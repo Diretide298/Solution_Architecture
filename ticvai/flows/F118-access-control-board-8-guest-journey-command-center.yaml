@@ -79,10 +79,11 @@ steps:
   screen: BO-219
   action: Works in Re-entry & Temporary Exit Journey
   operations:
-  - listEntryTemporaryExit
+  - listAdmissionRules
   outcome: Manage guests temporarily leaving and returning to the venue. The source matrix requires configurable
     re-entry and also describes a journey using a designated re-entry gate with both ticket verification
     and a UV stamp.
+  note: '**Repointed 2 October (CHG-WIR-001).** Re-entry is a block of the admission profile, read from listAdmissionRules; the separate re-entry rule list (listEntryTemporaryExit) was removed from BO-219.'
 - step: 11
   screen: BO-214
   action: Returns to the board's landing screen
@@ -135,7 +136,7 @@ steps:
   screen: BO-223
   action: Works in Journey Simulation, Audit & Publication
   operations:
-  - listJourneys
+  - listGuestJourney
   outcome: Test an entire guest journey—not merely an individual scan—before deploying it.
 branches:
 - at: 1

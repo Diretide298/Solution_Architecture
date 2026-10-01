@@ -40,9 +40,11 @@ steps:
   screen: ADM-140
   action: Works in Promotion Overview
   operations:
-  - listPromotions
+  - getPromotion
+  - getPromotionUsage
   outcome: Provide the complete business summary of one selected promotion without opening its detailed
     configuration.
+  note: '**Repointed 2 October (CHG-WIR-025).** The overview of one promotion reads that promotion and its usage, not the whole list.'
 - step: 5
   screen: ADM-138
   action: Returns to the board's landing screen

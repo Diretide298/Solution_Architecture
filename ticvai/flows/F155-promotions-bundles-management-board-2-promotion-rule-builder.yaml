@@ -128,10 +128,11 @@ steps:
   screen: ADM-157
   action: Works in Rule Test, Simulation & AI Recommendation Workspace
   operations:
-  - setRuleTestRecommendation
+  - evaluatePromotions
   outcome: Allow administrators to test promotional rules before activating them. This is critical because
     the matrix requires simulation of redemption, discount exposure, revenue impact, margin impact and
     financial performance before activation.
+  note: 'Repointed 2 October (CHG-WIR-025): ADM-157 tests rules with evaluatePromotions (and simulatePromotion on history) instead of setRuleTestRecommendation, a PUT for a test that took its inputs as strings (design-notes correction ticketing-backoffice ADM-157).'
 branches:
 - at: 1
   condition: Nothing has been set up on Promotion Rule Builder yet

@@ -38,8 +38,8 @@ steps:
   action: The session opens with its cross-tenant reach.
   operations:
   - getCurrentSession
-  - listActiveSessions
   outcome: The operator sees their session and every other active one they may end.
+  note: '**Repointed 2 October (CHG-WIR-021).** A sign-in door shows no active-session table; session management belongs to a signed-in security screen.'
 - step: 4
   screen: PTR-001
   action: A partner user signs in through the same door.

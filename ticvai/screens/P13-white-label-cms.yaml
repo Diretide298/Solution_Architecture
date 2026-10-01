@@ -163,8 +163,6 @@ screens:
     - to: CMS-003
       trigger: Typography
       provenance: flow F102 step 1→2
-      carries:
-      - version
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **The
@@ -591,11 +589,6 @@ screens:
     - to: CMS-006
       trigger: Component Preview
       provenance: flow F102 step 2→3
-      carries:
-      - bannerId
-      - pageId
-      - policyKind
-      - version
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37
@@ -626,21 +619,6 @@ screens:
         - FontConfig.changeScope
         operation: getFonts
         provenance: contract white-label.yaml GET /tenant-config/fonts
-      - kind: detailPanel
-        label: The theme
-        bindsTo: Theme
-        columns:
-        - Theme.primaryColour
-        - Theme.secondaryColour
-        - Theme.accentColour
-        - Theme.backgroundColour
-        - Theme.textColour
-        - Theme.darkMode
-        - Theme.cornerRadius
-        - Theme.surfaceStyle
-        - Theme.buttonStyle
-        operation: getTheme
-        provenance: contract white-label.yaml GET /tenant-config/theme
     - name: actionBar
       slot: rowActions
       components:
@@ -648,10 +626,6 @@ screens:
         label: Save fonts
         operation: setFonts
         provenance: contract white-label.yaml PUT /tenant-config/fonts
-      - kind: secondaryButton
-        label: Save theme
-        operation: setTheme
-        provenance: contract white-label.yaml PUT /tenant-config/theme
   states:
     loading: The typography, read by `getFonts`.
     error: Could not load. Names which read failed and leaves the typography untouched.
@@ -665,28 +639,11 @@ screens:
     contract: white-label
     purpose: Read font configuration
     trigger: onLoad
-  - operationId: getTheme
-    contract: white-label
-    purpose: Read colour theme
-    trigger: onLoad
   - operationId: setFonts
     contract: white-label
     purpose: Set fonts
     trigger: onAction
-  - operationId: setTheme
-    contract: white-label
-    purpose: Set colour theme
-    trigger: onAction
   entryState:
-    params:
-    - name: bannerId
-      from: deepLink
-    - name: pageId
-      from: deepLink
-    - name: policyKind
-      from: deepLink
-    - name: version
-      from: deepLink
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
       are for.** The screen opens the requested version read-only, says it is not current, and links to
       the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
@@ -719,30 +676,21 @@ screens:
       - customFontAssetRefs
       - changeScope
     provenance: contract white-label.yaml PUT /tenant-config/fonts
-  - id: formSetTheme
-    component: modal
-    trigger: Save theme
-    body: '**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`,
-      `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle`
-      (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided
-      29 September, rev 3 CFG-3). Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: Theme
-    confirm:
-      label: Save theme
-      operation: setTheme
-    dismiss:
-      label: Cancel
-      discards:
-      - primaryColour
-      - secondaryColour
-      - backgroundColour
-      - textColour
-      - accentColour
-      - darkMode
-      - cornerRadius
-      - surfaceStyle
-      - buttonStyle
-    provenance: contract white-label.yaml PUT /tenant-config/theme
+  gaps:
+  - operation: getTheme
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-015): Typography also read and saved the Theme (getTheme, setTheme);
+      the theme belongs to CMS-005, and two save points for one record drift. The entry parameters bannerId,
+      pageId, policyKind and version were left from the 41-operation bulk attach (design-notes corrections
+      white-label CMS-003).'
+    source: screens/P13-white-label-cms.yaml#CMS-005
+  - operation: setTheme
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-015): Typography also read and saved the Theme (getTheme, setTheme);
+      the theme belongs to CMS-005, and two save points for one record drift. The entry parameters bannerId,
+      pageId, policyKind and version were left from the 41-operation bulk attach (design-notes corrections
+      white-label CMS-003).'
+    source: screens/P13-white-label-cms.yaml#CMS-005
 - id: CMS-004
   name: Logo & Assets
   module: White Label
@@ -1094,11 +1042,6 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      carries:
-      - bannerId
-      - pageId
-      - policyKind
-      - version
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-006 holds bannerId, pageId, policyKind, version, so an edge into it carries them
     - to: ADM-016
@@ -1106,11 +1049,6 @@ screens:
       provenance: flow F102 step 3→4
       crossesDevice: true
       back: false
-      carries:
-      - bannerId
-      - pageId
-      - policyKind
-      - version
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **36
@@ -1129,46 +1067,29 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every config version
-        bindsTo: ConfigVersion
-        columns:
-        - ConfigVersion.publishedAt
-        - ConfigVersion.publishedByPrincipalId
-        - ConfigVersion.publishedByName
-        - ConfigVersion.note
-        - ConfigVersion.isCurrent
-        - ConfigVersion.scheduledFor
-        - ConfigVersion.contentHash
-        - ConfigVersion.pendingBuildTimeChanges
-        - ConfigVersion.scopePath
-        operation: listConfigVersions
-        provenance: contract white-label.yaml GET /tenant-config/versions
-      - kind: publishGate
-        impliedBy: publishTenantConfig
-        notes: 'Declares `publishTenantConfig`. **The gate names what the publish will affect before it
-          happens** — a disabled Publish with no reason is the state operators escalate.
-
-          '
-        provenance: carried from the previous definition
+      - kind: detailPanel
+        label: Theme
+        bindsTo: Theme
+        operation: getTheme
+        provenance: contract white-label.yaml GET /tenant-config/theme; wiring fix, 2 October 2026
+      - kind: detailPanel
+        label: Fonts
+        bindsTo: FontConfig
+        operation: getFonts
+        provenance: contract white-label.yaml GET /tenant-config/fonts; wiring fix, 2 October 2026
+      - kind: detailPanel
+        label: Brand
+        bindsTo: BrandIdentity
+        operation: getBrandIdentity
+        provenance: contract white-label.yaml GET /tenant-config/brand; wiring fix, 2 October 2026
+      - kind: detailPanel
+        label: Booking flow
+        bindsTo: BookingFlowConfig
+        operation: getBookingFlowConfig
+        provenance: contract white-label.yaml GET /tenant-config/booking-flow; wiring fix, 2 October 2026
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected config version
-        bindsTo: ConfigVersion
-        columns:
-        - ConfigVersion.publishedAt
-        - ConfigVersion.publishedByPrincipalId
-        - ConfigVersion.publishedByName
-        - ConfigVersion.note
-        - ConfigVersion.isCurrent
-        - ConfigVersion.scheduledFor
-        - ConfigVersion.contentHash
-        - ConfigVersion.pendingBuildTimeChanges
-        - ConfigVersion.scopePath
-        operation: listConfigVersions
-        provenance: contract white-label.yaml GET /tenant-config/versions
+      components: []
     - name: actionBar
       slot: rowActions
       components:
@@ -1176,18 +1097,6 @@ screens:
         label: Create preview
         operation: createPreview
         provenance: contract white-label.yaml POST /tenant-config/preview
-      - kind: secondaryButton
-        label: Diff config version
-        operation: diffConfigVersion
-        provenance: contract white-label.yaml GET /tenant-config/versions/{version}/diff
-      - kind: secondaryButton
-        label: Publish tenant config
-        operation: publishTenantConfig
-        provenance: contract white-label.yaml POST /tenant-config/publish
-      - kind: secondaryButton
-        label: Restore config version
-        operation: restoreConfigVersion
-        provenance: contract white-label.yaml POST /tenant-config/versions/{version}/restore
       - kind: publishGate
         label: What publishing changes
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
@@ -1197,48 +1106,37 @@ screens:
     loading: The component preview list.
     error: Could not load. Names which read failed and leaves the component preview untouched.
     emptyFirstRun: No component preview yet. Offers Create preview (`createPreview`).
-    emptyNoResults: 'Never shown: `listConfigVersions` takes no filter, so an empty list is always the
-      first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
+      the first-run state above.'
+    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
   apis:
   - operationId: createPreview
     contract: white-label
     purpose: Generate a preview link
     trigger: onAction
-    invalidates:
-    - listConfigVersions
-  - operationId: diffConfigVersion
+  - operationId: getTheme
     contract: white-label
-    purpose: Compare a version against the working draft
-    trigger: onAction
-  - operationId: listConfigVersions
-    contract: white-label
-    purpose: Version history
+    purpose: The theme being previewed
     trigger: onLoad
-  - operationId: publishTenantConfig
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-015)
+  - operationId: getFonts
     contract: white-label
-    purpose: Publish the working draft
-    trigger: onAction
-    invalidates:
-    - listConfigVersions
-  - operationId: restoreConfigVersion
+    purpose: The fonts being previewed
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-015)
+  - operationId: getBrandIdentity
     contract: white-label
-    purpose: Restore a previous version
-    trigger: onAction
-    invalidates:
-    - listConfigVersions
+    purpose: The marks being previewed
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-015)
+  - operationId: getBookingFlowConfig
+    contract: white-label
+    purpose: The booking presentation being previewed
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-015)
   entryState:
-    params:
-    - name: bannerId
-      from: deepLink
-    - name: pageId
-      from: deepLink
-    - name: policyKind
-      from: deepLink
-    - name: version
-      from: deepLink
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
       are for.** The screen opens the requested version read-only, says it is not current, and links to
       the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
@@ -1274,20 +1172,35 @@ screens:
       - language
       - expiresInHours
     provenance: contract white-label.yaml POST /tenant-config/preview
-  - id: formPublishTenantConfig
-    component: modal
-    trigger: Publish tenant config
-    body: '**Collects what `publishTenantConfig` sends before it is called.** Required: `note`. Optional:
-      `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Publish tenant config
-      operation: publishTenantConfig
-    dismiss:
-      label: Cancel
-      discards:
-      - note
-      - scheduledFor
-    provenance: contract white-label.yaml POST /tenant-config/publish
+  gaps:
+  - operation: diffConfigVersion
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-015): The screen was wired to the version table and publish
+      gate (listConfigVersions, diffConfigVersion, publishTenantConfig, restoreConfigVersion), which are
+      CMS-015 and CMS-014; Component Preview needs the theme, fonts, brand and booking-flow reads and
+      createPreview (design-notes correction white-label CMS-006).'
+    source: screens/P13-white-label-cms.yaml#CMS-015 | screens/P13-white-label-cms.yaml#CMS-014
+  - operation: listConfigVersions
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-015): The screen was wired to the version table and publish
+      gate (listConfigVersions, diffConfigVersion, publishTenantConfig, restoreConfigVersion), which are
+      CMS-015 and CMS-014; Component Preview needs the theme, fonts, brand and booking-flow reads and
+      createPreview (design-notes correction white-label CMS-006).'
+    source: screens/P13-white-label-cms.yaml#CMS-015 | screens/P13-white-label-cms.yaml#CMS-014
+  - operation: publishTenantConfig
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-015): The screen was wired to the version table and publish
+      gate (listConfigVersions, diffConfigVersion, publishTenantConfig, restoreConfigVersion), which are
+      CMS-015 and CMS-014; Component Preview needs the theme, fonts, brand and booking-flow reads and
+      createPreview (design-notes correction white-label CMS-006).'
+    source: screens/P13-white-label-cms.yaml#CMS-015 | screens/P13-white-label-cms.yaml#CMS-014
+  - operation: restoreConfigVersion
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-015): The screen was wired to the version table and publish
+      gate (listConfigVersions, diffConfigVersion, publishTenantConfig, restoreConfigVersion), which are
+      CMS-015 and CMS-014; Component Preview needs the theme, fonts, brand and booking-flow reads and
+      createPreview (design-notes correction white-label CMS-006).'
+    source: screens/P13-white-label-cms.yaml#CMS-015 | screens/P13-white-label-cms.yaml#CMS-014
 - id: CMS-007
   name: Page Builder
   module: White Label
@@ -1322,8 +1235,6 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      carries:
-      - pageId
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-007 holds pageId, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
@@ -1609,8 +1520,6 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      carries:
-      - bannerId
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-008 holds bannerId, so an edge into it carries them
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -1895,7 +1804,7 @@ screens:
 - id: CMS-009
   name: Navigation & Menus
   module: White Label
-  requiresModule: fnb
+  requiresModule: core
   wave: 2
   capability: C00
   implementation:
@@ -1942,46 +1851,10 @@ screens:
     regions:
     - name: contentBody
       slot: collection
-      components:
-      - kind: textField
-        label: Outlet id
-        operation: listMenus
-        notes: Sends `?outletId=` to `listMenus`.
-        provenance: contract fnb.yaml GET /menus
-      - kind: datePicker
-        label: Active at
-        operation: listMenus
-        notes: Sends `?activeAt=` to `listMenus`.
-        provenance: contract fnb.yaml GET /menus
-      - kind: dataTable
-        label: Every menu
-        bindsTo: Menu
-        columns:
-        - Menu.id
-        - Menu.code
-        - Menu.name
-        - Menu.outletId
-        - Menu.availability
-        - Menu.sections
-        - Menu.isActive
-        operation: listMenus
-        provenance: contract fnb.yaml GET /menus
+      components: []
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected menu
-        bindsTo: Menu
-        columns:
-        - Menu.id
-        - Menu.code
-        - Menu.name
-        - Menu.outletId
-        - Menu.availability
-        - Menu.sections
-        - Menu.isActive
-        operation: getMenu
-        provenance: contract fnb.yaml GET /menus/{menuId}
+      components: []
     - name: navigationEditor
       slot: selection
       components:
@@ -2005,59 +1878,21 @@ screens:
         label: Save navigation and tabs
         operation: setNavigation
         provenance: contract white-label.yaml PUT /tenant-config/navigation
-      - kind: primaryButton
-        label: Create menu
-        operation: createMenu
-        provenance: contract fnb.yaml POST /menus
-      - kind: secondaryButton
-        label: Save menu sections
-        operation: setMenuSections
-        provenance: contract fnb.yaml PUT /menus/{menuId}/sections
-      - kind: secondaryButton
-        label: Save menu
-        operation: updateMenu
-        provenance: contract fnb.yaml PATCH /menus/{menuId}
   states:
     loading: The navigation menus list.
     error: Could not load. Names which read failed and leaves the navigation menus untouched.
-    emptyFirstRun: No navigation menus yet. Offers Create menu (`createMenu`); distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No navigation menus yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on outletId, activeAt and the navigation menus are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that
-      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getNavigation` requires, and
+      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
   apis:
   - operationId: getNavigation
     contract: white-label
     purpose: The navigation and the mobile tab set (MOB-1)
     trigger: onLoad
-  - operationId: listMenus
-    contract: fnb
-    purpose: List menus
-    trigger: onLoad
-  - operationId: getMenu
-    contract: fnb
-    purpose: Read a menu with sections and items
-    trigger: onAction
-  - operationId: createMenu
-    contract: fnb
-    purpose: Create a menu
-    trigger: onAction
-    invalidates:
-    - listMenus
-  - operationId: setMenuSections
-    contract: fnb
-    purpose: Set menu sections and their item ordering
-    trigger: onAction
-    invalidates:
-    - listMenus
-  - operationId: updateMenu
-    contract: fnb
-    purpose: Amend a menu
-    trigger: onAction
-    invalidates:
-    - listMenus
   - operationId: setNavigation
     contract: white-label
     purpose: Save the navigation, the mobile tabs and the Buy tickets button (MOB-1, MOB-2)
@@ -2066,9 +1901,6 @@ screens:
     - getNavigation
     provenance: decided 29 September, VM close-out (venue management and configuration)
   entryState:
-    params:
-    - name: menuId
-      from: deepLink
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -2105,51 +1937,42 @@ screens:
       - items
       - buyButton
     provenance: contract white-label.yaml PUT /tenant-config/navigation
-  - id: formCreateMenu
-    component: modal
-    trigger: Create menu
-    body: '**Collects what `createMenu` sends before it is called.** Required: `code`, `name`, `outletId`.
-      Optional: `availability`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateMenuRequest
-    confirm:
-      label: Create menu
-      operation: createMenu
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-      - name
-      - outletId
-      - availability
-    provenance: contract fnb.yaml POST /menus
-  - id: formSetMenuSections
-    component: modal
-    trigger: Save menu sections
-    body: '**Collects what `setMenuSections` sends before it is called.** Required: `sections`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save menu sections
-      operation: setMenuSections
-    dismiss:
-      label: Cancel
-      discards:
-      - sections
-    provenance: contract fnb.yaml PUT /menus/{menuId}/sections
-  - id: formUpdateMenu
-    component: modal
-    trigger: Save menu
-    body: '**Collects what `updateMenu` sends before it is called.** Nothing in the body is required.
-      Optional: `name`, `availability`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save menu
-      operation: updateMenu
-    dismiss:
-      label: Cancel
-      discards:
-      - name
-      - availability
-      - isActive
-    provenance: contract fnb.yaml PATCH /menus/{menuId}
+  gaps:
+  - operation: createMenu
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): "Navigation & Menus" means site navigation menus; the
+      F&B menu operations (listMenus, getMenu, createMenu, setMenuSections, updateMenu) were attached
+      by name resemblance and belong to BO-045 and BO-109. Every tenant needs navigation, so the screen
+      requires core (R254; design-notes corrections fnb-retail CMS-009, white-label CMS-102).'
+    source: screens/P13-white-label-cms.yaml#CMS-009 | R254
+  - operation: getMenu
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): "Navigation & Menus" means site navigation menus; the
+      F&B menu operations (listMenus, getMenu, createMenu, setMenuSections, updateMenu) were attached
+      by name resemblance and belong to BO-045 and BO-109. Every tenant needs navigation, so the screen
+      requires core (R254; design-notes corrections fnb-retail CMS-009, white-label CMS-102).'
+    source: screens/P13-white-label-cms.yaml#CMS-009 | R254
+  - operation: listMenus
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): "Navigation & Menus" means site navigation menus; the
+      F&B menu operations (listMenus, getMenu, createMenu, setMenuSections, updateMenu) were attached
+      by name resemblance and belong to BO-045 and BO-109. Every tenant needs navigation, so the screen
+      requires core (R254; design-notes corrections fnb-retail CMS-009, white-label CMS-102).'
+    source: screens/P13-white-label-cms.yaml#CMS-009 | R254
+  - operation: setMenuSections
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): "Navigation & Menus" means site navigation menus; the
+      F&B menu operations (listMenus, getMenu, createMenu, setMenuSections, updateMenu) were attached
+      by name resemblance and belong to BO-045 and BO-109. Every tenant needs navigation, so the screen
+      requires core (R254; design-notes corrections fnb-retail CMS-009, white-label CMS-102).'
+    source: screens/P13-white-label-cms.yaml#CMS-009 | R254
+  - operation: updateMenu
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): "Navigation & Menus" means site navigation menus; the
+      F&B menu operations (listMenus, getMenu, createMenu, setMenuSections, updateMenu) were attached
+      by name resemblance and belong to BO-045 and BO-109. Every tenant needs navigation, so the screen
+      requires core (R254; design-notes corrections fnb-retail CMS-009, white-label CMS-102).'
+    source: screens/P13-white-label-cms.yaml#CMS-009 | R254
 - id: CMS-010
   name: Media Library
   module: White Label
@@ -2349,26 +2172,9 @@ screens:
         - MediaAssetDetail.venueId
         operation: getMediaAsset
         provenance: contract assets.yaml GET /media/{mediaId}
-      - kind: detailPanel
-        label: The media entitlements
-        bindsTo: MediaEntitlements
-        columns:
-        - MediaEntitlements.mediaCode
-        - MediaEntitlements.mediaKind
-        - MediaEntitlements.subjectId
-        - MediaEntitlements.isValid
-        - MediaEntitlements.invalidReason
-        - MediaEntitlements.canAcceptMore
-        - MediaEntitlements.entitlements
-        operation: getMediaEntitlements
-        provenance: contract orders.yaml GET /media/{mediaCode}/entitlements
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Append entitlement to media
-        operation: appendEntitlementToMedia
-        provenance: contract orders.yaml POST /media/{mediaCode}/entitlements
       - kind: secondaryButton
         label: Complete upload
         operation: completeUpload
@@ -2433,25 +2239,6 @@ screens:
       label: Release
       operation: updateMediaAsset
     provenance: contract assets.yaml PATCH /media/{mediaId}
-  - id: formAppendEntitlementToMedia
-    component: modal
-    trigger: Append entitlement to media
-    body: '**Collects what `appendEntitlementToMedia` sends before it is called.** Required: `id`, `lines`,
-      `recordedAt`. Optional: `paymentMethod`, `note`. Dismissing sends nothing; the screen behind is
-      unchanged.'
-    bindsTo: AppendEntitlementRequest
-    confirm:
-      label: Append entitlement to media
-      operation: appendEntitlementToMedia
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - lines
-      - recordedAt
-      - paymentMethod
-      - note
-    provenance: contract orders.yaml POST /media/{mediaCode}/entitlements
   - id: formCompleteUpload
     component: modal
     trigger: Complete upload
@@ -2543,24 +2330,14 @@ screens:
       that matched nothing.
     emptyNoResults: Nothing matches the filter on kind, tag, collectionId, venueId, search, unusedOnly
       and the media are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and
+    emptyNoAccess: Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `searchMedia` requires, and
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
   apis:
-  - operationId: getMediaEntitlements
-    contract: orders
-    purpose: What is already on this media
-    trigger: onAction
   - operationId: searchMedia
     contract: assets
     purpose: Search the asset library
     trigger: onLoad
-  - operationId: appendEntitlementToMedia
-    contract: orders
-    purpose: Add something to a ticket the guest already holds
-    trigger: onAction
-    invalidates:
-    - searchMedia
   - operationId: completeUpload
     contract: assets
     purpose: Confirm an upload and create the asset
@@ -2616,8 +2393,6 @@ screens:
     provenance: build, 29 September 2026
   entryState:
     params:
-    - name: mediaCode
-      from: deepLink
     - name: mediaId
       from: deepLink
     - name: uploadId
@@ -2640,6 +2415,19 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: appendEntitlementToMedia
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): getMediaEntitlements and appendEntitlementToMedia (orders)
+      operate on ticket media, a wristband or card carrying entitlements, not on digital assets; the word
+      "media" collided (design-notes correction platform-foundation CMS-010).'
+    source: contracts/spine/orders.yaml#appendEntitlementToMedia
+  - operation: getMediaEntitlements
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): getMediaEntitlements and appendEntitlementToMedia (orders)
+      operate on ticket media, a wristband or card carrying entitlements, not on digital assets; the word
+      "media" collided (design-notes correction platform-foundation CMS-010).'
+    source: contracts/spine/orders.yaml#appendEntitlementToMedia
 - id: CMS-013
   name: SEO & Metadata
   module: White Label
@@ -2750,6 +2538,11 @@ screens:
         label: scopePath
         bindsTo: SeoMetadata.scopePath
         provenance: contract marketing-crm.yaml PUT /seo-metadata
+      - kind: detailPanel
+        label: Metadata in force
+        bindsTo: SeoMetadata
+        operation: getSeoMetadata
+        provenance: contract marketing-crm.yaml GET /seo-metadata; wiring fix, 2 October 2026
     - name: actionBar
       slot: publish
       components:
@@ -2757,6 +2550,10 @@ screens:
         label: Save SEO metadata
         operation: setSeoMetadata
         provenance: contract marketing-crm.yaml PUT /seo-metadata
+      - kind: secondaryButton
+        label: Add redirect
+        operation: createUrlRedirect
+        provenance: contract marketing-crm.yaml POST /seo-redirects; wiring fix, 2 October 2026
   states:
     loading: Detail loads
     error: Could not load
@@ -2769,6 +2566,16 @@ screens:
     contract: marketing-crm
     purpose: Title, description and share image
     trigger: onAction
+  - operationId: getSeoMetadata
+    contract: marketing-crm
+    purpose: The metadata in force for this page
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: createUrlRedirect
+    contract: marketing-crm
+    purpose: Redirect the old address when the slug changes
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   wireframe:
     status: notStarted
     provenance: generated
@@ -2776,6 +2583,19 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formCreateUrlRedirect
+    component: modal
+    trigger: Add redirect
+    body: '**Collects what `createUrlRedirect` sends before it is called.** Dismissing sends nothing;
+      the screen behind is unchanged.'
+    confirm:
+      label: Add redirect
+      operation: createUrlRedirect
+    dismiss:
+      label: Cancel
+    provenance: contract marketing-crm.yaml POST /seo-redirects; wiring fix, 2 October 2026
+  entryState: {}
 - id: CMS-011
   name: Translations
   module: White Label
@@ -2844,6 +2664,11 @@ screens:
         operation: setLanguages
         notes: Required.
         provenance: contract white-label.yaml PUT /tenant-config/languages
+      - kind: detailPanel
+        label: Languages
+        bindsTo: TenantConfig
+        operation: getTenantConfig
+        provenance: contract white-label.yaml GET /tenant-config; wiring fix, 2 October 2026
   states:
     loading: The saved translations.
     error: Could not load. Names which read failed and leaves the translations untouched.
@@ -2857,6 +2682,11 @@ screens:
     contract: white-label
     purpose: Set enabled languages and default
     trigger: onAction
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Languages and translation gaps
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-015)
   wireframe:
     status: notStarted
     provenance: generated
@@ -2864,6 +2694,18 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  entryState: {}
+  gaps:
+  - operation: proposeTranslations
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-015): proposeTranslations answers 202 and nothing on the screen
+      can follow the job (R288); the machine-translation step stays on BO-785 and BO-793 until a status
+      read exists (logged as a contract gap).'
+    source: contracts/satellite/ai.yaml#proposeTranslations | R288
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-017): No read follows a proposeTranslations job,
+      so the CMS cannot offer machine translation.'
+    source: contracts/satellite/ai.yaml#proposeTranslations | DI-081
 - id: CMS-012
   name: RTL Preview
   module: White Label
@@ -2898,8 +2740,6 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      carries:
-      - version
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-012 holds version, so an edge into it carries them
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -3002,8 +2842,6 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      carries:
-      - version
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-014 holds version, so an edge into it carries them
     - to: CMS-103
@@ -3069,6 +2907,12 @@ screens:
 
           '
         provenance: carried from the previous definition
+      - kind: detailPanel
+        label: Review changes
+        bindsTo: ConfigDiff
+        operation: diffConfigVersion
+        provenance: contract white-label.yaml GET /tenant-config/versions/{version}/diff; wiring fix,
+          2 October 2026
     - name: actionBar
       slot: rowActions
       components:
@@ -3085,6 +2929,10 @@ screens:
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
           one somebody presses meaning to save.'
         provenance: authored — required by check-screens
+      - kind: secondaryButton
+        label: Preview
+        operation: createPreview
+        provenance: contract white-label.yaml POST /tenant-config/preview; wiring fix, 2 October 2026
   states:
     loading: The publishing workflow, read by `getTenantAppStatus`.
     error: Could not load. Names which read failed and leaves the publishing workflow untouched.
@@ -3110,6 +2958,16 @@ screens:
     contract: white-label
     purpose: The venue's flows and whether each is valid, for the gate (W12)
     trigger: onLoad
+  - operationId: diffConfigVersion
+    contract: white-label
+    purpose: What changes against the live version
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-015)
+  - operationId: createPreview
+    contract: white-label
+    purpose: Preview the draft before publishing
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-015)
   wireframe:
     status: notStarted
     provenance: generated
@@ -3132,10 +2990,28 @@ screens:
       - note
       - scheduledFor
     provenance: contract white-label.yaml POST /tenant-config/publish
+  - id: formCreatePreview
+    component: modal
+    trigger: Preview
+    body: '**Collects what `createPreview` sends before it is called.** Dismissing sends nothing; the
+      screen behind is unchanged.'
+    confirm:
+      label: Preview
+      operation: createPreview
+    dismiss:
+      label: Cancel
+    provenance: contract white-label.yaml POST /tenant-config/preview; wiring fix, 2 October 2026
   entryState:
     params:
     - name: venueId
       from: session
+    - name: version
+      from: navigation
+  gaps:
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-017): getTenantAppStatus and getPublishedBookingFlow
+      need the staff audience for the CMS (CMS-001, CMS-014, CMS-102, CMS-103).'
+    source: contracts/satellite/white-label.yaml#getTenantAppStatus
 - id: CMS-015
   name: Version History
   module: White Label
@@ -3170,8 +3046,6 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      carries:
-      - version
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-015 holds version, so an edge into it carries them
     - to: CMS-014
@@ -3352,8 +3226,6 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      carries:
-      - version
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-016 holds version, so an edge into it carries them
     - to: CMS-017
@@ -3774,9 +3646,6 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      carries:
-      - policyKind
-      - version
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-018 holds policyKind, version, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
@@ -4176,6 +4045,12 @@ screens:
         - Principal.lastLoginAt
         operation: listPrincipals
         provenance: contract identity.yaml GET /principals
+    - name: actionBar
+      components:
+      - kind: secondaryButton
+        label: Change access
+        operation: updatePrincipal
+        provenance: contract identity.yaml PATCH /principals/{principalId}; wiring fix, 2 October 2026
   states:
     loading: The user access list.
     error: Could not load. Names which read failed and leaves the user access untouched.
@@ -4195,6 +4070,11 @@ screens:
     contract: identity
     purpose: List roles
     trigger: onLoad
+  - operationId: updatePrincipal
+    contract: identity
+    purpose: Grant or remove a CMS role for the selected person
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-021)
   entryState:
     preloaded:
     - Principal.id
@@ -4209,6 +4089,18 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formUpdatePrincipal
+    component: modal
+    trigger: Change access
+    body: '**Collects what `updatePrincipal` sends before it is called.** Dismissing sends nothing; the
+      screen behind is unchanged.'
+    confirm:
+      label: Change access
+      operation: updatePrincipal
+    dismiss:
+      label: Cancel
+    provenance: contract identity.yaml PATCH /principals/{principalId}; wiring fix, 2 October 2026
 - id: CMS-021
   name: Privacy & Consent Configuration Command Center
   module: Policy
@@ -4299,6 +4191,12 @@ screens:
       Test Configuration, Submit for Approval. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Quick Actions
+  - operation: listCustomerPrivacyConsent
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): listCustomerPrivacyConsent is one guest''s privacy 360,
+      which is CMS-032''s; a configuration command centre shows counts (design-notes correction customer-marketing
+      CMS-021).'
+    source: screens/P13-white-label-cms.yaml#CMS-021 | contracts/satellite/marketing-crm.yaml#listCustomerPrivacyConsent
   layout:
     template: form
     regions:
@@ -4398,8 +4296,8 @@ screens:
   states:
     loading: The privacy consent configuration as saved.
     error: Could not load. Names which read failed and leaves the privacy consent untouched.
-    emptyFirstRun: No privacy consent configured yet. Carries the create action and says what the platform
-      does in the meantime.
+    emptyFirstRun: No privacy consent configured yet. Offers no create action — this screen declares no
+      operation that makes one and says what the platform does in the meantime.
     emptyNoResults: The filter narrowed it and the privacy consent are still there. Names the active filter
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -4408,10 +4306,6 @@ screens:
   - operationId: listPrivacyConsent
     contract: marketing-crm
     purpose: Privacy & Consent Configuration Command Center
-    trigger: onLoad
-  - operationId: listCustomerPrivacyConsent
-    contract: marketing-crm
-    purpose: Customer Privacy, Consent & Preference 360°
     trigger: onLoad
   wireframe:
     status: notStarted
@@ -4483,6 +4377,12 @@ screens:
         impliedBy: listDataProcessingPurpose
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      components:
+      - kind: secondaryButton
+        label: Save purpose
+        operation: setDataProcessingPurpose
+        provenance: contract marketing-crm.yaml PUT /data-processing-purpose; wiring fix, 2 October 2026
   states:
     loading: The data processing purpose list.
     error: Could not load. Names which read failed and leaves the data processing purpose untouched.
@@ -4497,6 +4397,11 @@ screens:
     contract: marketing-crm
     purpose: Data Processing Purpose & Lawful Basis Registry
     trigger: onLoad
+  - operationId: setDataProcessingPurpose
+    contract: marketing-crm
+    purpose: Create or change a processing purpose
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   entryState:
     preloaded:
     - DataProcessingPurposeLawfulBasisRegistryView.purposeId
@@ -4513,6 +4418,18 @@ screens:
     5. 0 of 0 labels bound to a contract property; 0 of 54 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetDataProcessingPurpose
+    component: modal
+    trigger: Save purpose
+    body: '**Collects what `setDataProcessingPurpose` sends before it is called.** Dismissing sends nothing;
+      the screen behind is unchanged.'
+    confirm:
+      label: Save purpose
+      operation: setDataProcessingPurpose
+    dismiss:
+      label: Cancel
+    provenance: contract marketing-crm.yaml PUT /data-processing-purpose; wiring fix, 2 October 2026
 - id: CMS-023
   name: Consent Purpose & Consent Type Builder
   module: Policy
@@ -6285,6 +6202,10 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Privacy__Consent___Preference_Management_Reference.pdf, page 29
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation performs or approves deletion,
+      pseudonymisation, restriction or biometric removal.'
+    source: contracts/satellite/marketing-crm.yaml#listDeletionAnonymizationRestriction
   layout:
     template: split
     regions:
@@ -6441,6 +6362,14 @@ screens:
       - kind: secondaryButton
         label: Release Hold
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support
+      - kind: secondaryButton
+        label: Run retention
+        operation: runDataRetention
+        provenance: contract marketing-crm.yaml POST /retention-runs; wiring fix, 2 October 2026
+      - kind: secondaryButton
+        label: Place or release hold
+        operation: setLegalHold
+        provenance: contract marketing-crm.yaml PUT /data-retention-expiry; wiring fix, 2 October 2026
   overlays:
   - id: confirmDelete
     component: confirmDialog
@@ -6456,6 +6385,28 @@ screens:
       and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog
       states that it is recorded.'
     provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support
+  - id: formRunDataRetention
+    component: modal
+    trigger: Run retention
+    body: '**Collects what `runDataRetention` sends before it is called.** Dismissing sends nothing; the
+      screen behind is unchanged.'
+    confirm:
+      label: Run retention
+      operation: runDataRetention
+    dismiss:
+      label: Cancel
+    provenance: contract marketing-crm.yaml POST /retention-runs; wiring fix, 2 October 2026
+  - id: formSetLegalHold
+    component: modal
+    trigger: Place or release hold
+    body: '**Collects what `setLegalHold` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Place or release hold
+      operation: setLegalHold
+    dismiss:
+      label: Cancel
+    provenance: contract marketing-crm.yaml PUT /data-retention-expiry; wiring fix, 2 October 2026
   states:
     loading: The data retention expiry list.
     error: Could not load. Names which read failed and leaves the data retention expiry untouched.
@@ -6470,6 +6421,16 @@ screens:
     contract: marketing-crm
     purpose: Data Retention, Expiry & Legal Hold Operations
     trigger: onLoad
+  - operationId: runDataRetention
+    contract: marketing-crm
+    purpose: Preview or execute a retention pass
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: setLegalHold
+    contract: marketing-crm
+    purpose: Place
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   entryState:
     preloaded:
     - DataRetentionExpiryLegalHoldOperationsView.recordsApproachingExpiry
@@ -6550,6 +6511,11 @@ screens:
         bindsTo: PrivacyComplianceExceptionInvestigationWorkspaceView
         operation: setPrivacyComplianceException
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Display
+      - kind: dataTable
+        label: Privacy exceptions
+        operation: listPrivacyComplianceExceptions
+        provenance: contract marketing-crm.yaml GET /privacy-compliance-exception; wiring fix, 2 October
+          2026
     - name: contextPanel
       slot: selection
       components:
@@ -6599,6 +6565,11 @@ screens:
     contract: marketing-crm
     purpose: Privacy Compliance, Exception & Investigation Workspace
     trigger: onAction
+  - operationId: listPrivacyComplianceExceptions
+    contract: marketing-crm
+    purpose: The privacy exception queue
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   entryState:
     preloaded:
     - PrivacyComplianceExceptionInvestigationWorkspaceView.severity
@@ -7260,12 +7231,17 @@ screens:
       - kind: primaryButton
         label: Create New
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 8 §Allow
+        operation: createForm
       - kind: secondaryButton
         label: Duplicate Existing
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 8 §Allow
       - kind: secondaryButton
         label: Create From Approved Corporate Template
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 8 §Allow
+      - kind: secondaryButton
+        label: Create waiver form
+        operation: createForm
+        provenance: contract marketing-crm.yaml POST /forms; wiring fix, 2 October 2026
   states:
     loading: The waiver template master configuration as saved.
     error: Could not load. Names which read failed and leaves the waiver template master untouched.
@@ -7278,6 +7254,11 @@ screens:
     contract: marketing-crm
     purpose: Waiver Template Library & Master Setup
     trigger: onLoad
+  - operationId: createForm
+    contract: marketing-crm
+    purpose: Create the master definition of a waiver form
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   wireframe:
     status: notStarted
     provenance: generated
@@ -7287,6 +7268,19 @@ screens:
     page 8. 0 of 0 labels bound to a contract property; 14 of 27 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: formCreateForm
+    component: modal
+    trigger: Create waiver form
+    body: '**Collects what `createForm` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Create waiver form
+      operation: createForm
+    dismiss:
+      label: Cancel
+    provenance: contract marketing-crm.yaml POST /forms; wiring fix, 2 October 2026
+  entryState: {}
 - id: CMS-043
   name: Digital Waiver & Form Builder
   module: Policy
@@ -7425,6 +7419,10 @@ screens:
       Select, Customer Lookup. Each needs an operation, or needs removing from the screen; this is the
       Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 11 §Support
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-007): No write saves a waiver''s dynamic fields,
+      questions and conditional logic.'
+    source: contracts/satellite/marketing-crm.yaml#listDynamicFieldQuestion
   layout:
     template: form
     regions:
@@ -7704,6 +7702,10 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 14
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-007): No write creates or changes a waiver''s
+      product, event and experience associations.'
+    source: contracts/satellite/marketing-crm.yaml#listProductEventExperience
   layout:
     template: split
     regions:
@@ -7886,6 +7888,11 @@ screens:
     page 16. 0 of 0 labels bound to a contract property; 15 of 46 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  gaps:
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-007): No write saves waiver trigger, eligibility
+      and completion rules.'
+    source: contracts/satellite/marketing-crm.yaml#listWaiverTriggerEligibility
 - id: CMS-048
   name: Versioning, Effective Dates & Legal Change Control
   module: Policy
@@ -8046,6 +8053,12 @@ screens:
         operation: setLocalizationBrandingCustomer
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 19 §Each version
           should show
+      - kind: detailPanel
+        label: Current configuration
+        bindsTo: LocalizationBrandingCustomerExperienceConfigurationView
+        operation: getLocalizationBrandingCustomer
+        provenance: contract marketing-crm.yaml GET /localization-branding-customer; wiring fix, 2 October
+          2026
     - name: contextPanel
       slot: selection
       components:
@@ -8082,6 +8095,11 @@ screens:
     contract: marketing-crm
     purpose: Localization, Branding & Customer Experience Configuration
     trigger: onAction
+  - operationId: getLocalizationBrandingCustomer
+    contract: marketing-crm
+    purpose: The waiver version's languages
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   entryState:
     preloaded:
     - LocalizationBrandingCustomerExperienceConfigurationView.sourceLanguage
@@ -8594,6 +8612,10 @@ screens:
       or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
       rather than the contract side.'
     source: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation sends or resends a waiver signing
+      link (email, SMS, WhatsApp, QR).'
+    source: contracts/satellite/marketing-crm.yaml#listDigitalSigningCollection
   layout:
     template: split
     regions:
@@ -8848,6 +8870,11 @@ screens:
         bindsTo: WaiverVerificationValidationWorkspaceView
         operation: setWaiverVerificationValidation
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 33 §Display
+      - kind: dataTable
+        label: Submissions to verify
+        operation: listWaiverVerificationQueue
+        provenance: contract marketing-crm.yaml GET /waiver-verification-validation; wiring fix, 2 October
+          2026
     - name: contextPanel
       slot: selection
       components:
@@ -8888,6 +8915,11 @@ screens:
     contract: marketing-crm
     purpose: Waiver Verification & Validation Workspace
     trigger: onAction
+  - operationId: listWaiverVerificationQueue
+    contract: marketing-crm
+    purpose: Waiver submissions awaiting or given verification
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   entryState:
     preloaded:
     - WaiverVerificationValidationWorkspaceView.submissionId
@@ -9102,6 +9134,11 @@ screens:
     page 36. 0 of 0 labels bound to a contract property; 7 of 40 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  gaps:
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-007): No write records an on-site waiver exception
+      with its reason.'
+    source: contracts/satellite/marketing-crm.yaml#listSiteWaiverException
 - id: CMS-058
   name: Compliance Evidence, Audit & Waiver Repository
   module: Policy
@@ -10702,6 +10739,12 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Digital Asset Management DAM.pdf, page 25 §Display
+  - operation: listAssets
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): The screen is about media files in the DAM (assets.yaml);
+      maintenance listAssets returns rides, turnstiles and pumps from the physical asset register (design-notes
+      correction venue-operations CMS-071).'
+    source: screens/P13-white-label-cms.yaml#CMS-071 | contracts/satellite/maintenance.yaml#listAssets
   layout:
     template: split
     regions:
@@ -10778,17 +10821,13 @@ screens:
   states:
     loading: The asset intelligence list.
     error: Could not load. Names which read failed and leaves the asset intelligence untouched.
-    emptyFirstRun: No asset intelligence yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No asset intelligence yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the asset intelligence are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAssets
-    contract: maintenance
-    purpose: List assets
-    trigger: onLoad
   - operationId: getMediaUsageAnalytics
     contract: assets
     purpose: What the library looks like to AI
@@ -14374,8 +14413,6 @@ screens:
       trigger: 5 Look and feel — fonts
       provenance: authored 29 September, W12
       back: true
-      carries:
-      - version
     - to: CMS-009
       trigger: 6 Mobile app — tabs and the Buy tickets button
       provenance: authored 29 September, MOB-1 and MOB-2
@@ -14392,8 +14429,6 @@ screens:
       trigger: 7 Preview
       provenance: authored 29 September, W12 (step 7 is CMS-006, CMS-012 and CMS-014)
       back: true
-      carries:
-      - version
     - to: CMS-012
       trigger: 7 Preview right to left
       provenance: authored 29 September, W12

@@ -41,7 +41,6 @@ steps:
   - fireCourse
   - holdCourse
   - prioritiseKitchenTicket
-  - setCourseRules
   outcome: '**Drawn by the client as FNB-3C.** 4 operations on this step.'
   crossesDevice: true
 - step: 4

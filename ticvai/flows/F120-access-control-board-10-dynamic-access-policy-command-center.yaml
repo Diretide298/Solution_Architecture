@@ -124,7 +124,7 @@ steps:
   screen: BO-243
   action: Works in Policy Approval, Audit, Analytics & AI Optimization
   operations:
-  - listPolicies
+  - listDynamicAccessPolicy
   outcome: Govern the complete policy lifecycle and continuously measure policy effectiveness.
 branches:
 - at: 1

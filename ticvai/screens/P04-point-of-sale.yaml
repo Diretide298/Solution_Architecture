@@ -327,12 +327,8 @@ screens:
       guard: sale.create
       carries:
       - shiftId
-      - operatorId
-      - operatorRole
       - openingFloat
       - workstationId
-      - outletId
-      - catalogueBundleVersion
       onFailure:
       - when: networkLost
         to: POS-001#offline
@@ -348,7 +344,6 @@ screens:
       carries:
       - shiftId
       - expectedCash
-      - cashMovements
       provenance: board TICVAI POS Terminal · goClose (4891); flow F32 step 6
     - to: POS-009
       trigger: Staff Roster
@@ -411,8 +406,6 @@ screens:
         shiftId, so an edge into it carries them
     - to: POS-019
       trigger: Shift Templates & Policies
-      carries:
-      - venueId
       provenance: derived — POS-019 declares entryState.params venueId and POS-001 holds venueId, so an
         edge into it carries them
     - to: POS-020
@@ -444,47 +437,92 @@ screens:
     why: '**`getWorkstationHealth` declares its response inline**, so the component that shows it names
       fields but binds to no schema. The contract should name the shape.'
     source: contract tenancy.yaml GET /workstations/{workstationId}/health
+  - operation: acceptShiftVariance
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Thirteen operations that belong to other screens were
+      bulk-attached to Begin Shift: closing and variance acceptance are POS-007, cash in/out POS-017,
+      safe drops POS-018, no-sale and suspend the till''s shift menu. Kept: openShift, getCurrentShift,
+      resumeShift, approveShiftOpen, listDenominations, getWorkstationHealth, selectRole (R254, R080;
+      design-notes correction fnb-retail POS-001).'
+    source: R254 | R080 | screens/P04-point-of-sale.yaml#POS-001
+  - operation: adjustDepositBoxFloat
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Thirteen operations that belong to other screens were
+      bulk-attached to Begin Shift: closing and variance acceptance are POS-007, cash in/out POS-017,
+      safe drops POS-018, no-sale and suspend the till''s shift menu. Kept: openShift, getCurrentShift,
+      resumeShift, approveShiftOpen, listDenominations, getWorkstationHealth, selectRole (R254, R080;
+      design-notes correction fnb-retail POS-001).'
+    source: R254 | R080 | screens/P04-point-of-sale.yaml#POS-001
+  - operation: closeShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Thirteen operations that belong to other screens were
+      bulk-attached to Begin Shift: closing and variance acceptance are POS-007, cash in/out POS-017,
+      safe drops POS-018, no-sale and suspend the till''s shift menu. Kept: openShift, getCurrentShift,
+      resumeShift, approveShiftOpen, listDenominations, getWorkstationHealth, selectRole (R254, R080;
+      design-notes correction fnb-retail POS-001).'
+    source: R254 | R080 | screens/P04-point-of-sale.yaml#POS-001
+  - operation: createCashMovement
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Thirteen operations that belong to other screens were
+      bulk-attached to Begin Shift: closing and variance acceptance are POS-007, cash in/out POS-017,
+      safe drops POS-018, no-sale and suspend the till''s shift menu. Kept: openShift, getCurrentShift,
+      resumeShift, approveShiftOpen, listDenominations, getWorkstationHealth, selectRole (R254, R080;
+      design-notes correction fnb-retail POS-001).'
+    source: R254 | R080 | screens/P04-point-of-sale.yaml#POS-001
+  - operation: getShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Thirteen operations that belong to other screens were
+      bulk-attached to Begin Shift: closing and variance acceptance are POS-007, cash in/out POS-017,
+      safe drops POS-018, no-sale and suspend the till''s shift menu. Kept: openShift, getCurrentShift,
+      resumeShift, approveShiftOpen, listDenominations, getWorkstationHealth, selectRole (R254, R080;
+      design-notes correction fnb-retail POS-001).'
+    source: R254 | R080 | screens/P04-point-of-sale.yaml#POS-001
+  - operation: listCashMovements
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Thirteen operations that belong to other screens were
+      bulk-attached to Begin Shift: closing and variance acceptance are POS-007, cash in/out POS-017,
+      safe drops POS-018, no-sale and suspend the till''s shift menu. Kept: openShift, getCurrentShift,
+      resumeShift, approveShiftOpen, listDenominations, getWorkstationHealth, selectRole (R254, R080;
+      design-notes correction fnb-retail POS-001).'
+    source: R254 | R080 | screens/P04-point-of-sale.yaml#POS-001
+  - operation: listShifts
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Thirteen operations that belong to other screens were
+      bulk-attached to Begin Shift: closing and variance acceptance are POS-007, cash in/out POS-017,
+      safe drops POS-018, no-sale and suspend the till''s shift menu. Kept: openShift, getCurrentShift,
+      resumeShift, approveShiftOpen, listDenominations, getWorkstationHealth, selectRole (R254, R080;
+      design-notes correction fnb-retail POS-001).'
+    source: R254 | R080 | screens/P04-point-of-sale.yaml#POS-001
+  - operation: recordNoSale
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Thirteen operations that belong to other screens were
+      bulk-attached to Begin Shift: closing and variance acceptance are POS-007, cash in/out POS-017,
+      safe drops POS-018, no-sale and suspend the till''s shift menu. Kept: openShift, getCurrentShift,
+      resumeShift, approveShiftOpen, listDenominations, getWorkstationHealth, selectRole (R254, R080;
+      design-notes correction fnb-retail POS-001).'
+    source: R254 | R080 | screens/P04-point-of-sale.yaml#POS-001
+  - operation: reopenShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Thirteen operations that belong to other screens were
+      bulk-attached to Begin Shift: closing and variance acceptance are POS-007, cash in/out POS-017,
+      safe drops POS-018, no-sale and suspend the till''s shift menu. Kept: openShift, getCurrentShift,
+      resumeShift, approveShiftOpen, listDenominations, getWorkstationHealth, selectRole (R254, R080;
+      design-notes correction fnb-retail POS-001).'
+    source: R254 | R080 | screens/P04-point-of-sale.yaml#POS-001
+  - operation: suspendShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Thirteen operations that belong to other screens were
+      bulk-attached to Begin Shift: closing and variance acceptance are POS-007, cash in/out POS-017,
+      safe drops POS-018, no-sale and suspend the till''s shift menu. Kept: openShift, getCurrentShift,
+      resumeShift, approveShiftOpen, listDenominations, getWorkstationHealth, selectRole (R254, R080;
+      design-notes correction fnb-retail POS-001).'
+    source: R254 | R080 | screens/P04-point-of-sale.yaml#POS-001
   layout:
     template: split
     regions:
     - name: contentBody
       slot: queue
       components:
-      - kind: dataTable
-        label: Waiting for a decision
-        bindsTo: CashMovement
-        columns:
-        - CashMovement.id
-        - CashMovement.kind
-        - CashMovement.amount
-        - CashMovement.denominations
-        - CashMovement.reference
-        - CashMovement.reason
-        - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
-        - CashMovement.syncedAt
-        operation: listCashMovements
-        provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
-      - kind: dataTable
-        label: Every shift
-        bindsTo: Shift
-        columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
-        - Shift.principalDisplayName
-        - Shift.incidents
-        - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
-        - Shift.depositBoxCode
-        - Shift.bagNumber
-        operation: listShifts
-        provenance: contract shift.yaml GET /shifts
       - kind: dataTable
         label: Every denomination
         bindsTo: Denomination
@@ -517,48 +555,6 @@ screens:
     - name: contextPanel
       slot: item
       components:
-      - kind: detailPanel
-        label: The selected cash movement
-        bindsTo: CashMovement
-        columns:
-        - CashMovement.id
-        - CashMovement.kind
-        - CashMovement.amount
-        - CashMovement.denominations
-        - CashMovement.reference
-        - CashMovement.reason
-        - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.depositBoxId
-        - CashMovement.witnessPrincipalId
-        - CashMovement.withdrawalReason
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
-        - CashMovement.syncedAt
-        operation: listCashMovements
-        provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
-      - kind: detailPanel
-        label: The shift
-        bindsTo: Shift
-        columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
-        - Shift.principalDisplayName
-        - Shift.incidents
-        - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
-        - Shift.depositBoxCode
-        - Shift.bagNumber
-        - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
-        operation: getShift
-        provenance: contract shift.yaml GET /shifts/{shiftId}
       - kind: detailPanel
         label: Workstation health
         operation: getWorkstationHealth
@@ -595,41 +591,13 @@ screens:
         operation: openShift
         provenance: contract shift.yaml POST /shifts
       - kind: secondaryButton
-        label: Accept shift variance
-        operation: acceptShiftVariance
-        provenance: contract shift.yaml POST /shifts/{shiftId}/accept-variance
-      - kind: secondaryButton
         label: Approve shift open
         operation: approveShiftOpen
         provenance: contract shift.yaml POST /shifts/{shiftId}/approve-open
-      - kind: destructiveButton
-        label: Close shift
-        operation: closeShift
-        provenance: contract shift.yaml POST /shifts/{shiftId}/close
-      - kind: secondaryButton
-        label: Create cash movement
-        operation: createCashMovement
-        provenance: contract shift.yaml POST /shifts/{shiftId}/cash-movements
-      - kind: secondaryButton
-        label: Record no sale
-        operation: recordNoSale
-        provenance: contract shift.yaml POST /shifts/{shiftId}/no-sale
-      - kind: secondaryButton
-        label: Reopen shift
-        operation: reopenShift
-        provenance: contract shift.yaml POST /shifts/{shiftId}/reopen
       - kind: secondaryButton
         label: Resume shift
         operation: resumeShift
         provenance: contract shift.yaml POST /shifts/{shiftId}/resume
-      - kind: destructiveButton
-        label: Suspend shift
-        operation: suspendShift
-        provenance: contract shift.yaml POST /shifts/{shiftId}/suspend
-      - kind: secondaryButton
-        label: Adjust deposit box float
-        operation: adjustDepositBoxFloat
-        provenance: contract shift.yaml POST /deposit-boxes/{boxId}/adjust-float
       - kind: secondaryButton
         label: Select role
         operation: selectRole
@@ -638,40 +606,6 @@ screens:
         label: Review & confirm
         provenance: carried from the previous definition
   overlays:
-  - id: confirmCloseShift
-    component: confirmDialog
-    trigger: Close shift
-    body: '**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than
-      the verb. A begin shift this affects should be identified in the dialog, not just counted. **Collects
-      what `closeShift` sends before it is called.** Required: `countedCash`, `recordedAt`. Optional:
-      `nonCashDeclared`, `notes`, `releaseHeldLeases`.'
-    provenance: client-verified
-    confirm:
-      label: Close the shift
-      operation: closeShift
-      carries: &id003
-      - shiftId
-      - countedFloat
-      - varianceReason
-    dismiss:
-      label: Not yet
-      discards: &id004 []
-    bindsTo: CloseShiftRequest
-  - id: confirmSuspendShift
-    component: confirmDialog
-    trigger: Suspend shift
-    body: '**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than
-      the verb. A begin shift this affects should be identified in the dialog, not just counted. **Collects
-      what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.'
-    provenance: client-verified
-    confirm:
-      label: Suspend
-      operation: suspendShift
-      carries: &id005
-      - shiftId
-    dismiss:
-      label: Cancel
-      discards: &id006 []
   - id: formOpenShift
     component: modal
     trigger: Open shift
@@ -691,19 +625,6 @@ screens:
       - bagNumber
       - recordedAt
     provenance: client-verified
-  - id: formAcceptShiftVariance
-    component: modal
-    trigger: Accept shift variance
-    body: '**Collects what `acceptShiftVariance` sends before it is called.** Required: `reason`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Accept shift variance
-      operation: acceptShiftVariance
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-    provenance: client-verified
   - id: formApproveShiftOpen
     component: modal
     trigger: Approve shift open
@@ -717,59 +638,6 @@ screens:
       discards:
       - reason
     provenance: client-verified
-  - id: formCreateCashMovement
-    component: modal
-    trigger: Create cash movement
-    body: '**Collects what `createCashMovement` sends before it is called.** Required: `id`, `kind`, `amount`,
-      `recordedAt`. Optional: `denominations`, `reference`, `reason`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: CreateCashMovementRequest
-    confirm:
-      label: Create cash movement
-      operation: createCashMovement
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - kind
-      - amount
-      - recordedAt
-      - denominations
-      - reference
-      - reason
-    provenance: client-verified
-  - id: formRecordNoSale
-    component: modal
-    trigger: Record no sale
-    body: '**Collects what `recordNoSale` sends before it is called.** Required: `id`, `reason`, `recordedAt`.
-      Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Record no sale
-      operation: recordNoSale
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - reason
-      - recordedAt
-      - note
-    provenance: client-verified
-  - id: formReopenShift
-    component: modal
-    trigger: Reopen shift
-    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `supervisorStepUp`
-      {`principalId`, `credential`}: the supervisor enters their staff PIN on this device, and may not
-      be the principal who closed the shift. Refused 403 `approver-is-closer` or `supervisor-step-up-refused`
-      (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Reopen shift
-      operation: reopenShift
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-      - supervisorStepUp
-    provenance: client-verified
   - id: formResumeShift
     component: modal
     trigger: Resume shift
@@ -782,20 +650,6 @@ screens:
       label: Cancel
       discards:
       - recordedAt
-    provenance: client-verified
-  - id: formAdjustDepositBoxFloat
-    component: modal
-    trigger: Adjust deposit box float
-    body: '**Collects what `adjustDepositBoxFloat` sends before it is called.** Required: `amount`, `reason`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Adjust deposit box float
-      operation: adjustDepositBoxFloat
-    dismiss:
-      label: Cancel
-      discards:
-      - amount
-      - reason
     provenance: client-verified
   - id: formSelectRole
     component: modal
@@ -815,8 +669,8 @@ screens:
     error: Could not load. Names which read failed and leaves the begin shift untouched.
     emptyFirstRun: '**Nothing is waiting, which is the good outcome.** An empty queue means every item
       has been decided; it offers no create action, because creating work is not what it needs.'
-    emptyNoResults: 'Never shown: `listCashMovements` takes no filter, so an empty list is always the
-      first-run state above.'
+    emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
+      the first-run state above.'
     emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
@@ -830,84 +684,22 @@ screens:
     contract: shift
     purpose: Open with the counted float
     trigger: onAction
-    invalidates:
-    - listCashMovements
   - operationId: getCurrentShift
     contract: shift
     purpose: Whether a shift is already open here
     trigger: onLoad
-  - operationId: acceptShiftVariance
-    contract: shift
-    purpose: Accept an over/short beyond the threshold
-    trigger: onAction
-    invalidates:
-    - listCashMovements
   - operationId: approveShiftOpen
     contract: shift
     purpose: Approve a shift opening outside tolerance
     trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: closeShift
-    contract: shift
-    purpose: Blind close-out
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: createCashMovement
-    contract: shift
-    purpose: Record a cash lift or add
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: getShift
-    contract: shift
-    purpose: Read a shift
-    trigger: onAction
-  - operationId: listCashMovements
-    contract: shift
-    purpose: Lifts, adds and the opening float
-    trigger: onAction
-  - operationId: listShifts
-    contract: shift
-    purpose: List shifts
-    trigger: onLoad
-  - operationId: recordNoSale
-    contract: shift
-    purpose: Open the drawer without a sale
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: reopenShift
-    contract: shift
-    purpose: Reopen a shift closed in error
-    trigger: onAction
-    invalidates:
-    - listCashMovements
   - operationId: resumeShift
     contract: shift
     purpose: Resume a suspended shift
     trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: suspendShift
-    contract: shift
-    purpose: Suspend a shift so another user can log in
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: adjustDepositBoxFloat
-    contract: shift
-    purpose: Change the initial fund
-    trigger: onAction
-    invalidates:
-    - listCashMovements
   - operationId: selectRole
     contract: identity
     purpose: Choose a role for a multi-role session
     trigger: onAction
-    invalidates:
-    - listCashMovements
   - operationId: getWorkstationHealth
     contract: tenancy
     purpose: getWorkstationHealth
@@ -990,7 +782,6 @@ screens:
     - POS-027
     - POS-030
     exitTo:
-    - BO-045
     - POS-003
     - POS-004
     - POS-005
@@ -1004,6 +795,7 @@ screens:
     - POS-020
     - POS-030
     - POS-031
+    - POS-018
     fromFlows: true
     notes: '**flow F31 — the till picks up the new catalogue and the manager returns to the menu.** The
       flow is the authority on the journey and the navigation has to agree with it; marking this block
@@ -1015,9 +807,6 @@ screens:
       precondition: product.timed
       carries:
       - productId
-      - visitDate
-      - sessionTime
-      - quantityByVariant
       returnsTo: POS-002
       discards:
       - drawerSelection
@@ -1029,9 +818,6 @@ screens:
       carries:
       - productId
       - performanceId
-      - seatPicks
-      - zoneId
-      - holdExpiresAt
       returnsTo: POS-002
       discards:
       - seatPicks
@@ -1050,12 +836,7 @@ screens:
       precondition: cart.lineCount > 0
       guard: payment.take
       carries:
-      - cart
-      - guest
       - discount
-      - orderType
-      - table
-      - taxTotals
       returnsTo: POS-002
       discards: []
       onFailure:
@@ -1078,28 +859,11 @@ screens:
       provenance: board TICVAI POS Terminal · hold (3992) — hot key F2
       carries:
       - orderId
-    - to: BO-045
-      trigger: The new price is wrong on eleven items
-      provenance: flow F31 step 6→7
-      operation: getLatestBundle
     - to: POS-013
-      trigger: A guest wants cash back and the drawer is heavy
-      provenance: flow F32 step 3→4
-    - to: BO-130
-      trigger: Four transactions are rejected — a product retired while the till was offline
-      provenance: flow F33 step 6→7
-      operation: syncOrders
-      crossesDevice: true
-      back: false
-    - to: BO-133
-      trigger: The venue's offline exposure crosses a ceiling
-      provenance: flow F33 step 3→4
-      crossesDevice: true
-      back: false
+      trigger: Offline sales and sync
+      provenance: 'wiring fix, 2 October 2026 (CHG-WIR-009): flow F32 step 3→4'
     - to: POS-007
       trigger: Close Shift
-      carries:
-      - saleId
       provenance: derived — POS-007 declares entryState.params saleId and POS-002 holds saleId, so an
         edge into it carries them
     - to: POS-010
@@ -1136,21 +900,9 @@ screens:
       carries:
       - orderId
       - outletId
-    - to: BO-084
-      trigger: The manager sees it in their inbox
-      provenance: flow F14 step 2→3
-      operation: evaluateApprovalRequirement
-      crossesDevice: true
-      back: false
-      carries:
-      - approvalRequestId
-    - to: GST-026
-      trigger: Checks the balance in the app
-      provenance: flow F18 step 1→2
-      crossesDevice: true
-      back: false
-      carries:
-      - cardCode
+    - to: POS-018
+      trigger: A guest wants cash back and the drawer is heavy
+      provenance: 'wiring fix, 2 October 2026 (CHG-WIR-009): flow F32 step 3→4'
     uses:
     - posPrimaryRail
     - posSaleToPayment
@@ -1228,6 +980,82 @@ screens:
     why: '**`getLoyaltyPosition` declares its response inline**, so the component that shows it names
       fields but binds to no schema. The contract should name the shape.'
     source: contract marketing-crm.yaml GET /loyalty/position
+  - operation: getLoyaltyPosition
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): getLoyaltyPosition is the guest''s own read (guest audience);
+      at a till it would return the cashier''s points. A named guest''s position at the till is getGuestLoyalty
+      (decided 1 October as a screen change; design-notes correction customer-marketing POS-027).'
+    source: contracts/satellite/marketing-crm.yaml#getLoyaltyPosition | contracts/satellite/marketing-crm.yaml#getGuestLoyalty
+  - operation: createRefund
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Some 25 operation buttons sat on the sell screen; post-sale
+      actions (refunds, retail returns, exchanges, modify, reschedule, void, statements, balance transfer)
+      live on POS-011, POS-014, POS-026 and POS-030, and order sync is POS-013''s. The sell screen is
+      tiles, cards and the cart (DI-132; design-notes correction ticketing-guest POS-002).'
+    source: screens/P04-point-of-sale.yaml#POS-002 | DI-132
+  - operation: createRetailReturn
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Some 25 operation buttons sat on the sell screen; post-sale
+      actions (refunds, retail returns, exchanges, modify, reschedule, void, statements, balance transfer)
+      live on POS-011, POS-014, POS-026 and POS-030, and order sync is POS-013''s. The sell screen is
+      tiles, cards and the cart (DI-132; design-notes correction ticketing-guest POS-002).'
+    source: screens/P04-point-of-sale.yaml#POS-002 | DI-132
+  - operation: exchangeOrderLines
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Some 25 operation buttons sat on the sell screen; post-sale
+      actions (refunds, retail returns, exchanges, modify, reschedule, void, statements, balance transfer)
+      live on POS-011, POS-014, POS-026 and POS-030, and order sync is POS-013''s. The sell screen is
+      tiles, cards and the cart (DI-132; design-notes correction ticketing-guest POS-002).'
+    source: screens/P04-point-of-sale.yaml#POS-002 | DI-132
+  - operation: getOrderStatement
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Some 25 operation buttons sat on the sell screen; post-sale
+      actions (refunds, retail returns, exchanges, modify, reschedule, void, statements, balance transfer)
+      live on POS-011, POS-014, POS-026 and POS-030, and order sync is POS-013''s. The sell screen is
+      tiles, cards and the cart (DI-132; design-notes correction ticketing-guest POS-002).'
+    source: screens/P04-point-of-sale.yaml#POS-002 | DI-132
+  - operation: listOrderRefunds
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Some 25 operation buttons sat on the sell screen; post-sale
+      actions (refunds, retail returns, exchanges, modify, reschedule, void, statements, balance transfer)
+      live on POS-011, POS-014, POS-026 and POS-030, and order sync is POS-013''s. The sell screen is
+      tiles, cards and the cart (DI-132; design-notes correction ticketing-guest POS-002).'
+    source: screens/P04-point-of-sale.yaml#POS-002 | DI-132
+  - operation: modifyOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Some 25 operation buttons sat on the sell screen; post-sale
+      actions (refunds, retail returns, exchanges, modify, reschedule, void, statements, balance transfer)
+      live on POS-011, POS-014, POS-026 and POS-030, and order sync is POS-013''s. The sell screen is
+      tiles, cards and the cart (DI-132; design-notes correction ticketing-guest POS-002).'
+    source: screens/P04-point-of-sale.yaml#POS-002 | DI-132
+  - operation: rescheduleOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Some 25 operation buttons sat on the sell screen; post-sale
+      actions (refunds, retail returns, exchanges, modify, reschedule, void, statements, balance transfer)
+      live on POS-011, POS-014, POS-026 and POS-030, and order sync is POS-013''s. The sell screen is
+      tiles, cards and the cart (DI-132; design-notes correction ticketing-guest POS-002).'
+    source: screens/P04-point-of-sale.yaml#POS-002 | DI-132
+  - operation: syncOrders
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Some 25 operation buttons sat on the sell screen; post-sale
+      actions (refunds, retail returns, exchanges, modify, reschedule, void, statements, balance transfer)
+      live on POS-011, POS-014, POS-026 and POS-030, and order sync is POS-013''s. The sell screen is
+      tiles, cards and the cart (DI-132; design-notes correction ticketing-guest POS-002).'
+    source: screens/P04-point-of-sale.yaml#POS-002 | DI-132
+  - operation: transferGameCard
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Some 25 operation buttons sat on the sell screen; post-sale
+      actions (refunds, retail returns, exchanges, modify, reschedule, void, statements, balance transfer)
+      live on POS-011, POS-014, POS-026 and POS-030, and order sync is POS-013''s. The sell screen is
+      tiles, cards and the cart (DI-132; design-notes correction ticketing-guest POS-002).'
+    source: screens/P04-point-of-sale.yaml#POS-002 | DI-132
+  - operation: voidOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Some 25 operation buttons sat on the sell screen; post-sale
+      actions (refunds, retail returns, exchanges, modify, reschedule, void, statements, balance transfer)
+      live on POS-011, POS-014, POS-026 and POS-030, and order sync is POS-013''s. The sell screen is
+      tiles, cards and the cart (DI-132; design-notes correction ticketing-guest POS-002).'
+    source: screens/P04-point-of-sale.yaml#POS-002 | DI-132
   layout:
     template: split
     regions:
@@ -1278,24 +1106,6 @@ screens:
         - AlternativeCode.note
         operation: listAlternativeCodes
         provenance: contract catalogue.yaml GET /products/{productId}/alternative-codes
-      - kind: dataTable
-        label: Every refund
-        bindsTo: Refund
-        columns:
-        - Refund.id
-        - Refund.orderId
-        - Refund.batchId
-        - Refund.fxRate
-        - Refund.taxReversalEntryId
-        - Refund.settleTo
-        - Refund.fxVariance
-        - Refund.amount
-        - Refund.appliedPercentage
-        - Refund.status
-        - Refund.reason
-        - Refund.requestedByPrincipalId
-        operation: listOrderRefunds
-        provenance: contract orders.yaml GET /orders/{orderId}/refunds
       - kind: dataTable
         label: Every order
         bindsTo: OrderSummary
@@ -1419,6 +1229,12 @@ screens:
           **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
           reads *always requires confirmation*.'
         provenance: carried from the previous definition
+      - kind: detailPanel
+        label: Guest loyalty
+        bindsTo: LoyaltyPosition
+        operation: getGuestLoyalty
+        provenance: contract marketing-crm.yaml GET /guests/{subjectId}/loyalty; wiring fix, 2 October
+          2026
     - name: contextPanel
       slot: selection
       components:
@@ -1444,20 +1260,6 @@ screens:
         - Product.isStockTracked
         operation: getProduct
         provenance: contract catalogue.yaml GET /products/{productId}
-      - kind: detailPanel
-        label: The order statement
-        bindsTo: OrderStatement
-        columns:
-        - OrderStatement.orderId
-        - OrderStatement.orderNumber
-        - OrderStatement.currency
-        - OrderStatement.currencyScale
-        - OrderStatement.entries
-        - OrderStatement.totalPaid
-        - OrderStatement.totalRefunded
-        - OrderStatement.currentBalance
-        operation: getOrderStatement
-        provenance: contract orders.yaml GET /orders/{orderId}/statement
       - kind: detailPanel
         label: The promotion
         bindsTo: Promotion
@@ -1493,13 +1295,6 @@ screens:
         - PromotionUsage.byChannel
         operation: getPromotionUsage
         provenance: contract promotions.yaml GET /promotions/{promotionId}/usage
-      - kind: detailPanel
-        label: Loyalty position
-        operation: getLoyaltyPosition
-        notes: Shows `subjectId`, `programmeId`, `pointsBalance`, `pointsPending`, `tier`, `nextTier`,
-          `pointsToNextTier`, `expiringPoints`, `expiringAt` from `getLoyaltyPosition`'s inline response.
-          **The response has no named schema**, so this cannot bind until the contract names one.
-        provenance: contract marketing-crm.yaml GET /loyalty/position
       - kind: detailPanel
         label: The catalogue bundle
         bindsTo: CatalogueBundle
@@ -1573,25 +1368,9 @@ screens:
         operation: createOrder
         provenance: contract orders.yaml POST /orders
       - kind: secondaryButton
-        label: Create refund
-        operation: createRefund
-        provenance: contract orders.yaml POST /orders/{orderId}/refunds
-      - kind: secondaryButton
-        label: Exchange order lines
-        operation: exchangeOrderLines
-        provenance: contract orders.yaml POST /orders/{orderId}/exchanges
-      - kind: secondaryButton
-        label: Modify order
-        operation: modifyOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/modify
-      - kind: secondaryButton
         label: Reprint order
         operation: reprintOrder
         provenance: contract orders.yaml POST /orders/{orderId}/reprints
-      - kind: secondaryButton
-        label: Reschedule order
-        operation: rescheduleOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/reschedule
       - kind: secondaryButton
         label: Resolve product by code
         operation: resolveProductByCode
@@ -1600,10 +1379,6 @@ screens:
         label: Resume order
         operation: resumeOrder
         provenance: contract orders.yaml POST /orders/{orderId}/resume
-      - kind: destructiveButton
-        label: Void order
-        operation: voidOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/voids
       - kind: secondaryButton
         label: Evaluate approval requirement
         operation: evaluateApprovalRequirement
@@ -1633,14 +1408,6 @@ screens:
         operation: identifyGuest
         provenance: contract marketing-crm.yaml POST /guests/identify
       - kind: secondaryButton
-        label: Sync orders
-        operation: syncOrders
-        provenance: contract orders.yaml POST /sync/orders
-      - kind: secondaryButton
-        label: Create retail return
-        operation: createRetailReturn
-        provenance: contract retail.yaml POST /retail-returns
-      - kind: secondaryButton
         label: Redeem loyalty points
         operation: redeemLoyaltyPoints
         provenance: contract marketing-crm.yaml POST /loyalty/redemptions
@@ -1652,10 +1419,6 @@ screens:
         label: Create retail sale
         operation: createRetailSale
         provenance: contract retail.yaml POST /retail-sales
-      - kind: secondaryButton
-        label: Transfer game card
-        operation: transferGameCard
-        provenance: contract games.yaml POST /game-cards/{cardCode}/transfer
       - kind: primaryButton
         label: Checkout
         provenance: carried from the previous definition
@@ -1682,26 +1445,6 @@ screens:
         label: Print last receipt
         provenance: minute 2026-08-03 §UX Design Approach Discussion
   overlays:
-  - id: confirmVoidOrder
-    component: confirmDialog
-    trigger: Void order
-    body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
-      the verb. A sell ticket catalogue this affects should be identified in the dialog, not just counted.
-      **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.
-      `reason` is picked from the void reason list (guestChangedMind, enteredInError, itemUnavailable,
-      qualityIssue, duplicate, other); **`note` is required when the reason is other**, refused 400 without
-      it (decided 28 September, audit R125 (4), R222).'
-    provenance: client-verified
-    confirm:
-      label: Void
-      operation: voidOrder
-      carries: &id001
-      - orderId
-      - reason
-    dismiss:
-      label: Keep the sale
-      discards: &id002
-      - reason
   - id: drawerTicketDetail
     component: drawer
     trigger: Select a ticket
@@ -1769,21 +1512,6 @@ screens:
       discards:
       - seatPicks
       - zoneId
-  - id: formTransferGameCard
-    component: modal
-    trigger: Transfer game card
-    body: '**Collects what `transferGameCard` sends before it is called.** Required: `targetCardCode`,
-      `reason`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Transfer game card
-      operation: transferGameCard
-    dismiss:
-      label: Cancel
-      discards:
-      - targetCardCode
-      - reason
-      - note
-    provenance: client-verified
   - id: formEvaluatePromotions
     component: modal
     trigger: Evaluate promotions
@@ -1865,66 +1593,6 @@ screens:
       - guestLinkId
       - catalogueBundleVersion
     provenance: client-verified
-  - id: formCreateRefund
-    component: modal
-    trigger: Create refund
-    body: '**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`,
-      `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateRefundRequest
-    confirm:
-      label: Create refund
-      operation: createRefund
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - amount
-      - reason
-      - recordedAt
-      - lineIds
-      - secondaryAuthorisation
-      - refundToOriginalTender
-      - alternateTender
-    provenance: client-verified
-  - id: formExchangeOrderLines
-    component: modal
-    trigger: Exchange order lines
-    body: '**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`,
-      `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: ExchangeOrderRequest
-    confirm:
-      label: Exchange order lines
-      operation: exchangeOrderLines
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - outgoingLineIds
-      - incomingLines
-      - recordedAt
-      - waiveFee
-      - reason
-    provenance: client-verified
-  - id: formModifyOrder
-    component: modal
-    trigger: Modify order
-    body: '**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional:
-      `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: ModifyOrderRequest
-    confirm:
-      label: Modify order
-      operation: modifyOrder
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - recordedAt
-      - addLines
-      - removeLineIds
-      - reason
-    provenance: client-verified
   - id: formReprintOrder
     component: modal
     trigger: Reprint order
@@ -1940,24 +1608,6 @@ screens:
       - recordedAt
       - destination
       - lineIds
-      - reason
-    provenance: client-verified
-  - id: formRescheduleOrder
-    component: modal
-    trigger: Reschedule order
-    body: '**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`,
-      `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind
-      is unchanged.'
-    confirm:
-      label: Reschedule order
-      operation: rescheduleOrder
-    dismiss:
-      label: Cancel
-      discards:
-      - targetPerformanceId
-      - recordedAt
-      - lineIds
-      - waiveFee
       - reason
     provenance: client-verified
   - id: formEvaluateApprovalRequirement
@@ -2073,43 +1723,6 @@ screens:
       - token
       - tokenKind
     provenance: client-verified
-  - id: formSyncOrders
-    component: modal
-    trigger: Sync orders
-    body: '**Collects what `syncOrders` sends before it is called.** Required: `deviceId`, `orders`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Sync orders
-      operation: syncOrders
-    dismiss:
-      label: Cancel
-      discards:
-      - deviceId
-      - orders
-    provenance: client-verified
-  - id: formCreateRetailReturn
-    component: modal
-    trigger: Create retail return
-    body: '**Collects what `createRetailReturn` sends before it is called.** Required: `id`, `saleId`,
-      `lines`, `reason`, `recordedAt`. Optional: `refundTender`, `secondaryAuthorisation`. **Above the
-      outlet''s self-authorise limit a supervisor enters their staff PIN on this till** (`secondaryAuthorisation`
-      {`principalId`, `credential`}); refused 403 `supervisor-step-up-refused`. There is no approval-request
-      path (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateRetailReturnRequest
-    confirm:
-      label: Create retail return
-      operation: createRetailReturn
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - saleId
-      - lines
-      - reason
-      - recordedAt
-      - refundTender
-      - secondaryAuthorisation
-    provenance: client-verified
   - id: formRedeemLoyaltyPoints
     component: modal
     trigger: Redeem loyalty points
@@ -2220,25 +1833,9 @@ screens:
     trigger: onAction
     invalidates:
     - listProducts
-  - operationId: createRefund
-    contract: orders
-    purpose: Refund an order, wholly or in part
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: exchangeOrderLines
-    contract: orders
-    purpose: Exchange lines for different products or dates
-    trigger: onAction
-    invalidates:
-    - listProducts
   - operationId: getOrder
     contract: orders
     purpose: Read an order
-    trigger: onAction
-  - operationId: getOrderStatement
-    contract: orders
-    purpose: Full financial history of an order
     trigger: onAction
   - operationId: getProduct
     contract: catalogue
@@ -2256,10 +1853,6 @@ screens:
     contract: catalogue
     purpose: External identifiers for a product
     trigger: onAction
-  - operationId: listOrderRefunds
-    contract: orders
-    purpose: List refunds against an order
-    trigger: onAction
   - operationId: listOrders
     contract: orders
     purpose: List orders
@@ -2272,21 +1865,9 @@ screens:
     contract: promotions
     purpose: List promotions
     trigger: onLoad
-  - operationId: modifyOrder
-    contract: orders
-    purpose: Add or remove lines on an existing order
-    trigger: onAction
-    invalidates:
-    - listProducts
   - operationId: reprintOrder
     contract: orders
     purpose: Reprint or resend tickets
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: rescheduleOrder
-    contract: orders
-    purpose: Move an order to another performance
     trigger: onAction
     invalidates:
     - listProducts
@@ -2297,12 +1878,6 @@ screens:
   - operationId: resumeOrder
     contract: orders
     purpose: Bring a parked sale back to a till
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: voidOrder
-    contract: orders
-    purpose: Void an order
     trigger: onAction
     invalidates:
     - listProducts
@@ -2344,10 +1919,6 @@ screens:
     trigger: onAction
     invalidates:
     - listProducts
-  - operationId: getLoyaltyPosition
-    contract: marketing-crm
-    purpose: A guest's points, tier and what is within reach
-    trigger: onLoad
   - operationId: identifyGuest
     contract: marketing-crm
     purpose: Resolve any identifier to a guest
@@ -2366,18 +1937,6 @@ screens:
     contract: catalogue
     purpose: Pull the current bundle for this workstation's venue
     trigger: onLoad
-  - operationId: syncOrders
-    contract: orders
-    purpose: Replay orders recorded offline
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: createRetailReturn
-    contract: retail
-    purpose: Accept a return
-    trigger: onAction
-    invalidates:
-    - listProducts
   - operationId: redeemLoyaltyPoints
     contract: marketing-crm
     purpose: Spend points
@@ -2396,13 +1955,11 @@ screens:
     trigger: onAction
     invalidates:
     - listProducts
-  - operationId: transferGameCard
-    contract: games
-    purpose: Move balances to another card
+  - operationId: getGuestLoyalty
+    contract: marketing-crm
+    purpose: The identified guest's points and tier
     trigger: onAction
-    provenance: client-verified
-    invalidates:
-    - getGameCard
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   entryState:
     params:
     - name: workstationId
@@ -2417,6 +1974,8 @@ screens:
       from: deepLink
     - name: promotionId
       from: deepLink
+    - name: subjectId
+      from: navigation
     coldEntry: '**The cart in progress at this till**, held locally. A cold arrival mid-sale resumes it
       from the journal rather than losing it. An order recalled from the held list or a receipt lookup.'
     preloaded:
@@ -2503,12 +2062,6 @@ screens:
       trigger: Add to sale, then charge
       precondition: cart.lineCount > 0
       guard: payment.take
-      carries:
-      - cart
-      - guest
-      - discount
-      - visitDate
-      - sessionTime
       provenance: board TICVAI POS Terminal · drawerConfirm (4118) then goCheckout (5157)
     - to: POS-004
       trigger: Sell — Seat Map
@@ -2539,6 +2092,18 @@ screens:
       selection is now step two of the drawer on `POS-002`. Same decision as `POS-004`, same reason for
       recording it rather than acting on it.'
     source: minute 2026-08-03 §Point-of-Sale (Cashier) UI Walkthrough
+  - operation: relinquishInventoryHold
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): The hold is taken when the line is added; the cashier
+      sees a countdown, not Acquire, Release and Renew controls (the approved build has none) (design-notes
+      correction ticketing-guest POS-003).'
+    source: screens/P04-point-of-sale.yaml#POS-003
+  - operation: renewInventoryHold
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): The hold is taken when the line is added; the cashier
+      sees a countdown, not Acquire, Release and Renew controls (the approved build has none) (design-notes
+      correction ticketing-guest POS-003).'
+    source: screens/P04-point-of-sale.yaml#POS-003
   layout:
     template: split
     regions:
@@ -2640,14 +2205,6 @@ screens:
         operation: acquireInventoryHold
         provenance: contract catalogue.yaml POST /inventory-holds
       - kind: secondaryButton
-        label: Release inventory hold
-        operation: relinquishInventoryHold
-        provenance: contract catalogue.yaml DELETE /inventory-holds/{inventoryHoldId}
-      - kind: secondaryButton
-        label: Renew inventory hold
-        operation: renewInventoryHold
-        provenance: contract catalogue.yaml POST /inventory-holds/{inventoryHoldId}/renew
-      - kind: secondaryButton
         label: Resolve product by code
         operation: resolveProductByCode
         provenance: contract catalogue.yaml GET /products/resolve
@@ -2724,18 +2281,6 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  - operationId: relinquishInventoryHold
-    contract: catalogue
-    purpose: Return unsold units
-    trigger: onAction
-    invalidates:
-    - listProductVariants
-  - operationId: renewInventoryHold
-    contract: catalogue
-    purpose: Extend a lease TTL
-    trigger: onAction
-    invalidates:
-    - listProductVariants
   - operationId: resolveProductByCode
     contract: catalogue
     purpose: Resolve a partner code to a product
@@ -2802,33 +2347,6 @@ screens:
       - ttlSeconds
       - channel
     provenance: client-verified
-  - id: formRelinquishInventoryHold
-    component: modal
-    trigger: Release inventory hold
-    body: '**Collects what `relinquishInventoryHold` sends before it is called.** Required: `consumedUnits`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Release inventory hold
-      operation: relinquishInventoryHold
-    dismiss:
-      label: Cancel
-      discards:
-      - consumedUnits
-    provenance: client-verified
-  - id: formRenewInventoryHold
-    component: modal
-    trigger: Renew inventory hold
-    body: '**Collects what `renewInventoryHold` sends before it is called.** Required: `consumedUnits`.
-      Optional: `additionalUnits`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Renew inventory hold
-      operation: renewInventoryHold
-    dismiss:
-      label: Cancel
-      discards:
-      - consumedUnits
-      - additionalUnits
-    provenance: client-verified
 - id: POS-004
   name: Sell — Seat Map
   module: Sell
@@ -2862,12 +2380,6 @@ screens:
       trigger: Add seats to sale, then charge
       precondition: cart.lineCount > 0
       guard: payment.take
-      carries:
-      - cart
-      - seatPicks
-      - holdExpiresAt
-      - guest
-      - discount
       provenance: board TICVAI POS Terminal · drawerConfirm (4118) then goCheckout (5157)
     - to: POS-003
       trigger: Sell — Timed Entry
@@ -2905,6 +2417,18 @@ screens:
       as a screen of its own is a decision nobody has made: a seat map may still be wanted full-screen
       on a tablet, and a screen id is never reissued, so it is recorded rather than deleted.'
     source: minute 2026-08-03 §Point-of-Sale (Cashier) UI Walkthrough
+  - operation: evaluateApprovalRequirement
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): A till does not edit performances, and approval is asked
+      when a discount needs it, not as a button on the seat map (design-notes correction ticketing-guest
+      POS-004).'
+    source: screens/P04-point-of-sale.yaml#POS-004
+  - operation: updatePerformance
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): A till does not edit performances, and approval is asked
+      when a discount needs it, not as a button on the seat map (design-notes correction ticketing-guest
+      POS-004).'
+    source: screens/P04-point-of-sale.yaml#POS-004
   layout:
     template: detail
     regions:
@@ -2981,10 +2505,6 @@ screens:
         operation: relinquishSeatHold
         provenance: contract seating.yaml DELETE /seat-holds/{holdId}
       - kind: secondaryButton
-        label: Save performance
-        operation: updatePerformance
-        provenance: contract catalogue.yaml PATCH /performances/{performanceId}
-      - kind: secondaryButton
         label: Create order
         operation: createOrder
         provenance: contract orders.yaml POST /orders
@@ -2992,10 +2512,6 @@ screens:
         label: Create payment
         operation: createPayment
         provenance: contract orders.yaml POST /payments
-      - kind: secondaryButton
-        label: Evaluate approval requirement
-        operation: evaluateApprovalRequirement
-        provenance: contract approvals.yaml POST /approval-requests/evaluate
       - kind: primaryButton
         label: Add seats to cart
         provenance: carried from the previous definition
@@ -3048,10 +2564,6 @@ screens:
     contract: seating
     purpose: Release a hold
     trigger: onAction
-  - operationId: updatePerformance
-    contract: catalogue
-    purpose: Amend a performance
-    trigger: onAction
   - operationId: createOrder
     contract: orders
     purpose: Create an order
@@ -3059,10 +2571,6 @@ screens:
   - operationId: createPayment
     contract: orders
     purpose: Take a payment against an order
-    trigger: onAction
-  - operationId: evaluateApprovalRequirement
-    contract: approvals
-    purpose: Does this need approval, and from whom
     trigger: onAction
   entryState:
     params:
@@ -3145,23 +2653,6 @@ screens:
       - accessibleCount
       - maxOptions
     provenance: client-verified
-  - id: formUpdatePerformance
-    component: modal
-    trigger: Save performance
-    body: '**Collects what `updatePerformance` sends before it is called.** Nothing in the body is required.
-      Optional: `startsAt`, `endsAt`, `status`, `admissionRulesId`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    confirm:
-      label: Save performance
-      operation: updatePerformance
-    dismiss:
-      label: Cancel
-      discards:
-      - startsAt
-      - endsAt
-      - status
-      - admissionRulesId
-    provenance: client-verified
   - id: formCreateOrder
     component: modal
     trigger: Create order
@@ -3208,22 +2699,6 @@ screens:
       - walletAuthorisationId
       - deviceId
     provenance: client-verified
-  - id: formEvaluateApprovalRequirement
-    component: modal
-    trigger: Evaluate approval requirement
-    body: '**Collects what `evaluateApprovalRequirement` sends before it is called.** Required: `kind`,
-      `scopePath`. Optional: `amount`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Evaluate approval requirement
-      operation: evaluateApprovalRequirement
-    dismiss:
-      label: Cancel
-      discards:
-      - kind
-      - scopePath
-      - amount
-      - attributes
-    provenance: client-verified
 - id: POS-005
   name: Payment
   module: Payment
@@ -3248,6 +2723,7 @@ screens:
     - POS-010
     - POS-022
     - POS-023
+    - POS-026
     fromFlows: true
     transitions:
     - to: POS-002
@@ -3258,10 +2734,7 @@ screens:
       - tendered
       - splitParts
       carries:
-      - cart
-      - guest
       - discount
-      - orderType
       provenance: board TICVAI POS Terminal · backToSale (5506). **The cart survives.** `cancelPaymentTxn`
         (4655) is the other path and it clears the cart — raised as POS-BOARD-AUDIT.md C-6, because a
         declined card is not an abandoned sale.
@@ -3300,6 +2773,9 @@ screens:
       back: false
       carries:
       - merchandiseId
+    - to: POS-026
+      trigger: Receipt
+      provenance: 'wiring fix, 2 October 2026 (CHG-WIR-019): the payment''s success branch'
     uses:
     - posPrimaryRail
   notes: 'Design: Park_POS_dc.html, "Cash Payment". Add Tip appears in the design and had no operation
@@ -4074,10 +3550,13 @@ screens:
     confirm:
       label: Void
       operation: voidOrder
-      carries: *id001
+      carries: &id001
+      - orderId
+      - reason
     dismiss:
       label: Keep the sale
-      discards: *id002
+      discards: &id002
+      - reason
   - id: formApplyManualDiscount
     component: modal
     trigger: Apply manual discount
@@ -4496,24 +3975,6 @@ screens:
         operation: listCashMovements
         provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
       - kind: dataTable
-        label: Every shift
-        bindsTo: Shift
-        columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
-        - Shift.principalDisplayName
-        - Shift.incidents
-        - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
-        - Shift.depositBoxCode
-        - Shift.bagNumber
-        operation: listShifts
-        provenance: contract shift.yaml GET /shifts
-      - kind: dataTable
         label: Every denomination
         bindsTo: Denomination
         columns:
@@ -4582,28 +4043,6 @@ screens:
         - Shift.salesTotal
         - Shift.refundsTotal
         - Shift.liftsTotal
-        operation: getShift
-        provenance: contract shift.yaml GET /shifts/{shiftId}
-      - kind: detailPanel
-        label: The shift
-        bindsTo: Shift
-        columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
-        - Shift.principalDisplayName
-        - Shift.incidents
-        - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
-        - Shift.depositBoxCode
-        - Shift.bagNumber
-        - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getCurrentShift
         provenance: contract shift.yaml GET /shifts/current
     - name: actionBar
@@ -4617,46 +4056,6 @@ screens:
         label: Accept shift variance
         operation: acceptShiftVariance
         provenance: contract shift.yaml POST /shifts/{shiftId}/accept-variance
-      - kind: secondaryButton
-        label: Record no sale
-        operation: recordNoSale
-        provenance: contract shift.yaml POST /shifts/{shiftId}/no-sale
-      - kind: secondaryButton
-        label: Approve shift open
-        operation: approveShiftOpen
-        provenance: contract shift.yaml POST /shifts/{shiftId}/approve-open
-      - kind: secondaryButton
-        label: Create cash movement
-        operation: createCashMovement
-        provenance: contract shift.yaml POST /shifts/{shiftId}/cash-movements
-      - kind: secondaryButton
-        label: Open shift
-        operation: openShift
-        provenance: contract shift.yaml POST /shifts
-      - kind: secondaryButton
-        label: Reopen shift
-        operation: reopenShift
-        provenance: contract shift.yaml POST /shifts/{shiftId}/reopen
-      - kind: secondaryButton
-        label: Resume shift
-        operation: resumeShift
-        provenance: contract shift.yaml POST /shifts/{shiftId}/resume
-      - kind: destructiveButton
-        label: Suspend shift
-        operation: suspendShift
-        provenance: contract shift.yaml POST /shifts/{shiftId}/suspend
-      - kind: destructiveButton
-        label: Close deposit boxes
-        operation: closeDepositBoxes
-        provenance: contract shift.yaml POST /deposit-boxes/close
-      - kind: secondaryButton
-        label: Adjust deposit box float
-        operation: adjustDepositBoxFloat
-        provenance: contract shift.yaml POST /deposit-boxes/{boxId}/adjust-float
-      - kind: secondaryButton
-        label: Reprint receipt
-        operation: reprintReceipt
-        provenance: contract retail.yaml POST /retail-sales/{saleId}/reprint
       - kind: primaryButton
         label: Submit count
         provenance: carried from the previous definition
@@ -4672,41 +4071,14 @@ screens:
     confirm:
       label: Close the shift
       operation: closeShift
-      carries: *id003
+      carries:
+      - shiftId
+      - countedFloat
+      - varianceReason
     dismiss:
       label: Not yet
-      discards: *id004
-    bindsTo: CloseShiftRequest
-  - id: confirmSuspendShift
-    component: confirmDialog
-    trigger: Suspend shift
-    body: '**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than
-      the verb. A close shift this affects should be identified in the dialog, not just counted. **Collects
-      what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.'
-    provenance: client-verified
-    confirm:
-      label: Suspend
-      operation: suspendShift
-      carries: *id005
-    dismiss:
-      label: Cancel
-      discards: *id006
-  - id: confirmCloseDepositBoxes
-    component: confirmDialog
-    trigger: Close deposit boxes
-    body: '**Names what `closeDepositBoxes` changes and what it leaves alone**, in the consequence rather
-      than the verb. A close shift this affects should be identified in the dialog, not just counted.
-      **Collects what `closeDepositBoxes` sends before it is called.** Nothing in the body is required.
-      Optional: `boxIds`, `allOpenAtVenue`.'
-    provenance: client-verified
-    confirm:
-      label: Close the boxes
-      operation: closeDepositBoxes
-      carries:
-      - depositBoxIds
-    dismiss:
-      label: Cancel
       discards: []
+    bindsTo: CloseShiftRequest
   - id: formAcceptShiftVariance
     component: modal
     trigger: Accept shift variance
@@ -4720,132 +4092,6 @@ screens:
       label: Cancel
       discards:
       - reason
-    provenance: client-verified
-  - id: formRecordNoSale
-    component: modal
-    trigger: Record no sale
-    body: '**Collects what `recordNoSale` sends before it is called.** Required: `id`, `reason`, `recordedAt`.
-      Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Record no sale
-      operation: recordNoSale
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - reason
-      - recordedAt
-      - note
-    provenance: client-verified
-  - id: formApproveShiftOpen
-    component: modal
-    trigger: Approve shift open
-    body: '**Collects what `approveShiftOpen` sends before it is called.** Required: `reason`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Approve shift open
-      operation: approveShiftOpen
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-    provenance: client-verified
-  - id: formCreateCashMovement
-    component: modal
-    trigger: Create cash movement
-    body: '**Collects what `createCashMovement` sends before it is called.** Required: `id`, `kind`, `amount`,
-      `recordedAt`. Optional: `denominations`, `reference`, `reason`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: CreateCashMovementRequest
-    confirm:
-      label: Create cash movement
-      operation: createCashMovement
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - kind
-      - amount
-      - recordedAt
-      - denominations
-      - reference
-      - reason
-    provenance: client-verified
-  - id: formOpenShift
-    component: modal
-    trigger: Open shift
-    body: '**Collects what `openShift` sends before it is called.** Required: `workstationId`, `openingFloat`.
-      Optional: `depositBoxCode`, `bagNumber`, `recordedAt`. Dismissing sends nothing; the screen behind
-      is unchanged.'
-    bindsTo: OpenShiftRequest
-    confirm:
-      label: Open shift
-      operation: openShift
-    dismiss:
-      label: Cancel
-      discards:
-      - workstationId
-      - openingFloat
-      - depositBoxCode
-      - bagNumber
-      - recordedAt
-    provenance: client-verified
-  - id: formReopenShift
-    component: modal
-    trigger: Reopen shift
-    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `supervisorStepUp`
-      {`principalId`, `credential`}: the supervisor enters their staff PIN on this device, and may not
-      be the principal who closed the shift. Refused 403 `approver-is-closer` or `supervisor-step-up-refused`
-      (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Reopen shift
-      operation: reopenShift
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-      - supervisorStepUp
-    provenance: client-verified
-  - id: formResumeShift
-    component: modal
-    trigger: Resume shift
-    body: '**Collects what `resumeShift` sends before it is called.** Required: `recordedAt`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Resume shift
-      operation: resumeShift
-    dismiss:
-      label: Cancel
-      discards:
-      - recordedAt
-    provenance: client-verified
-  - id: formAdjustDepositBoxFloat
-    component: modal
-    trigger: Adjust deposit box float
-    body: '**Collects what `adjustDepositBoxFloat` sends before it is called.** Required: `amount`, `reason`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Adjust deposit box float
-      operation: adjustDepositBoxFloat
-    dismiss:
-      label: Cancel
-      discards:
-      - amount
-      - reason
-    provenance: client-verified
-  - id: formReprintReceipt
-    component: modal
-    trigger: Reprint receipt
-    body: '**Collects what `reprintReceipt` sends before it is called.** Required: `delivery`. Optional:
-      `destination`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Reprint receipt
-      operation: reprintReceipt
-    dismiss:
-      label: Cancel
-      discards:
-      - delivery
-      - destination
     provenance: client-verified
   states:
     loading: The close shift list.
@@ -4881,94 +4127,24 @@ screens:
     trigger: onAction
     invalidates:
     - listCashMovements
-  - operationId: recordNoSale
-    contract: shift
-    purpose: Drawer opened without a sale
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: approveShiftOpen
-    contract: shift
-    purpose: Approve a shift opening outside tolerance
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: createCashMovement
-    contract: shift
-    purpose: Record a cash lift or add
-    trigger: onAction
-    invalidates:
-    - listCashMovements
   - operationId: getCurrentShift
     contract: shift
     purpose: The open or suspended shift on the session's workstation
-    trigger: onLoad
-  - operationId: getShift
-    contract: shift
-    purpose: Read a shift
     trigger: onLoad
   - operationId: listCashMovements
     contract: shift
     purpose: Lifts, adds and the opening float
     trigger: onLoad
-  - operationId: listShifts
-    contract: shift
-    purpose: List shifts
-    trigger: onLoad
-  - operationId: openShift
-    contract: shift
-    purpose: Open a shift
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: reopenShift
-    contract: shift
-    purpose: Reopen a shift closed in error
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: resumeShift
-    contract: shift
-    purpose: Resume a suspended shift
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: suspendShift
-    contract: shift
-    purpose: Suspend a shift so another user can log in
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: closeDepositBoxes
-    contract: shift
-    purpose: Close one box or all of them
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: adjustDepositBoxFloat
-    contract: shift
-    purpose: Change the initial fund
-    trigger: onAction
-    invalidates:
-    - listCashMovements
   - operationId: listDenominations
     contract: shift
     purpose: listDenominations
     trigger: onLoad
-  - operationId: reprintReceipt
-    contract: retail
-    purpose: Reprint or resend a receipt
-    trigger: onAction
-    invalidates:
-    - listCashMovements
   entryState:
     params:
     - name: shiftId
       from: session
     - name: boxId
       from: session
-    - name: saleId
-      from: deepLink
     coldEntry: Resolves from the session; a cold arrival is the ordinary case. The deposit box allocated
       to this till for the shift. A sale opened from the transaction list.
     preloaded:
@@ -4999,6 +4175,91 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: adjustDepositBoxFloat
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
+  - operation: approveShiftOpen
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
+  - operation: closeDepositBoxes
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
+  - operation: createCashMovement
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
+  - operation: getShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
+  - operation: listShifts
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
+  - operation: openShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
+  - operation: recordNoSale
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
+  - operation: reopenShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
+  - operation: reprintReceipt
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
+  - operation: resumeShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
+  - operation: suspendShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Close Shift carried fourteen bulk-attached operations;
+      its purpose is to count the drawer and close. Kept: closeShift, acceptShiftVariance, getCurrentShift,
+      listDenominations and listCashMovements for the supervisor''s review (R254, F87 step 4; design-notes
+      correction fnb-retail POS-007).'
+    source: R254 | F87 step 4 | screens/P04-point-of-sale.yaml#POS-007
 - id: POS-008
   name: Reports
   module: Reports
@@ -5373,24 +4634,6 @@ screens:
         operation: listShifts
         provenance: contract shift.yaml GET /shifts
       - kind: dataTable
-        label: Every cash movement
-        bindsTo: CashMovement
-        columns:
-        - CashMovement.id
-        - CashMovement.kind
-        - CashMovement.amount
-        - CashMovement.denominations
-        - CashMovement.reference
-        - CashMovement.reason
-        - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.depositBoxId
-        - CashMovement.witnessPrincipalId
-        - CashMovement.withdrawalReason
-        - CashMovement.authorisedByPrincipalId
-        operation: listCashMovements
-        provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
-      - kind: dataTable
         label: Every rota assignment
         bindsTo: RotaAssignment
         columns:
@@ -5409,130 +4652,14 @@ screens:
         operation: listRotaAssignments
         provenance: contract workforce.yaml GET /rota-assignments
       - kind: dataTable
-        label: Every workstation
-        bindsTo: Workstation
-        columns:
-        - Workstation.id
-        - Workstation.code
-        - Workstation.name
-        - Workstation.venueId
-        - Workstation.regionId
-        - Workstation.departmentId
-        - Workstation.scopePath
-        - Workstation.saleBoard
-        - Workstation.accessPointId
-        - Workstation.devices
-        - Workstation.currency
-        - Workstation.currencyScale
-        operation: listWorkstations
-        provenance: contract tenancy.yaml GET /workstations
-      - kind: dataTable
-        label: Every alert
-        bindsTo: Alert
-        columns:
-        - Alert.id
-        - Alert.ruleId
-        - Alert.ruleName
-        - Alert.metric
-        - Alert.raisedAt
-        - Alert.severity
-        - Alert.status
-        - Alert.observedValue
-        - Alert.threshold
-        - Alert.scopePath
-        - Alert.workstationId
-        - Alert.shiftId
-        operation: listAlerts
-        provenance: contract reporting.yaml GET /alerts
-      - kind: dataTable
         notes: Staff, role and terminal, shift, sales, status — the columns in the design
         provenance: carried from the previous definition
     - name: contextPanel
       slot: item
-      components:
-      - kind: detailPanel
-        label: The selected shift
-        bindsTo: Shift
-        columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
-        - Shift.principalDisplayName
-        - Shift.incidents
-        - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
-        - Shift.depositBoxCode
-        - Shift.bagNumber
-        - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
-        operation: getCurrentShift
-        provenance: contract shift.yaml GET /shifts/current
-      - kind: detailPanel
-        label: The shift
-        bindsTo: Shift
-        columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
-        - Shift.principalDisplayName
-        - Shift.incidents
-        - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
-        - Shift.depositBoxCode
-        - Shift.bagNumber
-        - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
-        operation: getShift
-        provenance: contract shift.yaml GET /shifts/{shiftId}
+      components: []
     - name: actionBar
       slot: decision
       components:
-      - kind: primaryButton
-        label: Accept shift variance
-        operation: acceptShiftVariance
-        provenance: contract shift.yaml POST /shifts/{shiftId}/accept-variance
-      - kind: secondaryButton
-        label: Approve shift open
-        operation: approveShiftOpen
-        provenance: contract shift.yaml POST /shifts/{shiftId}/approve-open
-      - kind: destructiveButton
-        label: Close shift
-        operation: closeShift
-        provenance: contract shift.yaml POST /shifts/{shiftId}/close
-      - kind: secondaryButton
-        label: Open shift
-        operation: openShift
-        provenance: contract shift.yaml POST /shifts
-      - kind: secondaryButton
-        label: Record no sale
-        operation: recordNoSale
-        provenance: contract shift.yaml POST /shifts/{shiftId}/no-sale
-      - kind: secondaryButton
-        label: Reopen shift
-        operation: reopenShift
-        provenance: contract shift.yaml POST /shifts/{shiftId}/reopen
-      - kind: secondaryButton
-        label: Resume shift
-        operation: resumeShift
-        provenance: contract shift.yaml POST /shifts/{shiftId}/resume
-      - kind: destructiveButton
-        label: Suspend shift
-        operation: suspendShift
-        provenance: contract shift.yaml POST /shifts/{shiftId}/suspend
-      - kind: secondaryButton
-        label: Create rota assignment
-        operation: createRotaAssignment
-        provenance: contract workforce.yaml POST /rota-assignments
       - kind: secondaryButton
         label: Clock in, clock out, start or end a break
         operation: recordAttendance
@@ -5564,158 +4691,6 @@ screens:
       - assignmentId
       - accessPointId
     provenance: contract workforce.yaml POST /attendance/clock (decided 1 October 2026, POSV2-3)
-  - id: confirmCloseShift
-    component: confirmDialog
-    trigger: Close shift
-    body: '**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than
-      the verb. A staff roster this affects should be identified in the dialog, not just counted. **Collects
-      what `closeShift` sends before it is called.** Required: `countedCash`, `recordedAt`. Optional:
-      `nonCashDeclared`, `notes`, `releaseHeldLeases`.'
-    provenance: designed
-    confirm:
-      label: Close the shift
-      operation: closeShift
-      carries: *id003
-    dismiss:
-      label: Not yet
-      discards: *id004
-    bindsTo: CloseShiftRequest
-  - id: confirmSuspendShift
-    component: confirmDialog
-    trigger: Suspend shift
-    body: '**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than
-      the verb. A staff roster this affects should be identified in the dialog, not just counted. **Collects
-      what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.'
-    provenance: designed
-    confirm:
-      label: Suspend
-      operation: suspendShift
-      carries: *id005
-    dismiss:
-      label: Cancel
-      discards: *id006
-  - id: formAcceptShiftVariance
-    component: modal
-    trigger: Accept shift variance
-    body: '**Collects what `acceptShiftVariance` sends before it is called.** Required: `reason`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Accept shift variance
-      operation: acceptShiftVariance
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-    provenance: designed
-  - id: formApproveShiftOpen
-    component: modal
-    trigger: Approve shift open
-    body: '**Collects what `approveShiftOpen` sends before it is called.** Required: `reason`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Approve shift open
-      operation: approveShiftOpen
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-    provenance: designed
-  - id: formOpenShift
-    component: modal
-    trigger: Open shift
-    body: '**Collects what `openShift` sends before it is called.** Required: `workstationId`, `openingFloat`.
-      Optional: `depositBoxCode`, `bagNumber`, `recordedAt`. Dismissing sends nothing; the screen behind
-      is unchanged.'
-    bindsTo: OpenShiftRequest
-    confirm:
-      label: Open shift
-      operation: openShift
-    dismiss:
-      label: Cancel
-      discards:
-      - workstationId
-      - openingFloat
-      - depositBoxCode
-      - bagNumber
-      - recordedAt
-    provenance: designed
-  - id: formRecordNoSale
-    component: modal
-    trigger: Record no sale
-    body: '**Collects what `recordNoSale` sends before it is called.** Required: `id`, `reason`, `recordedAt`.
-      Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Record no sale
-      operation: recordNoSale
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - reason
-      - recordedAt
-      - note
-    provenance: designed
-  - id: formReopenShift
-    component: modal
-    trigger: Reopen shift
-    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `supervisorStepUp`
-      {`principalId`, `credential`}: the supervisor enters their staff PIN on this device, and may not
-      be the principal who closed the shift. Refused 403 `approver-is-closer` or `supervisor-step-up-refused`
-      (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Reopen shift
-      operation: reopenShift
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-      - supervisorStepUp
-    provenance: designed
-  - id: formResumeShift
-    component: modal
-    trigger: Resume shift
-    body: '**Collects what `resumeShift` sends before it is called.** Required: `recordedAt`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Resume shift
-      operation: resumeShift
-    dismiss:
-      label: Cancel
-      discards:
-      - recordedAt
-    provenance: designed
-  - id: formCreateRotaAssignment
-    component: modal
-    trigger: Create rota assignment
-    body: '**Collects what `createRotaAssignment` sends before it is called.** Required: `principalId`,
-      `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`, `breachesWorkingHourLimit`,
-      `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`, `workstationId`, `status`,
-      `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: RotaAssignment
-    confirm:
-      label: Create rota assignment
-      operation: createRotaAssignment
-    dismiss:
-      label: Cancel
-      discards:
-      - principalId
-      - venueId
-      - position
-      - startsAt
-      - endsAt
-      - overtimeMinutes
-      - restPeriodBefore
-      - breachesWorkingHourLimit
-      - labourCost
-      - id
-      - displayName
-      - departmentId
-      - requiredRoleId
-      - workstationId
-      - status
-      - breakMinutes
-      - note
-    provenance: designed
   states:
     loading: The staff roster list.
     error: Could not load. Names which read failed and leaves the staff roster untouched.
@@ -5732,83 +4707,9 @@ screens:
     contract: shift
     purpose: Open shifts at this venue
     trigger: onLoad
-  - operationId: acceptShiftVariance
-    contract: shift
-    purpose: Accept an over/short beyond the threshold
-    trigger: onAction
-    invalidates:
-    - listShifts
-  - operationId: approveShiftOpen
-    contract: shift
-    purpose: Approve a shift opening outside tolerance
-    trigger: onAction
-    invalidates:
-    - listShifts
-  - operationId: closeShift
-    contract: shift
-    purpose: Blind close-out
-    trigger: onAction
-    invalidates:
-    - listShifts
-  - operationId: getCurrentShift
-    contract: shift
-    purpose: The open or suspended shift on the session's workstation
-    trigger: onLoad
-  - operationId: getShift
-    contract: shift
-    purpose: Read a shift
-    trigger: onLoad
-  - operationId: listCashMovements
-    contract: shift
-    purpose: Lifts, adds and the opening float
-    trigger: onLoad
-  - operationId: openShift
-    contract: shift
-    purpose: Open a shift
-    trigger: onAction
-    invalidates:
-    - listShifts
-  - operationId: recordNoSale
-    contract: shift
-    purpose: Open the drawer without a sale
-    trigger: onAction
-    invalidates:
-    - listShifts
-  - operationId: reopenShift
-    contract: shift
-    purpose: Reopen a shift closed in error
-    trigger: onAction
-    invalidates:
-    - listShifts
-  - operationId: resumeShift
-    contract: shift
-    purpose: Resume a suspended shift
-    trigger: onAction
-    invalidates:
-    - listShifts
-  - operationId: suspendShift
-    contract: shift
-    purpose: Suspend a shift so another user can log in
-    trigger: onAction
-    invalidates:
-    - listShifts
-  - operationId: createRotaAssignment
-    contract: workforce
-    purpose: Put someone on the rota
-    trigger: onAction
-    invalidates:
-    - listShifts
   - operationId: listRotaAssignments
     contract: workforce
     purpose: The rota
-    trigger: onLoad
-  - operationId: listWorkstations
-    contract: tenancy
-    purpose: List workstations
-    trigger: onLoad
-  - operationId: listAlerts
-    contract: reporting
-    purpose: What is currently raised
     trigger: onLoad
   - operationId: recordAttendance
     contract: workforce
@@ -5844,6 +4745,91 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: acceptShiftVariance
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: approveShiftOpen
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: closeShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: createRotaAssignment
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: getCurrentShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: getShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: listAlerts
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: listCashMovements
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: listWorkstations
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: openShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: recordNoSale
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: reopenShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: resumeShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: suspendShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): A roster is a read plus attendance; twelve shift and money
+      operations, the workstation and alert tables and rota planning (createRotaAssignment, a back-office
+      workforce task) were bulk-attached (R254; design-notes corrections fnb-retail POS-009).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-009 | contracts/satellite/workforce.yaml#createRotaAssignment
 - id: POS-010
   name: Add to Existing Ticket
   module: Sell
@@ -6170,47 +5156,13 @@ screens:
   pattern: listDetail
   patternReason: '`listDenominations` reads the population and `getReturnPolicy` reads one of them — list,
     select, act'
-  purpose: Returns, Refunds & Exchanges — from the client design board, 20 August.
+  purpose: Take back a sale, refund it or exchange it, against the original receipt.
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: toggle
-        label: Include inactive
-        operation: listDenominations
-        notes: Sends `?includeInactive=` to `listDenominations`.
-        provenance: contract shift.yaml GET /denominations
-      - kind: dataTable
-        label: Every denomination
-        bindsTo: Denomination
-        columns:
-        - Denomination.id
-        - Denomination.currencyCode
-        - Denomination.displayName
-        - Denomination.kind
-        - Denomination.sortOrder
-        - Denomination.isActive
-        - Denomination.value
-        operation: listDenominations
-        provenance: contract shift.yaml GET /denominations
-      - kind: dataTable
-        label: Every outlet
-        bindsTo: Outlet
-        columns:
-        - Outlet.id
-        - Outlet.code
-        - Outlet.name
-        - Outlet.venueId
-        - Outlet.kind
-        - Outlet.zone
-        - Outlet.stockLocationId
-        - Outlet.costCenterId
-        - Outlet.openingHours
-        - Outlet.isActive
-        operation: listOutlets
-        provenance: contract tenancy.yaml GET /outlets
       - kind: dataTable
         label: Every serialised
         bindsTo: SerialisedItem
@@ -6229,36 +5181,9 @@ screens:
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
-      - kind: dataTable
-        label: Cash counted
-        bindsTo: CountedDenominationLine
-        columns:
-        - CountedDenominationLine.denominationId
-        - CountedDenominationLine.count
-        - CountedDenominationLine.total
-        operation: adjustDepositBoxFloat
-        notes: '**One line per note or coin the cashier counts: the denomination, how many, and what they
-          come to** (`CountedDenominationLine`, decided 29 September, readiness close-out). The rows are
-          the active `listDenominations` in counting order; the cashier types `count`, `total` is computed
-          on the till and checked by the server. The signed sum is what `adjustDepositBoxFloat` sends
-          as `amount`; the same line shape is the blind count on close (`closeShift`, POS-007).'
-        provenance: contract shift.yaml CountedDenominationLine (decided 29 September, readiness close-out)
     - name: contextPanel
       slot: selection
       components:
-      - kind: detailPanel
-        label: The selected denomination
-        bindsTo: Denomination
-        columns:
-        - Denomination.id
-        - Denomination.currencyCode
-        - Denomination.displayName
-        - Denomination.kind
-        - Denomination.sortOrder
-        - Denomination.isActive
-        - Denomination.value
-        operation: listDenominations
-        provenance: contract shift.yaml GET /denominations
       - kind: detailPanel
         label: The return policy
         bindsTo: ReturnPolicy
@@ -6286,10 +5211,6 @@ screens:
         label: Exchange order lines
         operation: exchangeOrderLines
         provenance: contract orders.yaml POST /orders/{orderId}/exchanges
-      - kind: secondaryButton
-        label: Adjust deposit box float
-        operation: adjustDepositBoxFloat
-        provenance: contract shift.yaml POST /deposit-boxes/{boxId}/adjust-float
       - kind: secondaryButton
         label: Lookup retail sale
         operation: lookupRetailSale
@@ -6331,32 +5252,14 @@ screens:
     contract: orders
     purpose: Refund an order, wholly or in part
     trigger: onAction
-    invalidates:
-    - listDenominations
   - operationId: exchangeOrderLines
     contract: orders
     purpose: Exchange lines for different products or dates
     trigger: onAction
-    invalidates:
-    - listDenominations
   - operationId: getReturnPolicy
     contract: retail
     purpose: Read the retail return policy
     trigger: onAction
-  - operationId: adjustDepositBoxFloat
-    contract: shift
-    purpose: Change the initial fund
-    trigger: onAction
-    invalidates:
-    - listDenominations
-  - operationId: listDenominations
-    contract: shift
-    purpose: listDenominations
-    trigger: onLoad
-  - operationId: listOutlets
-    contract: tenancy
-    purpose: List outlets
-    trigger: onLoad
   - operationId: lookupRetailSale
     contract: retail
     purpose: Find a sale from a receipt; returns a list with matchedBy, a pick list when several match
@@ -6366,8 +5269,6 @@ screens:
     contract: retail
     purpose: Accept a return
     trigger: onAction
-    invalidates:
-    - listDenominations
   - operationId: listSerialisedItems
     contract: inventory
     purpose: listSerialisedItems
@@ -6385,8 +5286,6 @@ screens:
       from: deepLink
     - name: outletId
       from: deepLink
-    - name: boxId
-      from: session
     - name: invoiceId
       from: navigation
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
@@ -6462,20 +5361,6 @@ screens:
       - waiveFee
       - reason
     provenance: client-verified
-  - id: formAdjustDepositBoxFloat
-    component: modal
-    trigger: Adjust deposit box float
-    body: '**Collects what `adjustDepositBoxFloat` sends before it is called.** Required: `amount`, `reason`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Adjust deposit box float
-      operation: adjustDepositBoxFloat
-    dismiss:
-      label: Cancel
-      discards:
-      - amount
-      - reason
-    provenance: client-verified
   - id: formCreateRetailReturn
     component: modal
     trigger: Create retail return
@@ -6499,6 +5384,28 @@ screens:
       - refundTender
       - secondaryAuthorisation
     provenance: client-verified
+  gaps:
+  - operation: adjustDepositBoxFloat
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): The cash count, denominations, outlets and the deposit-box
+      float adjustment were attached by resemblance and serve no return (R254; design-notes correction
+      fnb-retail POS-011).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-011
+  - operation: listDenominations
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): The cash count, denominations, outlets and the deposit-box
+      float adjustment were attached by resemblance and serve no return (R254; design-notes correction
+      fnb-retail POS-011).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-011
+  - operation: listOutlets
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): The cash count, denominations, outlets and the deposit-box
+      float adjustment were attached by resemblance and serve no return (R254; design-notes correction
+      fnb-retail POS-011).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-011
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose read "Returns, Refunds & Exchanges
+    — from the client design board, 20 August", not a purpose a designer can act on (design-notes correction
+    fnb-retail POS-011).'
 - id: POS-012
   name: Omnichannel Order & Fulfilment Center
   module: Sell
@@ -6594,19 +5501,6 @@ screens:
         - OrderSummary.lineCount
         operation: listOrders
         provenance: contract orders.yaml GET /orders
-      - kind: dataTable
-        label: Every denomination
-        bindsTo: Denomination
-        columns:
-        - Denomination.id
-        - Denomination.currencyCode
-        - Denomination.displayName
-        - Denomination.kind
-        - Denomination.sortOrder
-        - Denomination.isActive
-        - Denomination.value
-        operation: listDenominations
-        provenance: contract shift.yaml GET /denominations
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
@@ -6662,14 +5556,6 @@ screens:
         label: Reserve merchandise
         operation: reserveMerchandise
         provenance: contract retail.yaml POST /outlets/{outletId}/reserve
-      - kind: secondaryButton
-        label: Adjust deposit box float
-        operation: adjustDepositBoxFloat
-        provenance: contract shift.yaml POST /deposit-boxes/{boxId}/adjust-float
-      - kind: secondaryButton
-        label: Open shift
-        operation: openShift
-        provenance: contract shift.yaml POST /shifts
   states:
     loading: The omnichannel order fulfilment list.
     error: Could not load. Names which read failed and leaves the omnichannel order fulfilment untouched.
@@ -6699,26 +5585,10 @@ screens:
     trigger: onAction
     invalidates:
     - listOrders
-  - operationId: adjustDepositBoxFloat
-    contract: shift
-    purpose: Change the initial fund
-    trigger: onAction
-    invalidates:
-    - listOrders
   - operationId: getCurrentShift
     contract: shift
     purpose: The open or suspended shift on the session's workstation
     trigger: onLoad
-  - operationId: listDenominations
-    contract: shift
-    purpose: listDenominations
-    trigger: onLoad
-  - operationId: openShift
-    contract: shift
-    purpose: Open a shift
-    trigger: onAction
-    invalidates:
-    - listOrders
   entryState:
     params:
     - name: workstationId
@@ -6727,8 +5597,6 @@ screens:
       from: deepLink
     - name: outletId
       from: deepLink
-    - name: boxId
-      from: session
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to. The deposit box allocated to this till for the shift.'
     preloaded:
@@ -6812,39 +5680,25 @@ screens:
       - subjectId
       - collectionNote
     provenance: client-verified
-  - id: formAdjustDepositBoxFloat
-    component: modal
-    trigger: Adjust deposit box float
-    body: '**Collects what `adjustDepositBoxFloat` sends before it is called.** Required: `amount`, `reason`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Adjust deposit box float
-      operation: adjustDepositBoxFloat
-    dismiss:
-      label: Cancel
-      discards:
-      - amount
-      - reason
-    provenance: client-verified
-  - id: formOpenShift
-    component: modal
-    trigger: Open shift
-    body: '**Collects what `openShift` sends before it is called.** Required: `workstationId`, `openingFloat`.
-      Optional: `depositBoxCode`, `bagNumber`, `recordedAt`. Dismissing sends nothing; the screen behind
-      is unchanged.'
-    bindsTo: OpenShiftRequest
-    confirm:
-      label: Open shift
-      operation: openShift
-    dismiss:
-      label: Cancel
-      discards:
-      - workstationId
-      - openingFloat
-      - depositBoxCode
-      - bagNumber
-      - recordedAt
-    provenance: client-verified
+  gaps:
+  - operation: adjustDepositBoxFloat
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Denominations, Adjust deposit box float and Open shift
+      were bulk-attached; a collection counter needs the order list and the handover (R254; design-notes
+      correction fnb-retail POS-012).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-012
+  - operation: listDenominations
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Denominations, Adjust deposit box float and Open shift
+      were bulk-attached; a collection counter needs the order list and the handover (R254; design-notes
+      correction fnb-retail POS-012).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-012
+  - operation: openShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Denominations, Adjust deposit box float and Open shift
+      were bulk-attached; a collection counter needs the order list and the handover (R254; design-notes
+      correction fnb-retail POS-012).'
+    source: R254 | screens/P04-point-of-sale.yaml#POS-012
 - id: POS-013
   name: Mobile POS, Event Sales & Offline Operations
   module: Sell
@@ -6866,10 +5720,6 @@ screens:
     transitions:
     - to: POS-002
       trigger: Back to sale
-      carries:
-      - cart
-      - guest
-      - discount
       provenance: board TICVAI POS Terminal · navigation rail; **selling continues offline** (ADR-0013)
         and the queue drains on reconnect — `toggleNet` (4750).
     - to: POS-020
@@ -6878,10 +5728,6 @@ screens:
       precondition: syncQueue.any(status in ['CONFLICT','FAILED','REQUIRES_ATTENTION'])
       guard: inventory.conflict.resolve
       escalatable: true
-      carries:
-      - localTxnId
-      - conflictReason
-      - productId
       provenance: board TICVAI POS Terminal · openConflict (4770) + resolveConflict (4776)
     - to: POS-007
       trigger: Close Shift
@@ -6918,83 +5764,23 @@ screens:
   pattern: listDetail
   patternReason: '`listCashMovements` reads the population and `getOfflinePackage` reads one of them —
     list, select, act'
-  purpose: Mobile POS, Event Sales & Offline Operations — from the client design board, 20 August.
+  purpose: Keep selling while the till is offline, and see what the server refused when it syncs.
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every cash movement
-        bindsTo: CashMovement
-        columns:
-        - CashMovement.id
-        - CashMovement.kind
-        - CashMovement.amount
-        - CashMovement.denominations
-        - CashMovement.reference
-        - CashMovement.reason
-        - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
-        - CashMovement.syncedAt
-        operation: listCashMovements
-        provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
-      - kind: dataTable
-        label: Every denomination
-        bindsTo: Denomination
-        columns:
-        - Denomination.id
-        - Denomination.currencyCode
-        - Denomination.displayName
-        - Denomination.kind
-        - Denomination.sortOrder
-        - Denomination.isActive
-        - Denomination.value
-        operation: listDenominations
-        provenance: contract shift.yaml GET /denominations
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
+      - kind: dataTable
+        label: Refused on replay
+        operation: listSyncRejections
+        provenance: contract orders.yaml GET /sync/rejections; wiring fix, 2 October 2026
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected cash movement
-        bindsTo: CashMovement
-        columns:
-        - CashMovement.id
-        - CashMovement.kind
-        - CashMovement.amount
-        - CashMovement.denominations
-        - CashMovement.reference
-        - CashMovement.reason
-        - CashMovement.recordedAt
-        - CashMovement.shiftId
-        - CashMovement.depositBoxId
-        - CashMovement.witnessPrincipalId
-        - CashMovement.withdrawalReason
-        - CashMovement.authorisedByPrincipalId
-        - CashMovement.sequence
-        - CashMovement.syncedAt
-        operation: listCashMovements
-        provenance: contract shift.yaml GET /shifts/{shiftId}/cash-movements
-      - kind: detailPanel
-        label: The offline package
-        bindsTo: OfflinePackage
-        columns:
-        - OfflinePackage.generatedAt
-        - OfflinePackage.validFrom
-        - OfflinePackage.validTo
-        - OfflinePackage.accessPointId
-        - OfflinePackage.entitlements
-        - OfflinePackage.delegatedRights
-        - OfflinePackage.blacklist
-        - OfflinePackage.admissionRules
-        operation: getOfflinePackage
-        provenance: contract access.yaml GET /access/offline-package
+      components: []
     - name: actionBar
       slot: rowActions
       components:
@@ -7006,37 +5792,7 @@ screens:
         label: Create order
         operation: createOrder
         provenance: contract orders.yaml POST /orders
-      - kind: secondaryButton
-        label: Adjust deposit box float
-        operation: adjustDepositBoxFloat
-        provenance: contract shift.yaml POST /deposit-boxes/{boxId}/adjust-float
-      - kind: secondaryButton
-        label: Create cash movement
-        operation: createCashMovement
-        provenance: contract shift.yaml POST /shifts/{shiftId}/cash-movements
-      - kind: destructiveButton
-        label: Withdraw from deposit box
-        operation: withdrawFromDepositBox
-        provenance: contract shift.yaml POST /deposit-boxes/{boxId}/withdraw
   overlays:
-  - id: confirmWithdrawFromDepositBox
-    component: confirmDialog
-    trigger: Withdraw from deposit box
-    body: '**Names what `withdrawFromDepositBox` changes and what it leaves alone**, in the consequence
-      rather than the verb. A mobile pos event this affects should be identified in the dialog, not just
-      counted. **Collects what `withdrawFromDepositBox` sends before it is called.** Required: `id`, `amount`,
-      `witnessPrincipalId`, `recordedAt`. Optional: `reason`, `note`.'
-    provenance: client-verified
-    confirm:
-      label: Withdraw
-      operation: withdrawFromDepositBox
-      carries: &id007
-      - depositBoxId
-      - amount
-    dismiss:
-      label: Cancel
-      discards: &id008
-      - amount
   - id: formSyncOrders
     component: modal
     trigger: Sync orders
@@ -7074,101 +5830,35 @@ screens:
       - guestLinkId
       - catalogueBundleVersion
     provenance: client-verified
-  - id: formAdjustDepositBoxFloat
-    component: modal
-    trigger: Adjust deposit box float
-    body: '**Collects what `adjustDepositBoxFloat` sends before it is called.** Required: `amount`, `reason`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Adjust deposit box float
-      operation: adjustDepositBoxFloat
-    dismiss:
-      label: Cancel
-      discards:
-      - amount
-      - reason
-    provenance: client-verified
-  - id: formCreateCashMovement
-    component: modal
-    trigger: Create cash movement
-    body: '**Collects what `createCashMovement` sends before it is called.** Required: `id`, `kind`, `amount`,
-      `recordedAt`. Optional: `denominations`, `reference`, `reason`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: CreateCashMovementRequest
-    confirm:
-      label: Create cash movement
-      operation: createCashMovement
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - kind
-      - amount
-      - recordedAt
-      - denominations
-      - reference
-      - reason
-    provenance: client-verified
   states:
     loading: The mobile pos event list.
     error: Could not load. Names which read failed and leaves the mobile pos event untouched.
     emptyFirstRun: No mobile pos event yet. Offers Create order (`createOrder`).
-    emptyNoResults: 'Never shown: `listCashMovements` takes no filter, so an empty list is always the
-      first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoResults: 'Never shown: nothing on this screen filters its list, so an empty list is always
+      the first-run state above.'
+    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and
+      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
     denied: The sync queue is readable by anyone on shift. Resolving a conflict changes stock and needs
       `inventory.conflict.resolve`; a supervisor PIN unlocks it in place.
   apis:
-  - operationId: getOfflinePackage
-    contract: access
-    purpose: Entitlement and rule set for offline validation
-    trigger: onLoad
   - operationId: syncOrders
     contract: orders
     purpose: Replay orders recorded offline
     trigger: onAction
-    invalidates:
-    - listCashMovements
   - operationId: createOrder
     contract: orders
     purpose: Create an order
     trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: adjustDepositBoxFloat
-    contract: shift
-    purpose: Change the initial fund
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: createCashMovement
-    contract: shift
-    purpose: Record a cash lift or add
-    trigger: onAction
-    invalidates:
-    - listCashMovements
-  - operationId: listCashMovements
-    contract: shift
-    purpose: Lifts, adds and the opening float
+  - operationId: listSyncRejections
+    contract: orders
+    purpose: Sales the server refused on replay
     trigger: onLoad
-  - operationId: listDenominations
-    contract: shift
-    purpose: listDenominations
-    trigger: onLoad
-  - operationId: withdrawFromDepositBox
-    contract: shift
-    purpose: A supervisor takes cash out mid-shift
-    trigger: onAction
-    invalidates:
-    - listCashMovements
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
   entryState:
     params:
     - name: workstationId
-      from: session
-    - name: boxId
       from: session
     - name: shiftId
       from: session
@@ -7203,6 +5893,52 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: adjustDepositBoxFloat
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Cash operations (movements, withdraw, float) and getOfflinePackage
+      (a gate scanner''s package needing ACCESS_VALIDATE) are other screens''; the refused-on-replay list
+      (listSyncRejections) is this screen''s job and was missing (MATRIX 2.3.1, R254; design-notes correction
+      fnb-retail POS-013).'
+    source: screens/P04-point-of-sale.yaml#POS-013 | MATRIX 2.3.1 | R254
+  - operation: createCashMovement
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Cash operations (movements, withdraw, float) and getOfflinePackage
+      (a gate scanner''s package needing ACCESS_VALIDATE) are other screens''; the refused-on-replay list
+      (listSyncRejections) is this screen''s job and was missing (MATRIX 2.3.1, R254; design-notes correction
+      fnb-retail POS-013).'
+    source: screens/P04-point-of-sale.yaml#POS-013 | MATRIX 2.3.1 | R254
+  - operation: getOfflinePackage
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Cash operations (movements, withdraw, float) and getOfflinePackage
+      (a gate scanner''s package needing ACCESS_VALIDATE) are other screens''; the refused-on-replay list
+      (listSyncRejections) is this screen''s job and was missing (MATRIX 2.3.1, R254; design-notes correction
+      fnb-retail POS-013).'
+    source: screens/P04-point-of-sale.yaml#POS-013 | MATRIX 2.3.1 | R254
+  - operation: listCashMovements
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Cash operations (movements, withdraw, float) and getOfflinePackage
+      (a gate scanner''s package needing ACCESS_VALIDATE) are other screens''; the refused-on-replay list
+      (listSyncRejections) is this screen''s job and was missing (MATRIX 2.3.1, R254; design-notes correction
+      fnb-retail POS-013).'
+    source: screens/P04-point-of-sale.yaml#POS-013 | MATRIX 2.3.1 | R254
+  - operation: listDenominations
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Cash operations (movements, withdraw, float) and getOfflinePackage
+      (a gate scanner''s package needing ACCESS_VALIDATE) are other screens''; the refused-on-replay list
+      (listSyncRejections) is this screen''s job and was missing (MATRIX 2.3.1, R254; design-notes correction
+      fnb-retail POS-013).'
+    source: screens/P04-point-of-sale.yaml#POS-013 | MATRIX 2.3.1 | R254
+  - operation: withdrawFromDepositBox
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): Cash operations (movements, withdraw, float) and getOfflinePackage
+      (a gate scanner''s package needing ACCESS_VALIDATE) are other screens''; the refused-on-replay list
+      (listSyncRejections) is this screen''s job and was missing (MATRIX 2.3.1, R254; design-notes correction
+      fnb-retail POS-013).'
+    source: screens/P04-point-of-sale.yaml#POS-013 | MATRIX 2.3.1 | R254
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose read "Mobile POS, Event Sales
+    & Offline Operations — from the client design board, 20 August"; the prototype covers only offline
+    and sync (design-notes correction fnb-retail POS-013).'
 - id: POS-014
   name: Sales Exceptions, Controls & Operational Actions
   module: Sell
@@ -7410,7 +6146,7 @@ screens:
   pattern: listDetail
   patternReason: '`listCashMovements` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Cash Operations Dashboard — from the client design board, 20 August.
+  purpose: See the live cash position of every till, for a supervisor.
   layout:
     template: split
     regions:
@@ -7523,6 +6259,9 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose read "Cash Operations Dashboard
+    — from the client design board, 20 August"; the client asked for live cash status per till with expected
+    cash and card totals for supervisors (DI-273, DI-308; design-notes correction fnb-retail POS-015).'
 - id: POS-016
   name: Till Configuration
   module: Sell
@@ -7556,8 +6295,6 @@ screens:
       trigger: Shift policy is set
       provenance: flow F73 step 1→2
       operation: configureWorkstation
-      carries:
-      - venueId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it.** **Drawn 31 August** — `POS Frontline
     Board 2.dc.html` frame `pos-2b`. **Matched on frame title against screen name, constrained to this
@@ -7571,7 +6308,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`allocateDepositBox`, `configureWorkstation`) and no
     read of a population — it is settings, not a list
-  purpose: Till Configuration — from the client design board, 20 August.
+  purpose: 'Configure this till in place: its workstation settings, its peripherals and the cashier''s
+    deposit box.'
   layout:
     template: form
     regions:
@@ -7683,10 +6421,6 @@ screens:
         operation: setDeviceAssignment
         provenance: contract tenancy.yaml PUT /devices/{deviceId}/assignment (decided 29 September, readiness
           close-out (QA wiring note))
-      - kind: secondaryButton
-        label: Record device heartbeat
-        operation: recordDeviceHeartbeat
-        provenance: contract tenancy.yaml POST /devices/{deviceId}/heartbeat
   states:
     loading: The saved till.
     error: Could not load. Names which read failed and leaves the till untouched.
@@ -7716,10 +6450,6 @@ screens:
     provenance: decided 29 September, readiness close-out (QA wiring note)
     invalidates:
     - listDevices
-  - operationId: recordDeviceHeartbeat
-    contract: tenancy
-    purpose: Whether each peripheral is answering
-    trigger: background
   entryState:
     params:
     - name: workstationId
@@ -7765,22 +6495,6 @@ screens:
       - assignedWorkstationId
       - custodianPrincipalId
     provenance: client-verified
-  - id: formRecordDeviceHeartbeat
-    component: modal
-    trigger: Record device heartbeat
-    body: '**Collects what `recordDeviceHeartbeat` sends before it is called.** Required: `status`, `recordedAt`.
-      Optional: `detail`, `firmwareVersion`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Record device heartbeat
-      operation: recordDeviceHeartbeat
-    dismiss:
-      label: Cancel
-      discards:
-      - status
-      - recordedAt
-      - detail
-      - firmwareVersion
-    provenance: client-verified
   - id: formConfigureWorkstation
     component: modal
     trigger: Configure workstation
@@ -7808,6 +6522,16 @@ screens:
       - edgeNodeId
       - isActive
     provenance: client-verified
+  gaps:
+  - operation: recordDeviceHeartbeat
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): recordDeviceHeartbeat is device-audience only; the peripheral
+      reports its own heartbeat and a cashier pressing the button is refused 403. The last heartbeat shows
+      read-only on the device list (ADR-0025; design-notes correction platform-foundation POS-016).'
+    source: contracts/spine/tenancy.yaml#recordDeviceHeartbeat | ADR-0025
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder
+    "Till Configuration — from the client design board, 20 August"; the screen configures this workstation
+    in place (F73 step 1; design-notes correction platform-foundation POS-016).'
 - id: POS-017
   name: Cash In / Cash Out Operations
   module: Sell
@@ -7945,8 +6669,10 @@ screens:
     entryFrom:
     - POS-001
     - POS-015
+    - POS-002
     exitTo:
     - POS-001
+    - POS-020
     inferred: false
     notes: '**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
@@ -7958,6 +6684,9 @@ screens:
       - shiftId
       provenance: derived — POS-001 declares entryState.params shiftId and POS-018 holds shiftId, so an
         edge into it carries them
+    - to: POS-020
+      trigger: A no-sale is recorded
+      provenance: 'wiring fix, 2 October 2026 (CHG-WIR-009): flow F32 step 4→5'
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-3B** (client pack, 24 August). **Assigned by board purpose rather
     than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense,
@@ -7968,77 +6697,23 @@ screens:
   pattern: listDetail
   patternReason: '`listPrincipals` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Safe Drop & Cash Transfer Management — from the client design board, 20 August.
+  purpose: Drop cash from a drawer to the safe when it passes the ceiling.
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Scope path
-        operation: listPrincipals
-        notes: Sends `?scopePath=` to `listPrincipals`.
-        provenance: contract identity.yaml GET /principals
-      - kind: toggle
-        label: Is active
-        operation: listPrincipals
-        notes: Sends `?isActive=` to `listPrincipals`.
-        provenance: contract identity.yaml GET /principals
-      - kind: dataTable
-        label: Every principal
-        bindsTo: Principal
-        columns:
-        - Principal.id
-        - Principal.username
-        - Principal.displayName
-        - Principal.isActive
-        - Principal.validFrom
-        - Principal.validTo
-        - Principal.primaryRoleId
-        - Principal.roles
-        - Principal.lastLoginAt
-        operation: listPrincipals
-        provenance: contract identity.yaml GET /principals
-      - kind: dataTable
-        label: Every rota assignment
-        bindsTo: RotaAssignment
-        columns:
-        - RotaAssignment.overtimeMinutes
-        - RotaAssignment.restPeriodBefore
-        - RotaAssignment.breachesWorkingHourLimit
-        - RotaAssignment.labourCost
-        - RotaAssignment.id
-        - RotaAssignment.principalId
-        - RotaAssignment.displayName
-        - RotaAssignment.venueId
-        - RotaAssignment.departmentId
-        - RotaAssignment.position
-        - RotaAssignment.requiredRoleId
-        - RotaAssignment.workstationId
-        operation: listRotaAssignments
-        provenance: contract workforce.yaml GET /rota-assignments
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
+      - kind: dataTable
+        label: Open drawers
+        operation: listDepositBoxes
+        provenance: contract shift.yaml GET /deposit-boxes; wiring fix, 2 October 2026
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected principal
-        bindsTo: Principal
-        columns:
-        - Principal.id
-        - Principal.username
-        - Principal.displayName
-        - Principal.isActive
-        - Principal.validFrom
-        - Principal.validTo
-        - Principal.primaryRoleId
-        - Principal.roles
-        - Principal.lastLoginAt
-        operation: listPrincipals
-        provenance: contract identity.yaml GET /principals
+      components: []
     - name: actionBar
       slot: rowActions
       components:
@@ -8050,10 +6725,6 @@ screens:
         label: Withdraw from deposit box
         operation: withdrawFromDepositBox
         provenance: contract shift.yaml POST /deposit-boxes/{boxId}/withdraw
-      - kind: secondaryButton
-        label: Create rota assignment
-        operation: createRotaAssignment
-        provenance: contract workforce.yaml POST /rota-assignments
   overlays:
   - id: confirmWithdrawFromDepositBox
     component: confirmDialog
@@ -8066,10 +6737,13 @@ screens:
     confirm:
       label: Withdraw
       operation: withdrawFromDepositBox
-      carries: *id007
+      carries:
+      - depositBoxId
+      - amount
     dismiss:
       label: Cancel
-      discards: *id008
+      discards:
+      - amount
   - id: formCreateCashMovement
     component: modal
     trigger: Create cash movement
@@ -8091,38 +6765,6 @@ screens:
       - reference
       - reason
     provenance: designed
-  - id: formCreateRotaAssignment
-    component: modal
-    trigger: Create rota assignment
-    body: '**Collects what `createRotaAssignment` sends before it is called.** Required: `principalId`,
-      `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`, `breachesWorkingHourLimit`,
-      `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`, `workstationId`, `status`,
-      `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: RotaAssignment
-    confirm:
-      label: Create rota assignment
-      operation: createRotaAssignment
-    dismiss:
-      label: Cancel
-      discards:
-      - principalId
-      - venueId
-      - position
-      - startsAt
-      - endsAt
-      - overtimeMinutes
-      - restPeriodBefore
-      - breachesWorkingHourLimit
-      - labourCost
-      - id
-      - displayName
-      - departmentId
-      - requiredRoleId
-      - workstationId
-      - status
-      - breakMinutes
-      - note
-    provenance: designed
   states:
     loading: The safe drop cash list.
     error: Could not load. Names which read failed and leaves the safe drop cash untouched.
@@ -8130,7 +6772,7 @@ screens:
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on scopePath, isActive and the safe drop cash are still
       there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names
+    emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
     offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
@@ -8139,28 +6781,15 @@ screens:
     contract: shift
     purpose: Record a cash lift or add
     trigger: onAction
-    invalidates:
-    - listPrincipals
   - operationId: withdrawFromDepositBox
     contract: shift
     purpose: A supervisor takes cash out mid-shift
     trigger: onAction
-    invalidates:
-    - listPrincipals
-  - operationId: createRotaAssignment
-    contract: workforce
-    purpose: Put someone on the rota
-    trigger: onAction
-    invalidates:
-    - listPrincipals
-  - operationId: listPrincipals
-    contract: identity
-    purpose: List principals
+  - operationId: listDepositBoxes
+    contract: shift
+    purpose: The open drawers and boxes to drop from
     trigger: onLoad
-  - operationId: listRotaAssignments
-    contract: workforce
-    purpose: The rota
-    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
   entryState:
     params:
     - name: workstationId
@@ -8196,6 +6825,28 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: createRotaAssignment
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): listPrincipals (needs USER_MANAGE), the principal and
+      rota tables and Create rota assignment are unrelated to a safe drop, which needs the open drawers
+      (listDepositBoxes) and the withdrawal (R254; design-notes correction fnb-retail POS-018).'
+    source: screens/P04-point-of-sale.yaml#POS-018 | R254
+  - operation: listPrincipals
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): listPrincipals (needs USER_MANAGE), the principal and
+      rota tables and Create rota assignment are unrelated to a safe drop, which needs the open drawers
+      (listDepositBoxes) and the withdrawal (R254; design-notes correction fnb-retail POS-018).'
+    source: screens/P04-point-of-sale.yaml#POS-018 | R254
+  - operation: listRotaAssignments
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): listPrincipals (needs USER_MANAGE), the principal and
+      rota tables and Create rota assignment are unrelated to a safe drop, which needs the open drawers
+      (listDepositBoxes) and the withdrawal (R254; design-notes correction fnb-retail POS-018).'
+    source: screens/P04-point-of-sale.yaml#POS-018 | R254
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose was the board title ("Safe
+    Drop & Cash Transfer Management — from the client design board, 20 August"), and cash transfer between
+    drawers has no operation (design-notes correction fnb-retail POS-018).'
 - id: POS-019
   name: Shift Templates & Policies
   module: Sell
@@ -8240,7 +6891,7 @@ screens:
   pattern: listDetail
   patternReason: '`listShifts` reads the population and `getVenueSettings` reads one of them — list, select,
     act'
-  purpose: Shift Templates & Policies — from the client design board, 20 August.
+  purpose: See this till's shifts and the opening and closing rules they run under.
   layout:
     template: split
     regions:
@@ -8313,28 +6964,9 @@ screens:
         - Shift.liftsTotal
         operation: listShifts
         provenance: contract shift.yaml GET /shifts
-      - kind: detailPanel
-        label: The venue settings
-        bindsTo: VenueSettings
-        columns:
-        - VenueSettings.id
-        - VenueSettings.venueId
-        - VenueSettings.currencyCode
-        - VenueSettings.currencyScale
-        - VenueSettings.supportHours
-        - VenueSettings.quietHours
-        - VenueSettings.biometrics
-        - VenueSettings.segregatedAccess
-        - VenueSettings.alerting
-        operation: getVenueSettings
-        provenance: contract tenancy.yaml GET /venues/{venueId}/settings
     - name: actionBar
       slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Save venue settings
-        operation: setVenueSettings
-        provenance: contract tenancy.yaml PUT /venues/{venueId}/settings
+      components: []
   states:
     loading: The shift templates policies list.
     error: Could not load. Names which read failed and leaves the shift templates policies untouched.
@@ -8351,22 +6983,10 @@ screens:
     contract: shift
     purpose: List shifts
     trigger: onLoad
-  - operationId: setVenueSettings
-    contract: tenancy
-    purpose: Set support hours, quiet hours, segregated access and alerti
-    trigger: onAction
-    invalidates:
-    - listShifts
-  - operationId: getVenueSettings
-    contract: tenancy
-    purpose: Operational settings for this venue
-    trigger: onLoad
   entryState:
     params:
     - name: workstationId
       from: session
-    - name: venueId
-      from: deepLink
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
     preloaded:
@@ -8394,30 +7014,27 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formSetVenueSettings
-    component: modal
-    trigger: Save venue settings
-    body: '**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required.
-      Optional: `id`, `venueId`, `currencyCode`, `currencyScale`, `supportHours`, `quietHours`, `biometrics`,
-      `segregatedAccess`, `alerting`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: VenueSettings
-    confirm:
-      label: Save venue settings
-      operation: setVenueSettings
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - venueId
-      - currencyCode
-      - currencyScale
-      - supportHours
-      - quietHours
-      - biometrics
-      - segregatedAccess
-      - alerting
-    provenance: designed
+  gaps:
+  - operation: getVenueSettings
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): Venue-wide settings (setVenueSettings, TENANT_CONFIGURE)
+      were edited and read from a till; venue configuration belongs in Venue Management (BO-1063), and
+      a till is a device the venue configures, not a place to configure the venue (ADR-0018; design-notes
+      correction platform-foundation POS-019).'
+    source: ADR-0018 | contracts/spine/tenancy.yaml#setVenueSettings
+  - operation: setVenueSettings
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): Venue-wide settings (setVenueSettings, TENANT_CONFIGURE)
+      were edited and read from a till; venue configuration belongs in Venue Management (BO-1063), and
+      a till is a device the venue configures, not a place to configure the venue (ADR-0018; design-notes
+      correction platform-foundation POS-019).'
+    source: ADR-0018 | contracts/spine/tenancy.yaml#setVenueSettings
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-024): No operation reads or writes a till shift
+      policy (opening and closing rules, exceptions and alerts) for F73 step 2.'
+    source: DI-309 | screens/P04-point-of-sale.yaml#POS-019 | F73 step 2
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder
+    "Shift Templates & Policies — from the client design board, 20 August" (DI-309).'
 - id: POS-020
   name: Shift Exceptions & Alerts
   module: Sell
@@ -8431,6 +7048,7 @@ screens:
   navigation:
     entryFrom:
     - POS-001
+    - POS-018
     exitTo:
     - POS-002
     - POS-007
@@ -8742,12 +7360,7 @@ screens:
       precondition: cart.lineCount > 0
       guard: payment.take
       carries:
-      - cart
-      - guest
       - discount
-      - orderType
-      - table
-      - taxTotals
       returnsTo: POS-021
       provenance: board TICVAI POS Terminal · goCheckout (5157) from the `fnb` screen
     - to: POS-002
@@ -8781,42 +7394,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Outlet id
-        operation: listMenus
-        notes: Sends `?outletId=` to `listMenus`.
-        provenance: contract fnb.yaml GET /menus
-      - kind: datePicker
-        label: Active at
-        operation: listMenus
-        notes: Sends `?activeAt=` to `listMenus`.
-        provenance: contract fnb.yaml GET /menus
-      - kind: dataTable
-        label: Every menu
-        bindsTo: Menu
-        columns:
-        - Menu.id
-        - Menu.code
-        - Menu.name
-        - Menu.outletId
-        - Menu.availability
-        - Menu.sections
-        - Menu.isActive
-        operation: listMenus
-        provenance: contract fnb.yaml GET /menus
-      - kind: dataTable
-        label: Every modifier group
-        bindsTo: ModifierGroup
-        columns:
-        - ModifierGroup.id
-        - ModifierGroup.code
-        - ModifierGroup.name
-        - ModifierGroup.minSelections
-        - ModifierGroup.maxSelections
-        - ModifierGroup.options
-        - ModifierGroup.scopePath
-        operation: listModifierGroups
-        provenance: contract fnb.yaml GET /modifier-groups
       - kind: cardList
         bindsTo: MenuItem[]
         label: Menu
@@ -8837,21 +7414,6 @@ screens:
     - name: contextPanel
       slot: selection
       components:
-      - kind: detailPanel
-        label: The selected menu
-        bindsTo: Menu
-        columns:
-        - Menu.id
-        - Menu.code
-        - Menu.name
-        - Menu.outletId
-        - Menu.availability
-        - Menu.sections
-        - Menu.isActive
-        - Menu.publishedVersion
-        - Menu.publishedAt
-        operation: listMenus
-        provenance: contract fnb.yaml GET /menus
       - kind: detailPanel
         label: The guest menu
         bindsTo: GuestMenu
@@ -8898,32 +7460,18 @@ screens:
     contract: fnb
     purpose: The menu a guest sees
     trigger: onLoad
-  - operationId: listMenus
-    contract: fnb
-    purpose: List menus
-    trigger: onLoad
-  - operationId: listModifierGroups
-    contract: fnb
-    purpose: List modifier groups
-    trigger: onLoad
   - operationId: addCartLine
     contract: orders
     purpose: Add something
     trigger: onAction
-    invalidates:
-    - listMenus
   - operationId: evaluatePromotions
     contract: promotions
     purpose: Evaluate promotions against a cart
     trigger: onAction
-    invalidates:
-    - listMenus
   - operationId: setItemAvailability
     contract: fnb
     purpose: Mark an item available or eighty-sixed
     trigger: onAction
-    invalidates:
-    - listMenus
   entryState:
     params:
     - name: workstationId
@@ -9029,6 +7577,21 @@ screens:
       - reason
       - restoreAt
     provenance: client-verified
+  gaps:
+  - operation: listMenus
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): listMenus is a back-office read needing PRODUCT_VIEW ("A
+      terminal reads its menu from the catalogue bundle"), and getGuestMenu already returns each item''s
+      option groups, so listModifierGroups is not needed on the till (R254; design-notes correction fnb-retail
+      POS-021).'
+    source: contracts/satellite/fnb.yaml#listMenus | contracts/satellite/fnb.yaml#getGuestMenu | R254
+  - operation: listModifierGroups
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): listMenus is a back-office read needing PRODUCT_VIEW ("A
+      terminal reads its menu from the catalogue bundle"), and getGuestMenu already returns each item''s
+      option groups, so listModifierGroups is not needed on the till (R254; design-notes correction fnb-retail
+      POS-021).'
+    source: contracts/satellite/fnb.yaml#listMenus | contracts/satellite/fnb.yaml#getGuestMenu | R254
 - id: POS-022
   name: Send to Kitchen
   module: Sell
@@ -9054,8 +7617,6 @@ screens:
       carries:
       - orderId
       - tableLabel
-      - courses
-      - cart
       provenance: board TICVAI POS Terminal · queue STAGES (3483). **Send to kitchen, then charge, for
         every POS F&B order** — the ticket fires on send and the till charges after (decided 28 September,
         audit R261); the board's "fires on payment for quick service" is superseded. Flow F108 step 3→4.
@@ -9166,6 +7727,10 @@ screens:
         label: Mark order collected
         operation: markOrderCollected
         provenance: contract fnb.yaml POST /orders/{orderId}/collected
+      - kind: secondaryButton
+        label: Cancel order
+        operation: cancelFnbOrder
+        provenance: contract fnb.yaml POST /fnb-orders/{orderId}/cancel; wiring fix, 2 October 2026
   states:
     loading: The send kitchen list.
     error: Could not load. Names which read failed and leaves the send kitchen untouched.
@@ -9203,6 +7768,11 @@ screens:
     trigger: onAction
     invalidates:
     - listKitchenTickets
+  - operationId: cancelFnbOrder
+    contract: fnb
+    purpose: Cancel an unpaid sent order (the guest walked away)
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
   entryState:
     params:
     - name: workstationId
@@ -9307,6 +7877,17 @@ screens:
       - recordedAt
       - verifiedBy
     provenance: client-verified
+  - id: formCancelFnbOrder
+    component: modal
+    trigger: Cancel order
+    body: '**Collects what `cancelFnbOrder` sends before it is called.** Dismissing sends nothing; the
+      screen behind is unchanged.'
+    confirm:
+      label: Cancel order
+      operation: cancelFnbOrder
+    dismiss:
+      label: Cancel
+    provenance: contract fnb.yaml POST /fnb-orders/{orderId}/cancel; wiring fix, 2 October 2026
 - id: POS-023
   name: Sell — Merchandise
   module: Sell
@@ -9331,10 +7912,7 @@ screens:
       precondition: cart.lineCount > 0
       guard: payment.take
       carries:
-      - cart
-      - guest
       - discount
-      - taxTotals
       returnsTo: POS-023
       onFailure:
       - when: outOfStock
@@ -9366,44 +7944,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Outlet id
-        operation: listMerchandise
-        notes: Sends `?outletId=` to `listMerchandise`.
-        provenance: contract retail.yaml GET /merchandise
-      - kind: textField
-        label: Category id
-        operation: listMerchandise
-        notes: Sends `?categoryId=` to `listMerchandise`.
-        provenance: contract retail.yaml GET /merchandise
-      - kind: toggle
-        label: In stock only
-        operation: listMerchandise
-        notes: Sends `?inStockOnly=` to `listMerchandise`.
-        provenance: contract retail.yaml GET /merchandise
-      - kind: searchField
-        label: Search
-        operation: listMerchandise
-        notes: Sends `?search=` to `listMerchandise`.
-        provenance: contract retail.yaml GET /merchandise
-      - kind: dataTable
-        label: Every merchandise
-        bindsTo: MerchandiseItem
-        columns:
-        - MerchandiseItem.id
-        - MerchandiseItem.sku
-        - MerchandiseItem.barcode
-        - MerchandiseItem.name
-        - MerchandiseItem.outletId
-        - MerchandiseItem.categoryId
-        - MerchandiseItem.variantId
-        - MerchandiseItem.inventoryItemId
-        - MerchandiseItem.price
-        - MerchandiseItem.onHand
-        - MerchandiseItem.isReturnable
-        - MerchandiseItem.returnWindowDays
-        operation: listMerchandise
-        provenance: contract retail.yaml GET /merchandise
       - kind: searchField
         label: Scan or search
         provenance: carried from the previous definition
@@ -9415,28 +7955,7 @@ screens:
         provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected merchandise
-        bindsTo: MerchandiseItem
-        columns:
-        - MerchandiseItem.id
-        - MerchandiseItem.sku
-        - MerchandiseItem.barcode
-        - MerchandiseItem.name
-        - MerchandiseItem.outletId
-        - MerchandiseItem.categoryId
-        - MerchandiseItem.variantId
-        - MerchandiseItem.inventoryItemId
-        - MerchandiseItem.price
-        - MerchandiseItem.onHand
-        - MerchandiseItem.isReturnable
-        - MerchandiseItem.returnWindowDays
-        - MerchandiseItem.requiresSerialNumber
-        - MerchandiseItem.imageAssetRef
-        - MerchandiseItem.isActive
-        operation: listMerchandise
-        provenance: contract retail.yaml GET /merchandise
+      components: []
     - name: actionBar
       slot: rowActions
       components:
@@ -9473,10 +7992,6 @@ screens:
     stockConflict: The merchandise line went out of stock between scan and charge. The line is flagged
       and the rest of the sale stands.
   apis:
-  - operationId: listMerchandise
-    contract: retail
-    purpose: List merchandise
-    trigger: onLoad
   - operationId: lookupMerchandise
     contract: retail
     purpose: Price and stock check by barcode
@@ -9485,20 +8000,14 @@ screens:
     contract: orders
     purpose: Add something
     trigger: onAction
-    invalidates:
-    - listMerchandise
   - operationId: createRetailSale
     contract: retail
     purpose: Sell merchandise
     trigger: onAction
-    invalidates:
-    - listMerchandise
   - operationId: evaluatePromotions
     contract: promotions
     purpose: Evaluate promotions against a cart
     trigger: onAction
-    invalidates:
-    - listMerchandise
   entryState:
     params:
     - name: workstationId
@@ -9605,6 +8114,13 @@ screens:
       - couponCodes
       - evaluateAt
     provenance: client-verified
+  gaps:
+  - operation: listMerchandise
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): listMerchandise was loaded although "a terminal does not
+      call this"; the till reads its catalogue from the local bundle and checks stock with the barcode
+      lookup (R254; design-notes correction fnb-retail POS-023).'
+    source: contracts/satellite/retail.yaml#listMerchandise | R254
 - id: POS-024
   name: Outlet Setup
   module: Sell
@@ -9648,47 +8164,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Venue id
-        operation: listOutlets
-        notes: Sends `?venueId=` to `listOutlets`.
-        provenance: contract tenancy.yaml GET /outlets
-      - kind: textField
-        label: Kind
-        operation: listOutlets
-        notes: Sends `?kind=` to `listOutlets`.
-        provenance: contract tenancy.yaml GET /outlets
-      - kind: dataTable
-        label: Every outlet
-        bindsTo: Outlet
-        columns:
-        - Outlet.id
-        - Outlet.code
-        - Outlet.name
-        - Outlet.venueId
-        - Outlet.kind
-        - Outlet.zone
-        - Outlet.stockLocationId
-        - Outlet.costCenterId
-        - Outlet.openingHours
-        - Outlet.isActive
-        operation: listOutlets
-        provenance: contract tenancy.yaml GET /outlets
-      - kind: dataTable
-        label: Every menu
-        bindsTo: Menu
-        columns:
-        - Menu.id
-        - Menu.code
-        - Menu.name
-        - Menu.outletId
-        - Menu.availability
-        - Menu.sections
-        - Menu.isActive
-        - Menu.publishedVersion
-        - Menu.publishedAt
-        operation: listMenus
-        provenance: contract fnb.yaml GET /menus
       - kind: cardList
         bindsTo: TableDefinition[]
         label: Floor
@@ -9704,25 +8179,14 @@ screens:
       - kind: primaryButton
         label: Apply
         provenance: carried from the previous definition
+      - kind: detailPanel
+        label: Floor
+        bindsTo: TableMap
+        operation: getTableMap
+        provenance: contract fnb.yaml GET /outlets/{outletId}/tables; wiring fix, 2 October 2026
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected outlet
-        bindsTo: Outlet
-        columns:
-        - Outlet.id
-        - Outlet.code
-        - Outlet.name
-        - Outlet.venueId
-        - Outlet.kind
-        - Outlet.zone
-        - Outlet.stockLocationId
-        - Outlet.costCenterId
-        - Outlet.openingHours
-        - Outlet.isActive
-        operation: listOutlets
-        provenance: contract tenancy.yaml GET /outlets
+      components: []
     - name: actionBar
       slot: rowActions
       components:
@@ -9748,32 +8212,23 @@ screens:
     offline: '**Configuration is refused offline.** A table layout edited on two disconnected tablets
       is two layouts, and the room only has one.'
   apis:
-  - operationId: listOutlets
-    contract: tenancy
-    purpose: List outlets
-    trigger: onLoad
   - operationId: setTableLayout
     contract: fnb
     purpose: Configure the table layout
     trigger: onAction
-    invalidates:
-    - listOutlets
   - operationId: setTableCombinations
     contract: fnb
     purpose: Which tables can be pushed together, and to what capacity
     trigger: onAction
-    invalidates:
-    - listOutlets
   - operationId: setItemAvailability
     contract: fnb
     purpose: Mark an item available or eighty-sixed
     trigger: onAction
-    invalidates:
-    - listOutlets
-  - operationId: listMenus
+  - operationId: getTableMap
     contract: fnb
-    purpose: List menus
+    purpose: The outlet's floor as it is laid out
     trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
   entryState:
     params:
     - name: workstationId
@@ -9848,6 +8303,19 @@ screens:
       - reason
       - restoreAt
     provenance: designed
+  gaps:
+  - operation: listMenus
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): The outlet is the till''s and the menu is not edited here
+      (86 needs only the items); the outlet and menu tables were plumbing on a manager''s screen (R254;
+      design-notes correction fnb-retail POS-024).'
+    source: screens/P04-point-of-sale.yaml#POS-024 | R254
+  - operation: listOutlets
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-008): The outlet is the till''s and the menu is not edited here
+      (86 needs only the items); the outlet and menu tables were plumbing on a manager''s screen (R254;
+      design-notes correction fnb-retail POS-024).'
+    source: screens/P04-point-of-sale.yaml#POS-024 | R254
 - id: POS-025
   name: Till Home
   module: Sell
@@ -9941,6 +8409,16 @@ screens:
       - kind: banner
         label: Alerts for this workstation
         bindsTo: Alert
+    - name: actionBar
+      components:
+      - kind: secondaryButton
+        label: Suspend shift
+        operation: suspendShift
+        provenance: contract shift.yaml POST /shifts/{shiftId}/suspend; wiring fix, 2 October 2026
+      - kind: secondaryButton
+        label: Reopen shift
+        operation: reopenShift
+        provenance: contract shift.yaml POST /shifts/{shiftId}/reopen; wiring fix, 2 October 2026
   states:
     loading: The saved till home.
     error: Could not load. Names which read failed and leaves the till home untouched.
@@ -9972,10 +8450,22 @@ screens:
     contract: tenancy
     purpose: The peripherals bound to this workstation
     trigger: onLoad
+  - operationId: suspendShift
+    contract: shift
+    purpose: Suspend the shift so another user can sign in
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: reopenShift
+    contract: shift
+    purpose: Supervisor reopens a shift closed in error (PIN step-up, R144)
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
   entryState:
     params:
     - name: workstationId
       from: session
+    - name: shiftId
+      from: navigation
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: core
@@ -10011,6 +8501,29 @@ screens:
         since nothing is encoded before payment (POSV2-2); the Shift management panel drops ''Expected
         in drawer'', the blind count standing (POSV2-3, audit R080), and its Clock out and breaks call
         recordAttendance, on POS-009 Staff Roster (POSV2-3).'
+  overlays:
+  - id: formSuspendShift
+    component: modal
+    trigger: Suspend shift
+    body: '**Collects what `suspendShift` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Suspend shift
+      operation: suspendShift
+    dismiss:
+      label: Cancel
+    provenance: contract shift.yaml POST /shifts/{shiftId}/suspend; wiring fix, 2 October 2026
+  - id: formReopenShift
+    component: modal
+    trigger: Reopen shift
+    body: '**Collects what `reopenShift` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Reopen shift
+      operation: reopenShift
+    dismiss:
+      label: Cancel
+    provenance: contract shift.yaml POST /shifts/{shiftId}/reopen; wiring fix, 2 October 2026
 - id: POS-026
   name: Receipt & Reprint
   module: Sell
@@ -10024,6 +8537,7 @@ screens:
     entryFrom:
     - POS-025
     - POS-030
+    - POS-005
     exitTo:
     - POS-025
     - POS-011
@@ -10179,6 +8693,18 @@ screens:
         bindsTo: GuestProfile
       - kind: primaryButton
         label: Attach to sale
+      - kind: detailPanel
+        label: Loyalty
+        bindsTo: LoyaltyPosition
+        operation: getGuestLoyalty
+        provenance: contract marketing-crm.yaml GET /guests/{subjectId}/loyalty; wiring fix, 2 October
+          2026
+    - name: actionBar
+      components:
+      - kind: secondaryButton
+        label: Top up wallet
+        operation: topUpWallet
+        provenance: contract wallet.yaml POST /wallets/{subjectId}/top-ups; wiring fix, 2 October 2026
   states:
     loading: The saved guest lookup.
     error: Could not load. Names which read failed and leaves the guest lookup untouched.
@@ -10196,10 +8722,22 @@ screens:
     contract: marketing-crm
     purpose: Attach that guest to the sale
     trigger: onAction
+  - operationId: getGuestLoyalty
+    contract: marketing-crm
+    purpose: The identified guest's points and tier
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: topUpWallet
+    contract: wallet
+    purpose: Top up the guest's wallet (AED 50 to 1
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
   entryState:
     params:
     - name: workstationId
       from: session
+    - name: subjectId
+      from: navigation
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: core
@@ -10215,6 +8753,23 @@ screens:
       view: Left rail 'Guests', or cart guest button (goGuests)
       differences: Adds guest enrolment ('Create & link to sale') and wallet top-up (TOPUPS 50–1000),
         neither declared on this screen. Open reservations are not shown on the guest card.
+  overlays:
+  - id: formTopUpWallet
+    component: modal
+    trigger: Top up wallet
+    body: '**Collects what `topUpWallet` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Top up wallet
+      operation: topUpWallet
+    dismiss:
+      label: Cancel
+    provenance: contract wallet.yaml POST /wallets/{subjectId}/top-ups; wiring fix, 2 October 2026
+  gaps:
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-007): No staff operation creates a guest profile
+      at the till; recordConsent lacks the staff audience for agent-recorded consent.'
+    source: screens/P04-point-of-sale.yaml#POS-027 | contracts/satellite/marketing-crm.yaml#recordConsent
 - id: POS-028
   name: Table Service
   module: Sell
@@ -10276,6 +8831,27 @@ screens:
         bindsTo: TableReservation
       - kind: primaryButton
         label: Close visit & charge
+      - kind: detailPanel
+        label: Recall check
+        bindsTo: TableVisit
+        operation: getTableVisit
+        provenance: contract fnb.yaml GET /table-visits/{visitId}; wiring fix, 2 October 2026
+      - kind: detailPanel
+        label: Bill
+        bindsTo: Bill
+        operation: getBill
+        provenance: contract fnb.yaml GET /table-visits/{visitId}/bill; wiring fix, 2 October 2026
+    - name: actionBar
+      components:
+      - kind: secondaryButton
+        label: Bill requested
+        operation: requestBill
+        provenance: contract fnb.yaml POST /table-visits/{visitId}/request-bill; wiring fix, 2 October
+          2026
+      - kind: secondaryButton
+        label: Split bill
+        operation: splitBill
+        provenance: contract fnb.yaml POST /table-visits/{visitId}/bill/split; wiring fix, 2 October 2026
   states:
     loading: The saved floor.
     error: Could not load. Names which read failed and leaves the floor untouched.
@@ -10309,6 +8885,26 @@ screens:
     contract: fnb
     purpose: Seat a booked party
     trigger: onAction
+  - operationId: getTableVisit
+    contract: fnb
+    purpose: Recall the table's visit with its orders
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: getBill
+    contract: fnb
+    purpose: The table's bill
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: requestBill
+    contract: fnb
+    purpose: The party asked to pay
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: splitBill
+    contract: fnb
+    purpose: Split by amount, covers, category, item or seat
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
   entryState:
     params:
     - name: workstationId
@@ -10335,6 +8931,10 @@ screens:
     why: Deferred until after r2 (POS v2 decision POSV2-8, 1 October 2026). Kept in the fnb contract and
       on EMP-058; comes back to the till in a later release.
     source: docs/registers/pos-v2-decisions.md
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-audience table reservation create
+      for the till.'
+    source: contracts/satellite/fnb.yaml#createTableReservation
   wireframe:
     status: review
     provenance: designed
@@ -10364,6 +8964,29 @@ screens:
         / clear of a table visit. Decided 1 October (POSV2-8): moving and merging tables is deferred until
         after r2 and taken off this screen; moveTableVisit and mergeTableVisits stay in the contract and
         on EMP-058.'
+  overlays:
+  - id: formRequestBill
+    component: modal
+    trigger: Bill requested
+    body: '**Collects what `requestBill` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Bill requested
+      operation: requestBill
+    dismiss:
+      label: Cancel
+    provenance: contract fnb.yaml POST /table-visits/{visitId}/request-bill; wiring fix, 2 October 2026
+  - id: formSplitBill
+    component: modal
+    trigger: Split bill
+    body: '**Collects what `splitBill` sends before it is called.** Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Split bill
+      operation: splitBill
+    dismiss:
+      label: Cancel
+    provenance: contract fnb.yaml POST /table-visits/{visitId}/bill/split; wiring fix, 2 October 2026
 - id: POS-029
   name: Order Queue
   module: Sell
@@ -10428,7 +9051,8 @@ screens:
   states:
     loading: The saved queue.
     error: Could not load. Names which read failed and leaves the queue untouched.
-    emptyFirstRun: No queue yet. Carries the create action and says what the till does in the meantime.
+    emptyFirstRun: No queue yet. Offers no create action — this screen declares no operation that makes
+      one and says what the till does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     offline: '**The queue is the one thing that must never look current when it is not.** Offline, every
@@ -10438,28 +9062,12 @@ screens:
     contract: fnb
     purpose: Every order this outlet is working
     trigger: onLoad
-  - operationId: listQueueEntries
-    contract: queue
-    purpose: Who is waiting and for how long
-    trigger: onAction
-  - operationId: getQueue
-    contract: queue
-    purpose: The queue this workstation serves
-    trigger: onAction
-  - operationId: getQueueFeedHealth
-    contract: queue
-    purpose: Whether the feed is current
-    trigger: onAction
   entryState:
     params:
     - name: workstationId
       from: session
     - name: outletId
       from: session
-    - name: queueId
-      from: navigation
-    - name: feedId
-      from: navigation
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: fnb
@@ -10490,6 +9098,25 @@ screens:
         No queue feed-health display. Decided 1 October: Cancel is dropped from the design, no operation
         is behind it (POSV2-8); the guest status board is owned by KIT-007 (P15) and this queue mirrors
         it (POSV2-7).'
+  gaps:
+  - operation: getQueue
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Ride-queue and sensor-feed operations (listQueueEntries,
+      getQueue, getQueueFeedHealth) sat on an F&B order board; an outlet''s order flow reads listFnbOrders
+      (ADR-0012; design-notes correction venue-operations POS-029).'
+    source: contracts/satellite/queue.yaml#listQueueEntries | ADR-0012 | R254
+  - operation: getQueueFeedHealth
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Ride-queue and sensor-feed operations (listQueueEntries,
+      getQueue, getQueueFeedHealth) sat on an F&B order board; an outlet''s order flow reads listFnbOrders
+      (ADR-0012; design-notes correction venue-operations POS-029).'
+    source: contracts/satellite/queue.yaml#listQueueEntries | ADR-0012 | R254
+  - operation: listQueueEntries
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Ride-queue and sensor-feed operations (listQueueEntries,
+      getQueue, getQueueFeedHealth) sat on an F&B order board; an outlet''s order flow reads listFnbOrders
+      (ADR-0012; design-notes correction venue-operations POS-029).'
+    source: contracts/satellite/queue.yaml#listQueueEntries | ADR-0012 | R254
 - id: POS-030
   name: Sales Journal
   module: Sell

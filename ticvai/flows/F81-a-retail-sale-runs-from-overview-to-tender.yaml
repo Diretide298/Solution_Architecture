@@ -23,19 +23,14 @@ steps:
   screen: BO-021
   action: Order Search.
   operations:
-  - getGuestOrderStatus
+  - listFnbOrders
   - recordOrderHandover
   outcome: '**Drawn by the client as RET-3A.** 2 operations on this step.'
 - step: 2
   screen: POS-002
   action: Sell — Ticket Catalogue.
   operations:
-  - exchangeOrderLines
-  - getOrderStatement
   - holdOrder
-  - listOrderRefunds
-  - modifyOrder
-  - rescheduleOrder
   outcome: '**Drawn by the client as RET-3B.** 8 operations on this step.'
   crossesDevice: true
 - step: 3

@@ -1570,7 +1570,6 @@ screens:
       crossesDevice: true
       back: false
       carries:
-      - caseId
       - conversationId
   notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with no
     AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations

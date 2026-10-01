@@ -21,7 +21,6 @@ steps:
   action: Live Table & Service Management.
   operations:
   - reassignServer
-  - setTableCombinations
   - transferTableVisit
   - updateTableVisit
   outcome: '**Drawn by the client as FNB-4A.**'

@@ -33,7 +33,6 @@ steps:
   action: Anything unsynced is pushed first.
   operations:
   - syncScans
-  - syncOrders
   - listSyncRejections
   outcome: '**Sync before close, always.** F33 exits at `openWithUnsynced` for exactly this.'
   crossesDevice: true

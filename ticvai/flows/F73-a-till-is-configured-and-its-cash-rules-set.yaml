@@ -28,12 +28,11 @@ steps:
 - step: 2
   screen: POS-019
   action: Shift policy is set.
-  operations:
-  - getVenueSettings
-  - setVenueSettings
+  operations: []
   outcome: '**Venue scope, not workstation.** Every till in a venue closes to the same rules or the
     variance report compares nothing.'
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-021, CHG-WIR-024).** This step set venue-wide settings (getVenueSettings/setVenueSettings) from a till; venue configuration belongs in Venue Management. No operation reads or writes a till shift policy yet (open contract gap CHG-WIR-024), so the step has no operation until one exists.'
 - step: 3
   screen: POS-015
   action: Cash limits and the drawer ceiling are set.

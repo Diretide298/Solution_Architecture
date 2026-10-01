@@ -27,9 +27,7 @@ steps:
   screen: POS-012
   action: Omnichannel Order & Fulfilment Center.
   operations:
-  - adjustDepositBoxFloat
   - getCurrentShift
-  - listDenominations
   - listOrders
   outcome: '**Drawn by the client as POS-2C.** 4 operations on this step.'
   crossesDevice: true
@@ -37,20 +35,14 @@ steps:
   screen: POS-013
   action: Mobile POS, Event Sales & Offline Operations.
   operations:
-  - adjustDepositBoxFloat
-  - createCashMovement
   - createOrder
-  - getOfflinePackage
   outcome: '**Drawn by the client as POS-2D.** 4 operations on this step.'
   crossesDevice: true
 - step: 4
   screen: POS-007
   action: Close Shift.
   operations:
-  - approveShiftOpen
-  - reopenShift
-  - resumeShift
-  - suspendShift
+  - closeShift
   outcome: '**Drawn by the client as POS-2E.** 4 operations on this step.'
   crossesDevice: true
 branches:

@@ -2423,6 +2423,10 @@ screens:
       - realisedOutcome
       - note
     provenance: contract ai.yaml POST /ai/suggestions/{suggestionId}/outcome
+  gaps:
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-014): No listSuggestions read of open suggestions.'
+    source: screens/P16-venue-analytics.yaml#ANL-010
 - id: ANL-012
   name: Live Operations Dashboard
   module: Analytics
@@ -3320,6 +3324,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10
+  - operation: listAnalyticsAnomalies
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-012): Two sources of anomalies on one card list show the same
+      situation twice; ADR-0053 and the insight layer make ai.listAiInsights (kind anomaly) the one list
+      (design-notes correction ai ANL-019).'
+    source: ADR-0053 | contracts/satellite/ai.yaml#listAiInsights | contracts/satellite/reporting.yaml#listAnalyticsAnomalies
   layout:
     template: split
     regions:
@@ -3329,11 +3339,6 @@ screens:
         derived: true
         impliedBy: askReportingQuestion
         notes: The act the screen exists for.
-      - kind: dataTable
-        derived: true
-        impliedBy: listAnalyticsAnomalies
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -3342,7 +3347,8 @@ screens:
   states:
     loading: The insights list.
     error: Could not load. Names which read failed and leaves the insights untouched.
-    emptyFirstRun: No insights yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyFirstRun: No insights yet. Offers no create action — this screen declares no operation that makes
+      one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the insights are still there. Names the active filter and
       offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -3352,11 +3358,6 @@ screens:
     contract: reporting
     purpose: Ask about what moved
     trigger: onAction
-    provenance: board reading, 19 September 2026
-  - operationId: listAnalyticsAnomalies
-    contract: reporting
-    purpose: What moved unexpectedly
-    trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: listAiInsights
     contract: ai
@@ -7235,18 +7236,11 @@ screens:
   states:
     loading: The retention archive governance configuration as saved.
     error: Could not load. Names which read failed and leaves the retention archive governance untouched.
-    emptyFirstRun: No retention archive governance configured yet. Carries the create action and says
-      what the platform does in the meantime.
+    emptyFirstRun: No retention archive governance configured yet. Offers no create action — this screen
+      declares no operation that makes one and says what the platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setApprovalRetentionPolicy
-    contract: approvals
-    purpose: Retention and archive
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getApprovalRecord
   - operationId: listDataRetentionSettings
     contract: tenancy
     purpose: Retention period per data class
@@ -7269,6 +7263,13 @@ screens:
     params:
     - name: dataClass
       from: navigation
+  gaps:
+  - operation: setApprovalRetentionPolicy
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): setApprovalRetentionPolicy on the analytics retention
+      screen; approval decision records are not reports, and ADM-346 keeps the operation (design-notes
+      correction platform-foundation ANL-050).'
+    source: contracts/spine/approvals.yaml#setApprovalRetentionPolicy
 - id: ANL-051
   name: AI Analytics Command Center
   module: Analytics
@@ -7754,6 +7755,11 @@ screens:
       shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 113 §Each Anomaly
       Displays
+  - operation: listAnalyticsAnomalies
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-012): The same duplication as ANL-019; listAiInsights (kind
+      anomaly) is the one list (ADR-0053; design-notes correction ai ANL-055).'
+    source: ADR-0053 | contracts/satellite/ai.yaml#listAiInsights
   layout:
     template: split
     regions:
@@ -7801,18 +7807,13 @@ screens:
   states:
     loading: The anomaly detection list.
     error: Could not load. Names which read failed and leaves the anomaly detection untouched.
-    emptyFirstRun: No anomaly detection yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No anomaly detection yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the anomaly detection are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAnalyticsAnomalies
-    contract: reporting
-    purpose: Anomalies, with severity
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: listAiInsights
     contract: ai
     purpose: Insights and anomalies
@@ -8229,6 +8230,14 @@ screens:
       - kind: textField
         label: Whether recommendation was accepted
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 118 §Capture
+      - kind: dataTable
+        label: Decisions
+        operation: searchAiDecisions
+        provenance: contract ai.yaml GET /decision-records; wiring fix, 2 October 2026
+      - kind: dataTable
+        label: Interactions
+        operation: listAiInteractions
+        provenance: contract ai.yaml GET /interactions; wiring fix, 2 October 2026
   states:
     loading: The insight history evidence configuration as saved.
     error: Could not load. Names which read failed and leaves the insight history evidence untouched.
@@ -8252,6 +8261,16 @@ screens:
     purpose: Review, accept, reject or mark an insight actioned
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: searchAiDecisions
+    contract: ai
+    purpose: The decision records behind each insight
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-012)
+  - operationId: listAiInteractions
+    contract: ai
+    purpose: Who asked and what was accessed
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-012)
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-059
@@ -8300,18 +8319,18 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 119 §Display
+  - operation: publishPromptTemplate
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-012): publishPromptTemplate (AI_APPROVE) is model governance
+      on the console (ADM-037); on a venue analytics screen prompts are read-only (design-notes correction
+      ai ANL-060).'
+    source: contracts/satellite/ai.yaml#publishPromptTemplate
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: publishGate
-        impliedBy: publishPromptTemplate
-        notes: 'Declares `publishPromptTemplate`. **The gate names what the publish will affect before
-          it happens**: which tenants, venues or capabilities take the new version, and that the previous
-          one stays available to roll back to.'
-        provenance: check-screens publish rule, 29 September 2026
       - kind: dataTable
         label: Every analytics governance model
         columns:
@@ -8366,8 +8385,8 @@ screens:
   states:
     loading: The analytics governance model list.
     error: Could not load. Names which read failed and leaves the analytics governance model untouched.
-    emptyFirstRun: No analytics governance model yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No analytics governance model yet. Offers no create action — this screen declares no
+      operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the analytics governance model are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -8397,11 +8416,6 @@ screens:
     contract: ai
     purpose: The prompt registry
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: publishPromptTemplate
-    contract: ai
-    purpose: Publish a prompt template version
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: runAiEvaluation
     contract: ai
@@ -9606,6 +9620,18 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor
+  - operation: listSecurityDetectionGovernance
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): listSecurityDetectionGovernance is access fraud analytics
+      (BO-253); this screen governs BI and analytics, whose data is the platform audit trail and AI usage
+      and interactions. An analytics governance read does not exist yet (contract gap CHG-WIR-004) (design-notes
+      correction venue-operations ANL-070).'
+    source: contracts/spine/access.yaml#listSecurityDetectionGovernance | contracts/spine/tenancy.yaml#listAuditRecords
+      | contracts/satellite/ai.yaml#getAiUsage
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-004): No analytics governance read (report and
+      dataset access, sharing, sensitivity).'
+    source: contracts/spine/tenancy.yaml#listAuditRecords
   layout:
     template: split
     regions:
@@ -9635,6 +9661,19 @@ screens:
         bindsTo: null
         operation: null
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor
+      - kind: dataTable
+        label: Audit trail
+        operation: listAuditRecords
+        provenance: contract tenancy.yaml GET /audit-records; wiring fix, 2 October 2026
+      - kind: detailPanel
+        label: AI usage
+        bindsTo: AiUsageReport
+        operation: getAiUsage
+        provenance: contract ai.yaml GET /usage; wiring fix, 2 October 2026
+      - kind: dataTable
+        label: AI interactions
+        operation: listAiInteractions
+        provenance: contract ai.yaml GET /interactions; wiring fix, 2 October 2026
     - name: contextPanel
       slot: selection
       components:
@@ -9665,17 +9704,28 @@ screens:
   states:
     loading: The analytics governance security list.
     error: Could not load. Names which read failed and leaves the analytics governance security untouched.
-    emptyFirstRun: No analytics governance security yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No analytics governance security yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the analytics governance security are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listSecurityDetectionGovernance
-    contract: access
-    purpose: Security Analytics, AI Detection & Governance
+  - operationId: listAuditRecords
+    contract: tenancy
+    purpose: 'Changes to analytics objects: who did what, and when'
     trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
+  - operationId: getAiUsage
+    contract: ai
+    purpose: AI usage, cost and performance in analytics
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
+  - operationId: listAiInteractions
+    contract: ai
+    purpose: Every AI prompt, response and action
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
   entryState:
     preloaded:
     - Dashboard Permissions

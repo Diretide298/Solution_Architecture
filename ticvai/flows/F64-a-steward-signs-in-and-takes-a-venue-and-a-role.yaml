@@ -32,10 +32,10 @@ steps:
   screen: EMP-002
   action: They pick a venue and a role for the shift.
   operations:
-  - listRoles
   - getCurrentSession
   outcome: '**One person, several roles, one at a time** (ADR-0002). A supervisor covering a lane takes
     the steward role and loses the supervisor one until they change back.'
+  note: '**Repointed 2 October (CHG-WIR-021).** listRoles needs ROLE_MANAGE, which a steward never holds; the roles to choose from come from the login response (availableRoles).'
 - step: 3
   screen: EMP-048
   action: The opening checklist is worked.
