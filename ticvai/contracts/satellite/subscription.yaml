@@ -7555,6 +7555,9 @@ paths:
         - "P17 SGN-008 Additional Business Module Assessment"
         - "P17 SGN-009 Integration, Payment & Technical Readiness"
         - "P17 SGN-010 AI Assessment Summary & Handoff"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Score a prospect's answers into a tier and a package
       description: 'Board 2, all ten screens of it — venue type, visitor scale, channels, ticketing
         needs, access and queue, additional modules, integrations.
@@ -7675,6 +7678,12 @@ paths:
         - "P17 SGN-014 AI Module & Package Recommendations"
         - "P17 SGN-015 Module Detail & Commercial Treatment"
         - "P17 SGN-016 Module Dependency & Compatibility Manager"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: Modules, their dependencies and their commercial treatment
       description: 'Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells
         combinations that cannot be provisioned.** F&B needs inventory; seating needs the venue map;
@@ -7749,6 +7758,9 @@ paths:
         - "P09 ADM-466 Commercial Scenario Simulator"
         - "P17 SGN-011 Recommended Package Overview"
         - "P17 SGN-012 Commercial Model & Tier Selection"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: What this package would cost, and what it would provision
       description: 'Boards 3.9, 4.8 and 10.8. **Four boards ask for a simulator, which is the pack
         saying the model is too complex to hold in a head.** Tier, allowances, billable unit, minimum

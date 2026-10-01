@@ -35,7 +35,7 @@ steps:
   screen: KSK-002
   action: Chooses a language
   operations:
-  - getTenantConfig
+  - getPublishedTenantConfig
   outcome: Everything after this is in their language, including receipts
 - step: 3
   screen: KSK-003

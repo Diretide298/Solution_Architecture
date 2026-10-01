@@ -27,8 +27,8 @@ steps:
     audit R166). **No live availability in the first release**: the line is accepted or refused against
     the facility''s capacity, never against a sensor count.'
 - step: 2
-  screen: GST-027
-  action: They pay, and the parking entitlement is issued.
+  screen: GST-009
+  action: They pay in the basket, and the parking entitlement is issued (R166; GFIX-3, 2 October).
   operations:
   - checkoutCart
   - createPayment

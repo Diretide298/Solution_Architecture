@@ -121,6 +121,12 @@ paths:
         - "P08 BO-038 Reconciliation Queue"
         - "P08 BO-221 Fast Pass & Attraction Access Journey"
         - "P12 SUP-020 Queue Configuration & Management"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience: [staff, guest]
       x-ticvai-audience-note: >
         24 August: widened to include guest. A guest needs to see which queues exist before join
@@ -791,9 +797,12 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
-        - guestAuth: []
-        - bearerAuth: []
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       parameters:
         - name: venueId
           in: query

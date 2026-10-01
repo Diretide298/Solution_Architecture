@@ -1063,7 +1063,10 @@ paths:
         - "P02 GST-027 Parking – Reserve & Pay"
         - "P02 GST-028 Parking – Reservation Confirmed"
         - "P08 BO-006 Parking Configuration"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
+      - {}
       - guestAuth: []
       - bearerAuth: []
       x-ticvai-audience:

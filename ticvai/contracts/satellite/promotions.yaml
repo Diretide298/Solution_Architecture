@@ -227,6 +227,9 @@ paths:
   /recommendations:
     post:
       operationId: getRecommendations
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: What else this guest might want
       description: '**A channel adapter of the one recommendation engine** (ADR-0052, accepted 1 October). This operation stays as the guest browse surface, with its path, id and response shape. **Block A**: the promotions module answers it from the relationship map (rules; strategy, relationships, business priority and suppression are configured in promotions). **Block B**: it forwards to the engine in `ticvai-ai` (ai `decideRecommendations`, placement `surface`) with no contract change, under a hard 200 ms budget and failing open to the rules answer, so checkout never waits on it. New screens may bind either; the deprecation of 29 September is withdrawn.
         The text below describes the behaviour both producers carry.
@@ -379,6 +382,12 @@ paths:
         - "P09 ADM-140 Promotion Overview"
         - "P09 ADM-145 Promotion Approval Inbox"
         - "P10 PTR-010 Cart & Quote"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -517,6 +526,12 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -1200,6 +1215,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-037 Offers & Promotions"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1593,6 +1611,12 @@ paths:
         - "P01 WEB-008 Add-ons & Upsell"
         - "P02 GST-004 Item Detail"
         - "P02 GST-056 Bundle Package"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1911,6 +1935,9 @@ paths:
   /upsell-suggestions:
     post:
       operationId: getUpsellSuggestions
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1989,6 +2016,9 @@ paths:
         - "P05 KSK-006 Review"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -7517,6 +7547,9 @@ paths:
   /recommendations/outcomes:
     post:
       operationId: recordRecommendationOutcome
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Shown, clicked, accepted or dismissed
       deprecated: true
       x-ticvai-superseded-by: 'recordRecommendationEvents'

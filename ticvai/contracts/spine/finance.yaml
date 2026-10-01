@@ -1947,7 +1947,10 @@ paths:
         - "P01 WEB-035 Multi-Currency & Pricing"
         - "P02 GST-044 Multi-Currency & Pricing"
         - "P08 BO-077 FX Rates & Variances"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
+      - {}
       - guestAuth: []
       - bearerAuth: []
       x-ticvai-audience:

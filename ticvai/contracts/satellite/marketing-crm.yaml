@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 211
+  x-ticvai-screen-count: 212
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -89,6 +89,9 @@ paths:
         - "P02 GST-040 Help & Support"
         - "P08 BO-804 Case Command Center"
         - "P08 BO-813 Case Analytics & Audit"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: The cases this guest raised
       description: '24 August. **No case operation was guest-callable** — `createCase`, `getCase` and
         `addCaseMessage` all carry staff permissions, so a guest could raise nothing and read nothing.
@@ -244,6 +247,9 @@ paths:
         - "P01 WEB-034 Lost & Found"
         - "P02 GST-034 Lost & Found"
         - "P02 GST-040 Help & Support"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Reply on a case the guest raised
       description: '**Threaded, so the guest sees what was said.** A support model where the venue can
         write and the guest cannot is an email address with extra steps.
@@ -716,6 +722,9 @@ paths:
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-066 Privacy & My Data"
         - "P08 BO-740 Family & Guardians"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: The things a regular should not have to say twice
       description: 'Board 4G. **Table, drink, dietary needs, contact channel.** A guest who states an
         allergy on every visit is a guest the venue is not looking after.
@@ -815,6 +824,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
         - "P02 GST-072 Share & Group Booking"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Accept or decline
       description: '**The token is single-use.** An invitation link forwarded to a group chat is the failure
         mode, and a token that survives its first use ends up there.
@@ -1013,6 +1025,9 @@ paths:
         format: uuid
     get:
       operationId: getForm
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: One form, to fill in or to edit
       description: '**What a guest reads before signing or answering, and what the builder loads.** Without
         it a survey screen had nothing to load.
@@ -1052,6 +1067,9 @@ paths:
   /form-submissions:
     post:
       operationId: submitForm
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Sign a waiver, answer a survey, capture details
       description: '**Bound to the version accepted, not to the form.** A submission pointing at a form
         that has since changed is a submission proving nothing.
@@ -1107,6 +1125,9 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-067 Refunds & Resale"
         - "P08 BO-852 Documents, Search & Retention"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Whether this guest may be issued a ticket that requires a waiver
       description: '2.15.9. **Ticket issuance is conditional on waiver acceptance**, which puts this in
         the purchase path rather than beside it — and means it must answer fast and offline.
@@ -1160,6 +1181,9 @@ paths:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P02 GST-066 Privacy & My Data"
         - "P08 BO-743 AI Guest Intelligence"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Store a guest photo, ID or signed document
       description: 'BL-133. **Deliberately not `assets`.** A guest''s passport scan is not a marketing
         asset — it has a different retention clock, a different access rule and a different reason to
@@ -1248,8 +1272,10 @@ paths:
       operationId: getMyChallenges
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
-        - "P02 GST-072 Share & Group Booking"
         - "P08 BO-824 Gamification Command Center"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Active challenges and how far along I am
       description: '22.6.14 and 22.6.15. **Progress is shown, not just the outcome.** A guest two visits
         from a reward behaves differently from one who does not know how close they are — **which is the
@@ -1429,6 +1455,9 @@ paths:
       operationId: listLostItems
       x-ticvai-consumed-by:
         - "P08 BO-073 Lost & Found Register"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Reported and found items
       description: 'BL-021. **The match is the capability.** A guest reports a lost phone and a cleaner
         hands one in — without both sides modelled, somebody searches a case list by hand.
@@ -1471,6 +1500,9 @@ paths:
       operationId: recordLostItem
       x-ticvai-consumed-by:
         - "P08 BO-073 Lost & Found Register"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Report something lost, or hand something in
       description: '**One operation for both sides**, distinguished by `kind`. A guest reports; a cleaner
         hands in. **Modelling them separately would mean matching across two shapes**, which is how a
@@ -1550,8 +1582,10 @@ paths:
       operationId: createReferral
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
-        - "P02 GST-072 Share & Group Booking"
         - "P08 BO-830 Referral & Streak Management"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Issue a referral code
       description: 'BL-034. **The reward fires on the referee''s qualifying act, not on the sign-up**
         — a referral that pays on registration pays for accounts rather than for guests.
@@ -2156,6 +2190,8 @@ paths:
   /guests/me/profile:
     get:
       operationId: getMyProfile
+      x-ticvai-consumed-by:
+        - "P02 GST-001 Home"
       security:
       - guestAuth: []
       summary: A guest reading their own details
@@ -2351,6 +2387,9 @@ paths:
         - "P02 GST-071 Payment Methods"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-005 Payment"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Spend points
       description: 'BL-018. **A guest could see a balance and not spend it, and there was no rewards catalogue**
         — points that accrue and never redeem are a liability with no exit.
@@ -2533,6 +2572,9 @@ paths:
         - "P02 GST-032 AI Concierge – Chat"
         - "P08 BO-799 Agent Workspace"
         - "P12 SUP-005 Live Chat Workspace"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -2609,6 +2651,9 @@ paths:
         - "P02 GST-032 AI Concierge – Chat"
         - "P05 KSK-015 Assistant"
         - "P08 BO-799 Agent Workspace"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: Pass an assistant conversation to a person
@@ -3024,6 +3069,9 @@ paths:
         - "P02 GST-036 Loyalty & Rewards"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-831 Progress, Leaderboards & Hub"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: A guest's points, tier and what is within reach
@@ -3295,12 +3343,14 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
-        - "P02 GST-001 Home"
         - "P06 EMP-057 Guest Profile & Dining History"
         - "P08 BO-735 Guest Directory"
         - "P08 BO-738 Activity Timeline"
         - "P08 BO-740 Family & Guardians"
         - "P09 ADM-680 Customer Recommendation Profile"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -3461,6 +3511,9 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
         - "P08 BO-749 Guest Preference Center"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -3711,6 +3764,12 @@ paths:
         - "P02 GST-065 Newsletter & Preferences"
         - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-018 Consent & Legal"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -5203,6 +5262,9 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: marketing.read
       x-ticvai-audience:
       - staff
@@ -5272,6 +5334,9 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
@@ -5629,6 +5694,12 @@ paths:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
         - "P08 BO-833 Gamification Analytics & Audit"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -5960,6 +6031,9 @@ paths:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-065 Newsletter & Preferences"
         - "P08 BO-788 Subscriptions & Preferences"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: What this guest has opted into
@@ -5993,6 +6067,9 @@ paths:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-065 Newsletter & Preferences"
         - "P08 BO-788 Subscriptions & Preferences"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: Subscribe or unsubscribe
@@ -14635,6 +14712,12 @@ paths:
   /loyalty/rewards:
     get:
       operationId: listRewards
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: What points can be turned into
       tags:
       - loyalty
@@ -14793,6 +14876,12 @@ paths:
   /badges:
     get:
       operationId: listBadges
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: Badges a guest can be awarded
       tags:
       - loyalty
@@ -14860,6 +14949,9 @@ paths:
   /customers/{customerId}/badges:
     get:
       operationId: listCustomerBadges
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Badges a guest holds
       description: '**A badge can expire and can be revoked**, so this returns the status rather than
         a list of names — a guest page showing a lapsed badge as current is a promise the venue did
@@ -15440,6 +15532,9 @@ paths:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P02 GST-007 Select Date & Time"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-requires-module: core   # booking consent works without the marketing licence (decided 29 September, rev 3 REV3-26)
       x-ticvai-audience:
       - guest
@@ -15515,6 +15610,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-046 In-Venue Notifications"
         - "P02 GST-030 In-Venue Notifications"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-requires-module: core
       summary: The signed-in guest's notification feed
       description: '**The in-venue notifications feed** (decided 29 September, rev 3 GAP-C1: the feed is in
@@ -15577,6 +15675,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-046 In-Venue Notifications"
         - "P02 GST-030 In-Venue Notifications"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-requires-module: core
       summary: Mark the signed-in guest's notifications read
       description: 'Marks the given notifications, or all of them when `all` is true, as opened. Only the

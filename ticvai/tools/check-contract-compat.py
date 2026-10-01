@@ -15,12 +15,13 @@ which records its operations and field shapes in `contracts/frozen/<contract>.js
 while the major version is unchanged:
 
   allowed   a new operation, a new optional request field or parameter, a new response field,
-            a new enum value on a request field
+            a new enum value on a request field, a `security` list that only gained alternatives
+            (every scheme a client used still admits it; 2 October, GFIX-5)
   refused   an operation removed or moved (method or path), a parameter or field removed, a type
             changed, anything newly required in a request, a response field no longer required,
             an enum value removed, **a value added to a response enum**, and a change to what the
             operation means: its `x-ticvai-permission`, `x-ticvai-conflict-policy`,
-            `x-ticvai-read-routing`, `security` or `x-ticvai-emits`
+            `x-ticvai-read-routing`, `security` (an alternative removed or changed) or `x-ticvai-emits`
 
 **Semantics count, not only shapes** (system-design review SD-050 and 17 September minutes M17-14,
 added 30 September). A client built against a frozen contract switches on the enum values it was
@@ -129,6 +130,24 @@ SEMANTIC_KEYS = ("x-ticvai-permission", "x-ticvai-conflict-policy", "x-ticvai-re
                  "x-ticvai-emits")
 
 
+def security_widened(old: str | None, new: str | None) -> bool:
+    """**A security list that only gained alternatives is additive** (2 October, GFIX-5). OpenAPI security is
+    a list of alternatives, any one of which admits the caller: a client built against r1 presents one the
+    old list accepted, and the new list still accepts it. Adding `guestAuth` or `{}` (credential optional)
+    widens who may call; dropping or changing an alternative is still breaking. 84 guest-audience operations
+    admitted only a staff bearer token (check-audience-match AM-GUEST-SECURITY); letting guests in must not
+    read as a breaking change to the staff clients that keep working."""
+    try:
+        a = json.loads(old) if old else None
+        b = json.loads(new) if new else None
+    except (TypeError, ValueError):
+        return False
+    if not isinstance(a, list) or not isinstance(b, list) or not a:
+        return False
+    alts = lambda xs: {json.dumps(x, sort_keys=True) for x in xs}
+    return alts(a) <= alts(b)
+
+
 def semantics(op: dict, c: dict) -> dict:
     """What an operation means beyond its fields (SD-050). `security` falls back to the contract's own."""
     out = {}
@@ -220,6 +239,8 @@ def compare(old: dict, new: dict) -> list[str]:
         if sa is not None:  # baselines frozen before SD-050 carry none
             for k in SEMANTIC_KEYS:
                 if sa.get(k) != sb.get(k):
+                    if k == "security" and security_widened(sa.get(k), sb.get(k)):
+                        continue
                     bad.append(f"{o}: {k} changed {sa.get(k)} -> {sb.get(k)}")
     return bad
 

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 234
+  x-ticvai-screen-count: 233
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -91,6 +91,12 @@ paths:
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P13 CMS-101 Help Me Choose"
         - "P13 CMS-103 Booking Flows"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: The merchandise hierarchy — categories, brands, collections
       description: 'Retail Board 2. **`listSeatCategories` existed and a product category did not** —
         a seat category prices a seat; this groups a catalogue.
@@ -264,6 +270,9 @@ paths:
         - "P01 WEB-022 Membership Plans"
         - "P01 WEB-023 Membership Management"
         - "P02 GST-015 Memberships"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: A guest's own memberships, benefits and history
       description: '19.2.26 to 19.2.28. **`membership` is a `ProductKind`, so purchase and renewal already
         ride the order path — and nothing returned a guest their own membership.** No active list, no
@@ -433,10 +442,9 @@ paths:
   /guest/memberships:
     get:
       operationId: listGuestMemberships
-      x-ticvai-consumed-by:
-        - "P01 WEB-022 Membership Plans"
-        - "P01 WEB-023 Membership Management"
-        - "P02 GST-015 Memberships"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: A guest's memberships, benefits and history
       description: '19.2.26 to 19.2.28. **`membership` is a `ProductKind`, so purchase and renewal already
         ride the order path — and nothing returned a guest their own memberships.**
@@ -841,6 +849,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Pause a membership at the guest's request
       description: '2.14.13. **The opposite act to a suspension, and it needed its own operation.** `suspendEntitlement`
         is a sanction — its own description names fraud, a chargeback and a behavioural ban, and it denies
@@ -996,6 +1007,12 @@ paths:
         - "P02 GST-002 Explore"
         - "P02 GST-003 Buy Tickets"
         - "P02 GST-063 Explore – Search Results"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: Find something by name
@@ -1282,6 +1299,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-040 Virtual Queue"
         - "P02 GST-070 Reserve a Table"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: Ask to be told if capacity frees up
@@ -1346,6 +1366,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-040 Virtual Queue"
         - "P02 GST-070 Reserve a Table"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: Stop waiting
@@ -1455,6 +1478,12 @@ paths:
         - "P13 CMS-101 Help Me Choose"
         - "P13 CMS-103 Booking Flows"
         - "P16 ANL-004 Product Performance"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -1655,6 +1684,12 @@ paths:
         - "P01 WEB-004 Attraction Details"
         - "P02 GST-004 Item Detail"
         - "P08 BO-161 Guest, Companion & Eligibility Rules"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: 'Who may take part: age, height, supervision'
       description: '**A product with no rule set answers `200`, not `404`.** The schema''s own reading
         of absence is "anyone may take part", so an unset rule comes back with every limit null and every
@@ -1753,6 +1788,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Performance Selection"
         - "P02 GST-007 Select Date & Time"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Can this party take part
       description: 'Checks a party''s declared ages and heights against every product in the booking before
         payment, and says per guest who cannot take part and why, and whether a guardian signature or waiver
@@ -1794,6 +1832,12 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
         - "P08 BO-011 Packages & Bundles"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: A school-trip format or party package
       tags:
       - product
@@ -1879,6 +1923,12 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: The school-trip formats or party packages on offer
       tags:
       - product
@@ -1941,6 +1991,12 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -2167,6 +2223,12 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -2595,6 +2657,12 @@ paths:
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -2990,11 +3058,16 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-008 Add-ons & Upsell"
         - "P02 GST-052 Suggested Itineraries"
-        - "P02 GST-056 Bundle Package"
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-094 Map Editor & Publish"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -3710,6 +3783,12 @@ paths:
         - "P05 KSK-005 Choose a performance"
         - "P05 KSK-015 Assistant"
         - "P10 PTR-007 Availability Search"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -4325,6 +4404,12 @@ paths:
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -14792,6 +14877,12 @@ paths:
   /membership-programmes:
     get:
       operationId: listMembershipProgrammes
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: Membership schemes, the level above a plan
       description: 'Decision 9 of the schema merge. **A programme groups plans**; the plan itself is
         `catalogue.entitlement_template`, which the TAKE BODY verdict settled — validity kind,
@@ -14852,6 +14943,12 @@ paths:
   /membership-benefits:
     get:
       operationId: listMembershipBenefits
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: Benefits a plan can grant
       description: 'Decision 9. **Benefits were columns on `entitlement_template`**, so adding one
         was a schema change — `can_share_media`, `can_claim_shop_and_drop`, `included_value`. Its 15
@@ -14912,6 +15009,12 @@ paths:
   /entitlement-templates/{templateId}/benefits:
     get:
       operationId: getPlanBenefits
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: Which benefits a plan grants, and how much of each
       description: '**Keyed by the entitlement template because that is the plan.** `plan_benefit`
         carries the usage limit and the period, which is the part a benefit definition cannot hold —

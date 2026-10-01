@@ -1,0 +1,50 @@
+id: CHG-GST-005
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'Security widened on 100 guest operations: 49 published reads admit a visitor ({}), 51 other guest operations
+  admit a guest token; check-contract-compat counts a security list that only gained alternatives as additive.'
+decision:
+  what: Let a visitor call the published, non-personal reads and a guest call what the audience says, widening only;
+    leave personal reads behind sign-in.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Finding of the typed checks of the council of 2 October (branch change-rules): check-audience-match AM-GUEST-SECURITY
+  84 operations, check-preauth-session PS-LOAD-NEEDS-SESSION 200 loads on 125 pre-sign-in guest screens (listProducts
+  25, getWaitTimes 14, listPerformances 9, getAvailability 9).'
+keys_touched:
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/finance.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/transport.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/white-label.yaml
+  - tools/check-contract-compat.py
+  - tools/applied/guest-public-reads-2-october.py
+  other:
+  - 'security on 100 operations: see tools/applied/guest-public-reads-2-october.py PUBLIC, PUBLIC_EXTRA and the
+    guest-session remainder'
+root_class: 'new: audience-mismatch'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: 'Decided by Chinmay, 2 October: fix before Block A starts. Register: docs/registers/guest-fix-decisions.md
+  (GFIX-5). Not closed: the prevention check arrives with the change-rules branch and is report-only until the lead
+  baselines it; close on the merge commit once run-checks.py runs it.'
