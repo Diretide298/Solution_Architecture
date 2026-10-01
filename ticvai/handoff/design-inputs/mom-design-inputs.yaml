@@ -10473,7 +10473,7 @@ inputs:
   scope: [P02]
   status: agreed
 - id: DI-1085
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.3
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.3
       Open Questions Flagged by Chinmay — Invoicing/Taxation & Biometric Consent for Minors}
   text: >-
     Open: biometric data for children. Adults with consent is compliant; for minors, either exclude biometric
@@ -10482,7 +10482,7 @@ inputs:
   scope: [GST-069]
   status: open-question
 - id: DI-1086
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.4
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.4
       Guest Mobile App — Revised Design Walkthrough}
   text: >-
     The revised mobile app design is approved in direction: Qossai liked the opening video and visual
@@ -10493,7 +10493,7 @@ inputs:
   status: agreed
   supersedes: [DI-970, DI-992]
 - id: DI-1087
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.5
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.5
       Mobile App — Configuration Flexibility}
   text: >-
     The home-screen navigation bar layout is configurable: home/explore/map/buy-tickets in different arrangements.
@@ -10501,14 +10501,14 @@ inputs:
   scope: [P02, CMS-009]
   status: agreed
 - id: DI-1088
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.5
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.5
       Mobile App — Configuration Flexibility}
   text: The landing page offers selectable scroll animations (venue choice).
   topic: [motion, configurability]
   scope: [GST-001]
   status: agreed
 - id: DI-1089
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.5
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.5
       Mobile App — Configuration Flexibility}
   text: >-
     Products can be presented in multiple card layout styles: carousel, video poster, split, etc.
@@ -10516,7 +10516,7 @@ inputs:
   scope: [P02]
   status: agreed
 - id: DI-1090
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.5
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.5
       Mobile App — Configuration Flexibility}
   text: >-
     Virtual queue join flow with a persistent status notification (e.g. "in queue, 25 minutes").
@@ -10524,7 +10524,7 @@ inputs:
   scope: [GST-023, GST-030]
   status: agreed
 - id: DI-1091
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.5
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.5
       Mobile App — Configuration Flexibility}
   text: >-
     In-app food ordering from venue outlets is kept deliberately simple, not built out as a full e-commerce
@@ -10533,7 +10533,7 @@ inputs:
   scope: [GST-024]
   status: agreed
 - id: DI-1092
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
       Mobile App — Booking Flow & Checkout}
   text: >-
     The mobile booking flow (date/day-pass selection, quantity, cross-sell, sign-in) is functionally identical
@@ -10542,7 +10542,7 @@ inputs:
   scope: [GST-007, GST-008, GST-048, GST-041]
   status: agreed
 - id: DI-1093
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
       Mobile App — Booking Flow & Checkout}
   text: >-
     Step-indicator style is configurable, the same as on the web: bars, dots, counters or step names.
@@ -10550,14 +10550,14 @@ inputs:
   scope: [P01, P02, CMS-103]
   status: agreed
 - id: DI-1094
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
       Mobile App — Booking Flow & Checkout}
   text: A "save and finish later" option retains an in-progress order locally.
   topic: [flow, states, offline]
   scope: [P02/Booking & Selection, P02/Cart & Checkout]
   status: agreed
 - id: DI-1095
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
       Mobile App — Booking Flow & Checkout}
   text: >-
     The mobile stadium/venue seat map uses the same pinch-to-zoom-in and zoom-out interaction agreed on
@@ -10566,7 +10566,7 @@ inputs:
   scope: [GST-049]
   status: agreed
 - id: DI-1096
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
       Mobile App — Booking Flow & Checkout}
   text: >-
     Checkout completes in 4 steps, supporting Apple Pay/card payment, and adds the resulting ticket to
@@ -10576,7 +10576,7 @@ inputs:
   status: agreed
   note: 29 Sep spoke of checkout in ~3 steps for the item-detail meal-combo path (M6-074).
 - id: DI-1097
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.6
       Mobile App — Booking Flow & Checkout}
   text: >-
     Font, header/footer (not yet in the current wireframe build), card size and layout are configurable
@@ -10585,7 +10585,7 @@ inputs:
   scope: [P02, P13/White Label]
   status: agreed
 - id: DI-1098
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.7
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.7
       Mobile App — Itinerary Planner & Multi-Venue Intelligence}
   text: >-
     Itinerary planner (Yas Island planner reference): party composition (adults/children with height/age),
@@ -10596,7 +10596,7 @@ inputs:
   status: agreed
   supersedes: [DI-1021]
 - id: DI-1099
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.7
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.7
       Mobile App — Itinerary Planner & Multi-Venue Intelligence}
   text: >-
     Allam: the planner applies multi-venue intelligence; it checks actual venue-level amenities before
@@ -10609,7 +10609,7 @@ inputs:
     Our reading (MOM-30-SEPTEMBER.md) draws a per-day park choice and a preferenceNotAtVenue state for
     this.
 - id: DI-1100
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.7
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.7
       Mobile App — Itinerary Planner & Multi-Venue Intelligence}
   text: >-
     Retail/kiosk shops are added to the planner's venue-linked options alongside F&B (previously only
@@ -10620,7 +10620,7 @@ inputs:
   note: >-
     BO-094 per our reading: a Retail field on venue points of kind shop/kiosk feeds the planner.
 - id: DI-1101
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.8
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.8
       Mobile App — In-Ride Video/Info & In-Park Navigation}
   text: >-
     Qossai: ride/attraction detail pages play the video directly, with no loading screen in front of it;
@@ -10629,7 +10629,7 @@ inputs:
   scope: [GST-004, WEB-004]
   status: agreed
 - id: DI-1102
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.8
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.8
       Mobile App — In-Ride Video/Info & In-Park Navigation}
   text: >-
     In-park navigation: a live map view lets a guest navigate to a selected point (e.g. the nearest food
@@ -10638,7 +10638,7 @@ inputs:
   scope: [GST-021, GST-038]
   status: agreed
 - id: DI-1103
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.8
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: 4.8
       Mobile App — In-Ride Video/Info & In-Park Navigation}
   text: >-
     In-park 3D navigation is built natively (React Three.js) from the venue's 3D GLB model plus a metadata
@@ -10741,7 +10741,7 @@ inputs:
   status: client-requested
   ref: 30SEP-6
 - id: DI-1112
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: '4.7'}
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: '4.7'}
   text: >-
     Allam: multi-venue visit planner. In a multi-venue tenant the guest picks a park per chosen day ("Which
     park each day?", hidden otherwise); each day tab names its park and every item, swap candidate and
@@ -10751,7 +10751,7 @@ inputs:
   status: agreed
   note: from screen notes; agreed by Chinmay.
 - id: DI-1113
-  source: {file: ../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: '4.7'}
+  source: {file: sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx, date: '2026-09-30', section: '4.7'}
   text: >-
     A preference a day's park cannot meet is said, not filled: a "Not at this park" banner per day names
     the cuisine or shop and the park that has it (e.g. "No Indian restaurant at Summit Peaks. Indian food

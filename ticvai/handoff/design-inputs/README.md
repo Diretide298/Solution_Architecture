@@ -80,8 +80,8 @@ The index is authored. When a new MoM, workshop output or design review arrives:
 | `sources/designs/guest-rev3-30-september/STATUS-29SEP.md` | 2026-09-29 | 4 |
 | `sources/designs/guest-rev3-30-september/TICVAI Engine Controls Manual.dc.html` | 2026-09-29 | 7 |
 | `sources/mom/TICVAI_MoM_2026-09-29_Licensing_B2C_Review.md` | 2026-09-29 | 23 |
-| `../TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx` | 2026-09-30 | 21 |
 | `sources/designs/guest-rev3-30-september/CLIENT-RESPONSE-30SEP.md` | 2026-09-30 | 8 |
+| `sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx` | 2026-09-30 | 21 |
 | `handoff/TICVAI - Decisions Register.xlsx` | 2026-10-01 | 6 |
 
 ## Open questions
