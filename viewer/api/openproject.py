@@ -241,7 +241,19 @@ def build_order(work_package: dict) -> Optional[int]:
     return int(found.group(1)) if found else None
 
 
-def summarise(work_package: dict, endpoint: str) -> dict:
+def _build_order(work_package: dict, endpoint: str, token: Optional[str]) -> Optional[int]:
+    """The number field (Priority_No.) when the project has one, else the description's line. Since release r1
+    (1 October) a ticket's description is a pointer to ADAM with no "Build order #n" line, so the field is the
+    only place the order is; the line stays the fallback for a project without the field."""
+    if token:
+        field = build_order_field(endpoint, token, work_package)
+        value = work_package.get(field) if field else None
+        if isinstance(value, (int, float)):
+            return int(value)
+    return build_order(work_package)
+
+
+def summarise(work_package: dict, endpoint: str, token: Optional[str] = None) -> dict:
     """
     A work package, flattened to the fields a board or a tool actually shows.
 
@@ -273,7 +285,7 @@ def summarise(work_package: dict, endpoint: str) -> dict:
         "dueDate": work_package.get("dueDate"),
         # Where this ticket sits in the order the work is finished in. Read here, where the description
         # is at hand, so the description itself need not be carried on every list row.
-        "buildOrder": build_order(work_package),
+        "buildOrder": _build_order(work_package, endpoint, token),
         # Whether this ticket's dates are its own. OpenProject schedules a
         # parent automatically by default: its dates are derived from its
         # children and a PATCH that sets them is refused with a 422. The plan
@@ -312,7 +324,7 @@ def work_package(endpoint: str, token: str, key: str) -> dict:
     """One, summarised, with its description — the part a developer works from.
     Lists leave the description out; one ticket keeps it."""
     raw = call(endpoint, token, f"work_packages/{key}")
-    found = summarise(raw, endpoint)
+    found = summarise(raw, endpoint, token)
     text = ((raw.get("description") or {}).get("raw") or "").strip()
     found["description"] = text[:DESCRIPTION_LIMIT]
     if len(text) > DESCRIPTION_LIMIT:
@@ -395,7 +407,7 @@ def update(endpoint: str, token: str, key: str, lock_version: int,
     if status_id is not None:
         body["_links"] = {"status": {"href": f"/api/v3/statuses/{status_id}"}}
     raw = call(endpoint, token, f"work_packages/{key}", method="PATCH", body=body)
-    return summarise(raw, endpoint)
+    return summarise(raw, endpoint, token)
 
 
 def types(endpoint: str, token: str, project_id: int) -> list:
@@ -440,7 +452,7 @@ def create(endpoint: str, token: str, project_id: int, subject: str,
         body["_links"] = links
     raw = call(endpoint, token, f"projects/{project_id}/work_packages",
                method="POST", body=body)
-    return summarise(raw, endpoint)
+    return summarise(raw, endpoint, token)
 
 
 def comment(endpoint: str, token: str, key: str, text: str) -> None:
@@ -506,7 +518,7 @@ def everything(endpoint: str, token: str, project_id: int, limit: int = 2000) ->
         elements = page.get("_embedded", {}).get("elements", [])
         before = len(found)
         for raw in elements:
-            summary = summarise(raw, endpoint)
+            summary = summarise(raw, endpoint, token)
             found[summary["key"]] = summary
         total = page.get("total")
         if (len(elements) < size or len(found) == before or len(found) >= limit
@@ -540,7 +552,7 @@ def mine_finished(endpoint: str, token: str, project_id: Optional[int] = None,
         "pageSize": max(1, min(limit, 200)),
         "sortBy": json.dumps([["updatedAt", "desc"]]),
     })
-    return [summarise(wp, endpoint)
+    return [summarise(wp, endpoint, token)
             for wp in page.get("_embedded", {}).get("elements", [])]
 
 
@@ -609,7 +621,7 @@ def mine(endpoint: str, token: str, limit: int = 2000,
         before = len(found)
         field = build_order_field(endpoint, token, elements[0]) if elements else None
         for raw in elements:
-            summary = summarise(raw, endpoint)
+            summary = summarise(raw, endpoint, token)
             if field and isinstance(raw.get(field), (int, float)):
                 summary["buildOrder"] = int(raw[field])
             found[summary["key"]] = summary
