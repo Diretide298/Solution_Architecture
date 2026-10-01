@@ -260,8 +260,8 @@ screens:
     is asked for the authenticator code after `login` via `createMfaChallenge` / `verifyMfaChallenge`.
     Enrolment happens on EMP-042, not at the till, so there is no `listMfaMethods` here.'
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-000
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -273,6 +273,14 @@ screens:
         locks after 90 s idle' rule, and a 'Shift not started · Float pending' pill. No MFA challenge,
         no active-session / force-logout, no role selection, no denied/offline state (YAML has mfaRequired,
         denied, offline, emptyNoAccess). The operator's role is fixed by the tile, not chosen.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-000.jpg
+      match: exact
+      view: 'Opens here: venue co-branding (Ferrari World), recent cashiers four at a time with their last shift, cashier-ID entry, PIN or password'
+      differences: 'v2 co-brands the sign-in with the venue (name and logo, a demo setting of the build), shows recent cashiers four at a time with their last shift, adds a cashier-ID entry for anyone not on the tiles, and switches between a 4-digit PIN and a password (LoginRequest.method takes pin or password). Badge / RFID, Corporate SSO, the 90 s idle lock and the ''Shift not started · Float pending'' pill stay. As in the approved build: no MFA challenge, no active-session / force-logout, no role selection, and no denied, offline or emptyNoAccess state.'
 - id: POS-001
   name: Begin Shift
   module: Shift
@@ -919,8 +927,8 @@ screens:
     - CashMovement.denominations
     - CashMovement.reference
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-001
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -932,6 +940,14 @@ screens:
         counting, and supervisor approval is a static 'PIN approved' note rather than a step. No suspend/resume/reopen
         shift, no cash movement, no no-sale, no deposit-box float or role selection here, although the
         YAML hangs all of those overlays on this screen.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-001.jpg
+      match: exact
+      view: 'Sign in -> ''Continue to float count'' -> ''STEP 2 OF 2 · SHIFT OPENING'' (eleven denominations, typed or tapped, with the hardware check running beside the count)'
+      differences: 'v2 counts the float on note and coin images (tap the row to count up, or type the quantity) and runs the hardware check beside the count (six devices, Re-run). A failed device shows Retry device test, Report to facilities and a reroute hint (open the shift and print to the spare gate B printer); Report to facilities has no operation on this screen. The expected float and a live variance (''Matches expected float — no variance'') are still shown while counting. No suspend, resume or reopen, cash movement, no-sale, deposit-box float or role selection, as before.'
     derivedFrom: wireframes/reference/TICVAI Boards v2.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `TICVAI Boards v2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
@@ -2380,8 +2396,8 @@ screens:
     - Product.description
     - Product.kind
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-002
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -2397,6 +2413,14 @@ screens:
         and a cart History modal with Reload cart. The YAML declares game-card issue/transfer/load, exchange,
         reschedule and promotion evaluation, and none of these appear (promo codes exist only inside the
         Discount modal).'
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-002.jpg
+      match: exact
+      view: 'Left rail ''Tickets'', with a timed ticket added (Aqua Park · Day Pass, 12:00, two adults and a child, add-ons dialog continued): REFINE chips, availability on each card, On now / Builder / Scan, the cart with the inventory hold, Reserve and Proceed to payment'
+      differences: 'v2: REFINE chips (available now, today, low capacity, best seller, on sale), availability on each card (''Next slot 17:30 · 26 left''), On now, an experience Builder and Scan. The cart shows the inventory hold with its countdown and Extend +2 min, History (cart history: no P04 screen), Hold sale, and Reserve (a sale reserved without payment: no P04 screen); Charge becomes Proceed to payment. The F1-F7 function bar replaces the home hot keys on every screen, and the operational inventory ledger is gone. As before: no game-card issue, transfer or load, no exchange or reschedule, and promotion codes only inside the Discount dialog.'
     derivedFrom: wireframes/reference/Retail Board 3.dc.html
     source: Claude Design Retail pack, 24 August
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
@@ -2689,8 +2713,8 @@ screens:
       with `inventoryHoldId`.'
     preloaded: []
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-003
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -2702,6 +2726,14 @@ screens:
       differences: This is a drawer step, not a page, which matches the YAML gap (the 3 Aug workshop decision)
         and not the screen as it is modelled. The prototype has no inventory-hold acquire/renew/relinquish
         UI; the only hold is the cart timer. It adds group bundles priced at one amount.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-003.jpg
+      match: partial
+      view: 'Tickets -> ''Aqua Park · Day Pass'' -> drawer: business date, the entry-slot grid with what is left per slot (12:00 PM picked), guests by ticket type (two adults, one child)'
+      differences: 'Still a step of the POS-002 drawer, not a page (the 3 August decision). v2: the visit date is a business-date card with Change, the entry slot a card with what is left (''59 LEFT'') and Change, then guests by ticket type (adult, child, senior, infant) and group & family bundles at one price. The cart''s inventory hold (countdown, Extend +2 min) is the only hold the cashier sees: there is no acquire, renew or relinquish of an inventory hold as such.'
   apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
@@ -2996,8 +3028,8 @@ screens:
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-004
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -3010,6 +3042,14 @@ screens:
         prototype adds a zone-priced general-admission flow (zones -> tiers -> 'Keep the party together'
         / best available) that has no screen. It also shows a running order and says 'Seats are held for
         8 minutes', but there is no seat-hold extend/recommend UI and no separate booking-fee line.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-004.jpg
+      match: partial
+      view: 'Tickets -> ''Pluma Circus · Reserved'' -> drawer -> ''Choose date & time'' -> 3:00 PM -> section map -> section 103 (seats, with held and sold seats)'
+      differences: 'Still inside the POS-002 drawer, not a full-screen map. v2 adds the section-then-seat flow for a reserved big-top event (Pluma Circus: date and time, a section map, then the section''s seats with held and sold seats and three price tiers; Back and All sections step back). No seat-hold extend or recommend, and no booking-fee line.'
     derivedFrom: wireframes/reference/Seat Board 3.dc.html
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -3557,8 +3597,8 @@ screens:
     - RetailSale.outletId
     - RetailSale.shiftId
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-005
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -3573,6 +3613,14 @@ screens:
         has a ''Tip prompt'' toggle but flags.tips is never read, so no tip is taken. There is no foreign-currency
         tender, and no buyer name/address/TRN is captured above the AED 10,000 invoice threshold, although
         the receipt does relabel to ''Tax Invoice'' (the YAML gap is still open).'
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-005.png
+      match: exact
+      view: 'Cart ''Proceed to payment'' (the POS-002 sale): tenders, cash keypad; a split is taken on the tender itself (''Add to split'', ''Half''), there is no Split payment tender'
+      differences: 'v2 takes a split on the tender itself (Add to split, Exact, Half, quick amounts) and lists the part payments taken (''Already taken in part payments''); there is no Split payment tender, where the definition still has a ''Split payment'' button. Tenders: cash, card, contactless, Apple Pay, Google Pay, guest wallet, gift voucher, complimentary, corporate voucher, prepaid / online. A printer-offline banner offers the receipt by email. As before: no tip step, no foreign-currency tender, and no buyer name, address or TRN above the AED 10,000 invoice threshold.'
     derivedFrom: wireframes/reference/Retail Board 3.dc.html
     source: Claude Design Retail pack, 24 August
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
@@ -4215,8 +4263,8 @@ screens:
     - OrderSummary.grossAmount
     - OrderSummary.refundedAmount
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-006
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -4227,6 +4275,14 @@ screens:
       differences: Held orders are a modal limited to this terminal, and there are also up to 4 parked
         cart tabs that act as a second hold mechanism. There is no search, and no modify/refund/exchange/reschedule/void
         of held orders, although the YAML attaches 9 overlays.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-006.png
+      match: partial
+      view: 'Cart ''Hold sale'', then F2 ''Recall held'' -> ''Held sales'' screen (was a modal): parked value, every line in full, Recall into sale / Print hold slip / Discard hold'
+      differences: 'v2 makes Held sales a screen (it was a modal): held sales, parked value, units held and oldest hold, then each hold with every line, Recall into sale, Print hold slip and Discard hold, and an empty state (''No held sales on this terminal''). Reached from the cart''s Hold sale and F2 Recall held. Still this terminal only, no search (emptyNoResults is not drawn), and no modify, refund, exchange or reschedule of a held order, although the definition attaches those overlays.'
     derivedFrom: wireframes/reference/Retail Board 3.dc.html
     source: Claude Design Retail pack, 24 August
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
@@ -6570,8 +6626,8 @@ screens:
     - OrderSummary.grossAmount
     - OrderSummary.refundedAmount
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-012
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -6582,6 +6638,14 @@ screens:
       differences: Omnichannel here means F&B takeaway, delivery and aggregator orders. There is no click-and-collect
         of merchandise (reserveMerchandise) and no handover record beyond the queue stage action. Delivery-partner
         capture (partner, reference, driver, fee) is not in the YAML.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-012.jpg
+      match: partial
+      view: 'Left rail ''F&B'' -> ''Loaded Fries'' -> cart order type ''Delivery'' (four order types: Dine-in, Quick service, Takeaway, Delivery) + left rail ''Queue'''
+      differences: 'v2: four order types in the cart (Dine-in, Quick service, Takeaway, Delivery); Delivery asks the fulfilment source (Own delivery or Delivery partner), and the queue (POS-029) works the orders. Quick service is a counter order with no guest details, whose number prints on the receipt and shows on the guest status board. No click-and-collect of merchandise (reserveMerchandise) and no handover record beyond the queue''s stage action.'
     derivedFrom: wireframes/reference/POS Frontline Board 2.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
@@ -8763,8 +8827,8 @@ screens:
     - Menu.outletId
     - Menu.availability
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-021
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -8774,6 +8838,14 @@ screens:
       view: Left rail 'F&B' or Home launcher 'Food & beverage'
       differences: Takeaway and delivery capture sit in the cart (see POS-012). There is no item-availability
         (86) toggle, although the YAML attaches setItemAvailability.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-021.jpg
+      match: exact
+      view: 'Left rail ''F&B'' (category tabs with counts, REFINE chips, Quick service order type)'
+      differences: 'v2: category tabs with counts (Popular, Mains, Sides, Drinks, Desserts), REFINE chips and Scan; the cart takes the order type. The header still reads ''kitchen fires on payment'', which the 28 September decision replaced (audit R261: send to kitchen, then charge, for every POS F&B order). No item-availability (86) toggle, although the definition attaches setItemAvailability.'
   apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -9029,8 +9101,8 @@ screens:
     - KitchenTicket.outletId
     - KitchenTicket.tableLabel
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-022
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -9042,6 +9114,14 @@ screens:
       differences: There is no explicit send-to-kitchen step at the counter; the order fires on payment.
         Kitchen ticket status and 'collected' are worked from the Queue board (POS-029), not from a screen
         of their own.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-022.png
+      match: partial
+      view: 'Left rail ''Queue'' -> partner order DLV-8842 ''Send to kitchen'' (it moves to Preparing; the guest status board above shows takeaway and quick-service numbers only, never partner, delivery or dine-in orders)'
+      differences: 'There is still no send-to-kitchen step at the counter: partner and kiosk orders arrive as Received and are sent from the queue (POS-029) with Send to kitchen, and a counter order fires on payment, which the 28 September decision replaced (audit R261: send to kitchen, then charge, for every POS F&B order). v2 adds the guest status board: takeaway and quick-service numbers under Preparing and Ready for pickup, mirroring the kitchen display, never a name. Kitchen ticket status and collection are worked from the queue, not from a screen of their own.'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -9306,8 +9386,8 @@ screens:
     - MerchandiseItem.name
     - MerchandiseItem.outletId
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-023
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -9318,6 +9398,14 @@ screens:
       differences: Adds lockers sold as retail lines linked to the ticket QR, and an operational inventory
         ledger (Sync -> 'Inventory ledger'). No size/variant picker for apparel ('S–XXL' is meta text
         only); the stockConflict state appears only via sync conflicts.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-023.jpg
+      match: exact
+      view: 'Left rail ''Retail'' (category tabs incl. Lockers, REFINE chips)'
+      differences: 'v2: category tabs including Lockers, REFINE chips and Scan; the operational inventory ledger that the approved build had under Sync is gone. Still no size or variant picker for apparel, and stockConflict shows only through sync conflicts.'
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -9750,8 +9838,8 @@ screens:
       not navigated to.'
   requiresModule: core
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-025
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -9762,6 +9850,14 @@ screens:
       differences: Adds hot keys, a venue highlight card and a recent-transactions feed that jumps to
         Refunds. The alerts and device health that the YAML binds to (listAlerts, listDevices) sit in
         the top-bar bell and device icon rather than on the home surface.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-025.jpg
+      match: exact
+      view: 'After ''Open shift & start selling'', or left rail ''Home'': the F1-F7 function bar replaces the home hot keys; the KPI tiles drill into the Sales journal'
+      differences: 'v2: the F1-F7 function bar (Scan ticket, Recall held, Open drawer, Reprint receipt, Reservations, Encode tickets · inactive, Sales journal) replaces the home hot keys and stays on every screen; the KPI tiles (shift sales, average basket, open checks, queue now) drill into the Sales journal; the launcher, the recent transactions with ''Open sales journal'', and the venue highlight stay. The ''On shift'' pill opens a Shift management panel (clock out, start break, shift statistics, the cash drawer, End shift & declare cash). Reservations, Encode tickets, the Sales journal and the shift panel have no P04 screen. Alerts and device health stay in the top bar.'
 - id: POS-026
   name: Receipt & Reprint
   module: Sell
@@ -10080,8 +10176,8 @@ screens:
       not navigated to.'
   requiresModule: fnb
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-028
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -10092,6 +10188,14 @@ screens:
       differences: There is no move, merge or close/clear of a table visit; tapping a table only drops
         into the F&B catalogue. The prototype adds reservation creation with a deposit, which goes beyond
         listTableReservations / seatTableReservation.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-028.jpg
+      match: partial
+      view: 'Left rail ''Tables'' -> ''Table service'': halls (Main Hall, Terrace, Majlis rooms), the plan drawn to scale, status filters, the hall''s table list with Seat & order / Recall check / Settle bill / Seat booking'
+      differences: 'v2: three halls (Main Hall, Terrace, Majlis rooms), the floor plan drawn to scale with status filters (vacant, occupied, bill requested, reserved), and the hall''s table list with Seat & order, Recall check, Settle bill and Seat booking. Reservations takes a sitting with party size, the table held for, the tables that fit and an optional holding deposit. Still no move, merge or close / clear of a table visit.'
 - id: POS-029
   name: Order Queue
   module: Sell
@@ -10183,8 +10287,8 @@ screens:
       not navigated to.'
   requiresModule: fnb
   wireframe:
-    status: notStarted
-    provenance: client-verified
+    status: review
+    provenance: designed
     board: wireframes/P04 Venue POS.dc.html#pos-029
     prototype:
       file: sources/designs/TICVAI_POS_Terminal_client_approved.html
@@ -10194,3 +10298,11 @@ screens:
       view: Left rail 'Queue'
       differences: Adds order cancellation with a reason, and auto-refund for partner-prepaid orders.
         The YAML has no cancel operation on this screen and no queue feed-health display.
+    candidate:
+      file: sources/designs/TICVAI_POS_Terminal_v2.html
+      rev: 'v2, 1 October 2026 (TICVAI POS Terminal (3).html): ours, not client-approved'
+      captured: '2026-10-01'
+      capture: wireframes/incoming/P04-pos-v2/img/pos-029.png
+      match: exact
+      view: 'Left rail ''Queue'': stage counts, the guest status board (order numbers only, mirrors the kitchen display), takeaway, partner, dine-in, delivery and quick-service orders'
+      differences: 'v2 adds the guest status board above the lanes (order numbers only, Preparing and Ready for pickup, mirroring the kitchen display) and quick-service orders beside takeaway, partner, dine-in and delivery. Each card carries its stage action (Send to kitchen, Mark ready, Served to table, Mark delivered, Hand over to guest) and Cancel, which has no operation on this screen. No queue feed-health display.'

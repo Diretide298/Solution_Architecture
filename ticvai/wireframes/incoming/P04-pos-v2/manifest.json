@@ -1,0 +1,321 @@
+{
+ "prototype": "sources/designs/TICVAI_POS_Terminal_v2.html",
+ "plan": "tools/capture-plans/pos-v2.json",
+ "captured": [
+  {
+   "id": "POS-000",
+   "name": "Sign In",
+   "view": "Opens here: venue co-branding (Ferrari World), recent cashiers four at a time with their last shift, cashier-ID entry, PIN or password",
+   "proof": [
+    "Sign in to shift",
+    "Ferrari World",
+    "RECENT CASHIERS",
+    "Enter cashier ID",
+    "4-digit PIN",
+    "Password",
+    "Badge / RFID"
+   ],
+   "file": "img/pos-000.jpg",
+   "bytes": 174488
+  },
+  {
+   "id": "POS-001",
+   "name": "Begin Shift",
+   "view": "Sign in -> 'Continue to float count' -> 'STEP 2 OF 2 · SHIFT OPENING' (eleven denominations, typed or tapped, with the hardware check running beside the count)",
+   "proof": [
+    "Count the opening float",
+    "AED 1,000",
+    "50 fils",
+    "25 fils",
+    "Hardware status",
+    "Re-run"
+   ],
+   "file": "img/pos-001.jpg",
+   "bytes": 161049
+  },
+  {
+   "id": "POS-025",
+   "name": "Till Home",
+   "view": "After 'Open shift & start selling', or left rail 'Home': the F1-F7 function bar replaces the home hot keys; the KPI tiles drill into the Sales journal",
+   "proof": [
+    "Sales board",
+    "Scan ticket",
+    "Recall held",
+    "Reservations",
+    "Encode tickets",
+    "Sales journal",
+    "SHIFT SALES",
+    "Recent transactions"
+   ],
+   "file": "img/pos-025.jpg",
+   "bytes": 209505
+  },
+  {
+   "id": "POS-002",
+   "name": "Sell — Ticket Catalogue",
+   "view": "Left rail 'Tickets', with a timed ticket added (Aqua Park · Day Pass, 12:00, two adults and a child, add-ons dialog continued): REFINE chips, availability on each card, On now / Builder / Scan, the cart with the inventory hold, Reserve and Proceed to payment",
+   "proof": [
+    "Ticketing & attractions",
+    "REFINE",
+    "Builder",
+    "Next slot",
+    "Inventory held",
+    "Aqua Park · Adult",
+    "Reserve",
+    "Proceed to payment"
+   ],
+   "file": "img/pos-002.jpg",
+   "bytes": 241788
+  },
+  {
+   "id": "POS-003",
+   "name": "Sell — Timed Entry",
+   "view": "Tickets -> 'Aqua Park · Day Pass' -> drawer: business date, the entry-slot grid with what is left per slot (12:00 PM picked), guests by ticket type (two adults, one child)",
+   "proof": [
+    "TICKET VARIANTS",
+    "BUSINESS DATE",
+    "ENTRY SLOT",
+    "LEFT",
+    "GUESTS BY TICKET TYPE",
+    "Add to sale"
+   ],
+   "file": "img/pos-003.jpg",
+   "bytes": 184010
+  },
+  {
+   "id": "POS-004",
+   "name": "Sell — Seat Map",
+   "view": "Tickets -> 'Pluma Circus · Reserved' -> drawer -> 'Choose date & time' -> 3:00 PM -> section map -> section 103 (seats, with held and sold seats)",
+   "proof": [
+    "Pluma Circus · Reserved",
+    "Section 103",
+    "STAGE THIS WAY",
+    "On hold",
+    "Sold / occupied",
+    "Add to sale"
+   ],
+   "file": "img/pos-004.jpg",
+   "bytes": 151898
+  },
+  {
+   "id": "POS-005",
+   "name": "Payment",
+   "view": "Cart 'Proceed to payment' (the POS-002 sale): tenders, cash keypad; a split is taken on the tender itself ('Add to split', 'Half'), there is no Split payment tender",
+   "proof": [
+    "Payment",
+    "Select payment method",
+    "Add to split",
+    "Half",
+    "Amount due",
+    "AED 687.75"
+   ],
+   "file": "img/pos-005.png",
+   "bytes": 167088
+  },
+  {
+   "id": "POS-006",
+   "name": "Held Orders",
+   "view": "Cart 'Hold sale', then F2 'Recall held' -> 'Held sales' screen (was a modal): parked value, every line in full, Recall into sale / Print hold slip / Discard hold",
+   "proof": [
+    "Held sales",
+    "PARKED VALUE",
+    "HLD-0044",
+    "Recall into sale",
+    "Print hold slip",
+    "Discard hold"
+   ],
+   "file": "img/pos-006.png",
+   "bytes": 176272
+  },
+  {
+   "id": "POS-012",
+   "name": "Omnichannel Order & Fulfilment Center",
+   "view": "Left rail 'F&B' -> 'Loaded Fries' -> cart order type 'Delivery' (four order types: Dine-in, Quick service, Takeaway, Delivery) + left rail 'Queue'",
+   "proof": [
+    "Food & beverage",
+    "Dine-in",
+    "Quick",
+    "Takeaway",
+    "Delivery",
+    "Loaded Fries"
+   ],
+   "file": "img/pos-012.jpg",
+   "bytes": 231384
+  },
+  {
+   "id": "POS-021",
+   "name": "Sell — Food & Drink",
+   "view": "Left rail 'F&B' (category tabs with counts, REFINE chips, Quick service order type)",
+   "proof": [
+    "Food & beverage",
+    "Popular",
+    "Mains",
+    "Desserts",
+    "REFINE",
+    "Marina Smash Burger"
+   ],
+   "file": "img/pos-021.jpg",
+   "bytes": 224060
+  },
+  {
+   "id": "POS-022",
+   "name": "Send to Kitchen",
+   "view": "Left rail 'Queue' -> partner order DLV-8842 'Send to kitchen' (it moves to Preparing; the guest status board above shows takeaway and quick-service numbers only, never partner, delivery or dine-in orders)",
+   "proof": [
+    "Delivery & takeaway queue",
+    "GUEST STATUS BOARD",
+    "Send to kitchen",
+    "DLV-8845",
+    "Prepaid via Talabat"
+   ],
+   "file": "img/pos-022.png",
+   "bytes": 242941
+  },
+  {
+   "id": "POS-023",
+   "name": "Sell — Merchandise",
+   "view": "Left rail 'Retail' (category tabs incl. Lockers, REFINE chips)",
+   "proof": [
+    "Retail",
+    "Apparel",
+    "Souvenirs",
+    "Lockers",
+    "REFINE"
+   ],
+   "file": "img/pos-023.jpg",
+   "bytes": 210374
+  },
+  {
+   "id": "POS-028",
+   "name": "Table Service",
+   "view": "Left rail 'Tables' -> 'Table service': halls (Main Hall, Terrace, Majlis rooms), the plan drawn to scale, status filters, the hall's table list with Seat & order / Recall check / Settle bill / Seat booking",
+   "proof": [
+    "Oasis Bistro floor plan",
+    "Main Hall",
+    "Terrace",
+    "Majlis rooms",
+    "drawn to scale",
+    "Bill requested",
+    "Seat booking"
+   ],
+   "file": "img/pos-028.jpg",
+   "bytes": 206649
+  },
+  {
+   "id": "POS-029",
+   "name": "Order Queue",
+   "view": "Left rail 'Queue': stage counts, the guest status board (order numbers only, mirrors the kitchen display), takeaway, partner, dine-in, delivery and quick-service orders",
+   "proof": [
+    "Delivery & takeaway queue",
+    "GUEST STATUS BOARD",
+    "READY FOR PICKUP",
+    "Quick service",
+    "Served to table",
+    "Hand over to guest"
+   ],
+   "file": "img/pos-029.png",
+   "bytes": 243461
+  },
+  {
+   "id": "V2-JOURNAL",
+   "name": "Sales journal (no P04 screen)",
+   "view": "F7 'Sales journal' -> first row expanded (line items, transaction status, Reprint receipt / Email tax invoice / Refund or void)",
+   "proof": [
+    "Sales journal",
+    "GROSS VALUE",
+    "SETTLEMENT",
+    "Pay status",
+    "TRANSACTION STATUS",
+    "Email tax invoice",
+    "Refund or void",
+    "CSV",
+    "Excel"
+   ],
+   "file": "img/v2-journal.png",
+   "bytes": 239974
+  },
+  {
+   "id": "V2-CARTHIST",
+   "name": "Cart history (no P04 screen)",
+   "view": "Cart 'History' -> 'Cart history': completed sales on this terminal by day; a row opens Reload this cart / Reprint receipt / Email tax invoice",
+   "proof": [
+    "Cart history",
+    "Yesterday",
+    "All days",
+    "AVG BASKET",
+    "Reload this cart",
+    "Email tax invoice"
+   ],
+   "file": "img/v2-carthist.png",
+   "bytes": 179019
+  },
+  {
+   "id": "V2-SHIFT",
+   "name": "Shift management panel (no P04 screen of its own)",
+   "view": "Top bar 'On shift' pill -> 'Shift Management': current shift (terminal, start, elapsed), Clock In & Open Lane / Clock Out, shift statistics, the cash drawer with expected in drawer and takings so far, shift history, End Shift & Declare Cash",
+   "proof": [
+    "Shift Management",
+    "CURRENT SHIFT",
+    "Clock Out",
+    "Expected in Drawer",
+    "End Shift & Declare Cash"
+   ],
+   "file": "img/v2-shift.jpg",
+   "bytes": 131494
+  },
+  {
+   "id": "V2-GROUPS",
+   "name": "Reservations / group bookings (no P04 screen)",
+   "view": "Left rail 'Bookings' (F5 'Reservations') -> Emirates Scouts · Troop 7: tickets encoded inactive, deposit paid, balance due, Take payment with Activate all on payment",
+   "proof": [
+    "Reservations",
+    "New reservation",
+    "Partially Paid",
+    "VALID AT GATES",
+    "BALANCE DUE",
+    "Set active",
+    "Activate all on payment",
+    "Take payment"
+   ],
+   "file": "img/v2-groups.jpg",
+   "bytes": 237944
+  },
+  {
+   "id": "V2-GROUPS-ENCODE",
+   "name": "Reservations: encode a confirmed booking (no P04 screen)",
+   "view": "Left rail 'Bookings' -> Al Noor International School (confirmed, unpaid, not encoded): encode tickets as Inactive (pay on arrival) or Active (prepaid)",
+   "proof": [
+    "Al Noor International School",
+    "Encode tickets as",
+    "Inactive",
+    "Pay on arrival",
+    "Prepaid",
+    "Encode & print 55 tickets"
+   ],
+   "file": "img/v2-groups-encode.png",
+   "bytes": 219021
+  }
+ ],
+ "missing": [
+  {
+   "id": "V2-NEWRES",
+   "view": "Bookings -> 'New reservation': customer or group, contact, visit date, entry slot, adults and children, Tentative (48 h hold, no encoding) or Confirmed",
+   "reason": "proof text not visible: \"GROUP RESERVATION\", \"ENTRY SLOT\", \"RESERVATION STATUS\", \"Create tentative reservation\"; the view shows: home tickets bookings f&b tables retail queue guests refunds sync reports setup close aqua park gate a · j. smith · pos-014 on shift · 8h 16m 16s float aed 1,00"
+  },
+  {
+   "id": "V2-RESERVE",
+   "view": "Cart 'Reserve' (the POS-002 sale): customer, mobile or email, visit date, note, Tentative (hold for 24/48/72 h) or Confirmed (pay on arrival)",
+   "reason": "proof text not visible: \"RESERVATION · NO PAYMENT\", \"Reserve this sale\", \"HOLD FOR\", \"48 h\", \"Payment status · Unpaid\", \"Reserve · no payment\"; the view shows: home tickets bookings f&b tables retail queue guests refunds sync reports setup close aqua park gate a · j. smith · pos-014 on shift · 8h 16m 23s float aed 1,00"
+  },
+  {
+   "id": "V2-BUILDER",
+   "view": "Tickets -> 'Builder' -> 'Design the guest's experience' (visit type, guests, extras, packages)",
+   "reason": "proof text not visible: \"Design the guest's experience\", \"Visit type\", \"Extras\", \"Packages\", \"Full Marina Bay Experience\"; the view shows: home tickets bookings f&b tables retail queue guests refunds sync reports setup close aqua park gate a · j. smith · pos-014 on shift · 8h 16m 16s float aed 1,00"
+  },
+  {
+   "id": "V2-PASS",
+   "view": "Tickets -> Passes -> 'Annual Pass · Family of 4' -> 'Annual pass enrolment' (holders, photo & ID, validity & card, review)",
+   "reason": "proof text not visible: \"ANNUAL PASS ENROLMENT\", \"Pass holders\", \"Photo & ID\", \"Validity & card\", \"DATE OF BIRTH\", \"NATIONALITY\"; the view shows: home tickets bookings f&b tables retail queue guests refunds sync reports setup close aqua park gate a · j. smith · pos-014 on shift · 8h 16m 17s float aed 1,00"
+  }
+ ]
+}
