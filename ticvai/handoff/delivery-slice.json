@@ -34,6 +34,8 @@
     "POS-027",
     "POS-028",
     "POS-029",
+    "POS-030",
+    "POS-031",
     "KIT-001",
     "KIT-002",
     "KIT-003",
@@ -217,7 +219,7 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 465,
+  "core": 471,
   "setup": 234,
   "allOperations": 2668
  },
@@ -263,7 +265,7 @@
    "total": 264
   },
   "OrderService": {
-   "core": 76,
+   "core": 81,
    "setup": 7,
    "total": 288
   },
@@ -283,7 +285,7 @@
    "total": 25
   },
   "TenancyService": {
-   "core": 16,
+   "core": 17,
    "setup": 12,
    "total": 204
   },
@@ -406,6 +408,7 @@
     "POS-002",
     "POS-021",
     "POS-023",
+    "POS-030",
     "PTR-010",
     "WEB-006",
     "WEB-008",
@@ -802,11 +805,13 @@
    "perm": "ORDER_CANCEL",
    "platforms": [
     "MOB",
+    "POS",
     "WEB"
    ],
    "screens": [
     "GST-016",
     "GST-017",
+    "POS-031",
     "WEB-031"
    ],
    "enables": []
@@ -1253,6 +1258,21 @@
     "ai.policy_exception",
     "ai.release"
    ]
+  },
+  "convertReservation": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/reservations/{reservationId}/convert",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-031"
+   ],
+   "enables": []
   },
   "copyPriceList": {
    "part": "setup",
@@ -2443,6 +2463,21 @@
    ],
    "enables": []
   },
+  "createReservation": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/reservations",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-031"
+   ],
+   "enables": []
+  },
   "createResource": {
    "part": "setup",
    "service": "VenueOpsService",
@@ -3382,6 +3417,21 @@
    ],
    "enables": []
   },
+  "extendReservation": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/reservations/{reservationId}/extend",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-031"
+   ],
+   "enables": []
+  },
   "extendResourceHold": {
    "part": "core",
    "service": "VenueOpsService",
@@ -4055,11 +4105,13 @@
    "perm": "ORDER_VIEW",
    "platforms": [
     "MOB",
+    "POS",
     "WEB"
    ],
    "screens": [
     "BO-026",
     "GST-072",
+    "POS-031",
     "WEB-031"
    ],
    "enables": []
@@ -4538,6 +4590,7 @@
     "KSK-011",
     "POS-002",
     "POS-006",
+    "POS-030",
     "PTR-002",
     "PTR-005",
     "PTR-008",
@@ -4835,11 +4888,13 @@
    "perm": "ORDER_VIEW",
    "platforms": [
     "MOB",
+    "POS",
     "WEB"
    ],
    "screens": [
     "GST-016",
     "GST-017",
+    "POS-031",
     "WEB-031"
    ],
    "enables": []
@@ -5046,6 +5101,7 @@
     "BO-023",
     "GST-019",
     "POS-026",
+    "POS-030",
     "WEB-019"
    ],
    "enables": []
@@ -5833,6 +5889,7 @@
     "BO-022",
     "GST-019",
     "POS-026",
+    "POS-030",
     "WEB-019"
    ],
    "enables": []
@@ -6659,6 +6716,22 @@
    ],
    "enables": []
   },
+  "listGroupArrivalCheck": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/group-arrival-check",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-280",
+    "POS-031"
+   ],
+   "enables": []
+  },
   "listGroupPackages": {
    "part": "core",
    "service": "CatalogueService",
@@ -7091,6 +7164,7 @@
     "POS-002",
     "POS-006",
     "POS-012",
+    "POS-030",
     "PTR-002",
     "PTR-005",
     "PTR-008",
@@ -7510,10 +7584,12 @@
    "perm": "ORDER_VIEW",
    "platforms": [
     "MOB",
+    "POS",
     "WEB"
    ],
    "screens": [
     "GST-016",
+    "POS-031",
     "WEB-031"
    ],
    "enables": []
@@ -8610,6 +8686,27 @@
    ],
    "enables": []
   },
+  "recordAttendance": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "workforce",
+   "verb": "POST",
+   "path": "/attendance/clock",
+   "perm": "ATTENDANCE_RECORD",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-056",
+    "BO-889",
+    "BO-935",
+    "BO-936",
+    "EMP-024",
+    "EMP-025",
+    "POS-009"
+   ],
+   "enables": []
+  },
   "recordConsent": {
    "part": "core",
    "service": "MarketingService",
@@ -8713,6 +8810,22 @@
     "BO-124",
     "BO-125",
     "POS-016"
+   ],
+   "enables": []
+  },
+  "recordGroupCheckIn": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/group-bookings/{groupBookingId}/check-in",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-280",
+    "POS-031"
    ],
    "enables": []
   },
@@ -9211,6 +9324,7 @@
     "POS-002",
     "POS-006",
     "POS-026",
+    "POS-030",
     "PTR-002",
     "PTR-005",
     "PTR-008",
@@ -9233,7 +9347,8 @@
    "screens": [
     "POS-005",
     "POS-007",
-    "POS-026"
+    "POS-026",
+    "POS-030"
    ],
    "enables": []
   },
@@ -9749,7 +9864,8 @@
    "screens": [
     "BO-734",
     "BO-735",
-    "POS-027"
+    "POS-027",
+    "POS-030"
    ],
    "enables": []
   },
@@ -13049,11 +13165,11 @@
   "orders.fraud_rule": [
    "setFraudRules"
   ],
+  "orders.group_participant": [
+   "setParticipantGuestList"
+  ],
   "orders.invitation": [
    "issueInvitation"
-  ],
-  "orders.reservation_line": [
-   "createReservation"
   ],
   "queue.reading": [
    "submitQueueReading",
@@ -13102,7 +13218,8 @@
   "platform.device_heartbeat",
   "retail.shop_and_drop_line",
   "subscription.plan_module",
-  "venuemap.map_version"
+  "venuemap.map_version",
+  "workforce.attendance_amendment"
  ],
  "missingFromLineage": []
 }

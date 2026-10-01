@@ -3680,6 +3680,7 @@ paths:
         - "P01 WEB-019 Order History"
         - "P02 GST-019 Order History"
         - "P04 POS-026 Receipt & Reprint"
+        - "P04 POS-030 Sales Journal"
         - "P08 BO-022 Order Detail"
       x-ticvai-audience:
       - staff
@@ -3982,6 +3983,7 @@ paths:
         - "P01 WEB-019 Order History"
         - "P02 GST-019 Order History"
         - "P04 POS-026 Receipt & Reprint"
+        - "P04 POS-030 Sales Journal"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
       x-ticvai-audience:

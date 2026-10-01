@@ -79,10 +79,10 @@ prefixes:
     authored: 1-17
     fromClientPack: null
   POS:
-    issued: 30
-    highWaterMark: 29
-    nextFree: 30
-    authored: 0-29
+    issued: 32
+    highWaterMark: 31
+    nextFree: 32
+    authored: 0-31
     fromClientPack: null
   PTR:
     issued: 51

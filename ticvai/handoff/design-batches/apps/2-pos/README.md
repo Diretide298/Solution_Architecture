@@ -58,17 +58,19 @@ What the client asked for in the meetings, workshops and design reviews. **Apply
 - `sources/designs/TICVAI_POS_Terminal_v2.html`: **the POS reference from 1 October.** Our improved build of the client-approved terminal (`TICVAI POS Terminal (3).html`). It is a **candidate, not client-approved**: the 14 screens captured from it are `designed`, in `review`, with a `wireframe.candidate` block, never client-verified (tools/applied/pos-v2-1-october.py). The file is 9.7 MB and **kept out of git**: it is on Chinmay's disk at that path, and the captures in `wireframes/incoming/P04-pos-v2/` are the record.
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the build the client signed off (10 September). It stays as it is; each screen's `wireframe.prototype` block still cites its view. When the client approves v2, v2 takes its place.
 
-**The kitchen display (P15) builds on v2.** Neither build has a kitchen display view. The nearest thing is v2's guest status board on the Queue (order numbers under Preparing and Ready for pickup, "mirrors the kitchen display"): draw the kitchen screens in v2's look so the two agree.
+**The kitchen display (P15) builds on v2.** Neither build has a kitchen display view. The nearest thing is v2's guest status board on the Queue (order numbers under Preparing and Ready for pickup, "mirrors the kitchen display"): draw the kitchen screens in v2's look so the two agree. **KIT-007 owns the customer-facing order status board** and takes v2's queue status board (`wireframes/incoming/P04-pos-v2/img/pos-029.png`) as its look; the till's Order Queue (POS-029) only mirrors it (POS v2 decision POSV2-7, 1 October).
+
+**The POS v2 decisions of 1 October** (all eight approved as recommended; [`docs/registers/pos-v2-decisions.md`](../../../../docs/registers/pos-v2-decisions.md)) correct v2 where it contradicts the package. Draw to the correction, not to v2, wherever they differ: no 'Expected in drawer' on the shift panel and no expected float while counting (the count is blind); nothing encoded before payment (no 'Encode tickets'); no 'Report to facilities' and no 'Cancel' on queue cards; send to kitchen, then charge; a split taken on any tender.
 
 Open the file and match it. Do not describe it in words.
 
 ### Where it stands
 
-- **40 screens.** 40 are Block A (the first 35 days of the build, from Monday 5 October).
-- **30 have a frame** (all of P04): **14 are v2 captures** (candidate, in review: POS-000 to 006, 012, 021, 022, 023, 025, 028, 029), **9 are client-verified** (views v2 did not change: POS-007, 008, 011, 013, 014, 016, 020, 026, 027) and 7 were drawn in Claude Design on 29 September in the prototype's style. The 10 kitchen screens have none.
-- v2 also has views with **no P04 screen** (sales journal, cart history, reservations with ticket encoding, a shift management panel). They are captured for review in `wireframes/incoming/P04-pos-v2/` (V2-*) and are questions for Chinmay, not screens: do not draw them as P04 screens.
+- **42 screens** (32 P04, 10 P15). The 40 that were in Block A on 1 October stay Block A (the first 35 days of the build, from Monday 5 October); the two new screens, POS-030 and POS-031 (wave 1), get their tasks at the release refresh (r2).
+- **32 have a frame** (all of P04): **16 are v2 captures** (candidate, in review: POS-000 to 006, 012, 021, 022, 023, 025, 028, 029, and the two new screens), **9 are client-verified** (views v2 did not change: POS-007, 008, 011, 013, 014, 016, 020, 026, 027) and 7 were drawn in Claude Design on 29 September in the approved build's style. The 10 kitchen screens have none.
+- **The v2 views that had no P04 screen are decided** (1 October): the sales journal and the cart history are one new screen, **POS-030 Sales Journal**; the reservations and group bookings are **POS-031 Reservations & Group Arrivals**, without v2's ticket encoding before payment. Both are already covered by their v2 frames: **do not draw them again**. The shift management panel is not a screen of its own: its clock and shift history land on POS-009 Staff Roster and its cash drawer on POS-015 Cash Operations Dashboard, both drawn in the batch below.
 
-**P04 is locked.** The v2 build is the design (pending the client's approval), so no batch is cut for it. Only the kitchen display (P15) is drawn here.
+**P04 is locked, except for seven screens.** The v2 build is the design (pending the client's approval), so the 25 screens it covers stay in locked batches. **Seven P04 screens have no view in either build** and are drawn here, in v2's look, in their own batch, `P04-not-in-v2-01`: POS-010 Add to Existing Ticket, POS-017 Cash In / Cash Out, POS-018 Safe Drop & Cash Transfer, POS-019 Shift Templates & Policies and POS-024 Outlet Setup, which v2 does not cover at all, and POS-009 Staff Roster and POS-015 Cash Operations Dashboard, which **build on v2's shift panel** (`wireframes/incoming/P04-pos-v2/img/v2-shift.jpg`: current shift, clock in and out, shift history, the cash drawer) **without its 'Expected in drawer'**: the count is blind (POSV2-3). Clock out and breaks are `recordAttendance` on POS-009. Their frames from 29 September are replaced when the batch comes back. **Scope here: those 7 P04 screens and the 10 kitchen screens (P15).**
 
 ### Batches, in the order to run them
 
@@ -78,18 +80,20 @@ Block A first: batches with a new or changed screen, then the rest of Block A. T
 
 | batch | label | screens | status | notes |
 |---|---|---|---|---|
-| [`P15-kitchen-01`](../../P15-kitchen-01/) | P15 · Kitchen | 10 | to draw | 10 Block A |
+| [`P04-not-in-v2-01`](../../P04-not-in-v2-01/) | P04 · Screens the v2 build does not draw | 7 | to draw (redraw in v2's look) | 7 Block A: POS-009, 010, 015, 017, 018, 019, 024; POS-009 and POS-015 build on v2's shift panel, without 'Expected in drawer' |
+| [`P15-kitchen-01`](../../P15-kitchen-01/) | P15 · Kitchen | 10 | to draw | 10 Block A; KIT-007 builds on v2's queue status board |
+
+The manifest reads `P04-not-in-v2-01` as `drawn`, because the 29 September frames are on disk; it is on this list to be drawn again in v2's look (`redraw` in `wireframes/design-manifest.json`).
 
 #### Locked (the v2 build is the design, pending client approval)
 
 | batch | label | screens | status | notes |
 |---|---|---|---|---|
-| `P04-payment-01` (no folder: locked) | P04 · Payment | 1 | locked | 1 Block A |
-| `P04-reports-01` (no folder: locked) | P04 · Reports | 1 | locked | 1 Block A |
-| `P04-sell-01` (no folder: locked) | P04 · Sell (1 of 3) | 10 | locked | 10 Block A; changed: POS-002, POS-011 |
-| `P04-sell-02` (no folder: locked) | P04 · Sell (2 of 3) | 10 | locked | 10 Block A |
-| `P04-sell-03` (no folder: locked) | P04 · Sell (3 of 3) | 4 | locked | 4 Block A; changed: POS-026, POS-029 |
-| `P04-shift-01` (no folder: locked) | P04 · Shift | 4 | locked | 4 Block A; changed: POS-001 |
+| `P04-payment-01` (no folder: locked) | P04 · Payment | 1 | locked | POS-005; changed 1 October: split on any tender |
+| `P04-reports-01` (no folder: locked) | P04 · Reports | 1 | locked | POS-008 |
+| `P04-sell-01` (no folder: locked) | P04 · Sell (1 of 2) | 10 | locked | POS-002 to 004, 006, 011 to 014, 016, 020 |
+| `P04-sell-02` (no folder: locked) | P04 · Sell (2 of 2) | 10 | locked | POS-021 to 023, 025 to 029, and the new POS-030 and POS-031 (their v2 frames are the design: not drawn again) |
+| `P04-shift-01` (no folder: locked) | P04 · Shift | 3 | locked | POS-000, 001, 007 |
 
 ### Design inputs for P04
 

@@ -829,16 +829,16 @@ Money moves here. One atomic transaction with entitlement and ledger.
 | GET | `/fraud-rules` | `listFraudRules` | `ORDER_VIEW` | — | ticvai-web |
 | PUT | `/fraud-rules` | `setFraudRules` | `ORDER_MODIFY` | — | ticvai-web |
 | GET | `/group-amendment-cancellation` | `listGroupAmendmentCancellation` | `ORDER_VIEW` | — | venue-management-web |
-| GET | `/group-arrival-check` | `listGroupArrivalCheck` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/group-arrival-check` | `listGroupArrivalCheck` | `ORDER_VIEW` | — | venue-management-web, venue-pos |
 | GET | `/group-booking` | `listGroupBooking` | `ORDER_VIEW` | — | venue-management-web |
 | PUT | `/group-booking-handover` | `setGroupBookingHandover` | `ORDER_CREATE` | — | venue-management-web |
 | GET | `/group-booking-reconciliation` | `listGroupBookingReconciliation` | `ORDER_VIEW` | — | venue-management-web |
 | POST | `/group-booking-requests` | `requestGroupBooking` | `—` | — | guest-app, guest-web |
 | POST | `/group-bookings` | `createGroupBooking` | `ORDER_CREATE` | — | venue-management-web |
-| GET | `/group-bookings/{groupBookingId}` | `getGroupBooking` | `ORDER_VIEW` | — | guest-app, guest-web, venue-management-web |
+| GET | `/group-bookings/{groupBookingId}` | `getGroupBooking` | `ORDER_VIEW` | — | guest-app, guest-web, venue-management-web, venue-pos |
 | PATCH | `/group-bookings/{groupBookingId}` | `updateGroupBooking` | `ORDER_MODIFY` | — | venue-management-web |
 | PUT | `/group-bookings/{groupBookingId}/allocation` | `setGroupTicketAllocation` | `ORDER_MODIFY` | — | venue-management-web |
-| POST | `/group-bookings/{groupBookingId}/check-in` | `recordGroupCheckIn` | `ORDER_MODIFY` | — | venue-management-web |
+| POST | `/group-bookings/{groupBookingId}/check-in` | `recordGroupCheckIn` | `ORDER_MODIFY` | — | venue-management-web, venue-pos |
 | PUT | `/group-bookings/{groupBookingId}/fulfillment` | `setGroupTicketFulfillment` | `ORDER_MODIFY` | — | venue-management-web |
 | PUT | `/group-bookings/{groupBookingId}/participants` | `setParticipantGuestList` | `ORDER_MODIFY` | — | venue-management-web |
 | PUT | `/group-bookings/{groupBookingId}/payment-schedule` | `setGroupPaymentSchedule` | `ORDER_MODIFY` | — | venue-management-web |
@@ -960,12 +960,12 @@ Money moves here. One atomic transaction with entitlement and ledger.
 | GET | `/resale-ticket-detail` | `listResaleTicketDetail` | `ORDER_VIEW` | — | ticvai-web |
 | GET | `/reservation-confirmation-expiry` | `listReservationConfirmationExpiry` | `ORDER_VIEW` | — | venue-management-web |
 | PUT | `/reservation-hold-policy` | `setReservationHoldPolicy` | `ORDER_CREATE` | — | venue-management-web |
-| GET | `/reservations` | `listReservations` | `ORDER_VIEW` | — | guest-app, guest-web |
-| POST | `/reservations` | `createReservation` | `ORDER_CREATE` | — | — |
-| DELETE | `/reservations/{reservationId}` | `cancelReservation` | `ORDER_CANCEL` | — | guest-app, guest-web |
-| GET | `/reservations/{reservationId}` | `getReservation` | `ORDER_VIEW` | — | guest-app, guest-web |
-| POST | `/reservations/{reservationId}/convert` | `convertReservation` | `ORDER_CREATE` | — | — |
-| POST | `/reservations/{reservationId}/extend` | `extendReservation` | `ORDER_CREATE` | — | — |
+| GET | `/reservations` | `listReservations` | `ORDER_VIEW` | — | guest-app, guest-web, venue-pos |
+| POST | `/reservations` | `createReservation` | `ORDER_CREATE` | — | venue-pos |
+| DELETE | `/reservations/{reservationId}` | `cancelReservation` | `ORDER_CANCEL` | — | guest-app, guest-web, venue-pos |
+| GET | `/reservations/{reservationId}` | `getReservation` | `ORDER_VIEW` | — | guest-app, guest-web, venue-pos |
+| POST | `/reservations/{reservationId}/convert` | `convertReservation` | `ORDER_CREATE` | — | venue-pos |
+| POST | `/reservations/{reservationId}/extend` | `extendReservation` | `ORDER_CREATE` | — | venue-pos |
 | GET | `/seller-settlement-payout` | `listSellerSettlementPayout` | `ORDER_VIEW` | — | ticvai-web |
 | POST | `/stored-value/authorisations` | `authoriseStoredValue` | `ORDER_CREATE` | — | venue-management-web |
 | POST | `/stored-value/authorisations/{authorisationId}/capture` | `captureStoredValue` | `ORDER_CREATE` | — | venue-management-web |
@@ -2868,7 +2868,7 @@ Rota, attendance and announcements.
 | POST | `/announcements/{announcementId}/acknowledge` | `acknowledgeAnnouncement` | `WORKFORCE_VIEW` | ✓ | venue-management-web, venue-staff-app |
 | GET | `/announcements/{announcementId}/reach` | `getAnnouncementReach` | `WORKFORCE_VIEW` | — | venue-management-web, venue-staff-app |
 | GET | `/attendance` | `listAttendance` | `WORKFORCE_VIEW` | — | venue-management-web, venue-staff-app |
-| POST | `/attendance/clock` | `recordAttendance` | `ATTENDANCE_RECORD` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/attendance/clock` | `recordAttendance` | `ATTENDANCE_RECORD` | ✓ | venue-management-web, venue-pos, venue-staff-app |
 | POST | `/attendance/{recordId}/amend` | `amendAttendance` | `WORKFORCE_MANAGE` | — | venue-management-web, venue-staff-app |
 | GET | `/employees` | `listEmployees` | `WORKFORCE_VIEW` | — | — |
 | GET | `/employees/{employeeId}` | `getEmployee` | `WORKFORCE_VIEW` | — | venue-management-web |

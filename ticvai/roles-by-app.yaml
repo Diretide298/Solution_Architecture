@@ -423,9 +423,9 @@ apps:
     platforms:
     - P04
     - P15
-    screens: 40
-    operations: 167
-    permissions: 50
+    screens: 42
+    operations: 177
+    permissions: 52
     tiers:
       read:
       - APPROVAL_VIEW
@@ -445,12 +445,14 @@ apps:
       - ACCESS_VALIDATE
       - APPROVAL_DECIDE
       - APPROVAL_REQUEST
+      - ATTENDANCE_RECORD
       - CASH_ADD
       - CASH_LIFT
       - CASH_NO_SALE
       - INCIDENT_REPORT
       - LEDGER_POST
       - LOYALTY_REDEEM
+      - ORDER_CANCEL
       - ORDER_CREATE
       - ORDER_DISCOUNT
       - ORDER_EXCHANGE

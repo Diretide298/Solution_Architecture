@@ -7,23 +7,39 @@
  "locked": {
   "P04": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
  },
+ "unlocked": {
+  "P04": {
+   "id": "P04-not-in-v2-01",
+   "label": "P04 · Screens the v2 build does not draw",
+   "screens": [
+    "POS-009",
+    "POS-010",
+    "POS-015",
+    "POS-017",
+    "POS-018",
+    "POS-019",
+    "POS-024"
+   ],
+   "redraw": "No view in the POS v2 build or the approved build. The frames on disk were drawn in Claude Design on 29 September in the approved build's style; draw them again in v2's look (handoff/design-batches/apps/2-pos/README.md). POS-009 and POS-015 build on v2's shift panel, without 'Expected in drawer' (POS v2 decision POSV2-3)."
+  }
+ },
  "counts": {
   "batches": 303,
-  "screens": 2445,
-  "framesOnDisk": 157,
+  "screens": 2447,
+  "framesOnDisk": 159,
   "byStatus": {
    "pending": 264,
    "partial": 0,
-   "drawn": 33,
-   "locked": 6
+   "drawn": 34,
+   "locked": 5
   },
   "screensByStatus": {
    "pending": 2288,
    "partial": 0,
-   "drawn": 127,
-   "locked": 30
+   "drawn": 134,
+   "locked": 25
   },
-  "fullyDrawableBatches": 61
+  "fullyDrawableBatches": 62
  },
  "batches": [
   {
@@ -5736,6 +5752,26 @@
    "status": "drawn"
   },
   {
+   "id": "P04-not-in-v2-01",
+   "kind": "unlocked",
+   "label": "P04 · Screens the v2 build does not draw",
+   "platform": "P04",
+   "screens": [
+    "POS-009",
+    "POS-010",
+    "POS-015",
+    "POS-017",
+    "POS-018",
+    "POS-019",
+    "POS-024"
+   ],
+   "redraw": "No view in the POS v2 build or the approved build. The frames on disk were drawn in Claude Design on 29 September in the approved build's style; draw them again in v2's look (handoff/design-batches/apps/2-pos/README.md). POS-009 and POS-015 build on v2's shift panel, without 'Expected in drawer' (POS v2 decision POSV2-3).",
+   "drawable": 7,
+   "thin": 0,
+   "frames": 7,
+   "status": "drawn"
+  },
+  {
    "id": "P01-engagement-support-01",
    "kind": "module",
    "label": "P01 · Engagement & Support",
@@ -6036,19 +6072,19 @@
   {
    "id": "P04-sell-01",
    "kind": "module",
-   "label": "P04 · Sell (1 of 3)",
+   "label": "P04 · Sell (1 of 2)",
    "platform": "P04",
    "screens": [
     "POS-002",
     "POS-003",
     "POS-004",
     "POS-006",
-    "POS-010",
     "POS-011",
     "POS-012",
     "POS-013",
     "POS-014",
-    "POS-015"
+    "POS-016",
+    "POS-020"
    ],
    "drawable": 10,
    "thin": 0,
@@ -6059,40 +6095,23 @@
   {
    "id": "P04-sell-02",
    "kind": "module",
-   "label": "P04 · Sell (2 of 3)",
+   "label": "P04 · Sell (2 of 2)",
    "platform": "P04",
    "screens": [
-    "POS-016",
-    "POS-017",
-    "POS-018",
-    "POS-019",
-    "POS-020",
     "POS-021",
     "POS-022",
     "POS-023",
-    "POS-024",
-    "POS-025"
+    "POS-025",
+    "POS-026",
+    "POS-027",
+    "POS-028",
+    "POS-029",
+    "POS-030",
+    "POS-031"
    ],
    "drawable": 10,
    "thin": 0,
    "frames": 10,
-   "status": "locked",
-   "lockedReason": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
-  },
-  {
-   "id": "P04-sell-03",
-   "kind": "module",
-   "label": "P04 · Sell (3 of 3)",
-   "platform": "P04",
-   "screens": [
-    "POS-026",
-    "POS-027",
-    "POS-028",
-    "POS-029"
-   ],
-   "drawable": 4,
-   "thin": 0,
-   "frames": 4,
    "status": "locked",
    "lockedReason": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
   },
@@ -6104,12 +6123,11 @@
    "screens": [
     "POS-000",
     "POS-001",
-    "POS-007",
-    "POS-009"
+    "POS-007"
    ],
-   "drawable": 4,
+   "drawable": 3,
    "thin": 0,
-   "frames": 4,
+   "frames": 3,
    "status": "locked",
    "lockedReason": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
   }

@@ -248,6 +248,17 @@ _DOCS: list = []
 _DI = _design_inputs()
 
 
+def _redraw(b: dict) -> str:
+    """**A batch cut out of a locked platform says why** (1 October): the seven P04 screens neither POS
+    build draws are drawn in the v2 build's look, and a session reading only this folder must know it."""
+    if not b.get("redraw"):
+        return ""
+    look = (" The look to match is `sources/designs/TICVAI_POS_Terminal_v2.html` (its shift panel: "
+            "`wireframes/incoming/P04-pos-v2/img/v2-shift.jpg`), not the approved build below."
+            if b.get("platform") == "P04" else "")
+    return "## Why this batch is drawn\n\n" + b["redraw"] + look + "\n\n"
+
+
 def _screen_docs() -> list:
     """The screen files, read once per run: --all exports some 300 batches from the same files."""
     if not _DOCS:
@@ -329,7 +340,7 @@ Platform {plat.get('code')} {plat.get('shortName')} · ships as **{app}** ·
 {plat.get('audience')} audience · {plat.get('formFactor')} ·
 {'offline-capable' if plat.get('offlineCapable') else 'online only'}
 
-## Who this is for
+{_redraw(b)}## Who this is for
 
 **{plat.get('audience')} on {plat.get('formFactor')}.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one

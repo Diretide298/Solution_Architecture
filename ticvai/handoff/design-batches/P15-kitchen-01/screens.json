@@ -1902,7 +1902,7 @@
     }
    ]
   },
-  "notes": "**Built 20 August from board 3 of the client F&B design set.** **`buzzerCode` exists and nothing dispatches to a physical pager.** The digital half works; the buzzer half assumes a device driver the package does not model. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3g` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.",
+  "notes": "**Built 20 August from board 3 of the client F&B design set.** **`buzzerCode` exists and nothing dispatches to a physical pager.** The digital half works; the buzzer half assumes a device driver the package does not model. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3g` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **The customer-facing order status board is this screen's** (decided 1 October 2026, POS v2 decision POSV2-7, docs/registers/pos-v2-decisions.md): the board the guests read, order numbers only under Preparing and Ready for pickup, never a name. The till's Order Queue (POS-029) shows a mirror of it, not a board of its own.",
   "density": "touchLarge",
   "densityReason": "**Bumped by somebody with flour on their hands, read from two metres, in a room where nobody is sitting down.** A kitchen display is not a back office at a different width.",
   "boardFrames": [
@@ -1959,6 +1959,14 @@
        "bindsTo": "KitchenTicket[]",
        "notes": "**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes sits above one that arrived first, because a kitchen works to when food is wanted.",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "label": "Guest status board — Preparing and Ready for pickup",
+       "bindsTo": "KitchenTicket",
+       "operation": "listKitchenTickets",
+       "notes": "**Order numbers only, never a name**, in two columns, Preparing and Ready for pickup, readable from across the room. **Owned here** (decided 1 October 2026, POSV2-7); the till's Order Queue (POS-029) mirrors it. The look is the v2 build's queue status board.",
+       "provenance": "v2 build, Queue (the guest status board, wireframes/incoming/P04-pos-v2/img/pos-029.png)"
       },
       {
        "kind": "metricTile",
@@ -2072,7 +2080,7 @@
    "provenance": "generated",
    "board": "wireframes/P15 Kitchen Display.dc.html#kit-007",
    "source": "Claude Design F&B pack, 20 August",
-   "note": "**Drawn as FNB-3G in the client pack.** The pack's frame is the specification for this screen — it carries operations, states, entry params and exits, and it is better specified than anything derived from the screen file.",
+   "note": "**Drawn as FNB-3G in the client pack.** The pack's frame is the specification for this screen — it carries operations, states, entry params and exits, and it is better specified than anything derived from the screen file. **The design takes the v2 POS build's queue guest status board as its look** (decided 1 October 2026, POSV2-7): wireframes/incoming/P04-pos-v2/img/pos-029.png, the board above the lanes.",
    "derivedFrom": "wireframes/FnB Board 3.dc.html#fnb-3g"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",

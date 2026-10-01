@@ -15,7 +15,7 @@ Each platform folder says what the app is, who uses it, the reference design to 
 |---|---|---|---|---|---|
 | P01 Guest web | [`apps/1-guest-app`](apps/1-guest-app/README.md) | 50 | 50 | 49 | 48 |
 | P02 Guest app, mobile | [`apps/1-guest-app`](apps/1-guest-app/README.md) | 77 | 77 | 77 | 77, but on the old Mobile v2 build |
-| P04 POS + P15 kitchen display | [`apps/2-pos`](apps/2-pos/README.md) | 40 | 40 | 30 | 23 |
+| P04 POS + P15 kitchen display | [`apps/2-pos`](apps/2-pos/README.md) | 42 | 40, and the 2 new screens at the release refresh | 32 | 9 (16 more are v2 captures, not client-approved) |
 | P05 Guest kiosk | [`apps/1-guest-app`](apps/1-guest-app/README.md) | 17 | 0 | 0 | 0 |
 | P06 Venue staff app | [`apps/4-staff-app`](apps/4-staff-app/README.md) | 96 | 3 | 0 | 0 |
 | P07 Venue scanner | [`apps/3-scanner`](apps/3-scanner/README.md) | 11 | 0 | 0 | 0 |
@@ -40,7 +40,7 @@ Run top to bottom. Within a platform, its README gives the batch order.
 1. **P13 CMS flow builder**: [`CMS-FLOW-BUILDER/`](CMS-FLOW-BUILDER/BRIEF.md). CMS-101 to CMS-104 as one flow, with the step screens they open. Then the P13 Block A batches: `P13-white-label-03`, `-01`, `-02`, `WS41`.
 2. **P02 Mobile v4 changes**: see [`apps/1-guest-app`](apps/1-guest-app/README.md). First re-capture the 17 screens that are views in Mobile App v4 (a capture job, not a design batch). Then draw the 19 changed screens v4 has no view for, in the v4 look.
 3. **P01 WEB-050 and the changed screens**: [`P01-discovery-browse-01`](P01-discovery-browse-01/) (WEB-050 Plan Your Visit, from the Visit Planner), then the P01 batches with changed screens. See [`apps/1-guest-app`](apps/1-guest-app/README.md).
-4. **P15 kitchen display**: [`P15-kitchen-01`](P15-kitchen-01/). P04 is locked; the client-approved terminal is its design.
+4. **POS: the 7 screens no POS build draws, and the kitchen display**: [`P04-not-in-v2-01`](P04-not-in-v2-01/) and [`P15-kitchen-01`](P15-kitchen-01/). The rest of P04 is locked: the POS v2 build is its design (see [`apps/2-pos`](apps/2-pos/README.md)).
 5. **P08 set-up screens**: the 38 P08 Block A batches, set-up screens first. See [`apps/5-venue-management`](apps/5-venue-management/README.md).
 6. **The rest of Block A**: P09 (23 batches), P16 (3), P06 (2), P12 (1), P14 (1). Each platform README lists them.
 

@@ -130,7 +130,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
   <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
   <div class="head">
     <div><span class="mark">TICVAI</span>
-      <h1>P04 · Venue POS — Terminal and Tablet <span style="font-weight:600;color:#6B7280">(30 screens)</span></h1></div>
+      <h1>P04 · Venue POS — Terminal and Tablet <span style="font-weight:600;color:#6B7280">(32 screens)</span></h1></div>
     <div class="meta">staff · posTerminal · venue-pos</div>
   </div>
   <p class="lede"></p>
@@ -143,7 +143,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Authenticate the operator at the terminal and resolve the session every other screen on this app reads.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-000" class="proto-frame"><img src="frames/img/pos-000.jpg" alt="POS-000 Sign In, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Opens here: pick an operator tile, enter a 4-digit PIN</p></section>
+          <section id="pos-000" class="proto-frame"><img src="frames/img/pos-000.jpg" alt="POS-000 Sign In, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Opens here: venue co-branding (Ferrari World), recent cashiers four at a time with their last shift, cashier-ID entry, PIN or password</p></section>
 
         </div>
         <div class="foot">
@@ -162,7 +162,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Count the opening float and open the till.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-001" class="proto-frame"><img src="frames/img/pos-001.png" alt="POS-001 Begin Shift, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Login -&gt; &#x27;Continue to float count&#x27; (step 2 of 2, shift opening)</p></section>
+          <section id="pos-001" class="proto-frame"><img src="frames/img/pos-001.jpg" alt="POS-001 Begin Shift, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Sign in -&gt; 'Continue to float count' -&gt; 'STEP 2 OF 2 · SHIFT OPENING' (eleven denominations, typed or tapped, with the hardware check running beside the count)</p></section>
 
         </div>
         <div class="foot">
@@ -375,14 +375,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listShifts · acceptShiftVariance · approveShiftOpen · closeShift +12</div>
+          <div><b>OPERATIONS</b> &middot; listShifts · acceptShiftVariance · approveShiftOpen · closeShift +13</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; shiftId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-001">POS-001</a>  &mdash; <i>Begin Shift</i> <span class="car">shiftId</span><br><a href="#pos-007">POS-007</a>  &mdash; <i>Close Shift</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCloseShift &middot; <i>Close shift</i> &middot; <b>Close the shift</b> <span class="car">shiftId · countedFloat · varianceReason</span> &middot; Not yet</div><div class="ov"><b>confirmDialog</b> confirmSuspendShift &middot; <i>Suspend shift</i> &middot; <b>Suspend</b> <span class="car">shiftId</span> &middot; Cancel</div><div class="ov"><b>modal</b> formAcceptShiftVariance &middot; <i>Accept shift variance</i> &middot; <b>Accept shift variance</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formApproveShiftOpen &middot; <i>Approve shift open</i> &middot; <b>Approve shift open</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formOpenShift &middot; <i>Open shift</i> &middot; <b>Open shift</b> &middot; Cancel <span class="dis">discards workstationId · openingFloat · depositBoxCode · bagNumber · recordedAt</span></div><div class="ov"><b>modal</b> formRecordNoSale &middot; <i>Record no sale</i> &middot; <b>Record no sale</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formReopenShift &middot; <i>Reopen shift</i> &middot; <b>Reopen shift</b> &middot; Cancel <span class="dis">discards reason · supervisorStepUp</span></div><div class="ov"><b>modal</b> formResumeShift &middot; <i>Resume shift</i> &middot; <b>Resume shift</b> &middot; Cancel <span class="dis">discards recordedAt</span></div><div class="ov"><b>modal</b> formCreateRotaAssignment &middot; <i>Create rota assignment</i> &middot; <b>Create rota assignment</b> &middot; Cancel <span class="dis">discards principalId · venueId · position · startsAt · endsAt · overtimeMinutes · restPeriodBefore · breachesWorkingHourLimit · labourCost · id · displayName · departmentId · requiredRoleId · workstationId · status · breakMinutes · note</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecordAttendance &middot; <i>Clock in, clock out, start or end a break</i> &middot; <b>Record</b> &middot; Cancel <span class="dis">discards kind · occurredAt · assignmentId · accessPointId</span></div><div class="ov"><b>confirmDialog</b> confirmCloseShift &middot; <i>Close shift</i> &middot; <b>Close the shift</b> <span class="car">shiftId · countedFloat · varianceReason</span> &middot; Not yet</div><div class="ov"><b>confirmDialog</b> confirmSuspendShift &middot; <i>Suspend shift</i> &middot; <b>Suspend</b> <span class="car">shiftId</span> &middot; Cancel</div><div class="ov"><b>modal</b> formAcceptShiftVariance &middot; <i>Accept shift variance</i> &middot; <b>Accept shift variance</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formApproveShiftOpen &middot; <i>Approve shift open</i> &middot; <b>Approve shift open</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formOpenShift &middot; <i>Open shift</i> &middot; <b>Open shift</b> &middot; Cancel <span class="dis">discards workstationId · openingFloat · depositBoxCode · bagNumber · recordedAt</span></div><div class="ov"><b>modal</b> formRecordNoSale &middot; <i>Record no sale</i> &middot; <b>Record no sale</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formReopenShift &middot; <i>Reopen shift</i> &middot; <b>Reopen shift</b> &middot; Cancel <span class="dis">discards reason · supervisorStepUp</span></div><div class="ov"><b>modal</b> formResumeShift &middot; <i>Resume shift</i> &middot; <b>Resume shift</b> &middot; Cancel <span class="dis">discards recordedAt</span></div><div class="ov"><b>modal</b> formCreateRotaAssignment &middot; <i>Create rota assignment</i> &middot; <b>Create rota assignment</b> &middot; Cancel <span class="dis">discards principalId · venueId · position · startsAt · endsAt · overtimeMinutes · restPeriodBefore · breachesWorkingHourLimit · labourCost · id · displayName · departmentId · requiredRoleId · workstationId · status · breakMinutes · note</span></div></div>
         </div>
-      </div></div><div class="grp">02 — Sell · 24 screens</div><div class="stack">
+      </div></div><div class="grp">02 — Sell · 26 screens</div><div class="stack">
       <div id="pos-002" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-002</span>
@@ -390,14 +390,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Find a product and add it to the cart.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-002" class="proto-frame"><img src="frames/img/pos-002.jpg" alt="POS-002 Sell — Ticket Catalogue, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Left rail &#x27;Tickets&#x27;</p></section>
+          <section id="pos-002" class="proto-frame"><img src="frames/img/pos-002.jpg" alt="POS-002 Sell — Ticket Catalogue, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Left rail 'Tickets', with a timed ticket added (Aqua Park · Day Pass, 12:00, two adults and a child, add-ons dialog continued): REFINE chips, availability on each card, On now / Builder / Scan, the cart with the inventory hold, Reserve and Proceed to payment</p></section>
 
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listProducts · evaluatePromotions · holdOrder · applyManualDiscount +38</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · denied</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, cardCode&larr;deepLink, cartId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="P08%20Venue%20Management.dc.html#bo-045">BO-045</a> <span class="away">other board</span>  &mdash; <i>The new price is wrong on eleven items</i><br><a href="#pos-003">POS-003</a>  &mdash; <i>Choose a date and performance for a timed pr</i> <span class="car">productId · visitDate · sessionTime · quantityByVariant</span><br><a href="#pos-004">POS-004</a>  &mdash; <i>Select seats on the plan</i> <span class="car">productId · performanceId · seatPicks · zoneId</span><br><a href="#pos-005">POS-005</a>  &mdash; <i>Charge, or swipe the pay control</i> <span class="car">cart · guest · discount · orderType</span><br><a href="#pos-006">POS-006</a>  &mdash; <i>Recall held</i> <span class="car">orderId</span><br><a href="#pos-007">POS-007</a>  &mdash; <i>Close Shift</i> <span class="car">saleId</span><br><a href="#pos-008">POS-008</a>  &mdash; <i>Reports</i><br><a href="#pos-009">POS-009</a> <br><a href="#pos-010">POS-010</a>  &mdash; <i>Add to Existing Ticket</i> <span class="car">orderId</span><br><a href="#pos-011">POS-011</a>  &mdash; <i>Three days later the guest returns one item</i> <span class="car">orderId · outletId</span><br><a href="#pos-013">POS-013</a>  &mdash; <i>A guest wants cash back and the drawer is he</i><br><a href="#pos-020">POS-020</a>  &mdash; <i>Shift Exceptions &amp; Alerts</i></div>
+          <div><b>GOES TO</b> &middot; <a href="P08%20Venue%20Management.dc.html#bo-045">BO-045</a> <span class="away">other board</span>  &mdash; <i>The new price is wrong on eleven items</i><br><a href="#pos-003">POS-003</a>  &mdash; <i>Choose a date and performance for a timed pr</i> <span class="car">productId · visitDate · sessionTime · quantityByVariant</span><br><a href="#pos-004">POS-004</a>  &mdash; <i>Select seats on the plan</i> <span class="car">productId · performanceId · seatPicks · zoneId</span><br><a href="#pos-005">POS-005</a>  &mdash; <i>Charge, or swipe the pay control</i> <span class="car">cart · guest · discount · orderType</span><br><a href="#pos-006">POS-006</a>  &mdash; <i>Recall held</i> <span class="car">orderId</span><br><a href="#pos-007">POS-007</a>  &mdash; <i>Close Shift</i> <span class="car">saleId</span><br><a href="#pos-008">POS-008</a>  &mdash; <i>Reports</i><br><a href="#pos-009">POS-009</a> <br><a href="#pos-010">POS-010</a>  &mdash; <i>Add to Existing Ticket</i> <span class="car">orderId</span><br><a href="#pos-011">POS-011</a>  &mdash; <i>Three days later the guest returns one item</i> <span class="car">orderId · outletId</span><br><a href="#pos-013">POS-013</a>  &mdash; <i>A guest wants cash back and the drawer is he</i><br><a href="#pos-020">POS-020</a>  &mdash; <i>Shift Exceptions &amp; Alerts</i><br><a href="#pos-030">POS-030</a>  &mdash; <i>History</i> <span class="car">orderId</span><br><a href="#pos-031">POS-031</a>  &mdash; <i>Reserve</i> <span class="car">cartId</span></div>
           <div><b>MACHINE</b> &middot; <code>dstep</code> from <b>detail</b> &middot; detail · datetime · zone · seats · qty<div class="mac">detail&rarr;<b>qty</b> <i>product is admission</i> &nbsp;detail&rarr;<b>datetime</b> <i>product is dated or timed</i> &nbsp;detail&rarr;<b>zone</b> <i>product is seated</i> &nbsp;datetime&rarr;<b>qty</b> <i>date and performance chose</i> &nbsp;zone&rarr;<b>seats</b> <i>zone chosen</i> &nbsp;seats&rarr;<b>qty</b> <i>seats picked</i></div></div>
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void order</i> &middot; <b>Void</b> <span class="car">orderId · reason</span> &middot; Keep the sale <span class="dis">discards reason</span></div><div class="ov"><b>drawer</b> drawerTicketDetail &middot; <i>Select a ticket</i> &middot; <b>Continue</b> &rarr; <a href="#pos-002">POS-002</a> <span class="car">productId · variantQty</span> &middot; Close <span class="dis">discards variantQty</span></div><div class="ov"><b>drawer</b> drawerDateAndSession &middot; <i>Continue from ticket detail</i> &middot; <b>Continue</b> &rarr; <a href="#pos-002">POS-002</a> <span class="car">productId · visitDate · sessionTime</span> &middot; Close <span class="dis">discards visitDate · sessionTime</span></div><div class="ov"><b>drawer</b> drawerSeatSelection &middot; <i>Continue from date and performance</i> &middot; <b>Add to sale</b> &rarr; <a href="#pos-002">POS-002</a> <span class="car">productId · performanceId · seatPicks · holdExpiresAt</span> &middot; Close <span class="dis">discards seatPicks · zoneId</span></div><div class="ov"><b>modal</b> formTransferGameCard &middot; <i>Transfer game card</i> &middot; <b>Transfer game card</b> &middot; Cancel <span class="dis">discards targetCardCode · reason · note</span></div><div class="ov"><b>modal</b> formEvaluatePromotions &middot; <i>Evaluate promotions</i> &middot; <b>Evaluate promotions</b> &middot; Cancel <span class="dis">discards venueId · channel · lines · subjectId · membershipTierId · couponCodes · evaluateAt</span></div><div class="ov"><b>modal</b> formHoldOrder &middot; <i>Hold order</i> &middot; <b>Hold order</b> &middot; Cancel <span class="dis">discards recordedAt · label · holdUntil</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formCreateRefund &middot; <i>Create refund</i> &middot; <b>Create refund</b> &middot; Cancel <span class="dis">discards id · amount · reason · recordedAt · lineIds · secondaryAuthorisation · refundToOriginalTender · alternateTender</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div><div class="ov"><b>modal</b> formModifyOrder &middot; <i>Modify order</i> &middot; <b>Modify order</b> &middot; Cancel <span class="dis">discards id · recordedAt · addLines · removeLineIds · reason</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formRescheduleOrder &middot; <i>Reschedule order</i> &middot; <b>Reschedule order</b> &middot; Cancel <span class="dis">discards targetPerformanceId · recordedAt · lineIds · waiveFee · reason</span></div><div class="ov"><b>modal</b> formEvaluateApprovalRequirement &middot; <i>Evaluate approval requirement</i> &middot; <b>Evaluate approval requirement</b> &middot; Cancel <span class="dis">discards kind · scopePath · amount · attributes</span></div><div class="ov"><b>modal</b> formCreatePayment &middot; <i>Create payment</i> &middot; <b>Create payment</b> &middot; Cancel <span class="dis">discards id · orderId · tender · amount · recordedAt · tenderCurrency · tenderAmount · walletAuthorisationId · deviceId</span></div><div class="ov"><b>modal</b> formIssueGameCard &middot; <i>Issue game card</i> &middot; <b>Issue game card</b> &middot; Cancel <span class="dis">discards id · kind · venueId · cardCode · subjectId · initialCredits · validMonths</span></div><div class="ov"><b>modal</b> formLoadGameCredits &middot; <i>Load game credits</i> &middot; <b>Load game credits</b> &middot; Cancel <span class="dis">discards id · credits · recordedAt · bonusCredits · amountPaid · orderId</span></div><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div><div class="ov"><b>modal</b> formIdentifyGuest &middot; <i>Identify guest</i> &middot; <b>Identify guest</b> &middot; Cancel <span class="dis">discards token · tokenKind</span></div><div class="ov"><b>modal</b> formSyncOrders &middot; <i>Sync orders</i> &middot; <b>Sync orders</b> &middot; Cancel <span class="dis">discards deviceId · orders</span></div><div class="ov"><b>modal</b> formCreateRetailReturn &middot; <i>Create retail return</i> &middot; <b>Create retail return</b> &middot; Cancel <span class="dis">discards id · saleId · lines · reason · recordedAt · refundTender · secondaryAuthorisation</span></div><div class="ov"><b>modal</b> formRedeemLoyaltyPoints &middot; <i>Redeem loyalty points</i> &middot; <b>Redeem loyalty points</b> &middot; Cancel <span class="dis">discards subjectId · programmeId · points · rewardId · orderId</span></div><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Create approval request</i> &middot; <b>Create approval request</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div><div class="ov"><b>modal</b> formCreateRetailSale &middot; <i>Create retail sale</i> &middot; <b>Create retail sale</b> &middot; Cancel <span class="dis">discards id · outletId · lines · recordedAt · shiftId · subjectId · couponCodes</span></div></div>
         </div>
@@ -409,7 +409,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Pick a date, a session and ticket quantities.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-003" class="proto-frame"><img src="frames/img/pos-003.jpg" alt="POS-003 Sell — Timed Entry, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Tickets -&gt; &#x27;Aqua Park · Day Pass&#x27; drawer (timed entry, per-guest variants)</p></section>
+          <section id="pos-003" class="proto-frame"><img src="frames/img/pos-003.jpg" alt="POS-003 Sell — Timed Entry, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Tickets -&gt; 'Aqua Park · Day Pass' -&gt; drawer: business date, the entry-slot grid with what is left per slot (12:00 PM picked), guests by ticket type (two adults, one child)</p></section>
 
         </div>
         <div class="foot">
@@ -428,7 +428,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Choose specific seats for a seated event.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-004" class="proto-frame"><img src="frames/img/pos-004.jpg" alt="POS-004 Sell — Seat Map, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Tickets -&gt; &#x27;Skyline Cinema · Standard&#x27; -&gt; drawer -&gt; interactive seat map</p></section>
+          <section id="pos-004" class="proto-frame"><img src="frames/img/pos-004.jpg" alt="POS-004 Sell — Seat Map, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Tickets -&gt; 'Pluma Circus · Reserved' -&gt; drawer -&gt; 'Choose date &amp; time' -&gt; 3:00 PM -&gt; section map -&gt; section 103 (seats, with held and sold seats)</p></section>
 
         </div>
         <div class="foot">
@@ -447,7 +447,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Find and resume a parked sale.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-006" class="proto-frame"><img src="frames/img/pos-006.jpg" alt="POS-006 Held Orders, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Home hot key F2 &#x27;Recall held&#x27; -&gt; &#x27;Held sales&#x27; modal</p></section>
+          <section id="pos-006" class="proto-frame"><img src="frames/img/pos-006.png" alt="POS-006 Held Orders, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Cart 'Hold sale', then F2 'Recall held' -&gt; 'Held sales' screen (was a modal): parked value, every line in full, Recall into sale / Print hold slip / Discard hold</p></section>
 
         </div>
         <div class="foot">
@@ -676,7 +676,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Omnichannel Order &amp; Fulfilment Center — from the client design board, 20 August.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-012" class="proto-frame"><img src="frames/img/pos-012.jpg" alt="POS-012 Omnichannel Order &amp; Fulfilment Center, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · F&amp;B, cart order type &#x27;Delivery&#x27; -&gt; fulfilment source</p></section>
+          <section id="pos-012" class="proto-frame"><img src="frames/img/pos-012.jpg" alt="POS-012 Omnichannel Order &amp; Fulfilment Center, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Left rail 'F&amp;B' -&gt; 'Loaded Fries' -&gt; cart order type 'Delivery' (four order types: Dine-in, Quick service, Takeaway, Delivery) + left rail 'Queue'</p></section>
 
         </div>
         <div class="foot">
@@ -1474,7 +1474,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">A guest orders food at a counter and pays.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-021" class="proto-frame"><img src="frames/img/pos-021.jpg" alt="POS-021 Sell — Food &amp; Drink, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Left rail &#x27;F&amp;B&#x27;</p></section>
+          <section id="pos-021" class="proto-frame"><img src="frames/img/pos-021.jpg" alt="POS-021 Sell — Food &amp; Drink, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Left rail 'F&amp;B' (category tabs with counts, REFINE chips, Quick service order type)</p></section>
 
         </div>
         <div class="foot">
@@ -1493,7 +1493,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">The order goes to the pass and the guest is given a number.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-022" class="proto-frame"><img src="frames/img/pos-022.png" alt="POS-022 Send to Kitchen, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Left rail &#x27;Queue&#x27; -&gt; order in &#x27;Received&#x27; with &#x27;Send to kitchen&#x27;</p></section>
+          <section id="pos-022" class="proto-frame"><img src="frames/img/pos-022.png" alt="POS-022 Send to Kitchen, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Left rail 'Queue' -&gt; partner order DLV-8842 'Send to kitchen' (it moves to Preparing; the guest status board above shows takeaway and quick-service numbers only, never partner, delivery or dine-in orders)</p></section>
 
         </div>
         <div class="foot">
@@ -1512,7 +1512,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">A guest buys merchandise at a counter.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-023" class="proto-frame"><img src="frames/img/pos-023.jpg" alt="POS-023 Sell — Merchandise, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Left rail &#x27;Retail&#x27;</p></section>
+          <section id="pos-023" class="proto-frame"><img src="frames/img/pos-023.jpg" alt="POS-023 Sell — Merchandise, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Left rail 'Retail' (category tabs incl. Lockers, REFINE chips)</p></section>
 
         </div>
         <div class="foot">
@@ -1745,14 +1745,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">The surface a cashier lands on after opening a shift, and the one they return to between sales.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-025" class="proto-frame"><img src="frames/img/pos-025.png" alt="POS-025 Till Home, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · After &#x27;Open shift &amp; start selling&#x27;, or left rail &#x27;Home&#x27;</p></section>
+          <section id="pos-025" class="proto-frame"><img src="frames/img/pos-025.jpg" alt="POS-025 Till Home, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · After 'Open shift &amp; start selling', or left rail 'Home': the F1-F7 function bar replaces the home hot keys; the KPI tiles drill into the Sales journal</p></section>
 
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getCurrentShift · listSaleBoards · getWorkstationHealth · listAlerts +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · denied</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session</div>
-          <div><b>GOES TO</b> &middot; entry point · <a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i><br><a href="#pos-021">POS-021</a>  &mdash; <i>Sell — Food &amp; Drink</i><br><a href="#pos-023">POS-023</a>  &mdash; <i>Sell — Merchandise</i><br><a href="#pos-006">POS-006</a>  &mdash; <i>Held Orders</i><br><a href="#pos-027">POS-027</a>  &mdash; <i>Guest Lookup</i><br><a href="#pos-028">POS-028</a>  &mdash; <i>Table Service</i><br><a href="#pos-029">POS-029</a>  &mdash; <i>Order Queue</i><br><a href="#pos-026">POS-026</a>  &mdash; <i>Receipt &amp; Reprint</i><br><a href="#pos-007">POS-007</a>  &mdash; <i>Close Shift</i></div>
+          <div><b>GOES TO</b> &middot; entry point · <a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i><br><a href="#pos-021">POS-021</a>  &mdash; <i>Sell — Food &amp; Drink</i><br><a href="#pos-023">POS-023</a>  &mdash; <i>Sell — Merchandise</i><br><a href="#pos-006">POS-006</a>  &mdash; <i>Held Orders</i><br><a href="#pos-027">POS-027</a>  &mdash; <i>Guest Lookup</i><br><a href="#pos-028">POS-028</a>  &mdash; <i>Table Service</i><br><a href="#pos-029">POS-029</a>  &mdash; <i>Order Queue</i><br><a href="#pos-026">POS-026</a>  &mdash; <i>Receipt &amp; Reprint</i><br><a href="#pos-007">POS-007</a>  &mdash; <i>Close Shift</i><br><a href="#pos-030">POS-030</a>  &mdash; <i>Sales journal (F7, or a KPI tile)</i><br><a href="#pos-031">POS-031</a>  &mdash; <i>Reservations (F5)</i></div>
           
           
         </div>
@@ -1802,7 +1802,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Open, move, merge and close table visits from the floor.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-028" class="proto-frame"><img src="frames/img/pos-028.png" alt="POS-028 Table Service, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Left rail &#x27;Tables&#x27; -&gt; &#x27;Table service&#x27; floor plan</p></section>
+          <section id="pos-028" class="proto-frame"><img src="frames/img/pos-028.jpg" alt="POS-028 Table Service, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Left rail 'Tables' -&gt; 'Table service': halls (Main Hall, Terrace, Majlis rooms), the plan drawn to scale, status filters, the hall's table list with Seat &amp; order / Recall check / Settle bill / Seat booking</p></section>
 
         </div>
         <div class="foot">
@@ -1821,7 +1821,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Watch orders move from received to handed over, and act on the ones that stall.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-029" class="proto-frame"><img src="frames/img/pos-029.png" alt="POS-029 Order Queue, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Left rail &#x27;Queue&#x27;</p></section>
+          <section id="pos-029" class="proto-frame"><img src="frames/img/pos-029.png" alt="POS-029 Order Queue, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Left rail 'Queue': stage counts, the guest status board (order numbers only, mirrors the kitchen display), takeaway, partner, dine-in, delivery and quick-service orders</p></section>
 
         </div>
         <div class="foot">
@@ -1832,6 +1832,44 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           
         </div>
+      </div>
+      <div id="pos-030" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-030</span>
+            <span class="ttl">Sales Journal</span><span class="pill off">offline</span><span class="drawnb" title="A designer drew this frame">drawn</span></div>
+          <div class="pur">Find a sale this till made and act on it — reprint or email the receipt, issue a tax invoice, reload it into the cart, or hand it to returns.</div>
+        </div>
+        <div class="frame drawn">
+          <section id="pos-030" class="proto-frame"><img src="frames/img/pos-030.png" alt="POS-030 Sales Journal, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · F7 &#x27;Sales journal&#x27; (or a Till Home KPI tile) -&gt; first row expanded: line items, transaction status, Reprint receipt / Email tax invoice / Refund or void</p><img src="frames/img/pos-030-cart-history.png" alt="POS-030 Sales Journal (variant), POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto;margin-top:24px"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Variant: the same journal opened from the cart&#x27;s &#x27;History&#x27; (Cart history): this terminal by day; a row opens Reload this cart / Reprint receipt / Email tax invoice</p></section>
+
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listOrders · getOrder · searchGuests · reprintReceipt +4</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · denied · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, shiftId&larr;session, cartId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-025">POS-025</a>  &mdash; <i>Till Home</i><br><a href="#pos-002">POS-002</a>  &mdash; <i>Reload this cart</i> <span class="car">cartId</span><br><a href="#pos-011">POS-011</a>  &mdash; <i>Refund or void</i> <span class="car">orderId</span><br><a href="#pos-026">POS-026</a>  &mdash; <i>Open the receipt</i> <span class="car">orderId</span></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formReprintReceipt &middot; <i>Reprint or email the receipt</i> &middot; <b>Send</b> &middot; Cancel <span class="dis">discards delivery · destination</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint the order</i> &middot; <b>Reprint</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formIssueTaxInvoice &middot; <i>Tax invoice</i> &middot; <b>Issue tax invoice</b> &middot; Cancel <span class="dis">discards buyer</span></div><div class="ov"><b>confirmDialog</b> confirmReloadCart &middot; <i>Reload this cart</i> &middot; <b>Reload into the cart</b> &rarr; <a href="#pos-002">POS-002</a> <span class="car">cartId</span> &middot; Keep the cart as it is <span class="dis">discards cartId</span></div></div>
+        </div>
+      </div>
+      <div id="pos-031" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-031</span>
+            <span class="ttl">Reservations &amp; Group Arrivals</span><span class="pill off">offline</span><span class="drawnb" title="A designer drew this frame">drawn</span></div>
+          <div class="pur">Hold a sale without payment, and take payment when the guest or the group arrives.</div>
+        </div>
+        <div class="frame drawn">
+          <section id="pos-031" class="proto-frame"><img src="frames/img/pos-031.jpg" alt="POS-031 Reservations &amp; Group Arrivals, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Left rail &#x27;Bookings&#x27; (F5 &#x27;Reservations&#x27;) -&gt; a group reservation: deposit paid, balance due, Take payment. Design correction: the tickets shown as encoded inactive are not built; tickets are issued when the order is paid</p><img src="frames/img/pos-031-encode.png" alt="POS-031 Reservations &amp; Group Arrivals (variant), POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto;margin-top:24px"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Variant: a confirmed, unpaid group (v2 offers &#x27;Encode tickets as Inactive · Pay on arrival&#x27;). Design correction: not built; nothing is encoded before payment (convert, pay, issue)</p></section>
+
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listReservations · getReservation · createReservation · extendReservation +5</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · denied · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, venueId&larr;session, cartId&larr;POS-002</div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-025">POS-025</a>  &mdash; <i>Till Home</i><br><a href="#pos-005">POS-005</a>  &mdash; <i>Take payment</i> <span class="car">orderId</span></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateReservation &middot; <i>New reservation</i> &middot; <b>Reserve, no payment</b> &middot; Cancel <span class="dis">discards id · venueId · lines · expiresAt · subjectId</span></div><div class="ov"><b>confirmDialog</b> confirmExtendReservation &middot; <i>Extend the hold</i> &middot; <b>Extend</b> &middot; Keep the current expiry</div><div class="ov"><b>confirmDialog</b> confirmCancelReservation &middot; <i>Cancel reservation</i> &middot; <b>Cancel reservation</b> &middot; Keep the reservation</div><div class="ov"><b>modal</b> formRecordGroupCheckIn &middot; <i>Check the group in</i> &middot; <b>Check in</b> &middot; Cancel <span class="dis">discards arrivedCount · additionalGuests · staffLeadersCount · arrivalGateId · actualArrivalAt · checkInIssues</span></div></div>
+        </div>
       </div></div><div class="grp">03 — Payment · 1 screens</div><div class="stack">
       <div id="pos-005" class="scr">
         <div>
@@ -1840,7 +1878,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Take payment and complete the sale.</div>
         </div>
         <div class="frame drawn">
-          <section id="pos-005" class="proto-frame"><img src="frames/img/pos-005.png" alt="POS-005 Payment, client prototype OS 4.2.1 build 2026.08.14 (client-approved)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">Client prototype OS 4.2.1 build 2026.08.14 (client-approved) · Cart &#x27;Charge&#x27; -&gt; checkout, &#x27;Select payment method&#x27;</p></section>
+          <section id="pos-005" class="proto-frame"><img src="frames/img/pos-005.png" alt="POS-005 Payment, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Cart 'Proceed to payment' (the POS-002 sale): tenders, cash keypad; a split is taken on the tender itself ('Add to split', 'Half'), there is no Split payment tender</p></section>
 
         </div>
         <div class="foot">
@@ -1873,6 +1911,6 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       </div></div>
   <div class="bottom">
     <span>Generated by tools/derive-wireframes.py from screens/P04-point-of-sale.yaml — do not hand-edit</span>
-    <span>P04 · 30 screens · 4 groups</span>
+    <span>P04 · 32 screens · 4 groups</span>
   </div>
 </div></body></html>

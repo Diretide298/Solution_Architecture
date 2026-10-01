@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 202
+  x-ticvai-screen-count: 205
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -519,6 +519,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
+        - "P04 POS-031 Reservations & Group Arrivals"
         - "P08 BO-026 Group Bookings"
       security:
       - guestAuth: []
@@ -2753,6 +2754,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-023 Sell — Merchandise"
+        - "P04 POS-030 Sales Journal"
         - "P05 KSK-005 Choose a performance"
         - "P05 KSK-006 Review"
         - "P05 KSK-017 Shop"
@@ -3669,6 +3671,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+        - "P04 POS-030 Sales Journal"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P06 EMP-057 Guest Profile & Dining History"
@@ -3694,7 +3697,8 @@ paths:
       - partner
       x-ticvai-read-routing: replica
       summary: List orders
-      description: '**The staff list: venue-scoped, filtered by venue, cashier and shift.** A guest''s
+      description: '**The staff list: venue-scoped, filtered by venue, cashier, shift, terminal, customer
+        and tender** (the last three added 1 October 2026, optional). A guest''s
         own history is `listMyOrders`, which is scoped to the caller rather than filtered by a parameter
         (raised 24 August for `WEB-019` and `GST-019`). A guest surface does not load its list from here.
 
@@ -3741,6 +3745,29 @@ paths:
         schema:
           type: string
           format: date-time
+      - name: workstationId
+        in: query
+        description: 'Exact match on the till the order was taken on (`Order.workstationId`). **Added
+          1 October 2026 for the POS Sales Journal (`POS-030`)**, which opens on this terminal; an
+          optional filter, so nothing built against r1 changes. Orders another principal raised still
+          need ORDER_VIEW_OTHER.'
+        schema:
+          type: string
+          format: uuid
+      - name: subjectId
+        in: query
+        description: Exact match on the guest the order belongs to (`Order.subjectId`). **Added 1 October
+          2026**, optional, for the Sales Journal's customer filter.
+        schema:
+          type: string
+          format: uuid
+      - name: tender
+        in: query
+        description: 'Only orders with at least one payment in this tender (`Payment.tender`), so a split
+          order matches each tender it used. **Added 1 October 2026**, optional, for the Sales Journal''s
+          payment-method filter.'
+        schema:
+          $ref: '#/components/schemas/TenderKind'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -3898,6 +3925,7 @@ paths:
         - "P02 GST-028 Parking – Reservation Confirmed"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
+        - "P04 POS-030 Sales Journal"
         - "P05 KSK-009 Ticket issued"
         - "P05 KSK-011 Collect a booking"
         - "P06 EMP-014 Ticket lookup"
@@ -5299,6 +5327,8 @@ paths:
         format: uuid
     post:
       operationId: convertReservation
+      x-ticvai-consumed-by:
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       summary: Convert a reservation into an order
@@ -5938,6 +5968,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-026 Receipt & Reprint"
+        - "P04 POS-030 Sales Journal"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
@@ -6342,6 +6373,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-016 My Reservations"
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       - guest
@@ -6403,6 +6435,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createReservation
+      x-ticvai-consumed-by:
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       summary: Hold without payment
@@ -6460,6 +6494,7 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-016 My Reservations"
         - "P02 GST-017 Reservation Details"
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       - guest
@@ -6492,6 +6527,7 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-016 My Reservations"
         - "P02 GST-017 Reservation Details"
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       - guest
@@ -6538,6 +6574,8 @@ paths:
         format: uuid
     post:
       operationId: extendReservation
+      x-ticvai-consumed-by:
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       summary: Extend a reservation
@@ -8293,6 +8331,7 @@ paths:
     get:
       operationId: listGroupArrivalCheck
       x-ticvai-consumed-by:
+        - "P04 POS-031 Reservations & Group Arrivals"
         - "P08 BO-280 Group Arrival, Check-In & Admission Operations"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -13356,6 +13395,7 @@ paths:
     post:
       operationId: recordGroupCheckIn
       x-ticvai-consumed-by:
+        - "P04 POS-031 Reservations & Group Arrivals"
         - "P08 BO-280 Group Arrival, Check-In & Admission Operations"
       summary: Record a group's arrival at the venue
       description: '**Group check-in is a status distinct from the access scan** (MoM 31 Aug Key

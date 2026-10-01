@@ -705,6 +705,7 @@ paths:
         - "P04 POS-005 Payment"
         - "P04 POS-007 Close Shift"
         - "P04 POS-026 Receipt & Reprint"
+        - "P04 POS-030 Sales Journal"
       x-ticvai-audience: [staff]
       summary: Reprint or resend a receipt
       tags: [sale]

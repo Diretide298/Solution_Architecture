@@ -1,0 +1,2409 @@
+[
+ {
+  "id": "POS-009",
+  "name": "Staff Roster",
+  "module": "Shift",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C11",
+  "implementation": {
+   "app": "venue-pos",
+   "route": "/sell/staff-roster",
+   "component": "apps/venue-pos/src/routes/sell/StaffRosterBoard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "POS-002",
+    "POS-008"
+   ],
+   "exitTo": [
+    "POS-001",
+    "POS-007"
+   ],
+   "uses": [
+    "posPrimaryRail"
+   ],
+   "transitions": [
+    {
+     "to": "POS-001",
+     "trigger": "Begin Shift",
+     "carries": [
+      "shiftId"
+     ],
+     "provenance": "derived — POS-001 declares entryState.params shiftId and POS-009 holds shiftId, so an edge into it carries them"
+    },
+    {
+     "to": "POS-007",
+     "trigger": "Close Shift",
+     "provenance": "derived — POS-007 declares entryState.params saleId and POS-009 holds none of them. The edge carries nothing: saleId only pre-selects (deep link or optional), and POS-007 opens on its own"
+    }
+   ]
+  },
+  "notes": "Close counts each foreign currency separately (`foreignHoldings`). **A variance collapsed into a base-currency total cannot be attributed to the currency that caused it.** **createCashMovement removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class). **Improved 20 August against the client design board**, answering 2 board screen(s): Shift & Operator Dashboard; Operator & Workstation Assignment. **Owns POS board frame(s) POS-3A** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "POS Board 3.dc.html#pos-3a"
+  ],
+  "pattern": "approvalInbox",
+  "patternReason": "`approveShiftOpen` decides items that `listShifts` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "See who is on duty and on which terminal.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listShifts",
+       "notes": "Sends `?workstationId=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listShifts",
+       "notes": "Sends `?status=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Opened from",
+       "operation": "listShifts",
+       "notes": "Sends `?openedFrom=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Opened to",
+       "operation": "listShifts",
+       "notes": "Sends `?openedTo=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber"
+       ],
+       "operation": "listShifts",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every cash movement",
+       "bindsTo": "CashMovement",
+       "columns": [
+        "CashMovement.id",
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.denominations",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.shiftId",
+        "CashMovement.depositBoxId",
+        "CashMovement.witnessPrincipalId",
+        "CashMovement.withdrawalReason",
+        "CashMovement.authorisedByPrincipalId"
+       ],
+       "operation": "listCashMovements",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every rota assignment",
+       "bindsTo": "RotaAssignment",
+       "columns": [
+        "RotaAssignment.overtimeMinutes",
+        "RotaAssignment.restPeriodBefore",
+        "RotaAssignment.breachesWorkingHourLimit",
+        "RotaAssignment.labourCost",
+        "RotaAssignment.id",
+        "RotaAssignment.principalId",
+        "RotaAssignment.displayName",
+        "RotaAssignment.venueId",
+        "RotaAssignment.departmentId",
+        "RotaAssignment.position",
+        "RotaAssignment.requiredRoleId",
+        "RotaAssignment.workstationId"
+       ],
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every workstation",
+       "bindsTo": "Workstation",
+       "columns": [
+        "Workstation.id",
+        "Workstation.code",
+        "Workstation.name",
+        "Workstation.venueId",
+        "Workstation.regionId",
+        "Workstation.departmentId",
+        "Workstation.scopePath",
+        "Workstation.saleBoard",
+        "Workstation.accessPointId",
+        "Workstation.devices",
+        "Workstation.currency",
+        "Workstation.currencyScale"
+       ],
+       "operation": "listWorkstations",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every alert",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.ruleName",
+        "Alert.metric",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.workstationId",
+        "Alert.shiftId"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "dataTable",
+       "notes": "Staff, role and terminal, shift, sales, status — the columns in the design",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected shift",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
+       ],
+       "operation": "getCurrentShift",
+       "provenance": "contract shift.yaml GET /shifts/current"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The shift",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
+       ],
+       "operation": "getShift",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Accept shift variance",
+       "operation": "acceptShiftVariance",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approve shift open",
+       "operation": "approveShiftOpen",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close shift",
+       "operation": "closeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Open shift",
+       "operation": "openShift",
+       "provenance": "contract shift.yaml POST /shifts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record no sale",
+       "operation": "recordNoSale",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reopen shift",
+       "operation": "reopenShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume shift",
+       "operation": "resumeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend shift",
+       "operation": "suspendShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create rota assignment",
+       "operation": "createRotaAssignment",
+       "provenance": "contract workforce.yaml POST /rota-assignments"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Clock in, clock out, start or end a break",
+       "operation": "recordAttendance",
+       "permission": "ATTENDANCE_RECORD",
+       "notes": "The v2 shift panel's Clock In & Open Lane, Clock Out and Start break (decided 1 October 2026, POSV2-3): each is one `recordAttendance` (clockIn, clockOut, breakStart, breakEnd), timestamped on the device and queued offline. Opening or ending the shift is still the shift's own (POS-001, POS-007), and **the panel shows no expected drawer figure**: the count is blind.",
+       "provenance": "contract workforce.yaml POST /attendance/clock · v2 Shift Management panel"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Export roster",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formRecordAttendance",
+    "component": "modal",
+    "trigger": "Clock in, clock out, start or end a break",
+    "body": "**Collects what `recordAttendance` sends before it is called.** Required: `kind` (clockIn, clockOut, breakStart, breakEnd) and `occurredAt`, the device time. Optional: `assignmentId`, `accessPointId`. An out-of-sequence clock (a clock-out with no clock-in) is refused 409 and reported, never corrected. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Record",
+     "operation": "recordAttendance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "occurredAt",
+      "assignmentId",
+      "accessPointId"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /attendance/clock (decided 1 October 2026, POSV2-3)"
+   },
+   {
+    "id": "confirmCloseShift",
+    "component": "confirmDialog",
+    "trigger": "Close shift",
+    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A staff roster this affects should be identified in the dialog, not just counted. **Collects what `closeShift` sends before it is called.** Required: `countedCash`, `recordedAt`. Optional: `nonCashDeclared`, `notes`, `releaseHeldLeases`.",
+    "provenance": "designed",
+    "confirm": {
+     "label": "Close the shift",
+     "operation": "closeShift",
+     "carries": [
+      "shiftId",
+      "countedFloat",
+      "varianceReason"
+     ]
+    },
+    "dismiss": {
+     "label": "Not yet",
+     "discards": []
+    },
+    "bindsTo": "CloseShiftRequest"
+   },
+   {
+    "id": "confirmSuspendShift",
+    "component": "confirmDialog",
+    "trigger": "Suspend shift",
+    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A staff roster this affects should be identified in the dialog, not just counted. **Collects what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.",
+    "provenance": "designed",
+    "confirm": {
+     "label": "Suspend",
+     "operation": "suspendShift",
+     "carries": [
+      "shiftId"
+     ]
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": []
+    }
+   },
+   {
+    "id": "formAcceptShiftVariance",
+    "component": "modal",
+    "trigger": "Accept shift variance",
+    "body": "**Collects what `acceptShiftVariance` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Accept shift variance",
+     "operation": "acceptShiftVariance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "designed"
+   },
+   {
+    "id": "formApproveShiftOpen",
+    "component": "modal",
+    "trigger": "Approve shift open",
+    "body": "**Collects what `approveShiftOpen` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Approve shift open",
+     "operation": "approveShiftOpen"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "designed"
+   },
+   {
+    "id": "formOpenShift",
+    "component": "modal",
+    "trigger": "Open shift",
+    "body": "**Collects what `openShift` sends before it is called.** Required: `workstationId`, `openingFloat`. Optional: `depositBoxCode`, `bagNumber`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "OpenShiftRequest",
+    "confirm": {
+     "label": "Open shift",
+     "operation": "openShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "workstationId",
+      "openingFloat",
+      "depositBoxCode",
+      "bagNumber",
+      "recordedAt"
+     ]
+    },
+    "provenance": "designed"
+   },
+   {
+    "id": "formRecordNoSale",
+    "component": "modal",
+    "trigger": "Record no sale",
+    "body": "**Collects what `recordNoSale` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record no sale",
+     "operation": "recordNoSale"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "note"
+     ]
+    },
+    "provenance": "designed"
+   },
+   {
+    "id": "formReopenShift",
+    "component": "modal",
+    "trigger": "Reopen shift",
+    "body": "**Collects what `reopenShift` sends before it is called.** Required: `reason`, `supervisorStepUp` {`principalId`, `credential`}: the supervisor enters their staff PIN on this device, and may not be the principal who closed the shift. Refused 403 `approver-is-closer` or `supervisor-step-up-refused` (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reopen shift",
+     "operation": "reopenShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "supervisorStepUp"
+     ]
+    },
+    "provenance": "designed"
+   },
+   {
+    "id": "formResumeShift",
+    "component": "modal",
+    "trigger": "Resume shift",
+    "body": "**Collects what `resumeShift` sends before it is called.** Required: `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Resume shift",
+     "operation": "resumeShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt"
+     ]
+    },
+    "provenance": "designed"
+   },
+   {
+    "id": "formCreateRotaAssignment",
+    "component": "modal",
+    "trigger": "Create rota assignment",
+    "body": "**Collects what `createRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`, `breachesWorkingHourLimit`, `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RotaAssignment",
+    "confirm": {
+     "label": "Create rota assignment",
+     "operation": "createRotaAssignment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "principalId",
+      "venueId",
+      "position",
+      "startsAt",
+      "endsAt",
+      "overtimeMinutes",
+      "restPeriodBefore",
+      "breachesWorkingHourLimit",
+      "labourCost",
+      "id",
+      "displayName",
+      "departmentId",
+      "requiredRoleId",
+      "workstationId",
+      "status",
+      "breakMinutes",
+      "note"
+     ]
+    },
+    "provenance": "designed"
+   }
+  ],
+  "states": {
+   "loading": "The staff roster list.",
+   "error": "Could not load. Names which read failed and leaves the staff roster untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "Nothing matches the filter on workstationId, status, openedFrom, openedTo and the staff roster are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Last known roster, with its age shown"
+  },
+  "apis": [
+   {
+    "operationId": "listShifts",
+    "contract": "shift",
+    "purpose": "Open shifts at this venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acceptShiftVariance",
+    "contract": "shift",
+    "purpose": "Accept an over/short beyond the threshold",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "approveShiftOpen",
+    "contract": "shift",
+    "purpose": "Approve a shift opening outside tolerance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "closeShift",
+    "contract": "shift",
+    "purpose": "Blind close-out",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "getCurrentShift",
+    "contract": "shift",
+    "purpose": "The open or suspended shift on the session's workstation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getShift",
+    "contract": "shift",
+    "purpose": "Read a shift",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCashMovements",
+    "contract": "shift",
+    "purpose": "Lifts, adds and the opening float",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "openShift",
+    "contract": "shift",
+    "purpose": "Open a shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "recordNoSale",
+    "contract": "shift",
+    "purpose": "Open the drawer without a sale",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "reopenShift",
+    "contract": "shift",
+    "purpose": "Reopen a shift closed in error",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "resumeShift",
+    "contract": "shift",
+    "purpose": "Resume a suspended shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "suspendShift",
+    "contract": "shift",
+    "purpose": "Suspend a shift so another user can log in",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "createRotaAssignment",
+    "contract": "workforce",
+    "purpose": "Put someone on the rota",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "listRotaAssignments",
+    "contract": "workforce",
+    "purpose": "The rota",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listWorkstations",
+    "contract": "tenancy",
+    "purpose": "List workstations",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAlerts",
+    "contract": "reporting",
+    "purpose": "What is currently raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordAttendance",
+    "contract": "workforce",
+    "purpose": "Clock in or out, or start or end a break",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "shiftId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Shift.id",
+    "Shift.workstationId",
+    "Shift.venueId",
+    "Shift.scopePath",
+    "Shift.principalId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "designed",
+   "board": "wireframes/P04 Venue POS.dc.html#pos-009",
+   "prototype": {
+    "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
+    "rev": "TICVAI OS 4.2.1, build 2026.08.14",
+    "match": "none",
+    "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
+   },
+   "derivedFrom": "wireframes/reference/POS Board 3.dc.html",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P04",
+   "audience": "staff",
+   "formFactor": "posTerminal",
+   "shortName": "Venue POS",
+   "name": "Venue POS — Terminal and Tablet",
+   "offlineCapable": true,
+   "app": "venue-pos",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-pos",
+    "name": "TICVAI POS",
+    "shell": "terminal",
+    "siblings": [
+     "P15"
+    ],
+    "note": "**The kitchen display is the till, signed into differently.** Same software, same outlet, same orders — what changes is who is looking and what they may do, which is a permission, not an application.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "POS-010",
+  "name": "Add to Existing Ticket",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C01",
+  "implementation": {
+   "app": "venue-pos",
+   "route": "/sell/add-to-existing-ticket",
+   "component": "apps/venue-pos/src/routes/sell/AddToExistingTicketDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "POS-002"
+   ],
+   "exitTo": [
+    "POS-002",
+    "POS-003",
+    "POS-004",
+    "POS-005",
+    "POS-011"
+   ],
+   "uses": [
+    "posSaleToPayment"
+   ],
+   "transitions": [
+    {
+     "to": "POS-002",
+     "trigger": "Sell — Ticket Catalogue",
+     "carries": [
+      "orderId",
+      "promotionId"
+     ],
+     "provenance": "derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-010 holds orderId, promotionId, so an edge into it carries them"
+    },
+    {
+     "to": "POS-003",
+     "trigger": "Sell — Timed Entry",
+     "provenance": "derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-010 holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (deep link or optional); POS-003 finds productId (listProducts) itself, and POS-003 opens on its own"
+    },
+    {
+     "to": "POS-004",
+     "trigger": "Sell — Seat Map",
+     "carries": [
+      "performanceId"
+     ],
+     "provenance": "derived — POS-004 declares entryState.params holdId, performanceId and POS-010 holds performanceId, so an edge into it carries them"
+    },
+    {
+     "to": "POS-005",
+     "trigger": "Payment",
+     "carries": [
+      "paymentId"
+     ],
+     "provenance": "derived — POS-005 declares entryState.params paymentId, saleId and POS-010 holds paymentId, so an edge into it carries them"
+    },
+    {
+     "to": "POS-011",
+     "trigger": "They change their mind about the locker",
+     "provenance": "flow F58 step 7→8",
+     "carries": [
+      "orderId"
+     ]
+    }
+   ]
+  },
+  "notes": "CF-58, from the 14 August MoM. Not in the delivered mockups. **9 assets operations removed 18 August (CF-114).** The whole media contract was attached to this screen. **A till adding an item to a ticket does not manage a media library** — it reads the asset it needs and nothing else. Same shape as CF-87, one level up: that attached sibling operations, this attached a whole contract. **Wired 24 August from review**: getCart, exchangeOrderLines. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.",
+  "density": "touchLarge",
+  "pattern": "statusTracker",
+  "patternReason": "`getMediaEntitlements` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Sell something onto media the guest is already carrying.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The media entitlements",
+       "bindsTo": "MediaEntitlements",
+       "columns": [
+        "MediaEntitlements.mediaCode",
+        "MediaEntitlements.mediaKind",
+        "MediaEntitlements.subjectId",
+        "MediaEntitlements.isValid",
+        "MediaEntitlements.invalidReason",
+        "MediaEntitlements.canAcceptMore",
+        "MediaEntitlements.entitlements"
+       ],
+       "operation": "getMediaEntitlements",
+       "provenance": "contract orders.yaml GET /media/{mediaCode}/entitlements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The media asset",
+       "bindsTo": "MediaAssetDetail",
+       "columns": [
+        "MediaAssetDetail.id",
+        "MediaAssetDetail.kind",
+        "MediaAssetDetail.status",
+        "MediaAssetDetail.filename",
+        "MediaAssetDetail.contentType",
+        "MediaAssetDetail.sizeBytes",
+        "MediaAssetDetail.title",
+        "MediaAssetDetail.description",
+        "MediaAssetDetail.altText",
+        "MediaAssetDetail.width",
+        "MediaAssetDetail.height",
+        "MediaAssetDetail.durationSeconds",
+        "MediaAssetDetail.customMetadata",
+        "MediaAssetDetail.sharedWithTenantIds",
+        "MediaAssetDetail.tags",
+        "MediaAssetDetail.venueId"
+       ],
+       "operation": "getMediaAsset",
+       "provenance": "contract assets.yaml GET /media/{mediaId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cart",
+       "bindsTo": "Cart",
+       "columns": [
+        "Cart.id",
+        "Cart.token",
+        "Cart.venueId",
+        "Cart.channel",
+        "Cart.subjectId",
+        "Cart.status",
+        "Cart.lines",
+        "Cart.conflicts",
+        "Cart.subtotal",
+        "Cart.discountTotal",
+        "Cart.taxTotal",
+        "Cart.total",
+        "Cart.appliedPromotionIds",
+        "Cart.expiresAt",
+        "Cart.extensionsUsed",
+        "Cart.maxExtensions"
+       ],
+       "operation": "getCart",
+       "provenance": "contract orders.yaml GET /carts/{cartId}"
+      },
+      {
+       "kind": "scanTarget",
+       "notes": "Scan the guest QR, wristband or card first. The media is the join, not the order",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "bindsTo": "MediaEntitlements",
+       "notes": "What they already hold — so a cashier does not sell a locker to someone who has one",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "bindsTo": "MediaEntitlements.canAcceptMore",
+       "notes": "Surrendered, expired or blocked media is refused before money is taken, not after",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "saleBoard",
+       "notes": "Only variants whose template allows canShareMedia",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Append entitlement to media",
+       "operation": "appendEntitlementToMedia",
+       "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Exchange order lines",
+       "operation": "exchangeOrderLines",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Add and pay",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The add existing ticket, read by `getMediaEntitlements`.",
+   "error": "Could not load. Names which read failed and leaves the add existing ticket untouched.",
+   "emptyFirstRun": "No add existing ticket yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available.** The entitlement set must be read live; appending to a stale picture double-sells a locker"
+  },
+  "apis": [
+   {
+    "operationId": "getMediaEntitlements",
+    "contract": "orders",
+    "purpose": "What the scanned QR already carries",
+    "trigger": "onScan"
+   },
+   {
+    "operationId": "appendEntitlementToMedia",
+    "contract": "orders",
+    "purpose": "Attach the new purchase to the same media",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getMediaAsset",
+    "contract": "assets",
+    "purpose": "Read an asset with derivatives and usage",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "The cart, priced and checked, right now",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "exchangeOrderLines",
+    "contract": "orders",
+    "purpose": "Exchange lines for different products or dates",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "mediaCode",
+     "from": "deepLink"
+    },
+    {
+     "name": "mediaId",
+     "from": "deepLink"
+    },
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mediaCode`, `mediaId`, `orderId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "designed",
+   "board": "wireframes/P04 Venue POS.dc.html#pos-010",
+   "prototype": {
+    "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
+    "rev": "TICVAI OS 4.2.1, build 2026.08.14",
+    "match": "none",
+    "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
+   }
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAppendEntitlementToMedia",
+    "component": "modal",
+    "trigger": "Append entitlement to media",
+    "body": "**Collects what `appendEntitlementToMedia` sends before it is called.** Required: `id`, `lines`, `recordedAt`. Optional: `paymentMethod`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AppendEntitlementRequest",
+    "confirm": {
+     "label": "Append entitlement to media",
+     "operation": "appendEntitlementToMedia"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "recordedAt",
+      "paymentMethod",
+      "note"
+     ]
+    },
+    "provenance": "designed"
+   },
+   {
+    "id": "formExchangeOrderLines",
+    "component": "modal",
+    "trigger": "Exchange order lines",
+    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ExchangeOrderRequest",
+    "confirm": {
+     "label": "Exchange order lines",
+     "operation": "exchangeOrderLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outgoingLineIds",
+      "incomingLines",
+      "recordedAt",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "designed"
+   }
+  ],
+  "_platform": {
+   "code": "P04",
+   "audience": "staff",
+   "formFactor": "posTerminal",
+   "shortName": "Venue POS",
+   "name": "Venue POS — Terminal and Tablet",
+   "offlineCapable": true,
+   "app": "venue-pos",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-pos",
+    "name": "TICVAI POS",
+    "shell": "terminal",
+    "siblings": [
+     "P15"
+    ],
+    "note": "**The kitchen display is the till, signed into differently.** Same software, same outlet, same orders — what changes is who is looking and what they may do, which is a permission, not an application.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "POS-015",
+  "name": "Cash Operations Dashboard",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-pos",
+   "route": "/sell/cash-operations-dashboard",
+   "component": "apps/venue-pos/src/routes/sell/CashOperationsDashboardBoard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "POS-001",
+    "POS-019"
+   ],
+   "exitTo": [
+    "POS-001",
+    "POS-018"
+   ],
+   "inferred": false,
+   "notes": "**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "uses": [
+    "posPrimaryRail"
+   ],
+   "transitions": [
+    {
+     "to": "POS-001",
+     "trigger": "Begin Shift",
+     "carries": [
+      "shiftId"
+     ],
+     "provenance": "derived — POS-001 declares entryState.params shiftId and POS-015 holds shiftId, so an edge into it carries them"
+    },
+    {
+     "to": "POS-018",
+     "trigger": "Safe drop destinations are allocated",
+     "provenance": "flow F73 step 3→4",
+     "carries": [
+      "shiftId"
+     ]
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "density": "touchLarge",
+  "pattern": "listDetail",
+  "patternReason": "`listCashMovements` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Cash Operations Dashboard — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every cash movement",
+       "bindsTo": "CashMovement",
+       "columns": [
+        "CashMovement.id",
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.denominations",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.shiftId",
+        "CashMovement.authorisedByPrincipalId",
+        "CashMovement.sequence",
+        "CashMovement.syncedAt"
+       ],
+       "operation": "listCashMovements",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every deposit box",
+       "bindsTo": "DepositBox",
+       "columns": [
+        "DepositBox.id",
+        "DepositBox.cashierPrincipalId",
+        "DepositBox.cashierName",
+        "DepositBox.venueId",
+        "DepositBox.workstationId",
+        "DepositBox.shiftId",
+        "DepositBox.status",
+        "DepositBox.openingFloat",
+        "DepositBox.openingDenominations",
+        "DepositBox.withdrawnTotal",
+        "DepositBox.foreignHoldings",
+        "DepositBox.expectedTotal"
+       ],
+       "operation": "listDepositBoxes",
+       "provenance": "contract shift.yaml GET /deposit-boxes"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected cash movement",
+       "bindsTo": "CashMovement",
+       "columns": [
+        "CashMovement.id",
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.denominations",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.shiftId",
+        "CashMovement.authorisedByPrincipalId",
+        "CashMovement.sequence",
+        "CashMovement.syncedAt"
+       ],
+       "operation": "listCashMovements",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The cash operations list.",
+   "error": "Could not load. Names which read failed and leaves the cash operations untouched.",
+   "emptyFirstRun": "No cash operations yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync."
+  },
+  "apis": [
+   {
+    "operationId": "listCashMovements",
+    "contract": "shift",
+    "purpose": "Lifts, adds and the opening float",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDepositBoxes",
+    "contract": "shift",
+    "purpose": "Cash boxes and who holds them",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    },
+    {
+     "name": "shiftId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**Resolves from the session, which carries the workstation** — a till is signed into, not navigated to.",
+   "preloaded": [
+    "CashMovement.id",
+    "CashMovement.kind",
+    "CashMovement.amount",
+    "CashMovement.denominations",
+    "CashMovement.reference"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "designed",
+   "board": "wireframes/P04 Venue POS.dc.html#pos-015",
+   "prototype": {
+    "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
+    "rev": "TICVAI OS 4.2.1, build 2026.08.14",
+    "match": "none",
+    "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
+   }
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P04",
+   "audience": "staff",
+   "formFactor": "posTerminal",
+   "shortName": "Venue POS",
+   "name": "Venue POS — Terminal and Tablet",
+   "offlineCapable": true,
+   "app": "venue-pos",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-pos",
+    "name": "TICVAI POS",
+    "shell": "terminal",
+    "siblings": [
+     "P15"
+    ],
+    "note": "**The kitchen display is the till, signed into differently.** Same software, same outlet, same orders — what changes is who is looking and what they may do, which is a permission, not an application.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "POS-017",
+  "name": "Cash In / Cash Out Operations",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-pos",
+   "route": "/sell/cash-in-cash-out-operations",
+   "component": "apps/venue-pos/src/routes/sell/CashInCashOutOperationsBoard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "POS-001"
+   ],
+   "exitTo": [
+    "POS-001"
+   ],
+   "inferred": false,
+   "notes": "**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "POS-001",
+     "trigger": "Begin Shift",
+     "carries": [
+      "shiftId"
+     ],
+     "provenance": "derived — POS-001 declares entryState.params shiftId and POS-017 holds shiftId, so an edge into it carries them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Drawn 31 August** — `POS Frontline Board 2.dc.html` frame `pos-2d`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Cash In / Cash Out Operations* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "POS Frontline Board 2.dc.html#pos-2d"
+  ],
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`createCashMovement`) and no read of a population — it is settings, not a list",
+  "purpose": "Cash In / Cash Out Operations — from the client design board, 20 August.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "id",
+       "bindsTo": "CreateCashMovementRequest.id",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "textField",
+       "label": "kind",
+       "bindsTo": "CreateCashMovementRequest.kind",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "textField",
+       "label": "amount",
+       "bindsTo": "CreateCashMovementRequest.amount",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "textField",
+       "label": "denominations",
+       "bindsTo": "CreateCashMovementRequest.denominations",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "textField",
+       "label": "reference",
+       "bindsTo": "CreateCashMovementRequest.reference",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "textField",
+       "label": "reason",
+       "bindsTo": "CreateCashMovementRequest.reason",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "textField",
+       "label": "recordedAt",
+       "bindsTo": "CreateCashMovementRequest.recordedAt",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create cash movement",
+       "operation": "createCashMovement",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved cash cash out.",
+   "error": "Could not load. Names which read failed and leaves the cash cash out untouched.",
+   "emptyFirstRun": "No cash cash out configured. The form opens empty and `createCashMovement` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `CASH_LIFT`, which `createCashMovement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync."
+  },
+  "apis": [
+   {
+    "operationId": "createCashMovement",
+    "contract": "shift",
+    "purpose": "Record a cash lift or add",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    },
+    {
+     "name": "shiftId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**Resolves from the session, which carries the workstation** — a till is signed into, not navigated to."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "designed",
+   "board": "wireframes/P04 Venue POS.dc.html#pos-017",
+   "prototype": {
+    "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
+    "rev": "TICVAI OS 4.2.1, build 2026.08.14",
+    "match": "none",
+    "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
+   },
+   "derivedFrom": "wireframes/reference/POS Frontline Board 2.dc.html",
+   "note": "**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P04",
+   "audience": "staff",
+   "formFactor": "posTerminal",
+   "shortName": "Venue POS",
+   "name": "Venue POS — Terminal and Tablet",
+   "offlineCapable": true,
+   "app": "venue-pos",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-pos",
+    "name": "TICVAI POS",
+    "shell": "terminal",
+    "siblings": [
+     "P15"
+    ],
+    "note": "**The kitchen display is the till, signed into differently.** Same software, same outlet, same orders — what changes is who is looking and what they may do, which is a permission, not an application.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "POS-018",
+  "name": "Safe Drop & Cash Transfer Management",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-pos",
+   "route": "/sell/safe-drop-cash-transfer-management",
+   "component": "apps/venue-pos/src/routes/sell/SafeDropCashTransferManagementBoard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "POS-001",
+    "POS-015"
+   ],
+   "exitTo": [
+    "POS-001"
+   ],
+   "inferred": false,
+   "notes": "**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "POS-001",
+     "trigger": "Begin Shift",
+     "carries": [
+      "shiftId"
+     ],
+     "provenance": "derived — POS-001 declares entryState.params shiftId and POS-018 holds shiftId, so an edge into it carries them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Owns POS board frame(s) POS-3B** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "POS Board 3.dc.html#pos-3b"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listPrincipals` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Safe Drop & Cash Transfer Management — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Scope path",
+       "operation": "listPrincipals",
+       "notes": "Sends `?scopePath=` to `listPrincipals`.",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listPrincipals",
+       "notes": "Sends `?isActive=` to `listPrincipals`.",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every principal",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "listPrincipals",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every rota assignment",
+       "bindsTo": "RotaAssignment",
+       "columns": [
+        "RotaAssignment.overtimeMinutes",
+        "RotaAssignment.restPeriodBefore",
+        "RotaAssignment.breachesWorkingHourLimit",
+        "RotaAssignment.labourCost",
+        "RotaAssignment.id",
+        "RotaAssignment.principalId",
+        "RotaAssignment.displayName",
+        "RotaAssignment.venueId",
+        "RotaAssignment.departmentId",
+        "RotaAssignment.position",
+        "RotaAssignment.requiredRoleId",
+        "RotaAssignment.workstationId"
+       ],
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected principal",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "listPrincipals",
+       "provenance": "contract identity.yaml GET /principals"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create cash movement",
+       "operation": "createCashMovement",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Withdraw from deposit box",
+       "operation": "withdrawFromDepositBox",
+       "provenance": "contract shift.yaml POST /deposit-boxes/{boxId}/withdraw"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create rota assignment",
+       "operation": "createRotaAssignment",
+       "provenance": "contract workforce.yaml POST /rota-assignments"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmWithdrawFromDepositBox",
+    "component": "confirmDialog",
+    "trigger": "Withdraw from deposit box",
+    "body": "**Names what `withdrawFromDepositBox` changes and what it leaves alone**, in the consequence rather than the verb. A safe drop cash this affects should be identified in the dialog, not just counted. **Collects what `withdrawFromDepositBox` sends before it is called.** Required: `id`, `amount`, `witnessPrincipalId`, `recordedAt`. Optional: `reason`, `note`.",
+    "provenance": "designed",
+    "confirm": {
+     "label": "Withdraw",
+     "operation": "withdrawFromDepositBox",
+     "carries": [
+      "depositBoxId",
+      "amount"
+     ]
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "amount"
+     ]
+    }
+   },
+   {
+    "id": "formCreateCashMovement",
+    "component": "modal",
+    "trigger": "Create cash movement",
+    "body": "**Collects what `createCashMovement` sends before it is called.** Required: `id`, `kind`, `amount`, `recordedAt`. Optional: `denominations`, `reference`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCashMovementRequest",
+    "confirm": {
+     "label": "Create cash movement",
+     "operation": "createCashMovement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "amount",
+      "recordedAt",
+      "denominations",
+      "reference",
+      "reason"
+     ]
+    },
+    "provenance": "designed"
+   },
+   {
+    "id": "formCreateRotaAssignment",
+    "component": "modal",
+    "trigger": "Create rota assignment",
+    "body": "**Collects what `createRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`, `breachesWorkingHourLimit`, `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RotaAssignment",
+    "confirm": {
+     "label": "Create rota assignment",
+     "operation": "createRotaAssignment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "principalId",
+      "venueId",
+      "position",
+      "startsAt",
+      "endsAt",
+      "overtimeMinutes",
+      "restPeriodBefore",
+      "breachesWorkingHourLimit",
+      "labourCost",
+      "id",
+      "displayName",
+      "departmentId",
+      "requiredRoleId",
+      "workstationId",
+      "status",
+      "breakMinutes",
+      "note"
+     ]
+    },
+    "provenance": "designed"
+   }
+  ],
+  "states": {
+   "loading": "The safe drop cash list.",
+   "error": "Could not load. Names which read failed and leaves the safe drop cash untouched.",
+   "emptyFirstRun": "No safe drop cash yet. Offers Create cash movement (`createCashMovement`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on scopePath, isActive and the safe drop cash are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync."
+  },
+  "apis": [
+   {
+    "operationId": "createCashMovement",
+    "contract": "shift",
+    "purpose": "Record a cash lift or add",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPrincipals"
+    ]
+   },
+   {
+    "operationId": "withdrawFromDepositBox",
+    "contract": "shift",
+    "purpose": "A supervisor takes cash out mid-shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPrincipals"
+    ]
+   },
+   {
+    "operationId": "createRotaAssignment",
+    "contract": "workforce",
+    "purpose": "Put someone on the rota",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPrincipals"
+    ]
+   },
+   {
+    "operationId": "listPrincipals",
+    "contract": "identity",
+    "purpose": "List principals",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listRotaAssignments",
+    "contract": "workforce",
+    "purpose": "The rota",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    },
+    {
+     "name": "boxId",
+     "from": "deepLink"
+    },
+    {
+     "name": "shiftId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**Resolves from the session, which carries the workstation** — a till is signed into, not navigated to.",
+   "preloaded": [
+    "Principal.id",
+    "Principal.username",
+    "Principal.displayName",
+    "Principal.isActive",
+    "Principal.validFrom"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "designed",
+   "board": "wireframes/P04 Venue POS.dc.html#pos-018",
+   "prototype": {
+    "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
+    "rev": "TICVAI OS 4.2.1, build 2026.08.14",
+    "match": "none",
+    "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
+   },
+   "derivedFrom": "wireframes/reference/POS Board 3.dc.html",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P04",
+   "audience": "staff",
+   "formFactor": "posTerminal",
+   "shortName": "Venue POS",
+   "name": "Venue POS — Terminal and Tablet",
+   "offlineCapable": true,
+   "app": "venue-pos",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-pos",
+    "name": "TICVAI POS",
+    "shell": "terminal",
+    "siblings": [
+     "P15"
+    ],
+    "note": "**The kitchen display is the till, signed into differently.** Same software, same outlet, same orders — what changes is who is looking and what they may do, which is a permission, not an application.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "POS-019",
+  "name": "Shift Templates & Policies",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-pos",
+   "route": "/sell/shift-templates-policies",
+   "component": "apps/venue-pos/src/routes/sell/ShiftTemplatesPoliciesBoard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "POS-001",
+    "POS-016"
+   ],
+   "exitTo": [
+    "POS-001",
+    "POS-015"
+   ],
+   "inferred": false,
+   "notes": "**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "POS-001",
+     "trigger": "Begin Shift",
+     "carries": [
+      "shiftId"
+     ],
+     "provenance": "derived — POS-001 declares entryState.params shiftId and POS-019 holds shiftId, so an edge into it carries them"
+    },
+    {
+     "to": "POS-015",
+     "trigger": "Cash limits and the drawer ceiling are set",
+     "provenance": "flow F73 step 2→3",
+     "carries": [
+      "shiftId"
+     ]
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it.** **Owns POS board frame(s) POS-3C** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "POS Board 3.dc.html#pos-3c"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listShifts` reads the population and `getVenueSettings` reads one of them — list, select, act",
+  "purpose": "Shift Templates & Policies — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listShifts",
+       "notes": "Sends `?workstationId=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listShifts",
+       "notes": "Sends `?status=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Opened from",
+       "operation": "listShifts",
+       "notes": "Sends `?openedFrom=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Opened to",
+       "operation": "listShifts",
+       "notes": "Sends `?openedTo=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every shift",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber"
+       ],
+       "operation": "listShifts",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected shift",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
+       ],
+       "operation": "listShifts",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue settings",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.currencyCode",
+        "VenueSettings.currencyScale",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.biometrics",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save venue settings",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The shift templates policies list.",
+   "error": "Could not load. Names which read failed and leaves the shift templates policies untouched.",
+   "emptyFirstRun": "No shift templates policies yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on workstationId, status, openedFrom, openedTo and the shift templates policies are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync."
+  },
+  "apis": [
+   {
+    "operationId": "listShifts",
+    "contract": "shift",
+    "purpose": "List shifts",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Set support hours, quiet hours, segregated access and alerti",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Operational settings for this venue",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    },
+    {
+     "name": "venueId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**Resolves from the session, which carries the workstation** — a till is signed into, not navigated to.",
+   "preloaded": [
+    "VenueSettings.id",
+    "VenueSettings.venueId",
+    "VenueSettings.supportHours",
+    "VenueSettings.quietHours",
+    "VenueSettings.segregatedAccess"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "designed",
+   "board": "wireframes/P04 Venue POS.dc.html#pos-019",
+   "prototype": {
+    "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
+    "rev": "TICVAI OS 4.2.1, build 2026.08.14",
+    "match": "none",
+    "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
+   },
+   "derivedFrom": "wireframes/reference/POS Board 3.dc.html",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetVenueSettings",
+    "component": "modal",
+    "trigger": "Save venue settings",
+    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `id`, `venueId`, `currencyCode`, `currencyScale`, `supportHours`, `quietHours`, `biometrics`, `segregatedAccess`, `alerting`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "VenueSettings",
+    "confirm": {
+     "label": "Save venue settings",
+     "operation": "setVenueSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "currencyCode",
+      "currencyScale",
+      "supportHours",
+      "quietHours",
+      "biometrics",
+      "segregatedAccess",
+      "alerting"
+     ]
+    },
+    "provenance": "designed"
+   }
+  ],
+  "_platform": {
+   "code": "P04",
+   "audience": "staff",
+   "formFactor": "posTerminal",
+   "shortName": "Venue POS",
+   "name": "Venue POS — Terminal and Tablet",
+   "offlineCapable": true,
+   "app": "venue-pos",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-pos",
+    "name": "TICVAI POS",
+    "shell": "terminal",
+    "siblings": [
+     "P15"
+    ],
+    "note": "**The kitchen display is the till, signed into differently.** Same software, same outlet, same orders — what changes is who is looking and what they may do, which is a permission, not an application.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "POS-024",
+  "name": "Outlet Setup",
+  "module": "Sell",
+  "requiresModule": "fnb",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-pos",
+   "route": "/sell/outlet-setup",
+   "component": "apps/venue-pos/src/routes/sell/OutletSetupBoard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "POS-001"
+   ],
+   "exitTo": [
+    "POS-002"
+   ],
+   "transitions": [
+    {
+     "to": "POS-002",
+     "trigger": "Sell — Ticket Catalogue",
+     "provenance": "derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-024 holds none of them. The edge carries nothing: cardCode, orderId, productId, promotionId only pre-select (deep link or optional), and POS-002 opens on its own"
+    }
+   ]
+  },
+  "notes": "**Configuration on the till, gated by permission rather than by device.** P04 is *Terminal and Tablet* (`reactNativeTablet`) and ADR-0002 makes authorisation user-driven — **a manager signs into the same till a cashier uses and sees screens the cashier does not.**\n\n**A table layout is decided standing in the room.** A manager at a desk cannot see whether two four-tops push together, which is why `setTableLayout` and `setTableCombinations` belong within reach of the floor and not only in the back office.",
+  "density": "touchLarge",
+  "densityReason": "**A tablet on a POS platform is still a POS platform.**  refused comfortable and was right: the same person configuring the floor is the person who was selling on it ten minutes ago, and a screen that changes target size between those two is a screen they mis-tap.",
+  "pattern": "listDetail",
+  "patternReason": "`listOutlets` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "A manager configures this outlet from the floor.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOutlets",
+       "notes": "Sends `?venueId=` to `listOutlets`.",
+       "provenance": "contract tenancy.yaml GET /outlets"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listOutlets",
+       "notes": "Sends `?kind=` to `listOutlets`.",
+       "provenance": "contract tenancy.yaml GET /outlets"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every outlet",
+       "bindsTo": "Outlet",
+       "columns": [
+        "Outlet.id",
+        "Outlet.code",
+        "Outlet.name",
+        "Outlet.venueId",
+        "Outlet.kind",
+        "Outlet.zone",
+        "Outlet.stockLocationId",
+        "Outlet.costCenterId",
+        "Outlet.openingHours",
+        "Outlet.isActive"
+       ],
+       "operation": "listOutlets",
+       "provenance": "contract tenancy.yaml GET /outlets"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every menu",
+       "bindsTo": "Menu",
+       "columns": [
+        "Menu.id",
+        "Menu.code",
+        "Menu.name",
+        "Menu.outletId",
+        "Menu.availability",
+        "Menu.sections",
+        "Menu.isActive",
+        "Menu.publishedVersion",
+        "Menu.publishedAt"
+       ],
+       "operation": "listMenus",
+       "provenance": "contract fnb.yaml GET /menus"
+      },
+      {
+       "kind": "cardList",
+       "bindsTo": "TableDefinition[]",
+       "label": "Floor",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Combinations",
+       "notes": "**Declared, not inferred.** Two adjacent tables do not always combine — a pillar, a step, a service run. A host knows which pairs work and a floor plan does not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "86 an item",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Apply",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected outlet",
+       "bindsTo": "Outlet",
+       "columns": [
+        "Outlet.id",
+        "Outlet.code",
+        "Outlet.name",
+        "Outlet.venueId",
+        "Outlet.kind",
+        "Outlet.zone",
+        "Outlet.stockLocationId",
+        "Outlet.costCenterId",
+        "Outlet.openingHours",
+        "Outlet.isActive"
+       ],
+       "operation": "listOutlets",
+       "provenance": "contract tenancy.yaml GET /outlets"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save table layout",
+       "operation": "setTableLayout",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save table combinations",
+       "operation": "setTableCombinations",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/table-combinations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save item availability",
+       "operation": "setItemAvailability",
+       "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "This outlet, its tables and its menu.",
+   "error": "Could not load configuration. **Selling is unaffected.**",
+   "emptyFirstRun": "**A new outlet with no layout.** The one action that draws the first table.",
+   "emptyNoResults": "Nothing matches.",
+   "emptyNoAccess": "**You are signed in as a cashier.** Configuration needs a manager role — ADR-0002 makes that the person, not the device, so signing in again on this same till is the way through.",
+   "offline": "**Configuration is refused offline.** A table layout edited on two disconnected tablets is two layouts, and the room only has one."
+  },
+  "apis": [
+   {
+    "operationId": "listOutlets",
+    "contract": "tenancy",
+    "purpose": "List outlets",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setTableLayout",
+    "contract": "fnb",
+    "purpose": "Configure the table layout",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOutlets"
+    ]
+   },
+   {
+    "operationId": "setTableCombinations",
+    "contract": "fnb",
+    "purpose": "Which tables can be pushed together, and to what capacity",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOutlets"
+    ]
+   },
+   {
+    "operationId": "setItemAvailability",
+    "contract": "fnb",
+    "purpose": "Mark an item available or eighty-sixed",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOutlets"
+    ]
+   },
+   {
+    "operationId": "listMenus",
+    "contract": "fnb",
+    "purpose": "List menus",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    },
+    {
+     "name": "outletId",
+     "from": "session"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**Resolves from the session, which carries the workstation and its outlet.** A till is signed into, not navigated to — and the outlet is a property of where the till is bolted down, not something a cashier picks.",
+   "preloaded": [
+    "Outlet.id",
+    "Outlet.code",
+    "Outlet.name",
+    "Outlet.venueId",
+    "Outlet.kind"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "designed",
+   "board": "wireframes/P04 Venue POS.dc.html#pos-024",
+   "prototype": {
+    "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
+    "rev": "TICVAI OS 4.2.1, build 2026.08.14",
+    "match": "none",
+    "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
+   }
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetTableLayout",
+    "component": "modal",
+    "trigger": "Save table layout",
+    "body": "**Collects what `setTableLayout` sends before it is called.** Required: `tables`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save table layout",
+     "operation": "setTableLayout"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tables"
+     ]
+    },
+    "provenance": "designed"
+   },
+   {
+    "id": "formSetTableCombinations",
+    "component": "modal",
+    "trigger": "Save table combinations",
+    "body": "**Collects what `setTableCombinations` sends before it is called.** Required: `combinations`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save table combinations",
+     "operation": "setTableCombinations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "combinations"
+     ]
+    },
+    "provenance": "designed"
+   },
+   {
+    "id": "formSetItemAvailability",
+    "component": "modal",
+    "trigger": "Save item availability",
+    "body": "**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`, `recordedAt`. Optional: `reason`, `restoreAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save item availability",
+     "operation": "setItemAvailability"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "isAvailable",
+      "recordedAt",
+      "reason",
+      "restoreAt"
+     ]
+    },
+    "provenance": "designed"
+   }
+  ],
+  "_platform": {
+   "code": "P04",
+   "audience": "staff",
+   "formFactor": "posTerminal",
+   "shortName": "Venue POS",
+   "name": "Venue POS — Terminal and Tablet",
+   "offlineCapable": true,
+   "app": "venue-pos",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-pos",
+    "name": "TICVAI POS",
+    "shell": "terminal",
+    "siblings": [
+     "P15"
+    ],
+    "note": "**The kitchen display is the till, signed into differently.** Same software, same outlet, same orders — what changes is who is looking and what they may do, which is a permission, not an application.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

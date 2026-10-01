@@ -16306,14 +16306,17 @@
    "POS-010",
    "POS-011",
    "POS-013",
-   "POS-020"
+   "POS-020",
+   "POS-030",
+   "POS-031"
   ],
   "pattern": "listDetail",
   "entryFrom": [
    "POS-001",
    "POS-006",
    "POS-025",
-   "POS-027"
+   "POS-027",
+   "POS-030"
   ],
   "transitions": [
    {
@@ -16458,6 +16461,22 @@
     "to": "POS-008",
     "trigger": "Reports",
     "provenance": "derived \u2014 POS-008 declares entryState.params conversationId, reportId and POS-002 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or optional), and POS-008 opens on its own"
+   },
+   {
+    "to": "POS-030",
+    "trigger": "History",
+    "provenance": "decided 1 October 2026 (POS v2 decisions, POSV2-1): the cart's History opens the Sales journal on this terminal and today (v2's cart history); Reload this cart comes back here",
+    "carries": [
+     "orderId"
+    ]
+   },
+   {
+    "to": "POS-031",
+    "trigger": "Reserve",
+    "carries": [
+     "cartId"
+    ],
+    "provenance": "decided 1 October 2026 (POSV2-2): the cart's Reserve holds the sale without payment as a reservation (createReservation on POS-031); a reservation issues no ticket"
    },
    {
     "to": "POS-011",
@@ -17664,7 +17683,8 @@
    "POS-002",
    "POS-003",
    "POS-004",
-   "POS-028"
+   "POS-028",
+   "POS-031"
   ],
   "transitions": [
    {
@@ -18867,7 +18887,8 @@
    "createRotaAssignment",
    "listRotaAssignments",
    "listWorkstations",
-   "listAlerts"
+   "listAlerts",
+   "recordAttendance"
   ],
   "services": [
    "OrderService",
@@ -18879,6 +18900,7 @@
    "redis"
   ],
   "reads": [
+   "access.access_point",
    "cache:idempotency",
    "identity.delegated_access",
    "identity.principal",
@@ -18895,6 +18917,8 @@
    "platform.workstation",
    "reporting.alert",
    "reporting.alert_rule",
+   "workforce.attendance",
+   "workforce.attendance_amendment",
    "workforce.rota_assignment"
   ],
   "writes": [
@@ -18904,6 +18928,7 @@
    "orders.no_sale_event",
    "orders.pos_shift",
    "platform.outbox",
+   "workforce.attendance",
    "workforce.rota_assignment"
   ],
   "storedProcedures": [],
@@ -18944,6 +18969,26 @@
    "offline": "Last known roster, with its age shown"
   },
   "overlays": [
+   {
+    "id": "formRecordAttendance",
+    "component": "modal",
+    "trigger": "Clock in, clock out, start or end a break",
+    "body": "**Collects what `recordAttendance` sends before it is called.** Required: `kind` (clockIn, clockOut, breakStart, breakEnd) and `occurredAt`, the device time. Optional: `assignmentId`, `accessPointId`. An out-of-sequence clock (a clock-out with no clock-in) is refused 409 and reported, never corrected. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Record",
+     "operation": "recordAttendance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "occurredAt",
+      "assignmentId",
+      "accessPointId"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /attendance/clock (decided 1 October 2026, POSV2-3)"
+   },
    {
     "id": "confirmCloseShift",
     "component": "confirmDialog",
@@ -19384,7 +19429,8 @@
   "pattern": "listDetail",
   "entryFrom": [
    "POS-001",
-   "POS-026"
+   "POS-026",
+   "POS-030"
   ],
   "transitions": [
    {
@@ -21499,7 +21545,9 @@
    "POS-028",
    "POS-029",
    "POS-026",
-   "POS-007"
+   "POS-007",
+   "POS-030",
+   "POS-031"
   ],
   "pattern": "dashboard",
   "entryFrom": [
@@ -21550,6 +21598,16 @@
     "to": "POS-007",
     "trigger": "Close Shift",
     "provenance": "structural \u2014 POS-025 is P04's home screen and its exits are its launcher"
+   },
+   {
+    "to": "POS-030",
+    "trigger": "Sales journal (F7, or a KPI tile)",
+    "provenance": "decided 1 October 2026 (POS v2 decisions, POSV2-1): v2's F7 Sales journal and the KPI tiles open the journal, on this terminal and today"
+   },
+   {
+    "to": "POS-031",
+    "trigger": "Reservations (F5)",
+    "provenance": "decided 1 October 2026 (POSV2-2): v2's F5 Reservations and the Bookings rail item"
    }
   ],
   "machine": null,
@@ -21624,7 +21682,8 @@
   ],
   "pattern": "detail",
   "entryFrom": [
-   "POS-025"
+   "POS-025",
+   "POS-030"
   ],
   "transitions": [
    {
@@ -21862,6 +21921,397 @@
    "offline": "**The queue is the one thing that must never look current when it is not.** Offline, every card carries the time it was last known and the advance action is withheld."
   },
   "overlays": []
+ },
+ "POS-030": {
+  "name": "Sales Journal",
+  "platform": "P04",
+  "platformName": "Venue POS",
+  "operator": "venue",
+  "app": "venue-pos",
+  "route": "/sell/journal",
+  "operations": [
+   "listOrders",
+   "getOrder",
+   "searchGuests",
+   "reprintReceipt",
+   "reprintOrder",
+   "issueTaxInvoice",
+   "getTaxDocumentRendition",
+   "addCartLine"
+  ],
+  "services": [
+   "LedgerService",
+   "MarketingService",
+   "OrderService",
+   "RetailService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:idempotency",
+   "catalogue.channel_capacity",
+   "catalogue.performance",
+   "catalogue.variant",
+   "ledger.credit_memo",
+   "ledger.legal_entity",
+   "ledger.tax_code",
+   "ledger.tax_invoice",
+   "ledger.tax_invoice_line",
+   "ledger.tax_invoice_template",
+   "marketing.consent_question",
+   "marketing.consent_question_version",
+   "marketing.guest_profile",
+   "orders.cart",
+   "orders.cart_line",
+   "orders.order_line",
+   "orders.order_line_discount",
+   "orders.order_line_eligibility",
+   "orders.payment",
+   "orders.sales_order",
+   "retail.sale"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "ledger.tax_invoice",
+   "ledger.tax_invoice_line",
+   "ledger.tax_invoice_template",
+   "orders.cart",
+   "orders.cart_line",
+   "orders.sales_order",
+   "platform.audit_record",
+   "platform.idempotency_record",
+   "platform.outbox",
+   "retail.sale"
+  ],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": true,
+  "specified": true,
+  "exits": [
+   "POS-025",
+   "POS-002",
+   "POS-011",
+   "POS-026"
+  ],
+  "pattern": "listDetail",
+  "entryFrom": [
+   "POS-025",
+   "POS-002"
+  ],
+  "transitions": [
+   {
+    "to": "POS-025",
+    "trigger": "Till Home",
+    "provenance": "decided 1 October 2026 (POS v2 decisions, POSV2-1): the journal is opened from the Till Home function bar (F7 Sales journal) and its KPI tiles, and this edge is the way back. It carries nothing: POS-025 keeps its own state"
+   },
+   {
+    "to": "POS-002",
+    "trigger": "Reload this cart",
+    "control": "secondaryButton#reloadCart",
+    "operation": "addCartLine",
+    "guard": "ORDER_CREATE",
+    "carries": [
+     "cartId"
+    ],
+    "provenance": "decided 1 October 2026 (POSV2-1), from the v2 cart history (Reload this cart): the selected sale's lines are read with `getOrder` and added to the till's cart with `addCartLine`, at today's prices and availability; the old order is not touched"
+   },
+   {
+    "to": "POS-011",
+    "trigger": "Refund or void",
+    "control": "secondaryButton#refundOrVoid",
+    "guard": "ORDER_REFUND",
+    "escalatable": true,
+    "carries": [
+     "orderId"
+    ],
+    "provenance": "decided 1 October 2026 (POSV2-1), from the v2 sales journal (Refund or void): the journal hands the sale to Returns, Refunds & Exchanges and does not refund or void on its own surface"
+   },
+   {
+    "to": "POS-026",
+    "trigger": "Open the receipt",
+    "control": "dataTable#journal",
+    "carries": [
+     "orderId"
+    ],
+    "provenance": "decided 1 October 2026 (POSV2-1): a sale opened from the journal shows its receipt on Receipt & Reprint, where the entitlement can be reissued"
+   }
+  ],
+  "machine": null,
+  "states": {
+   "loading": "This terminal's sales today, newest first. **The filters render before the rows.**",
+   "error": "Could not load the journal. Names which read failed and keeps the filters as they were.",
+   "emptyFirstRun": "**No sales on this terminal today yet.** Says so plainly; the journal fills as sales are made.",
+   "emptyNoResults": "Nothing matches the filter on terminal, day, customer, payment method or status, and the till's sales are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data*.",
+   "denied": "Another terminal's or another cashier's sales need `ORDER_VIEW_OTHER`. **This terminal's own sales are still listed**; the filter names what is withheld.",
+   "offline": "**Orders taken on this terminal are listed from the local journal**; other terminals, the customer search and tax invoices need the network. Reprint works offline (`reprintOrder`)."
+  },
+  "overlays": [
+   {
+    "id": "formReprintReceipt",
+    "component": "modal",
+    "trigger": "Reprint or email the receipt",
+    "body": "**Collects what `reprintReceipt` sends before it is called.** Required: `delivery` (print, email, SMS or WhatsApp). `destination` is required for anything but print. Dismissing sends nothing; the sale is unchanged.",
+    "confirm": {
+     "label": "Send",
+     "operation": "reprintReceipt"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "destination"
+     ]
+    },
+    "provenance": "v2 sales journal (Reprint receipt, Email tax invoice)"
+   },
+   {
+    "id": "formReprintOrder",
+    "component": "modal",
+    "trigger": "Reprint the order",
+    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the sale is unchanged.",
+    "confirm": {
+     "label": "Reprint",
+     "operation": "reprintOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "recordedAt",
+      "destination",
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+   },
+   {
+    "id": "formIssueTaxInvoice",
+    "component": "modal",
+    "trigger": "Tax invoice",
+    "body": "**Collects what `issueTaxInvoice` sends before it is called**: the buyer's name, address and TRN where the invoice needs them. An invoice already issued for the sale opens instead of a second one. Dismissing sends nothing.",
+    "bindsTo": "FinIssueTaxInvoiceRequest",
+    "confirm": {
+     "label": "Issue tax invoice",
+     "operation": "issueTaxInvoice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "buyer"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /tax-invoices"
+   },
+   {
+    "id": "confirmReloadCart",
+    "component": "confirmDialog",
+    "trigger": "Reload this cart",
+    "body": "**Adds this sale's lines to the cart at today's prices and availability.** A line no longer on sale, or a performance that has passed, is named and left out. The original sale is not changed.",
+    "confirm": {
+     "label": "Reload into the cart",
+     "operation": "addCartLine",
+     "to": "POS-002",
+     "carries": [
+      "cartId"
+     ]
+    },
+    "dismiss": {
+     "label": "Keep the cart as it is",
+     "discards": [
+      "cartId"
+     ]
+    },
+    "provenance": "v2 cart history (Reload this cart)"
+   }
+  ]
+ },
+ "POS-031": {
+  "name": "Reservations & Group Arrivals",
+  "platform": "P04",
+  "platformName": "Venue POS",
+  "operator": "venue",
+  "app": "venue-pos",
+  "route": "/sell/reservations",
+  "operations": [
+   "listReservations",
+   "getReservation",
+   "createReservation",
+   "extendReservation",
+   "convertReservation",
+   "cancelReservation",
+   "listGroupArrivalCheck",
+   "getGroupBooking",
+   "recordGroupCheckIn"
+  ],
+  "services": [
+   "OrderService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "access.entitlement",
+   "access.scan_event",
+   "cache:idempotency",
+   "orders.group_booking",
+   "orders.group_participant",
+   "orders.group_visit_plan",
+   "orders.order_line",
+   "orders.order_line_discount",
+   "orders.order_line_eligibility",
+   "orders.payment",
+   "orders.reservation",
+   "orders.reservation_line",
+   "orders.sales_order",
+   "pii.subject"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.group_visit_plan",
+   "orders.order_event",
+   "orders.order_line",
+   "orders.payment",
+   "orders.reservation",
+   "orders.reservation_line",
+   "orders.sales_order",
+   "promotions.promotion_evaluation_trace"
+  ],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": true,
+  "specified": true,
+  "exits": [
+   "POS-025",
+   "POS-005"
+  ],
+  "pattern": "listDetail",
+  "entryFrom": [
+   "POS-025",
+   "POS-002"
+  ],
+  "transitions": [
+   {
+    "to": "POS-025",
+    "trigger": "Till Home",
+    "provenance": "decided 1 October 2026 (POS v2 decisions, POSV2-2): opened from the Till Home function bar (F5 Reservations) and the Bookings rail item, and this edge is the way back. It carries nothing"
+   },
+   {
+    "to": "POS-005",
+    "trigger": "Take payment",
+    "control": "primaryButton#takePayment",
+    "operation": "convertReservation",
+    "guard": "ORDER_CREATE",
+    "carries": [
+     "orderId"
+    ],
+    "precondition": "reservation.status == held, or the group's order has a balance due",
+    "onFailure": [
+     {
+      "when": "the reservation expired (409 reservationExpired)",
+      "to": "POS-031",
+      "note": "The capacity has been released. Offer a new reservation for what is still available."
+     },
+     {
+      "when": "already converted (409 alreadyConverted)",
+      "to": "POS-031",
+      "note": "Open the order it became and take its balance."
+     }
+    ],
+    "provenance": "decided 1 October 2026 (POSV2-2): a reservation is converted into an order on arrival (`convertReservation`) and paid at Payment; **the tickets are issued when it is paid, never before**. A group's order is paid the same way"
+   }
+  ],
+  "machine": null,
+  "states": {
+   "loading": "The reservations held at this venue, soonest expiry first, and the groups due today.",
+   "error": "Could not load. Names which read failed and leaves the reservations untouched.",
+   "emptyFirstRun": "**No reservations held and no groups due today.** Offers New reservation (`createReservation`).",
+   "emptyNoResults": "Nothing matches the status or expiry filter, and the reservations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires, and names that permission. **Never an empty table**.",
+   "denied": "Reservations are listed; New reservation, Take payment and Extend need `ORDER_CREATE`, Cancel needs `ORDER_CANCEL` and the check-in `ORDER_MODIFY`. **The list is still shown**, so the cashier can fetch a supervisor to the right reservation.",
+   "offline": "**Reservations need the network**: a hold is capacity, and only the server knows what is left. Offline the screen says so and sells nothing from here."
+  },
+  "overlays": [
+   {
+    "id": "formCreateReservation",
+    "component": "modal",
+    "trigger": "New reservation",
+    "body": "**Collects what `createReservation` sends before it is called.** Required: `id`, `venueId`, `lines`, `expiresAt` (the hold, from the venue's choices). Optional: `subjectId`, the guest or the group's leader. **Holds capacity only: no ticket is issued and nothing is charged.** Opened from the cart's Reserve, it carries the cart's lines. Dismissing sends nothing.",
+    "bindsTo": "CreateReservationRequest",
+    "confirm": {
+     "label": "Reserve, no payment",
+     "operation": "createReservation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "lines",
+      "expiresAt",
+      "subjectId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /reservations \u00b7 v2 cart Reserve and Bookings New reservation"
+   },
+   {
+    "id": "confirmExtendReservation",
+    "component": "confirmDialog",
+    "trigger": "Extend the hold",
+    "body": "**Keeps the capacity held for longer**, to the new expiry shown; refused once the reservation has expired.",
+    "confirm": {
+     "label": "Extend",
+     "operation": "extendReservation"
+    },
+    "dismiss": {
+     "label": "Keep the current expiry",
+     "discards": []
+    },
+    "provenance": "contract orders.yaml POST /reservations/{reservationId}/extend"
+   },
+   {
+    "id": "confirmCancelReservation",
+    "component": "confirmDialog",
+    "trigger": "Cancel reservation",
+    "body": "**Releases what the reservation holds back on sale.** Names the lines and the guest; nothing was charged, so nothing is refunded.",
+    "confirm": {
+     "label": "Cancel reservation",
+     "operation": "cancelReservation"
+    },
+    "dismiss": {
+     "label": "Keep the reservation",
+     "discards": []
+    },
+    "provenance": "contract orders.yaml DELETE /reservations/{reservationId}"
+   },
+   {
+    "id": "formRecordGroupCheckIn",
+    "component": "modal",
+    "trigger": "Check the group in",
+    "body": "**Collects what `recordGroupCheckIn` sends before it is called.** Required: `arrivedCount`. Optional: `additionalGuests`, `staffLeadersCount`, `arrivalGateId`, `actualArrivalAt`, `checkInIssues`. A group with a balance due is paid at Payment first; its tickets are issued when it is paid. Dismissing sends nothing.",
+    "bindsTo": "GroupCheckInRequest",
+    "confirm": {
+     "label": "Check in",
+     "operation": "recordGroupCheckIn"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "arrivedCount",
+      "additionalGuests",
+      "staffLeadersCount",
+      "arrivalGateId",
+      "actualArrivalAt",
+      "checkInIssues"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /group-bookings/{groupBookingId}/check-in (as on BO-280)"
+   }
+  ]
  },
  "KSK-001": {
   "name": "Attract Loop",

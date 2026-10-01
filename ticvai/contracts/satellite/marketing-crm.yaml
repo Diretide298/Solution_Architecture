@@ -3220,6 +3220,7 @@ paths:
       operationId: searchGuests
       x-ticvai-consumed-by:
         - "P04 POS-027 Guest Lookup"
+        - "P04 POS-030 Sales Journal"
         - "P08 BO-734 CRM Command Center"
         - "P08 BO-735 Guest Directory"
       x-ticvai-audience:
