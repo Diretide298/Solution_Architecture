@@ -12193,7 +12193,7 @@ screens:
       route (`favouriteId`) prefills the same way. A shared link with stations prefills From and To if both
       still exist, and says which one does not.
   wireframe:
-    status: notStarted
+    status: review
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-049
     prototype:
@@ -12450,7 +12450,7 @@ screens:
     coldEntry: Starts at the first question; a saved-plan link opens the plan, or says it has passed and
       offers to plan again. `itemId` is the plan item the guest taps Swap on, picked on this screen.
   wireframe:
-    status: notStarted
+    status: review
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-050
     prototype:

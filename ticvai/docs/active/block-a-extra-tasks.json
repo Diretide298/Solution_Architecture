@@ -153,7 +153,7 @@
     "SETUP-CI"
    ],
    "subject": "Hosts for the deployables on .NET 10: commerce, access, operations and workers, each composing its modules",
-   "detail": "In ticvai-backend, on .NET 10 LTS (decided 30 September; ADR-0055). Four .NET hosts in one solution: commerce (Identity, Tenancy, Catalogue, Order, Ledger, Wallet), access (Access), operations (F&B, Retail, Inventory, VenueOps, Marketing, WhiteLabel, Reporting, Platform, CrossRegion) and workers (the outbox relay, every module's event consumers, scheduled jobs), each composing its modules through IModule. ticvai-ai stays the Python service. Done when: each host starts locally with its modules registered and a health endpoint, CI builds one image per host, and moving a module to another host is a change of one registration."
+   "detail": "In **ticvai-backend**, on .NET 10 LTS (decided 30 September; ADR-0055). Four .NET hosts in one solution: commerce (Identity, Tenancy, Catalogue, Order, Ledger, Wallet), access (Access), operations (F&B, Retail, Inventory, VenueOps, Marketing, WhiteLabel, Reporting, Platform, CrossRegion) and workers (the outbox relay, every module's event consumers, scheduled jobs), each composing its modules through IModule. ticvai-ai stays the Python service. Done when: each host starts locally with its modules registered and a health endpoint, CI builds one image per host, and moving a module to another host is a change of one registration."
   },
   {
    "key": "ARCH-TESTS",
@@ -220,7 +220,7 @@
     "SETUP-ENV"
    ],
    "subject": "Qdrant cluster in dev and staging: 3 nodes, TLS, snapshots, monitoring",
-   "detail": "In ticvai-infra (Terraform): a self-hosted 3-node Qdrant cluster in Azure UAE North for dev and staging (ADR-0049), pinned to 1.16 or later, with TLS, JWT RBAC on and the signing key in the cell's Key Vault, snapshot storage in the UAE, and monitoring and alerts on node health, disk and latency. Check Qdrant Hybrid Cloud on our own AKS as an alternative before building. Done when: the cluster survives the loss of one node, a snapshot of a test collection restores into a fresh cluster, and a request without a valid token is refused."
+   "detail": "In **ticvai-infra** (Terraform): a self-hosted 3-node Qdrant cluster in Azure UAE North for dev and staging (ADR-0049), pinned to 1.16 or later, with TLS, JWT RBAC on and the signing key in the cell's Key Vault, snapshot storage in the UAE, and monitoring and alerts on node health, disk and latency. Check Qdrant Hybrid Cloud on our own AKS as an alternative before building. Done when: the cluster survives the loss of one node, a snapshot of a test collection restores into a fresh cluster, and a request without a valid token is refused."
   },
   {
    "key": "OFFLINE-JOURNAL",

@@ -15455,7 +15455,7 @@ screens:
       departures show at once; the guest can still change or swap them. A saved route from GST-079 prefills
       both stations.
   wireframe:
-    status: notStarted
+    status: review
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-076
     prototype:
@@ -15635,7 +15635,7 @@ screens:
     coldEntry: '**A departure that has left or was cancelled** says which and offers the next departure
       on the same route.'
   wireframe:
-    status: notStarted
+    status: review
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-077
     prototype:
@@ -15769,7 +15769,7 @@ screens:
       from: session
     coldEntry: Arrives with the stations last chosen on GST-076, or asks for them.
   wireframe:
-    status: notStarted
+    status: review
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-078
     prototype:
@@ -15884,7 +15884,7 @@ screens:
       from: navigation
     coldEntry: Needs a signed-in guest; one who is not signed in is offered sign-in first.
   wireframe:
-    status: notStarted
+    status: review
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-079
     prototype:

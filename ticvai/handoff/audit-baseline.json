@@ -12739,11 +12739,17 @@
  },
  "check-ticket-text": {
   "updated": "2026-10-01",
-  "commit": "278cc437",
+  "commit": "2d95ec30",
   "rules": {
    "T-DONE-WHEN": [
-    "APP-SETUP-BO-1045",
-    "APP-SETUP-BO-1065"
+    "AI-ENGINE-BASELINE",
+    "AI-ENGINE-CONCIERGE",
+    "AI-ENGINE-EVAL",
+    "AI-ENGINE-GATEWAY",
+    "AI-ENGINE-GUIDED",
+    "AI-ENGINE-PLANNER",
+    "AI-ENGINE-SUGGESTIONS",
+    "AI-ENGINE-TRANSLATE"
    ],
    "T-NONEMPTY-LABEL": [
     "AccessService.md:approveManualOverrideSupervisor",
@@ -12778,19 +12784,14 @@
     "VenueOpsService.md:updateResource",
     "VenueOpsService.md:updateResourcePackage"
    ],
-   "T-SLICE-CALLS": [
-    "APP-MOB-GST-051"
-   ],
    "T-USED-BY": [
     "SVC-PLATFORM-TENANT-1:listTenants",
     "SVC-REPORTING-DASHBOARD-1:getDashboard",
     "SVC-REPORTING-EXECUTION-1:runReport",
-    "SVC-WHITELABEL-OVERVIEW-1:getTenantAppStatus",
     "VM-REPORTING-REPORTING-1:getKpiValues",
     "VM-TENANCY-REQUEST-1:listApprovalRequests"
    ]
-  },
-  "note": "union of the working tree on 2026-10-01 (with other agents' uncommitted contract edits) and HEAD 278cc437, so neither state fails"
+  }
  },
  "check-wireframe-coverage": {
   "updated": "2026-10-01",

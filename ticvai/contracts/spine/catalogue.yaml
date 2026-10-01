@@ -14561,7 +14561,7 @@ paths:
         `onSaleWindow` puts the room in front of the performance while its product is on sale (`Product.onSaleFrom`
         to `onSaleTo`, the window ADR-0035''s burst environments already use); `on` puts it there now, until
         `activeUntil` if one is given; `off` takes it away, and every admission token already issued for the
-        performance stays valid until it expires. `maxReleasePerSecond` is the ceiling: with `automaticRelease` the
+        performance stays valid until it expires. `maxReleasePerSecond` is the ceiling: with `automaticReleaseEnabled` the
         controller admits fewer when `commerce` is slow or refusing (ADR-0064), never more.
 
 
@@ -21083,7 +21083,7 @@ components:
           maximum: 5000
           default: 50
           description: The most guests the release controller admits per second. The controller may admit fewer.
-        automaticRelease:
+        automaticReleaseEnabled:
           type: boolean
           default: true
           description: The controller sets the rate from `commerce` health (latency and the `429` rate, ADR-0064),
@@ -21212,7 +21212,7 @@ components:
         token:
           type: string
           description: The signed token, opaque to the client.
-        admissionId:
+        tokenId:
           type: string
           format: uuid
           description: The token's unique id.

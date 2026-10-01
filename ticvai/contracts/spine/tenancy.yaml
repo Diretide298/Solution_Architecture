@@ -3971,7 +3971,7 @@ components:
         29 September). Identity (kind, hardware type, model, serial), every version (firmware,
         configuration, rule package, credential package), health, heartbeat and one lifecycle
         (`enrolmentState`: registered, enrolled, provisioned, active, deactivated, retired) for every
-        device in the estate live on this row. `access.access_device`, which repeated serial,
+        device in the estate live on this row. The access-control device row, which repeated serial,
         versions, health and lifecycle, is now `access.device_placement` and holds only where an
         access-control device is placed. Tenancy owns and migrates this table; Access reads it only
         through this contract.
@@ -4014,7 +4014,7 @@ components:
           nullable: true
           maxLength: 100
           description: >
-            The manufacturer's serial (ADR-0067: was on `access.access_device`). A serial already
+            The manufacturer's serial (ADR-0067: was on the access-control device row, now `access.device_placement`). A serial already
             registered in the tenant is refused `409` by `registerDevice`.
         ipNetworkReference:
           type: string
