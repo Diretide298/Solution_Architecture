@@ -1,5 +1,5 @@
 {
- "note": "Block A tasks that come from no screen or operation, so the slice cannot derive them. Read by tools/build-service-docs.py. Edit this file, not the task sheet. Added 30 September 2026 from the system-design review (audit/ticvai/steps/SD, findings SD-016, 024, 026, 028, 030-032, 034, 046-049, 051, 057, 059, 063) and the AI functions review (docs/active/ai-functions-review-30-september.md). `pool: backend` goes to the least-loaded backend owner; `assignee` names a person. AI engine tasks carry no points: they are sized in engineer-days in their text and planned by the two AI engineers, whose capacity is separate from the developers' (decided 30 September). Since 1 October a task may carry `block` (for example `B1`): it is recorded here with the ADR that asks for it and is not ticketed in the Block A sheet; build-service-docs.py skips it until that block is planned. A task without `block` is Block A.",
+ "note": "Block A tasks that come from no screen or operation, so the slice cannot derive them. Read by tools/build-service-docs.py. Edit this file, not the task sheet. Added 30 September 2026 from the system-design review (audit/ticvai/steps/SD, findings SD-016, 024, 026, 028, 030-032, 034, 046-049, 051, 057, 059, 063) and the AI functions review (docs/active/ai-functions-review-30-september.md). `pool: backend` goes to the least-loaded backend owner; `assignee` names a person. AI engine tasks carry no points: they are sized in engineer-days in their text and planned by the two AI engineers, whose capacity is separate from the developers' (decided 30 September). Since 1 October a task may carry `block` (for example `B1`): it is recorded here with the ADR that asks for it and is not ticketed in the Block A sheet; build-service-docs.py skips it until that block is planned. A task without `block` is Block A. Since 1 October (the sprint plan) a later-block task names the app-module it lands in with `module` (a business module) and `platform` (P01-P17; none = that module's platform work), and build-service-docs.py plans it with the rest of the package. AI-ENGINE-EVAL moved to Kalpita Mejari on 1 October so the two AI engineers' Block A chains end together (gateway, then baseline and suggestions on one side).",
  "epics": [
   {
    "key": "PLATFORM",
@@ -360,7 +360,7 @@
   {
    "key": "AI-ENGINE-EVAL",
    "epic": "AI-ENGINE",
-   "assignee": "Second AI engineer",
+   "assignee": "Kalpita Mejari",
    "days": 5,
    "subject": "Evaluation harness and the promotion alert",
    "detail": "Offline evaluation of every AI answer type against a fixture, the backtest runner the learned producers will use, and the promotion-ready alert to the admin (AI-D16). About 5 engineer-days.",
@@ -402,7 +402,8 @@
     "KERNEL-TENANT-LIMITS"
    ],
    "subject": "The on-sale waiting room: Redis positions, the cached page, the release controller, admission tokens",
-   "detail": "ADR-0066 (accepted 1 October; B1, or Block A if an on-sale is booked in Block A): enterWaitingRoom gives a position from a Redis counter with no database write; the static branded waiting page is served from Front Door's cache and polls getWaitingRoomPosition; a release controller admits guests per second from the health of commerce (latency and the 429 rate, ADR-0064); an admitted guest gets a short-lived signed token (tenant, performance, expiry, unique id; key in Key Vault) that middleware checks by signature, with no database read, on addCartLine and acquireInventoryHold from guest channels only (till, kiosk and workstation holds are exempt, amendment of 1 October); activation follows the performance's onSaleFrom/onSaleTo or setWaitingRoomSetting. Done when: with the room on, a guest cart hold without a token is refused 403 admission-required, one with a valid token succeeds, a forged or expired token or one for another performance is refused, a till hold needs no token, and the release rate drops when commerce latency rises."
+   "detail": "ADR-0066 (accepted 1 October; B1, or Block A if an on-sale is booked in Block A): enterWaitingRoom gives a position from a Redis counter with no database write; the static branded waiting page is served from Front Door's cache and polls getWaitingRoomPosition; a release controller admits guests per second from the health of commerce (latency and the 429 rate, ADR-0064); an admitted guest gets a short-lived signed token (tenant, performance, expiry, unique id; key in Key Vault) that middleware checks by signature, with no database read, on addCartLine and acquireInventoryHold from guest channels only (till, kiosk and workstation holds are exempt, amendment of 1 October); activation follows the performance's onSaleFrom/onSaleTo or setWaitingRoomSetting. Done when: with the room on, a guest cart hold without a token is refused 403 admission-required, one with a valid token succeeds, a forged or expired token or one for another performance is refused, a till hold needs no token, and the release rate drops when commerce latency rises.",
+   "module": "Foundation & Setup"
   },
   {
    "key": "EDGE-WAITING-ROOM-LOAD",
@@ -414,7 +415,8 @@
     "EDGE-WAITING-ROOM"
    ],
    "subject": "Load test the waiting room at 30,000 arrivals in the burst environment",
-   "detail": "ADR-0066 item 4, before the first large sale: 30,000 arrivals in the opening seconds against a burst environment (ADR-0035) with the waiting room on, recording position latency, the Front Door cache hit rate, the release rate the controller holds, commerce p95 and 429s, and the relay lag while admitted guests buy (ADR-0058 amendment: 3,500 events a second). Done when: all 30,000 get a position without a database write, admitted guests buy with commerce p95 inside its target, no cart hold succeeds without a token, and the results are recorded against the sizing figures."
+   "detail": "ADR-0066 item 4, before the first large sale: 30,000 arrivals in the opening seconds against a burst environment (ADR-0035) with the waiting room on, recording position latency, the Front Door cache hit rate, the release rate the controller holds, commerce p95 and 429s, and the relay lag while admitted guests buy (ADR-0058 amendment: 3,500 events a second). Done when: all 30,000 get a position without a database write, admitted guests buy with commerce p95 inside its target, no cart hold succeeds without a token, and the results are recorded against the sizing figures.",
+   "module": "Foundation & Setup"
   },
   {
    "key": "ACC-RULE-EVAL",
@@ -426,7 +428,9 @@
     "OFFLINE-BUNDLE"
    ],
    "subject": "One admission rule format, two evaluators: .NET and TypeScript proven equal by shared test vectors",
-   "detail": "ADR-0068 (accepted 1 October; B1, with the scanner): the closed JSON rule format (AdmissionRule, AdmissionCondition; conditionRule on access.dynamic_policy versions) evaluated by validateAccess online in .NET and by the gate offline in TypeScript (packages/offline-core) against the same active policy version that getOfflinePackage carries; each scan_event records the policy version that decided it. Done when: one set of test vectors runs in CI against both evaluators and they agree on every vector, a rule the format cannot express is refused when the policy is saved, and an offline scan and an online scan of the same credential under the same policy version give the same decision."
+   "detail": "ADR-0068 (accepted 1 October; B1, with the scanner): the closed JSON rule format (AdmissionRule, AdmissionCondition; conditionRule on access.dynamic_policy versions) evaluated by validateAccess online in .NET and by the gate offline in TypeScript (packages/offline-core) against the same active policy version that getOfflinePackage carries; each scan_event records the policy version that decided it. Done when: one set of test vectors runs in CI against both evaluators and they agree on every vector, a rule the format cannot express is refused when the policy is saved, and an offline scan and an online scan of the same credential under the same policy version give the same decision.",
+   "module": "Admission & Access Control",
+   "platform": "P07"
   }
  ]
 }

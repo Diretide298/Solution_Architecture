@@ -97,5 +97,148 @@
  "helperShare": {
   "Deep Khanvilkar": 0.55
  },
- "helperShareNote": "A helper with a share keeps taking backend tasks until their load reaches this fraction of the owner's. Deep (.NET 2, PostgreSQL 2) against owners rated 3-4: about 55%, tasks up to 5 points (the owners' backend tasks are cut at 5 and 8 points, so a cap of 3 left him three tasks; 8-point tasks stay with the owners, and the owner reviews every one) (Chinmay, 29 September: 'we can increase Deep's tasks but have to stay proportional'). Loads otherwise follow skill and experience and are uneven on purpose."
+ "helperShareNote": "A helper with a share keeps taking backend tasks until their load reaches this fraction of the owner's. Deep (.NET 2, PostgreSQL 2) against owners rated 3-4: about 55%, tasks up to 5 points (the owners' backend tasks are cut at 5 and 8 points, so a cap of 3 left him three tasks; 8-point tasks stay with the owners, and the owner reviews every one) (Chinmay, 29 September: 'we can increase Deep's tasks but have to stay proportional'). Loads otherwise follow skill and experience and are uneven on purpose.",
+ "people": [
+  {
+   "name": "Hrushikant Patkar",
+   "role": "Back end and DevOps",
+   "pools": [
+    "be"
+   ]
+  },
+  {
+   "name": "Pranay Shinde",
+   "role": "Back end",
+   "pools": [
+    "be"
+   ]
+  },
+  {
+   "name": "Tanmay Dukhande",
+   "role": "Back end",
+   "pools": [
+    "be"
+   ]
+  },
+  {
+   "name": "Deep Khanvilkar",
+   "role": "Back-end helper",
+   "pools": [
+    "be"
+   ]
+  },
+  {
+   "name": "Pallavi Sawant",
+   "role": "Full stack (Venue Management)",
+   "pools": [
+    "web",
+    "be"
+   ]
+  },
+  {
+   "name": "Sanket Keluskar",
+   "role": "Full stack (Venue Management)",
+   "pools": [
+    "web",
+    "be"
+   ]
+  },
+  {
+   "name": "Chinmay Patkar",
+   "role": "Full stack (guest web, white label)",
+   "pools": [
+    "web",
+    "mob",
+    "be"
+   ]
+  },
+  {
+   "name": "Chitrangi Mestry",
+   "role": "Front end (guest app, web)",
+   "pools": [
+    "mob",
+    "web"
+   ]
+  },
+  {
+   "name": "Pradnya Yeram",
+   "role": "Front end (POS, guest app)",
+   "pools": [
+    "pos",
+    "mob",
+    "web"
+   ]
+  },
+  {
+   "name": "Surendra",
+   "role": "Full stack (Venue Management)",
+   "pools": [
+    "web",
+    "be"
+   ]
+  },
+  {
+   "name": "New full-stack developer 1",
+   "role": "Full stack (to hire)",
+   "pools": [
+    "web",
+    "be"
+   ],
+   "from": "2026-11-23"
+  },
+  {
+   "name": "New full-stack developer 2",
+   "role": "Full stack (to hire)",
+   "pools": [
+    "web",
+    "be"
+   ],
+   "from": "2026-11-23"
+  },
+  {
+   "name": "Kalpita Mejari",
+   "role": "AI engineer",
+   "pools": [
+    "ai"
+   ]
+  },
+  {
+   "name": "Second AI engineer",
+   "role": "AI engineer",
+   "pools": [
+    "ai"
+   ]
+  }
+ ],
+ "peopleNote": "The roster every plan generator reads (tools/sprint_plan.py), moved here from build-plan-deck.py on 1 October so the tickets, the schedule and the deck agree. pools: the work a person takes, first = home (be back end, web, mob mobile runtimes, pos POS and Kitchen Display, ai AI engine); a person outside their home pool takes work only when it saves two days. from: first working day. Chinmay Parab leads and is not counted in capacity.",
+ "sprintPlan": {
+  "sprintDays": 14,
+  "blocks": [
+   {
+    "block": "A",
+    "endSprint": 4
+   },
+   {
+    "block": "B",
+    "endSprint": 7
+   },
+   {
+    "block": "C",
+    "endSprint": 10
+   },
+   {
+    "block": "D",
+    "endSprint": 13
+   }
+  ],
+  "ticketBlocks": [
+   "A",
+   "B"
+  ],
+  "fePointsPerAppModule": 45,
+  "stableOwners": {
+   "since": "r2"
+  }
+ },
+ "sprintPlanNote": "The replan of 1 October (PM call): two-week sprints, Sprint 1 = 5-16 October 2026 ... Sprint 13 = 22 March-2 April 2027; app-modules (a business module split by the app it lands in, e.g. Ticketing · Guest Web, with the back end it needs); blocks A-D, each a set of complete, testable app-modules ending on a sprint boundary. blocks[].endSprint is the target: Block A is the first release (fixed); B, C and D take the remaining app-modules in build order by where they finish, and the plan reports where each block actually ends. ticketBlocks: blocks ticketed task by task; the others are ticketed at feature (app-module) level until they are planned. fePointsPerAppModule: screens points at which a module-on-an-app is cut into parts, so each part finishes in one to three sprints. stableOwners.since: from this release's bundle on, a pushed ticket keeps its owner (plan item L2); --rebalance moves New ones on purpose."
 }

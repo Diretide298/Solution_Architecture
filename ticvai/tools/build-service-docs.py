@@ -17,6 +17,19 @@ Writes, under handoff/service-docs/:
   TICVAI_First_Release_Client.xlsx  Platforms, Services, Screens, in plain language
   TICVAI_Backend_Build_Plan.xlsx  build plan, migrations, tables, services, APIs, API schemas, fields
   tasks.csv                  one row per work package, keyed for ADAM's OpenProject create()
+  plan-tasks.csv             every task of every block, ticketed or not (the schedule and the deck read it)
+
+**The sprint plan** (1 October, the PM's replan; tools/sprint_plan.py): the tickets are grouped Epic = Block (A,
+B, C, D), Feature = app-module (a business module on one app: "Ticketing · Guest Web", with the back end it needs),
+Task = the work, under the keys it was pushed with. Block A is the first release; B, C and D take the rest of the
+package in build order, each a set of complete, testable app-modules ending on a sprint boundary. Blocks named in
+team.json `sprintPlan.ticketBlocks` (A and B) are ticketed task by task; the others are ticketed as features until
+they are planned (their tasks are in plan-tasks.csv, with the keys they will have).
+
+    python3 tools/build-service-docs.py [--rebalance]
+
+--rebalance: a pushed ticket's owner may move (plan item L2); without it, owners of tickets pushed from release
+`sprintPlan.stableOwners.since` on are kept, and only new work is placed.
 
 **The task sheet is an input to OpenProject, not a second plan** (CF-124). Keys are local; the
 `parent` and `dependsOn` columns name other keys in the same file, so a person or ADAM's bridge
@@ -27,7 +40,9 @@ Run: python3 tools/build-service-docs.py
 from __future__ import annotations
 
 import csv
+import datetime as dt
 import json
+import math
 import re
 import sys
 import heapq
@@ -38,6 +53,9 @@ import yaml
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import sprint_plan as sp  # noqa: E402  (the calendar, app-modules and scheduler the plan generators share)
 
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -490,7 +508,9 @@ def slug(s: str) -> str:
 #   tables  the tables, within one schema (MIG-S and VM-MIG-S); sub-tasks are KEY#schema.table.
 
 SCREEN_KEY = re.compile(r"(?:APP-[A-Z]+|VM)-([A-Z]+-\d{3,}[A-Z]?)")
-TABLES_KEY = re.compile(r"(?:VM-)?MIG-([A-Z0-9_]+)")
+# MIG-<SCHEMA>-<n> (1 October): a forward migration a later app-module adds to a schema the first release created
+# (the baseline is frozen at r1); the schema is still its family.
+TABLES_KEY = re.compile(r"(?:VM-)?MIG-([A-Z0-9_]+)(?:-\d+)?")
 OPS_KEY = re.compile(r"(?:SVC|VM)-(.+)-(\d+)")
 
 
@@ -966,7 +986,7 @@ def main() -> int:
     # person scanning a list can tell them apart without opening the ticket.
     PREFIX = {"Frontend": "[FE]", "Backend": "[BE]", "Database": "[DB]", "DevOps": "[DevOps]",
               "Onboarding": "[Onboarding]", "Full stack": "[FE+BE]", "Setup": "[Setup]",
-              "AI": "[AI]"}
+              "AI": "[AI]", "Test": "[Test]"}
 
     def track_of(key, area):
         if key.startswith(("MIG", "VM-MIG", "VM-DB")):
@@ -978,7 +998,7 @@ def main() -> int:
         if area == "VM":
             return "Frontend" if key.startswith(("VM-BO-", "VM-FE")) else "Backend"
         return {"devops": "DevOps", "onboard": "Onboarding", "backend": "Backend",
-                "ai": "AI"}.get(area, "Frontend")
+                "ai": "AI", "test": "Test"}.get(area, "Frontend")
 
     by_key: dict[str, dict] = {}
 
@@ -1445,17 +1465,31 @@ def main() -> int:
     # service and reviews. Full-stack helpers already carry their frontend here, so they are not overfilled.
     helpers = team.get("backendHelpers") or {}
     taken = defaultdict(int)  # helper points so far: the helper work is shared, not given to the lightest
+    # **Block A is balanced on Block A's own load** (1 October): the Venue Management waves 1-2 are planned with
+    # Block B onwards now, so a first-release task is shared out against first-release loads only; otherwise a
+    # helper with Venue Management screens takes no first-release back end while the owners run past Sprint 4.
+    vm_load = Counter()
+    for x in tasks:
+        if x["type"] == "Task" and x["phase"] == 2 and x["assignee"]:
+            vm_load[x["assignee"]] += int(x["points"] or 0)
+
     for t_ in sorted((x for x in tasks if x["type"] == "Task" and x["track"] == "Backend" and x["points"]),
                      key=lambda x: (x["phase"], int(x["wave"] or 9), step_of(x["key"]), x["key"])):
         pts, owner = int(t_["points"]), t_["assignee"]
         able = [h for h, cap in helpers.items() if pts <= cap and h != owner]
         if not able:
             continue
-        h = min(able, key=lambda x: (taken[x], load[x], x))
+
+        def L(x):
+            return load[x] - (vm_load[x] if t_["phase"] == 1 else 0)
         # **A helper's share is proportional to their rating** (team.json "helperShare", 30 September):
-        # Deep at .NET 2 against owners at 3-4 carries about 55% of an owner's load, not an equal share.
-        share = HELPER_SHARE.get(h)
-        if (load[h] + pts <= share * (load[owner] - pts)) if share else (load[h] + pts <= load[owner] - pts):
+        # Deep at .NET 2 against owners at 3-4 carries about 55% of an owner's load, not an equal share. The
+        # helpers are tried in turn (least helper work first), so one at their share passes the task to the next.
+        def fits(h):
+            share = HELPER_SHARE.get(h)
+            return (L(h) + pts <= share * (L(owner) - pts)) if share else (L(h) + pts <= L(owner) - pts)
+        h = next((x for x in sorted(able, key=lambda x: (taken[x], L(x), x)) if fits(x)), None)
+        if h:
             t_["assignee"] = h
             taken[h] += pts
             t_["description"] += f" Helper task: {owner} owns the service and reviews."
@@ -1498,6 +1532,285 @@ def main() -> int:
             task(t_["key"], t_["epic"], "Task", t_["subject"], t_["subject"] + ". " + t_["detail"], 1, pts=pts,
                  area="ai" if is_ai else "backend", assignee=who, depends=t_.get("depends") or ())
 
+    # ================================================================ the rest of the package (1 October)
+    # **Every block is planned task by task now**, not only Block A: the PM's replan wants module-wise completion
+    # per app, in blocks that can each be tested end to end. Block A is the work above (the first release and its
+    # platform, AI engine and Venue Management waves 1-2 tickets). Everything else the package specifies is formed
+    # here with Block A's own formulas: one task per screen (the screen formula), the operations a screen needs in
+    # tasks of at most four by service and group (the operation formula), and a forward migration per schema for the
+    # tables they reach that no earlier migration creates. Which app-module and block each lands in is decided
+    # below (the sprint plan); the keys follow the same rules as Block A's, so a ticket keeps its key once pushed.
+    kmap_early = json.loads((OUT / "pms-map.json").read_text(encoding="utf-8")) if (OUT / "pms-map.json").exists() else {}
+    op_module = {o: sp.MODULE_OF_CONTRACT.get(x["contract"], "Platform Operations") for o, x in ops.items()}
+
+    def screen_module(sid):
+        s_ = screens[sid]
+        mods = Counter(op_module[a["operationId"]] for a in s_.get("apis") or []
+                       if isinstance(a, dict) and a.get("operationId") in op_module)
+        return mods.most_common(1)[0][0] if mods else sp.PLATFORM_MODULE.get(s_["_platform"]["code"], sp.FOUNDATION)
+
+    def plat_of(sid):
+        return screens[sid]["_platform"]["code"]
+
+    def screen_ops(sid):
+        return [a["operationId"] for a in screens[sid].get("apis") or []
+                if isinstance(a, dict) and a.get("operationId") in ops]
+
+    built_screen = {}
+    for t_ in tasks:
+        ident = key_identity(t_["key"]) if t_["type"] == "Task" and t_["track"] == "Frontend" else None
+        if ident and ident[0] == "screen":
+            built_screen[ident[1]] = t_["key"]
+    mig_of = dict(table_mig)
+    mig_of.update(vm_mig)
+    later_op_task, later_mig, later_items = {}, {}, []      # later_items: (key, module, platform, kind) per screen
+    later_ams = {}                                          # (module, platform) -> [(sid, key, pts, kind)]
+    fam_used = defaultdict(set)                             # ops family -> numbers planned or pushed
+
+    def note_family(k):
+        m = OPS_KEY.fullmatch(k)
+        if m and not SCREEN_KEY.fullmatch(k):
+            fam_used[m.group(1)].add(int(m.group(2)))
+
+    for k in list(by_key) + [k for k in kmap_early if "#" not in k]:
+        note_family(k)
+    planned_ops = set(op_task) | set(vm_op_task)
+    setup_sizes = {sid: points_of(1 + 0.6 * len(v)) for sid, v in setup_screens.items()}
+    for sid in sorted(screens):
+        s_ = screens[sid]
+        if str(s_.get("wave")) == "4":
+            continue
+        have = built_screen.get(sid)
+        if have and not have.startswith("APP-SETUP-"):
+            if have.startswith("VM-"):           # Venue Management waves 1-2: ticketed, planned with the rest of P08
+                later_ams.setdefault((screen_module(sid), plat_of(sid)), []).append(
+                    (sid, have, int(by_key[have]["points"] or 0), "ticketed"))
+            continue
+        if have:
+            # **A setup screen is built in Block A only as far as the slice needs** (its setup operations); the rest
+            # of the screen comes with its app-module, as one more task on the same screen.
+            rest = [o for o in screen_ops(sid) if o not in planned_ops]
+            if not rest:
+                continue
+            pts = max(1, points_of(screen_raw(s_)) - setup_sizes.get(sid, 1))
+            later_ams.setdefault((screen_module(sid), plat_of(sid)), []).append((sid, f"{have}-REST", pts, "rest"))
+            continue
+        pre = sp.SCREEN_PREFIX.get(plat_of(sid), "APP-" + plat_of(sid))
+        later_ams.setdefault((screen_module(sid), plat_of(sid)), []).append(
+            (sid, f"{pre}-{sid}", points_of(screen_raw(s_)), "new"))
+
+    # **App-modules small enough to finish in one to three sprints**: a module on one app whose screens add up to
+    # more than team.json `sprintPlan.fePointsPerAppModule` is cut into parts, in wave order and then by the
+    # screen's section, so Venue Management's ticketed waves 1-2 come first.
+    settings = sp.sprint_settings(team)
+    cap = settings["fePointsPerAppModule"]
+    am_of, am_info = {}, {}
+
+    def add_am(module, platform, part, parts, variant="", block=None, name=None, order=None, key=None):
+        k = key or sp.am_key(module, platform, part, variant)
+        if k not in am_info:
+            am_info[k] = {"key": k, "module": module, "platform": platform, "part": part, "parts": parts,
+                          "variant": variant, "block": block,
+                          "name": name or sp.am_name(module, platform, part, parts, variant),
+                          "order": order or sp.am_order(module, platform, part, variant)}
+        return k
+
+    a_plain = set()           # (module, platform) with a Block A app-module of the same name
+    parts_total = {}          # (module, platform) -> how many parts it has, Block A's included
+    for t_ in tasks:
+        if t_["type"] == "Task" and t_["track"] == "Frontend" and t_["phase"] == 1:
+            ident = key_identity(t_["key"])
+            if ident and ident[0] == "screen" and not t_["key"].startswith("APP-SETUP-"):
+                a_plain.add((screen_module(ident[1]), plat_of(ident[1])))
+    for (module, platform), lst in sorted(later_ams.items(), key=lambda x: sp.am_order(*x[0])):
+        lst.sort(key=lambda x: (int(screens[x[0]].get("wave") or 9), str(screens[x[0]].get("module") or ""), x[0]))
+        parts, cur, run = [], [], 0
+        for item in lst:
+            if cur and run + item[2] > cap:
+                parts.append(cur)
+                cur, run = [], 0
+            cur.append(item)
+            run += item[2]
+        if cur:
+            parts.append(cur)
+        first = 2 if (module, platform) in a_plain else 1
+        total = len(parts) + first - 1
+        parts_total[(module, platform)] = total
+        for i, part in enumerate(parts, first):
+            k = add_am(module, platform, i, total)
+            for sid, key, pts, kind in part:
+                later_items.append((key, sid, k, kind, pts))
+
+    # the operations no earlier task builds, each with the first later app-module whose screens call it
+    callers = defaultdict(set)
+    for key, sid, k, kind, _ in later_items:
+        for o in screen_ops(sid):
+            if o not in planned_ops:
+                callers[o].add(k)
+    home = {}
+    for k, a in sorted(am_info.items(), key=lambda x: x[1]["order"]):
+        if a["platform"] == "P08":
+            home.setdefault((a["module"], "P08"), k)
+        home.setdefault((a["module"], "*"), k)
+    am_ops = defaultdict(list)
+    for o in sorted(ops):
+        if o in planned_ops:
+            continue
+        if callers.get(o):
+            k = min(callers[o], key=lambda x: am_info[x]["order"])
+        else:
+            m_ = op_module[o]
+            k = home.get((m_, "P08")) or home.get((m_, "*")) or add_am(m_, "API", None, 1)
+        am_ops[k].append(o)
+
+    # migrations, then back end, app-module by app-module in build order (the first that needs a table creates it)
+    def fresh_mig_key(schema):
+        n = 2
+        while True:
+            k = f"MIG-{schema.upper()}-{n}"
+            if k not in by_key and k not in kmap_early:
+                return k
+            n += 1
+
+    for k in sorted(am_ops, key=lambda x: am_info[x]["order"]):
+        olist = am_ops[k]
+        need = {t for o in olist for kk in ("reads", "writes") for t in (lineage.get(o) or {}).get(kk) or []
+                if t in ddl and t not in mig_of}
+        frontier = list(need)
+        while frontier:
+            t = frontier.pop()
+            for x in sorted(ddl[t]["fks"]):
+                if x in ddl and x not in mig_of and x not in need:
+                    need.add(x)
+                    frontier.append(x)
+        for sch in sorted({t.split(".")[0] for t in need}):
+            ts = sorted(t for t in need if t.split(".")[0] == sch)
+            mk = fresh_mig_key(sch)
+            n_cols = sum(len(ddl[t]["columns"]) for t in ts)
+            pts = points_of(1 + 0.5 * len(ts) + n_cols / 40 + 0.3 * sum(1 for t in ts if ddl[t]["rls"])
+                            + 0.5 * sum(ddl[t]["partitioned"] for t in ts))
+            # A forward migration waits for the baseline, the first-release migration of its schema (if any) and the
+            # migrations that create what its keys point into; two forward migrations of one schema with no key
+            # between them do not wait on each other (their file numbers are given when they merge).
+            prior = sorted({m for t, m in mig_of.items() if t.split(".")[0] == sch and m not in later_mig.values()})
+            fk_into = sorted({mig_of[x] for t in ts for x in ddl[t]["fks"] if x in mig_of and x.split(".")[0] != sch})
+            task(mk, k, "Task", f"Forward migration: {sch} for {am_info[k]['name']} ({len(ts)} tables)",
+                 "Tables: " + ", ".join(ts) + f". Source DDL: {ddl[ts[0]]['file']} and the matching rows of "
+                 "900-foreign-keys, 910-indexes and 920-row-level-security. A forward migration after the r1 baseline "
+                 "(frozen, check-migration-freeze); applied forward by SqlMigrationRunner, and a second run applies "
+                 "nothing.", 3, service=schema_owner.get(sch, ""), pts=pts, area="backend",
+                 depends=["MIG-BASELINE"] + prior + fk_into)
+            for t in ts:
+                mig_of[t] = mk
+                later_mig[t] = mk
+        groups_ = defaultdict(list)
+        for o in olist:
+            groups_[((lineage.get(o) or {}).get("service") or "PlatformService", ops[o]["tag"])].append(o)
+        for (n, g), gl in sorted(groups_.items()):
+            gl = sorted(gl)
+            fam = f"{re.sub(r'Service$', '', n).upper()}-{slug(g).upper()}"
+            for i in range(0, len(gl), 4):
+                part = gl[i:i + 4]
+                num = 1
+                while num in fam_used[fam]:
+                    num += 1
+                fam_used[fam].add(num)
+                tk = f"SVC-{fam}-{num}"
+                deps = {mig_of.get(t) for o in part for kk in ("reads", "writes")
+                        for t in (lineage.get(o) or {}).get(kk) or []} - {None}
+                task(tk, k, "Task", f"{n}: " + ", ".join(part),
+                     "Operations: " + ", ".join(part) + f". Spec: contracts ({', '.join(sorted({ops[o]['contract'] for o in part}))}) "
+                     f"at the release tag, served by ADAM. Built for {am_info[k]['name']}; additive to {n}, whose "
+                     f"first-release owner ({svc_owner.get(n) or 'its owner'}) reviews.", 3, service=n,
+                     pts=points_of(sum(op_raw(o) for o in part if o in lineage)), area="backend",
+                     depends=deps or {"MIG-BASELINE"})
+                for o in part:
+                    later_op_task[o] = tk
+    # the screens, each waiting on the tasks that build its operations (soft: built against the mock server)
+    for key, sid, k, kind, pts in later_items:
+        if kind == "ticketed":
+            am_of[key] = k
+            continue
+        s_ = screens[sid]
+        deps = {op_task.get(o) or vm_op_task.get(o) or later_op_task.get(o) for o in screen_ops(sid)} - {None}
+        area = "SETUP" if kind == "rest" else {"P08": "VM", "P01": "WEB", "P02": "MOB", "P04": "POS",
+                                                "P15": "POS"}.get(plat_of(sid), plat_of(sid))
+        what = (f"The rest of {sid}: Block A built only its setup operations ({', '.join(sorted(setup_screens.get(sid, ())))}); "
+                f"this task adds the others. " if kind == "rest" else "")
+        task(key, k, "Task", f"{sid} {s_['name']}" + (" (the rest of the screen)" if kind == "rest" else ""),
+             what + f"{s_.get('purpose') or ''} Module: {s_.get('module')}. App: {sp.PLATFORM_NAME.get(plat_of(sid))}.",
+             s_.get("wave") or "", platform=s_["_platform"].get("shortName", ""), depends=deps | {"SETUP-CLIENTS"},
+             pts=pts, area=area)
+        am_of[key] = k
+    # **The AI engine beyond Block A** (docs/active/ai-functions-review-30-september.json): each capability is an
+    # app-module of its own, its AI-engineer weeks cut into tasks of at most one sprint (ten engineer-days, no
+    # points: the AI engineers' capacity is separate) and its extra back-end weeks into tasks of at most 8 points.
+    # The review's sprint for a capability (its own three-week sprints) orders the AI engineers' queue but does not
+    # hold them idle (as the plan of 30 September); for its back-end weeks it is the earliest they start. A
+    # capability the review puts in Block A (the planner agent, translations) is Block A's AI-ENGINE tasks already.
+    later_ai = []
+    rev = ROOT / "docs" / "active" / "ai-functions-review-30-september.json"
+    if rev.exists():
+        for c in json.loads(rev.read_text(encoding="utf-8")).get("capabilities") or []:
+            b_ = c.get("build") or {}
+            if "(Block A)" in str(c.get("sprint") or ""):
+                continue
+            cid = re.sub(r"[^A-Z0-9]+", "-", str(c.get("id") or c["name"]).upper()).strip("-")
+            m_ = re.search(r"S(\d)", str(c.get("sprint") or ""))
+            nb = sp.index_of(sp.START + dt.timedelta(days=21 * (int(m_.group(1)) - 1))) if m_ else 0
+            short = re.split(r" \(|,", c["name"])[0].strip()[:48]
+            k = add_am("AI & Intelligence", "AI", None, 1, variant=cid, key=f"AM-AI-ENGINE-{cid}",
+                       name=f"AI engine · {short}", order=(4, sp.MODULES.index("AI & Intelligence"), 98, 0, nb))
+            days = float(b_.get("aiEngineerWeeksTotal") or 0) * 5
+            n_ = 0
+            while days > 1e-6:
+                d_ = min(10.0, days)
+                n_ += 1
+                tk = f"AI-ENGINE-{cid}-{n_}"
+                task(tk, k, "Task", f"AI engine: {short} ({n_} of {math.ceil(float(b_.get('aiEngineerWeeksTotal') or 0) * 5 / 10)})",
+                     f"{c['name']}. " + " ".join(f"- {x}" for x in (b_.get("items") or [])[:6]) +
+                     " Sized by the AI review in engineer-weeks; built by the two AI engineers, baseline first, learning "
+                     "per tenant (ADR-0051, ADR-0059).", 3, area="ai", depends=["AI-ENGINE-GATEWAY"])
+                by_key[tk]["days"] = d_
+                later_ai.append(tk)
+                am_of[tk] = k
+                days -= d_
+            pts_be = float(b_.get("backendWeeksExtra") or 0) * 48
+            n_ = 0
+            while pts_be > 1e-6:
+                p_ = int(min(8, round(pts_be)))
+                n_ += 1
+                tk = f"AI-BE-{cid}-{n_}"
+                task(tk, k, "Task", f"AI back end: {short} (part {n_})",
+                     f"The back-end work the AI review names for {c['name']} beyond the AI engineers' own "
+                     "(validate-only tool operations, semantic-spec compile, historical import). Additive to AiService "
+                     "and the owning services; their owners review.", 3, service="AiService", pts=p_, area="backend",
+                     depends=["PLATFORM-KERNEL"])
+                by_key[tk]["notBefore"] = nb
+                am_of[tk] = k
+                pts_be -= p_
+    # **The later-block tasks block-a-extra-tasks.json records** (EDGE-WAITING-ROOM and its load test, the admission
+    # rule evaluator: ADRs of 1 October, plan item L9) are planned now, under the app-module they name.
+    if EXTRA.exists():
+        for t_ in json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or []:
+            if str(t_.get("block") or "A") == "A" or t_["key"] in by_key:
+                continue
+            m_ = t_.get("module") or sp.FOUNDATION
+            pf = t_.get("platform") or "API"
+            k = add_am(m_, pf, None, 1, variant="" if pf != "API" else "platform",
+                       name=None if pf != "API" else f"{sp.MODULE_SHORT.get(m_, m_)} · platform (later blocks)")
+            task(t_["key"], k, "Task", t_["subject"], t_["subject"] + ". " + t_["detail"], 3, pts=int(t_["points"]),
+                 area="backend", assignee=t_.get("assignee") or "", depends=t_.get("depends") or ())
+            am_of[t_["key"]] = k
+    later_keys = set(am_of) | set(later_op_task.values()) | set(later_mig.values())
+    for t_ in tasks:
+        if t_["key"] in later_keys:
+            t_["phase"] = 2
+    for o, k in later_op_task.items():
+        am_of.setdefault(k, by_key[k]["parent"])
+    for t, k in later_mig.items():
+        am_of.setdefault(k, by_key[k]["parent"])
+
     # **Services stand on the platform** (30 September). A service task used to wait only for its
     # migration, so the build order put 60-odd service tasks in front of the kernel they run on (tenant
     # routing, scope, auth) and every sale-path write in front of idempotency and the outbox. Now:
@@ -1505,7 +1818,7 @@ def main() -> int:
     # waits for PLATFORM-IDEMPOTENCY; one that publishes an event (writes platform.outbox) also waits
     # for PLATFORM-OUTBOX. The platform tasks themselves are exempt, so nothing waits on itself.
     ops_of = defaultdict(set)
-    for o, k in list(op_task.items()) + list(vm_op_task.items()):
+    for o, k in list(op_task.items()) + list(vm_op_task.items()) + list(later_op_task.items()):
         ops_of[k].add(o)
     platform_keys = {"PLATFORM-KERNEL", "PLATFORM-IDEMPOTENCY", "PLATFORM-OUTBOX"}
     if platform_keys <= set(by_key):
@@ -1578,14 +1891,12 @@ def main() -> int:
                                         "unknown and reconcile paths waits on the client's payment sandbox "
                                         "credentials: see the client's answer in the Decisions Register.")
 
-    # **Chronology.** Every task gets its place in the order work can happen: the first release before
-    # Venue Management, then wave, then how many tasks stand in front of it, then database before
-    # backend before frontend. `queue` is the same order within one person's list, so each developer's
+    # **Chronology.** Every task gets its place in the order work can happen: block, then app-module (a module on
+    # one app, in build-phase order), then build phase, wave, how many tasks stand in front of it, and database
+    # before backend before frontend. `queue` is the same order within one person's list, so each developer's
     # board reads top to bottom as the order to work in.
     TRACK_ORDER = {"Setup": 0, "DevOps": 1, "Onboarding": 1, "Database": 2, "Backend": 3,
                    "AI": 3, "Full stack": 4, "Frontend": 5}
-    for t_ in tasks:
-        step_of(t_["key"])
 
     # **Services are built in phases** (30 September, Chinmay): plumbing, then the services everything
     # reads, then the sale path, then the per-module operations, then engagement, then reporting. The
@@ -1613,61 +1924,378 @@ def main() -> int:
                         if d in by_key and by_key[d]["service"])
         return SERVICE_PHASE.get(calls.most_common(1)[0][0], 3) if calls else 0
 
-    for t_ in tasks:
+    # ================================================================ the sprint plan (1 October)
+    # **Every task belongs to an app-module, every app-module to a block.** Block A's screens go to the app-module
+    # of their module on their app; its setup screens to "<module> · Venue Management (setup)"; the platform, setup,
+    # database, offline and AI engine work to the Foundation and AI engine app-modules. A back-end task goes with the
+    # first app-module whose tasks wait on it, and a migration with the first whose back end needs its tables.
+    for i, (code, title) in enumerate((("SETUP", "Setup and environments"), ("DATABASE", "Database migrations"),
+                                       ("PLATFORM", "Platform kernel"),
+                                       ("OFFLINE", "Offline: POS, Kitchen Display and scanner"))):
+        add_am(sp.FOUNDATION, "", None, 1, key=f"AM-FOUNDATION-{code}", name=f"Foundation · {title}", block="A",
+               order=(0, i, 0, 0, 0))
+    add_am("AI & Intelligence", "AI", None, 1, key="AM-AI-ENGINE-A", block="A", order=(0, 9, 0, 0, 0),
+           name="AI engine · Block A (gateway, baseline, concierge, Help me choose, translations, planner)")
+
+    def foundation_am(k):
+        if k.startswith("SETUP-"):
+            return "AM-FOUNDATION-SETUP"
+        if k in ("MIG-BASELINE", "MIG-FOREIGN-KEYS", "MIG-PARTITIONS") or k.startswith("DB-"):
+            return "AM-FOUNDATION-DATABASE"
+        if k.startswith(("OFFLINE-", "POS-KDS")):
+            return "AM-FOUNDATION-OFFLINE"
+        if k.startswith("AI-ENGINE-"):
+            return "AM-AI-ENGINE-A"
+        if k.startswith(("PLATFORM-", "KERNEL-", "ARCH-", "OBS-", "EDGE-")):
+            return "AM-FOUNDATION-PLATFORM"
+        return None
+
+    leaf = [t_ for t_ in tasks if t_["type"] == "Task"]
+    dependents = defaultdict(set)
+    for t_ in leaf:
+        for d in t_["dependsOn"].split():
+            dependents[d].add(t_["key"])
+    for t_ in leaf:
+        k = t_["key"]
+        if k in am_of or t_["phase"] != 1:
+            continue
+        f_ = foundation_am(k)
+        if f_:
+            am_of[k] = f_
+        elif t_["track"] == "Frontend":
+            sid = key_identity(k)[1]
+            mod, pf = screen_module(sid), plat_of(sid)
+            if k.startswith("APP-SETUP-"):
+                # Block A's setup screens (only their setup operations) are one app-module per package and app:
+                # "Ticketing & Guest Commerce · Venue Management (setup)", not one per module (often one screen)
+                pkg = sp.PACKAGE_OF.get(mod, "Platform Foundation")
+                pi = [x[0] for x in sp.PACKAGES].index(pkg)
+                code = re.sub(r"[^A-Z0-9]+", "-", pkg.upper()).strip("-")
+                am_of[k] = add_am(pkg, pf, None, 1, block="A", key=f"AM-SETUP-{code}-{pf}",
+                                  name=f"{pkg} · {sp.PLATFORM_NAME.get(pf, pf)} (setup)",
+                                  order=(min(sp.MODULE_PHASE.get(m, 3) for m in sp.PACKAGES[pi][2]), 50 + pi,
+                                         sp.PLATFORM_ORDER.index(pf) if pf in sp.PLATFORM_ORDER else 99, 0, 0))
+            else:
+                am_of[k] = add_am(mod, pf, 1, parts_total.get((mod, pf), 1), block="A")
+    a_keys = {t_["key"] for t_ in leaf if t_["phase"] == 1}
+    later_set = {t_["key"] for t_ in leaf} - a_keys
+    for _ in range(12):
+        moved = False
+        for t_ in leaf:
+            k = t_["key"]
+            if k in am_of:
+                continue
+            same = a_keys if k in a_keys else later_set
+            # seed data and sign-in wait on every migration; they are not the app-module a table is built for
+            cand = {am_of[d] for d in dependents[k] if d in am_of and d in same and am_of[d] != "AM-FOUNDATION-SETUP"}
+            if cand:
+                am_of[k] = min(cand, key=lambda x: am_info[x]["order"])
+                moved = True
+        if not moved:
+            break
+    for t_ in leaf:                                        # nothing waits on it: its module's first app-module
+        k = t_["key"]
+        if k in am_of:
+            continue
+        mods = Counter(op_module[o] for o in ops_of.get(k, ()) if o in op_module)
+        mod = mods.most_common(1)[0][0] if mods else None
+        pool_ams = [a for a in am_info.values() if (a["block"] == "A") == (k in a_keys)]
+        home_a = "AM-FOUNDATION-DATABASE" if t_["track"] == "Database" else "AM-FOUNDATION-PLATFORM"
+        cand = [a for a in pool_ams if a["module"] == mod] or (
+            [a for a in pool_ams if a["key"] == home_a] if k in a_keys else pool_ams)
+        am_of[k] = min(cand, key=lambda a: a["order"])["key"]
+    for t_ in leaf:
         t_["tier"] = tier(t_)
-    prio = {t_["key"]: (t_["phase"], t_["tier"], int(t_["wave"] or 9), step[t_["key"]],
-                        TRACK_ORDER[t_["track"]], t_["key"]) for t_ in tasks}
-    waits = {t_["key"]: {d for d in t_["dependsOn"].split() if d in by_key and d != t_["key"]} for t_ in tasks}
-    freed = defaultdict(set)
-    for k, ds in waits.items():
-        for d in ds:
-            freed[d].add(k)
-    left = {k: len(ds) for k, ds in waits.items()}
-    ready = [prio[k] for k, n in left.items() if n == 0]
-    heapq.heapify(ready)
-    ordered, done = [], set()
-    while ready:
-        k = heapq.heappop(ready)[-1]
-        done.add(k)
-        ordered.append(by_key[k])
-        for n in freed[k]:
-            left[n] -= 1
-            if left[n] == 0:
-                heapq.heappush(ready, prio[n])
-    # A loop in the waits would strand its tasks; they follow in priority order rather than vanish.
-    ordered += sorted((t_ for t_ in tasks if t_["key"] not in done), key=lambda t_: prio[t_["key"]])
-    queue_n = defaultdict(int)
-    for i, t_ in enumerate(ordered, 1):
-        t_["sequence"] = i
-        t_["step"] = step[t_["key"]]
-        if t_["type"] == "Task" and t_["assignee"]:
-            queue_n[t_["assignee"]] += 1
-            t_["queue"] = queue_n[t_["assignee"]]
-        else:
-            t_["queue"] = ""
-    tasks.sort(key=lambda t_: t_["sequence"])
-    # Parents before children, whatever their sequence, so OpenProject can link each one on creation.
-    placed, out_ = set(), []
+    step.clear()
+    for t_ in leaf:
+        step_of(t_["key"])
 
-    def place(t_):
-        if t_["key"] in placed:
-            return
-        if t_["parent"] and t_["parent"] in by_key:
-            place(by_key[t_["parent"]])
-        placed.add(t_["key"])
-        out_.append(t_)
+    people, pool_caps, _ = sp.load_team(team)
+    days_ex = {}
+    if EXTRA.exists():
+        days_ex = {e["key"]: float(e["days"]) for e in json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or []
+                   if e.get("days")}
 
+    def pool_of(t_):
+        if t_["track"] == "AI":
+            return "ai"
+        if t_["track"] == "Frontend":
+            ident = key_identity(t_["key"]) or (None, None)
+            sid = ident[1] if ident[0] == "screen" else re.sub(r"-REST$", "", t_["key"]).split("-", 2)[-1]
+            return sp.POOL_OF_PLATFORM.get(plat_of(sid), "web") if sid in screens else "web"
+        if t_["track"] == "Onboarding":
+            return "web"
+        return "be"
+
+    def topo(prio_of):
+        keys = {t_["key"] for t_ in leaf}
+        waits = {t_["key"]: {d for d in t_["dependsOn"].split() if d in keys and d != t_["key"]} for t_ in leaf}
+        freed = defaultdict(set)
+        for k, ds in waits.items():
+            for d in ds:
+                freed[d].add(k)
+        left = {k: len(ds) for k, ds in waits.items()}
+        pr = {t_["key"]: prio_of(t_) for t_ in leaf}
+        ready = [pr[k] for k, n in left.items() if n == 0]
+        heapq.heapify(ready)
+        out, done = [], set()
+        while ready:
+            k = heapq.heappop(ready)[-1]
+            done.add(k)
+            out.append(by_key[k])
+            for n in freed[k]:
+                left[n] -= 1
+                if left[n] == 0:
+                    heapq.heappush(ready, pr[n])
+        # A loop in the waits would strand its tasks; they follow in priority order rather than vanish.
+        return out + sorted((t_ for t_ in leaf if t_["key"] not in done), key=lambda t_: pr[t_["key"]])
+
+    def block_of_task(k):
+        a_ = am_info.get(am_of.get(k)) if am_of.get(k) else None
+        return a_["block"] if a_ else by_key[k].get("block") or "A"
+
+    def items_of(order):
+        return [{"key": t_["key"], "who": t_["assignee"] or None, "pool": t_.get("pool") or pool_of(t_),
+                 "track": t_["track"], "service": t_["service"], "points": int(t_["points"] or 0),
+                 "days": t_.get("days") or days_ex.get(t_["key"]), "notBefore": t_.get("notBefore") or 0,
+                 "deps": t_["dependsOn"].split(), "client": t_["area"] == "client",
+                 "block": block_of_task(t_["key"]), "peerOf": t_.get("peerOf"),
+                 "fallback": {"pos": ("mob", "web"), "mob": ("web",)}.get(t_.get("pool")) if t_.get("peerOf") else None}
+                for t_ in order]
+
+    windows = {}
+
+    def run_schedule(order):
+        return sp.schedule(items_of(order), people, caps=pool_caps, svc_owner=svc_owner,
+                           backend_owners=areas.get("backend") or [], helper_share=HELPER_SHARE, freeze=windows)
+
+    BRANK = {b: i for i, b in enumerate(sp.BLOCKS)}
+
+    # **Pass 1: where each later app-module finishes**, with Block A first and the rest in build order. B, C and D
+    # are then the app-modules that finish by each block's target sprint (team.json sprintPlan.blocks).
+    first_run = run_schedule(topo(lambda t_: (0 if t_["phase"] == 1 else 1, am_info[am_of[t_["key"]]]["order"],
+                                              t_["tier"], int(t_["wave"] or 9), step[t_["key"]],
+                                              TRACK_ORDER[t_["track"]], t_["key"])))
+    am_end = defaultdict(float)
+    for k, r_ in first_run.items():
+        am_end[am_of[k]] = max(am_end[am_of[k]], r_["end"])
+    targets = settings["targets"]
+    tests = sp.test_settings(team)
+    for k, a in am_info.items():
+        if a["block"] == "A":
+            continue
+        fin = sp.sprint_of_index(max(am_end.get(k, 0.0) - 1e-6, 0.0))
+        # the block whose test window starts after it is done
+        a["block"] = next((b for b in sp.BLOCKS[1:]
+                           if sp.window_of(targets[b], tests["days"])[0] >= am_end.get(k, 0.0) - 1e-6), sp.BLOCKS[-1])
+    # **Each block is complete and testable on its own.** What an app-module's tasks wait on to be finished -- the
+    # back end a screen is wired to, the migration a service writes into, the migration a key points into, a task
+    # of the same service -- must be in its block or an earlier one. Shared back end and migrations are pulled into
+    # the earliest block that needs them (they go with the first app-module that needs them; the later ones wait on
+    # them). A report or read-only task waiting on another service's writers is not pulled: it is tested on seeded
+    # data.
+    later_leaf = [t_ for t_ in leaf if t_["key"] in later_set]
+
+    def binds(t_, d):
+        """Whether waiting on d ties t_'s block to d's."""
+        dt_ = by_key[d]
+        if t_["track"] == "Frontend":
+            return dt_["track"] in ("Backend", "Database")
+        if t_["track"] in ("Backend", "Database"):
+            return dt_["track"] == "Database" or (dt_["track"] == "Backend" and dt_["service"] == t_["service"])
+        return False
+
+    def pull():
+        for _ in range(40):
+            changed = False
+            for t_ in later_leaf:
+                if not am_of.get(t_["key"]):
+                    continue
+                mine = am_info[am_of[t_["key"]]]
+                for d in t_["dependsOn"].split():
+                    if not am_of.get(d) or d not in later_set or not binds(t_, d):
+                        continue
+                    theirs = am_info[am_of[d]]
+                    if BRANK[theirs["block"]] <= BRANK[mine["block"]]:
+                        continue
+                    if by_key[d]["track"] in ("Backend", "Database"):
+                        am_of[d] = mine["key"]                 # pull the shared back end into the earlier block
+                    else:
+                        mine["block"] = theirs["block"]
+                    changed = True
+            if not changed:
+                break
+
+    pull()
+
+    # **The test strategy** (decided 1 October, docs/active/block-test-strategy.md). A module test per app-module:
+    # about 10% of its points (at least 2), by a peer in its stack who is not its main builder (the scheduler skips
+    # whoever built most of it), waiting on every ticket in it, so it lands right after the last one. A block test
+    # per block: a back-end and a front-end tester (a pair rotating per block, team.json sprintPlan.blockTests), led
+    # by Chinmay Parab, in the last three working days of the block's final sprint, waiting on its module tests.
+    # In those three days no new feature task starts (sprint_plan.schedule `freeze`).
+    TRACK_ORDER["Test"] = 6
+    am_tasks = defaultdict(list)
+    for t_ in leaf:
+        am_tasks[am_of[t_["key"]]].append(t_)
+
+    def is_ai_engine(k):
+        return am_info[k]["platform"] == "AI" and k != "AM-AI-ENGINE-A"
+
+    for k, ch in sorted(am_tasks.items()):
+        pts = sum(int(x["points"] or 0) for x in ch)
+        days = sum(float(x.get("days") or days_ex.get(x["key"]) or 0) for x in ch)
+        pools = Counter()
+        for x in ch:
+            pools[pool_of(x)] += int(x["points"] or 0) or float(x.get("days") or days_ex.get(x["key"]) or 0)
+        pool = pools.most_common(1)[0][0] if pools else "be"
+        if am_info[k]["platform"] == "AI":
+            pool = "ai"                                  # an AI capability is tested by the other AI engineer
+        tk = f"TEST-{k}"
+        a = am_info[k]
+        is_a = a["block"] == "A"
+        task(tk, k, "Task", f"Module test: {a['name']}",
+             f"The module test of {a['name']} on the integration environment (docs/active/block-test-strategy.md): "
+             "every screen state its YAML lists, every navigation link, every permission (an allowed and a refused "
+             "user), every operation's error responses, and for an offline app its offline behaviour with the network "
+             "cut. Done when it passes with no open severity 1 or 2 defect. By a peer in the module's stack who did not "
+             f"build most of it. {len(ch)} tickets, {pts} points" + (f", {days:g} AI-engineer days" if days else "") + ".",
+             min((int(x["wave"]) for x in ch if str(x["wave"]).isdigit()), default=3), area="test",
+             pts=max(tests["minPoints"], round(tests["share"] * pts)) if pts else "",
+             depends=[x["key"] for x in ch])
+        t_ = by_key[tk]
+        t_["track"], t_["subject"] = "Test", f"[Test] Module test: {a['name']}"
+        t_["phase"] = 1 if is_a else 2
+        t_["pool"] = pool
+        t_["peerOf"] = [x["key"] for x in ch]
+        if pool == "ai":
+            t_["points"] = ""
+            t_["days"] = max(1.0, round(tests["share"] * (days + pts / sp.PLAN_PACE), 1))
+        elif not pts:
+            t_["days"] = max(1.0, round(tests["share"] * days, 1))
+        t_["tier"] = 0
+        step[tk] = 1 + max((step.get(x["key"], 0) for x in ch), default=0)
+        am_of[tk] = k
+        leaf.append(t_)
+        later_set.add(tk) if not is_a else a_keys.add(tk)
+    block_tests = {}
+    for i, b in enumerate(sp.BLOCKS):
+        be_, fe_ = tests["pairs"][i % len(tests["pairs"])]
+        for side, who in (("BE", be_), ("FE", fe_)):
+            tk = f"TEST-BLOCK-{b}-{side}"
+            task(tk, f"BLOCK-{b}", "Task", f"Block {b} test ({'back end' if side == 'BE' else 'front end'})",
+                 f"The block test of Block {b} (docs/active/block-test-strategy.md), led by {tests['lead']}: every flow "
+                 f"the block claims end to end on the integration environment, the offline runs, and the load run where "
+                 f"the block adds a purchase or admission path; then the client's acceptance session. Pair: {be_} (back "
+                 f"end) and {fe_} (front end). In the last {tests['days']:g} working days of the block's final sprint; no "
+                 "new feature work starts in them.", 3, area="test", assignee=who)
+            t_ = by_key[tk]
+            t_["track"], t_["subject"] = "Test", t_["subject"].replace("[FE]", "[Test]")
+            t_["phase"] = 1 if b == "A" else 2
+            t_["days"] = tests["days"]
+            t_["block"] = b
+            t_["tier"] = 0
+            t_["pool"] = "be" if side == "BE" else "web"
+            step[tk] = 999
+            am_of[tk] = None
+            block_tests[tk] = b
+            leaf.append(t_)
+
+    def block_first(t_):
+        if t_["key"] in block_tests:
+            return (BRANK[block_tests[t_["key"]]], (9, 99, 99, 9, 99), 9, 9, 999, 7, t_["key"])
+        a_ = am_info[am_of[t_["key"]]]
+        return (BRANK[a_["block"]], a_["order"], t_["tier"], int(t_["wave"] or 9), step[t_["key"]],
+                TRACK_ORDER[t_["track"]], t_["key"])
+
+    # **Pass 2: each block on a sprint boundary, its test in the last three days.** Scheduled block first, with each
+    # block's test window frozen. An app-module of B or C that still finishes after its block's target window opens,
+    # and that nothing in its block or an earlier one waits on, moves to the next block (D takes what is left). A
+    # block's final sprint is the first, from its target, whose window opens after the block's work (its tickets
+    # and module tests) is done; Block A's is wherever that falls.
+    final = {b: targets[b] for b in sp.BLOCKS}
+    for _round in range(10):
+        for tk, b in block_tests.items():
+            mods = [f"TEST-{k}" for k, a in am_info.items() if a["block"] == b and k in am_tasks and not is_ai_engine(k)]
+            by_key[tk]["dependsOn"] = " ".join(sorted(mods))
+            w0, w1 = sp.window_of(final[b], tests["days"])
+            by_key[tk]["notBefore"] = w0
+            windows[b] = (w0, w1)
+        res_ = run_schedule(topo(block_first))
+        fin = defaultdict(float)
+        for k, r_ in res_.items():
+            if k not in block_tests:
+                fin[am_of[k]] = max(fin[am_of[k]], r_["end"])
+        moved = 0
+        for b in sp.BLOCKS[1:-1]:
+            limit = sp.window_of(targets[b], tests["days"])[0]
+            late = {k for k, a in am_info.items() if a["block"] == b and fin.get(k, 0.0) > limit + 1e-6}
+            if not late:
+                continue
+            # the late app-modules move to the next block; the back end an app-module left in this block still
+            # needs is pulled back into it (it goes with the first app-module that needs it)
+            nxt = sp.BLOCKS[sp.BLOCKS.index(b) + 1]
+            for k in late:
+                am_info[k]["block"] = nxt
+                moved += 1
+        if moved:
+            pull()
+        new_final = {}
+        for b in sp.BLOCKS:
+            last = max([v for k, v in fin.items() if k and am_info[k]["block"] == b and not is_ai_engine(k)] or [0.0])
+            new_final[b] = sp.final_sprint(last, tests["days"], at_least=targets[b] if b != "A" else 1)
+        if not moved and new_final == final:
+            break
+        final = new_final
+    block_final = dict(final)
+
+    # **The hierarchy** (1 October): Epic = Block, Feature = app-module, Task = the work under its pushed key. The
+    # service and app epics and their group features of 23-30 September leave the plan; op-release.py closes them
+    # once their tickets have moved (re-parenting is allowed, renaming is not). A block test sits on its epic.
+    tasks[:] = leaf
+    by_key = {t_["key"]: t_ for t_ in tasks}
+    used_ams = {am_of[t_["key"]] for t_ in tasks if am_of[t_["key"]]}
     for t_ in tasks:
-        place(t_)
+        if t_["key"] in block_tests:
+            t_["parent"] = f"BLOCK-{block_tests[t_['key']]}"
+            continue
+        t_["parent"] = am_of[t_["key"]]
+        t_["block"] = am_info[t_["parent"]]["block"]
+    order_ = topo(block_first)
+    struct = {}
+    for b in sp.BLOCKS:
+        if any(am_info[k]["block"] == b for k in used_ams):
+            struct[f"BLOCK-{b}"] = {"key": f"BLOCK-{b}", "parent": "", "type": "Epic", "track": "", "phase": "",
+                                    "subject": f"Block {b}", "wave": "", "points": "", "assignee": "", "area": "",
+                                    "platform": "", "service": "", "dependsOn": "", "description": "", "tier": "",
+                                    "block": b, "step": ""}
+    for k in used_ams:
+        a = am_info[k]
+        struct[k] = {"key": k, "parent": f"BLOCK-{a['block']}", "type": "Feature", "track": "", "phase": "",
+                     "subject": a["name"], "wave": "", "points": "", "assignee": "", "area": "",
+                     "platform": sp.PLATFORM_NAME.get(a["platform"], ""), "service": "", "dependsOn": "",
+                     "description": "", "tier": "", "block": a["block"], "step": ""}
+    seq, out_ = 0, []
+    for t_ in order_:
+        for p in (f"BLOCK-{t_['block']}", t_["parent"]):
+            if p in struct and "sequence" not in struct[p]:
+                seq += 1
+                struct[p]["sequence"] = seq
+                out_.append(struct[p])
+        seq += 1
+        t_["sequence"] = seq
+        t_["step"] = step[t_["key"]]
+        out_.append(t_)
     tasks[:] = out_
+    by_key = {t_["key"]: t_ for t_ in tasks}
 
     # **Key stability** (30 September): the work on a pushed ticket keeps that ticket's key (see
     # reconcile_keys). Applied last, so the plan above -- phase, track, tier, order, links -- is formed from
     # the keys exactly as before and only the names change. With today's plan it renames nothing.
     work = defaultdict(set)
-    for o, k in list(op_task.items()) + list(vm_op_task.items()):
+    for o, k in list(op_task.items()) + list(vm_op_task.items()) + list(later_op_task.items()):
         work[k].add(o)
-    for t, k in list(table_mig.items()) + list(vm_mig.items()):
+    for t, k in list(table_mig.items()) + list(vm_mig.items()) + list(later_mig.items()):
         if k != "MIG-BASELINE":
             work[k].add(t)
     for t_ in tasks:
@@ -1702,14 +2330,161 @@ def main() -> int:
         print(f"key stability: {n_}")
     print(f"key stability: {len(renamed)} planned keys written under the key their work was pushed as")
 
+    # **Owners** (plan item L2, 1 October). A pushed ticket keeps the owner its last release gave it, from release
+    # `sprintPlan.stableOwners.since` on, unless --rebalance; started tickets are kept by op-release.rb in any case.
+    # Then pass 2: every task without an owner (the later blocks' new work) goes to whoever in its pool can start it
+    # first, in build order -- the same placement derive-block-a-schedule.py reproduces for the dates.
+    pins, pin_note = sp.pinned_owners(team, rebalance="--rebalance" in sys.argv[1:])
+    for t_ in tasks:
+        if t_["type"] == "Task" and t_["key"] in pins and t_["key"] in kmap:
+            t_["assignee"] = pins[t_["key"]]
+    print(f"owners: {pin_note}")
+    leaf = [t_ for t_ in tasks if t_["type"] == "Task"]
+    second = run_schedule(leaf)
+    for t_ in leaf:
+        r_ = second.get(t_["key"])
+        if not t_["assignee"] and r_ and r_["who"]:
+            t_["assignee"] = r_["who"]
+    queue_n = defaultdict(int)
+    for t_ in tasks:
+        if t_["type"] == "Task" and t_["assignee"]:
+            queue_n[t_["assignee"]] += 1
+            t_["queue"] = queue_n[t_["assignee"]]
+        else:
+            t_["queue"] = ""
+    # **Accountable** is written on the row (it was read from the service epics, which are gone): a service's
+    # owner for its back end and migrations, the area lead for a first-release screen, the app-module's lead else.
+    LEAD_AREA = {"POS": "Pradnya Yeram", "MOB": "Chitrangi Mestry", "WEB": "Chinmay Patkar", "WL": "Chinmay Patkar",
+                 "SETUP": "Pallavi Sawant", "VM": "Pallavi Sawant"}
+    ai_lead = ((team.get("ai") or {}).get("who") or [""])[0]
+    kids = defaultdict(list)
+    for t_ in tasks:
+        if t_["parent"]:
+            kids[t_["parent"]].append(t_)
+    lead_of = {}
+    for k, ch in kids.items():
+        c_ = Counter()
+        for x in ch:
+            if x["type"] == "Task" and x["assignee"]:
+                c_[x["assignee"]] += float(x["points"] or 0) or float(x.get("days") or 0) * sp.PLAN_PACE
+        lead_of[k] = c_.most_common(1)[0][0] if c_ else ""
+    for t_ in tasks:
+        if t_["type"] != "Task":
+            continue
+        if t_["key"] in block_tests:
+            t_["accountable"] = tests["lead"]
+        elif t_["track"] in ("Backend", "Database", "DevOps", "Setup", "Onboarding"):
+            t_["accountable"] = svc_owner.get(t_["service"]) or devops
+        elif t_["track"] == "AI":
+            t_["accountable"] = ai_lead
+        else:
+            t_["accountable"] = LEAD_AREA.get(t_["area"]) or lead_of.get(t_["parent"]) or t_["assignee"]
+    sched_of = {k: v for k, v in second.items()}
+
+    def span(keys_):
+        ss = [sched_of[k]["start"] for k in keys_ if k in sched_of]
+        ee = [sched_of[k]["end"] for k in keys_ if k in sched_of]
+        if not ss:
+            return None
+        return sp.sprint_of_index(min(ss)), sp.sprint_of_index(max(max(ee) - 1e-6, 0.0)), max(ee)
+
+    def fmt(d):
+        return f"{d.strftime('%a')} {d.day} {d.strftime('%b %Y')}"
+
+    lineage_c = {o: (lineage.get(o) or {}).get("contract") or ops.get(o, {}).get("contract") for o in ops}
+    block_end = {}
+    for t_ in tasks:
+        if t_["type"] != "Feature":
+            continue
+        ch = [x for x in kids[t_["key"]] if x["type"] == "Task"]
+        a = am_info[t_["key"]]
+        scr = sorted({key_identity(x["key"])[1] for x in ch if x["track"] == "Frontend" and key_identity(x["key"])}
+                     | {re.sub(r"^.*?-([A-Z]+-\d{3,}[A-Z]?)-REST$", r"\1", x["key"]) for x in ch if x["key"].endswith("-REST")})
+        opl = sorted({o for x in ch for o in ops_of.get(x["key"], ())})
+        tbl = sorted({tt for x in ch if x["track"] == "Database"
+                      for tt in (re.search(r"Tables: (.+?)\. Source", x["description"]) or [None, ""])[1].split(", ") if tt})
+        pts = sum(int(x["points"] or 0) for x in ch)
+        sp_ = span([x["key"] for x in ch])
+        t_["points"] = pts
+        t_["assignee"] = lead_of.get(t_["key"], "")
+        t_["accountable"] = t_["assignee"]
+        t_["area"] = {"P08": "VM", "P01": "WEB", "P02": "MOB", "P04": "POS", "P15": "POS"}.get(a["platform"], a["platform"])
+        when = (f"planned Sprint {sp_[0]}" + (f" to Sprint {sp_[1]}" if sp_[1] != sp_[0] else "")
+                + f", done by {fmt(sp.day(max(sp_[2] - 1e-6, 0)))}") if sp_ else "not scheduled"
+        builds = ([f"screen {s_}" for s_ in scr] + [f"operation {lineage_c.get(o) or '?'}#{o}" for o in opl]
+                  + [f"table {x}" for x in tbl])
+        ticketed = a["block"] in settings["ticketBlocks"]
+        t_["description"] = (
+            f"{a['name']}: {a['module']} on {sp.PLATFORM_NAME.get(a['platform'], 'the platform')}. Block {a['block']}, "
+            f"{when}. Complete when every screen, its back end and its tests are done and it passes end to end. "
+            f"Scope: {len(scr)} screens, {len(opl)} operations, {len(tbl)} tables, {pts} points"
+            + (f", {sum(float(x.get('days') or 0) for x in ch):g} AI-engineer days" if any(x.get('days') for x in ch) else "")
+            + "." + ("" if ticketed else f" Block {a['block']} is ticketed at this level until it is planned; its "
+                     f"{len(ch)} tasks are in plan-tasks.csv with the keys they will have.")
+            + " Builds: " + ", ".join(builds) + ".")
+        if sp_:
+            block_end[a["block"]] = max(block_end.get(a["block"], 0.0), sp_[2])
+    for t_ in tasks:
+        if t_["type"] != "Epic":
+            continue
+        b = t_["block"]
+        feats = [x for x in kids[t_["key"]] if x["type"] == "Feature"]
+        apps = Counter(am_info[x["key"]]["platform"] for x in feats)
+        end_sp = block_final[b]
+        # where a tenth of the block's hours have started (front ends run ahead against the mock server)
+        its = sorted((y for x in feats for y in kids[x["key"]] if y["key"] in sched_of),
+                     key=lambda y: sched_of[y["key"]]["start"])
+        tot = sum(float(y["points"] or 0) or float(y.get("days") or 0) * sp.PLAN_PACE for y in its) or 1.0
+        run, first_sp = 0.0, 1
+        for y in its:
+            run += float(y["points"] or 0) or float(y.get("days") or 0) * sp.PLAN_PACE
+            if run >= 0.1 * tot:
+                first_sp = sp.sprint_of_index(sched_of[y["key"]]["start"])
+                break
+        w0, w1 = windows[b]
+        ai_late = [x for x in feats if is_ai_engine(x["key"])]
+        t_["subject"] = (f"Block {b}: the first release (Sprints {first_sp}-{end_sp})" if b == "A"
+                         else f"Block {b} (Sprints {first_sp}-{end_sp})")
+        t_["points"] = sum(int(x["points"] or 0) for x in feats)
+        t_["accountable"] = tests["lead"]
+        t_["description"] = (
+            f"Block {b}: {len(feats)} app-modules, each complete and testable end to end (screens, back end, module "
+            f"test done), ending Friday {fmt(sp.SPRINTS_ALL[end_sp - 1]['end'])}, the end of Sprint {end_sp} (target: "
+            f"Sprint {settings['targets'][b]}). Block test {fmt(sp.day(w0))} to {fmt(sp.day(w1 - 1))}: no new feature "
+            "work starts in those days. Apps: " + ", ".join(f"{sp.PLATFORM_NAME.get(p_, p_ or 'platform')} ({n})"
+                                                          for p_, n in apps.most_common()) + "."
+            + (f" The AI engine capabilities in it ({len(ai_late)}) are accepted on their own module tests, by the two "
+               "AI engineers' calendar (docs/active/ai-functions-review-30-september.json)." if ai_late else ""))
+
     COLS = ["sequence", "queue", "key", "parent", "type", "track", "subject", "phase", "wave", "step", "points",
             "assignee", "area", "platform", "service", "dependsOn", "description",
             # the build phase (0 plumbing, 1 foundation, 2 commerce, 3 operations, 4 engagement, 5 reporting)
-            "tier"]
+            "tier",
+            # the sprint plan (1 October): its block, who answers for it, AI-engineer days (no points)
+            "block", "accountable", "days"]
+    # **What is ticketed** (1 October): every row of a block in team.json `sprintPlan.ticketBlocks`, every pushed
+    # ticket wherever it is planned, and every block and app-module. plan-tasks.csv holds all of it.
+    ticket_blocks = set(settings["ticketBlocks"])
+    for t_ in tasks:
+        t_["ticketed"] = "yes" if (t_["type"] != "Task" or t_["block"] in ticket_blocks or t_["key"] in kmap) else "no"
+        t_["sprint"] = (sp.sprint_of_index(sched_of[t_["key"]]["start"]) if t_["key"] in sched_of else "")
+    # A follows link exists only between two tickets: a ticketed task keeps, in tasks.csv, its waits on ticketed
+    # tasks; its waits on work of a block not ticketed yet are in plan-tasks.csv and become links when it is.
+    ticketed_keys = {t_["key"] for t_ in tasks if t_["ticketed"] == "yes"}
     with (OUT / "tasks.csv").open("w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=COLS)
+        w = csv.DictWriter(fh, fieldnames=COLS, extrasaction="ignore")
+        w.writeheader()
+        w.writerows(dict(t_, dependsOn=" ".join(d for d in t_["dependsOn"].split() if d in ticketed_keys))
+                    for t_ in tasks if t_["ticketed"] == "yes")
+    with (OUT / "plan-tasks.csv").open("w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=COLS + ["notBefore", "ticketed", "sprint"], extrasaction="ignore")
         w.writeheader()
         w.writerows(tasks)
+    n_t = Counter((t_["block"], t_["ticketed"]) for t_ in tasks if t_["type"] == "Task")
+    print("sprint plan: " + "; ".join(
+        f"Block {b} {sum(1 for x in tasks if x['type'] == 'Feature' and x['block'] == b)} app-modules, "
+        f"{n_t[(b, 'yes')]} tasks ticketed" + (f" + {n_t[(b, 'no')]} planned" if n_t[(b, 'no')] else "")
+        for b in sp.BLOCKS))
 
     # Occupancy: points on leaf tasks only, so an epic's roll-up is not counted twice.
     leaves = [t for t in tasks if t["type"] == "Task"]

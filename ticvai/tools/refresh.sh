@@ -183,6 +183,9 @@ python3 tools/build-api-list.py
 python3 tools/build-service-docs.py
 # **The Block A schedule is derived, not patched** (30 September): build order, dependencies and each
 # person's pace give every task a start day. op-descriptions.py reads it when ticket text is written.
+# Since the replan of 1 October it schedules every block (A-D) in two-week sprints from plan-tasks.csv, with the
+# calendar, app-modules and scheduler shared with build-service-docs.py (tools/sprint_plan.py). The deck and
+# "TICVAI - Sprint Plan.xlsx" (tools/build-plan-deck.py) are still run by hand after a refresh.
 python3 tools/derive-block-a-schedule.py
 # How the tickets are linked: layers, services, module builds, reports (handoff/service-docs/TICKET-LINKS.md).
 python3 tools/build-ticket-links.py
@@ -373,6 +376,7 @@ refresh-manifest                                                   # traces this
 build-plan-deck                                                    # the presentation plan, run by hand after a refresh
 build-mom-digest build-review-responses scan-domain-drift find-capability
 audit_guard release_baseline ddl_forward                           # imported by checkers and derive-ddl, no main (1 October)
+sprint_plan                                                        # imported by build-service-docs, derive-block-a-schedule and build-plan-deck, no main (1 October)
 push-openproject op-release op-retire op-check op-assign-sync op-order-sync op-bulk-links op-created-merge op-recent op-review adam-links   # distribution: run per release (docs/active/release-runbook.md), never on a rebuild
 release-notes                                                      # per release, between two tags
 build-decisions-workbook build-hld-lld build-readiness-page build-readiness-questions build-client-readiness build-closeout-register build-audit-decisions   # hand-run documents for people; each carries dated content a rebuild must not churn

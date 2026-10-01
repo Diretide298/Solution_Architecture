@@ -40,7 +40,8 @@ DOCS = ROOT / "handoff" / "service-docs"
 MAP = DOCS / "pms-map.json"
 BASE = "https://pms.softlabsgroup.in/api/v3"
 PROJECT = 153
-TYPES = {"Epic": 5, "Feature": 4, "Task": 1, "Sub Task": 10}
+TYPES = {"Epic": 5, "Feature": 4, "Task": 1, "Sub Task": 10}   # Epic = Block, Feature = app-module (1 October)
+LAST_SPRINT = 13                              # "Sprint 1" ... "Sprint 13": 5 October 2026 to 2 April 2027
 PRIORITY = {"1": 9, "2": 8, "3": 7}          # wave 1 High, 2 Normal, 3 Low
 PRIORITY_NO = "customField9"                  # "Priority_No." (integer): the build-order sequence
 LEAD = {"POS": "Pradnya Yeram", "MOB": "Chitrangi Mestry", "WEB": "Chinmay Patkar", "WL": "Chinmay Patkar",
@@ -152,7 +153,12 @@ def main() -> int:
     sched = json.load(open(a.schedule, encoding="utf-8"))
     lineage = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
     who = sched["assign"]
-    week = {k: min(int(v // 5), 6) + 1 for k, v in sched["start"].items()}
+    # **Two-week sprints** (1 October): a task's version is "Sprint n", the sprint it starts in (1-13; later work
+    # is planned into Sprint 13). The old "Block A · Week n" versions stay in the project and are no longer set.
+    week = {k: max(1, min(int(v), LAST_SPRINT)) for k, v in (sched.get("sprint") or {}).items()}
+    for k, v in sched["start"].items():
+        week.setdefault(k, max(1, min(int(v // 10) + 1, LAST_SPRINT)))
+    sprint_cal = {int(x["n"]): x for x in sched.get("sprints") or []}
     svc_owner = {r["service"]: r["assignee"] for r in rows if r["type"] == "Epic" and r["key"].startswith("SVC-")}
     mp = json.loads(MAP.read_text(encoding="utf-8")) if MAP.exists() else {}
 
@@ -176,16 +182,18 @@ def main() -> int:
             call("DELETE", f"/work_packages/{w['id']}")
             print(f"deleted #{w['id']} {w['subject']}")
 
-    # ---- 2. versions: one per Block A week
-    for n in range(1, 8):
-        k = f"VERSION-W{n}"
+    # ---- 2. versions: one per sprint ("Sprint 1" ... "Sprint 13", 1 October; the week versions are left alone)
+    for n in range(1, LAST_SPRINT + 1):
+        k = f"VERSION-S{n}"
         if k in mp or a.dry_run or a.export:
             continue
-        v = call("POST", "/versions", {"name": f"Block A · Week {n}",
-                                       "_links": {"definingProject": {"href": f"/api/v3/projects/{PROJECT}"}}})
+        body = {"name": f"Sprint {n}", "_links": {"definingProject": {"href": f"/api/v3/projects/{PROJECT}"}}}
+        if sprint_cal.get(n):
+            body.update({"startDate": sprint_cal[n]["start"], "endDate": sprint_cal[n]["end"]})
+        v = call("POST", "/versions", body)
         mp[k] = v["id"]
         save()
-        print(f"version Week {n} -> {v['id']}")
+        print(f"version Sprint {n} -> {v['id']}")
 
     # ---- 3. work packages, parents first (tasks.csv is written parents first)
     def checker(key, track):
@@ -194,6 +202,8 @@ def main() -> int:
                 else FE_CHECK[w % len(FE_CHECK)])
 
     def accountable(r):
+        if r.get("accountable"):                 # written by the sprint plan (1 October)
+            return r["accountable"]
         if r["track"] in ("Backend", "Database"):
             return svc_owner.get(r["service"]) or LEAD["devops"]
         area = "VM" if r["area"] == "VM" else r["area"]
@@ -209,7 +219,7 @@ def main() -> int:
                              "description": full.get(key, desc), "parent_key": parent_key,
                              "parent_id": mp.get(parent_key) if parent_key else None,
                              "assignee": assignee, "responsible": acct, "priority_id": prio,
-                             "version_id": mp.get(f"VERSION-W{version_week}") if version_week else None,
+                             "version_id": mp.get(f"VERSION-S{version_week}") if version_week else None,
                              "sequence": int(seq) if seq else None, "priority_no_field": PRIORITY_NO})
             return
         links = {"type": {"href": f"/api/v3/types/{TYPES[typ]}"},
@@ -219,8 +229,8 @@ def main() -> int:
         for field, name in (("assignee", assignee), ("responsible", acct)):
             if name and user_link(name):
                 links[field] = user_link(name)
-        if version_week and f"VERSION-W{version_week}" in mp:
-            links["version"] = {"href": f"/api/v3/versions/{mp[f'VERSION-W{version_week}']}"}
+        if version_week and f"VERSION-S{version_week}" in mp:
+            links["version"] = {"href": f"/api/v3/versions/{mp[f'VERSION-S{version_week}']}"}
         body = {"subject": subject[:255], "description": {"format": "markdown", "raw": full.get(key, desc)},
                 "_links": links}
         if seq:
@@ -268,8 +278,8 @@ def main() -> int:
         wk = week.get(key)
         extra = [f"Build order: #{r['sequence']}" + (f" · {assignee}'s queue" if assignee else "")]
         if typ == "Task":
-            extra.append(f"Planned: Block A week {wk}" if wk else "")
-            extra.append(f"Checker (week {wk}): {checker(key, r['track'])}" if wk else "")
+            extra.append(f"Planned: Sprint {wk}" + (f" (Block {r['block']})" if r.get("block") else "") if wk else "")
+            extra.append(f"Checker (sprint {wk}): {checker(key, r['track'])}" if wk else "")
             if r["dependsOn"]:
                 extra.append("Follows: " + ", ".join(r["dependsOn"].split()))
         desc = (r["description"] or "") + "\n\n" + "\n".join(f"- {x}" for x in extra if x) + f"\n\nKey: `{key}` · Track: {r['track']} · Points: {r['points']}"

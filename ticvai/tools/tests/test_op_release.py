@@ -54,6 +54,7 @@ SCHED = {"assign": {"MIG-THING": "Hrushikant Patkar", "SVC-THING-CORE-1": "Suren
 
 def mapped(**extra):
     mp = {f"VERSION-W{n}": 69 + n for n in range(1, 8)}
+    mp.update({f"VERSION-S{n}": 200 + n for n in range(1, 14)})
     mp.update({"_relations": [], "SVC-THING": 100, "SVC-THING-CORE": 101, "MIG-THING": 102,
                "MIG-THING#thing.thing": 103})
     mp.update(extra)
@@ -135,12 +136,14 @@ def test_comment_is_marked_and_filled_on_the_server():
                             "comment": rel.COMMENT_MARKER}
 
 
-def test_assignee_alias_week_version_and_accountable():
+def test_assignee_alias_sprint_version_and_accountable():
     t = by_key(build()[0])
     assert t["SVC-THING-CORE-1"]["assignee"] == "Surendra Loke"          # OP_NAME alias
     assert t["SVC-THING-CORE-1"]["responsible"] == "Pranay Shinde"       # the service epic's owner
-    assert t["SVC-THING-CORE-1"]["week"] == 2 and t["SVC-THING-CORE-1"]["version"] == 71
-    assert t["APP-MOB-GST-001"]["week"] == 7 and t["APP-MOB-GST-001"]["version"] == 76   # capped at week 7
+    # two-week sprints (1 October): day 6 is Sprint 1, day 60 Sprint 7; the version is "Sprint n"
+    assert t["SVC-THING-CORE-1"]["sprint"] == 1 and t["SVC-THING-CORE-1"]["version"] == 201
+    assert t["SVC-THING-CORE-1"]["version_key"] == "VERSION-S1"
+    assert t["APP-MOB-GST-001"]["sprint"] == 7 and t["APP-MOB-GST-001"]["version"] == 207
     assert t["SVC-THING-CORE-1#getThing"]["assignee"] == "Surendra Loke"  # a sub-task takes its task's
     assert t["SVC-THING-CORE-1#getThing"]["set_version"] is True
     assert t["SVC-THING"]["set_version"] is False and t["SVC-THING"]["version"] is None
@@ -261,3 +264,27 @@ def test_main_refuses_a_non_release_tag(monkeypatch):
     import sys
     monkeypatch.setattr(sys, "argv", ["op-release.py", "--release", "v1"])
     assert rel.main() == 2
+
+
+def test_sprint_from_the_schedule_wins_and_is_capped_at_13():
+    sched = dict(SCHED, sprint={"SVC-THING-CORE-1": 3, "APP-MOB-GST-001": 15})
+    b, _ = rel.build(plan(), mapped(), sched, LINEAGE, [], [], "r2")
+    t = by_key(b)
+    assert t["SVC-THING-CORE-1"]["sprint"] == 3 and t["SVC-THING-CORE-1"]["version"] == 203
+    assert t["APP-MOB-GST-001"]["sprint"] == 13                         # past 2 April: planned into Sprint 13
+    assert [v["name"] for v in b["sprint_versions"]][:2] == ["Sprint 1", "Sprint 2"] and len(b["sprint_versions"]) == 13
+
+
+def test_accountable_written_on_the_row_wins():
+    rows = plan()
+    rows[3] = dict(rows[3], accountable="Tanmay Dukhande")
+    t = by_key(build(rows=rows)[0])
+    assert t["SVC-THING-CORE-1"]["responsible"] == "Tanmay Dukhande"
+
+
+def test_old_epics_and_features_are_regrouped_not_unexplained():
+    rows = [r for r in plan()]
+    retire, unexp = rel.regroup(rows, mapped(), [], ["SVC-OLD", "SVC-OLD-GROUP", "SVC-GONE-1"], "r2",
+                                structure={"SVC-OLD", "SVC-OLD-GROUP"})
+    assert [(k, a) for k, a, _ in retire] == [("SVC-OLD", "regroup"), ("SVC-OLD-GROUP", "regroup")]
+    assert unexp == ["SVC-GONE-1"]                                      # a task with no reason stays unexplained

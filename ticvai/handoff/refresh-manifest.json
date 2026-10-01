@@ -1202,7 +1202,8 @@
    "step": 35,
    "command": "python3 tools/build-service-docs.py",
    "tools": [
-    "tools/build-service-docs.py"
+    "tools/build-service-docs.py",
+    "tools/sprint_plan.py"
    ],
    "reads": [
     "backend/control/*",
@@ -1218,7 +1219,10 @@
     "screens/*",
     "states/*",
     "tools/build-service-docs.py",
-    "tools/op-retire.py"
+    "tools/op-retire.py",
+    "docs/active/ai-functions-review-30-september.json",
+    "handoff/service-docs/op-release.json",
+    "tools/sprint_plan.py"
    ],
    "writes": [
     "handoff/service-docs/README.md",
@@ -1231,7 +1235,8 @@
     "handoff/service-docs/frontend/POS.md",
     "handoff/service-docs/frontend/WEB.md",
     "handoff/service-docs/frontend/WL.md",
-    "handoff/service-docs/tasks.csv"
+    "handoff/service-docs/tasks.csv",
+    "handoff/service-docs/plan-tasks.csv"
    ],
    "self_reads": [],
    "changed_in_trace": 4,
@@ -1248,13 +1253,17 @@
    "step": 36,
    "command": "python3 tools/derive-block-a-schedule.py",
    "tools": [
-    "tools/derive-block-a-schedule.py"
+    "tools/derive-block-a-schedule.py",
+    "tools/sprint_plan.py"
    ],
    "reads": [
     "docs/active/block-a-extra-tasks.json",
     "docs/active/team.json",
     "handoff/service-docs/tasks.csv",
-    "tools/derive-block-a-schedule.py"
+    "tools/derive-block-a-schedule.py",
+    "handoff/service-docs/plan-tasks.csv",
+    "handoff/service-docs/op-release.json",
+    "tools/sprint_plan.py"
    ],
    "writes": [
     "handoff/service-docs/block-a-schedule.json"
