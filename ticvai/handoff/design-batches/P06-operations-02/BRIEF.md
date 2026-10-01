@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -56,21 +57,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `EMP-014` | Ticket lookup | listDetail | 14 | 9 | — |
-| `EMP-015` | Group scan | listDetail | 7 | 4 | — |
-| `EMP-017` | Sync & reconciliation | listDetail | 9 | 5 | — |
-| `EMP-018` | Offline package | listDetail | 3 | 1 | — |
-| `EMP-019` | AI assistant — home | listDetail | 3 | 2 | — |
-| `EMP-020` | AI assistant — answer | listDetail | 4 | 2 | — |
-| `EMP-021` | Roster | listDetail | 2 | 1 | — |
-| `EMP-022` | My rota | listDetail | 3 | 1 | — |
-| `EMP-023` | Swap request | listDetail | 3 | 1 | — |
-| `EMP-024` | Clock in / out | listDetail | 3 | 2 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `EMP-014` | Ticket lookup | B–D | 127 | 53 | 6 | 70 | 2 | 0 | — | notStarted (generated) |
+| `EMP-015` | Group scan | B–D | 37 | 35 | 6 | 60 | 1 | 0 | — | notStarted (generated) |
+| `EMP-017` | Sync & reconciliation | B–D | 74 | 40 | 6 | 62 | 2 | 0 | — | notStarted (generated) |
+| `EMP-018` | Offline package | B–D | 3 | 26 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-019` | AI assistant — home | B–D | 4 | 16 | 6 | 16 | 1 | 0 | — | notStarted (generated) |
+| `EMP-020` | AI assistant — answer | B–D | 4 | 16 | 6 | 16 | 1 | 0 | — | notStarted (generated) |
+| `EMP-021` | Roster | B–D | 6 | 28 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
+| `EMP-022` | My rota | B–D | 6 | 44 | 6 | 16 | 2 | 0 | — | notStarted (generated) |
+| `EMP-023` | Swap request | B–D | 6 | 36 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
+| `EMP-024` | Clock in / out | B–D | 11 | 31 | 6 | 5 | 3 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

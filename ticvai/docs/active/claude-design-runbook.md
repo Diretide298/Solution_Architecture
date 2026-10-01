@@ -69,6 +69,16 @@ said in the minutes, workshops and design reviews about that batch's platform, m
 and screens. Apply every item. Where a reference design or house style disagrees, the
 input wins; an open question gets the default it states.
 
+EACH SCREEN HAS A BLOCK: DRAW TO IT
+
+Every BUNDLE.md has a section "Screen by screen": one block per screen with every input
+(control, required, default, allowed values, format, error), every output (what is shown,
+in what format; what each action produces; where the user goes next), every state, the
+permissions, the requirements it meets, the client's inputs for it, the tracker items, what
+the tenant configures and the references. Draw the screen to its block and tick its
+acceptance checklist. On a guest screen apply apps/1-guest-app/WHITE-LABEL.md: the default
+theme, and the alternate tenant theme on the key screens.
+
 WHERE YOU MUST BE CREATIVE, AND WHERE YOU MUST NOT
 
 1,292 of the 7,679 component labels in this package are scaffolding a generator wrote

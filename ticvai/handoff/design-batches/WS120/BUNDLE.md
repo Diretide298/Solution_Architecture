@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -55,21 +56,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `ADM-509` | Operational Forecasting Command Center | commandCentre | 2 | 0 | — |
-| `ADM-510` | Capacity & Occupancy Forecast | listDetail | 4 | 0 | — |
-| `ADM-511` | Attraction Utilization & Queue Forecast | listDetail | 3 | 0 | — |
-| `ADM-512` | Entry, Access & Guest Flow Forecast | listDetail | 2 | 0 | — |
-| `ADM-513` | Workforce Demand & Staffing Forecast | listDetail | 3 | 0 | — |
-| `ADM-514` | POS, Kiosk & Frontline Service Forecast | listDetail | 2 | 0 | — |
-| `ADM-515` | F&B, Retail & Inventory Demand Forecast | listDetail | 2 | 0 | — |
-| `ADM-516` | Resource, Equipment & Facility Requirement Forecast | listDetail | 2 | 0 | — |
-| `ADM-517` | Operational Scenario & Readiness Simulator | commandCentre | 3 | 0 | — |
-| `ADM-518` | Operational Forecast Review, Recommendations & Handover | listDetail | 2 | 0 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `ADM-509` | Operational Forecasting Command Center | B–D | 2 | 0 | 6 | 46 | 0 | 0 | — | notStarted (—) |
+| `ADM-510` | Capacity & Occupancy Forecast | B–D | 0 | 0 | 6 | 50 | 0 | 0 | — | notStarted (—) |
+| `ADM-511` | Attraction Utilization & Queue Forecast | B–D | 0 | 0 | 6 | 57 | 0 | 6 | — | notStarted (—) |
+| `ADM-512` | Entry, Access & Guest Flow Forecast | B–D | 0 | 0 | 6 | 46 | 0 | 0 | — | notStarted (—) |
+| `ADM-513` | Workforce Demand & Staffing Forecast | B–D | 0 | 18 | 6 | 47 | 0 | 0 | — | notStarted (—) |
+| `ADM-514` | POS, Kiosk & Frontline Service Forecast | B–D | 0 | 16 | 6 | 46 | 0 | 0 | — | notStarted (—) |
+| `ADM-515` | F&B, Retail & Inventory Demand Forecast | B–D | 0 | 0 | 6 | 46 | 1 | 4 | — | notStarted (—) |
+| `ADM-516` | Resource, Equipment & Facility Requirement Forecast | B–D | 0 | 0 | 6 | 46 | 0 | 0 | — | notStarted (—) |
+| `ADM-517` | Operational Scenario & Readiness Simulator | B–D | 0 | 0 | 6 | 9 | 1 | 0 | — | notStarted (—) |
+| `ADM-518` | Operational Forecast Review, Recommendations & Handover | B–D | 0 | 0 | 6 | 8 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -77,2853 +84,1421 @@ convincingly. It is never a caption.
 
 ---
 
-## `screens.json`
+## Screen by screen
 
-Every field of every screen in this batch. **`machine` is what a screen is in the middle of**, `overlays` is what opens over it and what closing it does, and `navigation.transitions` is how you leave, with `carries` naming the state that travels.
+**One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-```json
-[
- {
-  "id": "ADM-509",
-  "name": "Operational Forecasting Command Center",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
-   "board": "2",
-   "number": "1",
-   "page": 32
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/analytics/operational-forecasting-command-center-adm-509",
-   "component": "apps/ticvai-web/src/routes/analytics/OperationalForecastingCommandCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-002"
-   ],
-   "exitTo": [
-    "ADM-002",
-    "ADM-510",
-    "ADM-511",
-    "ADM-512",
-    "ADM-513",
-    "ADM-514",
-    "ADM-515",
-    "ADM-516",
-    "ADM-517",
-    "ADM-518"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-002",
-     "trigger": "Back to Platform Dashboard",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026",
-     "back": true
-    },
-    {
-     "to": "ADM-510",
-     "trigger": "Capacity & Occupancy Forecast",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-511",
-     "trigger": "Attraction Utilization & Queue Forecast",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-512",
-     "trigger": "Entry, Access & Guest Flow Forecast",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-513",
-     "trigger": "Workforce Demand & Staffing Forecast",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-514",
-     "trigger": "POS, Kiosk & Frontline Service Forecast",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-515",
-     "trigger": "F&B, Retail & Inventory Demand Forecast",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-516",
-     "trigger": "Resource, Equipment & Facility Requirement Forecast",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-517",
-     "trigger": "Operational Scenario & Readiness Simulator",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-518",
-     "trigger": "Operational Forecast Review, Recommendations & Handover",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Provide operations management with one central view of future operational pressure and predicted resource requirements.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search operational forecasting",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Filters"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Tenant",
-        "Venue",
-        "Date",
-        "Time",
-        "Zone",
-        "Attraction",
-        "Department",
-        "Forecast Scenario"
-       ],
-       "notes": "The pack filters this screen by tenant, venue, date, time, zone, attraction and 2 more — which are present is a decision the pack already made.",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Filters"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Forecast Attendance",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Peak In-Venue Population",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Forecast Occupancy",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "High-Pressure Periods",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Attractions at Risk",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Queue Pressure Alerts",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Required Workforce",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Workforce Gap",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Required POS Capacity",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "F&B Demand Index",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Inventory Risk Items",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Operational Readiness Score",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The operational forecasting list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the operational forecasting untouched.",
-   "emptyFirstRun": "No operational forecasting yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the operational forecasting are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getForecast",
-    "contract": "ai",
-    "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-509",
-   "workshopBoard": "wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-509"
-  },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 32. 0 of 8 labels bound to a contract property; 20 of 56 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-510",
-  "name": "Capacity & Occupancy Forecast",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
-   "board": "2",
-   "number": "2",
-   "page": 34
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/analytics/capacity-occupancy-forecast-adm-510",
-   "component": "apps/ticvai-web/src/routes/analytics/CapacityOccupancyForecast.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-509"
-   ],
-   "exitTo": [
-    "ADM-509"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-509",
-     "trigger": "Back to Operational Forecasting Command Center",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Translate forecast attendance into predicted occupancy and capacity pressure across the venue.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 34"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 34"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOperationalRequirements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "configureAnomalyDetector",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "configureAnomalyDetector"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The capacity occupancy forecast list.",
-   "error": "Could not load. Names which read failed and leaves the capacity occupancy forecast untouched.",
-   "emptyFirstRun": "No capacity occupancy forecast yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the capacity occupancy forecast are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getForecast",
-    "contract": "ai",
-    "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "configureAnomalyDetector",
-    "contract": "ai",
-    "purpose": "Set an alert when the forecast crosses a threshold (e.g. attendance p50 above N, occupancy above % of capacity)",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAiInsights",
-    "contract": "ai",
-    "purpose": "Forecast threshold alerts (kind forecastThreshold)",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-510",
-   "workshopBoard": "wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-510"
-  },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "detectorKey",
-     "from": "navigation"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-511",
-  "name": "Attraction Utilization & Queue Forecast",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
-   "board": "2",
-   "number": "3",
-   "page": 36
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/analytics/attraction-utilization-queue-forecast-adm-511",
-   "component": "apps/ticvai-web/src/routes/analytics/AttractionUtilizationQueueForecast.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-509"
-   ],
-   "exitTo": [
-    "ADM-509"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-509",
-     "trigger": "Back to Operational Forecasting Command Center",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Predict demand, utilization and queue pressure for rides, attractions, experiences and service points.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 36"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 36"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOperationalRequirements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "requestSuggestion",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "requestSuggestion"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The attraction utilization queue list.",
-   "error": "Could not load. Names which read failed and leaves the attraction utilization queue untouched.",
-   "emptyFirstRun": "No attraction utilization queue yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the attraction utilization queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getForecast",
-    "contract": "ai",
-    "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "requestSuggestion",
-    "contract": "ai",
-    "purpose": "Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-511",
-   "workshopBoard": "wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-511"
-  },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 0 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-512",
-  "name": "Entry, Access & Guest Flow Forecast",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
-   "board": "2",
-   "number": "4",
-   "page": 37
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/analytics/entry-access-guest-flow-forecast-adm-512",
-   "component": "apps/ticvai-web/src/routes/analytics/EntryAccessGuestFlowForecast.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-509"
-   ],
-   "exitTo": [
-    "ADM-509"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-509",
-     "trigger": "Back to Operational Forecasting Command Center",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Predict guest arrival, admission, exit and movement pressure across gates and venue zones.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 37"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 37"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOperationalRequirements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The entry access guest list.",
-   "error": "Could not load. Names which read failed and leaves the entry access guest untouched.",
-   "emptyFirstRun": "No entry access guest yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the entry access guest are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getForecast",
-    "contract": "ai",
-    "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-512",
-   "workshopBoard": "wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-512"
-  },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 0 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-513",
-  "name": "Workforce Demand & Staffing Forecast",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
-   "board": "2",
-   "number": "5",
-   "page": 38
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/analytics/workforce-demand-staffing-forecast-adm-513",
-   "component": "apps/ticvai-web/src/routes/analytics/WorkforceDemandStaffingForecast.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-509"
-   ],
-   "exitTo": [
-    "ADM-509"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-509",
-     "trigger": "Back to Operational Forecasting Command Center",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Translate predicted operational demand into required staffing levels.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 38 §Show"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every workforce demand staffing",
-       "columns": [
-        "Required Staff",
-        "Currently Scheduled",
-        "Staffing Drivers",
-        "Gate Staff Requirement",
-        "Forecast arrival volume",
-        "Gate throughput",
-        "Group arrivals",
-        "Credential mix",
-        "Manual validation rate"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 38 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected workforce demand staffing",
-       "bindsTo": null,
-       "columns": [
-        "Required Staff",
-        "Currently Scheduled",
-        "Staffing Drivers",
-        "Gate Staff Requirement",
-        "Forecast arrival volume",
-        "Gate throughput",
-        "Group arrivals",
-        "Credential mix",
-        "Manual validation rate"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Cashiers 16 21 -5 High”, “Role Productivity”, “Skills & Certification”.",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 38 §Show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The workforce demand staffing list.",
-   "error": "Could not load. Names which read failed and leaves the workforce demand staffing untouched.",
-   "emptyFirstRun": "No workforce demand staffing yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the workforce demand staffing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getForecast",
-    "contract": "ai",
-    "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getStaffingCoverage",
-    "contract": "workforce",
-    "purpose": "Workforce demand and staffing forecast against rostered staff (basis=forecastRequirement)",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "Required Staff",
-    "Currently Scheduled",
-    "Staffing Drivers",
-    "Gate Staff Requirement",
-    "Forecast arrival volume",
-    "Gate throughput"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-513",
-   "workshopBoard": "wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-513"
-  },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 38. 0 of 9 labels bound to a contract property; 9 of 54 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-514",
-  "name": "POS, Kiosk & Frontline Service Forecast",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
-   "board": "2",
-   "number": "6",
-   "page": 40
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/analytics/pos-kiosk-frontline-service-forecast-adm-514",
-   "component": "apps/ticvai-web/src/routes/analytics/PosKioskFrontlineServiceForecast.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-509"
-   ],
-   "exitTo": [
-    "ADM-509"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-509",
-     "trigger": "Back to Operational Forecasting Command Center",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Forecast) and no metric row",
-  "purpose": "Predict the number of active selling/service points required to handle expected transaction volume and maintain acceptable service levels.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 40 §Forecast"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every pos kiosk frontline",
-       "columns": [
-        "POS Counters",
-        "Flying POS",
-        "Ticket Windows",
-        "Kiosks",
-        "Guest Service Desks",
-        "Membership Counters",
-        "F&B POS",
-        "Retail POS"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 40 §Forecast"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected pos kiosk frontline",
-       "bindsTo": null,
-       "columns": [
-        "POS Counters",
-        "Flying POS",
-        "Ticket Windows",
-        "Kiosks",
-        "Guest Service Desks",
-        "Membership Counters",
-        "F&B POS",
-        "Retail POS"
-       ],
-       "notes": null,
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 40 §Forecast"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The pos kiosk frontline list.",
-   "error": "Could not load. Names which read failed and leaves the pos kiosk frontline untouched.",
-   "emptyFirstRun": "No pos kiosk frontline yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the pos kiosk frontline are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getForecast",
-    "contract": "ai",
-    "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "POS Counters",
-    "Flying POS",
-    "Ticket Windows",
-    "Kiosks",
-    "Guest Service Desks",
-    "Membership Counters"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-514",
-   "workshopBoard": "wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-514"
-  },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 40. 0 of 8 labels bound to a contract property; 8 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-515",
-  "name": "F&B, Retail & Inventory Demand Forecast",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
-   "board": "2",
-   "number": "7",
-   "page": 41
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/analytics/f-b-retail-inventory-demand-forecast-adm-515",
-   "component": "apps/ticvai-web/src/routes/analytics/FBRetailInventoryDemandForecast.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-509"
-   ],
-   "exitTo": [
-    "ADM-509"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-509",
-     "trigger": "Back to Operational Forecasting Command Center",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Translate visitor forecasts into expected F&B, retail and stock demand. This screen should forecast operational requirements without replacing the detailed F&B/Retail/Inventory modules already designed.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 41"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 41"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOperationalRequirements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The retail inventory demand list.",
-   "error": "Could not load. Names which read failed and leaves the retail inventory demand untouched.",
-   "emptyFirstRun": "No retail inventory demand yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the retail inventory demand are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getForecast",
-    "contract": "ai",
-    "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-515",
-   "workshopBoard": "wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-515"
-  },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-516",
-  "name": "Resource, Equipment & Facility Requirement Forecast",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
-   "board": "2",
-   "number": "8",
-   "page": 42
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/analytics/resource-equipment-facility-requirement-forecast-adm-516",
-   "component": "apps/ticvai-web/src/routes/analytics/ResourceEquipmentFacilityRequirementForecast.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-509"
-   ],
-   "exitTo": [
-    "ADM-509"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-509",
-     "trigger": "Back to Operational Forecasting Command Center",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Predict non-workforce operational resources required to support expected visitor demand.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 42"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 42"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOperationalRequirements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The resource equipment facility list.",
-   "error": "Could not load. Names which read failed and leaves the resource equipment facility untouched.",
-   "emptyFirstRun": "No resource equipment facility yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the resource equipment facility are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getForecast",
-    "contract": "ai",
-    "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-516",
-   "workshopBoard": "wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-516"
-  },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 42. 0 of 0 labels bound to a contract property; 0 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-517",
-  "name": "Operational Scenario & Readiness Simulator",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
-   "board": "2",
-   "number": "9",
-   "page": 44
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/analytics/operational-scenario-readiness-simulator-adm-517",
-   "component": "apps/ticvai-web/src/routes/analytics/OperationalScenarioReadinessSimulator.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-509"
-   ],
-   "exitTo": [
-    "ADM-509"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-509",
-     "trigger": "Back to Operational Forecasting Command Center",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§Metric Baseline A B C) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Allow management to test operational alternatives before changing real configurations.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Readiness 87% 93% 90% 91%",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline A B C"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Workforce Gap 18 0 18 18",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline A B C"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Avg Queue 26m 24m 25m 19m",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline A B C"
-      },
-      {
-       "kind": "metricTile",
-       "label": "POS Wait 17m 16m 7m 16m",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline A B C"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The operational scenario readiness list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the operational scenario readiness untouched.",
-   "emptyFirstRun": "No operational scenario readiness yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the operational scenario readiness are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "createForecastScenario",
-    "contract": "ai",
-    "purpose": "Run a what-if",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "compareForecastScenarios",
-    "contract": "ai",
-    "purpose": "Compare scenarios",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-517",
-   "workshopBoard": "wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-517"
-  },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 4 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-518",
-  "name": "Operational Forecast Review, Recommendations & Handover",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
-   "board": "2",
-   "number": "10",
-   "page": 45
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/analytics/operational-forecast-review-recommendations-handover-adm-518",
-   "component": "apps/ticvai-web/src/routes/analytics/OperationalForecastReviewRecommendationsHandover.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-509"
-   ],
-   "exitTo": [
-    "ADM-509"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-509",
-     "trigger": "Back to Operational Forecasting Command Center",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Consolidate forecast findings into a controlled operational readiness plan and hand recommendations to the appropriate TICVAI modules. This is the final screen of the Forecasting module.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 20 actions on this screen and the screen declares 0 operations.** Unserved: Critical Board 1 → Board 2 Architecture, BOARD 1, ATTENDANCE, DEMAND & REVENUE FORECASTING, ├── Attendance, ├── Arrival Pattern, ├── Product Demand, ├── Timeslot Demand, ├── Channel Demand …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 45 §Actions"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 45"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 45"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Critical Board 1 → Board 2 Architecture",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 45 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "BOARD 1",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 45 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "ATTENDANCE, DEMAND & REVENUE FORECASTING",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 45 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "├── Attendance",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 45 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "├── Arrival Pattern",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 45 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "├── Product Demand",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 45 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "├── Timeslot Demand",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 45 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "├── Channel Demand",
-       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 45 §Actions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "components": []
-    }
-   ]
-  },
-  "states": {
-   "loading": "The operational forecast review list.",
-   "error": "Could not load. Names which read failed and leaves the operational forecast review untouched.",
-   "emptyFirstRun": "No operational forecast review yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the operational forecast review are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "decideOperationalRequirement",
-    "contract": "ai",
-    "purpose": "Accept, modify or reject a requirement",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-518",
-   "workshopBoard": "wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-518"
-  },
-  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 45. 0 of 0 labels bound to a contract property; 20 of 172 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "requirementId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- }
-]
-```
+### `ADM-509` Operational Forecasting Command Center
 
-## `operations.json`
+**Provide operations management with one central view of future operational pressure and predicted resource requirements.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Analytics · wave 3 · needs the `analytics` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/analytics/operational-forecasting-command-center-adm-509` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Search operational forecasting | search field | — | — | — | — | — | — |
+| Filter by | multi select | — | — | — | — | The pack filters this screen by tenant, venue, date, time, zone, attraction and 2 more — which are present is a decision the pack already made. | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Definition key | text field | — | — | `getForecast` ?definitionKey |
+| Version | picker: choose a version | — | — | `getForecast` ?versionId |
+| From | date and time picker | — | — | `getForecast` ?from |
+| To | date and time picker | — | — | `getForecast` ?to |
+| Dimension key | text field | — | — | `getForecast` ?dimensionKey |
+| Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
+| Kind | select | — | Staff · POS · Kiosk · Gates · Fnb · Retail · Stock · Resource · Equipment · Facility | `listOperationalRequirements` ?kind |
+| Status | select | — | Issued · Accepted · Modified · Rejected · Handed over · Expired | `listOperationalRequirements` ?status |
+| From | date and time picker | — | — | `listOperationalRequirements` ?from |
+| To | date and time picker | — | — | `listOperationalRequirements` ?to |
+| Version | picker: choose a version | — | — | `listOperationalRequirements` ?versionId |
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Forecast Attendance** (metric tile)
+
+**Peak In-Venue Population** (metric tile)
+
+**Forecast Occupancy** (metric tile)
+
+**High-Pressure Periods** (metric tile)
+
+**Attractions at Risk** (metric tile)
+
+**Queue Pressure Alerts** (metric tile)
+
+**Required Workforce** (metric tile)
+
+**Workforce Gap** (metric tile)
+
+**Required POS Capacity** (metric tile)
+
+**F&B Demand Index** (metric tile)
+
+**Inventory Risk Items** (metric tile)
+
+**Operational Readiness Score** (metric tile)
+
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listOperationalRequirements` (onLoad, Requirements derived from the forecast)
+
+**Where the user goes next**
+
+- → `ADM-002` Platform Dashboard: *Back to Platform Dashboard*
+- → `ADM-510` Capacity & Occupancy Forecast: *Capacity & Occupancy Forecast*
+- → `ADM-511` Attraction Utilization & Queue Forecast: *Attraction Utilization & Queue Forecast*
+- → `ADM-512` Entry, Access & Guest Flow Forecast: *Entry, Access & Guest Flow Forecast*
+- → `ADM-513` Workforce Demand & Staffing Forecast: *Workforce Demand & Staffing Forecast*
+- → `ADM-514` POS, Kiosk & Frontline Service Forecast: *POS, Kiosk & Frontline Service Forecast*
+- → `ADM-515` F&B, Retail & Inventory Demand Forecast: *F&B, Retail & Inventory Demand Forecast*
+- → `ADM-516` Resource, Equipment & Facility Requirement Forecast: *Resource, Equipment & Facility Requirement Forecast*
+- → `ADM-517` Operational Scenario & Readiness Simulator: *Operational Scenario & Readiness Simulator*
+- → `ADM-518` Operational Forecast Review, Recommendations & Handover: *Operational Forecast Review, Recommendations & Handover*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The operational forecasting list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the operational forecasting untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No operational forecasting yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the operational forecasting are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getForecast` → `AI_USE` (operate) · staff
+- `listOperationalRequirements` → `AI_USE` (operate) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+46 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.2.55 | AI shall forecast future resource demand. | Ticketing Catalogue | CONTRACTED | `getForecast` |
+| 4.1.17 | Forecast demand based on historical and operational data. | Bundles and Promotions | CONTRACTED | `getForecast` |
+| 5.6.26 | Predict queue lengths, wait times, peak demand, and capacity shortages. | F&B & Guest Management | CONTRACTED | `getForecast` |
+| 8.2.1 | System shall forecast attendance based on historical attendance patterns. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.2 | System shall forecast attendance by venue. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.3 | System shall forecast attendance by attraction. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.4 | System shall forecast attendance by event. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.5 | System shall forecast attendance by session. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.6 | System shall forecast attendance by date range. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| … 34 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-509` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-509`
+- Workshop pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf board 2
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 1: Opens Operational Forecasting Command Center → Provide operations management with one central view of future operational pressure and predicted resource requirements.
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 3: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 5: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 7: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 9: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 11: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 13: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 15: Returns to the board's landing screen → Ready for the next screen on this board
+- … and 1 more flow steps (`flows/`)
+- Flow F229 branch at step 1 (expected): when Nothing has been set up on Operational Forecasting Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
+- Flow F229 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-509?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-002`, `ADM-510`, `ADM-511`, `ADM-512`, `ADM-513`, `ADM-514`, `ADM-515`, `ADM-516`, `ADM-517`, `ADM-518`.
+- [ ] Every gated control is gated: `AI_USE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-510` Capacity & Occupancy Forecast
+
+**Translate forecast attendance into predicted occupancy and capacity pressure across the venue.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Analytics · wave 3 · needs the `analytics` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_CONFIGURE`, `AI_USE` (1 configure, 1 operate); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `detectorKey` (navigation) |
+| Route | `/analytics/capacity-occupancy-forecast-adm-510` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Definition key | text field | — | — | `getForecast` ?definitionKey |
+| Version | picker: choose a version | — | — | `getForecast` ?versionId |
+| From | date and time picker | — | — | `getForecast` ?from |
+| To | date and time picker | — | — | `getForecast` ?to |
+| Dimension key | text field | — | — | `getForecast` ?dimensionKey |
+| Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
+| Kind | select | — | Staff · POS · Kiosk · Gates · Fnb · Retail · Stock · Resource · Equipment · Facility | `listOperationalRequirements` ?kind |
+| Status | select | — | Issued · Accepted · Modified · Rejected · Handed over · Expired | `listOperationalRequirements` ?status |
+| From | date and time picker | — | — | `listOperationalRequirements` ?from |
+| To | date and time picker | — | — | `listOperationalRequirements` ?to |
+| Version | picker: choose a version | — | — | `listOperationalRequirements` ?versionId |
+| Status | select | — | New · Reviewed · Accepted · Rejected · Actioned · Measured | `listAiInsights` ?status |
+| Kind | select | — | Anomaly · Forecast deviation · Trend · Opportunity · Executive summary · Root cause · Forecast threshold · Marketing recommendation | `listAiInsights` ?kind |
+| Priority | radio group | — | Low · Medium · High · Critical | `listAiInsights` ?priority |
+| From | date and time picker | — | — | `listAiInsights` ?from |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+|  (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listOperationalRequirements` (onLoad, Requirements derived from the forecast); `listAiInsights` (onLoad, Forecast threshold alerts (kind forecastThreshold))
+
+**Where the user goes next**
+
+- → `ADM-509` Operational Forecasting Command Center: *Back to Operational Forecasting Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The capacity occupancy forecast list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the capacity occupancy forecast untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No capacity occupancy forecast yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the capacity occupancy forecast are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getForecast` → `AI_USE` (operate) · staff
+- `listOperationalRequirements` → `AI_USE` (operate) · staff
+- `configureAnomalyDetector` → `AI_CONFIGURE` (configure) · staff
+- `listAiInsights` → `AI_USE` (operate) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+50 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.2.55 | AI shall forecast future resource demand. | Ticketing Catalogue | CONTRACTED | `getForecast` |
+| 4.1.17 | Forecast demand based on historical and operational data. | Bundles and Promotions | CONTRACTED | `getForecast` |
+| 5.6.26 | Predict queue lengths, wait times, peak demand, and capacity shortages. | F&B & Guest Management | CONTRACTED | `getForecast` |
+| 8.2.1 | System shall forecast attendance based on historical attendance patterns. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.2 | System shall forecast attendance by venue. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.3 | System shall forecast attendance by attraction. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.4 | System shall forecast attendance by event. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.5 | System shall forecast attendance by session. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.6 | System shall forecast attendance by date range. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| … 38 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-510` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-510`
+- Workshop pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf board 2
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 2: Works in Capacity & Occupancy Forecast → Translate forecast attendance into predicted occupancy and capacity pressure across the venue.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-510?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every transition is wired: `ADM-509`.
+- [ ] Every gated control is gated: `AI_CONFIGURE`, `AI_USE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-511` Attraction Utilization & Queue Forecast
+
+**Predict demand, utilization and queue pressure for rides, attractions, experiences and service points.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Analytics · wave 3 · needs the `analytics` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/analytics/attraction-utilization-queue-forecast-adm-511` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Definition key | text field | — | — | `getForecast` ?definitionKey |
+| Version | picker: choose a version | — | — | `getForecast` ?versionId |
+| From | date and time picker | — | — | `getForecast` ?from |
+| To | date and time picker | — | — | `getForecast` ?to |
+| Dimension key | text field | — | — | `getForecast` ?dimensionKey |
+| Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
+| Kind | select | — | Staff · POS · Kiosk · Gates · Fnb · Retail · Stock · Resource · Equipment · Facility | `listOperationalRequirements` ?kind |
+| Status | select | — | Issued · Accepted · Modified · Rejected · Handed over · Expired | `listOperationalRequirements` ?status |
+| From | date and time picker | — | — | `listOperationalRequirements` ?from |
+| To | date and time picker | — | — | `listOperationalRequirements` ?to |
+| Version | picker: choose a version | — | — | `listOperationalRequirements` ?versionId |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+|  (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listOperationalRequirements` (onLoad, Requirements derived from the forecast)
+
+**Where the user goes next**
+
+- → `ADM-509` Operational Forecasting Command Center: *Back to Operational Forecasting Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The attraction utilization queue list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the attraction utilization queue untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No attraction utilization queue yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the attraction utilization queue are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem) |
+
+#### Permissions
+
+- `getForecast` → `AI_USE` (operate) · staff
+- `listOperationalRequirements` → `AI_USE` (operate) · staff
+- `requestSuggestion` → `AI_USE` (operate) · staff, guest
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+57 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.2.55 | AI shall forecast future resource demand. | Ticketing Catalogue | CONTRACTED | `getForecast` |
+| 4.1.17 | Forecast demand based on historical and operational data. | Bundles and Promotions | CONTRACTED | `getForecast` |
+| 5.6.26 | Predict queue lengths, wait times, peak demand, and capacity shortages. | F&B & Guest Management | CONTRACTED | `getForecast` |
+| 8.2.1 | System shall forecast attendance based on historical attendance patterns. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.2 | System shall forecast attendance by venue. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.3 | System shall forecast attendance by attraction. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.4 | System shall forecast attendance by event. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.5 | System shall forecast attendance by session. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.6 | System shall forecast attendance by date range. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| … 45 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A57** Design integration to consume each venue's live attraction wait-time feed (from entry-counting sensors/cameras) via API, and surface wait times in the guest mobile app *(Softlabs Team · Medium · Done → 30 Sep: Closed, Done (as recorded earlier) · workshop tracker · keyword 'wait-time')*
+- **A243** Merge accreditation, entitlement and virtual queue boards into fewer screens *(Chinmay Parab / Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 7 Sep 2026 · workshop tracker · keyword 'virtual queue')*
+- **A244** Build virtual queue with 3 guest tiers (walk-in, VQ, VIP); keep VQ separate from VIP lane *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 7 Sep 2026 · workshop tracker · keyword 'virtual queue')*
+- **A245** Recalculate virtual queue return times live, not fixed at booking *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 7 Sep 2026 · workshop tracker · keyword 'virtual queue')*
+- **A246** Support virtual queue via app (theme parks) and kiosk/wristband scan (water parks) *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 7 Sep 2026 · workshop tracker · keyword 'virtual queue')*
+- **A247** Build virtual queue ops dashboard, AI guest-flow tips and fast-lane upsell on long waits *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 7 Sep 2026 · workshop tracker · keyword 'virtual queue')*
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-511` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-511`
+- Workshop pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf board 2
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 4: Works in Attraction Utilization & Queue Forecast → Predict demand, utilization and queue pressure for rides, attractions, experiences and service points.
+- ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (422).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-511?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every transition is wired: `ADM-509`.
+- [ ] Every gated control is gated: `AI_USE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-512` Entry, Access & Guest Flow Forecast
+
+**Predict guest arrival, admission, exit and movement pressure across gates and venue zones.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Analytics · wave 3 · needs the `analytics` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/analytics/entry-access-guest-flow-forecast-adm-512` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Definition key | text field | — | — | `getForecast` ?definitionKey |
+| Version | picker: choose a version | — | — | `getForecast` ?versionId |
+| From | date and time picker | — | — | `getForecast` ?from |
+| To | date and time picker | — | — | `getForecast` ?to |
+| Dimension key | text field | — | — | `getForecast` ?dimensionKey |
+| Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
+| Kind | select | — | Staff · POS · Kiosk · Gates · Fnb · Retail · Stock · Resource · Equipment · Facility | `listOperationalRequirements` ?kind |
+| Status | select | — | Issued · Accepted · Modified · Rejected · Handed over · Expired | `listOperationalRequirements` ?status |
+| From | date and time picker | — | — | `listOperationalRequirements` ?from |
+| To | date and time picker | — | — | `listOperationalRequirements` ?to |
+| Version | picker: choose a version | — | — | `listOperationalRequirements` ?versionId |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listOperationalRequirements` (onLoad, Requirements derived from the forecast)
+
+**Where the user goes next**
+
+- → `ADM-509` Operational Forecasting Command Center: *Back to Operational Forecasting Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The entry access guest list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the entry access guest untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No entry access guest yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the entry access guest are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getForecast` → `AI_USE` (operate) · staff
+- `listOperationalRequirements` → `AI_USE` (operate) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+46 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.2.55 | AI shall forecast future resource demand. | Ticketing Catalogue | CONTRACTED | `getForecast` |
+| 4.1.17 | Forecast demand based on historical and operational data. | Bundles and Promotions | CONTRACTED | `getForecast` |
+| 5.6.26 | Predict queue lengths, wait times, peak demand, and capacity shortages. | F&B & Guest Management | CONTRACTED | `getForecast` |
+| 8.2.1 | System shall forecast attendance based on historical attendance patterns. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.2 | System shall forecast attendance by venue. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.3 | System shall forecast attendance by attraction. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.4 | System shall forecast attendance by event. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.5 | System shall forecast attendance by session. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.6 | System shall forecast attendance by date range. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| … 34 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-512` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-512`
+- Workshop pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf board 2
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 6: Works in Entry, Access & Guest Flow Forecast → Predict guest arrival, admission, exit and movement pressure across gates and venue zones.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-512?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-509`.
+- [ ] Every gated control is gated: `AI_USE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-513` Workforce Demand & Staffing Forecast
+
+**Translate predicted operational demand into required staffing levels.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Analytics · wave 3 · needs the `analytics` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_USE`, `WORKFORCE_VIEW` (1 operate, 1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/analytics/workforce-demand-staffing-forecast-adm-513` |
+
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Definition key | text field | — | — | `getForecast` ?definitionKey |
+| Version | picker: choose a version | — | — | `getForecast` ?versionId |
+| From | date and time picker | — | — | `getForecast` ?from |
+| To | date and time picker | — | — | `getForecast` ?to |
+| Dimension key | text field | — | — | `getForecast` ?dimensionKey |
+| Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
+| Kind | select | — | Staff · POS · Kiosk · Gates · Fnb · Retail · Stock · Resource · Equipment · Facility | `listOperationalRequirements` ?kind |
+| Status | select | — | Issued · Accepted · Modified · Rejected · Handed over · Expired | `listOperationalRequirements` ?status |
+| From | date and time picker | — | — | `listOperationalRequirements` ?from |
+| To | date and time picker | — | — | `listOperationalRequirements` ?to |
+| Version | picker: choose a version | — | — | `listOperationalRequirements` ?versionId |
+| From | date picker | — | — | `getStaffingCoverage` ?from |
+| To | date picker | — | — | `getStaffingCoverage` ?to |
+| Basis | segmented control | Minimum | Minimum · Forecast requirement · Higher of both | `getStaffingCoverage` ?basis |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every workforce demand staffing** (data table)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Required staff | text | not in the schema: `Required Staff` |
+| Currently scheduled | text | not in the schema: `Currently Scheduled` |
+| Staffing drivers | text | not in the schema: `Staffing Drivers` |
+| Gate staff requirement | text | not in the schema: `Gate Staff Requirement` |
+| Forecast arrival volume | text | not in the schema: `Forecast arrival volume` |
+| Gate throughput | text | not in the schema: `Gate throughput` |
+| Group arrivals | text | not in the schema: `Group arrivals` |
+| Credential mix | text | not in the schema: `Credential mix` |
+| Manual validation rate | text | not in the schema: `Manual validation rate` |
+
+**The selected workforce demand staffing** (detail panel): The pack groups this record's detail under its own headings: “Cashiers 16 21 -5 High”, “Role Productivity”, “Skills & Certification”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Required staff | text | not in the schema: `Required Staff` |
+| Currently scheduled | text | not in the schema: `Currently Scheduled` |
+| Staffing drivers | text | not in the schema: `Staffing Drivers` |
+| Gate staff requirement | text | not in the schema: `Gate Staff Requirement` |
+| Forecast arrival volume | text | not in the schema: `Forecast arrival volume` |
+| Gate throughput | text | not in the schema: `Gate throughput` |
+| Group arrivals | text | not in the schema: `Group arrivals` |
+| Credential mix | text | not in the schema: `Credential mix` |
+| Manual validation rate | text | not in the schema: `Manual validation rate` |
+
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listOperationalRequirements` (onLoad, Requirements derived from the forecast); `getStaffingCoverage` (onLoad, Workforce demand and staffing forecast against rostered …)
+
+**Where the user goes next**
+
+- → `ADM-509` Operational Forecasting Command Center: *Back to Operational Forecasting Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The workforce demand staffing list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the workforce demand staffing untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No workforce demand staffing yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the workforce demand staffing are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getForecast` → `AI_USE` (operate) · staff
+- `listOperationalRequirements` → `AI_USE` (operate) · staff
+- `getStaffingCoverage` → `WORKFORCE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+47 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.2.55 | AI shall forecast future resource demand. | Ticketing Catalogue | CONTRACTED | `getForecast` |
+| 4.1.17 | Forecast demand based on historical and operational data. | Bundles and Promotions | CONTRACTED | `getForecast` |
+| 5.6.26 | Predict queue lengths, wait times, peak demand, and capacity shortages. | F&B & Guest Management | CONTRACTED | `getForecast` |
+| 8.2.1 | System shall forecast attendance based on historical attendance patterns. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.2 | System shall forecast attendance by venue. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.3 | System shall forecast attendance by attraction. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.4 | System shall forecast attendance by event. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.5 | System shall forecast attendance by session. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.6 | System shall forecast attendance by date range. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| … 35 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-513` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-513`
+- Workshop pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf board 2
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 8: Works in Workforce Demand & Staffing Forecast → Translate predicted operational demand into required staffing levels.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-513?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-509`.
+- [ ] Every gated control is gated: `AI_USE`, `WORKFORCE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-514` POS, Kiosk & Frontline Service Forecast
+
+**Predict the number of active selling/service points required to handle expected transaction volume and maintain acceptable service levels.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Analytics · wave 3 · needs the `analytics` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Forecast) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/analytics/pos-kiosk-frontline-service-forecast-adm-514` |
+
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Definition key | text field | — | — | `getForecast` ?definitionKey |
+| Version | picker: choose a version | — | — | `getForecast` ?versionId |
+| From | date and time picker | — | — | `getForecast` ?from |
+| To | date and time picker | — | — | `getForecast` ?to |
+| Dimension key | text field | — | — | `getForecast` ?dimensionKey |
+| Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
+| Kind | select | — | Staff · POS · Kiosk · Gates · Fnb · Retail · Stock · Resource · Equipment · Facility | `listOperationalRequirements` ?kind |
+| Status | select | — | Issued · Accepted · Modified · Rejected · Handed over · Expired | `listOperationalRequirements` ?status |
+| From | date and time picker | — | — | `listOperationalRequirements` ?from |
+| To | date and time picker | — | — | `listOperationalRequirements` ?to |
+| Version | picker: choose a version | — | — | `listOperationalRequirements` ?versionId |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every pos kiosk frontline** (data table)
+
+| Shows | Format | Notes |
+|---|---|---|
+| POS counters | text | not in the schema: `POS Counters` |
+| Flying POS | text | not in the schema: `Flying POS` |
+| Ticket windows | text | not in the schema: `Ticket Windows` |
+| Kiosks | text | not in the schema: `Kiosks` |
+| Guest service desks | text | not in the schema: `Guest Service Desks` |
+| Membership counters | text | not in the schema: `Membership Counters` |
+| F&B POS | text | not in the schema: `F&B POS` |
+| Retail POS | text | not in the schema: `Retail POS` |
+
+**The selected pos kiosk frontline** (detail panel)
+
+| Shows | Format | Notes |
+|---|---|---|
+| POS counters | text | not in the schema: `POS Counters` |
+| Flying POS | text | not in the schema: `Flying POS` |
+| Ticket windows | text | not in the schema: `Ticket Windows` |
+| Kiosks | text | not in the schema: `Kiosks` |
+| Guest service desks | text | not in the schema: `Guest Service Desks` |
+| Membership counters | text | not in the schema: `Membership Counters` |
+| F&B POS | text | not in the schema: `F&B POS` |
+| Retail POS | text | not in the schema: `Retail POS` |
+
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listOperationalRequirements` (onLoad, Requirements derived from the forecast)
+
+**Where the user goes next**
+
+- → `ADM-509` Operational Forecasting Command Center: *Back to Operational Forecasting Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The pos kiosk frontline list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the pos kiosk frontline untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No pos kiosk frontline yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the pos kiosk frontline are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getForecast` → `AI_USE` (operate) · staff
+- `listOperationalRequirements` → `AI_USE` (operate) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+46 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.2.55 | AI shall forecast future resource demand. | Ticketing Catalogue | CONTRACTED | `getForecast` |
+| 4.1.17 | Forecast demand based on historical and operational data. | Bundles and Promotions | CONTRACTED | `getForecast` |
+| 5.6.26 | Predict queue lengths, wait times, peak demand, and capacity shortages. | F&B & Guest Management | CONTRACTED | `getForecast` |
+| 8.2.1 | System shall forecast attendance based on historical attendance patterns. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.2 | System shall forecast attendance by venue. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.3 | System shall forecast attendance by attraction. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.4 | System shall forecast attendance by event. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.5 | System shall forecast attendance by session. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.6 | System shall forecast attendance by date range. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| … 34 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-514` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-514`
+- Workshop pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf board 2
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 10: Works in POS, Kiosk & Frontline Service Forecast → Predict the number of active selling/service points required to handle expected transaction volume and maintain acceptable service levels.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-514?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-509`.
+- [ ] Every gated control is gated: `AI_USE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-515` F&B, Retail & Inventory Demand Forecast
+
+**Translate visitor forecasts into expected F&B, retail and stock demand. This screen should forecast operational requirements without replacing the detailed F&B/Retail/Inventory modules already designed.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Analytics · wave 3 · needs the `analytics` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/analytics/f-b-retail-inventory-demand-forecast-adm-515` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Definition key | text field | — | — | `getForecast` ?definitionKey |
+| Version | picker: choose a version | — | — | `getForecast` ?versionId |
+| From | date and time picker | — | — | `getForecast` ?from |
+| To | date and time picker | — | — | `getForecast` ?to |
+| Dimension key | text field | — | — | `getForecast` ?dimensionKey |
+| Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
+| Kind | select | — | Staff · POS · Kiosk · Gates · Fnb · Retail · Stock · Resource · Equipment · Facility | `listOperationalRequirements` ?kind |
+| Status | select | — | Issued · Accepted · Modified · Rejected · Handed over · Expired | `listOperationalRequirements` ?status |
+| From | date and time picker | — | — | `listOperationalRequirements` ?from |
+| To | date and time picker | — | — | `listOperationalRequirements` ?to |
+| Version | picker: choose a version | — | — | `listOperationalRequirements` ?versionId |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listOperationalRequirements` (onLoad, Requirements derived from the forecast)
+
+**Where the user goes next**
+
+- → `ADM-509` Operational Forecasting Command Center: *Back to Operational Forecasting Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The retail inventory demand list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the retail inventory demand untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No retail inventory demand yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the retail inventory demand are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getForecast` → `AI_USE` (operate) · staff
+- `listOperationalRequirements` → `AI_USE` (operate) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+46 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.2.55 | AI shall forecast future resource demand. | Ticketing Catalogue | CONTRACTED | `getForecast` |
+| 4.1.17 | Forecast demand based on historical and operational data. | Bundles and Promotions | CONTRACTED | `getForecast` |
+| 5.6.26 | Predict queue lengths, wait times, peak demand, and capacity shortages. | F&B & Guest Management | CONTRACTED | `getForecast` |
+| 8.2.1 | System shall forecast attendance based on historical attendance patterns. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.2 | System shall forecast attendance by venue. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.3 | System shall forecast attendance by attraction. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.4 | System shall forecast attendance by event. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.5 | System shall forecast attendance by session. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.6 | System shall forecast attendance by date range. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| … 34 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Retail intelligence shows sales and outlet performance, top-performing stores, demand forecasting (from retail sales history and online ticket booking trends) and target-vs-actual per outlet (e.g. monthly target vs. achieved, with variance). *(client request · MoM 19 Aug 2026, 4.9 Retail Intelligence & Reporting · DI-368)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A72** Design a generic, configurable multi-stage approval-workflow engine (approve / reject / return / request-more-information, AI-generated summary, audit trail) applicable to procurement, pricing changes, product creation … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 18 Aug 2026 · workshop tracker · keyword 'procurement')*
+- **A87** Design the Inventory & Procurement module: an Item Master with UOM/pack-size conversions supporting both Weighted-Average and FIFO costing, a customizable warehouse/location hierarchy with batch/date-level expiry … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 18 Aug 2026 · workshop tracker · keyword 'procurement')*
+- **A101** Schedule and hold the outstanding F&B, Retail, Procurement & Inventory workshop *(Chinmay Parab / Allam · High · Done → 30 Sep: Closed, Done (as recorded earlier) · 21 Aug 2026 · workshop tracker · keyword 'procurement')*
+- **A301** Build maintenance vendor/procurement ops and analytics *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 17 Sep 2026 · workshop tracker · keyword 'procurement')*
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-515` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-515`
+- Workshop pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf board 2
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 12: Works in F&B, Retail & Inventory Demand Forecast → Translate visitor forecasts into expected F&B, retail and stock demand. This screen should forecast operational requirements without replacing the detailed F&B/Retail/Inventory modules already …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-515?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-509`.
+- [ ] Every gated control is gated: `AI_USE`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-516` Resource, Equipment & Facility Requirement Forecast
+
+**Predict non-workforce operational resources required to support expected visitor demand.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Analytics · wave 3 · needs the `analytics` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/analytics/resource-equipment-facility-requirement-forecast-adm-516` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Definition key | text field | — | — | `getForecast` ?definitionKey |
+| Version | picker: choose a version | — | — | `getForecast` ?versionId |
+| From | date and time picker | — | — | `getForecast` ?from |
+| To | date and time picker | — | — | `getForecast` ?to |
+| Dimension key | text field | — | — | `getForecast` ?dimensionKey |
+| Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
+| Kind | select | — | Staff · POS · Kiosk · Gates · Fnb · Retail · Stock · Resource · Equipment · Facility | `listOperationalRequirements` ?kind |
+| Status | select | — | Issued · Accepted · Modified · Rejected · Handed over · Expired | `listOperationalRequirements` ?status |
+| From | date and time picker | — | — | `listOperationalRequirements` ?from |
+| To | date and time picker | — | — | `listOperationalRequirements` ?to |
+| Version | picker: choose a version | — | — | `listOperationalRequirements` ?versionId |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listOperationalRequirements` (onLoad, Requirements derived from the forecast)
+
+**Where the user goes next**
+
+- → `ADM-509` Operational Forecasting Command Center: *Back to Operational Forecasting Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The resource equipment facility list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the resource equipment facility untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No resource equipment facility yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the resource equipment facility are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getForecast` → `AI_USE` (operate) · staff
+- `listOperationalRequirements` → `AI_USE` (operate) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+46 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.2.55 | AI shall forecast future resource demand. | Ticketing Catalogue | CONTRACTED | `getForecast` |
+| 4.1.17 | Forecast demand based on historical and operational data. | Bundles and Promotions | CONTRACTED | `getForecast` |
+| 5.6.26 | Predict queue lengths, wait times, peak demand, and capacity shortages. | F&B & Guest Management | CONTRACTED | `getForecast` |
+| 8.2.1 | System shall forecast attendance based on historical attendance patterns. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.2 | System shall forecast attendance by venue. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.3 | System shall forecast attendance by attraction. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.4 | System shall forecast attendance by event. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.5 | System shall forecast attendance by session. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.6 | System shall forecast attendance by date range. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
+| … 34 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-516` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-516`
+- Workshop pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf board 2
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 14: Works in Resource, Equipment & Facility Requirement Forecast → Predict non-workforce operational resources required to support expected visitor demand.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-516?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-509`.
+- [ ] Every gated control is gated: `AI_USE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-517` Operational Scenario & Readiness Simulator
+
+**Allow management to test operational alternatives before changing real configurations.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Analytics · wave 3 · needs the `analytics` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Metric Baseline A B C) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/analytics/operational-scenario-readiness-simulator-adm-517` |
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | select | — | Staff · POS · Kiosk · Gates · Fnb · Retail · Stock · Resource · Equipment · Facility | `listOperationalRequirements` ?kind |
+| Status | select | — | Issued · Accepted · Modified · Rejected · Handed over · Expired | `listOperationalRequirements` ?status |
+| From | date and time picker | — | — | `listOperationalRequirements` ?from |
+| To | date and time picker | — | — | `listOperationalRequirements` ?to |
+| Version | picker: choose a version | — | — | `listOperationalRequirements` ?versionId |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Readiness 87% 93% 90% 91%** (metric tile)
+
+**Workforce Gap 18 0 18 18** (metric tile)
+
+**Avg Queue 26m 24m 25m 19m** (metric tile)
+
+**POS Wait 17m 16m 7m 16m** (metric tile)
+
+**Data it reads**: `listOperationalRequirements` (onLoad, Requirements derived from the forecast)
+
+**Where the user goes next**
+
+- → `ADM-509` Operational Forecasting Command Center: *Back to Operational Forecasting Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The operational scenario readiness list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the operational scenario readiness untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No operational scenario readiness yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the operational scenario readiness are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `createForecastScenario` → `AI_USE` (operate) · staff
+- `compareForecastScenarios` → `AI_USE` (operate) · staff
+- `listOperationalRequirements` → `AI_USE` (operate) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+9 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.2.58 | AI shall simulate future operational scenarios. | Ticketing Catalogue | CONTRACTED | `createForecastScenario` |
+| 5.6.38 | The system shall provide operational recommendations to reduce queue congestion based on forecasted demand. | F&B & Guest Management | CONTRACTED | `listOperationalRequirements` |
+| 8.2.43 | System shall forecast staffing requirements by venue. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.44 | System shall forecast staffing requirements by department. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.45 | System shall forecast staffing requirements by shift. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.46 | System shall forecast staffing requirements by attraction. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.47 | System shall forecast staffing requirements based on attendance forecasts. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.48 | System shall forecast staffing requirements based on operational demand. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.50 | System shall provide staffing forecasting dashboards. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Demand forecasts show current sales pace, forecast and remaining opportunity broken down by sales channel; revenue forecasts show drivers and confidence levels. A forecast simulator models a hypothetical change (e.g. a 10% price decrease, reduced operating hours, staffing changes) before it is made. *(client request · MoM 18 Sep 2026, 4.10 AI Forecasting — Attendance, Demand, Revenue & Capacity Forecasting · DI-943)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-517` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-517`
+- Workshop pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf board 2
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 16: Works in Operational Scenario & Readiness Simulator → Allow management to test operational alternatives before changing real configurations.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-517?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-509`.
+- [ ] Every gated control is gated: `AI_USE`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-518` Operational Forecast Review, Recommendations & Handover
+
+**Consolidate forecast findings into a controlled operational readiness plan and hand recommendations to the appropriate TICVAI modules. This is the final screen of the Forecasting module.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Analytics · wave 3 · needs the `analytics` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `requirementId` (navigation) |
+| Route | `/analytics/operational-forecast-review-recommendations-handover-adm-518` |
+
+**Known gaps.** **The pack names 20 actions on this screen and the screen declares 0 operations.** Unserved: Critical Board 1 → Board 2 Architecture, BOARD 1, ATTENDANCE, DEMAND & REVENUE FORECASTING, ├── … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | select | — | Staff · POS · Kiosk · Gates · Fnb · Retail · Stock · Resource · Equipment · Facility | `listOperationalRequirements` ?kind |
+| Status | select | — | Issued · Accepted · Modified · Rejected · Handed over · Expired | `listOperationalRequirements` ?status |
+| From | date and time picker | — | — | `listOperationalRequirements` ?from |
+| To | date and time picker | — | — | `listOperationalRequirements` ?to |
+| Version | picker: choose a version | — | — | `listOperationalRequirements` ?versionId |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Critical Board 1 → Board 2 Architecture (primary button) | navigation or local | — | — | — | — |
+| BOARD 1 (secondary button) | navigation or local | — | — | — | — |
+| ATTENDANCE, DEMAND & REVENUE FORECASTING (secondary button) | navigation or local | — | — | — | — |
+| ├── Attendance (secondary button) | navigation or local | — | — | — | — |
+| ├── Arrival Pattern (secondary button) | navigation or local | — | — | — | — |
+| ├── Product Demand (secondary button) | navigation or local | — | — | — | — |
+| ├── Timeslot Demand (secondary button) | navigation or local | — | — | — | — |
+| ├── Channel Demand (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listOperationalRequirements` (onLoad, Requirements derived from the forecast)
+
+**Where the user goes next**
+
+- → `ADM-509` Operational Forecasting Command Center: *Back to Operational Forecasting Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The operational forecast review list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the operational forecast review untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No operational forecast review yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the operational forecast review are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The requirement is no longer `issued` (`requirement-not-open`). |
+
+#### Permissions
+
+- `listOperationalRequirements` → `AI_USE` (operate) · staff
+- `decideOperationalRequirement` → `AI_USE` (operate) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 5.6.38 | The system shall provide operational recommendations to reduce queue congestion based on forecasted demand. | F&B & Guest Management | CONTRACTED | `listOperationalRequirements` |
+| 8.2.43 | System shall forecast staffing requirements by venue. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.44 | System shall forecast staffing requirements by department. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.45 | System shall forecast staffing requirements by shift. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.46 | System shall forecast staffing requirements by attraction. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.47 | System shall forecast staffing requirements based on attendance forecasts. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.48 | System shall forecast staffing requirements based on operational demand. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+| 8.2.50 | System shall provide staffing forecasting dashboards. | Unified Operations Dashboard | CONTRACTED | `listOperationalRequirements` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-518` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html#adm-518`
+- Workshop pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf board 2
+- Flow F229 *AI Forecasting and Predictive Intelligence board 2: Operational Forecasting …*, step 18: Works in Operational Forecast Review, Recommendations & Handover → Consolidate forecast findings into a controlled operational readiness plan and hand recommendations to the appropriate TICVAI modules. This is the final screen of the Forecasting module.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-518?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Critical Board 1 → Board 2 Architecture, BOARD 1, ATTENDANCE, DEMAND & REVENUE FORECASTING, ├── Attendance, ├── Arrival Pattern, ├── Product Demand, ├── Timeslot Demand, ├── Channel Demand.
+- [ ] Every transition is wired: `ADM-509`.
+- [ ] Every gated control is gated: `AI_USE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+
+
+## Reference designs and the trackers for this platform
+
+**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+
+- `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
+- `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
+
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+
+## Design inputs from the client meetings
+
+**What the client asked for in the meetings and design reviews, for these screens.** Apply every item. They are the client's own requirements and they are later than the reference files: where a reference design or a screen's fields disagree with an item here, the item wins. Newest first; where two items disagree, the newer one wins (anything a later meeting replaced is already left out). An **Open question** is not settled: build the default it states and keep it easy to change. The text in brackets is for traceability and, like everything else in this bundle, never appears on a screen.
+
+### Everywhere, on every app
+
+- Allam (platform-wide requirement): every calendar throughout the platform, not just maintenance, must support day, week and month views, with the day view further broken down by hour from a defined start hour through the day. *(agreed · MoM 17 Sep 2026, 4.2 Preventive Maintenance Planning · DI-907)*
+- Minimise the number of separate screens an end user navigates: consolidate related information wherever it can reasonably be shown together, rather than mirroring every workshop board as its own screen. *(agreed · MoM 7 Sep 2026, 4.10 Screen consolidation / 5. Key Decisions · DI-671)*
+- Region-configurable tax on pre-discount price (e.g. Egypt: AED 100 ticket with 20% off is paid at AED 80 but taxed on AED 100). Rounding must support up to three decimal places without dropping the third decimal where the currency requires it. *(agreed · MoM 1 Sep 2026, 4.5 Taxes, Fees & Price Calculation · DI-598)*
+- "Powered by TICVAI" is shown consistently across staff and guest-facing surfaces. *(agreed · MoM 14 Aug 2026, 8. POS / Kiosk Branding · DI-297)*
+- Full multi-language support (Arabic and others such as Chinese) consistent with the agreed i18n/RTL architecture. *(agreed · MoM 10 Aug 2026, 4.7 Account Creation, Localisation & Multi-Currency · DI-210)*
+- The reference system is a functional reference only: its dated UI/UX is not to be replicated; TICVAI delivers equivalent depth with a modern, AI-friendly, easy-to-configure experience. *(agreed · MoM 7 Aug 2026, 23. Reference System Access & Documentation · DI-186)*
+- Direction: modern, minimalistic, spacious, cross-device designs that still convey a sense of place (venue or park); Softlabs proposes two to three enhanced visual concepts for TICVAI to steer. *(agreed · MoM 3 Aug 2026, 11. Design Alignment & Team Input · DI-126)*
+- Languages: English and Arabic at minimum, with Russian, Spanish and Mandarin. *(agreed · MoM 31 Jul 2026, 13. Internationalization & Localization · DI-080)*
+- Clarity first; reduce cognitive load (simple layouts, familiar patterns); consistency ("Use the system. Do not recreate."); accessibility; hierarchy (guide attention with contrast, spacing and visual weight); feedback (every action has a clear response). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Design Principles in Action · DI-051)*
+- Standard components: search bar with Cmd+K; tabs (Overview, Events, Sales, Reports); pagination; badges (New, Pending, Sold Out, Completed); toggle (Off/On); dropdown; removable chip ("VIP x"). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Example UI Components · DI-050)*
+- Spacing on an 8px base grid: 4, 8, 12, 16, 24, 32, 40, 48, 64, 80. Border radius scale 4, 8, 12, 16, 24px, consistent across the platform. Soft shadows: sm 0 1px 2px rgba(0,0,0,.05); md 0 4px 6px rgba(0,0,0,.08); lg 0 10px 15px rgba(0,0,0,.10); xl 0 20px 40px rgba(0,0,0,.14). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 6. Spacing / 7. Border Radius / 8. Shadows · DI-049)*
+- Icons: line style, outline, 2px stroke, round corners, clean and consistent. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 5. Icons · DI-048)*
+- Component principles: clarity first; consistent spacing on an 8px grid; meaningful colour (colours communicate status and guide the user); accessible by design; mobile ready (components adapt across all screen sizes). Components are consistent, flexible, accessible and composable. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Component principles · DI-045)*
+- Empty states have a title, one explanatory line and one action: "No events yet / Create your first event to get started / Create Event"; "No data available / We couldn't find anything to show here / Refresh". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Empty States · DI-044)*
+- Notification list: status icon, title, one-line detail and relative time (e.g. "Payment received ... 2m ago", "High demand detected ... 10m ago"), with "View all notifications". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Notifications · DI-042)*
+- Forms: label above field; text input, select ("Choose an option"), date picker, toggle, checkbox. Input states: Default, Focused, Filled, Disabled and Error with inline message (e.g. "This field is required"). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Forms; 08 Design System (p8) - 4. Inputs · DI-040)*
+- Card types: event card (title, date and time, venue, "From 120.00 AED"); KPI card (label, value, delta, "vs last 7 days"); onboarding checklist card ("3 of 6 completed": Create Event, Add Staff, Configure Seating, Connect Payment). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Cards · DI-038)*
+- Button hierarchy Primary, Secondary, Tertiary (text) and Icon buttons, each with Default, Hover, Pressed and Disabled states. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Buttons; 08 Design System (p8) - 3. Buttons · DI-036)*
+- Regardless of the module a user is working in, the experience should feel like one product, not a collection of separate applications. *(agreed · Design Vision Book 29 Jul 2026, 07 Modules Overview (p7) · DI-034)*
+- DO: focus on clarity and hierarchy, use clear simple interactive elements, give relevant information at a glance (card example: "Annual Membership / All Venues / 4.4 (388) / BESTSELLER"). DON'T: clutter and overload (e.g. "-10% NEW PROMO AED 450.00 !!! BOOK NOW!!!"), complex forms and flows, hard-to-read data visualisations. *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - DO / DON'T · DI-033)*
+- Eight principles on every screen: User-Centric, AI-First, Simple & Clear (clean layouts, clear hierarchy, minimal noise), Fast & Efficient (optimised for quick actions), Reliable & Secure (permissions, data protection), Data-Driven (data visual, actionable, easy to understand), Scalable, Consistent (same patterns, components and interactions across the ecosystem). *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - Our Design Principles · DI-032)*
+- Accessibility: high contrast, readable text, keyboard navigation and inclusive components throughout; WCAG AA standards minimum ("Design for everyone"). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Better Accessibility; 06 Component principles (p6); 08 Design principles in action (p8) · DI-029)*
+- AI everywhere: AI insights, recommendations and smart assistance are embedded across the platform, not hidden. AI is not an add-on: it assists, predicts, recommends and automates. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - How TICVAI improves this concept; 05 Design Principles (p5) - 2. AI-First · DI-027)*
+- Global Search: prominent, AI-powered search that finds anything, in the top bar with a Cmd+K shortcut (placeholder e.g. "Search events, customers, orders, venues or ask AI..."). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - UI inspiration reference, item 1; 08 Design System (p8) - Search Bar · DI-025)*
+- Visual direction: Purposeful (every element has a clear purpose), Consistent (one visual system across all modules and devices), Clear (easy to scan, understand and act on), Modern. Key takeaway: clean, modern, product-first layout with clear hierarchy and minimal visual noise; deep, modern, trustworthy; built for enterprise scale. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) · DI-024)*
+- The brand is presented consistently across Web Platform, Mobile App and Admin Portal (and print). Ticvai identity, colours and typography are applied consistently across all screens and devices. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand in action; 03 Visual Direction (p3) - Consistent Branding · DI-023)*
+- Copy is Professional, Friendly, Clear, Confident, Concise and Helpful. Avoid jargon, overly technical language, clutter, outdated language and complexity. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand voice · DI-022)*
+- Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
+- Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
+
+### Across P09 TICVAI Web
+
+- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
+- Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
+- Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
+- Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+
+**2 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+
+---
+
+## Raw data
+
+The same package data the blocks above are built from. `screens.json` is in the folder and not repeated here: every field of it is in the blocks.
+
+### `operations.json`
 
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
 {
- "compareForecastScenarios": {
-  "method": "POST",
-  "path": "/forecast-scenarios/compare",
-  "contract": "ai",
-  "summary": "Compare scenarios",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiScenarioComparison"
- },
- "configureAnomalyDetector": {
-  "method": "PUT",
-  "path": "/anomaly-detectors/{detectorKey}",
-  "contract": "ai",
-  "summary": "Set up anomaly detection on a KPI",
-  "permission": "AI_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AiAnomalyDetector",
-  "responds": "AiAnomalyDetector"
- },
- "createForecastScenario": {
-  "method": "POST",
-  "path": "/forecast-scenarios",
-  "contract": "ai",
-  "summary": "Run a what-if",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AiForecastScenario",
-  "responds": null
- },
- "decideOperationalRequirement": {
-  "method": "POST",
-  "path": "/operational-requirements/{requirementId}/decide",
-  "contract": "ai",
-  "summary": "Accept, modify or reject a requirement",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiOperationalRequirement"
- },
- "getForecast": {
-  "method": "GET",
-  "path": "/forecasts",
-  "contract": "ai",
-  "summary": "Forecast values",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "definitionKey",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "versionId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "from",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "to",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "dimensionKey",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "scenarioId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "getStaffingCoverage": {
-  "method": "GET",
-  "path": "/staffing-coverage",
-  "contract": "workforce",
-  "summary": "Where the rota is short, and by how much",
-  "permission": "WORKFORCE_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "from",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "to",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "basis",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "StaffingCoverage"
- },
- "listAiInsights": {
-  "method": "GET",
-  "path": "/insights",
-  "contract": "ai",
-  "summary": "Insights and anomalies",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "priority",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "from",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listOperationalRequirements": {
-  "method": "GET",
-  "path": "/operational-requirements",
-  "contract": "ai",
-  "summary": "Requirements derived from the forecast",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "from",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "to",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "versionId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "requestSuggestion": {
-  "method": "POST",
-  "path": "/ai/suggestions",
-  "contract": "ai",
-  "summary": "Ask for an answer, however it is currently produced",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Suggestion"
- }
+"compareForecastScenarios": {"method":"POST","path":"/forecast-scenarios/compare","contract":"ai","summary":"Compare scenarios","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiScenarioComparison"},
+"configureAnomalyDetector": {"method":"PUT","path":"/anomaly-detectors/{detectorKey}","contract":"ai","summary":"Set up anomaly detection on a KPI","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AiAnomalyDetector","responds":"AiAnomalyDetector"},
+"createForecastScenario": {"method":"POST","path":"/forecast-scenarios","contract":"ai","summary":"Run a what-if","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AiForecastScenario","responds":null},
+"decideOperationalRequirement": {"method":"POST","path":"/operational-requirements/{requirementId}/decide","contract":"ai","summary":"Accept, modify or reject a requirement","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiOperationalRequirement"},
+"getForecast": {"method":"GET","path":"/forecasts","contract":"ai","summary":"Forecast values","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"definitionKey","in":"query","required":true},{"name":"versionId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"dimensionKey","in":"query","required":null},{"name":"scenarioId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"getStaffingCoverage": {"method":"GET","path":"/staffing-coverage","contract":"workforce","summary":"Where the rota is short, and by how much","permission":"WORKFORCE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true},{"name":"venueId","in":"query","required":null},{"name":"basis","in":"query","required":null}],"requestBody":null,"responds":"StaffingCoverage"},
+"listAiInsights": {"method":"GET","path":"/insights","contract":"ai","summary":"Insights and anomalies","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"priority","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listOperationalRequirements": {"method":"GET","path":"/operational-requirements","contract":"ai","summary":"Requirements derived from the forecast","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"versionId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"requestSuggestion": {"method":"POST","path":"/ai/suggestions","contract":"ai","summary":"Ask for an answer, however it is currently produced","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Suggestion"}
 }
 ```
 
-## `schemas.json`
+### `schemas.json`
 
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
 {
- "AiAnomalyDetector": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.anomaly_detector",
-  "description": "**An anomaly detector on one KPI** (C9, AIP-080..095). Configured thresholds on day one; a seasonal robust baseline (median/MAD) and peer comparison across venues as history builds. Detects **aggregate** deviations; actor-level patterns belong to risk, and both share one correlation key (AIP-090).",
-  "required": [
-   "detectorKey",
-   "method"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "detectorKey": {
-    "type": "string"
-   },
-   "source": {
-    "type": "string",
-    "enum": [
-     "metric",
-     "forecast",
-     "deviceHealth"
-    ],
-    "default": "metric",
-    "description": "What is watched (29 September, build): a semantic-layer KPI, a published forecast (8.2.20, 8.2.41), or device status events (8.9.9)."
-   },
-   "metricKey": {
-    "type": "string",
-    "nullable": true,
-    "description": "A metric of the semantic layer (Reporting KPI). Required where `source` is `metric`."
-   },
-   "forecastSource": {
-    "type": "object",
-    "nullable": true,
-    "description": "Required where `source` is `forecast`; `method` is then `threshold`.",
-    "required": [
-     "definitionKey",
-     "comparator",
-     "threshold"
-    ],
-    "properties": {
-     "definitionKey": {
-      "type": "string"
-     },
-     "dimensionKey": {
-      "type": "string",
-      "nullable": true
-     },
-     "percentile": {
-      "type": "string",
-      "enum": [
-       "p10",
-       "p50",
-       "p90"
-      ],
-      "default": "p50"
-     },
-     "comparator": {
-      "type": "string",
-      "enum": [
-       "above",
-       "atOrAbove",
-       "below",
-       "atOrBelow"
-      ]
-     },
-     "threshold": {
-      "type": "number"
-     },
-     "thresholdKind": {
-      "type": "string",
-      "enum": [
-       "absolute",
-       "percentOfCapacity"
-      ],
-      "default": "absolute",
-      "description": "`percentOfCapacity` compares with the period's capacity (occupancy, 8.2.41)."
-     },
-     "horizonDays": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 365,
-      "nullable": true,
-      "description": "Only points this many days ahead are compared. Null means the whole horizon."
-     }
-    }
-   },
-   "deviceHealthSource": {
-    "type": "object",
-    "nullable": true,
-    "description": "Required where `source` is `deviceHealth`.",
-    "properties": {
-     "deviceKinds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      },
-      "description": "DeviceKind values; empty means every kind."
-     },
-     "failureRatePercent": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 100
-     },
-     "windowMinutes": {
-      "type": "integer",
-      "minimum": 5,
-      "maximum": 1440,
-      "default": 60
-     }
-    }
-   },
-   "method": {
-    "type": "string",
-    "enum": [
-     "threshold",
-     "seasonalRobustZ",
-     "peerComparison",
-     "model"
-    ]
-   },
-   "thresholds": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true
-   },
-   "sensitivity": {
-    "type": "string",
-    "enum": [
-     "low",
-     "medium",
-     "high"
-    ],
-    "default": "medium"
-   },
-   "dimensions": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "cadence": {
-    "type": "string",
-    "enum": [
-     "hourly",
-     "daily"
-    ]
-   },
-   "isActive": {
-    "type": "boolean",
-    "default": true
-   },
-   "falseAlarmRate": {
-    "type": "number",
-    "nullable": true,
-    "readOnly": true,
-    "description": "Share of its insights rejected over 90 days. The number that decides whether a model is worth it."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
- "AiEvidenceItemList": {
-  "type": "array",
-  "x-ticvai-persistence-kind": "valueObject",
-  "x-ticvai-persistence-column": "jsonb",
-  "description": "The evidence of one decision record, stored with it.",
-  "items": {
-   "$ref": "#/components/schemas/AiEvidenceItem"
-  }
- },
- "AiForecastPoint": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.forecast_point",
-  "description": "One forecast value with its interval: 10th, 50th and 90th percentile (design 5.6: a range, never a bare percentage). Partitioned by target month. **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
-  "required": [
-   "versionId",
-   "targetStart",
-   "p50"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "versionId": {
-    "type": "string",
-    "format": "uuid",
-    "x-ticvai-references": "ai.forecast_version"
-   },
-   "scenarioId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "x-ticvai-references": "ai.forecast_scenario",
-    "description": "Set where the point belongs to a what-if scenario rather than the version itself."
-   },
-   "targetStart": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "targetEnd": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "dimensionKey": {
-    "type": "string",
-    "nullable": true,
-    "description": "Canonical key of the breakdown, e.g. `product=…;channel=web`."
-   },
-   "p10": {
-    "type": "number",
-    "nullable": true
-   },
-   "p50": {
-    "type": "number"
-   },
-   "p90": {
-    "type": "number",
-    "nullable": true
-   },
-   "unit": {
-    "type": "string"
-   },
-   "drivers": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "Component decomposition or SHAP contributions, largest first (ADM-506)."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
- "AiForecastScenario": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.forecast_scenario",
-  "description": "**A what-if against a published version** (ADM-507, ADM-517, BO-931). Changes nothing in production; its points are written with `scenarioId`.",
-  "required": [
-   "baseVersionId",
-   "changes"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "name": {
-    "type": "string"
-   },
-   "baseVersionId": {
-    "type": "string",
-    "format": "uuid",
-    "x-ticvai-references": "ai.forecast_version"
-   },
-   "changes": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "lever"
-     ],
-     "properties": {
-      "lever": {
-       "type": "string",
-       "enum": [
-        "price",
-        "capacity",
-        "openingHours",
-        "weather",
-        "event",
-        "marketing",
-        "staffing",
-        "closure"
-       ]
-      },
-      "target": {
-       "type": "string",
-       "nullable": true
-      },
-      "value": {
-       "type": "object",
-       "additionalProperties": true,
-       "nullable": true
-      }
-     }
-    },
-    "minItems": 1
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "computing",
-     "ready",
-     "failed"
-    ],
-    "readOnly": true
-   },
-   "result": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "readOnly": true,
-    "description": "Deltas against the base version by subject and period."
-   },
-   "createdByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
- "AiForecastVersion": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.forecast_version",
-  "description": "**An immutable forecast version** (AIP-032): producer, model version, data cut-off, horizon and status. Nothing is overwritten; yesterday's actuals are scored against every earlier version.",
-  "required": [
-   "definitionId",
-   "versionNumber",
-   "status",
-   "basis"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "definitionId": {
-    "type": "string",
-    "format": "uuid",
-    "x-ticvai-references": "ai.forecast_definition"
-   },
-   "versionNumber": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "running",
-     "draft",
-     "awaitingApproval",
-     "published",
-     "superseded",
-     "rejected",
-     "failed"
-    ],
-    "readOnly": true
-   },
-   "basis": {
-    "$ref": "#/components/schemas/SuggestionBasis"
-   },
-   "maturity": {
-    "$ref": "#/components/schemas/AiMaturity"
-   },
-   "producerRef": {
-    "type": "string"
-   },
-   "modelVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "dataCutoffAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "The analytical replica watermark the snapshot was taken at."
-   },
-   "horizonStart": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "horizonEnd": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "qualityChecks": {
-    "type": "object",
-    "additionalProperties": true,
-    "readOnly": true,
-    "description": "Each gate and whether it passed."
-   },
-   "publishedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal",
-    "description": "Null where the definition auto-published."
-   },
-   "publishedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "decisionRecordId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
- "AiInsight": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.insight",
-  "description": "**An insight with a lifecycle** (AIP-181): new, reviewed, accepted or rejected, actioned, measured. Anomalies, forecast deviations, trends and opportunities land here; the narrative binds numbers to results, so a figure can only come from a query (design 8, 5.10).",
-  "required": [
-   "kind",
-   "title",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "anomaly",
-     "forecastDeviation",
-     "trend",
-     "opportunity",
-     "executiveSummary",
-     "rootCause",
-     "forecastThreshold",
-     "marketingRecommendation"
-    ]
-   },
-   "detectorId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "x-ticvai-references": "ai.anomaly_detector"
-   },
-   "metricKey": {
-    "type": "string",
-    "nullable": true
-   },
-   "subjectKind": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "campaign",
-     "journey",
-     "forecastDefinition",
-     "venue"
-    ],
-    "description": "What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for `marketingRecommendation`, a forecast definition for `forecastThreshold`."
-   },
-   "subjectRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "recommendedAction": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "For `marketingRecommendation`: `{recommendation, parameters}` as `AiMarketingRecommendation`. Applied by a person in the owning module, never here."
-   },
-   "expectedImpact": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "A range on a named metric (`metric`, `low`, `high`), never a single number (design 5.6)."
-   },
-   "title": {
-    "type": "string"
-   },
-   "narrative": {
-    "type": "string",
-    "nullable": true
-   },
-   "evidence": {
-    "$ref": "#/components/schemas/AiEvidenceItemList"
-   },
-   "magnitude": {
-    "type": "number",
-    "nullable": true
-   },
-   "priority": {
-    "type": "string",
-    "enum": [
-     "low",
-     "medium",
-     "high",
-     "critical"
-    ]
-   },
-   "correlationKey": {
-    "type": "string",
-    "nullable": true
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "new",
-     "reviewed",
-     "accepted",
-     "rejected",
-     "actioned",
-     "measured"
-    ],
-    "readOnly": true
-   },
-   "decidedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "actionRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "measuredImpact": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "readOnly": true
-   },
-   "decisionRecordId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true
-   },
-   "detectedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
- "AiMaturity": {
-  "type": "object",
-  "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
-  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
-  "required": [
-   "stage",
-   "basedOn"
-  ],
-  "properties": {
-   "stage": {
-    "type": "string",
-    "enum": [
-     "starting",
-     "learning",
-     "established",
-     "learned"
-    ],
-    "description": "`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."
-   },
-   "basedOn": {
-    "type": "string",
-    "description": "The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."
-   },
-   "sources": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "source"
-     ],
-     "properties": {
-      "source": {
-       "type": "string",
-       "enum": [
-        "venueSettings",
-        "startingPattern",
-        "calendar",
-        "weather",
-        "bookingsOnHand",
-        "ownHistory",
-        "importedHistory",
-        "configuration",
-        "trainedModel"
-       ]
-      },
-      "detail": {
-       "type": "string",
-       "nullable": true,
-       "description": "e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."
-      },
-      "observations": {
-       "type": "integer",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "ownDataShare": {
-    "type": "number",
-    "minimum": 0,
-    "maximum": 1,
-    "description": "The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."
-   },
-   "limitedHistory": {
-    "type": "boolean"
-   },
-   "nextStage": {
-    "type": "object",
-    "nullable": true,
-    "description": "What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.",
-    "properties": {
-     "stage": {
-      "type": "string",
-      "enum": [
-       "learning",
-       "established",
-       "learned"
-      ]
-     },
-     "needs": {
-      "type": "string"
-     },
-     "expectedBy": {
-      "type": "string",
-      "format": "date",
-      "nullable": true
-     }
-    }
-   }
-  }
- },
- "AiOperationalRequirement": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.operational_requirement",
-  "description": "**A requirement derived from a forecast version** (design 2.2 C step 6, AIP-067): staff, POS, gates, F&B, stock or resources, computed with the tenant's productivity standards. **Autonomy L2 (prepare)**: it is sent to the owning module as a recommendation bound to that version, and a person applies it there.",
-  "required": [
-   "versionId",
-   "kind",
-   "periodStart",
-   "quantity"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "versionId": {
-    "type": "string",
-    "format": "uuid",
-    "x-ticvai-references": "ai.forecast_version"
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "staff",
-     "pos",
-     "kiosk",
-     "gates",
-     "fnb",
-     "retail",
-     "stock",
-     "resource",
-     "equipment",
-     "facility"
-    ]
-   },
-   "targetContract": {
-    "type": "string",
-    "description": "The owning module that applies it: `workforce`, `fnb`, `inventory`, `resources`, `access`."
-   },
-   "subjectRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "A role, outlet, gate, item or resource type."
-   },
-   "periodStart": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "periodEnd": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "quantity": {
-    "type": "number"
-   },
-   "quantityP90": {
-    "type": "number",
-    "nullable": true,
-    "description": "The requirement at the forecast's 90th percentile, for planning to the busy case."
-   },
-   "unit": {
-    "type": "string"
-   },
-   "productivityStandard": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "The standard used, e.g. covers per staff hour, scans per gate per hour."
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "issued",
-     "accepted",
-     "modified",
-     "rejected",
-     "handedOver",
-     "expired"
-    ],
-    "readOnly": true
-   },
-   "decidedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "decisionNote": {
-    "type": "string",
-    "nullable": true
-   },
-   "handoverRef": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The owning module's record once handed over."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
- "AiScenarioComparison": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed from ai.forecast_point",
-  "description": "Scenarios side by side against their base version.",
-  "required": [
-   "scenarios"
-  ],
-  "properties": {
-   "scenarios": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AiForecastScenario"
-    }
-   },
-   "rows": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "subject": {
-       "type": "string"
-      },
-      "periodStart": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "base": {
-       "type": "number"
-      },
-      "values": {
-       "type": "object",
-       "additionalProperties": true,
-       "description": "Scenario id to value."
-      }
-     }
-    }
-   }
-  }
- },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
-   }
-  }
- },
- "StaffingCoverage": {
-  "type": "object",
-  "description": "Resource board 4.4. **The gap is the product.**",
-  "properties": {
-   "date": {
-    "type": "string",
-    "format": "date"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "positionCode": {
-    "type": "string"
-   },
-   "label": {
-    "type": "string"
-   },
-   "from": {
-    "type": "string"
-   },
-   "to": {
-    "type": "string"
-   },
-   "required": {
-    "type": "integer"
-   },
-   "rostered": {
-    "type": "integer"
-   },
-   "qualified": {
-    "type": "integer",
-    "description": "**A position filled by somebody not qualified for it is still a gap.**"
-   },
-   "gap": {
-    "type": "integer"
-   },
-   "severity": {
-    "type": "string",
-    "enum": [
-     "covered",
-     "tight",
-     "short",
-     "blocking"
-    ]
-   },
-   "openShiftIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "basisApplied": {
-    "type": "string",
-    "enum": [
-     "minimum",
-     "forecastRequirement"
-    ],
-    "description": "Which figure `required` is for this row. With `higherOfBoth`, the larger; with `forecastRequirement` and no handed-over requirement for the period, `minimum`."
-   },
-   "minimumRequired": {
-    "type": "integer",
-    "nullable": true,
-    "description": "The configured minimum for the position and window."
-   },
-   "forecastRequired": {
-    "type": "number",
-    "nullable": true,
-    "description": "The forecast staff requirement (p50) for the position and window, from `workforce.forecast_requirement`. Null where none was handed over."
-   },
-   "forecastRequiredP90": {
-    "type": "number",
-    "nullable": true,
-    "description": "The busy-case requirement, for planning to the busy case."
-   },
-   "forecastVersionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The AI forecast version the requirement is bound to (AIP-067), so a manager can open the forecast behind it."
-   }
-  }
- },
- "Suggestion": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.suggestion",
-  "description": "One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n",
-  "required": [
-   "id",
-   "kind",
-   "basis",
-   "maturity",
-   "producedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/SuggestionKind"
-   },
-   "basis": {
-    "$ref": "#/components/schemas/SuggestionBasis"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "subjectRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "What it is about — a product, an outlet, an item, a party."
-   },
-   "value": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "The suggestion itself. Shape depends on `kind`."
-   },
-   "confidence": {
-    "type": "number",
-    "nullable": true,
-    "minimum": 0,
-    "maximum": 1,
-    "description": "**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"
-   },
-   "explanation": {
-    "type": "string",
-    "description": "**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"
-   },
-   "inputs": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"
-   },
-   "producerRef": {
-    "type": "string",
-    "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
-   },
-   "maturity": {
-    "$ref": "#/components/schemas/AiMaturity"
-   },
-   "producedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"
-   }
-  }
- },
- "SuggestionBasis": {
-  "type": "string",
-  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
-  "enum": [
-   "heuristic",
-   "statistical",
-   "model",
-   "hybrid",
-   "manual"
-  ]
- },
- "SuggestionKind": {
-  "type": "string",
-  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline. Every change names a point or performance of that day's venue only, rides, dining and retail alike (30 September client meeting, MoM 4.7).\n",
-  "enum": [
-   "price",
-   "replenishment",
-   "requisition",
-   "demandForecast",
-   "prepPlan",
-   "menuEngineering",
-   "staffing",
-   "slaTarget",
-   "waitTime",
-   "upsell",
-   "segmentation",
-   "anomaly",
-   "scenario",
-   "sendTime",
-   "wasteRisk",
-   "queueBalancing",
-   "itinerary"
-  ]
- }
+"AiAnomalyDetector": {"type":"object","x-ticvai-persistence":"ai.anomaly_detector","description":"**An anomaly detector on one KPI** (C9, AIP-080..095). Configured thresholds on day one; a seasonal robust baseline (median/MAD) and peer comparison across venues as history builds. Detects **aggregate** deviations; actor-level patterns belong to risk, and both share one correlation key (AIP-090).","required":["detectorKey","method"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"detectorKey":{"type":"string"},"source":{"type":"string","enum":["metric","forecast","deviceHealth"],"default":"metric","description":"What is watched (29 September, build): a semantic-layer KPI, a published forecast (8.2.20, 8.2.41), or device status events (8.9.9)."},"metricKey":{"type":"string","nullable":true,"description":"A metric of the semantic layer (Reporting KPI). Required where `source` is `metric`."},"forecastSource":{"type":"object","nullable":true,"description":"Required where `source` is `forecast`; `method` is then `threshold`.","required":["definitionKey","comparator","threshold"],"properties":{"definitionKey":{"type":"string"},"dimensionKey":{"type":"string","nullable":true},"percentile":{"type":"string","enum":["p10","p50","p90"],"default":"p50"},"comparator":{"type":"string","enum":["above","atOrAbove","below","atOrBelow"]},"threshold":{"type":"number"},"thresholdKind":{"type":"string","enum":["absolute","percentOfCapacity"],"default":"absolute","description":"`percentOfCapacity` compares with the period's capacity (occupancy, 8.2.41)."},"horizonDays":{"type":"integer","minimum":1,"maximum":365,"nullable":true,"description":"Only points this many days ahead are compared. Null means the whole horizon."}}},"deviceHealthSource":{"type":"object","nullable":true,"description":"Required where `source` is `deviceHealth`.","properties":{"deviceKinds":{"type":"array","items":{"type":"string"},"description":"DeviceKind values; empty means every kind."},"failureRatePercent":{"type":"number","minimum":0,"maximum":100},"windowMinutes":{"type":"integer","minimum":5,"maximum":1440,"default":60}}},"method":{"type":"string","enum":["threshold","seasonalRobustZ","peerComparison","model"]},"thresholds":{"type":"object","additionalProperties":true,"nullable":true},"sensitivity":{"type":"string","enum":["low","medium","high"],"default":"medium"},"dimensions":{"type":"array","items":{"type":"string"}},"cadence":{"type":"string","enum":["hourly","daily"]},"isActive":{"type":"boolean","default":true},"falseAlarmRate":{"type":"number","nullable":true,"readOnly":true,"description":"Share of its insights rejected over 90 days. The number that decides whether a model is worth it."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiEvidenceItemList": {"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"The evidence of one decision record, stored with it.","items":{"$ref":"#/components/schemas/AiEvidenceItem"}},
+"AiForecastPoint": {"type":"object","x-ticvai-persistence":"ai.forecast_point","description":"One forecast value with its interval: 10th, 50th and 90th percentile (design 5.6: a range, never a bare percentage). Partitioned by target month. **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.","required":["versionId","targetStart","p50"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"versionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_version"},"scenarioId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.forecast_scenario","description":"Set where the point belongs to a what-if scenario rather than the version itself."},"targetStart":{"type":"string","format":"date-time"},"targetEnd":{"type":"string","format":"date-time"},"dimensionKey":{"type":"string","nullable":true,"description":"Canonical key of the breakdown, e.g. `product=…;channel=web`."},"p10":{"type":"number","nullable":true},"p50":{"type":"number"},"p90":{"type":"number","nullable":true},"unit":{"type":"string"},"drivers":{"type":"object","additionalProperties":true,"nullable":true,"description":"Component decomposition or SHAP contributions, largest first (ADM-506)."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiForecastScenario": {"type":"object","x-ticvai-persistence":"ai.forecast_scenario","description":"**A what-if against a published version** (ADM-507, ADM-517, BO-931). Changes nothing in production; its points are written with `scenarioId`.","required":["baseVersionId","changes"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"name":{"type":"string"},"baseVersionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_version"},"changes":{"type":"array","items":{"type":"object","required":["lever"],"properties":{"lever":{"type":"string","enum":["price","capacity","openingHours","weather","event","marketing","staffing","closure"]},"target":{"type":"string","nullable":true},"value":{"type":"object","additionalProperties":true,"nullable":true}}},"minItems":1},"status":{"type":"string","enum":["computing","ready","failed"],"readOnly":true},"result":{"type":"object","additionalProperties":true,"nullable":true,"readOnly":true,"description":"Deltas against the base version by subject and period."},"createdByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiForecastVersion": {"type":"object","x-ticvai-persistence":"ai.forecast_version","description":"**An immutable forecast version** (AIP-032): producer, model version, data cut-off, horizon and status. Nothing is overwritten; yesterday's actuals are scored against every earlier version.","required":["definitionId","versionNumber","status","basis"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"definitionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_definition"},"versionNumber":{"type":"integer","minimum":1},"status":{"type":"string","enum":["running","draft","awaitingApproval","published","superseded","rejected","failed"],"readOnly":true},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"maturity":{"$ref":"#/components/schemas/AiMaturity"},"producerRef":{"type":"string"},"modelVersion":{"type":"string","nullable":true},"dataCutoffAt":{"type":"string","format":"date-time","description":"The analytical replica watermark the snapshot was taken at."},"horizonStart":{"type":"string","format":"date-time"},"horizonEnd":{"type":"string","format":"date-time"},"qualityChecks":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Each gate and whether it passed."},"publishedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal","description":"Null where the definition auto-published."},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"decisionRecordId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiInsight": {"type":"object","x-ticvai-persistence":"ai.insight","description":"**An insight with a lifecycle** (AIP-181): new, reviewed, accepted or rejected, actioned, measured. Anomalies, forecast deviations, trends and opportunities land here; the narrative binds numbers to results, so a figure can only come from a query (design 8, 5.10).","required":["kind","title","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"type":"string","enum":["anomaly","forecastDeviation","trend","opportunity","executiveSummary","rootCause","forecastThreshold","marketingRecommendation"]},"detectorId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.anomaly_detector"},"metricKey":{"type":"string","nullable":true},"subjectKind":{"type":"string","nullable":true,"enum":["campaign","journey","forecastDefinition","venue"],"description":"What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for `marketingRecommendation`, a forecast definition for `forecastThreshold`."},"subjectRef":{"type":"string","nullable":true},"recommendedAction":{"type":"object","additionalProperties":true,"nullable":true,"description":"For `marketingRecommendation`: `{recommendation, parameters}` as `AiMarketingRecommendation`. Applied by a person in the owning module, never here."},"expectedImpact":{"type":"object","additionalProperties":true,"nullable":true,"description":"A range on a named metric (`metric`, `low`, `high`), never a single number (design 5.6)."},"title":{"type":"string"},"narrative":{"type":"string","nullable":true},"evidence":{"$ref":"#/components/schemas/AiEvidenceItemList"},"magnitude":{"type":"number","nullable":true},"priority":{"type":"string","enum":["low","medium","high","critical"]},"correlationKey":{"type":"string","nullable":true},"status":{"type":"string","enum":["new","reviewed","accepted","rejected","actioned","measured"],"readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"actionRef":{"type":"string","nullable":true},"measuredImpact":{"type":"object","additionalProperties":true,"nullable":true,"readOnly":true},"decisionRecordId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"detectedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiMaturity": {"type":"object","x-ticvai-persistence":"none — embedded as jsonb on ai.suggestion and ai.forecast_version","description":"**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.","required":["stage","basedOn"],"properties":{"stage":{"type":"string","enum":["starting","learning","established","learned"],"description":"`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."},"basedOn":{"type":"string","description":"The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."},"sources":{"type":"array","items":{"type":"object","required":["source"],"properties":{"source":{"type":"string","enum":["venueSettings","startingPattern","calendar","weather","bookingsOnHand","ownHistory","importedHistory","configuration","trainedModel"]},"detail":{"type":"string","nullable":true,"description":"e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."},"observations":{"type":"integer","nullable":true}}}},"ownDataShare":{"type":"number","minimum":0,"maximum":1,"description":"The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."},"limitedHistory":{"type":"boolean"},"nextStage":{"type":"object","nullable":true,"description":"What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.","properties":{"stage":{"type":"string","enum":["learning","established","learned"]},"needs":{"type":"string"},"expectedBy":{"type":"string","format":"date","nullable":true}}}}},
+"AiOperationalRequirement": {"type":"object","x-ticvai-persistence":"ai.operational_requirement","description":"**A requirement derived from a forecast version** (design 2.2 C step 6, AIP-067): staff, POS, gates, F&B, stock or resources, computed with the tenant's productivity standards. **Autonomy L2 (prepare)**: it is sent to the owning module as a recommendation bound to that version, and a person applies it there.","required":["versionId","kind","periodStart","quantity"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"versionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_version"},"kind":{"type":"string","enum":["staff","pos","kiosk","gates","fnb","retail","stock","resource","equipment","facility"]},"targetContract":{"type":"string","description":"The owning module that applies it: `workforce`, `fnb`, `inventory`, `resources`, `access`."},"subjectRef":{"type":"string","nullable":true,"description":"A role, outlet, gate, item or resource type."},"periodStart":{"type":"string","format":"date-time"},"periodEnd":{"type":"string","format":"date-time"},"quantity":{"type":"number"},"quantityP90":{"type":"number","nullable":true,"description":"The requirement at the forecast's 90th percentile, for planning to the busy case."},"unit":{"type":"string"},"productivityStandard":{"type":"object","additionalProperties":true,"nullable":true,"description":"The standard used, e.g. covers per staff hour, scans per gate per hour."},"status":{"type":"string","enum":["issued","accepted","modified","rejected","handedOver","expired"],"readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"decisionNote":{"type":"string","nullable":true},"handoverRef":{"type":"string","nullable":true,"readOnly":true,"description":"The owning module's record once handed over."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiScenarioComparison": {"type":"object","x-ticvai-persistence":"none — computed from ai.forecast_point","description":"Scenarios side by side against their base version.","required":["scenarios"],"properties":{"scenarios":{"type":"array","items":{"$ref":"#/components/schemas/AiForecastScenario"}},"rows":{"type":"array","items":{"type":"object","properties":{"subject":{"type":"string"},"periodStart":{"type":"string","format":"date-time"},"base":{"type":"number"},"values":{"type":"object","additionalProperties":true,"description":"Scenario id to value."}}}}}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"StaffingCoverage": {"type":"object","description":"Resource board 4.4. **The gap is the product.**","properties":{"date":{"type":"string","format":"date"},"venueId":{"type":"string","format":"uuid"},"positionCode":{"type":"string"},"label":{"type":"string"},"from":{"type":"string"},"to":{"type":"string"},"required":{"type":"integer"},"rostered":{"type":"integer"},"qualified":{"type":"integer","description":"**A position filled by somebody not qualified for it is still a gap.**"},"gap":{"type":"integer"},"severity":{"type":"string","enum":["covered","tight","short","blocking"]},"openShiftIds":{"type":"array","items":{"type":"string","format":"uuid"}},"basisApplied":{"type":"string","enum":["minimum","forecastRequirement"],"description":"Which figure `required` is for this row. With `higherOfBoth`, the larger; with `forecastRequirement` and no handed-over requirement for the period, `minimum`."},"minimumRequired":{"type":"integer","nullable":true,"description":"The configured minimum for the position and window."},"forecastRequired":{"type":"number","nullable":true,"description":"The forecast staff requirement (p50) for the position and window, from `workforce.forecast_requirement`. Null where none was handed over."},"forecastRequiredP90":{"type":"number","nullable":true,"description":"The busy-case requirement, for planning to the busy case."},"forecastVersionId":{"type":"string","format":"uuid","nullable":true,"description":"The AI forecast version the requirement is bound to (AIP-067), so a manager can open the forecast behind it."}}},
+"Suggestion": {"type":"object","x-ticvai-persistence":"ai.suggestion","description":"One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n","required":["id","kind","basis","maturity","producedAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/SuggestionKind"},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"scopePath":{"type":"string"},"subjectRef":{"type":"string","nullable":true,"description":"What it is about — a product, an outlet, an item, a party."},"value":{"type":"object","additionalProperties":true,"description":"The suggestion itself. Shape depends on `kind`."},"confidence":{"type":"number","nullable":true,"minimum":0,"maximum":1,"description":"**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"},"explanation":{"type":"string","description":"**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"},"inputs":{"type":"object","additionalProperties":true,"description":"What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"},"producerRef":{"type":"string","description":"The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"},"maturity":{"$ref":"#/components/schemas/AiMaturity"},"producedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true,"description":"**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"}}},
+"SuggestionBasis": {"type":"string","description":"**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n","enum":["heuristic","statistical","model","hybrid","manual"]},
+"SuggestionKind": {"type":"string","description":"What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline. Every change names a point or performance of that day's venue only, rides, dining and retail alike (30 September client meeting, MoM 4.7).\n","enum":["price","replenishment","requisition","demandForecast","prepPlan","menuEngineering","staffing","slaTarget","waitTime","upsell","segmentation","anomaly","scenario","sendTime","wasteRisk","queueBalancing","itinerary"]}
 }
 ```

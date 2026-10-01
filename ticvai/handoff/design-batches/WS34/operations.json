@@ -179,45 +179,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listMembershipCommercialPricing": {
-  "method": "GET",
-  "path": "/membership-commercial-pricing",
-  "contract": "subscription",
-  "summary": "Membership Commercial, Pricing & Channel Association",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "membershipCode",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "channel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "salesPeriod",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listPackageBundleAdd": {
   "method": "GET",
   "path": "/package-bundle-add",

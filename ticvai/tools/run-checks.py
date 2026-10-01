@@ -52,6 +52,9 @@ CHECKS = [
     "check-ticket-text", "check-screen-wiring", "check-navigation", "check-contract-shapes",
     "check-ddl-conventions", "check-contract-storage", "check-starter-fit", "check-glossary-terms",
     "check-wireframe-coverage",
+    # 1 October: the process design notes (handoff/design-notes/*.yaml) reach every design session through
+    # BUNDLE.md; every rule there must carry a source that exists. Passes while the folder is empty.
+    "check-design-notes",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

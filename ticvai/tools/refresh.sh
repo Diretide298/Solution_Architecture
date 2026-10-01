@@ -146,6 +146,11 @@ python3 tools/derive-design-manifest.py
 # screens (a retired screen id fails here, not silently in a bundle), writes its README and fills the
 # app guides' generated blocks. export-design-batch imports the same file, so it runs first.
 python3 tools/build-design-inputs.py
+# **The white-label map, before the batches that render it** (1 October). Every configuring operation's
+# request fields, the CMS screen that sets each and the guest screens it reaches, derived from the
+# contracts and the screens: handoff/design-inputs/white-label-map.json (read per screen by
+# export-design-batch through tools/design_spec.py) and apps/1-guest-app/WHITE-LABEL.md.
+python3 tools/build-white-label-map.py
 # **Every design-batch folder rebuilt from today's package** (30 September). Claude Design reads a batch
 # folder and nothing else; one exported before a contract changed hands a design session yesterday's
 # fields and data. Existing folders only, never a locked batch; the special folders are not batches.
@@ -378,6 +383,8 @@ build-plan-doc                                                     # the Word bu
 build-mom-digest build-review-responses scan-domain-drift find-capability
 audit_guard release_baseline ddl_forward                           # imported by checkers and derive-ddl, no main (1 October)
 sprint_plan                                                        # imported by build-service-docs, derive-block-a-schedule and build-plan-deck, no main (1 October)
+design_spec                                                        # imported by export-design-batch and build-white-label-map, no main (1 October)
+build-tracker-index                                                # intake: reads the two task-tracker workbooks at the repository root, outside git, once per tracker drop (1 October)
 push-openproject op-release op-retire op-check op-assign-sync op-order-sync op-bulk-links op-created-merge op-recent op-review adam-links   # distribution: run per release (docs/active/release-runbook.md), never on a rebuild
 release-notes                                                      # per release, between two tags
 build-decisions-workbook build-hld-lld build-readiness-page build-readiness-questions build-client-readiness build-closeout-register build-audit-decisions   # hand-run documents for people; each carries dated content a rebuild must not churn

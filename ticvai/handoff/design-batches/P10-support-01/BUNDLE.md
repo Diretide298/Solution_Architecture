@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -55,958 +56,385 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `PTR-021` | Support & Contact | listDetail | 7 | 5 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `PTR-021` | Support & Contact | B–D | 32 | 44 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
-## `screens.json`
+## Screen by screen
 
-Every field of every screen in this batch. **`machine` is what a screen is in the middle of**, `overlays` is what opens over it and what closing it does, and `navigation.transitions` is how you leave, with `carries` naming the state that travels.
+**One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-```json
-[
- {
-  "id": "PTR-021",
-  "name": "Support & Contact",
-  "module": "Support",
-  "requiresModule": "partner",
-  "wave": 3,
-  "capability": "C32",
-  "implementation": {
-   "app": "partner-web",
-   "route": "/general/support-and-contact",
-   "component": "apps/partner-web/src/routes/general/SupportAndContactDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "PTR-003"
-   ],
-   "transitions": [
-    {
-     "to": "PTR-003",
-     "trigger": "Profile & Company Details",
-     "provenance": "derived — PTR-003 declares entryState.params  and PTR-021 holds none of them. The edge carries nothing: PTR-003 needs nothing to open"
-    }
-   ]
-  },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
-  "purpose": "Answer a question without needing a person.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "Status",
-       "operation": "listCases",
-       "notes": "Sends `?status=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "textField",
-       "label": "Assigned to principal id",
-       "operation": "listCases",
-       "notes": "Sends `?assignedToPrincipalId=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "toggle",
-       "label": "Breached sla",
-       "operation": "listCases",
-       "notes": "Sends `?breachedSla=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "textField",
-       "label": "Priority",
-       "operation": "listCases",
-       "notes": "Sends `?priority=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every case",
-       "bindsTo": "Case",
-       "columns": [
-        "Case.id",
-        "Case.caseNumber",
-        "Case.subjectId",
-        "Case.guestName",
-        "Case.subject",
-        "Case.categoryId",
-        "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt"
-       ],
-       "operation": "listCases",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected case",
-       "bindsTo": "Case",
-       "columns": [
-        "Case.id",
-        "Case.caseNumber",
-        "Case.subjectId",
-        "Case.guestName",
-        "Case.subject",
-        "Case.kind",
-        "Case.channel",
-        "Case.recordedAt",
-        "Case.syncedAt",
-        "Case.categoryId",
-        "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt"
-       ],
-       "operation": "listCases",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The case",
-       "bindsTo": "CaseDetail",
-       "columns": [
-        "CaseDetail.id",
-        "CaseDetail.caseNumber",
-        "CaseDetail.subjectId",
-        "CaseDetail.guestName",
-        "CaseDetail.subject",
-        "CaseDetail.kind",
-        "CaseDetail.channel",
-        "CaseDetail.recordedAt",
-        "CaseDetail.syncedAt",
-        "CaseDetail.categoryId",
-        "CaseDetail.status",
-        "CaseDetail.priority",
-        "CaseDetail.assignedToPrincipalId",
-        "CaseDetail.venueId",
-        "CaseDetail.relatedOrderId",
-        "CaseDetail.slaDueAt"
-       ],
-       "operation": "getCase",
-       "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create case",
-       "operation": "createCase",
-       "provenance": "contract marketing-crm.yaml POST /cases"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Add case message",
-       "operation": "addCaseMessage",
-       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Escalate case",
-       "operation": "escalateCase",
-       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reopen case",
-       "operation": "reopenCase",
-       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save case",
-       "operation": "updateCase",
-       "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The support contact list.",
-   "error": "Could not load. Names which read failed and leaves the support contact untouched.",
-   "emptyFirstRun": "No support contact yet. Offers Create case (`createCase`); distinct from a filter that matched nothing.",
-   "emptyNoResults": "Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the support contact are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "createCase",
-    "contract": "marketing-crm",
-    "purpose": "from page inventory",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "addCaseMessage",
-    "contract": "marketing-crm",
-    "purpose": "Add a message or internal note",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
-   },
-   {
-    "operationId": "escalateCase",
-    "contract": "marketing-crm",
-    "purpose": "Escalate a case",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
-   },
-   {
-    "operationId": "getCase",
-    "contract": "marketing-crm",
-    "purpose": "Read a case with its thread",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "listCases",
-    "contract": "marketing-crm",
-    "purpose": "List service cases",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "reopenCase",
-    "contract": "marketing-crm",
-    "purpose": "Reopen a resolved case",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
-   },
-   {
-    "operationId": "updateCase",
-    "contract": "marketing-crm",
-    "purpose": "Assign, reprioritise or resolve a case",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "caseId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `caseId`.",
-   "preloaded": [
-    "Case.id",
-    "Case.caseNumber",
-    "Case.subjectId",
-    "Case.guestName",
-    "Case.subject"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-021"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formCreateCase",
-    "component": "modal",
-    "trigger": "Create case",
-    "body": "**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateCaseRequest",
-    "confirm": {
-     "label": "Create case",
-     "operation": "createCase"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "subject",
-      "description",
-      "channel",
-      "recordedAt",
-      "subjectId",
-      "categoryId",
-      "priority",
-      "kind",
-      "venueId",
-      "relatedOrderId",
-      "attachmentRefs"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /cases"
-   },
-   {
-    "id": "formAddCaseMessage",
-    "component": "modal",
-    "trigger": "Add case message",
-    "body": "**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`, `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Add case message",
-     "operation": "addCaseMessage"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "body",
-      "isInternal",
-      "recordedAt",
-      "channel",
-      "attachmentRefs"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
-   },
-   {
-    "id": "formEscalateCase",
-    "component": "modal",
-    "trigger": "Escalate case",
-    "body": "**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`, `newPriority`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Escalate case",
-     "operation": "escalateCase"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason",
-      "assignToPrincipalId",
-      "newPriority"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
-   },
-   {
-    "id": "formReopenCase",
-    "component": "modal",
-    "trigger": "Reopen case",
-    "body": "**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Reopen case",
-     "operation": "reopenCase"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
-   },
-   {
-    "id": "formUpdateCase",
-    "component": "modal",
-    "trigger": "Save case",
-    "body": "**Collects what `updateCase` sends before it is called.** Nothing in the body is required. Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save case",
-     "operation": "updateCase"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "status",
-      "priority",
-      "assignedToPrincipalId",
-      "categoryId",
-      "resolutionNote"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
-   }
-  ],
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- }
-]
-```
+### `PTR-021` Support & Contact
 
-## `operations.json`
+**Answer a question without needing a person.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P10 Partner Web (web) |
+| Module | Support · wave 3 · needs the `partner` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | partner staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read) |
+| Device and orientation | web · LTR and RTL · light theme |
+| Pattern | listDetail (compact density): `listCases` reads the population and `getCase` reads one of them — list, select, act |
+| Offline | online only |
+| Opens with | `caseId` (deepLink) · cold entry: **A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. … |
+| Route | `/general/support-and-contact` |
+
+**What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Status | select | optional | — | Open · In progress · Awaiting guest · Escalated · Resolved · Closed | — | Sends `?status=` to `listCases`. | `listCases` ?status |
+| Assigned to principal id | picker: choose an assigned to principal (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?assignedToPrincipalId=` to `listCases`. | `listCases` ?assignedToPrincipalId |
+| Breached sla | toggle | optional | — | — | — | Sends `?breachedSla=` to `listCases`. | `listCases` ?breachedSla |
+| Priority | radio group | optional | — | Low · Normal · High · Urgent | — | Sends `?priority=` to `listCases`. | `listCases` ?priority |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Membership | picker: choose a membership | — | — | `listCases` ?membershipId |
+
+**Form: Create case** (modal, opened by *Create case*; *Create case* calls `createCase`, *Cancel* sends nothing)
+
+**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createCase` body |
+| Subject `subjectId` | picker: choose a subject | optional | — | — | shows names, sends the id | — | `createCase` body |
+| Subject `subject` | text field | required | — | max length 200 | — | — | `createCase` body |
+| Description `description` | text area | required | — | max length 10000 | — | — | `createCase` body |
+| Category `categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `createCase` body |
+| Membership `membershipId` | picker: choose a membership | optional | — | — | shows names, sends the id | The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. | `createCase` body |
+| Priority `priority` | radio group | optional | Normal | Low · Normal · High · Urgent | — | — | `createCase` body |
+| Kind `kind` | select | optional | — | Lost property · Complaint · Question · Accessibility · Refund request · Other; Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.; A case raised as `other` must carry a non-empty `detail` … | — | What the guest says the case is about, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. | `createCase` body |
+| Channel `channel` | select | required | — | Email · SMS · Whatsapp · Push · In app · Post | — | — | `createCase` body |
+| Venue `venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | — | `createCase` body |
+| Related order `relatedOrderId` | text field | optional | — | — | — | — | `createCase` body |
+| Attachment refs `attachmentRefs` | list of values (chips) | optional | — | — | — | Stored on the opening `CaseMessage`, not on the case. | `createCase` body |
+| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time the case was raised. The server stamps `Case.syncedAt` on arrival. | `createCase` body |
+
+**Form: Add case message** (modal, opened by *Add case message*; *Add case message* calls `addCaseMessage`, *Cancel* sends nothing)
+
+**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`, `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `addCaseMessage` body |
+| Body `body` | text area | required | — | min length 1; max length 10000 | — | — | `addCaseMessage` body |
+| Is internal `isInternal` | toggle | required | — | — | — | — | `addCaseMessage` body |
+| Channel `channel` | select | optional | — | Email · SMS · Whatsapp · Push · In app · Post | — | — | `addCaseMessage` body |
+| Attachment refs `attachmentRefs` | list of values (chips) | optional | — | — | — | — | `addCaseMessage` body |
+| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `addCaseMessage` body |
+
+**Form: Escalate case** (modal, opened by *Escalate case*; *Escalate case* calls `escalateCase`, *Cancel* sends nothing)
+
+**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`, `newPriority`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `escalateCase` body |
+| Assign to principal `assignToPrincipalId` | picker: choose an assign to principal | optional | — | — | shows names, sends the id | — | `escalateCase` body |
+| New priority `newPriority` | radio group | optional | — | Low · Normal · High · Urgent | — | — | `escalateCase` body |
+
+**Form: Reopen case** (modal, opened by *Reopen case*; *Reopen case* calls `reopenCase`, *Cancel* sends nothing)
+
+**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Reason `reason` | text area | required | — | — | — | — | `reopenCase` body |
+
+Errors to draw in the form: 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem)
+
+**Form: Save case** (modal, opened by *Save case*; *Save case* calls `updateCase`, *Cancel* sends nothing)
+
+**Collects what `updateCase` sends before it is called.** Nothing in the body is required. Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Status `status` | select | optional | — | Open · In progress · Awaiting guest · Escalated · Resolved · Closed | — | — | `updateCase` body |
+| Priority `priority` | radio group | optional | — | Low · Normal · High · Urgent | — | — | `updateCase` body |
+| Assigned to principal `assignedToPrincipalId` | picker: choose an assigned to principal | optional | — | — | shows names, sends the id | — | `updateCase` body |
+| Category `categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `updateCase` body |
+| Resolution note `resolutionNote` | text area | optional | — | max length 2000 | — | — | `updateCase` body |
+
+Errors to draw in the form: 400 Resolving without a resolution note
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every case** (data table, from `listCases`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
+| Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
+| Subject | the name it points at, never the id | — |
+| Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
+| Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
+| Category | the name it points at, never the id | — |
+| Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
+| Priority | chip: Low, Normal, High, Urgent | — |
+| Assigned to principal | the name it points at, never the id | — |
+| Venue | the name it points at, never the id | — |
+| Related order | text | — |
+| Sla due at | 1 Oct 2026, 14:30 | — |
+
+**The selected case** (detail panel, from `listCases`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
+| Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
+| Subject | the name it points at, never the id | — |
+| Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
+| Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
+| Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
+| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
+| Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
+| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
+| Category | the name it points at, never the id | — |
+| Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
+| Priority | chip: Low, Normal, High, Urgent | — |
+| Assigned to principal | the name it points at, never the id | — |
+| Venue | the name it points at, never the id | — |
+| Related order | text | — |
+| Sla due at | 1 Oct 2026, 14:30 | — |
+
+**The case** (detail panel, from `getCase`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
+| Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
+| Subject | the name it points at, never the id | — |
+| Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
+| Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
+| Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
+| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
+| Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
+| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
+| Category | the name it points at, never the id | — |
+| Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
+| Priority | chip: Low, Normal, High, Urgent | — |
+| Assigned to principal | the name it points at, never the id | — |
+| Venue | the name it points at, never the id | — |
+| Related order | text | — |
+| Sla due at | 1 Oct 2026, 14:30 | — |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Create case (primary button) | `createCase` POST `/cases` | CreateCaseRequest | Case | — | opens modal first |
+| Add case message (secondary button) | `addCaseMessage` POST `/cases/{caseId}/messages` | inline | CaseMessage | — | opens modal first |
+| Escalate case (secondary button) | `escalateCase` POST `/cases/{caseId}/escalate` | inline | Case | — | opens modal first |
+| Reopen case (secondary button) | `reopenCase` POST `/cases/{caseId}/reopen` | inline | Case | 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem) | opens modal first |
+| Save case (secondary button) | `updateCase` PATCH `/cases/{caseId}` | inline | Case | 400 Resolving without a resolution note | opens modal first |
+
+**Data it reads**: `listCases` (onLoad, List service cases)
+
+**Where the user goes next**
+
+- → `PTR-003` Profile & Company Details: *Profile & Company Details*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The support contact list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the support contact untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No support contact yet. Offers Create case (`createCase`); distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the support contact are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Resolving without a resolution note; 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem) |
+
+#### Permissions
+
+- `createCase` → `CASE_MANAGE` (configure) · staff, guest, partner
+- `addCaseMessage` → `CASE_MANAGE` (configure) · staff, partner
+- `escalateCase` → `CASE_MANAGE` (configure) · staff, partner
+- `getCase` → `CASE_VIEW` (read) · staff, partner
+- `listCases` → `CASE_VIEW` (read) · staff, guest, partner
+- `reopenCase` → `CASE_MANAGE` (configure) · staff, partner
+- `updateCase` → `CASE_MANAGE` (configure) · staff, partner
+
+**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+13 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 19.2.66 | Guest Support - System shall provide guest support channels. | Guest Mobile App & Branding | CONTRACTED | `createCase` |
+| 19.2.70 | Complaint Management - System shall support guest complaints. | Guest Mobile App & Branding | CONTRACTED | `createCase` |
+| 2.8.12 | System shall allow agents to create, assign, escalate, track, and resolve guest cases including complaints, refund requests, service requests, incidents, and operational issues. Cases shall be linked … | Ticketing Sales | CONTRACTED | `createCase` |
+| 5.3.34 | Link guest profiles with customer service cases, complaints, incidents, refunds, investigations, and follow-up activities. | F&B & Guest Management | CONTRACTED | `createCase` |
+| 22.3.1 | Case Creation | Marketing & CRM | CONTRACTED | `createCase` |
+| 22.3.2 | Case Classification | Marketing & CRM | CONTRACTED | `createCase` |
+| 22.3.3 | Case Assignment | Marketing & CRM | CONTRACTED | `createCase` |
+| 22.8.12 | Case Creation & Escalation | Marketing & CRM | CONTRACTED | `createCase` |
+| 22.3.7 | Agent Notes & Attachments | Marketing & CRM | CONTRACTED | `addCaseMessage` |
+| 22.3.6 | Case Escalation Management | Marketing & CRM | CONTRACTED | `escalateCase` |
+| 22.3.10 | Case Audit Trail | Marketing & CRM | CONTRACTED | `getCase` |
+| 22.2.17 | Case & Support History | Marketing & CRM | CONTRACTED | `listCases` |
+| … 1 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P10 Partner Web.dc.html#ptr-021` · status **notStarted** · provenance generated
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (32), with its required mark, default, format and its error state (400, 404, 409).
+- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#PTR-021?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Create case, Add case message, Escalate case, Reopen case, Save case.
+- [ ] Every transition is wired: `PTR-003`.
+- [ ] Every gated control is gated: `CASE_MANAGE`, `CASE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+
+
+## Reference designs and the trackers for this platform
+
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+
+**Workshop tracker rows about P10 as a whole** (12: 0 open, 12 closed). Open first; a closed row says where it went on 30 September.
+
+- **A89** Build corporate/B2B self-service onboarding (trade licence & VAT upload → approve/reject → rate setup → credential issuance) *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 20 Aug 2026 · workshop tracker)*
+- **A135** Manage group, family and corporate/allocation ticket types inside the unified product screen rather than separate screens *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 25 Aug 2026 · workshop tracker)*
+- **A170** Build family and corporate wallets (parent-funded child wristbands, per-member allowances, parent-only top-up, guest self-service family setup, department-segregated corporate funds, bidirectional transfer as a venue … *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 27 Aug 2026 · workshop tracker)*
+- **A178** Build B2B partner management (configurable profiles, onboarding workflow, sub-agents, territory and distribution rights, venue association with per-venue pricing, document compliance repository, action permissions … *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 31 Aug 2026 · workshop tracker)*
+- **A179** Support all three B2B/OTA routes (direct portal · bidirectional API with external OTAs · bulk pre-generated QR CSV for non-integrating partners), with an existing OTA integration reusable by configuration *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 31 Aug 2026 · workshop tracker)*
+- **A180** Build B2B agreements & payment models (tiered volume discounts, commission rates, credit limit vs. prepaid wallet vs. card, partner-reserved inventory, booking limits) *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 31 Aug 2026 · workshop tracker)*
+- **A181** Build B2B settlement & reconciliation (per-partner operations dashboard, statements of account, exception management for unsettled transfers, dispute handling, AI partner performance view) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 31 Aug 2026 · workshop tracker)*
+- **A184** Build group, school and corporate sales (inquiry dashboard, configurable customer categories, package builder against live inventory and resources, versioned quotations with discount approval, conversion to confirmed … *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 31 Aug 2026 · workshop tracker)*
+- **A208** Check amendments and cancellations against policy before allowing refund, cancellation or reschedule, track booking financial status, and support deposits for school and corporate bookings *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 1 Sep 2026 · workshop tracker)*
+- **A231** Build the live operations dashboard and group/B2B admission profile (real-time attendance by venue and gate, gate status, turnstile mode reconfigurable through the day, entry stats by category) *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 2 Sep 2026 · workshop tracker)*
+- **C35** Share the wallet-configuration reference documentation (foundation, funding, stored value, family/corporate, gift cards, payments, fraud/risk, API) *(Allam · Pending → 30 Sep: Closed, Moved to T7 · 27 Aug 2026 · workshop tracker)*
+- **C44** Confirm how B2B/reseller-issued tickets are handled under a fully-dynamic-QR event policy *(Qossai · Pending → 30 Sep: Closed, Moved to T10 · 2 Sep 2026 · workshop tracker)*
+
+## Design inputs from the client meetings
+
+**What the client asked for in the meetings and design reviews, for these screens.** Apply every item. They are the client's own requirements and they are later than the reference files: where a reference design or a screen's fields disagree with an item here, the item wins. Newest first; where two items disagree, the newer one wins (anything a later meeting replaced is already left out). An **Open question** is not settled: build the default it states and keep it easy to change. The text in brackets is for traceability and, like everything else in this bundle, never appears on a screen.
+
+### Everywhere, on every app
+
+- Allam (platform-wide requirement): every calendar throughout the platform, not just maintenance, must support day, week and month views, with the day view further broken down by hour from a defined start hour through the day. *(agreed · MoM 17 Sep 2026, 4.2 Preventive Maintenance Planning · DI-907)*
+- Minimise the number of separate screens an end user navigates: consolidate related information wherever it can reasonably be shown together, rather than mirroring every workshop board as its own screen. *(agreed · MoM 7 Sep 2026, 4.10 Screen consolidation / 5. Key Decisions · DI-671)*
+- Region-configurable tax on pre-discount price (e.g. Egypt: AED 100 ticket with 20% off is paid at AED 80 but taxed on AED 100). Rounding must support up to three decimal places without dropping the third decimal where the currency requires it. *(agreed · MoM 1 Sep 2026, 4.5 Taxes, Fees & Price Calculation · DI-598)*
+- "Powered by TICVAI" is shown consistently across staff and guest-facing surfaces. *(agreed · MoM 14 Aug 2026, 8. POS / Kiosk Branding · DI-297)*
+- Full multi-language support (Arabic and others such as Chinese) consistent with the agreed i18n/RTL architecture. *(agreed · MoM 10 Aug 2026, 4.7 Account Creation, Localisation & Multi-Currency · DI-210)*
+- The reference system is a functional reference only: its dated UI/UX is not to be replicated; TICVAI delivers equivalent depth with a modern, AI-friendly, easy-to-configure experience. *(agreed · MoM 7 Aug 2026, 23. Reference System Access & Documentation · DI-186)*
+- Direction: modern, minimalistic, spacious, cross-device designs that still convey a sense of place (venue or park); Softlabs proposes two to three enhanced visual concepts for TICVAI to steer. *(agreed · MoM 3 Aug 2026, 11. Design Alignment & Team Input · DI-126)*
+- Languages: English and Arabic at minimum, with Russian, Spanish and Mandarin. *(agreed · MoM 31 Jul 2026, 13. Internationalization & Localization · DI-080)*
+- Clarity first; reduce cognitive load (simple layouts, familiar patterns); consistency ("Use the system. Do not recreate."); accessibility; hierarchy (guide attention with contrast, spacing and visual weight); feedback (every action has a clear response). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Design Principles in Action · DI-051)*
+- Standard components: search bar with Cmd+K; tabs (Overview, Events, Sales, Reports); pagination; badges (New, Pending, Sold Out, Completed); toggle (Off/On); dropdown; removable chip ("VIP x"). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Example UI Components · DI-050)*
+- Spacing on an 8px base grid: 4, 8, 12, 16, 24, 32, 40, 48, 64, 80. Border radius scale 4, 8, 12, 16, 24px, consistent across the platform. Soft shadows: sm 0 1px 2px rgba(0,0,0,.05); md 0 4px 6px rgba(0,0,0,.08); lg 0 10px 15px rgba(0,0,0,.10); xl 0 20px 40px rgba(0,0,0,.14). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 6. Spacing / 7. Border Radius / 8. Shadows · DI-049)*
+- Icons: line style, outline, 2px stroke, round corners, clean and consistent. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 5. Icons · DI-048)*
+- Component principles: clarity first; consistent spacing on an 8px grid; meaningful colour (colours communicate status and guide the user); accessible by design; mobile ready (components adapt across all screen sizes). Components are consistent, flexible, accessible and composable. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Component principles · DI-045)*
+- Empty states have a title, one explanatory line and one action: "No events yet / Create your first event to get started / Create Event"; "No data available / We couldn't find anything to show here / Refresh". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Empty States · DI-044)*
+- Notification list: status icon, title, one-line detail and relative time (e.g. "Payment received ... 2m ago", "High demand detected ... 10m ago"), with "View all notifications". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Notifications · DI-042)*
+- Forms: label above field; text input, select ("Choose an option"), date picker, toggle, checkbox. Input states: Default, Focused, Filled, Disabled and Error with inline message (e.g. "This field is required"). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Forms; 08 Design System (p8) - 4. Inputs · DI-040)*
+- Card types: event card (title, date and time, venue, "From 120.00 AED"); KPI card (label, value, delta, "vs last 7 days"); onboarding checklist card ("3 of 6 completed": Create Event, Add Staff, Configure Seating, Connect Payment). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Cards · DI-038)*
+- Button hierarchy Primary, Secondary, Tertiary (text) and Icon buttons, each with Default, Hover, Pressed and Disabled states. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Buttons; 08 Design System (p8) - 3. Buttons · DI-036)*
+- Regardless of the module a user is working in, the experience should feel like one product, not a collection of separate applications. *(agreed · Design Vision Book 29 Jul 2026, 07 Modules Overview (p7) · DI-034)*
+- DO: focus on clarity and hierarchy, use clear simple interactive elements, give relevant information at a glance (card example: "Annual Membership / All Venues / 4.4 (388) / BESTSELLER"). DON'T: clutter and overload (e.g. "-10% NEW PROMO AED 450.00 !!! BOOK NOW!!!"), complex forms and flows, hard-to-read data visualisations. *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - DO / DON'T · DI-033)*
+- Eight principles on every screen: User-Centric, AI-First, Simple & Clear (clean layouts, clear hierarchy, minimal noise), Fast & Efficient (optimised for quick actions), Reliable & Secure (permissions, data protection), Data-Driven (data visual, actionable, easy to understand), Scalable, Consistent (same patterns, components and interactions across the ecosystem). *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - Our Design Principles · DI-032)*
+- Accessibility: high contrast, readable text, keyboard navigation and inclusive components throughout; WCAG AA standards minimum ("Design for everyone"). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Better Accessibility; 06 Component principles (p6); 08 Design principles in action (p8) · DI-029)*
+- AI everywhere: AI insights, recommendations and smart assistance are embedded across the platform, not hidden. AI is not an add-on: it assists, predicts, recommends and automates. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - How TICVAI improves this concept; 05 Design Principles (p5) - 2. AI-First · DI-027)*
+- Global Search: prominent, AI-powered search that finds anything, in the top bar with a Cmd+K shortcut (placeholder e.g. "Search events, customers, orders, venues or ask AI..."). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - UI inspiration reference, item 1; 08 Design System (p8) - Search Bar · DI-025)*
+- Visual direction: Purposeful (every element has a clear purpose), Consistent (one visual system across all modules and devices), Clear (easy to scan, understand and act on), Modern. Key takeaway: clean, modern, product-first layout with clear hierarchy and minimal visual noise; deep, modern, trustworthy; built for enterprise scale. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) · DI-024)*
+- The brand is presented consistently across Web Platform, Mobile App and Admin Portal (and print). Ticvai identity, colours and typography are applied consistently across all screens and devices. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand in action; 03 Visual Direction (p3) - Consistent Branding · DI-023)*
+- Copy is Professional, Friendly, Clear, Confident, Concise and Helpful. Avoid jargon, overly technical language, clutter, outdated language and complexity. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand voice · DI-022)*
+- Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
+- Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
+
+### Across P10 Partner Web
+
+- **Open question.** Qossai proposes a POS-style interface for high-volume resellers (hotels, travel agents) instead of a B2C-style site with login: assigned tickets and partner prices after login, optional cash drawer, sent-ticket history and resend, balance view. Chinmay wireframes both options; decide after review. *(open · MoM 29 Sep 2026, 3. B2B / reseller portal · DI-1023)*
+- Qossai: partners may use the TICVAI B2B portal directly with a white-label-style B2B credential (similar to B2C), or integrate via API (preferred for OTAs such as Ticketmaster, Platinum List, BookMyShow). *(agreed · MoM 31 Aug 2026, 4.3 Clarified (integration models) · DI-552)*
+- Partner access controls define which actions a partner may perform (e.g. refund, reschedule); the partner portal should only offer the actions granted. *(client request · MoM 31 Aug 2026, 4.3 B2B Reseller & OTA Partner Management · DI-551)*
+- Allam: B2B Portal option — partners without their own platform use a TICVAI B2B portal structured like the B2C store but behind login credentials, showing pre-configured partner pricing and products, with commission tracked the same way. *(client request · MoM 5 Aug 2026, 2. B2B Ticket Distribution Models · DI-134)*
+- The POS/tablet application carries TICVAI's own branding and UI direction; the B2C and B2B mobile applications are white-label by design. *(agreed · MoM 31 Jul 2026, 15. Monday UI/UX Session Planning · DI-084)*
+- Qossai: the target product is a white-label application supporting both B2C and B2B mobile use cases, built around three to four distinct flows (e.g. admission ticket flow, seat assignment flow). *(client request · MoM 31 Jul 2026, 4. Application Flow & White-Label Requirements · DI-056)*
+- Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
+- Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
+- Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
+- Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+
+---
+
+## Raw data
+
+The same package data the blocks above are built from. `screens.json` is in the folder and not repeated here: every field of it is in the blocks.
+
+### `operations.json`
 
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
 {
- "addCaseMessage": {
-  "method": "POST",
-  "path": "/cases/{caseId}/messages",
-  "contract": "marketing-crm",
-  "summary": "Add a message or internal note",
-  "permission": "CASE_MANAGE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "CaseMessage"
- },
- "createCase": {
-  "method": "POST",
-  "path": "/cases",
-  "contract": "marketing-crm",
-  "summary": "Raise a service case",
-  "permission": "CASE_MANAGE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateCaseRequest",
-  "responds": "Case"
- },
- "escalateCase": {
-  "method": "POST",
-  "path": "/cases/{caseId}/escalate",
-  "contract": "marketing-crm",
-  "summary": "Escalate a case",
-  "permission": "CASE_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Case"
- },
- "getCase": {
-  "method": "GET",
-  "path": "/cases/{caseId}",
-  "contract": "marketing-crm",
-  "summary": "Read a case with its thread",
-  "permission": "CASE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CaseDetail"
- },
- "listCases": {
-  "method": "GET",
-  "path": "/cases",
-  "contract": "marketing-crm",
-  "summary": "List service cases",
-  "permission": "CASE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "assignedToPrincipalId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "breachedSla",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "priority",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "membershipId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "reopenCase": {
-  "method": "POST",
-  "path": "/cases/{caseId}/reopen",
-  "contract": "marketing-crm",
-  "summary": "Reopen a resolved case",
-  "permission": "CASE_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Case"
- },
- "updateCase": {
-  "method": "PATCH",
-  "path": "/cases/{caseId}",
-  "contract": "marketing-crm",
-  "summary": "Assign, reprioritise or resolve a case",
-  "permission": "CASE_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Case"
- }
+"addCaseMessage": {"method":"POST","path":"/cases/{caseId}/messages","contract":"marketing-crm","summary":"Add a message or internal note","permission":"CASE_MANAGE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CaseMessage"},
+"createCase": {"method":"POST","path":"/cases","contract":"marketing-crm","summary":"Raise a service case","permission":"CASE_MANAGE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateCaseRequest","responds":"Case"},
+"escalateCase": {"method":"POST","path":"/cases/{caseId}/escalate","contract":"marketing-crm","summary":"Escalate a case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Case"},
+"getCase": {"method":"GET","path":"/cases/{caseId}","contract":"marketing-crm","summary":"Read a case with its thread","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CaseDetail"},
+"listCases": {"method":"GET","path":"/cases","contract":"marketing-crm","summary":"List service cases","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"assignedToPrincipalId","in":"query","required":null},{"name":"breachedSla","in":"query","required":null},{"name":"priority","in":"query","required":null},{"name":"membershipId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"reopenCase": {"method":"POST","path":"/cases/{caseId}/reopen","contract":"marketing-crm","summary":"Reopen a resolved case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Case"},
+"updateCase": {"method":"PATCH","path":"/cases/{caseId}","contract":"marketing-crm","summary":"Assign, reprioritise or resolve a case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Case"}
 }
 ```
 
-## `schemas.json`
+### `schemas.json`
 
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
 {
- "Case": {
-  "x-ticvai-persistence": "marketing.case",
-  "x-ticvai-retired-columns": [
-   "guest_name",
-   "subject",
-   "is_sla_breached"
-  ],
-  "type": "object",
-  "required": [
-   "id",
-   "caseNumber",
-   "subject",
-   "status",
-   "priority",
-   "createdAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."
-   },
-   "caseNumber": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "guestName": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"
-   },
-   "subject": {
-    "type": "string",
-    "x-ticvai-column": "title",
-    "description": "**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"
-   },
-   "kind": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/CaseKind"
-     }
-    ],
-    "nullable": true,
-    "description": "What the guest said it was about, where the guest raised it."
-   },
-   "channel": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/MessageChannel"
-     }
-    ],
-    "description": "How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Device time the case was raised — the start of the SLA clock."
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true,
-    "description": "Server time the case arrived. Equal to `recordedAt` for a case raised online."
-   },
-   "categoryId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "queueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"
-   },
-   "membershipId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"
-   },
-   "status": {
-    "$ref": "#/components/schemas/CaseStatus"
-   },
-   "priority": {
-    "$ref": "#/components/schemas/CasePriority"
-   },
-   "assignedToPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "relatedOrderId": {
-    "type": "string",
-    "nullable": true
-   },
-   "slaDueAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "isSlaBreached": {
-    "type": "boolean",
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "description": "**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"
-   },
-   "slaPausedSeconds": {
-    "type": "integer",
-    "description": "Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"
-   },
-   "escalationCount": {
-    "type": "integer"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "resolvedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "CaseDetail": {
-  "x-ticvai-persistence": "marketing.case",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/Case"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "description": {
-      "type": "string"
-     },
-     "resolutionNote": {
-      "type": "string",
-      "nullable": true
-     },
-     "messages": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/CaseMessage"
-      }
-     }
-    }
-   }
-  ]
- },
- "CaseKind": {
-  "type": "string",
-  "description": "**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n",
-  "enum": [
-   "lostProperty",
-   "complaint",
-   "question",
-   "accessibility",
-   "refundRequest",
-   "other"
-  ]
- },
- "CaseMessage": {
-  "x-ticvai-persistence": "marketing.case_message",
-  "type": "object",
-  "required": [
-   "id",
-   "body",
-   "isInternal",
-   "authorKind",
-   "recordedAt"
-  ],
-  "properties": {
-   "resolution": {
-    "type": "string",
-    "description": "**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"
-   },
-   "id": {
-    "type": "string"
-   },
-   "body": {
-    "type": "string"
-   },
-   "isInternal": {
-    "type": "boolean"
-   },
-   "authorKind": {
-    "type": "string",
-    "enum": [
-     "agent",
-     "guest",
-     "system",
-     "ai"
-    ]
-   },
-   "authorPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "channel": {
-    "$ref": "#/components/schemas/MessageChannel"
-   },
-   "attachmentRefs": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Device time — `addCaseMessage` is offline-capable."
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true,
-    "description": "Server time the message arrived."
-   }
-  }
- },
- "CasePriority": {
-  "type": "string",
-  "enum": [
-   "low",
-   "normal",
-   "high",
-   "urgent"
-  ]
- },
- "CaseStatus": {
-  "type": "string",
-  "enum": [
-   "open",
-   "inProgress",
-   "awaitingGuest",
-   "escalated",
-   "resolved",
-   "closed"
-  ]
- },
- "CreateCaseRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "id",
-   "subject",
-   "description",
-   "channel",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subject": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string",
-    "maxLength": 10000
-   },
-   "categoryId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "membershipId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. Must belong to `subjectId` when both are given (422). (decided 29 September, coordinator decision DM4, writers pass)"
-   },
-   "priority": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/CasePriority"
-     }
-    ],
-    "default": "normal"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/CaseKind"
-   },
-   "channel": {
-    "$ref": "#/components/schemas/MessageChannel"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "relatedOrderId": {
-    "type": "string"
-   },
-   "attachmentRefs": {
-    "type": "array",
-    "description": "Stored on the opening `CaseMessage`, not on the case.",
-    "items": {
-     "type": "string"
-    }
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Device time the case was raised. The server stamps `Case.syncedAt` on arrival."
-   }
-  }
- },
- "MessageChannel": {
-  "type": "string",
-  "enum": [
-   "email",
-   "sms",
-   "whatsapp",
-   "push",
-   "inApp",
-   "post"
-  ]
- },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
-   }
-  }
- }
+"Case": {"x-ticvai-persistence":"marketing.case","x-ticvai-retired-columns":["guest_name","subject","is_sla_breached"],"type":"object","required":["id","caseNumber","subject","status","priority","createdAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."},"caseNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"},"subjectId":{"type":"string","format":"uuid","nullable":true},"guestName":{"type":"string","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"description":"**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"},"subject":{"type":"string","x-ticvai-column":"title","description":"**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"},"kind":{"allOf":[{"$ref":"#/components/schemas/CaseKind"}],"nullable":true,"description":"What the guest said it was about, where the guest raised it."},"channel":{"allOf":[{"$ref":"#/components/schemas/MessageChannel"}],"description":"How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."},"recordedAt":{"type":"string","format":"date-time","description":"Device time the case was raised — the start of the SLA clock."},"syncedAt":{"type":"string","format":"date-time","readOnly":true,"description":"Server time the case arrived. Equal to `recordedAt` for a case raised online."},"categoryId":{"type":"string","format":"uuid","nullable":true},"queueId":{"type":"string","format":"uuid","nullable":true,"description":"The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"},"membershipId":{"type":"string","format":"uuid","nullable":true,"description":"The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"},"status":{"$ref":"#/components/schemas/CaseStatus"},"priority":{"$ref":"#/components/schemas/CasePriority"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"relatedOrderId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"isSlaBreached":{"type":"boolean","readOnly":true,"x-ticvai-persisted":false,"description":"**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"},"slaPausedSeconds":{"type":"integer","description":"Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"},"escalationCount":{"type":"integer"},"createdAt":{"type":"string","format":"date-time"},"resolvedAt":{"type":"string","format":"date-time","nullable":true}}},
+"CaseDetail": {"x-ticvai-persistence":"marketing.case","allOf":[{"$ref":"#/components/schemas/Case"},{"type":"object","properties":{"description":{"type":"string"},"resolutionNote":{"type":"string","nullable":true},"messages":{"type":"array","items":{"$ref":"#/components/schemas/CaseMessage"}}}}]},
+"CaseKind": {"type":"string","description":"**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n","enum":["lostProperty","complaint","question","accessibility","refundRequest","other"]},
+"CaseMessage": {"x-ticvai-persistence":"marketing.case_message","type":"object","required":["id","body","isInternal","authorKind","recordedAt"],"properties":{"resolution":{"type":"string","description":"**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"},"id":{"type":"string"},"body":{"type":"string"},"isInternal":{"type":"boolean"},"authorKind":{"type":"string","enum":["agent","guest","system","ai"]},"authorPrincipalId":{"type":"string","format":"uuid","nullable":true},"channel":{"$ref":"#/components/schemas/MessageChannel"},"attachmentRefs":{"type":"array","items":{"type":"string"}},"recordedAt":{"type":"string","format":"date-time","description":"Device time — `addCaseMessage` is offline-capable."},"syncedAt":{"type":"string","format":"date-time","readOnly":true,"description":"Server time the message arrived."}}},
+"CasePriority": {"type":"string","enum":["low","normal","high","urgent"]},
+"CaseStatus": {"type":"string","enum":["open","inProgress","awaitingGuest","escalated","resolved","closed"]},
+"CreateCaseRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","subject","description","channel","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid"},"subject":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":10000},"categoryId":{"type":"string","format":"uuid"},"membershipId":{"type":"string","format":"uuid","nullable":true,"description":"The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. Must belong to `subjectId` when both are given (422). (decided 29 September, coordinator decision DM4, writers pass)"},"priority":{"allOf":[{"$ref":"#/components/schemas/CasePriority"}],"default":"normal"},"kind":{"$ref":"#/components/schemas/CaseKind"},"channel":{"$ref":"#/components/schemas/MessageChannel"},"venueId":{"type":"string","format":"uuid"},"relatedOrderId":{"type":"string"},"attachmentRefs":{"type":"array","description":"Stored on the opening `CaseMessage`, not on the case.","items":{"type":"string"}},"recordedAt":{"type":"string","format":"date-time","description":"Device time the case was raised. The server stamps `Case.syncedAt` on arrival."}}},
+"MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}
 }
 ```

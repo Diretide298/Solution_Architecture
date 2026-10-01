@@ -1944,7 +1944,25 @@
   }
  },
  "ModuleKey": {
-  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+  "type": "string",
+  "enum": [
+   "ticketsAndBooking",
+   "membership",
+   "events",
+   "attractions",
+   "virtualQueue",
+   "diningAndFnb",
+   "shop",
+   "parking",
+   "gamification",
+   "photoGallery",
+   "wallet",
+   "loyalty",
+   "lostAndFound",
+   "map",
+   "visitPlanner"
+  ],
+  "description": "`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown."
  },
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_item",

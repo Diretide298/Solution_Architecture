@@ -50,25 +50,6 @@
   "requestBody": null,
   "responds": "AiActionPlanDetail"
  },
- "getGoLiveReadiness": {
-  "method": "GET",
-  "path": "/go-live-readiness",
-  "contract": "subscription",
-  "summary": "Everything that must pass before a tenant can sell",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": "tenantId",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": "GoLiveReadiness"
- },
  "getTenantConfig": {
   "method": "GET",
   "path": "/tenant-config",
@@ -87,44 +68,6 @@
   ],
   "requestBody": null,
   "responds": "TenantConfig"
- },
- "runGoLiveValidation": {
-  "method": "POST",
-  "path": "/go-live-readiness/run",
-  "contract": "subscription",
-  "summary": "Run the validation plan against a tenant",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "setChannelListing": {
-  "method": "PUT",
-  "path": "/channel-listings",
-  "contract": "subscription",
-  "summary": "List a product on a channel, with its own allocation",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ChannelListing",
-  "responds": "ChannelListing"
  },
  "setPrices": {
   "method": "PUT",

@@ -298,30 +298,6 @@
   "requestBody": null,
   "responds": "MfaMethod"
  },
- "listPartnerAgreements": {
-  "method": "GET",
-  "path": "/partner-agreements",
-  "contract": "subscription",
-  "summary": "Commercial agreements with B2B partners",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "expiringWithinDays",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PartnerAgreement"
- },
  "listPrincipals": {
   "method": "GET",
   "path": "/principals",

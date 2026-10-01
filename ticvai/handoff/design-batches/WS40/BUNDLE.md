@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -55,21 +56,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `ADM-108` | Revenue Optimization Command Center | commandCentre | 1 | 0 | — |
-| `ADM-109` | Pricing Simulation Studio | listDetail | 1 | 1 | — |
-| `ADM-110` | Scenario Modeling & What-If Analysis | listDetail | 1 | 0 | — |
-| `ADM-111` | A/B Pricing Experiment Studio | listDetail | 1 | 0 | — |
-| `ADM-112` | Revenue & Demand Impact Forecasting | commandCentre | 1 | 0 | — |
-| `ADM-113` | AI Recommendation Review & Decision Queue | listDetail | 2 | 0 | — |
-| `ADM-114` | Automation Policy & Autonomous Pricing Orchestrator | configEditor | 2 | 1 | — |
-| `ADM-115` | Live Dynamic Price Execution & Deployment Monitor | listDetail | 1 | 0 | — |
-| `ADM-116` | Dynamic Pricing Performance & Optimization Analytics | listDetail | 1 | 0 | — |
-| `ADM-117` | AI Learning, Model Performance & Optimization Feedback | listDetail | 2 | 1 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `ADM-108` | Revenue Optimization Command Center | B–D | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-109` | Pricing Simulation Studio | B–D | 0 | 12 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
+| `ADM-110` | Scenario Modeling & What-If Analysis | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-111` | A/B Pricing Experiment Studio | B–D | 0 | 8 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `ADM-112` | Revenue & Demand Impact Forecasting | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
+| `ADM-113` | AI Recommendation Review & Decision Queue | B–D | 5 | 22 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-114` | Automation Policy & Autonomous Pricing Orchestrator | B–D | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
+| `ADM-115` | Live Dynamic Price Execution & Deployment Monitor | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-116` | Dynamic Pricing Performance & Optimization Analytics | B–D | 0 | 36 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `ADM-117` | AI Learning, Model Performance & Optimization Feedback | B–D | 18 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -77,4848 +84,1502 @@ convincingly. It is never a caption.
 
 ---
 
-## `screens.json`
+## Screen by screen
 
-Every field of every screen in this batch. **`machine` is what a screen is in the middle of**, `overlays` is what opens over it and what closing it does, and `navigation.transitions` is how you leave, with `carries` naming the state that travels.
+**One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-```json
-[
- {
-  "id": "ADM-108",
-  "name": "Revenue Optimization Command Center",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Pricing___Revenue_Management_Reference.pdf",
-   "board": "7",
-   "number": "10.7.1",
-   "page": 114
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/revenue-optimization-command-center-adm-108",
-   "component": "apps/ticvai-web/src/routes/commercial/RevenueOptimizationCommandCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-002"
-   ],
-   "exitTo": [
-    "ADM-002",
-    "ADM-109",
-    "ADM-110",
-    "ADM-111",
-    "ADM-112",
-    "ADM-113",
-    "ADM-114",
-    "ADM-115",
-    "ADM-116",
-    "ADM-117"
-   ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
-   "transitions": [
-    {
-     "to": "ADM-002",
-     "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-108 holds none of them. The edge carries nothing: ADM-108 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
-    },
-    {
-     "to": "ADM-109",
-     "trigger": "Works in Pricing Simulation Studio",
-     "provenance": "flow F149 step 1→2",
-     "operation": "listRevenue"
-    },
-    {
-     "to": "ADM-110",
-     "trigger": "Works in Scenario Modeling & What-If Analysis",
-     "provenance": "flow F149 step 3→4",
-     "operation": "listRevenue"
-    },
-    {
-     "to": "ADM-111",
-     "trigger": "Works in A/B Pricing Experiment Studio",
-     "provenance": "flow F149 step 5→6",
-     "operation": "listRevenue"
-    },
-    {
-     "to": "ADM-112",
-     "trigger": "Works in Revenue & Demand Impact Forecasting",
-     "provenance": "flow F149 step 7→8",
-     "operation": "listRevenue"
-    },
-    {
-     "to": "ADM-114",
-     "trigger": "Works in Automation Policy & Autonomous Pricing Orchestrator",
-     "provenance": "flow F149 step 11→12",
-     "operation": "listRevenue"
-    },
-    {
-     "to": "ADM-115",
-     "trigger": "Works in Live Dynamic Price Execution & Deployment Monitor",
-     "provenance": "flow F149 step 13→14",
-     "operation": "listRevenue"
-    },
-    {
-     "to": "ADM-116",
-     "trigger": "Works in Dynamic Pricing Performance & Optimization Analytics",
-     "provenance": "flow F149 step 15→16",
-     "operation": "listRevenue"
-    },
-    {
-     "to": "ADM-117",
-     "trigger": "Works in AI Learning, Model Performance & Optimization Feedback",
-     "provenance": "flow F149 step 17→18",
-     "operation": "listRevenue"
-    },
-    {
-     "to": "ADM-113",
-     "trigger": "Works in AI Recommendation Review & Decision Queue",
-     "provenance": "flow F149 step 9→10",
-     "operation": "listRevenue",
-     "carries": [
-      "recommendationId"
-     ]
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Revenue teams can monitor and act on pricing optimization opportunities across the organization from one centralized workspace.",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each row displays) — counts over a population, then the population",
-  "purpose": "Provide Revenue Managers with the operational control center for all dynamic pricing simulations, AI recommendations, automated changes, experiments and revenue optimization activity.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Run Simulation, Review Recommendations, Start Experiment, Approve Changes, Pause Automation, Open Execution Monitor. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions"
-   }
-  ],
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Revenue Opportunity",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.revenueOpportunity"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Incremental Revenue Generated",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterSummary.incrementalRevenueGenerated"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Optimizations",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterSummary.activeOptimizations"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Recommendations Awaiting Action",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterSummary.recommendationsAwaitingAction"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Pending Simulations",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterSummary.pendingSimulations"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Auto-Executed Changes",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterSummary.autoExecutedChanges"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Approval Required",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterSummary.approvalRequired"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active A/B Tests",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterSummary.activeABTests"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Pricing Exceptions",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterSummary.pricingExceptions"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revenue at Risk",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterSummary.revenueAtRisk"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Forecast Accuracy",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterSummary.forecastAccuracy"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Optimization Success Rate",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterSummary.optimizationSuccessRate"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every revenue optimization",
-       "columns": [
-        "RevenueOptimizationCommandCenterView.venue",
-        "RevenueOptimizationCommandCenterView.eventProduct",
-        "RevenueOptimizationCommandCenterView.performance",
-        "RevenueOptimizationCommandCenterView.currentPrice",
-        "RevenueOptimizationCommandCenterView.recommendedPrice",
-        "RevenueOptimizationCommandCenterView.forecastRevenue",
-        "RevenueOptimizationCommandCenterView.expectedUplift",
-        "RevenueOptimizationCommandCenterView.confidence",
-        "RevenueOptimizationCommandCenterView.automationMode",
-        "RevenueOptimizationCommandCenterView.approvalStatus",
-        "RevenueOptimizationCommandCenterView.executionStatus"
-       ],
-       "bindsTo": "RevenueOptimizationCommandCenterView",
-       "operation": "listRevenue",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Each row displays"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected revenue optimization",
-       "bindsTo": "RevenueOptimizationCommandCenterView",
-       "columns": [
-        "RevenueOptimizationCommandCenterView.venue",
-        "RevenueOptimizationCommandCenterView.eventProduct",
-        "RevenueOptimizationCommandCenterView.performance",
-        "RevenueOptimizationCommandCenterView.currentPrice",
-        "RevenueOptimizationCommandCenterView.recommendedPrice",
-        "RevenueOptimizationCommandCenterView.forecastRevenue",
-        "RevenueOptimizationCommandCenterView.expectedUplift",
-        "RevenueOptimizationCommandCenterView.confidence",
-        "RevenueOptimizationCommandCenterView.automationMode",
-        "RevenueOptimizationCommandCenterView.approvalStatus",
-        "RevenueOptimizationCommandCenterView.executionStatus"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Event Action”, “AED”, “Attraction AED Simulat”, “B 220 e”.",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Each row displays"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Run Simulation",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Review Recommendations",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start Experiment",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Approve Changes",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Pause Automation",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Open Execution Monitor",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The revenue optimization list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the revenue optimization untouched.",
-   "emptyFirstRun": "No revenue optimization yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the revenue optimization are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listRevenue",
-    "contract": "catalogue",
-    "purpose": "Revenue Optimization Command Center",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-108",
-   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-108"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 114. 23 of 23 labels bound to a contract property; 29 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-109",
-  "name": "Pricing Simulation Studio",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Pricing___Revenue_Management_Reference.pdf",
-   "board": "7",
-   "number": "10.7.2",
-   "page": 115
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/pricing-simulation-studio-adm-109",
-   "component": "apps/ticvai-web/src/routes/commercial/PricingSimulationStudio.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-108"
-   ],
-   "exitTo": [
-    "ADM-108"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-108, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-108",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F149 step 2→3",
-     "operation": "setPricing"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Authorized users can safely evaluate a pricing recommendation or strategy against forecast commercial outcomes without modifying production prices.",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Allow any proposed dynamic-pricing change to be tested before affecting live customers. This should become the sandbox of the Dynamic Pricing Engine.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Save Scenario, Compare Scenario, Send for Approval, Start Experiment, Discard. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 115 §Actions"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every pricing simulation",
-       "columns": [
-        "PricingSimulationStudioView.simulationConfidence",
-        "PricingSimulationStudioView.dataVolume",
-        "PricingSimulationStudioView.historicalSimilarity",
-        "PricingSimulationStudioView.forecastConfidence",
-        "PricingSimulationStudioView.elasticityConfidence",
-        "PricingSimulationStudioView.externalSignalQuality"
-       ],
-       "bindsTo": "PricingSimulationStudioView",
-       "operation": "setPricing",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 115 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected pricing simulation",
-       "bindsTo": "PricingSimulationStudioView",
-       "columns": [
-        "PricingSimulationStudioView.simulationConfidence",
-        "PricingSimulationStudioView.dataVolume",
-        "PricingSimulationStudioView.historicalSimilarity",
-        "PricingSimulationStudioView.forecastConfidence",
-        "PricingSimulationStudioView.elasticityConfidence",
-        "PricingSimulationStudioView.externalSignalQuality"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “A simulation can originate from”, “Calculate”, “Current Strategy”, “Before simulation completes, show”.",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 115 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save Scenario",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 115 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Compare Scenario",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 115 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Send for Approval",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 115 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start Experiment",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 115 §Actions"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Discard",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 115 §Actions"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmDiscard",
-    "component": "confirmDialog",
-    "trigger": "Discard",
-    "body": "**Discard on a pricing simulation is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 115 §Actions"
-   }
-  ],
-  "states": {
-   "loading": "The pricing simulation list.",
-   "error": "Could not load. Names which read failed and leaves the pricing simulation untouched.",
-   "emptyFirstRun": "No pricing simulation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the pricing simulation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setPricing",
-    "contract": "catalogue",
-    "purpose": "Pricing Simulation Studio",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "PricingSimulationStudioView.simulationConfidence",
-    "PricingSimulationStudioView.dataVolume",
-    "PricingSimulationStudioView.historicalSimilarity",
-    "PricingSimulationStudioView.forecastConfidence",
-    "PricingSimulationStudioView.elasticityConfidence",
-    "PricingSimulationStudioView.externalSignalQuality"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-109",
-   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-109"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 115. 6 of 6 labels bound to a contract property; 20 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-110",
-  "name": "Scenario Modeling & What-If Analysis",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Pricing___Revenue_Management_Reference.pdf",
-   "board": "7",
-   "number": "10.7.3",
-   "page": 117
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/scenario-modeling-what-if-analysis-adm-110",
-   "component": "apps/ticvai-web/src/routes/commercial/ScenarioModelingWhatIfAnalysis.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-108"
-   ],
-   "exitTo": [
-    "ADM-108"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-108, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-108",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F149 step 4→5",
-     "operation": "listScenarioModelingWhat"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Revenue teams can model alternative market and demand conditions and compare different pricing responses before implementation.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Scenario Modeling & What-If Analysis",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 11 actions on this screen and the screen declares 1 operation.** Unserved: Low Demand, Expected Demand, High Demand, Competitor Price Drop, Competitor Price Increase, Inventory Reduction, Custom Scenario, Save …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 117"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 117"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Low Demand",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Expected Demand",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "High Demand",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Competitor Price Drop",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Competitor Price Increase",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Inventory Reduction",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Custom Scenario",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Allow users to"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "components": []
-    }
-   ]
-  },
-  "states": {
-   "loading": "The scenario modeling what-if list.",
-   "error": "Could not load. Names which read failed and leaves the scenario modeling what-if untouched.",
-   "emptyFirstRun": "No scenario modeling what-if yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the scenario modeling what-if are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listScenarioModelingWhat",
-    "contract": "catalogue",
-    "purpose": "Scenario Modeling & What-If Analysis",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "ScenarioModelingWhatIfAnalysisView.scenarioTypes"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-110",
-   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-110"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 117. 0 of 0 labels bound to a contract property; 11 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-111",
-  "name": "A/B Pricing Experiment Studio",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Pricing___Revenue_Management_Reference.pdf",
-   "board": "7",
-   "number": "10.7.4",
-   "page": 119
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/a-b-pricing-experiment-studio-adm-111",
-   "component": "apps/ticvai-web/src/routes/commercial/ABPricingExperimentStudio.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-108"
-   ],
-   "exitTo": [
-    "ADM-108"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-108, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-108",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F149 step 6→7",
-     "operation": "setPricingExperiment"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Authorized users can execute controlled pricing experiments and determine statistically whether one strategy performs better than another.",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Allow TICVAI to scientifically test different pricing strategies using controlled customer groups. This is essential because AI should learn from actual customer behavior, not only historical assumptions.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every pricing experiment",
-       "columns": [
-        "ABPricingExperimentStudioView.sampleSize",
-        "ABPricingExperimentStudioView.confidenceLevel",
-        "ABPricingExperimentStudioView.experimentDuration",
-        "ABPricingExperimentStudioView.statisticalSignificance"
-       ],
-       "bindsTo": "ABPricingExperimentStudioView",
-       "operation": "setPricingExperiment",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 119 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected pricing experiment",
-       "bindsTo": "ABPricingExperimentStudioView",
-       "columns": [
-        "ABPricingExperimentStudioView.sampleSize",
-        "ABPricingExperimentStudioView.confidenceLevel",
-        "ABPricingExperimentStudioView.experimentDuration",
-        "ABPricingExperimentStudioView.statisticalSignificance"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “AED 250”, “Variant B”, “AED 265”, “Experiments must respect”, “Winner”.",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 119 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setPricingExperiment"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The pricing experiment list.",
-   "error": "Could not load. Names which read failed and leaves the pricing experiment untouched.",
-   "emptyFirstRun": "No pricing experiment yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the pricing experiment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setPricingExperiment",
-    "contract": "catalogue",
-    "purpose": "A/B Pricing Experiment Studio",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "ABPricingExperimentStudioView.sampleSize",
-    "ABPricingExperimentStudioView.confidenceLevel",
-    "ABPricingExperimentStudioView.experimentDuration",
-    "ABPricingExperimentStudioView.statisticalSignificance"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-111",
-   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-111"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 119. 4 of 4 labels bound to a contract property; 20 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-112",
-  "name": "Revenue & Demand Impact Forecasting",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Pricing___Revenue_Management_Reference.pdf",
-   "board": "7",
-   "number": "10.7.5",
-   "page": 120
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/revenue-demand-impact-forecasting-adm-112",
-   "component": "apps/ticvai-web/src/routes/commercial/RevenueDemandImpactForecasting.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-108"
-   ],
-   "exitTo": [
-    "ADM-108"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-108, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-108",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F149 step 8→9",
-     "operation": "listRevenueDemandImpact"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Approvers can clearly understand expected revenue, demand and customer consequences before authorizing a dynamic pricing action.",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§Forecast; Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Provide a dedicated commercial impact assessment before a dynamic-pricing action is approved or executed.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Revenue",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 120 §Forecast",
-       "bindsTo": "RevenueDemandImpactForecastingView.revenue"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Demand",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 120 §Forecast",
-       "bindsTo": "RevenueDemandImpactForecastingView.demand"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Attendance",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 120 §Forecast",
-       "bindsTo": "RevenueDemandImpactForecastingView.attendance"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Occupancy",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 120 §Forecast",
-       "bindsTo": "RevenueDemandImpactForecastingView.occupancy"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Conversion",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 120 §Forecast",
-       "bindsTo": "RevenueDemandImpactForecastingView.conversion"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Margin",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 120 §Forecast",
-       "bindsTo": "RevenueDemandImpactForecastingView.margin"
-      },
-      {
-       "kind": "metricTile",
-       "label": "ASP",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 120 §Forecast",
-       "bindsTo": "RevenueDemandImpactForecastingView.asp"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Sell-Through",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 120 §Forecast",
-       "bindsTo": "RevenueDemandImpactForecastingView.sellThrough"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Sell-Out Probability",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 120 §Forecast",
-       "bindsTo": "RevenueDemandImpactForecastingView.sellOutProbability"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The revenue demand impact list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the revenue demand impact untouched.",
-   "emptyFirstRun": "No revenue demand impact yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the revenue demand impact are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listRevenueDemandImpact",
-    "contract": "catalogue",
-    "purpose": "Revenue & Demand Impact Forecasting",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": []
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-112",
-   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-112"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 120. 9 of 9 labels bound to a contract property; 9 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-113",
-  "name": "AI Recommendation Review & Decision Queue",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Pricing___Revenue_Management_Reference.pdf",
-   "board": "7",
-   "number": "10.7.6",
-   "page": 122
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/ai-recommendation-review-decision-queue-adm-113",
-   "component": "apps/ticvai-web/src/routes/commercial/AiRecommendationReviewDecisionQueue.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-108"
-   ],
-   "exitTo": [
-    "ADM-108"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-108, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-108",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F149 step 10→11",
-     "operation": "listRecommendationReviewDecision"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Every material AI recommendation can be reviewed, explained, simulated, approved, modified or rejected with complete traceability.",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide the human decision workspace for recommendations produced by Board 6. This should be the Revenue Manager's inbox.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every recommendation review decision",
-       "columns": [
-        "AiRecommendationReviewDecisionQueueView.recommendation",
-        "AiRecommendationReviewDecisionQueueView.venue",
-        "AiRecommendationReviewDecisionQueueView.event",
-        "AiRecommendationReviewDecisionQueueView.currentPrice",
-        "AiRecommendationReviewDecisionQueueView.recommendedPrice",
-        "AiRecommendationReviewDecisionQueueView.change",
-        "AiRecommendationReviewDecisionQueueView.revenueOpportunity",
-        "AiRecommendationReviewDecisionQueueView.demandImpact",
-        "AiRecommendationReviewDecisionQueueView.confidence",
-        "AiRecommendationReviewDecisionQueueView.urgency",
-        "AiRecommendationReviewDecisionQueueView.governanceLevel"
-       ],
-       "bindsTo": "AiRecommendationReviewDecisionQueueView",
-       "operation": "listRecommendationReviewDecision",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 122 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected recommendation review decision",
-       "bindsTo": "AiRecommendationReviewDecisionQueueView",
-       "columns": [
-        "AiRecommendationReviewDecisionQueueView.recommendation",
-        "AiRecommendationReviewDecisionQueueView.venue",
-        "AiRecommendationReviewDecisionQueueView.event",
-        "AiRecommendationReviewDecisionQueueView.currentPrice",
-        "AiRecommendationReviewDecisionQueueView.recommendedPrice",
-        "AiRecommendationReviewDecisionQueueView.change",
-        "AiRecommendationReviewDecisionQueueView.revenueOpportunity",
-        "AiRecommendationReviewDecisionQueueView.demandImpact",
-        "AiRecommendationReviewDecisionQueueView.confidence",
-        "AiRecommendationReviewDecisionQueueView.urgency",
-        "AiRecommendationReviewDecisionQueueView.governanceLevel"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Simulation Result”, “Simulation Revenue Uplift”, “Demand Impact”, “AED 265”, “Feedback Loop”, “Human Selected AED 265”.",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 122 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions; since 29 September the decision buttons are `decidePricingRecommendation` (AI_APPROVE)** — earlier text: Accept, Reject, Modify, Simulate Again, Schedule, Send for Approval. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 122 §Authorized users can"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Accept",
-       "operation": "decidePricingRecommendation",
-       "notes": "Sends `decision: accept`.",
-       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Modify",
-       "operation": "decidePricingRecommendation",
-       "notes": "Sends `decision: modify`.",
-       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reject",
-       "operation": "decidePricingRecommendation",
-       "notes": "Sends `decision: reject`.",
-       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Schedule",
-       "operation": "decidePricingRecommendation",
-       "notes": "Sends `decision: schedule`.",
-       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Send for approval",
-       "operation": "decidePricingRecommendation",
-       "notes": "Sends `decision: sendForApproval`.",
-       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The recommendation review decision list.",
-   "error": "Could not load. Names which read failed and leaves the recommendation review decision untouched.",
-   "emptyFirstRun": "No recommendation review decision yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the recommendation review decision are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listRecommendationReviewDecision",
-    "contract": "catalogue",
-    "purpose": "AI Recommendation Review & Decision Queue",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "decidePricingRecommendation",
-    "contract": "catalogue",
-    "purpose": "Record a human decision on an AI pricing recommendation",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "AiRecommendationReviewDecisionQueueView.recommendation",
-    "AiRecommendationReviewDecisionQueueView.venue",
-    "AiRecommendationReviewDecisionQueueView.event",
-    "AiRecommendationReviewDecisionQueueView.currentPrice",
-    "AiRecommendationReviewDecisionQueueView.recommendedPrice",
-    "AiRecommendationReviewDecisionQueueView.change"
-   ],
-   "params": [
-    {
-     "name": "recommendationId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-113",
-   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-113"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 122. 11 of 11 labels bound to a contract property; 24 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-114",
-  "name": "Automation Policy & Autonomous Pricing Orchestrator",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Pricing___Revenue_Management_Reference.pdf",
-   "board": "7",
-   "number": "10.7.7",
-   "page": 123
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/automation-policy-autonomous-pricing-orchestrator-adm-114",
-   "component": "apps/ticvai-web/src/routes/commercial/AutomationPolicyAutonomousPricingOrchestrator.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-108"
-   ],
-   "exitTo": [
-    "ADM-108"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-108, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-108",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F149 step 12→13",
-     "operation": "listAutomationPolicyAutonomous"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "confidence, commercial guardrails and emergency safety controls.",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
-  "purpose": "Control when TICVAI is allowed to execute pricing changes automatically. Board 5 defines the strategy-level automation permission. This screen manages operational autonomous execution at scale.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Tenant",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Venue",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Product",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Event",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Strategy",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Channel",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Market",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Date/Time",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Evaluation Frequency",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Execution Frequency",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      },
-      {
-       "kind": "textField",
-       "label": "Minimum Time Between Changes",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      },
-      {
-       "kind": "textField",
-       "label": "Maximum Changes per Day",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save dynamic pricing guardrail policy",
-       "operation": "setDynamicPricingGuardrailPolicy",
-       "permission": "PRICE_CONFIGURE",
-       "notes": "**Guardrails and automation policy, one row per scope** (29 September, writers pass).",
-       "provenance": "contract catalogue.yaml PUT /dynamic-pricing-controls"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The automation policy autonomous configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the automation policy autonomous untouched.",
-   "emptyFirstRun": "No automation policy autonomous configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listAutomationPolicyAutonomous",
-    "contract": "catalogue",
-    "purpose": "Automation Policy & Autonomous Pricing Orchestrator",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setDynamicPricingGuardrailPolicy",
-    "contract": "catalogue",
-    "purpose": "Set the guardrails and automation level of dynamic pricing at one scope",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAutomationPolicyAutonomous"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-114",
-   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-114"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 123. 0 of 0 labels bound to a contract property; 12 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
-   {
-    "id": "formSetDynamicPricingGuardrailPolicy",
-    "component": "modal",
-    "trigger": "Save dynamic pricing guardrail policy",
-    "body": "**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "DynamicPricingControl",
-    "confirm": {
-     "label": "Save dynamic pricing guardrail policy",
-     "operation": "setDynamicPricingGuardrailPolicy"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "scopePath",
-      "scopeLevel",
-      "automationLevel",
-      "scopeId",
-      "absoluteMinimumPrice",
-      "absoluteMaximumPrice",
-      "minimumMarginPercent",
-      "maximumUpliftPercent",
-      "maximumReductionPercent",
-      "maximumSingleChangePercent",
-      "maximumDailyChangePercent",
-      "maximumWeeklyChangePercent",
-      "minimumChangeIntervalMinutes",
-      "maximumChangesPerDay",
-      "minimumInventory",
-      "maximumOccupancyTriggerPercent",
-      "protectedRateTypes"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PUT /dynamic-pricing-controls"
-   }
-  ],
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-115",
-  "name": "Live Dynamic Price Execution & Deployment Monitor",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Pricing___Revenue_Management_Reference.pdf",
-   "board": "7",
-   "number": "10.7.8",
-   "page": 125
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/live-dynamic-price-execution-deployment-monitor-adm-115",
-   "component": "apps/ticvai-web/src/routes/commercial/LiveDynamicPriceExecutionDeploymentMonitor.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-108"
-   ],
-   "exitTo": [
-    "ADM-108"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-108, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-108",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F149 step 14→15",
-     "operation": "createLiveDynamicPrice"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Operations teams can monitor the real-time execution and distribution of dynamic prices across all applicable sales channels.",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Each execution shows) and no metric row",
-  "purpose": "Monitor pricing actions as they are executed across TICVAI's selling ecosystem.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Retry, Hold, Revert, Escalate, Freeze Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 125 §Actions"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every live dynamic price",
-       "columns": [
-        "LiveDynamicPriceExecutionDeploymentMonitorView.timestamp",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.product",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.event",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.previousPrice",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.newPrice",
-        "Trigger",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.strategy",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.aiRecommendation",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.approval",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.executionSource",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.status"
-       ],
-       "bindsTo": "LiveDynamicPriceExecutionDeploymentMonitorView",
-       "operation": "createLiveDynamicPrice",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 125 §Each execution shows"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected live dynamic price",
-       "bindsTo": "LiveDynamicPriceExecutionDeploymentMonitorView",
-       "columns": [
-        "LiveDynamicPriceExecutionDeploymentMonitorView.timestamp",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.product",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.event",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.previousPrice",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.newPrice",
-        "Trigger",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.strategy",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.aiRecommendation",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.approval",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.executionSource",
-        "LiveDynamicPriceExecutionDeploymentMonitorView.status"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Dubai Indoor Attraction”, “Trigger”, “Monitor propagation to”, “Alert”, “Display every live movement”, “Board 4 Integration”.",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 125 §Each execution shows"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Retry",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 125 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Hold",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 125 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Revert",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 125 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Escalate",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 125 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Freeze Channel",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 125 §Actions"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The live dynamic price list.",
-   "error": "Could not load. Names which read failed and leaves the live dynamic price untouched.",
-   "emptyFirstRun": "No live dynamic price yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the live dynamic price are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "createLiveDynamicPrice",
-    "contract": "catalogue",
-    "purpose": "Live Dynamic Price Execution & Deployment Monitor",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "LiveDynamicPriceExecutionDeploymentMonitorView.timestamp",
-    "LiveDynamicPriceExecutionDeploymentMonitorView.product",
-    "LiveDynamicPriceExecutionDeploymentMonitorView.event",
-    "LiveDynamicPriceExecutionDeploymentMonitorView.previousPrice",
-    "LiveDynamicPriceExecutionDeploymentMonitorView.newPrice",
-    "Trigger"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-115",
-   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-115"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 125. 10 of 11 labels bound to a contract property; 16 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-116",
-  "name": "Dynamic Pricing Performance & Optimization Analytics",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Pricing___Revenue_Management_Reference.pdf",
-   "board": "7",
-   "number": "10.7.9",
-   "page": 126
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/dynamic-pricing-performance-optimization-analytics-adm-116",
-   "component": "apps/ticvai-web/src/routes/commercial/DynamicPricingPerformanceOptimizationAnalytics.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-108"
-   ],
-   "exitTo": [
-    "ADM-108"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-108, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-108",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F149 step 16→17",
-     "operation": "listDynamicPricingPerformance"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "pricing strategies and AI recommendations.",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Measure) and no metric row",
-  "purpose": "Determine whether dynamic pricing actually improves TICVAI's commercial performance.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Strategy vs Strategy, Venue vs Venue, Event vs Event, Channel vs Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every dynamic pricing performance",
-       "columns": [
-        "DynamicPricingPerformanceOptimizationAnalyticsView.incrementalRevenue",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.revenueUplift",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.marginUplift",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.averageSellingPrice",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.conversion",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.attendance",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.occupancy",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.sellThrough",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.revenuePerAvailableCapacity",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.numberOfPriceChanges",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.strategyRoi",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.recommendationsGenerated",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.accepted",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.rejected",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.modified",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.autoExecuted",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.successful",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.negativeOutcome"
-       ],
-       "bindsTo": "DynamicPricingPerformanceOptimizationAnalyticsView",
-       "operation": "listDynamicPricingPerformance",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Measure"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected dynamic pricing performance",
-       "bindsTo": "DynamicPricingPerformanceOptimizationAnalyticsView",
-       "columns": [
-        "DynamicPricingPerformanceOptimizationAnalyticsView.incrementalRevenue",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.revenueUplift",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.marginUplift",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.averageSellingPrice",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.conversion",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.attendance",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.occupancy",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.sellThrough",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.revenuePerAvailableCapacity",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.numberOfPriceChanges",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.strategyRoi",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.recommendationsGenerated",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.accepted",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.rejected",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.modified",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.autoExecuted",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.successful",
-        "DynamicPricingPerformanceOptimizationAnalyticsView.negativeOutcome"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Revenue”, “ASP”, “Conversion”, “Attendance”, “Margin”, “Price”.",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Measure"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Strategy vs Strategy",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Venue vs Venue",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Event vs Event",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Channel vs Channel",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The dynamic pricing performance list.",
-   "error": "Could not load. Names which read failed and leaves the dynamic pricing performance untouched.",
-   "emptyFirstRun": "No dynamic pricing performance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the dynamic pricing performance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listDynamicPricingPerformance",
-    "contract": "catalogue",
-    "purpose": "Dynamic Pricing Performance & Optimization Analytics",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "DynamicPricingPerformanceOptimizationAnalyticsView.incrementalRevenue",
-    "DynamicPricingPerformanceOptimizationAnalyticsView.revenueUplift",
-    "DynamicPricingPerformanceOptimizationAnalyticsView.marginUplift",
-    "DynamicPricingPerformanceOptimizationAnalyticsView.averageSellingPrice",
-    "DynamicPricingPerformanceOptimizationAnalyticsView.conversion",
-    "DynamicPricingPerformanceOptimizationAnalyticsView.attendance"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-116",
-   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-116"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 126. 18 of 18 labels bound to a contract property; 22 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-117",
-  "name": "AI Learning, Model Performance & Optimization Feedback",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Pricing___Revenue_Management_Reference.pdf",
-   "board": "7",
-   "number": "10.7.10",
-   "page": 128
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/ai-learning-model-performance-optimization-feedback-adm-117",
-   "component": "apps/ticvai-web/src/routes/commercial/AiLearningModelPerformanceOptimizationFeedback.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-108"
-   ],
-   "exitTo": [
-    "ADM-108"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-108, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
-  },
-  "density": "compact",
-  "purposeNote": "outcomes and provides governed feedback for improving future pricing intelligence. Board 7 — Final Screen Register # Backend Screen Core Responsibility 10.7. Revenue Optimization Command Center Optimization operations 1 # Backend Screen Core Responsibility 10.7. Pricing Simulation Studio Test proposed pricing 2 10.7. Commercial scenario",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Forecast; Track; Detect) and no metric row",
-  "purpose": "Close the intelligence loop by comparing AI predictions and recommendations with actual commercial outcomes. This is what allows the system to improve over time.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every learning model performance",
-       "columns": [
-        "↓",
-        "AiLearningModelPerformanceOptimizationFeedbackView.demandForecastAccuracy",
-        "AiLearningModelPerformanceOptimizationFeedbackView.revenueForecastAccuracy",
-        "AiLearningModelPerformanceOptimizationFeedbackView.elasticityAccuracy",
-        "AiLearningModelPerformanceOptimizationFeedbackView.recommendationSuccess",
-        "AiLearningModelPerformanceOptimizationFeedbackView.confidenceCalibration",
-        "AiLearningModelPerformanceOptimizationFeedbackView.falsePositiveRate",
-        "AiLearningModelPerformanceOptimizationFeedbackView.revenueUplift"
-       ],
-       "bindsTo": "AiLearningModelPerformanceOptimizationFeedbackView",
-       "operation": "listLearningModelPerformance",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 128 §Forecast"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected learning model performance",
-       "bindsTo": "AiLearningModelPerformanceOptimizationFeedbackView",
-       "columns": [
-        "↓",
-        "AiLearningModelPerformanceOptimizationFeedbackView.demandForecastAccuracy",
-        "AiLearningModelPerformanceOptimizationFeedbackView.revenueForecastAccuracy",
-        "AiLearningModelPerformanceOptimizationFeedbackView.elasticityAccuracy",
-        "AiLearningModelPerformanceOptimizationFeedbackView.recommendationSuccess",
-        "AiLearningModelPerformanceOptimizationFeedbackView.confidenceCalibration",
-        "AiLearningModelPerformanceOptimizationFeedbackView.falsePositiveRate",
-        "AiLearningModelPerformanceOptimizationFeedbackView.revenueUplift"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Situation”, “Signals”, “Human/Automation Decision”, “Actual Price”, “Actual Demand”, “Actual Revenue”.",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 128 §Forecast"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save signal registry policy",
-       "operation": "setSignalRegistryPolicy",
-       "permission": "AI_CONFIGURE",
-       "notes": "**AI governance of signals and models** (29 September, writers pass).",
-       "provenance": "contract catalogue.yaml PUT /signal-registry"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The learning model performance list.",
-   "error": "Could not load. Names which read failed and leaves the learning model performance untouched.",
-   "emptyFirstRun": "No learning model performance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the learning model performance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listLearningModelPerformance",
-    "contract": "catalogue",
-    "purpose": "AI Learning, Model Performance & Optimization Feedback",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setSignalRegistryPolicy",
-    "contract": "catalogue",
-    "purpose": "Register a signal or model and set how far AI may trust it",
-    "trigger": "onAction",
-    "invalidates": [
-     "listLearningModelPerformance"
-    ]
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "↓",
-    "AiLearningModelPerformanceOptimizationFeedbackView.demandForecastAccuracy",
-    "AiLearningModelPerformanceOptimizationFeedbackView.revenueForecastAccuracy",
-    "AiLearningModelPerformanceOptimizationFeedbackView.elasticityAccuracy",
-    "AiLearningModelPerformanceOptimizationFeedbackView.recommendationSuccess",
-    "AiLearningModelPerformanceOptimizationFeedbackView.confidenceCalibration"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-117",
-   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-117"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 128. 7 of 8 labels bound to a contract property; 8 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
-   {
-    "id": "formSetSignalRegistryPolicy",
-    "component": "modal",
-    "trigger": "Save signal registry policy",
-    "body": "**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `id`, `scopePath`, `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`, `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`, `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "SignalRegistryEntry",
-    "confirm": {
-     "label": "Save signal registry policy",
-     "operation": "setSignalRegistryPolicy"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "scopePath",
-      "registryKind",
-      "name",
-      "trustLevel",
-      "category",
-      "provider",
-      "source",
-      "internalExternal",
-      "marketCode",
-      "refreshFrequency",
-      "aiUsePermissions",
-      "fallbackPolicy",
-      "status",
-      "ownerPrincipalId",
-      "purpose",
-      "deployedAt",
-      "trainingWindow"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PUT /signal-registry"
-   }
-  ],
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- }
-]
-```
+### `ADM-108` Revenue Optimization Command Center
 
-## `operations.json`
+**Provide Revenue Managers with the operational control center for all dynamic pricing simulations, AI recommendations, automated changes, experiments and revenue optimization activity.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each row displays) — counts over a population, then the population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/revenue-optimization-command-center-adm-108` |
+
+**Known gaps.** **The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Run Simulation, Review Recommendations, Start Experiment, Approve Changes, Pause Automation, Open Execution …
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Venue | text field | — | — | `listRevenue` ?venue |
+| Automation mode | radio group | — | Advisory · Human in the loop · Conditional autonomous · Autonomous | `listRevenue` ?automationMode |
+| Urgency | radio group | — | Low · Medium · High · Critical | `listRevenue` ?urgency |
+| Rank by | select | — | Revenue opportunity · Revenue risk · Event proximity · Confidence · Inventory position · Demand variance · Urgency | `listRevenue` ?rankBy |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Revenue Opportunity** (metric tile)
+
+**Incremental Revenue Generated** (metric tile)
+
+**Active Optimizations** (metric tile)
+
+**Recommendations Awaiting Action** (metric tile)
+
+**Pending Simulations** (metric tile)
+
+**Auto-Executed Changes** (metric tile)
+
+**Approval Required** (metric tile)
+
+**Active A/B Tests** (metric tile)
+
+**Pricing Exceptions** (metric tile)
+
+**Revenue at Risk** (metric tile)
+
+**Forecast Accuracy** (metric tile)
+
+**Optimization Success Rate** (metric tile)
+
+**Every revenue optimization** (data table, from `listRevenue`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+
+**The selected revenue optimization** (detail panel): The pack groups this record's detail under its own headings: “Event Action”, “AED”, “Attraction AED Simulat”, “B 220 e”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Run Simulation (primary button) | navigation or local | — | — | — | — |
+| Review Recommendations (secondary button) | navigation or local | — | — | — | — |
+| Start Experiment (secondary button) | navigation or local | — | — | — | — |
+| Approve Changes (secondary button) | navigation or local | — | — | — | — |
+| Pause Automation (secondary button) | navigation or local | — | — | — | — |
+| Open Execution Monitor (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listRevenue` (onLoad, Revenue Optimization Command Center)
+
+**Where the user goes next**
+
+- → `ADM-002` Platform Dashboard: *Platform Dashboard*
+- → `ADM-109` Pricing Simulation Studio: *Works in Pricing Simulation Studio*; calls `listRevenue`
+- → `ADM-110` Scenario Modeling & What-If Analysis: *Works in Scenario Modeling & What-If Analysis*; calls `listRevenue`
+- → `ADM-111` A/B Pricing Experiment Studio: *Works in A/B Pricing Experiment Studio*; calls `listRevenue`
+- → `ADM-112` Revenue & Demand Impact Forecasting: *Works in Revenue & Demand Impact Forecasting*; calls `listRevenue`
+- → `ADM-114` Automation Policy & Autonomous Pricing Orchestrator: *Works in Automation Policy & Autonomous Pricing Orchestrator*; calls `listRevenue`
+- → `ADM-115` Live Dynamic Price Execution & Deployment Monitor: *Works in Live Dynamic Price Execution & Deployment Monitor*; calls `listRevenue`
+- → `ADM-116` Dynamic Pricing Performance & Optimization Analytics: *Works in Dynamic Pricing Performance & Optimization Analytics*; calls `listRevenue`
+- → `ADM-117` AI Learning, Model Performance & Optimization Feedback: *Works in AI Learning, Model Performance & Optimization Feedback*; calls `listRevenue`
+- → `ADM-113` AI Recommendation Review & Decision Queue: *Works in AI Recommendation Review & Decision Queue*; carries `recommendationId`; calls `listRevenue`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The revenue optimization list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the revenue optimization untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No revenue optimization yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the revenue optimization are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listRevenue` → `PRODUCT_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 8.5.30 | System shall support revenue optimization. | Unified Operations Dashboard | CONTRACTED | `listRevenue` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-108` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-108`
+- Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 1: Opens Revenue Optimization Command Center → Provide Revenue Managers with the operational control center for all dynamic pricing simulations, AI recommendations, automated changes, experiments and revenue optimization activity.
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 3: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 5: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 7: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 9: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 11: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 13: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 15: Returns to the board's landing screen → Ready for the next screen on this board
+- … and 1 more flow steps (`flows/`)
+- Flow F149 branch at step 1 (expected): when Nothing has been set up on Revenue Optimization Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
+- Flow F149 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-108?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Run Simulation, Review Recommendations, Start Experiment, Approve Changes, Pause Automation, Open Execution Monitor.
+- [ ] Every transition is wired: `ADM-002`, `ADM-109`, `ADM-110`, `ADM-111`, `ADM-112`, `ADM-114`, `ADM-115`, `ADM-116`, `ADM-117`, `ADM-113`.
+- [ ] Every gated control is gated: `PRODUCT_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-109` Pricing Simulation Studio
+
+**Allow any proposed dynamic-pricing change to be tested before affecting live customers. This should become the sandbox of the Dynamic Pricing Engine.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/pricing-simulation-studio-adm-109` |
+
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Save Scenario, Compare Scenario, Send for Approval, Start Experiment, Discard. Each needs an operation, or …
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every pricing simulation** (data table, from `setPricing`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Simulation confidence | 1,234.5 | Simulation Confidence, percent |
+| Data volume | 1,234 | Data Volume: transactions behind the simulation |
+| Historical similarity | 1,234.5 | Historical Similarity, percent |
+| Forecast confidence | 1,234.5 | Forecast Confidence, percent |
+| Elasticity confidence | 1,234.5 | Elasticity Confidence, percent |
+| External signal quality | 1,234.5 | External Signal Quality, percent |
+
+**The selected pricing simulation** (detail panel): The pack groups this record's detail under its own headings: “A simulation can originate from”, “Calculate”, “Current Strategy”, “Before simulation completes, show”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Simulation confidence | 1,234.5 | Simulation Confidence, percent |
+| Data volume | 1,234 | Data Volume: transactions behind the simulation |
+| Historical similarity | 1,234.5 | Historical Similarity, percent |
+| Forecast confidence | 1,234.5 | Forecast Confidence, percent |
+| Elasticity confidence | 1,234.5 | Elasticity Confidence, percent |
+| External signal quality | 1,234.5 | External Signal Quality, percent |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save Scenario (primary button) | navigation or local | — | — | — | — |
+| Compare Scenario (secondary button) | navigation or local | — | — | — | — |
+| Send for Approval (secondary button) | navigation or local | — | — | — | — |
+| Start Experiment (secondary button) | navigation or local | — | — | — | — |
+| Discard (destructive button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `ADM-108` Revenue Optimization Command Center: *Returns to the board's landing screen*; calls `setPricing`
+
+**What opens over it**
+
+- confirmDialog *Discard*: **Discard on a pricing simulation is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The pricing simulation list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the pricing simulation untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No pricing simulation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the pricing simulation are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `setPricing` → `PRODUCT_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 8.5.14 | System shall support automatic pricing simulations. | Unified Operations Dashboard | CONTRACTED | `setPricing` |
+| 8.5.16 | System shall support projected revenue simulations. | Unified Operations Dashboard | CONTRACTED | `setPricing` |
+| 8.5.17 | System shall support projected demand simulations. | Unified Operations Dashboard | CONTRACTED | `setPricing` |
+| 8.5.44 | System shall support simulation of pricing scenarios before activation. | Unified Operations Dashboard | CONTRACTED | `setPricing` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- AI forecasting recommends pricing/promotional action ahead of demand shifts (e.g. forecast rain > recommend a discount); a simulation tool previews the likely impact of a price change before it goes live. *(client request · MoM 1 Sep 2026, 4.8 AI Demand Forecasting & Pricing Simulation · DI-601)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-109` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-109`
+- Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 2: Works in Pricing Simulation Studio → Allow any proposed dynamic-pricing change to be tested before affecting live customers. This should become the sandbox of the Dynamic Pricing Engine.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-109?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save Scenario, Compare Scenario, Send for Approval, Start Experiment, Discard.
+- [ ] Every transition is wired: `ADM-108`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-110` Scenario Modeling & What-If Analysis
+
+**Scenario Modeling & What-If Analysis**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/scenario-modeling-what-if-analysis-adm-110` |
+
+**Known gaps.** **The pack names 11 actions on this screen and the screen declares 1 operation.** Unserved: Low Demand, Expected Demand, High Demand, Competitor Price Drop, Competitor Price Increase, Inventory … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Scenario type | select | — | Low demand · Expected demand · High demand · Sell out · Competitor price drop · Competitor price increase · Extreme weather · Rain · Nearby exhibition · Major concert · Tourism surge · Cancellation surge … | `listScenarioModelingWhat` ?scenarioType |
+| Venue | text field | — | — | `listScenarioModelingWhat` ?venue |
+| Search | text field | — | — | `listScenarioModelingWhat` ?search |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Low Demand (primary button) | navigation or local | — | — | — | — |
+| Expected Demand (secondary button) | navigation or local | — | — | — | — |
+| High Demand (secondary button) | navigation or local | — | — | — | — |
+| Competitor Price Drop (secondary button) | navigation or local | — | — | — | — |
+| Competitor Price Increase (secondary button) | navigation or local | — | — | — | — |
+| Inventory Reduction (secondary button) | navigation or local | — | — | — | — |
+| Custom Scenario (secondary button) | navigation or local | — | — | — | — |
+| Save (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listScenarioModelingWhat` (onLoad, Scenario Modeling & What-If Analysis)
+
+**Where the user goes next**
+
+- → `ADM-108` Revenue Optimization Command Center: *Returns to the board's landing screen*; calls `listScenarioModelingWhat`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The scenario modeling what-if list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the scenario modeling what-if untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No scenario modeling what-if yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the scenario modeling what-if are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listScenarioModelingWhat` → `PRODUCT_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 8.5.15 | System shall support pricing scenario modeling. | Unified Operations Dashboard | CONTRACTED | `listScenarioModelingWhat` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Demand forecasts show current sales pace, forecast and remaining opportunity broken down by sales channel; revenue forecasts show drivers and confidence levels. A forecast simulator models a hypothetical change (e.g. a 10% price decrease, reduced operating hours, staffing changes) before it is made. *(client request · MoM 18 Sep 2026, 4.10 AI Forecasting — Attendance, Demand, Revenue & Capacity Forecasting · DI-943)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-110` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-110`
+- Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 4: Works in Scenario Modeling & What-If Analysis → Scenario Modeling & What-If Analysis
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-110?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Low Demand, Expected Demand, High Demand, Competitor Price Drop, Competitor Price Increase, Inventory Reduction, Custom Scenario, Save.
+- [ ] Every transition is wired: `ADM-108`.
+- [ ] Every gated control is gated: `PRODUCT_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-111` A/B Pricing Experiment Studio
+
+**Allow TICVAI to scientifically test different pricing strategies using controlled customer groups. This is essential because AI should learn from actual customer behavior, not only historical assumptions.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/a-b-pricing-experiment-studio-adm-111` |
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every pricing experiment** (data table, from `setPricingExperiment`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Sample size | 1,234 | Sample Size reached |
+| Confidence level | 1,234.5 | Target Confidence Level; default 95 (decided 29 September, readiness close-out), percent |
+| Experiment duration | 1,234 | Experiment Duration, days |
+| Statistical significance | yes / no (icon or chip) | Statistical Significance reached at the target confidence level |
+
+**The selected pricing experiment** (detail panel): The pack groups this record's detail under its own headings: “AED 250”, “Variant B”, “AED 265”, “Experiments must respect”, “Winner”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Sample size | 1,234 | Sample Size reached |
+| Confidence level | 1,234.5 | Target Confidence Level; default 95 (decided 29 September, readiness close-out), percent |
+| Experiment duration | 1,234 | Experiment Duration, days |
+| Statistical significance | yes / no (icon or chip) | Statistical Significance reached at the target confidence level |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save changes (primary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `ADM-108` Revenue Optimization Command Center: *Returns to the board's landing screen*; calls `setPricingExperiment`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The pricing experiment list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the pricing experiment untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No pricing experiment yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the pricing experiment are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `setPricingExperiment` → `PRODUCT_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 8.5.43 | System shall support A/B testing of pricing strategies. | Unified Operations Dashboard | CONTRACTED | `setPricingExperiment` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-111` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-111`
+- Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 6: Works in A/B Pricing Experiment Studio → Allow TICVAI to scientifically test different pricing strategies using controlled customer groups. This is essential because AI should learn from actual customer behavior, not only historical …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-111?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save changes.
+- [ ] Every transition is wired: `ADM-108`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-112` Revenue & Demand Impact Forecasting
+
+**Provide a dedicated commercial impact assessment before a dynamic-pricing action is approved or executed.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Forecast; Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/revenue-demand-impact-forecasting-adm-112` |
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Recommendation | text field | — | — | `listRevenueDemandImpact` ?recommendationId |
+| Simulation | text field | — | — | `listRevenueDemandImpact` ?simulationId |
+| Venue | text field | — | — | `listRevenueDemandImpact` ?venue |
+| Event | text field | — | — | `listRevenueDemandImpact` ?event |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Revenue** (metric tile)
+
+**Demand** (metric tile)
+
+**Attendance** (metric tile)
+
+**Occupancy** (metric tile)
+
+**Conversion** (metric tile)
+
+**Margin** (metric tile)
+
+**ASP** (metric tile)
+
+**Sell-Through** (metric tile)
+
+**Sell-Out Probability** (metric tile)
+
+**Data it reads**: `listRevenueDemandImpact` (onLoad, Revenue & Demand Impact Forecasting)
+
+**Where the user goes next**
+
+- → `ADM-108` Revenue Optimization Command Center: *Returns to the board's landing screen*; calls `listRevenueDemandImpact`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The revenue demand impact list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the revenue demand impact untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No revenue demand impact yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the revenue demand impact are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listRevenueDemandImpact` → `PRODUCT_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 8.5.45 | System shall support revenue impact forecasting for pricing changes. | Unified Operations Dashboard | CONTRACTED | `listRevenueDemandImpact` |
+| 8.5.46 | System shall support demand impact forecasting for pricing changes. | Unified Operations Dashboard | CONTRACTED | `listRevenueDemandImpact` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Demand forecasts show current sales pace, forecast and remaining opportunity broken down by sales channel; revenue forecasts show drivers and confidence levels. A forecast simulator models a hypothetical change (e.g. a 10% price decrease, reduced operating hours, staffing changes) before it is made. *(client request · MoM 18 Sep 2026, 4.10 AI Forecasting — Attendance, Demand, Revenue & Capacity Forecasting · DI-943)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-112` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-112`
+- Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 8: Works in Revenue & Demand Impact Forecasting → Provide a dedicated commercial impact assessment before a dynamic-pricing action is approved or executed.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-112?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-108`.
+- [ ] Every gated control is gated: `PRODUCT_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-113` AI Recommendation Review & Decision Queue
+
+**Provide the human decision workspace for recommendations produced by Board 6. This should be the Revenue Manager's inbox.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_APPROVE`, `PRODUCT_VIEW` (1 operate, 1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
+| Offline | online only |
+| Opens with | `recommendationId` (navigation) |
+| Route | `/commercial/ai-recommendation-review-decision-queue-adm-113` |
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Venue | text field | — | — | `listRecommendationReviewDecision` ?venue |
+| Event | text field | — | — | `listRecommendationReviewDecision` ?event |
+| Urgency | radio group | — | Low · Medium · High · Critical | `listRecommendationReviewDecision` ?urgency |
+| Decision | select | — | Pending · Accepted · Rejected · Modified · Scheduled · Sent for approval | `listRecommendationReviewDecision` ?decision |
+| Governance level | text field | — | — | `listRecommendationReviewDecision` ?governanceLevel |
+
+**Sent by *Accept*** (`decidePricingRecommendation`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Decision `decision` | radio group | required | — | Accept · Modify · Reject · Schedule · Send for approval | — | — | `decidePricingRecommendation` body |
+| Rejection reason `rejectionReason` | select | optional | — | Commercial judgment · Brand positioning · Customer sensitivity · Event strategy · Incorrect signal · Data concern · Other | — | Required for reject. | `decidePricingRecommendation` body |
+| Rejection note `rejectionNote` | text area | optional | — | max length 2000 | — | — | `decidePricingRecommendation` body |
+| Human selected price `humanSelectedPrice` | money field | optional | — | — | AED, 2 decimals shown (up to 4 accepted), currency from the … | Required for modify; must sit inside the strategy's guardrails. | `decidePricingRecommendation` body |
+| Scheduled for `scheduledFor` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Required for schedule; in the future. | `decidePricingRecommendation` body |
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every recommendation review decision** (data table, from `listRecommendationReviewDecision`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Recommendation | text | Recommendation title |
+| Venue | text | Venue |
+| Event | text | Event |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Change | 1,234.5 | Change %, percent |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
+| Demand impact | 1,234.5 | Demand Impact, percent |
+| Confidence | 1,234.5 | AI Confidence, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Governance level | text | Governance Level: approval level required, from the configured approval matrix |
+
+**The selected recommendation review decision** (detail panel): The pack groups this record's detail under its own headings: “Simulation Result”, “Simulation Revenue Uplift”, “Demand Impact”, “AED 265”, “Feedback Loop”, “Human Selected AED 265”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Recommendation | text | Recommendation title |
+| Venue | text | Venue |
+| Event | text | Event |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Change | 1,234.5 | Change %, percent |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
+| Demand impact | 1,234.5 | Demand Impact, percent |
+| Confidence | 1,234.5 | AI Confidence, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Governance level | text | Governance Level: approval level required, from the configured approval matrix |
+
+**Permissions this screen separates** (banner): **The pack separates these permissions; since 29 September the decision buttons are `decidePricingRecommendation` (AI_APPROVE)** — earlier text: Accept, Reject, Modify, Simulate Again, Schedule, Send for Approval. Each needs attaching to the control it gates, or the screen needs the control.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Accept (primary button) | `decidePricingRecommendation` POST `/recommendation-review-decision/{recommendationId}/decision` | PricingRecommendationDecisionInput | PricingRecommendationDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The recommendation is no longer `pending` or `sentToSimulation` (`alreadyDecided`) or has expired … | — |
+| Modify (secondary button) | `decidePricingRecommendation` POST `/recommendation-review-decision/{recommendationId}/decision` | PricingRecommendationDecisionInput | PricingRecommendationDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The recommendation is no longer `pending` or `sentToSimulation` (`alreadyDecided`) or has expired … | — |
+| Reject (secondary button) | `decidePricingRecommendation` POST `/recommendation-review-decision/{recommendationId}/decision` | PricingRecommendationDecisionInput | PricingRecommendationDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The recommendation is no longer `pending` or `sentToSimulation` (`alreadyDecided`) or has expired … | — |
+| Schedule (secondary button) | `decidePricingRecommendation` POST `/recommendation-review-decision/{recommendationId}/decision` | PricingRecommendationDecisionInput | PricingRecommendationDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The recommendation is no longer `pending` or `sentToSimulation` (`alreadyDecided`) or has expired … | — |
+| Send for approval (secondary button) | `decidePricingRecommendation` POST `/recommendation-review-decision/{recommendationId}/decision` | PricingRecommendationDecisionInput | PricingRecommendationDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The recommendation is no longer `pending` or `sentToSimulation` (`alreadyDecided`) or has expired … | — |
+
+**Data it reads**: `listRecommendationReviewDecision` (onLoad, AI Recommendation Review & Decision Queue)
+
+**Where the user goes next**
+
+- → `ADM-108` Revenue Optimization Command Center: *Returns to the board's landing screen*; calls `listRecommendationReviewDecision`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The recommendation review decision list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the recommendation review decision untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No recommendation review decision yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the recommendation review decision are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The recommendation is no longer `pending` or `sentToSimulation` (`alreadyDecided`) or has expired (`recommendationExpired`).; 422 `rejectionReasonRequired`, `humanSelectedPriceRequired`, `guardrailBreached` or `scheduledForInPast`. |
+
+#### Permissions
+
+- `listRecommendationReviewDecision` → `PRODUCT_VIEW` (read) · staff
+- `decidePricingRecommendation` → `AI_APPROVE` (operate) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A57** Design integration to consume each venue's live attraction wait-time feed (from entry-counting sensors/cameras) via API, and surface wait times in the guest mobile app *(Softlabs Team · Medium · Done → 30 Sep: Closed, Done (as recorded earlier) · workshop tracker · keyword 'wait-time')*
+- **A243** Merge accreditation, entitlement and virtual queue boards into fewer screens *(Chinmay Parab / Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 7 Sep 2026 · workshop tracker · keyword 'virtual queue')*
+- **A244** Build virtual queue with 3 guest tiers (walk-in, VQ, VIP); keep VQ separate from VIP lane *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 7 Sep 2026 · workshop tracker · keyword 'virtual queue')*
+- **A245** Recalculate virtual queue return times live, not fixed at booking *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 7 Sep 2026 · workshop tracker · keyword 'virtual queue')*
+- **A246** Support virtual queue via app (theme parks) and kiosk/wristband scan (water parks) *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 7 Sep 2026 · workshop tracker · keyword 'virtual queue')*
+- **A247** Build virtual queue ops dashboard, AI guest-flow tips and fast-lane upsell on long waits *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 7 Sep 2026 · workshop tracker · keyword 'virtual queue')*
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-113` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-113`
+- Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 10: Works in AI Recommendation Review & Decision Queue → Provide the human decision workspace for recommendations produced by Board 6. This should be the Revenue Manager's inbox.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (404, 409, 422).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-113?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Accept, Modify, Reject, Schedule, Send for approval.
+- [ ] Every transition is wired: `ADM-108`.
+- [ ] Every gated control is gated: `AI_APPROVE`, `PRODUCT_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-114` Automation Policy & Autonomous Pricing Orchestrator
+
+**Control when TICVAI is allowed to execute pricing changes automatically. Board 5 defines the strategy-level automation permission. This screen manages operational autonomous execution at scale.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/automation-policy-autonomous-pricing-orchestrator-adm-114` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Tenant | select field | — | — | — | — | — | — |
+| Venue | select field | — | — | — | — | — | — |
+| Product | select field | — | — | — | — | — | — |
+| Event | select field | — | — | — | — | — | — |
+| Strategy | select field | — | — | — | — | — | — |
+| Channel | select field | — | — | — | — | — | — |
+| Market | select field | — | — | — | — | — | — |
+| Date/Time | select field | — | — | — | — | — | — |
+| Evaluation Frequency | select field | — | — | — | — | — | — |
+| Execution Frequency | select field | — | — | — | — | — | — |
+| Minimum Time Between Changes | text field | — | — | — | — | — | — |
+| Maximum Changes per Day | text field | — | — | — | — | — | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Venue | text field | — | — | `listAutomationPolicyAutonomous` ?venue |
+| Automation level | radio group | — | Advisory · Human in the loop · Conditional autonomous · Autonomous | `listAutomationPolicyAutonomous` ?automationLevel |
+| Strategy | text field | — | — | `listAutomationPolicyAutonomous` ?strategy |
+| Paused | toggle | — | — | `listAutomationPolicyAutonomous` ?paused |
+
+**Form: Save dynamic pricing guardrail policy** (modal, opened by *Save dynamic pricing guardrail policy*; *Save dynamic pricing guardrail policy* calls `setDynamicPricingGuardrailPolicy`, *Cancel* sends nothing)
+
+**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Scope level `scopeLevel` | select | required | — | Global · Market · Venue · Strategy · Product · Event · Performance · Channel | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Scope `scopeId` | picker: choose a scope | optional | — | — | shows names, sends the id | Null at `global`. | `setDynamicPricingGuardrailPolicy` body |
+| Absolute minimum price `absoluteMinimumPrice` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setDynamicPricingGuardrailPolicy` body |
+| Absolute maximum price `absoluteMaximumPrice` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setDynamicPricingGuardrailPolicy` body |
+| Minimum margin percent `minimumMarginPercent` | number field | optional | — | — | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Maximum uplift percent `maximumUpliftPercent` | number field | optional | — | min 0 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Maximum reduction percent `maximumReductionPercent` | number field | optional | — | min 0 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Maximum single change percent `maximumSingleChangePercent` | number field | optional | — | min 0 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Maximum daily change percent `maximumDailyChangePercent` | number field | optional | — | min 0 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Maximum weekly change percent `maximumWeeklyChangePercent` | number field | optional | — | min 0 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Minimum change interval minutes `minimumChangeIntervalMinutes` | number field (minutes) | optional | — | min 0 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Maximum changes per day `maximumChangesPerDay` | number field | optional | — | min 0 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Minimum inventory `minimumInventory` | number field | optional | — | min 0 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Maximum occupancy trigger percent `maximumOccupancyTriggerPercent` | stepper or slider | optional | — | min 0; max 100 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Protected rate types `protectedRateTypes` | multi-select chips | optional | — | Contract rates · Membership rates · Corporate rates · Promotional locked rates · Regulatory prices · Complimentary rates | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Is frozen `isFrozen` | toggle | optional | off | — | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Is kill switch active `isKillSwitchActive` | toggle | optional | off | — | — | Stops every automatic change in scope at once. | `setDynamicPricingGuardrailPolicy` body |
+| Automation level `automationLevel` | radio group | required | Advisory | Advisory · Human in the loop · Conditional autonomous · Autonomous | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Authority tiers `authorityTiers` | key and value settings | optional | — | — | — | `[{maxAdjustmentPercent, action, confidenceThreshold}]`. | `setDynamicPricingGuardrailPolicy` body |
+| Max adjustment percent `maxAdjustmentPercent` | number field | optional | — | min 0 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Min AI confidence `minAiConfidence` | stepper or slider | optional | — | min 0; max 1 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Min revenue uplift percent `minRevenueUpliftPercent` | number field | optional | — | — | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Evaluation frequency minutes `evaluationFrequencyMinutes` | number field (minutes) | optional | — | min 1 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Execution frequency minutes `executionFrequencyMinutes` | number field (minutes) | optional | — | min 1 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Quiet period minutes `quietPeriodMinutes` | number field (minutes) | optional | — | min 0 | — | — | `setDynamicPricingGuardrailPolicy` body |
+| No change windows `noChangeWindows` | key and value settings | optional | — | — | — | `[{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]`. | `setDynamicPricingGuardrailPolicy` body |
+| Circuit breakers `circuitBreakers` | key and value settings | optional | — | — | — | `[{trigger, threshold, enabled, tripped}]`. | `setDynamicPricingGuardrailPolicy` body |
+| Require guardrails passed `requireGuardrailsPassed` | toggle | optional | on | — | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Exclude protected rates `excludeProtectedRates` | toggle | optional | on | — | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Require healthy forecast data `requireHealthyForecastData` | toggle | optional | on | — | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Safe failure behavior `safeFailureBehavior` | radio group | optional | Hold last price | Hold last price · Return to base · Freeze · Request review | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Active override `activeOverride` | key and value settings | optional | — | — | — | `{user, reason, overridePrice, start, expiry, returnBehavior}`. | `setDynamicPricingGuardrailPolicy` body |
+| Is paused `isPaused` | toggle | optional | off | — | — | — | `setDynamicPricingGuardrailPolicy` body |
+| Effective from `effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setDynamicPricingGuardrailPolicy` body |
+| Effective to `effectiveTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setDynamicPricingGuardrailPolicy` body |
+
+Errors to draw in the form: 422 `invalidRange` or `scopeIdRequired`.
+
+#### Outputs: what the screen shows and produces
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save dynamic pricing guardrail policy (primary button) | `setDynamicPricingGuardrailPolicy` PUT `/dynamic-pricing-controls` | DynamicPricingControl | DynamicPricingControl | 422 `invalidRange` or `scopeIdRequired`. | gated `PRICE_CONFIGURE`; opens modal first |
+
+**Data it reads**: `listAutomationPolicyAutonomous` (onLoad, Automation Policy & Autonomous Pricing Orchestrator)
+
+**Where the user goes next**
+
+- → `ADM-108` Revenue Optimization Command Center: *Returns to the board's landing screen*; calls `listAutomationPolicyAutonomous`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The automation policy autonomous configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the automation policy autonomous untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No automation policy autonomous configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 422 `invalidRange` or `scopeIdRequired`. |
+
+#### Permissions
+
+- `listAutomationPolicyAutonomous` → `PRODUCT_VIEW` (read) · staff
+- `setDynamicPricingGuardrailPolicy` → `PRICE_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 8.5.19 | System shall support pricing thresholds. | Unified Operations Dashboard | CONTRACTED | `setDynamicPricingGuardrailPolicy` |
+| 8.5.20 | System shall support minimum pricing rules. | Unified Operations Dashboard | CONTRACTED | `setDynamicPricingGuardrailPolicy` |
+| 8.5.21 | System shall support maximum pricing rules. | Unified Operations Dashboard | CONTRACTED | `setDynamicPricingGuardrailPolicy` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-114` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-114`
+- Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 12: Works in Automation Policy & Autonomous Pricing Orchestrator → Control when TICVAI is allowed to execute pricing changes automatically. Board 5 defines the strategy-level automation permission. This screen manages operational autonomous execution at scale.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (47), with its required mark, default, format and its error state (422).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-114?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save dynamic pricing guardrail policy.
+- [ ] Every transition is wired: `ADM-108`.
+- [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-115` Live Dynamic Price Execution & Deployment Monitor
+
+**Monitor pricing actions as they are executed across TICVAI's selling ecosystem.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Each execution shows) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/live-dynamic-price-execution-deployment-monitor-adm-115` |
+
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Retry, Hold, Revert, Escalate, Freeze Channel. Each needs an operation, or needs removing from the screen …
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every live dynamic price** (data table, from `createLiveDynamicPrice`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Timestamp | 1 Oct 2026, 14:30 | Timestamp |
+| Product | text | Product id |
+| Event | text | Event id |
+| Previous price | AED 1,234.50 | Previous Price |
+| New price | AED 1,234.50 | New Price |
+| Trigger | text | not in the schema: `Trigger` |
+| Strategy | text | Strategy id |
+| AI recommendation | text | Recommendation id the change came from |
+| Approval | text | Approval reference; empty only for policy-permitted automatic execution |
+| Execution source | chip: Manual, Human approved, Scheduled, Conditional autonomous, Autonomous | Execution Source |
+| Status | text | Status: queued, processing, live, partial, failed or rolledBack |
+
+**The selected live dynamic price** (detail panel): The pack groups this record's detail under its own headings: “Dubai Indoor Attraction”, “Trigger”, “Monitor propagation to”, “Alert”, “Display every live movement”, “Board 4 Integration”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Timestamp | 1 Oct 2026, 14:30 | Timestamp |
+| Product | text | Product id |
+| Event | text | Event id |
+| Previous price | AED 1,234.50 | Previous Price |
+| New price | AED 1,234.50 | New Price |
+| Trigger | text | not in the schema: `Trigger` |
+| Strategy | text | Strategy id |
+| AI recommendation | text | Recommendation id the change came from |
+| Approval | text | Approval reference; empty only for policy-permitted automatic execution |
+| Execution source | chip: Manual, Human approved, Scheduled, Conditional autonomous, Autonomous | Execution Source |
+| Status | text | Status: queued, processing, live, partial, failed or rolledBack |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Retry (primary button) | navigation or local | — | — | — | — |
+| Hold (secondary button) | navigation or local | — | — | — | — |
+| Revert (secondary button) | navigation or local | — | — | — | — |
+| Escalate (secondary button) | navigation or local | — | — | — | — |
+| Freeze Channel (secondary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `ADM-108` Revenue Optimization Command Center: *Returns to the board's landing screen*; calls `createLiveDynamicPrice`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The live dynamic price list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the live dynamic price untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No live dynamic price yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the live dynamic price are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `createLiveDynamicPrice` → `PRODUCT_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-115` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-115`
+- Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 14: Works in Live Dynamic Price Execution & Deployment Monitor → Monitor pricing actions as they are executed across TICVAI's selling ecosystem.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-115?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Retry, Hold, Revert, Escalate, Freeze Channel.
+- [ ] Every transition is wired: `ADM-108`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-116` Dynamic Pricing Performance & Optimization Analytics
+
+**Determine whether dynamic pricing actually improves TICVAI's commercial performance.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Measure) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/dynamic-pricing-performance-optimization-analytics-adm-116` |
+
+**Known gaps.** **The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Strategy vs Strategy, Venue vs Venue, Event vs Event, Channel vs Channel. Each needs an operation, or needs …
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Level | select | — | Market · Venue · Event · Performance · Product · Price category · Channel | `listDynamicPricingPerformance` ?level |
+| Market | text field | — | — | `listDynamicPricingPerformance` ?market |
+| Venue | text field | — | — | `listDynamicPricingPerformance` ?venue |
+| Event | text field | — | — | `listDynamicPricingPerformance` ?event |
+| Channel | select | — | POS · Kiosk · Web · Mobile · B2B · Ota · Call centre | `listDynamicPricingPerformance` ?channel |
+| Compare by | select | — | Dynamic vs fixed · AI vs rules · AI vs human · Strategy vs strategy · Venue vs venue · Event vs event · Channel vs channel · Current vs previous period | `listDynamicPricingPerformance` ?compareBy |
+| Date from | date picker | — | — | `listDynamicPricingPerformance` ?dateFrom |
+| Date to | date picker | — | — | `listDynamicPricingPerformance` ?dateTo |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every dynamic pricing performance** (data table, from `listDynamicPricingPerformance`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Incremental revenue | AED 1,234.50 | Incremental Revenue |
+| Revenue uplift | 1,234.5 | Revenue Uplift, percent |
+| Margin uplift | 1,234.5 | Margin Uplift, percent |
+| Average selling price | AED 1,234.50 | Average Selling Price |
+| Conversion | 1,234.5 | Conversion, percent |
+| Attendance | 1,234 | Attendance |
+| Occupancy | 1,234.5 | Occupancy, percent |
+| Sell through | 1,234.5 | Sell-Through, percent |
+| Revenue per available capacity | AED 1,234.50 | Revenue per Available Capacity |
+| Number of price changes | 1,234 | Number of Price Changes |
+| Strategy roi | 1,234.5 | Strategy ROI, percent |
+| Recommendations generated | 1,234 | Recommendations Generated |
+| Accepted | 1,234 | Accepted |
+| Rejected | 1,234 | Rejected |
+| Modified | 1,234 | Modified |
+| Auto executed | 1,234 | Auto-Executed |
+| Successful | 1,234 | Successful |
+| Negative outcome | 1,234 | Negative Outcome |
+
+**The selected dynamic pricing performance** (detail panel): The pack groups this record's detail under its own headings: “Revenue”, “ASP”, “Conversion”, “Attendance”, “Margin”, “Price”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Incremental revenue | AED 1,234.50 | Incremental Revenue |
+| Revenue uplift | 1,234.5 | Revenue Uplift, percent |
+| Margin uplift | 1,234.5 | Margin Uplift, percent |
+| Average selling price | AED 1,234.50 | Average Selling Price |
+| Conversion | 1,234.5 | Conversion, percent |
+| Attendance | 1,234 | Attendance |
+| Occupancy | 1,234.5 | Occupancy, percent |
+| Sell through | 1,234.5 | Sell-Through, percent |
+| Revenue per available capacity | AED 1,234.50 | Revenue per Available Capacity |
+| Number of price changes | 1,234 | Number of Price Changes |
+| Strategy roi | 1,234.5 | Strategy ROI, percent |
+| Recommendations generated | 1,234 | Recommendations Generated |
+| Accepted | 1,234 | Accepted |
+| Rejected | 1,234 | Rejected |
+| Modified | 1,234 | Modified |
+| Auto executed | 1,234 | Auto-Executed |
+| Successful | 1,234 | Successful |
+| Negative outcome | 1,234 | Negative Outcome |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Strategy vs Strategy (primary button) | navigation or local | — | — | — | — |
+| Venue vs Venue (secondary button) | navigation or local | — | — | — | — |
+| Event vs Event (secondary button) | navigation or local | — | — | — | — |
+| Channel vs Channel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listDynamicPricingPerformance` (onLoad, Dynamic Pricing Performance & Optimization Analytics)
+
+**Where the user goes next**
+
+- → `ADM-108` Revenue Optimization Command Center: *Returns to the board's landing screen*; calls `listDynamicPricingPerformance`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The dynamic pricing performance list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the dynamic pricing performance untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No dynamic pricing performance yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the dynamic pricing performance are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listDynamicPricingPerformance` → `PRODUCT_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 8.5.27 | System shall provide pricing analytics dashboards. | Unified Operations Dashboard | CONTRACTED | `listDynamicPricingPerformance` |
+| 8.5.28 | System shall provide pricing performance reporting. | Unified Operations Dashboard | CONTRACTED | `listDynamicPricingPerformance` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-116` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-116`
+- Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 16: Works in Dynamic Pricing Performance & Optimization Analytics → Determine whether dynamic pricing actually improves TICVAI's commercial performance.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-116?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Strategy vs Strategy, Venue vs Venue, Event vs Event, Channel vs Channel.
+- [ ] Every transition is wired: `ADM-108`.
+- [ ] Every gated control is gated: `PRODUCT_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-117` AI Learning, Model Performance & Optimization Feedback
+
+**Close the intelligence loop by comparing AI predictions and recommendations with actual commercial outcomes. This is what allows the system to improve over time.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `AI_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Forecast; Track; Detect) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/ai-learning-model-performance-optimization-feedback-adm-117` |
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Model name | text field | — | — | `listLearningModelPerformance` ?modelName |
+| Venue | text field | — | — | `listLearningModelPerformance` ?venue |
+| Product | text field | — | — | `listLearningModelPerformance` ?product |
+| Event type | text field | — | — | `listLearningModelPerformance` ?eventType |
+| Season | text field | — | — | `listLearningModelPerformance` ?season |
+| Channel | select | — | POS · Kiosk · Web · Mobile · B2B · Ota · Call centre | `listLearningModelPerformance` ?channel |
+| Market | text field | — | — | `listLearningModelPerformance` ?market |
+| Forecast horizon | select | — | Intraday · Tomorrow · Days7 · Days30 · Event horizon · Seasonal horizon | `listLearningModelPerformance` ?forecastHorizon |
+
+**Form: Save signal registry policy** (modal, opened by *Save signal registry policy*; *Save signal registry policy* calls `setSignalRegistryPolicy`, *Cancel* sends nothing)
+
+**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `id`, `scopePath`, `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`, `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`, `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Registry kind `registryKind` | segmented control | required | — | Signal · Model | — | — | `setSignalRegistryPolicy` body |
+| Name `name` | text field | required | — | max length 200 | — | — | `setSignalRegistryPolicy` body |
+| Category `category` | select | optional | — | Internal sales · Inventory · Weather · Nearby events · Competitor · Tourism · Calendar · Transport · Market · Other | — | — | `setSignalRegistryPolicy` body |
+| Provider `provider` | text field | optional | — | max length 100 | — | — | `setSignalRegistryPolicy` body |
+| Source `source` | text field | optional | — | max length 100 | — | — | `setSignalRegistryPolicy` body |
+| Internal external `internalExternal` | segmented control | optional | — | Internal · External | — | — | `setSignalRegistryPolicy` body |
+| Market code `marketCode` | text field | optional | — | max length 40 | — | — | `setSignalRegistryPolicy` body |
+| Refresh frequency `refreshFrequency` | select | optional | — | Real time · Minutes10 · Hourly · Daily · Weekly · Manual | — | — | `setSignalRegistryPolicy` body |
+| Trust level `trustLevel` | radio group | required | Experimental | Approved · Experimental · Advisory only · Blocked | — | — | `setSignalRegistryPolicy` body |
+| AI use permissions `aiUsePermissions` | multi-select chips | optional | — | Forecasting · Recommendations · Simulation · Automated pricing | — | — | `setSignalRegistryPolicy` body |
+| Fallback policy `fallbackPolicy` | radio group | optional | — | Use historical value · Ignore · Substitute · Reduce confidence · Stop AI recommendation | — | — | `setSignalRegistryPolicy` body |
+| Status `status` | text field | optional | — | max length 40 | — | — | `setSignalRegistryPolicy` body |
+| Owner principal `ownerPrincipalId` | picker: choose an owner principal | optional | — | — | shows names, sends the id | — | `setSignalRegistryPolicy` body |
+| Version `version` | text field | optional | — | max length 40 | — | Models. | `setSignalRegistryPolicy` body |
+| Purpose `purpose` | text field | optional | — | — | — | — | `setSignalRegistryPolicy` body |
+| Deployed at `deployedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setSignalRegistryPolicy` body |
+| Training window `trainingWindow` | text field | optional | — | max length 60 | — | — | `setSignalRegistryPolicy` body |
+| Validation result `validationResult` | text field | optional | — | — | — | — | `setSignalRegistryPolicy` body |
+
+Errors to draw in the form: 422 `trustTooLow`.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every learning model performance** (data table, from `listLearningModelPerformance`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ↓ | text | not in the schema: `↓` |
+| Demand forecast accuracy | 1,234.5 | Demand Forecast Accuracy, percent |
+| Revenue forecast accuracy | 1,234.5 | Revenue Forecast Accuracy, percent |
+| Elasticity accuracy | 1,234.5 | Elasticity Accuracy, percent |
+| Recommendation success | 1,234.5 | Recommendation Success, percent |
+| Confidence calibration | 1,234.5 | Confidence Calibration: how closely stated confidence matched realised accuracy, percent |
+| False positive rate | 12.5% | False Positive Rate, percent |
+| Revenue uplift | 1,234.5 | Revenue Uplift, percent |
+
+**The selected learning model performance** (detail panel): The pack groups this record's detail under its own headings: “Situation”, “Signals”, “Human/Automation Decision”, “Actual Price”, “Actual Demand”, “Actual Revenue”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ↓ | text | not in the schema: `↓` |
+| Demand forecast accuracy | 1,234.5 | Demand Forecast Accuracy, percent |
+| Revenue forecast accuracy | 1,234.5 | Revenue Forecast Accuracy, percent |
+| Elasticity accuracy | 1,234.5 | Elasticity Accuracy, percent |
+| Recommendation success | 1,234.5 | Recommendation Success, percent |
+| Confidence calibration | 1,234.5 | Confidence Calibration: how closely stated confidence matched realised accuracy, percent |
+| False positive rate | 12.5% | False Positive Rate, percent |
+| Revenue uplift | 1,234.5 | Revenue Uplift, percent |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save signal registry policy (primary button) | `setSignalRegistryPolicy` PUT `/signal-registry` | SignalRegistryEntry | SignalRegistryEntry | 422 `trustTooLow`. | gated `AI_CONFIGURE`; opens modal first |
+
+**Data it reads**: `listLearningModelPerformance` (onLoad, AI Learning, Model Performance & Optimization Feedback)
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The learning model performance list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the learning model performance untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No learning model performance yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the learning model performance are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 422 `trustTooLow`. |
+
+#### Permissions
+
+- `listLearningModelPerformance` → `PRODUCT_VIEW` (read) · staff
+- `setSignalRegistryPolicy` → `AI_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-117` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-117`
+- Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
+- Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 18: Works in AI Learning, Model Performance & Optimization Feedback → Close the intelligence loop by comparing AI predictions and recommendations with actual commercial outcomes. This is what allows the system to improve over time.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (422).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-117?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save signal registry policy.
+- [ ] No transition is declared; back returns where the user came from.
+- [ ] Every gated control is gated: `AI_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+
+
+## Reference designs and the trackers for this platform
+
+**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+
+- `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
+- `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
+
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+
+## Design inputs from the client meetings
+
+**What the client asked for in the meetings and design reviews, for these screens.** Apply every item. They are the client's own requirements and they are later than the reference files: where a reference design or a screen's fields disagree with an item here, the item wins. Newest first; where two items disagree, the newer one wins (anything a later meeting replaced is already left out). An **Open question** is not settled: build the default it states and keep it easy to change. The text in brackets is for traceability and, like everything else in this bundle, never appears on a screen.
+
+### Everywhere, on every app
+
+- Allam (platform-wide requirement): every calendar throughout the platform, not just maintenance, must support day, week and month views, with the day view further broken down by hour from a defined start hour through the day. *(agreed · MoM 17 Sep 2026, 4.2 Preventive Maintenance Planning · DI-907)*
+- Minimise the number of separate screens an end user navigates: consolidate related information wherever it can reasonably be shown together, rather than mirroring every workshop board as its own screen. *(agreed · MoM 7 Sep 2026, 4.10 Screen consolidation / 5. Key Decisions · DI-671)*
+- Region-configurable tax on pre-discount price (e.g. Egypt: AED 100 ticket with 20% off is paid at AED 80 but taxed on AED 100). Rounding must support up to three decimal places without dropping the third decimal where the currency requires it. *(agreed · MoM 1 Sep 2026, 4.5 Taxes, Fees & Price Calculation · DI-598)*
+- "Powered by TICVAI" is shown consistently across staff and guest-facing surfaces. *(agreed · MoM 14 Aug 2026, 8. POS / Kiosk Branding · DI-297)*
+- Full multi-language support (Arabic and others such as Chinese) consistent with the agreed i18n/RTL architecture. *(agreed · MoM 10 Aug 2026, 4.7 Account Creation, Localisation & Multi-Currency · DI-210)*
+- The reference system is a functional reference only: its dated UI/UX is not to be replicated; TICVAI delivers equivalent depth with a modern, AI-friendly, easy-to-configure experience. *(agreed · MoM 7 Aug 2026, 23. Reference System Access & Documentation · DI-186)*
+- Direction: modern, minimalistic, spacious, cross-device designs that still convey a sense of place (venue or park); Softlabs proposes two to three enhanced visual concepts for TICVAI to steer. *(agreed · MoM 3 Aug 2026, 11. Design Alignment & Team Input · DI-126)*
+- Languages: English and Arabic at minimum, with Russian, Spanish and Mandarin. *(agreed · MoM 31 Jul 2026, 13. Internationalization & Localization · DI-080)*
+- Clarity first; reduce cognitive load (simple layouts, familiar patterns); consistency ("Use the system. Do not recreate."); accessibility; hierarchy (guide attention with contrast, spacing and visual weight); feedback (every action has a clear response). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Design Principles in Action · DI-051)*
+- Standard components: search bar with Cmd+K; tabs (Overview, Events, Sales, Reports); pagination; badges (New, Pending, Sold Out, Completed); toggle (Off/On); dropdown; removable chip ("VIP x"). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Example UI Components · DI-050)*
+- Spacing on an 8px base grid: 4, 8, 12, 16, 24, 32, 40, 48, 64, 80. Border radius scale 4, 8, 12, 16, 24px, consistent across the platform. Soft shadows: sm 0 1px 2px rgba(0,0,0,.05); md 0 4px 6px rgba(0,0,0,.08); lg 0 10px 15px rgba(0,0,0,.10); xl 0 20px 40px rgba(0,0,0,.14). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 6. Spacing / 7. Border Radius / 8. Shadows · DI-049)*
+- Icons: line style, outline, 2px stroke, round corners, clean and consistent. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 5. Icons · DI-048)*
+- Component principles: clarity first; consistent spacing on an 8px grid; meaningful colour (colours communicate status and guide the user); accessible by design; mobile ready (components adapt across all screen sizes). Components are consistent, flexible, accessible and composable. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Component principles · DI-045)*
+- Empty states have a title, one explanatory line and one action: "No events yet / Create your first event to get started / Create Event"; "No data available / We couldn't find anything to show here / Refresh". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Empty States · DI-044)*
+- Notification list: status icon, title, one-line detail and relative time (e.g. "Payment received ... 2m ago", "High demand detected ... 10m ago"), with "View all notifications". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Notifications · DI-042)*
+- Forms: label above field; text input, select ("Choose an option"), date picker, toggle, checkbox. Input states: Default, Focused, Filled, Disabled and Error with inline message (e.g. "This field is required"). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Forms; 08 Design System (p8) - 4. Inputs · DI-040)*
+- Card types: event card (title, date and time, venue, "From 120.00 AED"); KPI card (label, value, delta, "vs last 7 days"); onboarding checklist card ("3 of 6 completed": Create Event, Add Staff, Configure Seating, Connect Payment). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Cards · DI-038)*
+- Button hierarchy Primary, Secondary, Tertiary (text) and Icon buttons, each with Default, Hover, Pressed and Disabled states. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Buttons; 08 Design System (p8) - 3. Buttons · DI-036)*
+- Regardless of the module a user is working in, the experience should feel like one product, not a collection of separate applications. *(agreed · Design Vision Book 29 Jul 2026, 07 Modules Overview (p7) · DI-034)*
+- DO: focus on clarity and hierarchy, use clear simple interactive elements, give relevant information at a glance (card example: "Annual Membership / All Venues / 4.4 (388) / BESTSELLER"). DON'T: clutter and overload (e.g. "-10% NEW PROMO AED 450.00 !!! BOOK NOW!!!"), complex forms and flows, hard-to-read data visualisations. *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - DO / DON'T · DI-033)*
+- Eight principles on every screen: User-Centric, AI-First, Simple & Clear (clean layouts, clear hierarchy, minimal noise), Fast & Efficient (optimised for quick actions), Reliable & Secure (permissions, data protection), Data-Driven (data visual, actionable, easy to understand), Scalable, Consistent (same patterns, components and interactions across the ecosystem). *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - Our Design Principles · DI-032)*
+- Accessibility: high contrast, readable text, keyboard navigation and inclusive components throughout; WCAG AA standards minimum ("Design for everyone"). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Better Accessibility; 06 Component principles (p6); 08 Design principles in action (p8) · DI-029)*
+- AI everywhere: AI insights, recommendations and smart assistance are embedded across the platform, not hidden. AI is not an add-on: it assists, predicts, recommends and automates. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - How TICVAI improves this concept; 05 Design Principles (p5) - 2. AI-First · DI-027)*
+- Global Search: prominent, AI-powered search that finds anything, in the top bar with a Cmd+K shortcut (placeholder e.g. "Search events, customers, orders, venues or ask AI..."). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - UI inspiration reference, item 1; 08 Design System (p8) - Search Bar · DI-025)*
+- Visual direction: Purposeful (every element has a clear purpose), Consistent (one visual system across all modules and devices), Clear (easy to scan, understand and act on), Modern. Key takeaway: clean, modern, product-first layout with clear hierarchy and minimal visual noise; deep, modern, trustworthy; built for enterprise scale. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) · DI-024)*
+- The brand is presented consistently across Web Platform, Mobile App and Admin Portal (and print). Ticvai identity, colours and typography are applied consistently across all screens and devices. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand in action; 03 Visual Direction (p3) - Consistent Branding · DI-023)*
+- Copy is Professional, Friendly, Clear, Confident, Concise and Helpful. Avoid jargon, overly technical language, clutter, outdated language and complexity. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand voice · DI-022)*
+- Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
+- Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
+
+### Across P09 TICVAI Web
+
+- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
+- Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
+- Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
+- Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+
+**4 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+
+---
+
+## Raw data
+
+The same package data the blocks above are built from. `screens.json` is in the folder and not repeated here: every field of it is in the blocks.
+
+### `operations.json`
 
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
 {
- "createLiveDynamicPrice": {
-  "method": "POST",
-  "path": "/live-dynamic-price",
-  "contract": "catalogue",
-  "summary": "Live Dynamic Price Execution & Deployment Monitor",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LiveDynamicPriceExecutionDeploymentMonitorInput",
-  "responds": "LiveDynamicPriceExecutionDeploymentMonitorView"
- },
- "decidePricingRecommendation": {
-  "method": "POST",
-  "path": "/recommendation-review-decision/{recommendationId}/decision",
-  "contract": "catalogue",
-  "summary": "Record a human decision on an AI pricing recommendation",
-  "permission": "AI_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PricingRecommendationDecisionInput",
-  "responds": "PricingRecommendationDecision"
- },
- "listAutomationPolicyAutonomous": {
-  "method": "GET",
-  "path": "/automation-policy-autonomou",
-  "contract": "catalogue",
-  "summary": "Automation Policy & Autonomous Pricing Orchestrator",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "automationLevel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "strategy",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "paused",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listDynamicPricingPerformance": {
-  "method": "GET",
-  "path": "/dynamic-pricing-performance",
-  "contract": "catalogue",
-  "summary": "Dynamic Pricing Performance & Optimization Analytics",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "level",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "market",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "event",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "channel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "compareBy",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "dateFrom",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "dateTo",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listLearningModelPerformance": {
-  "method": "GET",
-  "path": "/learning-model-performance",
-  "contract": "catalogue",
-  "summary": "AI Learning, Model Performance & Optimization Feedback",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "modelName",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "product",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "eventType",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "season",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "channel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "market",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "forecastHorizon",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listRecommendationReviewDecision": {
-  "method": "GET",
-  "path": "/recommendation-review-decision",
-  "contract": "catalogue",
-  "summary": "AI Recommendation Review & Decision Queue",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "event",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "urgency",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "decision",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "governanceLevel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listRevenue": {
-  "method": "GET",
-  "path": "/revenue",
-  "contract": "catalogue",
-  "summary": "Revenue Optimization Command Center",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "automationMode",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "urgency",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "rankBy",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listRevenueDemandImpact": {
-  "method": "GET",
-  "path": "/revenue-demand-impact",
-  "contract": "catalogue",
-  "summary": "Revenue & Demand Impact Forecasting",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "recommendationId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "simulationId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "event",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listScenarioModelingWhat": {
-  "method": "GET",
-  "path": "/scenario-modeling-what",
-  "contract": "catalogue",
-  "summary": "Scenario Modeling & What-If Analysis",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "scenarioType",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "search",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "setDynamicPricingGuardrailPolicy": {
-  "method": "PUT",
-  "path": "/dynamic-pricing-controls",
-  "contract": "catalogue",
-  "summary": "Set the guardrails and automation level of dynamic pricing at one scope",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "DynamicPricingControl",
-  "responds": "DynamicPricingControl"
- },
- "setPricing": {
-  "method": "PUT",
-  "path": "/pricing-2",
-  "contract": "catalogue",
-  "summary": "Pricing Simulation Studio",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PricingSimulationStudioInput",
-  "responds": "PricingSimulationStudioView"
- },
- "setPricingExperiment": {
-  "method": "PUT",
-  "path": "/pricing-experiment",
-  "contract": "catalogue",
-  "summary": "A/B Pricing Experiment Studio",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ABPricingExperimentStudioInput",
-  "responds": "ABPricingExperimentStudioView"
- },
- "setSignalRegistryPolicy": {
-  "method": "PUT",
-  "path": "/signal-registry",
-  "contract": "catalogue",
-  "summary": "Register a signal or model and set how far AI may trust it",
-  "permission": "AI_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "SignalRegistryEntry",
-  "responds": "SignalRegistryEntry"
- }
+"createLiveDynamicPrice": {"method":"POST","path":"/live-dynamic-price","contract":"catalogue","summary":"Live Dynamic Price Execution & Deployment Monitor","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"LiveDynamicPriceExecutionDeploymentMonitorInput","responds":"LiveDynamicPriceExecutionDeploymentMonitorView"},
+"decidePricingRecommendation": {"method":"POST","path":"/recommendation-review-decision/{recommendationId}/decision","contract":"catalogue","summary":"Record a human decision on an AI pricing recommendation","permission":"AI_APPROVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PricingRecommendationDecisionInput","responds":"PricingRecommendationDecision"},
+"listAutomationPolicyAutonomous": {"method":"GET","path":"/automation-policy-autonomou","contract":"catalogue","summary":"Automation Policy & Autonomous Pricing Orchestrator","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venue","in":"query","required":false},{"name":"automationLevel","in":"query","required":false},{"name":"strategy","in":"query","required":false},{"name":"paused","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listDynamicPricingPerformance": {"method":"GET","path":"/dynamic-pricing-performance","contract":"catalogue","summary":"Dynamic Pricing Performance & Optimization Analytics","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"level","in":"query","required":false},{"name":"market","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"compareBy","in":"query","required":false},{"name":"dateFrom","in":"query","required":false},{"name":"dateTo","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listLearningModelPerformance": {"method":"GET","path":"/learning-model-performance","contract":"catalogue","summary":"AI Learning, Model Performance & Optimization Feedback","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"modelName","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"eventType","in":"query","required":false},{"name":"season","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"market","in":"query","required":false},{"name":"forecastHorizon","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listRecommendationReviewDecision": {"method":"GET","path":"/recommendation-review-decision","contract":"catalogue","summary":"AI Recommendation Review & Decision Queue","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venue","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"urgency","in":"query","required":false},{"name":"decision","in":"query","required":false},{"name":"governanceLevel","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listRevenue": {"method":"GET","path":"/revenue","contract":"catalogue","summary":"Revenue Optimization Command Center","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venue","in":"query","required":false},{"name":"automationMode","in":"query","required":false},{"name":"urgency","in":"query","required":false},{"name":"rankBy","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listRevenueDemandImpact": {"method":"GET","path":"/revenue-demand-impact","contract":"catalogue","summary":"Revenue & Demand Impact Forecasting","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"recommendationId","in":"query","required":false},{"name":"simulationId","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listScenarioModelingWhat": {"method":"GET","path":"/scenario-modeling-what","contract":"catalogue","summary":"Scenario Modeling & What-If Analysis","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"scenarioType","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"setDynamicPricingGuardrailPolicy": {"method":"PUT","path":"/dynamic-pricing-controls","contract":"catalogue","summary":"Set the guardrails and automation level of dynamic pricing at one scope","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DynamicPricingControl","responds":"DynamicPricingControl"},
+"setPricing": {"method":"PUT","path":"/pricing-2","contract":"catalogue","summary":"Pricing Simulation Studio","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PricingSimulationStudioInput","responds":"PricingSimulationStudioView"},
+"setPricingExperiment": {"method":"PUT","path":"/pricing-experiment","contract":"catalogue","summary":"A/B Pricing Experiment Studio","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ABPricingExperimentStudioInput","responds":"ABPricingExperimentStudioView"},
+"setSignalRegistryPolicy": {"method":"PUT","path":"/signal-registry","contract":"catalogue","summary":"Register a signal or model and set how far AI may trust it","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SignalRegistryEntry","responds":"SignalRegistryEntry"}
 }
 ```
 
-## `schemas.json`
+### `schemas.json`
 
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
 {
- "ABPricingExperimentStudioInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 5%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What A/B Pricing Experiment Studio submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "experimentName": {
-    "type": "string",
-    "description": "Experiment Name"
-   },
-   "objective": {
-    "type": "string",
-    "description": "Objective"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product id"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event id",
-    "nullable": true
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance id",
-    "nullable": true
-   },
-   "channel": {
-    "$ref": "#/components/schemas/Channel",
-    "description": "Channel"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer segment",
-    "nullable": true
-   },
-   "startDate": {
-    "type": "string",
-    "description": "Start Date",
-    "format": "date"
-   },
-   "endDate": {
-    "type": "string",
-    "description": "End Date",
-    "format": "date"
-   },
-   "minimumPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Minimum Price no variant may go below"
-   },
-   "maximumPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum Price no variant may exceed"
-   },
-   "variants": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "label": {
-       "type": "string",
-       "description": "Variant label (A = control)"
-      },
-      "price": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "Variant price"
-      },
-      "trafficSharePercent": {
-       "type": "number",
-       "description": "Share of traffic, percent; variants sum to 100"
-      }
-     }
-    },
-    "description": "Variant Configuration: control plus 1-3 variants (decided 29 September, readiness close-out)"
-   },
-   "successMetrics": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "revenue",
-      "conversion",
-      "averageSellingPrice",
-      "margin",
-      "sellThrough",
-      "occupancy",
-      "revenuePerVisitor"
-     ]
-    },
-    "description": "Success Metrics"
-   },
-   "targetConfidenceLevel": {
-    "type": "number",
-    "description": "Target confidence level, percent; default 95 (decided 29 September, readiness close-out)"
-   }
-  }
- },
- "ABPricingExperimentStudioView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What A/B Pricing Experiment Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "experimentName": {
-    "type": "string",
-    "description": "Experiment Name"
-   },
-   "objective": {
-    "type": "string",
-    "description": "Objective"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product id"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event id",
-    "nullable": true
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance id",
-    "nullable": true
-   },
-   "channel": {
-    "$ref": "#/components/schemas/Channel",
-    "description": "Channel"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer segment",
-    "nullable": true
-   },
-   "startDate": {
-    "type": "string",
-    "description": "Start Date",
-    "format": "date"
-   },
-   "endDate": {
-    "type": "string",
-    "description": "End Date",
-    "format": "date"
-   },
-   "minimumPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Minimum Price no variant may go below"
-   },
-   "maximumPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum Price no variant may exceed"
-   },
-   "sampleSize": {
-    "type": "integer",
-    "description": "Sample Size reached"
-   },
-   "confidenceLevel": {
-    "type": "number",
-    "description": "Target Confidence Level; default 95 (decided 29 September, readiness close-out), percent"
-   },
-   "experimentDuration": {
-    "type": "integer",
-    "description": "Experiment Duration, days"
-   },
-   "statisticalSignificance": {
-    "type": "boolean",
-    "description": "Statistical Significance reached at the target confidence level"
-   },
-   "experimentId": {
-    "type": "string",
-    "description": "Experiment id"
-   },
-   "variants": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "label": {
-       "type": "string",
-       "description": "Variant label (A = control)"
-      },
-      "price": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "Variant price"
-      },
-      "trafficSharePercent": {
-       "type": "number",
-       "description": "Share of traffic, percent; variants sum to 100"
-      }
-     }
-    },
-    "description": "Variant Configuration: control plus 1-3 variants (decided 29 September, readiness close-out)"
-   },
-   "successMetrics": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "revenue",
-      "conversion",
-      "averageSellingPrice",
-      "margin",
-      "sellThrough",
-      "occupancy",
-      "revenuePerVisitor"
-     ]
-    },
-    "description": "Success Metrics"
-   },
-   "guardrailChecks": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "check": {
-       "type": "string",
-       "enum": [
-        "minimumPrice",
-        "maximumPrice",
-        "contractRates",
-        "membershipRates",
-        "regulatoryRequirements"
-       ],
-       "description": "Guardrail"
-      },
-      "passed": {
-       "type": "boolean",
-       "description": "Pass / fail"
-      }
-     }
-    },
-    "description": "Guardrails the experiment must respect"
-   },
-   "variantResults": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "label": {
-       "type": "string",
-       "description": "Variant"
-      },
-      "revenueChangePercent": {
-       "type": "number",
-       "description": "Revenue change vs control, percent"
-      },
-      "conversionChangePercent": {
-       "type": "number",
-       "description": "Conversion change vs control, percent"
-      },
-      "aspChangePercent": {
-       "type": "number",
-       "description": "ASP change vs control, percent"
-      },
-      "confidence": {
-       "type": "number",
-       "description": "Statistical confidence, percent"
-      }
-     }
-    },
-    "description": "Results per variant"
-   },
-   "recommendedWinner": {
-    "type": "string",
-    "description": "Statistically preferred variant label, advisory",
-    "nullable": true
-   },
-   "experimentStage": {
-    "type": "string",
-    "description": "Stage: draft, pendingApproval, running, completed or stopped (decided 29 September, readiness close-out)"
-   }
-  }
- },
- "AiLearningModelPerformanceOptimizationFeedbackView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What AI Learning, Model Performance & Optimization Feedback displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "forecastError": {
-    "type": "number",
-    "description": "Mean forecast error (actual vs forecast demand), percent"
-   },
-   "demandForecastAccuracy": {
-    "type": "number",
-    "description": "Demand Forecast Accuracy, percent"
-   },
-   "revenueForecastAccuracy": {
-    "type": "number",
-    "description": "Revenue Forecast Accuracy, percent"
-   },
-   "elasticityAccuracy": {
-    "type": "number",
-    "description": "Elasticity Accuracy, percent"
-   },
-   "recommendationSuccess": {
-    "type": "number",
-    "description": "Recommendation Success, percent"
-   },
-   "confidenceCalibration": {
-    "type": "number",
-    "description": "Confidence Calibration: how closely stated confidence matched realised accuracy, percent"
-   },
-   "falsePositiveRate": {
-    "type": "number",
-    "description": "False Positive Rate, percent"
-   },
-   "revenueUplift": {
-    "type": "number",
-    "description": "Revenue Uplift, percent"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue",
-    "nullable": true
-   },
-   "product": {
-    "type": "string",
-    "description": "Product",
-    "nullable": true
-   },
-   "eventType": {
-    "type": "string",
-    "description": "Event type",
-    "nullable": true
-   },
-   "season": {
-    "type": "string",
-    "description": "Season",
-    "nullable": true
-   },
-   "channel": {
-    "$ref": "#/components/schemas/Channel",
-    "description": "Channel"
-   },
-   "market": {
-    "type": "string",
-    "description": "Market",
-    "nullable": true
-   },
-   "forecastHorizon": {
-    "type": "string",
-    "description": "Forecast Horizon",
-    "enum": [
-     "intraday",
-     "tomorrow",
-     "days7",
-     "days30",
-     "eventHorizon",
-     "seasonalHorizon"
-    ]
-   },
-   "modelName": {
-    "type": "string",
-    "description": "Model name"
-   },
-   "modelVersion": {
-    "type": "string",
-    "description": "Model version"
-   },
-   "lifecycleStage": {
-    "type": "string",
-    "description": "Model lifecycle: candidate, validation, approved, production, monitored or retired"
-   },
-   "accuracyChange30d": {
-    "type": "number",
-    "description": "Model Drift: accuracy change over the last 30 days, percent"
-   },
-   "signalEffectiveness": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "signal": {
-       "type": "string",
-       "enum": [
-        "internalSales",
-        "bookingVelocity",
-        "occupancy",
-        "historicalEvents",
-        "nearbyEvent",
-        "weather",
-        "marketTourism",
-        "competitor",
-        "priceElasticity",
-        "other"
-       ],
-       "description": "Signal"
-      },
-      "forecastContribution": {
-       "type": "string",
-       "enum": [
-        "low",
-        "medium",
-        "high"
-       ],
-       "description": "Forecast contribution"
-      },
-      "reliability": {
-       "type": "number",
-       "description": "Reliability, percent"
-      }
-     }
-    },
-    "description": "Signal Effectiveness"
-   },
-   "humanOverrideRate": {
-    "type": "number",
-    "description": "Share of AI recommendations modified by Revenue Managers, percent"
-   },
-   "overrideOutcomeDelta": {
-    "type": "number",
-    "description": "Revenue outcome of overridden vs unmodified recommendations, percent"
-   },
-   "optimizationSuggestions": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "AI Optimization Recommendations; adopting one requires governance. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"
-   }
-  }
- },
- "AiRecommendationReviewDecisionQueueView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What AI Recommendation Review & Decision Queue displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "recommendation": {
-    "type": "string",
-    "description": "Recommendation title"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "currentPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current Price"
-   },
-   "recommendedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Recommended Price"
-   },
-   "change": {
-    "type": "number",
-    "description": "Change %, percent"
-   },
-   "revenueOpportunity": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Opportunity"
-   },
-   "demandImpact": {
-    "type": "number",
-    "description": "Demand Impact, percent"
-   },
-   "confidence": {
-    "type": "number",
-    "description": "AI Confidence, percent"
-   },
-   "urgency": {
-    "type": "string",
-    "description": "Urgency",
-    "enum": [
-     "low",
-     "medium",
-     "high",
-     "critical"
-    ]
-   },
-   "governanceLevel": {
-    "type": "string",
-    "description": "Governance Level: approval level required, from the configured approval matrix"
-   },
-   "simulationRevenueUplift": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Simulation Revenue Uplift (Board 7)"
-   },
-   "recommendationId": {
-    "type": "string",
-    "description": "Recommendation id"
-   },
-   "drivers": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "signal": {
-       "type": "string",
-       "enum": [
-        "internalSales",
-        "bookingVelocity",
-        "occupancy",
-        "historicalEvents",
-        "nearbyEvent",
-        "weather",
-        "marketTourism",
-        "competitor",
-        "priceElasticity",
-        "other"
-       ],
-       "description": "Signal category behind the driver"
-      },
-      "direction": {
-       "type": "string",
-       "enum": [
-        "up",
-        "down"
-       ],
-       "description": "Whether the driver pushes the price up or down"
-      },
-      "explanation": {
-       "type": "string",
-       "description": "Business-language evidence, e.g. booking velocity 31% above forecast"
-      }
-     }
-    },
-    "description": "Primary drivers of the recommendation (pack's up/down driver list); explanatory, not literal model weights"
-   },
-   "guardrailsPassed": {
-    "type": "boolean",
-    "description": "Guardrails passed"
-   },
-   "decision": {
-    "type": "string",
-    "description": "Decision: pending, accepted, rejected, modified, scheduled or sentForApproval; every item starts pending"
-   },
-   "rejectionReason": {
-    "type": "string",
-    "description": "Rejection Reason",
-    "enum": [
-     "commercialJudgment",
-     "brandPositioning",
-     "customerSensitivity",
-     "eventStrategy",
-     "incorrectSignal",
-     "dataConcern",
-     "other"
-    ],
-    "nullable": true
-   },
-   "rejectionNote": {
-    "type": "string",
-    "description": "Free-text note, required when reason is other",
-    "nullable": true
-   },
-   "humanSelectedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price the Revenue Manager chose when modifying"
-   },
-   "scheduledFor": {
-    "type": "string",
-    "description": "When a scheduled change should execute",
-    "format": "date-time",
-    "nullable": true
-   },
-   "decidedBy": {
-    "type": "string",
-    "description": "User who decided",
-    "nullable": true
-   },
-   "decidedAt": {
-    "type": "string",
-    "description": "When decided",
-    "format": "date-time",
-    "nullable": true
-   },
-   "actualRevenueResultPercent": {
-    "type": "number",
-    "description": "Feedback Loop: actual revenue result after execution; empty until measured, percent"
-   }
-  }
- },
- "AutomationPolicyAutonomousPricingOrchestratorView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Automation Policy & Autonomous Pricing Orchestrator displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "tenant": {
-    "type": "string",
-    "description": "Tenant"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue",
-    "nullable": true
-   },
-   "product": {
-    "type": "string",
-    "description": "Product",
-    "nullable": true
-   },
-   "event": {
-    "type": "string",
-    "description": "Event",
-    "nullable": true
-   },
-   "strategy": {
-    "type": "string",
-    "description": "Dynamic pricing strategy (Board 5)"
-   },
-   "channel": {
-    "$ref": "#/components/schemas/Channel",
-    "description": "Channel"
-   },
-   "market": {
-    "type": "string",
-    "description": "Market",
-    "nullable": true
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "description": "Effective from",
-    "format": "date-time"
-   },
-   "evaluationFrequency": {
-    "type": "integer",
-    "description": "Evaluation Frequency, minutes; default 60 (decided 29 September, readiness close-out)"
-   },
-   "executionFrequency": {
-    "type": "integer",
-    "description": "Execution Frequency, minutes; default 240 (decided 29 September, readiness close-out)"
-   },
-   "minimumTimeBetweenChanges": {
-    "type": "integer",
-    "description": "Minimum Time Between Changes, minutes; default 240 (decided 29 September, readiness close-out)"
-   },
-   "maximumChangesPerDay": {
-    "type": "integer",
-    "description": "Maximum Changes per Day; default 3 (decided 29 September, readiness close-out)"
-   },
-   "requireGuardrailsPassed": {
-    "type": "boolean",
-    "description": "Auto-execute only if guardrails passed; always true, cannot be switched off"
-   },
-   "excludeProtectedRates": {
-    "type": "boolean",
-    "description": "Auto-execute only if no protected (contract/member) rate is affected; default true (decided 29 September, readiness close-out)"
-   },
-   "requireHealthyForecastData": {
-    "type": "boolean",
-    "description": "Auto-execute only if forecast data is healthy; default true (decided 29 September, readiness close-out)"
-   },
-   "policyId": {
-    "type": "string",
-    "description": "Policy id"
-   },
-   "effectiveTo": {
-    "type": "string",
-    "description": "Effective to",
-    "format": "date-time",
-    "nullable": true
-   },
-   "automationLevel": {
-    "type": "string",
-    "description": "Automation Level; default advisory (decided 29 September, readiness close-out)",
-    "enum": [
-     "advisory",
-     "humanInTheLoop",
-     "conditionalAutonomous",
-     "autonomous"
-    ]
-   },
-   "maxAdjustmentPercent": {
-    "type": "number",
-    "description": "Auto-execute only if adjustment is at or below this, percent; default 5 (decided 29 September, readiness close-out)"
-   },
-   "minAiConfidence": {
-    "type": "number",
-    "description": "Auto-execute only if AI confidence is at or above this, percent; default 90 (decided 29 September, readiness close-out)"
-   },
-   "minRevenueUpliftPercent": {
-    "type": "number",
-    "description": "Auto-execute only if expected uplift is at or above this, percent; default 2 (decided 29 September, readiness close-out)"
-   },
-   "quietPeriodMinutes": {
-    "type": "integer",
-    "description": "Quiet Period: no automated change within this many minutes of event start; default 60 (decided 29 September, readiness close-out)"
-   },
-   "circuitBreakers": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "trigger": {
-       "type": "string",
-       "enum": [
-        "dataQualityFalls",
-        "modelConfidenceDrops",
-        "conversionDropsAbnormally",
-        "priceVolatilityExceedsThreshold",
-        "revenueFalls",
-        "integrationFails"
-       ],
-       "description": "Circuit breaker"
-      },
-      "threshold": {
-       "type": "number",
-       "description": "Trigger threshold, in the trigger's unit"
-      },
-      "enabled": {
-       "type": "boolean",
-       "description": "Enabled; all enabled by default"
-      },
-      "tripped": {
-       "type": "boolean",
-       "description": "Currently tripped"
-      }
-     }
-    },
-    "description": "Circuit Breakers (decided 29 September, readiness close-out)"
-   },
-   "paused": {
-    "type": "boolean",
-    "description": "Paused by PAUSE ALL AUTONOMOUS PRICING or a tripped breaker"
-   }
-  }
- },
- "Channel": {
-  "type": "string",
-  "enum": [
-   "pos",
-   "kiosk",
-   "web",
-   "mobile",
-   "b2b",
-   "ota",
-   "callCentre"
-  ]
- },
- "DynamicPricingControl": {
-  "type": "object",
-  "x-ticvai-persistence": "catalogue.dynamic_pricing_control",
-  "description": "**The limits and the autonomy of dynamic pricing at one scope** (29 September, data model DM3). Merges guardrails (ADM-093) and automation policy (ADM-094, ADM-113): both are per-scope controls a price change must pass, and they share the rate-of-change limits. The most specific scope wins; guardrails are re-checked at execution (`createLiveDynamicPrice`). `automationLevel` is the one vocabulary: the strategy screen's `monitor`/`recommend` read as `advisory`, `prepareChange` as `humanInTheLoop`, `autoExecuteWithinGuardrails` as `conditionalAutonomous`.",
-  "required": [
-   "id",
-   "scopePath",
-   "scopeLevel",
-   "automationLevel"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
-   },
-   "scopeLevel": {
-    "type": "string",
-    "enum": [
-     "global",
-     "market",
-     "venue",
-     "strategy",
-     "product",
-     "event",
-     "performance",
-     "channel"
-    ]
-   },
-   "scopeId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Null at `global`."
-   },
-   "absoluteMinimumPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "nullable": true
-   },
-   "absoluteMaximumPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "nullable": true
-   },
-   "minimumMarginPercent": {
-    "type": "number",
-    "nullable": true
-   },
-   "maximumUpliftPercent": {
-    "type": "number",
-    "nullable": true,
-    "minimum": 0
-   },
-   "maximumReductionPercent": {
-    "type": "number",
-    "nullable": true,
-    "minimum": 0
-   },
-   "maximumSingleChangePercent": {
-    "type": "number",
-    "nullable": true,
-    "minimum": 0
-   },
-   "maximumDailyChangePercent": {
-    "type": "number",
-    "nullable": true,
-    "minimum": 0
-   },
-   "maximumWeeklyChangePercent": {
-    "type": "number",
-    "nullable": true,
-    "minimum": 0
-   },
-   "minimumChangeIntervalMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 0
-   },
-   "maximumChangesPerDay": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 0
-   },
-   "minimumInventory": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 0
-   },
-   "maximumOccupancyTriggerPercent": {
-    "type": "number",
-    "nullable": true,
-    "minimum": 0,
-    "maximum": 100
-   },
-   "protectedRateTypes": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "contractRates",
-      "membershipRates",
-      "corporateRates",
-      "promotionalLockedRates",
-      "regulatoryPrices",
-      "complimentaryRates"
-     ]
-    }
-   },
-   "isFrozen": {
-    "type": "boolean",
-    "default": false
-   },
-   "isKillSwitchActive": {
-    "type": "boolean",
-    "default": false,
-    "description": "Stops every automatic change in scope at once."
-   },
-   "automationLevel": {
-    "type": "string",
-    "enum": [
-     "advisory",
-     "humanInTheLoop",
-     "conditionalAutonomous",
-     "autonomous"
-    ],
-    "default": "advisory"
-   },
-   "authorityTiers": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "`[{maxAdjustmentPercent, action, confidenceThreshold}]`."
-   },
-   "maxAdjustmentPercent": {
-    "type": "number",
-    "nullable": true,
-    "minimum": 0
-   },
-   "minAiConfidence": {
-    "type": "number",
-    "nullable": true,
-    "minimum": 0,
-    "maximum": 1
-   },
-   "minRevenueUpliftPercent": {
-    "type": "number",
-    "nullable": true
-   },
-   "evaluationFrequencyMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 1
-   },
-   "executionFrequencyMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 1
-   },
-   "quietPeriodMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 0
-   },
-   "noChangeWindows": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "`[{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]`."
-   },
-   "circuitBreakers": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "`[{trigger, threshold, enabled, tripped}]`."
-   },
-   "requireGuardrailsPassed": {
-    "type": "boolean",
-    "default": true
-   },
-   "excludeProtectedRates": {
-    "type": "boolean",
-    "default": true
-   },
-   "requireHealthyForecastData": {
-    "type": "boolean",
-    "default": true
-   },
-   "safeFailureBehavior": {
-    "type": "string",
-    "enum": [
-     "holdLastPrice",
-     "returnToBase",
-     "freeze",
-     "requestReview"
-    ],
-    "default": "holdLastPrice"
-   },
-   "activeOverride": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "`{user, reason, overridePrice, start, expiry, returnBehavior}`."
-   },
-   "isPaused": {
-    "type": "boolean",
-    "default": false
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "effectiveTo": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
- "DynamicPricingPerformanceOptimizationAnalyticsView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Dynamic Pricing Performance & Optimization Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "incrementalRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Incremental Revenue"
-   },
-   "revenueUplift": {
-    "type": "number",
-    "description": "Revenue Uplift, percent"
-   },
-   "marginUplift": {
-    "type": "number",
-    "description": "Margin Uplift, percent"
-   },
-   "averageSellingPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Average Selling Price"
-   },
-   "conversion": {
-    "type": "number",
-    "description": "Conversion, percent"
-   },
-   "attendance": {
-    "type": "integer",
-    "description": "Attendance"
-   },
-   "occupancy": {
-    "type": "number",
-    "description": "Occupancy, percent"
-   },
-   "sellThrough": {
-    "type": "number",
-    "description": "Sell-Through, percent"
-   },
-   "revenuePerAvailableCapacity": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue per Available Capacity"
-   },
-   "numberOfPriceChanges": {
-    "type": "integer",
-    "description": "Number of Price Changes"
-   },
-   "strategyRoi": {
-    "type": "number",
-    "description": "Strategy ROI, percent"
-   },
-   "recommendationsGenerated": {
-    "type": "integer",
-    "description": "Recommendations Generated"
-   },
-   "accepted": {
-    "type": "integer",
-    "description": "Accepted"
-   },
-   "rejected": {
-    "type": "integer",
-    "description": "Rejected"
-   },
-   "modified": {
-    "type": "integer",
-    "description": "Modified"
-   },
-   "autoExecuted": {
-    "type": "integer",
-    "description": "Auto-Executed"
-   },
-   "successful": {
-    "type": "integer",
-    "description": "Successful"
-   },
-   "negativeOutcome": {
-    "type": "integer",
-    "description": "Negative Outcome"
-   },
-   "level": {
-    "type": "string",
-    "description": "Drilldown level of this row",
-    "enum": [
-     "market",
-     "venue",
-     "event",
-     "performance",
-     "product",
-     "priceCategory",
-     "channel"
-    ]
-   },
-   "key": {
-    "type": "string",
-    "description": "Id of the market/venue/event/... at that level"
-   },
-   "label": {
-    "type": "string",
-    "description": "Display name"
-   },
-   "comparisonGroup": {
-    "type": "string",
-    "description": "Side of the comparison this row is, e.g. dynamic / fixed, AI / rules",
-    "nullable": true
-   },
-   "opportunityLost": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Opportunity Lost: estimated revenue not captured through rejected recommendations (analytical estimate)"
-   },
-   "priceTimeline": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "at": {
-       "type": "string",
-       "format": "date-time",
-       "description": "Moment of the price movement"
-      },
-      "price": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "Price"
-      },
-      "demand": {
-       "type": "integer",
-       "description": "Demand"
-      },
-      "occupancy": {
-       "type": "number",
-       "description": "Occupancy, percent"
-      },
-      "conversion": {
-       "type": "number",
-       "description": "Conversion, percent"
-      },
-      "bookingVelocity": {
-       "type": "number",
-       "description": "Booking velocity vs forecast, percent"
-      },
-      "revenue": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "Revenue"
-      }
-     }
-    },
-    "description": "Price Timeline overlay"
-   }
-  }
- },
- "LiveDynamicPriceExecutionDeploymentMonitorInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Live Dynamic Price Execution & Deployment Monitor submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "product": {
-    "type": "string",
-    "description": "Product id"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event id",
-    "nullable": true
-   },
-   "newPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "New Price"
-   },
-   "strategy": {
-    "type": "string",
-    "description": "Strategy id",
-    "nullable": true
-   },
-   "aiRecommendation": {
-    "type": "string",
-    "description": "Recommendation id",
-    "nullable": true
-   },
-   "approval": {
-    "type": "string",
-    "description": "Approval reference; required unless the automation policy permits automatic execution",
-    "nullable": true
-   },
-   "executionSource": {
-    "type": "string",
-    "description": "Execution Source",
-    "enum": [
-     "manual",
-     "humanApproved",
-     "scheduled",
-     "conditionalAutonomous",
-     "autonomous"
-    ]
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance id",
-    "nullable": true
-   },
-   "trigger": {
-    "type": "string",
-    "description": "Trigger",
-    "nullable": true
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "b2c",
-      "mobileApp",
-      "pos",
-      "kiosk",
-      "callCenter",
-      "b2b",
-      "reseller",
-      "ota",
-      "api"
-     ]
-    },
-    "description": "Channels to deploy to; default all channels the product is sold on (decided 29 September, readiness close-out)"
-   },
-   "scheduledFor": {
-    "type": "string",
-    "description": "Execute at; empty = now",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "LiveDynamicPriceExecutionDeploymentMonitorView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Live Dynamic Price Execution & Deployment Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "timestamp": {
-    "type": "string",
-    "description": "Timestamp",
-    "format": "date-time"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product id"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event id",
-    "nullable": true
-   },
-   "previousPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Previous Price"
-   },
-   "newPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "New Price"
-   },
-   "strategy": {
-    "type": "string",
-    "description": "Strategy id",
-    "nullable": true
-   },
-   "aiRecommendation": {
-    "type": "string",
-    "description": "Recommendation id the change came from",
-    "nullable": true
-   },
-   "approval": {
-    "type": "string",
-    "description": "Approval reference; empty only for policy-permitted automatic execution",
-    "nullable": true
-   },
-   "executionSource": {
-    "type": "string",
-    "description": "Execution Source",
-    "enum": [
-     "manual",
-     "humanApproved",
-     "scheduled",
-     "conditionalAutonomous",
-     "autonomous"
-    ]
-   },
-   "status": {
-    "type": "string",
-    "description": "Status: queued, processing, live, partial, failed or rolledBack"
-   },
-   "executionId": {
-    "type": "string",
-    "description": "Execution id"
-   },
-   "trigger": {
-    "type": "string",
-    "description": "Trigger, e.g. booking velocity + occupancy",
-    "nullable": true
-   },
-   "aiConfidence": {
-    "type": "number",
-    "description": "AI confidence at execution, percent"
-   },
-   "channelDeployments": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "channel": {
-       "type": "string",
-       "enum": [
-        "b2c",
-        "mobileApp",
-        "pos",
-        "kiosk",
-        "callCenter",
-        "b2b",
-        "reseller",
-        "ota",
-        "api"
-       ],
-       "description": "Channel"
-      },
-      "price": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "Price live on the channel"
-      },
-      "consistent": {
-       "type": "boolean",
-       "description": "Channel shows the new price"
-      },
-      "deploymentStatus": {
-       "type": "string",
-       "description": "queued, processing, live, failed or rolledBack"
-      }
-     }
-    },
-    "description": "Channel Deployment"
-   },
-   "priceInconsistency": {
-    "type": "boolean",
-    "description": "Price inconsistency detected across channels"
-   }
-  }
- },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
-   }
-  }
- },
- "PricingRecommendationDecision": {
-  "type": "object",
-  "x-ticvai-persistence": "catalogue.pricing_recommendation_decision",
-  "description": "**One human decision on one AI pricing recommendation** (decided 29 September, readiness close-out). New table: the queue row `AiRecommendationReviewDecisionQueueView` reads its decision fields from here. Written once by `decidePricingRecommendation` and never edited; a changed mind is a new recommendation.\n",
-  "required": [
-   "id",
-   "recommendationId",
-   "decision",
-   "decidedByPrincipalId",
-   "decidedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "recommendationId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "A `catalogue.pricing_recommendation` (29 September, data model DM3)."
-   },
-   "decision": {
-    "type": "string",
-    "enum": [
-     "accept",
-     "modify",
-     "reject",
-     "schedule",
-     "sendForApproval"
-    ]
-   },
-   "rejectionReason": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "commercialJudgment",
-     "brandPositioning",
-     "customerSensitivity",
-     "eventStrategy",
-     "incorrectSignal",
-     "dataConcern",
-     "other",
-     null
-    ]
-   },
-   "rejectionNote": {
-    "type": "string",
-    "nullable": true
-   },
-   "recommendedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "humanSelectedPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "nullable": true
-   },
-   "scheduledFor": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "approvalRequestId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The approvals request opened by `sendForApproval`."
-   },
-   "executionId": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The `createLiveDynamicPrice` execution that carried it out, once it has."
-   },
-   "decidedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true
-   }
-  }
- },
- "PricingRecommendationDecisionInput": {
-  "type": "object",
-  "x-ticvai-persistence": "none — request only",
-  "description": "What `decidePricingRecommendation` takes (decided 29 September, readiness close-out).",
-  "required": [
-   "decision"
-  ],
-  "properties": {
-   "decision": {
-    "type": "string",
-    "enum": [
-     "accept",
-     "modify",
-     "reject",
-     "schedule",
-     "sendForApproval"
-    ]
-   },
-   "rejectionReason": {
-    "type": "string",
-    "enum": [
-     "commercialJudgment",
-     "brandPositioning",
-     "customerSensitivity",
-     "eventStrategy",
-     "incorrectSignal",
-     "dataConcern",
-     "other"
-    ],
-    "description": "Required for reject."
-   },
-   "rejectionNote": {
-    "type": "string",
-    "maxLength": 2000
-   },
-   "humanSelectedPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Required for modify; must sit inside the strategy's guardrails."
-   },
-   "scheduledFor": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Required for schedule; in the future."
-   }
-  }
- },
- "PricingSimulationStudioInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Pricing Simulation Studio submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "venue": {
-    "type": "string",
-    "description": "Scope: venue id",
-    "nullable": true
-   },
-   "product": {
-    "type": "string",
-    "description": "Scope: product id",
-    "nullable": true
-   },
-   "event": {
-    "type": "string",
-    "description": "Scope: event id",
-    "nullable": true
-   },
-   "performance": {
-    "type": "string",
-    "description": "Scope: performance id",
-    "nullable": true
-   },
-   "timeslot": {
-    "type": "string",
-    "description": "Scope: timeslot",
-    "nullable": true
-   },
-   "priceCategory": {
-    "type": "string",
-    "description": "Scope: price category",
-    "nullable": true
-   },
-   "channel": {
-    "$ref": "#/components/schemas/Channel",
-    "description": "Scope: channel"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Scope: customer segment",
-    "nullable": true
-   },
-   "dateFrom": {
-    "type": "string",
-    "description": "Scope: first date",
-    "format": "date"
-   },
-   "dateTo": {
-    "type": "string",
-    "description": "Scope: last date",
-    "format": "date"
-   },
-   "simulationSource": {
-    "type": "string",
-    "description": "Simulation Source",
-    "enum": [
-     "manualPriceChange",
-     "dynamicRule",
-     "aiRecommendation",
-     "newDynamicStrategy",
-     "strategyModification",
-     "bulkPriceChange"
-    ]
-   },
-   "sourceReference": {
-    "type": "string",
-    "description": "Id of the rule, recommendation or strategy the simulation came from",
-    "nullable": true
-   },
-   "proposedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Proposed price (single-price change)"
-   },
-   "proposedAdjustmentPercent": {
-    "type": "number",
-    "description": "Proposed adjustment, percent (bulk change or strategy)",
-    "nullable": true
-   }
-  }
- },
- "PricingSimulationStudioView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Pricing Simulation Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "expectedDemand": {
-    "type": "integer",
-    "description": "Expected Demand"
-   },
-   "expectedConversion": {
-    "type": "number",
-    "description": "Expected Conversion, percent"
-   },
-   "expectedAttendance": {
-    "type": "integer",
-    "description": "Expected Attendance"
-   },
-   "expectedOccupancy": {
-    "type": "number",
-    "description": "Expected Occupancy, percent"
-   },
-   "expectedRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Expected Revenue"
-   },
-   "expectedMargin": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Expected Margin"
-   },
-   "expectedSellThrough": {
-    "type": "number",
-    "description": "Expected Sell-Through, percent"
-   },
-   "expectedSellOutTime": {
-    "type": "string",
-    "description": "Expected Sell-Out Time",
-    "format": "date-time",
-    "nullable": true
-   },
-   "averageSellingPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Average Selling Price"
-   },
-   "simulationConfidence": {
-    "type": "number",
-    "description": "Simulation Confidence, percent"
-   },
-   "dataVolume": {
-    "type": "integer",
-    "description": "Data Volume: transactions behind the simulation"
-   },
-   "historicalSimilarity": {
-    "type": "number",
-    "description": "Historical Similarity, percent"
-   },
-   "forecastConfidence": {
-    "type": "number",
-    "description": "Forecast Confidence, percent"
-   },
-   "elasticityConfidence": {
-    "type": "number",
-    "description": "Elasticity Confidence, percent"
-   },
-   "externalSignalQuality": {
-    "type": "number",
-    "description": "External Signal Quality, percent"
-   },
-   "simulationId": {
-    "type": "string",
-    "description": "Simulation id (saved scenarios keep it)"
-   },
-   "simulationSource": {
-    "type": "string",
-    "description": "Simulation Source",
-    "enum": [
-     "manualPriceChange",
-     "dynamicRule",
-     "aiRecommendation",
-     "newDynamicStrategy",
-     "strategyModification",
-     "bulkPriceChange"
-    ]
-   },
-   "currentPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current price"
-   },
-   "proposedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Proposed price"
-   },
-   "baselineRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current strategy: expected revenue"
-   },
-   "baselineDemand": {
-    "type": "integer",
-    "description": "Current strategy: expected demand"
-   },
-   "baselineOccupancy": {
-    "type": "number",
-    "description": "Current strategy: expected occupancy, percent"
-   },
-   "guardrailChecks": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "check": {
-       "type": "string",
-       "enum": [
-        "commercialGuardrail",
-        "contractProtection",
-        "priceLadder",
-        "approvalThreshold"
-       ],
-       "description": "Guardrail"
-      },
-      "passed": {
-       "type": "boolean",
-       "description": "Pass / fail"
-      },
-      "message": {
-       "type": "string",
-       "description": "Why it failed, or the approval level required"
-      }
-     }
-    },
-    "description": "Guardrail Check shown before the simulation completes"
-   }
-  }
- },
- "RevenueDemandImpactForecastingView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Revenue & Demand Impact Forecasting displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "revenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Proposed: expected revenue"
-   },
-   "demand": {
-    "type": "integer",
-    "description": "Proposed: expected demand"
-   },
-   "attendance": {
-    "type": "integer",
-    "description": "Proposed: attendance"
-   },
-   "occupancy": {
-    "type": "number",
-    "description": "Proposed: occupancy, percent"
-   },
-   "conversion": {
-    "type": "number",
-    "description": "Proposed: conversion, percent"
-   },
-   "margin": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Proposed: margin"
-   },
-   "asp": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Proposed: average selling price"
-   },
-   "sellThrough": {
-    "type": "number",
-    "description": "Proposed: sell-through, percent"
-   },
-   "sellOutProbability": {
-    "type": "number",
-    "description": "Proposed: sell-out probability, percent"
-   },
-   "assessmentId": {
-    "type": "string",
-    "description": "Assessment id"
-   },
-   "recommendationId": {
-    "type": "string",
-    "description": "Recommendation assessed",
-    "nullable": true
-   },
-   "simulationId": {
-    "type": "string",
-    "description": "Simulation assessed",
-    "nullable": true
-   },
-   "baselineRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Without change: expected revenue"
-   },
-   "baselineDemand": {
-    "type": "integer",
-    "description": "Without change: expected demand"
-   },
-   "baselineOccupancy": {
-    "type": "number",
-    "description": "Without change: expected occupancy, percent"
-   },
-   "revenueChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Impact: revenue"
-   },
-   "revenueChangePercent": {
-    "type": "number",
-    "description": "Impact: revenue, percent"
-   },
-   "demandChange": {
-    "type": "integer",
-    "description": "Impact: demand"
-   },
-   "demandChangePercent": {
-    "type": "number",
-    "description": "Impact: demand, percent"
-   },
-   "marginChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Impact: margin"
-   },
-   "customerImpacts": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "group": {
-       "type": "string",
-       "enum": [
-        "member",
-        "resident",
-        "tourist",
-        "family",
-        "b2b"
-       ],
-       "description": "Customer group"
-      },
-      "demandChangePercent": {
-       "type": "number",
-       "description": "Estimated demand change, percent"
-      },
-      "note": {
-       "type": "string",
-       "description": "Explanation"
-      }
-     }
-    },
-    "description": "Customer Impact, where supported"
-   },
-   "cannibalization": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "toProduct": {
-       "type": "string",
-       "description": "Product demand shifts toward"
-      },
-      "demandShiftPercent": {
-       "type": "number",
-       "description": "Share of demand shifting, percent"
-      }
-     }
-    },
-    "description": "Cannibalization"
-   },
-   "bestCaseRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Sensitivity: best case revenue"
-   },
-   "worstCaseRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Sensitivity: worst case revenue"
-   }
-  }
- },
- "RevenueOptimizationCommandCenterSummary": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
-  "description": "**The headline figures on Revenue Optimization Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
-  "properties": {
-   "revenueOpportunity": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Opportunity"
-   },
-   "incrementalRevenueGenerated": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Incremental Revenue Generated"
-   },
-   "activeOptimizations": {
-    "type": "integer",
-    "description": "Active Optimizations"
-   },
-   "recommendationsAwaitingAction": {
-    "type": "integer",
-    "description": "Recommendations Awaiting Action"
-   },
-   "pendingSimulations": {
-    "type": "integer",
-    "description": "Pending Simulations"
-   },
-   "autoExecutedChanges": {
-    "type": "integer",
-    "description": "Auto-Executed Changes"
-   },
-   "approvalRequired": {
-    "type": "integer",
-    "description": "Approval Required: changes waiting for an approver"
-   },
-   "activeABTests": {
-    "type": "integer",
-    "description": "Active A/B Tests"
-   },
-   "pricingExceptions": {
-    "type": "integer",
-    "description": "Pricing Exceptions"
-   },
-   "revenueAtRisk": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue at Risk"
-   },
-   "forecastAccuracy": {
-    "type": "number",
-    "description": "Forecast Accuracy over the last 30 days (decided 29 September, readiness close-out), percent"
-   },
-   "optimizationSuccessRate": {
-    "type": "number",
-    "description": "Optimization Success Rate: executed changes with a positive measured outcome, percent"
-   },
-   "aiRevenueBrief": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "AI Revenue Brief, e.g. AED 284,000 of opportunity in the next seven days. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"
-   }
-  }
- },
- "RevenueOptimizationCommandCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Revenue Optimization Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "eventProduct": {
-    "type": "string",
-    "description": "Event/Product"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance",
-    "nullable": true
-   },
-   "currentPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current Price"
-   },
-   "recommendedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Recommended Price"
-   },
-   "forecastRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Forecast Revenue"
-   },
-   "expectedUplift": {
-    "type": "number",
-    "description": "Expected Uplift, percent"
-   },
-   "confidence": {
-    "type": "number",
-    "description": "Confidence, percent"
-   },
-   "automationMode": {
-    "type": "string",
-    "description": "Automation Mode in force for this scope",
-    "enum": [
-     "advisory",
-     "humanInTheLoop",
-     "conditionalAutonomous",
-     "autonomous"
-    ]
-   },
-   "approvalStatus": {
-    "type": "string",
-    "description": "Approval Status: notRequired, pending, approved or rejected"
-   },
-   "executionStatus": {
-    "type": "string",
-    "description": "Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack"
-   },
-   "revenueRisk": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Risk if no action is taken"
-   },
-   "eventProximity": {
-    "type": "integer",
-    "description": "Event Proximity: days until the event"
-   },
-   "inventoryPosition": {
-    "type": "number",
-    "description": "Inventory Position: remaining inventory, percent"
-   },
-   "demandVariance": {
-    "type": "number",
-    "description": "Demand Variance against forecast, percent"
-   },
-   "urgency": {
-    "type": "string",
-    "description": "Urgency",
-    "enum": [
-     "low",
-     "medium",
-     "high",
-     "critical"
-    ]
-   },
-   "optimizationId": {
-    "type": "string",
-    "description": "Optimisation id"
-   },
-   "recommendationId": {
-    "type": "string",
-    "description": "Recommendation id",
-    "nullable": true
-   },
-   "revenueOpportunity": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Opportunity"
-   },
-   "priorityRank": {
-    "type": "integer",
-    "description": "Priority rank (1 = act first)"
-   },
-   "nextAction": {
-    "type": "string",
-    "description": "Suggested next action (the pack's Action column)",
-    "enum": [
-     "review",
-     "simulate",
-     "approve"
-    ]
-   }
-  }
- },
- "ScenarioModelingWhatIfAnalysisView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Scenario Modeling & What-If Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "demand": {
-    "type": "number",
-    "description": "Demand adjustment (+/-), percent"
-   },
-   "occupancy": {
-    "type": "number",
-    "description": "Occupancy, percent"
-   },
-   "inventory": {
-    "type": "integer",
-    "description": "Inventory available"
-   },
-   "bookingVelocity": {
-    "type": "number",
-    "description": "Booking velocity adjustment, percent"
-   },
-   "weatherImpact": {
-    "type": "number",
-    "description": "Weather impact on demand, percent"
-   },
-   "nearbyEventImpact": {
-    "type": "number",
-    "description": "Nearby event impact on demand, percent"
-   },
-   "competitorPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Competitor price"
-   },
-   "conversion": {
-    "type": "number",
-    "description": "Conversion, percent"
-   },
-   "price": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price"
-   },
-   "eventProximity": {
-    "type": "integer",
-    "description": "Event proximity, days"
-   },
-   "remainingCapacity": {
-    "type": "number",
-    "description": "Remaining Capacity, percent"
-   },
-   "scenarioId": {
-    "type": "string",
-    "description": "Scenario id"
-   },
-   "name": {
-    "type": "string",
-    "description": "Scenario name"
-   },
-   "scenarioTypes": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "lowDemand",
-      "expectedDemand",
-      "highDemand",
-      "sellOut",
-      "competitorPriceDrop",
-      "competitorPriceIncrease",
-      "extremeWeather",
-      "rain",
-      "nearbyExhibition",
-      "majorConcert",
-      "tourismSurge",
-      "cancellationSurge",
-      "inventoryReduction",
-      "customScenario"
-     ]
-    },
-    "description": "Scenario Library entries combined"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event",
-    "nullable": true
-   },
-   "strategyResults": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "strategy": {
-       "type": "string",
-       "enum": [
-        "fixedPrice",
-        "ruleBased",
-        "aiRecommendation",
-        "custom"
-       ],
-       "description": "Strategy compared"
-      },
-      "averagePrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "Avg. price"
-      },
-      "demand": {
-       "type": "integer",
-       "description": "Demand"
-      },
-      "revenue": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "Revenue"
-      },
-      "occupancy": {
-       "type": "number",
-       "description": "Occupancy, percent"
-      },
-      "margin": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "Margin"
-      }
-     }
-    },
-    "description": "Results per strategy"
-   },
-   "reviewStage": {
-    "type": "string",
-    "description": "Review stage: draft, submittedForReview or reviewed (decided 29 September, readiness close-out)"
-   },
-   "createdBy": {
-    "type": "string",
-    "description": "Author user id"
-   },
-   "updatedAt": {
-    "type": "string",
-    "description": "Last saved",
-    "format": "date-time"
-   }
-  }
- },
- "SignalRegistryEntry": {
-  "type": "object",
-  "x-ticvai-persistence": "catalogue.signal_registry",
-  "description": "**The registry of AI signals and models, with their trust and quality** (29 September, data model DM3). ADM-106 and ADM-118. A signal or model not `approved` for a use in `aiUsePermissions` is not used for it.",
-  "required": [
-   "id",
-   "scopePath",
-   "registryKind",
-   "name",
-   "trustLevel"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Operations write it at `tenant` scope."
-   },
-   "registryKind": {
-    "type": "string",
-    "enum": [
-     "signal",
-     "model"
-    ]
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "category": {
-    "type": "string",
-    "enum": [
-     "internalSales",
-     "inventory",
-     "weather",
-     "nearbyEvents",
-     "competitor",
-     "tourism",
-     "calendar",
-     "transport",
-     "market",
-     "other",
-     null
-    ],
-    "nullable": true
-   },
-   "provider": {
-    "type": "string",
-    "maxLength": 100,
-    "nullable": true
-   },
-   "source": {
-    "type": "string",
-    "maxLength": 100,
-    "nullable": true
-   },
-   "internalExternal": {
-    "type": "string",
-    "enum": [
-     "internal",
-     "external",
-     null
-    ],
-    "nullable": true
-   },
-   "marketCode": {
-    "type": "string",
-    "maxLength": 40,
-    "nullable": true
-   },
-   "refreshFrequency": {
-    "type": "string",
-    "enum": [
-     "realTime",
-     "minutes10",
-     "hourly",
-     "daily",
-     "weekly",
-     "manual",
-     null
-    ],
-    "nullable": true
-   },
-   "trustLevel": {
-    "type": "string",
-    "enum": [
-     "approved",
-     "experimental",
-     "advisoryOnly",
-     "blocked"
-    ],
-    "default": "experimental"
-   },
-   "aiUsePermissions": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "forecasting",
-      "recommendations",
-      "simulation",
-      "automatedPricing"
-     ]
-    }
-   },
-   "fallbackPolicy": {
-    "type": "string",
-    "enum": [
-     "useHistoricalValue",
-     "ignore",
-     "substitute",
-     "reduceConfidence",
-     "stopAiRecommendation",
-     null
-    ],
-    "nullable": true
-   },
-   "status": {
-    "type": "string",
-    "maxLength": 40,
-    "nullable": true
-   },
-   "ownerPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "version": {
-    "type": "string",
-    "maxLength": 40,
-    "nullable": true,
-    "description": "Models."
-   },
-   "purpose": {
-    "type": "string",
-    "nullable": true
-   },
-   "deployedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "trainingWindow": {
-    "type": "string",
-    "maxLength": 60,
-    "nullable": true
-   },
-   "validationResult": {
-    "type": "string",
-    "nullable": true
-   },
-   "lastUpdateAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "qualityCounts": {
-    "type": "object",
-    "additionalProperties": true,
-    "readOnly": true,
-    "description": "Signals: `{missingData, delayedData, outliers, invalidValues, unexpectedChanges, sourceFailure, duplicateData}`."
-   },
-   "performance": {
-    "type": "object",
-    "additionalProperties": true,
-    "readOnly": true,
-    "description": "Models: `{forecastAccuracy, bias, recommendationAccuracy, revenuePerformance, drift}` and the per-segment learning metrics."
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- }
+"ABPricingExperimentStudioInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 5%, so this is not an update to anything the package stores today and no new table has been decided","description":"**What A/B Pricing Experiment Studio submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"experimentName":{"type":"string","description":"Experiment Name"},"objective":{"type":"string","description":"Objective"},"product":{"type":"string","description":"Product id"},"event":{"type":"string","description":"Event id","nullable":true},"performance":{"type":"string","description":"Performance id","nullable":true},"channel":{"$ref":"#/components/schemas/Channel","description":"Channel"},"customerSegment":{"type":"string","description":"Customer segment","nullable":true},"startDate":{"type":"string","description":"Start Date","format":"date"},"endDate":{"type":"string","description":"End Date","format":"date"},"minimumPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Minimum Price no variant may go below"},"maximumPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Maximum Price no variant may exceed"},"variants":{"type":"array","items":{"type":"object","properties":{"label":{"type":"string","description":"Variant label (A = control)"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Variant price"},"trafficSharePercent":{"type":"number","description":"Share of traffic, percent; variants sum to 100"}}},"description":"Variant Configuration: control plus 1-3 variants (decided 29 September, readiness close-out)"},"successMetrics":{"type":"array","items":{"type":"string","enum":["revenue","conversion","averageSellingPrice","margin","sellThrough","occupancy","revenuePerVisitor"]},"description":"Success Metrics"},"targetConfidenceLevel":{"type":"number","description":"Target confidence level, percent; default 95 (decided 29 September, readiness close-out)"}}},
+"ABPricingExperimentStudioView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What A/B Pricing Experiment Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"experimentName":{"type":"string","description":"Experiment Name"},"objective":{"type":"string","description":"Objective"},"product":{"type":"string","description":"Product id"},"event":{"type":"string","description":"Event id","nullable":true},"performance":{"type":"string","description":"Performance id","nullable":true},"channel":{"$ref":"#/components/schemas/Channel","description":"Channel"},"customerSegment":{"type":"string","description":"Customer segment","nullable":true},"startDate":{"type":"string","description":"Start Date","format":"date"},"endDate":{"type":"string","description":"End Date","format":"date"},"minimumPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Minimum Price no variant may go below"},"maximumPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Maximum Price no variant may exceed"},"sampleSize":{"type":"integer","description":"Sample Size reached"},"confidenceLevel":{"type":"number","description":"Target Confidence Level; default 95 (decided 29 September, readiness close-out), percent"},"experimentDuration":{"type":"integer","description":"Experiment Duration, days"},"statisticalSignificance":{"type":"boolean","description":"Statistical Significance reached at the target confidence level"},"experimentId":{"type":"string","description":"Experiment id"},"variants":{"type":"array","items":{"type":"object","properties":{"label":{"type":"string","description":"Variant label (A = control)"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Variant price"},"trafficSharePercent":{"type":"number","description":"Share of traffic, percent; variants sum to 100"}}},"description":"Variant Configuration: control plus 1-3 variants (decided 29 September, readiness close-out)"},"successMetrics":{"type":"array","items":{"type":"string","enum":["revenue","conversion","averageSellingPrice","margin","sellThrough","occupancy","revenuePerVisitor"]},"description":"Success Metrics"},"guardrailChecks":{"type":"array","items":{"type":"object","properties":{"check":{"type":"string","enum":["minimumPrice","maximumPrice","contractRates","membershipRates","regulatoryRequirements"],"description":"Guardrail"},"passed":{"type":"boolean","description":"Pass / fail"}}},"description":"Guardrails the experiment must respect"},"variantResults":{"type":"array","items":{"type":"object","properties":{"label":{"type":"string","description":"Variant"},"revenueChangePercent":{"type":"number","description":"Revenue change vs control, percent"},"conversionChangePercent":{"type":"number","description":"Conversion change vs control, percent"},"aspChangePercent":{"type":"number","description":"ASP change vs control, percent"},"confidence":{"type":"number","description":"Statistical confidence, percent"}}},"description":"Results per variant"},"recommendedWinner":{"type":"string","description":"Statistically preferred variant label, advisory","nullable":true},"experimentStage":{"type":"string","description":"Stage: draft, pendingApproval, running, completed or stopped (decided 29 September, readiness close-out)"}}},
+"AiLearningModelPerformanceOptimizationFeedbackView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What AI Learning, Model Performance & Optimization Feedback displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"forecastError":{"type":"number","description":"Mean forecast error (actual vs forecast demand), percent"},"demandForecastAccuracy":{"type":"number","description":"Demand Forecast Accuracy, percent"},"revenueForecastAccuracy":{"type":"number","description":"Revenue Forecast Accuracy, percent"},"elasticityAccuracy":{"type":"number","description":"Elasticity Accuracy, percent"},"recommendationSuccess":{"type":"number","description":"Recommendation Success, percent"},"confidenceCalibration":{"type":"number","description":"Confidence Calibration: how closely stated confidence matched realised accuracy, percent"},"falsePositiveRate":{"type":"number","description":"False Positive Rate, percent"},"revenueUplift":{"type":"number","description":"Revenue Uplift, percent"},"venue":{"type":"string","description":"Venue","nullable":true},"product":{"type":"string","description":"Product","nullable":true},"eventType":{"type":"string","description":"Event type","nullable":true},"season":{"type":"string","description":"Season","nullable":true},"channel":{"$ref":"#/components/schemas/Channel","description":"Channel"},"market":{"type":"string","description":"Market","nullable":true},"forecastHorizon":{"type":"string","description":"Forecast Horizon","enum":["intraday","tomorrow","days7","days30","eventHorizon","seasonalHorizon"]},"modelName":{"type":"string","description":"Model name"},"modelVersion":{"type":"string","description":"Model version"},"lifecycleStage":{"type":"string","description":"Model lifecycle: candidate, validation, approved, production, monitored or retired"},"accuracyChange30d":{"type":"number","description":"Model Drift: accuracy change over the last 30 days, percent"},"signalEffectiveness":{"type":"array","items":{"type":"object","properties":{"signal":{"type":"string","enum":["internalSales","bookingVelocity","occupancy","historicalEvents","nearbyEvent","weather","marketTourism","competitor","priceElasticity","other"],"description":"Signal"},"forecastContribution":{"type":"string","enum":["low","medium","high"],"description":"Forecast contribution"},"reliability":{"type":"number","description":"Reliability, percent"}}},"description":"Signal Effectiveness"},"humanOverrideRate":{"type":"number","description":"Share of AI recommendations modified by Revenue Managers, percent"},"overrideOutcomeDelta":{"type":"number","description":"Revenue outcome of overridden vs unmodified recommendations, percent"},"optimizationSuggestions":{"type":"array","items":{"type":"string"},"description":"AI Optimization Recommendations; adopting one requires governance. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"}}},
+"AiRecommendationReviewDecisionQueueView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What AI Recommendation Review & Decision Queue displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"recommendation":{"type":"string","description":"Recommendation title"},"venue":{"type":"string","description":"Venue"},"event":{"type":"string","description":"Event"},"currentPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Current Price"},"recommendedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Recommended Price"},"change":{"type":"number","description":"Change %, percent"},"revenueOpportunity":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue Opportunity"},"demandImpact":{"type":"number","description":"Demand Impact, percent"},"confidence":{"type":"number","description":"AI Confidence, percent"},"urgency":{"type":"string","description":"Urgency","enum":["low","medium","high","critical"]},"governanceLevel":{"type":"string","description":"Governance Level: approval level required, from the configured approval matrix"},"simulationRevenueUplift":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Simulation Revenue Uplift (Board 7)"},"recommendationId":{"type":"string","description":"Recommendation id"},"drivers":{"type":"array","items":{"type":"object","properties":{"signal":{"type":"string","enum":["internalSales","bookingVelocity","occupancy","historicalEvents","nearbyEvent","weather","marketTourism","competitor","priceElasticity","other"],"description":"Signal category behind the driver"},"direction":{"type":"string","enum":["up","down"],"description":"Whether the driver pushes the price up or down"},"explanation":{"type":"string","description":"Business-language evidence, e.g. booking velocity 31% above forecast"}}},"description":"Primary drivers of the recommendation (pack's up/down driver list); explanatory, not literal model weights"},"guardrailsPassed":{"type":"boolean","description":"Guardrails passed"},"decision":{"type":"string","description":"Decision: pending, accepted, rejected, modified, scheduled or sentForApproval; every item starts pending"},"rejectionReason":{"type":"string","description":"Rejection Reason","enum":["commercialJudgment","brandPositioning","customerSensitivity","eventStrategy","incorrectSignal","dataConcern","other"],"nullable":true},"rejectionNote":{"type":"string","description":"Free-text note, required when reason is other","nullable":true},"humanSelectedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price the Revenue Manager chose when modifying"},"scheduledFor":{"type":"string","description":"When a scheduled change should execute","format":"date-time","nullable":true},"decidedBy":{"type":"string","description":"User who decided","nullable":true},"decidedAt":{"type":"string","description":"When decided","format":"date-time","nullable":true},"actualRevenueResultPercent":{"type":"number","description":"Feedback Loop: actual revenue result after execution; empty until measured, percent"}}},
+"AutomationPolicyAutonomousPricingOrchestratorView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Automation Policy & Autonomous Pricing Orchestrator displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"tenant":{"type":"string","description":"Tenant"},"venue":{"type":"string","description":"Venue","nullable":true},"product":{"type":"string","description":"Product","nullable":true},"event":{"type":"string","description":"Event","nullable":true},"strategy":{"type":"string","description":"Dynamic pricing strategy (Board 5)"},"channel":{"$ref":"#/components/schemas/Channel","description":"Channel"},"market":{"type":"string","description":"Market","nullable":true},"effectiveFrom":{"type":"string","description":"Effective from","format":"date-time"},"evaluationFrequency":{"type":"integer","description":"Evaluation Frequency, minutes; default 60 (decided 29 September, readiness close-out)"},"executionFrequency":{"type":"integer","description":"Execution Frequency, minutes; default 240 (decided 29 September, readiness close-out)"},"minimumTimeBetweenChanges":{"type":"integer","description":"Minimum Time Between Changes, minutes; default 240 (decided 29 September, readiness close-out)"},"maximumChangesPerDay":{"type":"integer","description":"Maximum Changes per Day; default 3 (decided 29 September, readiness close-out)"},"requireGuardrailsPassed":{"type":"boolean","description":"Auto-execute only if guardrails passed; always true, cannot be switched off"},"excludeProtectedRates":{"type":"boolean","description":"Auto-execute only if no protected (contract/member) rate is affected; default true (decided 29 September, readiness close-out)"},"requireHealthyForecastData":{"type":"boolean","description":"Auto-execute only if forecast data is healthy; default true (decided 29 September, readiness close-out)"},"policyId":{"type":"string","description":"Policy id"},"effectiveTo":{"type":"string","description":"Effective to","format":"date-time","nullable":true},"automationLevel":{"type":"string","description":"Automation Level; default advisory (decided 29 September, readiness close-out)","enum":["advisory","humanInTheLoop","conditionalAutonomous","autonomous"]},"maxAdjustmentPercent":{"type":"number","description":"Auto-execute only if adjustment is at or below this, percent; default 5 (decided 29 September, readiness close-out)"},"minAiConfidence":{"type":"number","description":"Auto-execute only if AI confidence is at or above this, percent; default 90 (decided 29 September, readiness close-out)"},"minRevenueUpliftPercent":{"type":"number","description":"Auto-execute only if expected uplift is at or above this, percent; default 2 (decided 29 September, readiness close-out)"},"quietPeriodMinutes":{"type":"integer","description":"Quiet Period: no automated change within this many minutes of event start; default 60 (decided 29 September, readiness close-out)"},"circuitBreakers":{"type":"array","items":{"type":"object","properties":{"trigger":{"type":"string","enum":["dataQualityFalls","modelConfidenceDrops","conversionDropsAbnormally","priceVolatilityExceedsThreshold","revenueFalls","integrationFails"],"description":"Circuit breaker"},"threshold":{"type":"number","description":"Trigger threshold, in the trigger's unit"},"enabled":{"type":"boolean","description":"Enabled; all enabled by default"},"tripped":{"type":"boolean","description":"Currently tripped"}}},"description":"Circuit Breakers (decided 29 September, readiness close-out)"},"paused":{"type":"boolean","description":"Paused by PAUSE ALL AUTONOMOUS PRICING or a tripped breaker"}}},
+"Channel": {"type":"string","enum":["pos","kiosk","web","mobile","b2b","ota","callCentre"]},
+"DynamicPricingControl": {"type":"object","x-ticvai-persistence":"catalogue.dynamic_pricing_control","description":"**The limits and the autonomy of dynamic pricing at one scope** (29 September, data model DM3). Merges guardrails (ADM-093) and automation policy (ADM-094, ADM-113): both are per-scope controls a price change must pass, and they share the rate-of-change limits. The most specific scope wins; guardrails are re-checked at execution (`createLiveDynamicPrice`). `automationLevel` is the one vocabulary: the strategy screen's `monitor`/`recommend` read as `advisory`, `prepareChange` as `humanInTheLoop`, `autoExecuteWithinGuardrails` as `conditionalAutonomous`.","required":["id","scopePath","scopeLevel","automationLevel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"scopeLevel":{"type":"string","enum":["global","market","venue","strategy","product","event","performance","channel"]},"scopeId":{"type":"string","format":"uuid","nullable":true,"description":"Null at `global`."},"absoluteMinimumPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"absoluteMaximumPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"minimumMarginPercent":{"type":"number","nullable":true},"maximumUpliftPercent":{"type":"number","nullable":true,"minimum":0},"maximumReductionPercent":{"type":"number","nullable":true,"minimum":0},"maximumSingleChangePercent":{"type":"number","nullable":true,"minimum":0},"maximumDailyChangePercent":{"type":"number","nullable":true,"minimum":0},"maximumWeeklyChangePercent":{"type":"number","nullable":true,"minimum":0},"minimumChangeIntervalMinutes":{"type":"integer","nullable":true,"minimum":0},"maximumChangesPerDay":{"type":"integer","nullable":true,"minimum":0},"minimumInventory":{"type":"integer","nullable":true,"minimum":0},"maximumOccupancyTriggerPercent":{"type":"number","nullable":true,"minimum":0,"maximum":100},"protectedRateTypes":{"type":"array","items":{"type":"string","enum":["contractRates","membershipRates","corporateRates","promotionalLockedRates","regulatoryPrices","complimentaryRates"]}},"isFrozen":{"type":"boolean","default":false},"isKillSwitchActive":{"type":"boolean","default":false,"description":"Stops every automatic change in scope at once."},"automationLevel":{"type":"string","enum":["advisory","humanInTheLoop","conditionalAutonomous","autonomous"],"default":"advisory"},"authorityTiers":{"type":"object","additionalProperties":true,"nullable":true,"description":"`[{maxAdjustmentPercent, action, confidenceThreshold}]`."},"maxAdjustmentPercent":{"type":"number","nullable":true,"minimum":0},"minAiConfidence":{"type":"number","nullable":true,"minimum":0,"maximum":1},"minRevenueUpliftPercent":{"type":"number","nullable":true},"evaluationFrequencyMinutes":{"type":"integer","nullable":true,"minimum":1},"executionFrequencyMinutes":{"type":"integer","nullable":true,"minimum":1},"quietPeriodMinutes":{"type":"integer","nullable":true,"minimum":0},"noChangeWindows":{"type":"object","additionalProperties":true,"nullable":true,"description":"`[{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]`."},"circuitBreakers":{"type":"object","additionalProperties":true,"nullable":true,"description":"`[{trigger, threshold, enabled, tripped}]`."},"requireGuardrailsPassed":{"type":"boolean","default":true},"excludeProtectedRates":{"type":"boolean","default":true},"requireHealthyForecastData":{"type":"boolean","default":true},"safeFailureBehavior":{"type":"string","enum":["holdLastPrice","returnToBase","freeze","requestReview"],"default":"holdLastPrice"},"activeOverride":{"type":"object","additionalProperties":true,"nullable":true,"description":"`{user, reason, overridePrice, start, expiry, returnBehavior}`."},"isPaused":{"type":"boolean","default":false},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"DynamicPricingPerformanceOptimizationAnalyticsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Dynamic Pricing Performance & Optimization Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"incrementalRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Incremental Revenue"},"revenueUplift":{"type":"number","description":"Revenue Uplift, percent"},"marginUplift":{"type":"number","description":"Margin Uplift, percent"},"averageSellingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Average Selling Price"},"conversion":{"type":"number","description":"Conversion, percent"},"attendance":{"type":"integer","description":"Attendance"},"occupancy":{"type":"number","description":"Occupancy, percent"},"sellThrough":{"type":"number","description":"Sell-Through, percent"},"revenuePerAvailableCapacity":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue per Available Capacity"},"numberOfPriceChanges":{"type":"integer","description":"Number of Price Changes"},"strategyRoi":{"type":"number","description":"Strategy ROI, percent"},"recommendationsGenerated":{"type":"integer","description":"Recommendations Generated"},"accepted":{"type":"integer","description":"Accepted"},"rejected":{"type":"integer","description":"Rejected"},"modified":{"type":"integer","description":"Modified"},"autoExecuted":{"type":"integer","description":"Auto-Executed"},"successful":{"type":"integer","description":"Successful"},"negativeOutcome":{"type":"integer","description":"Negative Outcome"},"level":{"type":"string","description":"Drilldown level of this row","enum":["market","venue","event","performance","product","priceCategory","channel"]},"key":{"type":"string","description":"Id of the market/venue/event/... at that level"},"label":{"type":"string","description":"Display name"},"comparisonGroup":{"type":"string","description":"Side of the comparison this row is, e.g. dynamic / fixed, AI / rules","nullable":true},"opportunityLost":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Opportunity Lost: estimated revenue not captured through rejected recommendations (analytical estimate)"},"priceTimeline":{"type":"array","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time","description":"Moment of the price movement"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price"},"demand":{"type":"integer","description":"Demand"},"occupancy":{"type":"number","description":"Occupancy, percent"},"conversion":{"type":"number","description":"Conversion, percent"},"bookingVelocity":{"type":"number","description":"Booking velocity vs forecast, percent"},"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue"}}},"description":"Price Timeline overlay"}}},
+"LiveDynamicPriceExecutionDeploymentMonitorInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Live Dynamic Price Execution & Deployment Monitor submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"product":{"type":"string","description":"Product id"},"event":{"type":"string","description":"Event id","nullable":true},"newPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"New Price"},"strategy":{"type":"string","description":"Strategy id","nullable":true},"aiRecommendation":{"type":"string","description":"Recommendation id","nullable":true},"approval":{"type":"string","description":"Approval reference; required unless the automation policy permits automatic execution","nullable":true},"executionSource":{"type":"string","description":"Execution Source","enum":["manual","humanApproved","scheduled","conditionalAutonomous","autonomous"]},"performance":{"type":"string","description":"Performance id","nullable":true},"trigger":{"type":"string","description":"Trigger","nullable":true},"channels":{"type":"array","items":{"type":"string","enum":["b2c","mobileApp","pos","kiosk","callCenter","b2b","reseller","ota","api"]},"description":"Channels to deploy to; default all channels the product is sold on (decided 29 September, readiness close-out)"},"scheduledFor":{"type":"string","description":"Execute at; empty = now","format":"date-time","nullable":true}}},
+"LiveDynamicPriceExecutionDeploymentMonitorView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Live Dynamic Price Execution & Deployment Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"timestamp":{"type":"string","description":"Timestamp","format":"date-time"},"product":{"type":"string","description":"Product id"},"event":{"type":"string","description":"Event id","nullable":true},"previousPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Previous Price"},"newPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"New Price"},"strategy":{"type":"string","description":"Strategy id","nullable":true},"aiRecommendation":{"type":"string","description":"Recommendation id the change came from","nullable":true},"approval":{"type":"string","description":"Approval reference; empty only for policy-permitted automatic execution","nullable":true},"executionSource":{"type":"string","description":"Execution Source","enum":["manual","humanApproved","scheduled","conditionalAutonomous","autonomous"]},"status":{"type":"string","description":"Status: queued, processing, live, partial, failed or rolledBack"},"executionId":{"type":"string","description":"Execution id"},"trigger":{"type":"string","description":"Trigger, e.g. booking velocity + occupancy","nullable":true},"aiConfidence":{"type":"number","description":"AI confidence at execution, percent"},"channelDeployments":{"type":"array","items":{"type":"object","properties":{"channel":{"type":"string","enum":["b2c","mobileApp","pos","kiosk","callCenter","b2b","reseller","ota","api"],"description":"Channel"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price live on the channel"},"consistent":{"type":"boolean","description":"Channel shows the new price"},"deploymentStatus":{"type":"string","description":"queued, processing, live, failed or rolledBack"}}},"description":"Channel Deployment"},"priceInconsistency":{"type":"boolean","description":"Price inconsistency detected across channels"}}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"PricingRecommendationDecision": {"type":"object","x-ticvai-persistence":"catalogue.pricing_recommendation_decision","description":"**One human decision on one AI pricing recommendation** (decided 29 September, readiness close-out). New table: the queue row `AiRecommendationReviewDecisionQueueView` reads its decision fields from here. Written once by `decidePricingRecommendation` and never edited; a changed mind is a new recommendation.\n","required":["id","recommendationId","decision","decidedByPrincipalId","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"recommendationId":{"type":"string","format":"uuid","description":"A `catalogue.pricing_recommendation` (29 September, data model DM3)."},"decision":{"type":"string","enum":["accept","modify","reject","schedule","sendForApproval"]},"rejectionReason":{"type":"string","nullable":true,"enum":["commercialJudgment","brandPositioning","customerSensitivity","eventStrategy","incorrectSignal","dataConcern","other",null]},"rejectionNote":{"type":"string","nullable":true},"recommendedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"humanSelectedPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"scheduledFor":{"type":"string","format":"date-time","nullable":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"description":"The approvals request opened by `sendForApproval`."},"executionId":{"type":"string","nullable":true,"readOnly":true,"description":"The `createLiveDynamicPrice` execution that carried it out, once it has."},"decidedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"decidedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true}}},
+"PricingRecommendationDecisionInput": {"type":"object","x-ticvai-persistence":"none — request only","description":"What `decidePricingRecommendation` takes (decided 29 September, readiness close-out).","required":["decision"],"properties":{"decision":{"type":"string","enum":["accept","modify","reject","schedule","sendForApproval"]},"rejectionReason":{"type":"string","enum":["commercialJudgment","brandPositioning","customerSensitivity","eventStrategy","incorrectSignal","dataConcern","other"],"description":"Required for reject."},"rejectionNote":{"type":"string","maxLength":2000},"humanSelectedPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Required for modify; must sit inside the strategy's guardrails."},"scheduledFor":{"type":"string","format":"date-time","description":"Required for schedule; in the future."}}},
+"PricingSimulationStudioInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Pricing Simulation Studio submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"venue":{"type":"string","description":"Scope: venue id","nullable":true},"product":{"type":"string","description":"Scope: product id","nullable":true},"event":{"type":"string","description":"Scope: event id","nullable":true},"performance":{"type":"string","description":"Scope: performance id","nullable":true},"timeslot":{"type":"string","description":"Scope: timeslot","nullable":true},"priceCategory":{"type":"string","description":"Scope: price category","nullable":true},"channel":{"$ref":"#/components/schemas/Channel","description":"Scope: channel"},"customerSegment":{"type":"string","description":"Scope: customer segment","nullable":true},"dateFrom":{"type":"string","description":"Scope: first date","format":"date"},"dateTo":{"type":"string","description":"Scope: last date","format":"date"},"simulationSource":{"type":"string","description":"Simulation Source","enum":["manualPriceChange","dynamicRule","aiRecommendation","newDynamicStrategy","strategyModification","bulkPriceChange"]},"sourceReference":{"type":"string","description":"Id of the rule, recommendation or strategy the simulation came from","nullable":true},"proposedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Proposed price (single-price change)"},"proposedAdjustmentPercent":{"type":"number","description":"Proposed adjustment, percent (bulk change or strategy)","nullable":true}}},
+"PricingSimulationStudioView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Pricing Simulation Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"expectedDemand":{"type":"integer","description":"Expected Demand"},"expectedConversion":{"type":"number","description":"Expected Conversion, percent"},"expectedAttendance":{"type":"integer","description":"Expected Attendance"},"expectedOccupancy":{"type":"number","description":"Expected Occupancy, percent"},"expectedRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Expected Revenue"},"expectedMargin":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Expected Margin"},"expectedSellThrough":{"type":"number","description":"Expected Sell-Through, percent"},"expectedSellOutTime":{"type":"string","description":"Expected Sell-Out Time","format":"date-time","nullable":true},"averageSellingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Average Selling Price"},"simulationConfidence":{"type":"number","description":"Simulation Confidence, percent"},"dataVolume":{"type":"integer","description":"Data Volume: transactions behind the simulation"},"historicalSimilarity":{"type":"number","description":"Historical Similarity, percent"},"forecastConfidence":{"type":"number","description":"Forecast Confidence, percent"},"elasticityConfidence":{"type":"number","description":"Elasticity Confidence, percent"},"externalSignalQuality":{"type":"number","description":"External Signal Quality, percent"},"simulationId":{"type":"string","description":"Simulation id (saved scenarios keep it)"},"simulationSource":{"type":"string","description":"Simulation Source","enum":["manualPriceChange","dynamicRule","aiRecommendation","newDynamicStrategy","strategyModification","bulkPriceChange"]},"currentPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Current price"},"proposedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Proposed price"},"baselineRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Current strategy: expected revenue"},"baselineDemand":{"type":"integer","description":"Current strategy: expected demand"},"baselineOccupancy":{"type":"number","description":"Current strategy: expected occupancy, percent"},"guardrailChecks":{"type":"array","items":{"type":"object","properties":{"check":{"type":"string","enum":["commercialGuardrail","contractProtection","priceLadder","approvalThreshold"],"description":"Guardrail"},"passed":{"type":"boolean","description":"Pass / fail"},"message":{"type":"string","description":"Why it failed, or the approval level required"}}},"description":"Guardrail Check shown before the simulation completes"}}},
+"RevenueDemandImpactForecastingView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Revenue & Demand Impact Forecasting displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Proposed: expected revenue"},"demand":{"type":"integer","description":"Proposed: expected demand"},"attendance":{"type":"integer","description":"Proposed: attendance"},"occupancy":{"type":"number","description":"Proposed: occupancy, percent"},"conversion":{"type":"number","description":"Proposed: conversion, percent"},"margin":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Proposed: margin"},"asp":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Proposed: average selling price"},"sellThrough":{"type":"number","description":"Proposed: sell-through, percent"},"sellOutProbability":{"type":"number","description":"Proposed: sell-out probability, percent"},"assessmentId":{"type":"string","description":"Assessment id"},"recommendationId":{"type":"string","description":"Recommendation assessed","nullable":true},"simulationId":{"type":"string","description":"Simulation assessed","nullable":true},"baselineRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Without change: expected revenue"},"baselineDemand":{"type":"integer","description":"Without change: expected demand"},"baselineOccupancy":{"type":"number","description":"Without change: expected occupancy, percent"},"revenueChange":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Impact: revenue"},"revenueChangePercent":{"type":"number","description":"Impact: revenue, percent"},"demandChange":{"type":"integer","description":"Impact: demand"},"demandChangePercent":{"type":"number","description":"Impact: demand, percent"},"marginChange":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Impact: margin"},"customerImpacts":{"type":"array","items":{"type":"object","properties":{"group":{"type":"string","enum":["member","resident","tourist","family","b2b"],"description":"Customer group"},"demandChangePercent":{"type":"number","description":"Estimated demand change, percent"},"note":{"type":"string","description":"Explanation"}}},"description":"Customer Impact, where supported"},"cannibalization":{"type":"array","items":{"type":"object","properties":{"toProduct":{"type":"string","description":"Product demand shifts toward"},"demandShiftPercent":{"type":"number","description":"Share of demand shifting, percent"}}},"description":"Cannibalization"},"bestCaseRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Sensitivity: best case revenue"},"worstCaseRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Sensitivity: worst case revenue"}}},
+"RevenueOptimizationCommandCenterSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Revenue Optimization Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"revenueOpportunity":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue Opportunity"},"incrementalRevenueGenerated":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Incremental Revenue Generated"},"activeOptimizations":{"type":"integer","description":"Active Optimizations"},"recommendationsAwaitingAction":{"type":"integer","description":"Recommendations Awaiting Action"},"pendingSimulations":{"type":"integer","description":"Pending Simulations"},"autoExecutedChanges":{"type":"integer","description":"Auto-Executed Changes"},"approvalRequired":{"type":"integer","description":"Approval Required: changes waiting for an approver"},"activeABTests":{"type":"integer","description":"Active A/B Tests"},"pricingExceptions":{"type":"integer","description":"Pricing Exceptions"},"revenueAtRisk":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue at Risk"},"forecastAccuracy":{"type":"number","description":"Forecast Accuracy over the last 30 days (decided 29 September, readiness close-out), percent"},"optimizationSuccessRate":{"type":"number","description":"Optimization Success Rate: executed changes with a positive measured outcome, percent"},"aiRevenueBrief":{"type":"array","items":{"type":"string"},"description":"AI Revenue Brief, e.g. AED 284,000 of opportunity in the next seven days. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"}}},
+"RevenueOptimizationCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Revenue Optimization Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"venue":{"type":"string","description":"Venue"},"eventProduct":{"type":"string","description":"Event/Product"},"performance":{"type":"string","description":"Performance","nullable":true},"currentPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Current Price"},"recommendedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Recommended Price"},"forecastRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Forecast Revenue"},"expectedUplift":{"type":"number","description":"Expected Uplift, percent"},"confidence":{"type":"number","description":"Confidence, percent"},"automationMode":{"type":"string","description":"Automation Mode in force for this scope","enum":["advisory","humanInTheLoop","conditionalAutonomous","autonomous"]},"approvalStatus":{"type":"string","description":"Approval Status: notRequired, pending, approved or rejected"},"executionStatus":{"type":"string","description":"Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack"},"revenueRisk":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue Risk if no action is taken"},"eventProximity":{"type":"integer","description":"Event Proximity: days until the event"},"inventoryPosition":{"type":"number","description":"Inventory Position: remaining inventory, percent"},"demandVariance":{"type":"number","description":"Demand Variance against forecast, percent"},"urgency":{"type":"string","description":"Urgency","enum":["low","medium","high","critical"]},"optimizationId":{"type":"string","description":"Optimisation id"},"recommendationId":{"type":"string","description":"Recommendation id","nullable":true},"revenueOpportunity":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue Opportunity"},"priorityRank":{"type":"integer","description":"Priority rank (1 = act first)"},"nextAction":{"type":"string","description":"Suggested next action (the pack's Action column)","enum":["review","simulate","approve"]}}},
+"ScenarioModelingWhatIfAnalysisView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Scenario Modeling & What-If Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"demand":{"type":"number","description":"Demand adjustment (+/-), percent"},"occupancy":{"type":"number","description":"Occupancy, percent"},"inventory":{"type":"integer","description":"Inventory available"},"bookingVelocity":{"type":"number","description":"Booking velocity adjustment, percent"},"weatherImpact":{"type":"number","description":"Weather impact on demand, percent"},"nearbyEventImpact":{"type":"number","description":"Nearby event impact on demand, percent"},"competitorPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Competitor price"},"conversion":{"type":"number","description":"Conversion, percent"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price"},"eventProximity":{"type":"integer","description":"Event proximity, days"},"remainingCapacity":{"type":"number","description":"Remaining Capacity, percent"},"scenarioId":{"type":"string","description":"Scenario id"},"name":{"type":"string","description":"Scenario name"},"scenarioTypes":{"type":"array","items":{"type":"string","enum":["lowDemand","expectedDemand","highDemand","sellOut","competitorPriceDrop","competitorPriceIncrease","extremeWeather","rain","nearbyExhibition","majorConcert","tourismSurge","cancellationSurge","inventoryReduction","customScenario"]},"description":"Scenario Library entries combined"},"venue":{"type":"string","description":"Venue"},"event":{"type":"string","description":"Event","nullable":true},"strategyResults":{"type":"array","items":{"type":"object","properties":{"strategy":{"type":"string","enum":["fixedPrice","ruleBased","aiRecommendation","custom"],"description":"Strategy compared"},"averagePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Avg. price"},"demand":{"type":"integer","description":"Demand"},"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue"},"occupancy":{"type":"number","description":"Occupancy, percent"},"margin":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Margin"}}},"description":"Results per strategy"},"reviewStage":{"type":"string","description":"Review stage: draft, submittedForReview or reviewed (decided 29 September, readiness close-out)"},"createdBy":{"type":"string","description":"Author user id"},"updatedAt":{"type":"string","description":"Last saved","format":"date-time"}}},
+"SignalRegistryEntry": {"type":"object","x-ticvai-persistence":"catalogue.signal_registry","description":"**The registry of AI signals and models, with their trust and quality** (29 September, data model DM3). ADM-106 and ADM-118. A signal or model not `approved` for a use in `aiUsePermissions` is not used for it.","required":["id","scopePath","registryKind","name","trustLevel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `tenant` scope."},"registryKind":{"type":"string","enum":["signal","model"]},"name":{"type":"string","maxLength":200},"category":{"type":"string","enum":["internalSales","inventory","weather","nearbyEvents","competitor","tourism","calendar","transport","market","other",null],"nullable":true},"provider":{"type":"string","maxLength":100,"nullable":true},"source":{"type":"string","maxLength":100,"nullable":true},"internalExternal":{"type":"string","enum":["internal","external",null],"nullable":true},"marketCode":{"type":"string","maxLength":40,"nullable":true},"refreshFrequency":{"type":"string","enum":["realTime","minutes10","hourly","daily","weekly","manual",null],"nullable":true},"trustLevel":{"type":"string","enum":["approved","experimental","advisoryOnly","blocked"],"default":"experimental"},"aiUsePermissions":{"type":"array","items":{"type":"string","enum":["forecasting","recommendations","simulation","automatedPricing"]}},"fallbackPolicy":{"type":"string","enum":["useHistoricalValue","ignore","substitute","reduceConfidence","stopAiRecommendation",null],"nullable":true},"status":{"type":"string","maxLength":40,"nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"version":{"type":"string","maxLength":40,"nullable":true,"description":"Models."},"purpose":{"type":"string","nullable":true},"deployedAt":{"type":"string","format":"date-time","nullable":true},"trainingWindow":{"type":"string","maxLength":60,"nullable":true},"validationResult":{"type":"string","nullable":true},"lastUpdateAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"qualityCounts":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Signals: `{missingData, delayedData, outliers, invalidValues, unexpectedChanges, sourceFailure, duplicateData}`."},"performance":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Models: `{forecastAccuracy, bias, recommendationAccuracy, revenuePerformance, drift}` and the per-segment learning metrics."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}}
 }
 ```

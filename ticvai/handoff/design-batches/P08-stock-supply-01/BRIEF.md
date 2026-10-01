@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -55,21 +56,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `BO-049` | Stock Levels | listDetail | 6 | 3 | — |
-| `BO-050` | Stock Position & Valuation | statusTracker | 2 | 0 | — |
-| `BO-051` | Purchase Orders | listDetail | 7 | 4 | — |
-| `BO-052` | Goods Receipt | listDetail | 12 | 7 | — |
-| `BO-078` | Requisitions | approvalInbox | 10 | 6 | — |
-| `BO-079` | Stock Count | listDetail | 9 | 7 | — |
-| `BO-080` | Stock Transfers | listDetail | 6 | 4 | — |
-| `BO-081` | Inventory Items | listDetail | 9 | 3 | — |
-| `BO-082` | Stock Movements | listDetail | 4 | 2 | — |
-| `BO-083` | Suppliers | listDetail | 8 | 3 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `BO-049` | Stock Levels | B–D | 23 | 30 | 6 | 35 | 2 | 4 | — | notStarted (generated) |
+| `BO-050` | Stock Position & Valuation | B–D | 0 | 16 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
+| `BO-051` | Purchase Orders | B–D | 18 | 21 | 6 | 12 | 1 | 4 | — | notStarted (generated) |
+| `BO-052` | Goods Receipt | B–D | 39 | 53 | 6 | 18 | 1 | 0 | — | notStarted (generated) |
+| `BO-078` | Requisitions | B–D | 25 | 46 | 6 | 16 | 3 | 0 | — | notStarted (generated) |
+| `BO-079` | Stock Count | B–D | 28 | 32 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
+| `BO-080` | Stock Transfers | B–D | 30 | 27 | 6 | 14 | 2 | 4 | — | notStarted (generated) |
+| `BO-081` | Inventory Items | A | 34 | 35 | 6 | 33 | 2 | 4 | — | notStarted (generated) |
+| `BO-082` | Stock Movements | B–D | 23 | 38 | 6 | 24 | 0 | 4 | — | notStarted (generated) |
+| `BO-083` | Suppliers | B–D | 36 | 19 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

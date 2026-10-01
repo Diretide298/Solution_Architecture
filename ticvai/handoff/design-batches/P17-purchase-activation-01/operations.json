@@ -18,44 +18,6 @@
   "requestBody": "LegalEntity",
   "responds": "LegalEntity"
  },
- "previewSubscriptionChange": {
-  "method": "POST",
-  "path": "/tenants/{tenantId}/subscription/preview",
-  "contract": "subscription",
-  "summary": "Preview the effect of a plan change",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "SetSubscriptionRequest",
-  "responds": "SubscriptionPreview"
- },
- "setAgreementContractTerm": {
-  "method": "PUT",
-  "path": "/agreement-contract-term",
-  "contract": "subscription",
-  "summary": "Agreement & Contract Terms Builder",
-  "permission": "PLATFORM_CELL_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AgreementContractTermsBuilderInput",
-  "responds": "AgreementContractTermsBuilderView"
- },
  "setPaymentProvider": {
   "method": "PUT",
   "path": "/payment-providers",
@@ -79,43 +41,5 @@
   ],
   "requestBody": "SetPaymentProviderRequest",
   "responds": "PaymentProvider"
- },
- "setSubscription": {
-  "method": "PUT",
-  "path": "/tenants/{tenantId}/subscription",
-  "contract": "subscription",
-  "summary": "Assign or change a subscription",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "SetSubscriptionRequest",
-  "responds": "Subscription"
- },
- "setTrialConfiguration": {
-  "method": "PUT",
-  "path": "/trial-configurations",
-  "contract": "subscription",
-  "summary": "What a trial includes, how long it lasts and how it converts",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "TrialConfiguration",
-  "responds": "TrialConfiguration"
  }
 }

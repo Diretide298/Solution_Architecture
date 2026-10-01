@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -55,21 +56,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `BO-008` | Product Detail & Variants | listDetail | 12 | 3 | — |
-| `BO-022` | Order Detail | listDetail | 19 | 9 | — |
-| `BO-023` | Refunds & Exchanges | listDetail | 18 | 9 | — |
-| `BO-024` | Payment Exceptions | configEditor | 6 | 4 | — |
-| `BO-025` | Chargebacks & Disputes | listDetail | 10 | 2 | — |
-| `BO-026` | Group Bookings | listDetail | 17 | 11 | — |
-| `BO-027` | Reissue & Media Replacement | statusTracker | 6 | 2 | — |
-| `BO-028` | Refund Approval Queue | configEditor | 1 | 0 | — |
-| `BO-029` | Report Builder | listDetail | 9 | 6 | — |
-| `BO-039` | Shift Directory | approvalInbox | 13 | 9 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `BO-008` | Product Detail & Variants | A | 41 | 39 | 6 | 37 | 22 | 3 | — | notStarted (generated) |
+| `BO-022` | Order Detail | B–D | 127 | 53 | 6 | 72 | 1 | 0 | — | notStarted (generated) |
+| `BO-023` | Refunds & Exchanges | B–D | 121 | 71 | 6 | 71 | 3 | 6 | — | notStarted (generated) |
+| `BO-024` | Payment Exceptions | B–D | 45 | 0 | 5 | 11 | 0 | 0 | — | notStarted (generated) |
+| `BO-025` | Chargebacks & Disputes | B–D | 10 | 49 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
+| `BO-026` | Group Bookings | B–D | 158 | 69 | 6 | 77 | 2 | 6 | — | notStarted (generated) |
+| `BO-027` | Reissue & Media Replacement | B–D | 10 | 23 | 6 | 24 | 0 | 0 | — | notStarted (generated) |
+| `BO-028` | Refund Approval Queue | B–D | 6 | 0 | 4 | 10 | 5 | 6 | — | notStarted (generated) |
+| `BO-029` | Report Builder | A | 64 | 35 | 6 | 93 | 1 | 0 | — | notStarted (generated) |
+| `BO-039` | Shift Directory | B–D | 61 | 56 | 6 | 6 | 2 | 6 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

@@ -56,30 +56,6 @@
   "requestBody": null,
   "responds": null
  },
- "getCommissionStatement": {
-  "method": "GET",
-  "path": "/partner-agreements/{agreementId}/commission-statement",
-  "contract": "subscription",
-  "summary": "What the partner earned and what is owed",
-  "permission": "PARTNER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "from",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "to",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "CommissionStatement"
- },
  "getFinancialReport": {
   "method": "GET",
   "path": "/reports/financial",
@@ -163,30 +139,6 @@
   ],
   "requestBody": null,
   "responds": null
- },
- "listPartnerAgreements": {
-  "method": "GET",
-  "path": "/partner-agreements",
-  "contract": "subscription",
-  "summary": "Commercial agreements with B2B partners",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "expiringWithinDays",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PartnerAgreement"
  },
  "listReports": {
   "method": "GET",

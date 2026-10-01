@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -55,21 +56,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `ANL-001` | Executive Command Center | listDetail | 7 | 2 | — |
-| `ANL-002` | Sales, Revenue & Channel | statusTracker | 3 | 1 | — |
-| `ANL-003` | Operational Performance | listDetail | 6 | 1 | — |
-| `ANL-004` | Product Performance | listDetail | 4 | 1 | — |
-| `ANL-005` | Cost, Margin & Profitability | statusTracker | 4 | 1 | — |
-| `ANL-006` | Inventory & Waste Intelligence | listDetail | 6 | 1 | — |
-| `ANL-007` | Guest & Conversion Intelligence | listDetail | 6 | 2 | — |
-| `ANL-008` | Demand Forecasting | statusTracker | 4 | 1 | — |
-| `ANL-009` | AI Assistant & Action Center | approvalInbox | 9 | 5 | — |
-| `ANL-010` | Suggestions & Advice | configEditor | 2 | 1 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `ANL-001` | Executive Command Center | B–D | 15 | 31 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
+| `ANL-002` | Sales, Revenue & Channel | B–D | 6 | 1 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
+| `ANL-003` | Operational Performance | B–D | 11 | 50 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `ANL-004` | Product Performance | B–D | 9 | 29 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
+| `ANL-005` | Cost, Margin & Profitability | B–D | 6 | 5 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
+| `ANL-006` | Inventory & Waste Intelligence | B–D | 7 | 25 | 6 | 23 | 1 | 4 | — | notStarted (generated) |
+| `ANL-007` | Guest & Conversion Intelligence | B–D | 17 | 19 | 6 | 18 | 2 | 0 | — | notStarted (generated) |
+| `ANL-008` | Demand Forecasting | B–D | 4 | 1 | 6 | 39 | 3 | 0 | — | notStarted (generated) |
+| `ANL-009` | AI Assistant & Action Center | B–D | 30 | 46 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
+| `ANL-010` | Suggestions & Advice | B–D | 17 | 40 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

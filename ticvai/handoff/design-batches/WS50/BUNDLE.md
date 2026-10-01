@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -55,21 +56,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `ADM-188` | Dynamic Bundle Operations Command Center | commandCentre | 3 | 0 | — |
-| `ADM-189` | Component Inventory & Availability Matrix | listDetail | 2 | 0 | — |
-| `ADM-190` | Bundle Sellability & Dependency Rule Engine | listDetail | 1 | 0 | — |
-| `ADM-191` | Capacity Pool & Reservation Manager | configEditor | 3 | 1 | — |
-| `ADM-192` | Dynamic Component Substitution Engine | configEditor | 1 | 0 | — |
-| `ADM-193` | Dynamic Bundle Rule & Composition Engine | listDetail | 1 | 0 | — |
-| `ADM-194` | Real-Time Availability & Checkout Validation | configEditor | 1 | 0 | — |
-| `ADM-195` | Bundle Availability by Channel, Venue & Partner | configEditor | 3 | 1 | — |
-| `ADM-196` | Bundle Availability Forecast, Alerts & Recovery | listDetail | 1 | 0 | — |
-| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | listDetail | 3 | 0 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `ADM-188` | Dynamic Bundle Operations Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-189` | Component Inventory & Availability Matrix | B–D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `ADM-190` | Bundle Sellability & Dependency Rule Engine | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-191` | Capacity Pool & Reservation Manager | B–D | 19 | 12 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-192` | Dynamic Component Substitution Engine | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-193` | Dynamic Bundle Rule & Composition Engine | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-194` | Real-Time Availability & Checkout Validation | B–D | 1 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-195` | Bundle Availability by Channel, Venue & Partner | B–D | 17 | 12 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-196` | Bundle Availability Forecast, Alerts & Recovery | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | B–D | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -77,2553 +84,1183 @@ convincingly. It is never a caption.
 
 ---
 
-## `screens.json`
+## Screen by screen
 
-Every field of every screen in this batch. **`machine` is what a screen is in the middle of**, `overlays` is what opens over it and what closing it does, and `navigation.transitions` is how you leave, with `carries` naming the state that travels.
+**One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-```json
-[
- {
-  "id": "ADM-188",
-  "name": "Dynamic Bundle Operations Command Center",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "6",
-   "number": "1",
-   "page": 78
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/dynamic-bundle-operations-command-center-adm-188",
-   "component": "apps/ticvai-web/src/routes/commercial/DynamicBundleOperationsCommandCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-002"
-   ],
-   "exitTo": [
-    "ADM-002",
-    "ADM-189",
-    "ADM-190",
-    "ADM-191",
-    "ADM-192",
-    "ADM-193",
-    "ADM-194",
-    "ADM-195",
-    "ADM-196",
-    "ADM-197"
-   ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
-   "transitions": [
-    {
-     "to": "ADM-002",
-     "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-188 holds none of them. The edge carries nothing: ADM-188 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
-    },
-    {
-     "to": "ADM-189",
-     "trigger": "Works in Component Inventory & Availability Matrix",
-     "provenance": "flow F159 step 1→2",
-     "operation": "listDynamicBundle"
-    },
-    {
-     "to": "ADM-190",
-     "trigger": "Works in Bundle Sellability & Dependency Rule Engine",
-     "provenance": "flow F159 step 3→4",
-     "operation": "listDynamicBundle"
-    },
-    {
-     "to": "ADM-191",
-     "trigger": "Works in Capacity Pool & Reservation Manager",
-     "provenance": "flow F159 step 5→6",
-     "operation": "listDynamicBundle"
-    },
-    {
-     "to": "ADM-192",
-     "trigger": "Works in Dynamic Component Substitution Engine",
-     "provenance": "flow F159 step 7→8",
-     "operation": "listDynamicBundle"
-    },
-    {
-     "to": "ADM-193",
-     "trigger": "Works in Dynamic Bundle Rule & Composition Engine",
-     "provenance": "flow F159 step 9→10",
-     "operation": "listDynamicBundle"
-    },
-    {
-     "to": "ADM-194",
-     "trigger": "Works in Real-Time Availability & Checkout Validation",
-     "provenance": "flow F159 step 11→12",
-     "operation": "listDynamicBundle"
-    },
-    {
-     "to": "ADM-195",
-     "trigger": "Works in Bundle Availability by Channel, Venue & Partner",
-     "provenance": "flow F159 step 13→14",
-     "operation": "listDynamicBundle"
-    },
-    {
-     "to": "ADM-196",
-     "trigger": "Works in Bundle Availability Forecast, Alerts & Recovery",
-     "provenance": "flow F159 step 15→16",
-     "operation": "listDynamicBundle"
-    },
-    {
-     "to": "ADM-197",
-     "trigger": "Works in Dynamic Bundle Simulation & AI Optimization",
-     "provenance": "flow F159 step 17→18",
-     "operation": "listDynamicBundle"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Provide real-time visibility into the operational health of all active bundles.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Active Dynamic Bundles",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.activeDynamicBundles"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Sellable Bundles",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.sellableBundles"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Partially Available Bundles",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.partiallyAvailableBundles"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Unavailable Bundles",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.unavailableBundles"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Bundles with Low Capacity",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.bundlesWithLowCapacity"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Components Sold Out",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.componentsSoldOut"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Substitutions Triggered",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.substitutionsTriggered"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Bundle Sales Today",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.bundleSalesToday"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Failed Bundle Attempts",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.failedBundleAttempts"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Capacity Reserved",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.capacityReserved"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revenue at Risk",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.revenueAtRisk"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Recovered Revenue",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 78 §KPI Cards",
-       "bindsTo": "DynamicBundleOperationsCommandCenterView.recoveredRevenue"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The dynamic bundle operations list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the dynamic bundle operations untouched.",
-   "emptyFirstRun": "No dynamic bundle operations yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the dynamic bundle operations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listDynamicBundle2",
-    "contract": "promotions",
-    "purpose": "Dynamic Bundle Simulation & AI Optimization",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listDynamicBundle",
-    "contract": "promotions",
-    "purpose": "Dynamic Bundle Operations Command Center",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listDynamicBundleRule",
-    "contract": "promotions",
-    "purpose": "Dynamic Bundle Rule & Composition Engine",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "DynamicBundleOperationsCommandCenterView.activeDynamicBundles",
-    "DynamicBundleOperationsCommandCenterView.sellableBundles",
-    "DynamicBundleOperationsCommandCenterView.partiallyAvailableBundles",
-    "DynamicBundleOperationsCommandCenterView.unavailableBundles",
-    "DynamicBundleOperationsCommandCenterView.bundlesWithLowCapacity",
-    "DynamicBundleOperationsCommandCenterView.componentsSoldOut"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-188",
-   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-188"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 78. 12 of 12 labels bound to a contract property; 12 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-189",
-  "name": "Component Inventory & Availability Matrix",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "6",
-   "number": "2",
-   "page": 79
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/component-inventory-availability-matrix-adm-189",
-   "component": "apps/ticvai-web/src/routes/commercial/ComponentInventoryAvailabilityMatrix.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-188"
-   ],
-   "exitTo": [
-    "ADM-188"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-188, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-188",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F159 step 2→3",
-     "operation": "listComponentInventoryAvailability"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide one centralized matrix showing availability for every component within every active bundle.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 79"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 79"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listComponentInventoryAvailability",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getInventoryKitDefinition",
-       "notes": "One record, read-only."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The component inventory availability list.",
-   "error": "Could not load. Names which read failed and leaves the component inventory availability untouched.",
-   "emptyFirstRun": "No component inventory availability yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the component inventory availability are still there. The pack's own statuses are t ry ty le — the state names which is selected.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listComponentInventoryAvailability",
-    "contract": "promotions",
-    "purpose": "Component Inventory & Availability Matrix",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getInventoryKitDefinition",
-    "contract": "inventory",
-    "purpose": "Show kit components",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "ComponentInventoryAvailabilityMatrixView.availabilitySource"
-   ],
-   "params": [
-    {
-     "name": "itemId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-189",
-   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-189"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 79. 0 of 0 labels bound to a contract property; 1 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-190",
-  "name": "Bundle Sellability & Dependency Rule Engine",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "6",
-   "number": "3",
-   "page": 80
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/bundle-sellability-dependency-rule-engine-adm-190",
-   "component": "apps/ticvai-web/src/routes/commercial/BundleSellabilityDependencyRuleEngine.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-188"
-   ],
-   "exitTo": [
-    "ADM-188"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-188, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-188",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F159 step 4→5",
-     "operation": "listBundleSellabilityDependency"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Determine whether the overall bundle can be sold based on the state of its underlying components.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Partner component required. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 80 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 80"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 80"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Partner component required",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 80 §Support"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listBundleSellabilityDependency",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The bundle sellability dependency list.",
-   "error": "Could not load. Names which read failed and leaves the bundle sellability dependency untouched.",
-   "emptyFirstRun": "No bundle sellability dependency yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the bundle sellability dependency are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listBundleSellabilityDependency",
-    "contract": "promotions",
-    "purpose": "Bundle Sellability & Dependency Rule Engine",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "BundleSellabilityDependencyRuleEngineView.dependencyRule"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-190",
-   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-190"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 80. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-191",
-  "name": "Capacity Pool & Reservation Manager",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "6",
-   "number": "4",
-   "page": 81
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/capacity-pool-reservation-manager-adm-191",
-   "component": "apps/ticvai-web/src/routes/commercial/CapacityPoolReservationManager.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-188"
-   ],
-   "exitTo": [
-    "ADM-188"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-188, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-188",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F159 step 6→7",
-     "operation": "listCapacityPoolReservation"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
-  "purpose": "Manage how bundle sales consume capacity from underlying products. This is particularly important because a bundle must not create artificial inventory separate from the actual attraction/product capacity.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Temporary reservation",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 81 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Hold duration",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 81 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Release timeout",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 81 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Hard allocation",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 81 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Soft allocation",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 81 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Overbooking policy",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 81 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Waitlist behavior",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 81 §Configure"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every bundle capacity policy",
-       "bindsTo": "BundleCapacityPolicy",
-       "columns": [
-        "BundleCapacityPolicy.id",
-        "BundleCapacityPolicy.bundleId",
-        "BundleCapacityPolicy.channel",
-        "BundleCapacityPolicy.venueId",
-        "BundleCapacityPolicy.partnerId",
-        "BundleCapacityPolicy.capacitySource",
-        "BundleCapacityPolicy.allocationMode",
-        "BundleCapacityPolicy.capacityCeiling",
-        "BundleCapacityPolicy.holdDurationMinutes",
-        "BundleCapacityPolicy.bookingCutoffMinutes",
-        "BundleCapacityPolicy.allowOverbooking",
-        "BundleCapacityPolicy.allowWaitlist"
-       ],
-       "operation": "listBundleCapacityPolicies",
-       "provenance": "contract promotions.yaml GET /bundles/{bundleId}/capacity-policies"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save bundle capacity policy",
-       "operation": "setBundleCapacityPolicy",
-       "permission": "PRODUCT_CONFIGURE",
-       "notes": "Replaces the bundle's `promotions.bundle_capacity_policy` rows with the set sent: a row sent with an `id` is updated, one without is created, and a stored row not sent is removed.",
-       "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The capacity pool reservation configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the capacity pool reservation untouched.",
-   "emptyFirstRun": "No capacity pool reservation configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCapacityPoolReservation",
-    "contract": "promotions",
-    "purpose": "Capacity Pool & Reservation Manager",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listBundleCapacityPolicies",
-    "contract": "promotions",
-    "purpose": "List a bundle's capacity policies",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setBundleCapacityPolicy",
-    "contract": "promotions",
-    "purpose": "Set a bundle's capacity policies",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCapacityPoolReservation",
-     "listBundleCapacityPolicies"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-191",
-   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-191"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 81. 0 of 0 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "bundleId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "formSetBundleCapacityPolicy",
-    "component": "modal",
-    "trigger": "Save bundle capacity policy",
-    "body": "**Collects what `setBundleCapacityPolicy` sends before it is called.** Required: `policies`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save bundle capacity policy",
-     "operation": "setBundleCapacityPolicy"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "policies"
-     ]
-    },
-    "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
-   }
-  ],
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-192",
-  "name": "Dynamic Component Substitution Engine",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "6",
-   "number": "5",
-   "page": 82
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/dynamic-component-substitution-engine-adm-192",
-   "component": "apps/ticvai-web/src/routes/commercial/DynamicComponentSubstitutionEngine.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-188"
-   ],
-   "exitTo": [
-    "ADM-188"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-188, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-188",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F159 step 8→9",
-     "operation": "listDynamicComponentSubstitution"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§For each component define; Define whether substitute) and no display directory — it is settings, not a population",
-  "purpose": "Automatically replace unavailable bundle components according to predefined commercial rules.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Primary component",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 82 §For each component define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Alternative 1",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 82 §For each component define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Alternative 2",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 82 §For each component define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Alternative 3",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 82 §For each component define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Fallback action",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 82 §For each component define"
-      },
-      {
-       "kind": "textField",
-       "label": "Maintains same bundle price",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 82 §Define whether substitute"
-      },
-      {
-       "kind": "selectField",
-       "label": "Adds surcharge",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 82 §Define whether substitute"
-      },
-      {
-       "kind": "selectField",
-       "label": "Reduces bundle price",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 82 §Define whether substitute"
-      },
-      {
-       "kind": "selectField",
-       "label": "Requires customer approval",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 82 §Define whether substitute"
-      },
-      {
-       "kind": "selectField",
-       "label": "Requires operator approval",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 82 §Define whether substitute"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The dynamic component substitution configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the dynamic component substitution untouched.",
-   "emptyFirstRun": "No dynamic component substitution configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listDynamicComponentSubstitution",
-    "contract": "promotions",
-    "purpose": "Dynamic Component Substitution Engine",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-192",
-   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-192"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 82. 0 of 0 labels bound to a contract property; 10 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-193",
-  "name": "Dynamic Bundle Rule & Composition Engine",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "6",
-   "number": "6",
-   "page": 83
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/dynamic-bundle-rule-composition-engine-adm-193",
-   "component": "apps/ticvai-web/src/routes/commercial/DynamicBundleRuleCompositionEngine.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-188"
-   ],
-   "exitTo": [
-    "ADM-188"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-188, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-188",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F159 step 10→11",
-     "operation": "listDynamicBundleRule"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Allow the actual composition of a bundle to change dynamically according to business and guest conditions. This builds upon the matrix requirement for dynamic bundles where guests select attractions, experiences, F&B, Retail, or services from predefined categories.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 83"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 83"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listDynamicBundleRule",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The dynamic bundle rule list.",
-   "error": "Could not load. Names which read failed and leaves the dynamic bundle rule untouched.",
-   "emptyFirstRun": "No dynamic bundle rule yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the dynamic bundle rule are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listDynamicBundleRule",
-    "contract": "promotions",
-    "purpose": "Dynamic Bundle Rule & Composition Engine",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "DynamicBundleRuleCompositionEngineView.guestSegment",
-    "DynamicBundleRuleCompositionEngineView.membership",
-    "DynamicBundleRuleCompositionEngineView.loyaltyTier",
-    "DynamicBundleRuleCompositionEngineView.purchaseHistory",
-    "DynamicBundleRuleCompositionEngineView.numberOfGuests"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-193",
-   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-193"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 83. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-194",
-  "name": "Real-Time Availability & Checkout Validation",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "6",
-   "number": "7",
-   "page": 84
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/real-time-availability-checkout-validation-adm-194",
-   "component": "apps/ticvai-web/src/routes/commercial/RealTimeAvailabilityCheckoutValidation.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-188"
-   ],
-   "exitTo": [
-    "ADM-188"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-188, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-188",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F159 step 12→13",
-     "operation": "listRealTimeAvailability"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Payment authorization/capture) and no display directory — it is settings, not a population",
-  "purpose": "Perform the final authoritative validation immediately before transaction confirmation. This is essential because availability may change between browsing and payment.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "↓",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 84 §Payment authorization/capture"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listRealTimeAvailability",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The real-time availability checkout configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the real-time availability checkout untouched.",
-   "emptyFirstRun": "No real-time availability checkout configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listRealTimeAvailability",
-    "contract": "promotions",
-    "purpose": "Real-Time Availability & Checkout Validation",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-194",
-   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-194"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 84. 0 of 0 labels bound to a contract property; 1 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-195",
-  "name": "Bundle Availability by Channel, Venue & Partner",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "6",
-   "number": "8",
-   "page": 85
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/bundle-availability-by-channel-venue-partner-adm-195",
-   "component": "apps/ticvai-web/src/routes/commercial/BundleAvailabilityByChannelVenuePartner.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-188"
-   ],
-   "exitTo": [
-    "ADM-188"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-188, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-188",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F159 step 14→15",
-     "operation": "listBundleAvailabilityChannel"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
-  "purpose": "Control where a bundle is sellable based on operational availability.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Venue-specific availability",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 85 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Attraction-specific availability",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 85 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Operating area",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 85 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Country/market",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 85 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Sales location",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 85 §Configure"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every bundle capacity policy",
-       "bindsTo": "BundleCapacityPolicy",
-       "columns": [
-        "BundleCapacityPolicy.id",
-        "BundleCapacityPolicy.bundleId",
-        "BundleCapacityPolicy.channel",
-        "BundleCapacityPolicy.venueId",
-        "BundleCapacityPolicy.partnerId",
-        "BundleCapacityPolicy.capacitySource",
-        "BundleCapacityPolicy.allocationMode",
-        "BundleCapacityPolicy.capacityCeiling",
-        "BundleCapacityPolicy.holdDurationMinutes",
-        "BundleCapacityPolicy.bookingCutoffMinutes",
-        "BundleCapacityPolicy.allowOverbooking",
-        "BundleCapacityPolicy.allowWaitlist"
-       ],
-       "operation": "listBundleCapacityPolicies",
-       "provenance": "contract promotions.yaml GET /bundles/{bundleId}/capacity-policies"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save bundle capacity policy",
-       "operation": "setBundleCapacityPolicy",
-       "permission": "PRODUCT_CONFIGURE",
-       "notes": "Replaces the bundle's `promotions.bundle_capacity_policy` rows with the set sent: a row sent with an `id` is updated, one without is created, and a stored row not sent is removed.",
-       "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The bundle availability channel configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the bundle availability channel untouched.",
-   "emptyFirstRun": "No bundle availability channel configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listBundleAvailabilityChannel",
-    "contract": "promotions",
-    "purpose": "Bundle Availability by Channel, Venue & Partner",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listBundleCapacityPolicies",
-    "contract": "promotions",
-    "purpose": "List a bundle's capacity policies",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setBundleCapacityPolicy",
-    "contract": "promotions",
-    "purpose": "Set a bundle's capacity policies",
-    "trigger": "onAction",
-    "invalidates": [
-     "listBundleAvailabilityChannel",
-     "listBundleCapacityPolicies"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-195",
-   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-195"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 85. 0 of 0 labels bound to a contract property; 5 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "bundleId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "formSetBundleCapacityPolicy",
-    "component": "modal",
-    "trigger": "Save bundle capacity policy",
-    "body": "**Collects what `setBundleCapacityPolicy` sends before it is called.** Required: `policies`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save bundle capacity policy",
-     "operation": "setBundleCapacityPolicy"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "policies"
-     ]
-    },
-    "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
-   }
-  ],
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-196",
-  "name": "Bundle Availability Forecast, Alerts & Recovery",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "6",
-   "number": "9",
-   "page": 86
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/bundle-availability-forecast-alerts-recovery-adm-196",
-   "component": "apps/ticvai-web/src/routes/commercial/BundleAvailabilityForecastAlertsRecovery.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-188"
-   ],
-   "exitTo": [
-    "ADM-188"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-188, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-188",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F159 step 16→17",
-     "operation": "listBundleAvailabilityForecast"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
-  "purpose": "Predict bundle availability problems before they affect sales.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every bundle availability forecast",
-       "columns": [
-        "BundleAvailabilityForecastAlertsRecoveryView.historicalDemand",
-        "BundleAvailabilityForecastAlertsRecoveryView.currentBookingVelocity",
-        "BundleAvailabilityForecastAlertsRecoveryView.inventory",
-        "BundleAvailabilityForecastAlertsRecoveryView.capacity",
-        "BundleAvailabilityForecastAlertsRecoveryView.timeslotUtilization",
-        "BundleAvailabilityForecastAlertsRecoveryView.seasonality",
-        "BundleAvailabilityForecastAlertsRecoveryView.dayOfWeek",
-        "BundleAvailabilityForecastAlertsRecoveryView.campaignActivity",
-        "BundleAvailabilityForecastAlertsRecoveryView.partnerReservations"
-       ],
-       "bindsTo": "BundleAvailabilityForecastAlertsRecoveryView",
-       "operation": "listBundleAvailabilityForecast",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 86 §Analyze"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected bundle availability forecast",
-       "bindsTo": "BundleAvailabilityForecastAlertsRecoveryView",
-       "columns": [
-        "BundleAvailabilityForecastAlertsRecoveryView.historicalDemand",
-        "BundleAvailabilityForecastAlertsRecoveryView.currentBookingVelocity",
-        "BundleAvailabilityForecastAlertsRecoveryView.inventory",
-        "BundleAvailabilityForecastAlertsRecoveryView.capacity",
-        "BundleAvailabilityForecastAlertsRecoveryView.timeslotUtilization",
-        "BundleAvailabilityForecastAlertsRecoveryView.seasonality",
-        "BundleAvailabilityForecastAlertsRecoveryView.dayOfWeek",
-        "BundleAvailabilityForecastAlertsRecoveryView.campaignActivity",
-        "BundleAvailabilityForecastAlertsRecoveryView.partnerReservations"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Alert Levels”, “AED 186,500”.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 86 §Analyze"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The bundle availability forecast list.",
-   "error": "Could not load. Names which read failed and leaves the bundle availability forecast untouched.",
-   "emptyFirstRun": "No bundle availability forecast yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the bundle availability forecast are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listBundleAvailabilityForecast",
-    "contract": "promotions",
-    "purpose": "Bundle Availability Forecast, Alerts & Recovery",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "BundleAvailabilityForecastAlertsRecoveryView.historicalDemand",
-    "BundleAvailabilityForecastAlertsRecoveryView.currentBookingVelocity",
-    "BundleAvailabilityForecastAlertsRecoveryView.inventory",
-    "BundleAvailabilityForecastAlertsRecoveryView.capacity",
-    "BundleAvailabilityForecastAlertsRecoveryView.timeslotUtilization",
-    "BundleAvailabilityForecastAlertsRecoveryView.seasonality"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-196",
-   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-196"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 86. 9 of 9 labels bound to a contract property; 9 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-197",
-  "name": "Dynamic Bundle Simulation & AI Optimization",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "6",
-   "number": "10",
-   "page": 87
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/dynamic-bundle-simulation-ai-optimization-adm-197",
-   "component": "apps/ticvai-web/src/routes/commercial/DynamicBundleSimulationAiOptimization.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-188"
-   ],
-   "exitTo": [
-    "ADM-188"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-188, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Test how a bundle behaves under different operational scenarios before activating dynamic rules.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every dynamic bundle simulation",
-       "columns": [
-        "DynamicBundleSimulationAiOptimizationView.bundleStatus",
-        "DynamicBundleSimulationAiOptimizationView.componentsSelected",
-        "DynamicBundleSimulationAiOptimizationView.substitutions",
-        "DynamicBundleSimulationAiOptimizationView.priceImpact",
-        "DynamicBundleSimulationAiOptimizationView.marginImpact",
-        "DynamicBundleSimulationAiOptimizationView.capacityImpact",
-        "DynamicBundleSimulationAiOptimizationView.customerImpact",
-        "DynamicBundleSimulationAiOptimizationView.revenueImpact"
-       ],
-       "bindsTo": "DynamicBundleSimulationAiOptimizationView",
-       "operation": "listDynamicBundle2",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 87 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected dynamic bundle simulation",
-       "bindsTo": "DynamicBundleSimulationAiOptimizationView",
-       "columns": [
-        "DynamicBundleSimulationAiOptimizationView.bundleStatus",
-        "DynamicBundleSimulationAiOptimizationView.componentsSelected",
-        "DynamicBundleSimulationAiOptimizationView.substitutions",
-        "DynamicBundleSimulationAiOptimizationView.priceImpact",
-        "DynamicBundleSimulationAiOptimizationView.marginImpact",
-        "DynamicBundleSimulationAiOptimizationView.capacityImpact",
-        "DynamicBundleSimulationAiOptimizationView.customerImpact",
-        "DynamicBundleSimulationAiOptimizationView.revenueImpact"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Scenario A”, “Scenario B”, “Scenario C”, “Scenario D”, “Scenario E”, “Photo”.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 87 §Show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The dynamic bundle simulation list.",
-   "error": "Could not load. Names which read failed and leaves the dynamic bundle simulation untouched.",
-   "emptyFirstRun": "No dynamic bundle simulation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the dynamic bundle simulation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listDynamicBundle2",
-    "contract": "promotions",
-    "purpose": "Dynamic Bundle Simulation & AI Optimization",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listDynamicBundle",
-    "contract": "promotions",
-    "purpose": "Dynamic Bundle Operations Command Center",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listDynamicBundleRule",
-    "contract": "promotions",
-    "purpose": "Dynamic Bundle Rule & Composition Engine",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "DynamicBundleSimulationAiOptimizationView.bundleStatus",
-    "DynamicBundleSimulationAiOptimizationView.componentsSelected",
-    "DynamicBundleSimulationAiOptimizationView.substitutions",
-    "DynamicBundleSimulationAiOptimizationView.priceImpact",
-    "DynamicBundleSimulationAiOptimizationView.marginImpact",
-    "DynamicBundleSimulationAiOptimizationView.capacityImpact"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-197",
-   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-197"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 87. 8 of 8 labels bound to a contract property; 9 of 87 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- }
-]
-```
+### `ADM-188` Dynamic Bundle Operations Command Center
 
-## `operations.json`
+**Provide real-time visibility into the operational health of all active bundles.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/dynamic-bundle-operations-command-center-adm-188` |
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Active Dynamic Bundles** (metric tile)
+
+**Sellable Bundles** (metric tile)
+
+**Partially Available Bundles** (metric tile)
+
+**Unavailable Bundles** (metric tile)
+
+**Bundles with Low Capacity** (metric tile)
+
+**Components Sold Out** (metric tile)
+
+**Substitutions Triggered** (metric tile)
+
+**Bundle Sales Today** (metric tile)
+
+**Failed Bundle Attempts** (metric tile)
+
+**Capacity Reserved** (metric tile)
+
+**Revenue at Risk** (metric tile)
+
+**Recovered Revenue** (metric tile)
+
+**Data it reads**: `listDynamicBundle2` (onLoad, Dynamic Bundle Simulation & AI Optimization); `listDynamicBundle` (onLoad, Dynamic Bundle Operations Command Center); `listDynamicBundleRule` (onLoad, Dynamic Bundle Rule & Composition Engine)
+
+**Where the user goes next**
+
+- → `ADM-002` Platform Dashboard: *Platform Dashboard*
+- → `ADM-189` Component Inventory & Availability Matrix: *Works in Component Inventory & Availability Matrix*; calls `listDynamicBundle`
+- → `ADM-190` Bundle Sellability & Dependency Rule Engine: *Works in Bundle Sellability & Dependency Rule Engine*; calls `listDynamicBundle`
+- → `ADM-191` Capacity Pool & Reservation Manager: *Works in Capacity Pool & Reservation Manager*; calls `listDynamicBundle`
+- → `ADM-192` Dynamic Component Substitution Engine: *Works in Dynamic Component Substitution Engine*; calls `listDynamicBundle`
+- → `ADM-193` Dynamic Bundle Rule & Composition Engine: *Works in Dynamic Bundle Rule & Composition Engine*; calls `listDynamicBundle`
+- → `ADM-194` Real-Time Availability & Checkout Validation: *Works in Real-Time Availability & Checkout Validation*; calls `listDynamicBundle`
+- → `ADM-195` Bundle Availability by Channel, Venue & Partner: *Works in Bundle Availability by Channel, Venue & Partner*; calls `listDynamicBundle`
+- → `ADM-196` Bundle Availability Forecast, Alerts & Recovery: *Works in Bundle Availability Forecast, Alerts & Recovery*; calls `listDynamicBundle`
+- → `ADM-197` Dynamic Bundle Simulation & AI Optimization: *Works in Dynamic Bundle Simulation & AI Optimization*; calls `listDynamicBundle`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The dynamic bundle operations list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the dynamic bundle operations untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No dynamic bundle operations yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the dynamic bundle operations are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listDynamicBundle2` → `PRICE_VIEW` (read) · staff
+- `listDynamicBundle` → `PRICE_VIEW` (read) · staff
+- `listDynamicBundleRule` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-188` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-188`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 1: Opens Dynamic Bundle Operations Command Center → Provide real-time visibility into the operational health of all active bundles.
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 3: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 5: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 7: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 9: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 11: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 13: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 15: Returns to the board's landing screen → Ready for the next screen on this board
+- … and 1 more flow steps (`flows/`)
+- Flow F159 branch at step 1 (expected): when Nothing has been set up on Dynamic Bundle Operations Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
+- Flow F159 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-188?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-002`, `ADM-189`, `ADM-190`, `ADM-191`, `ADM-192`, `ADM-193`, `ADM-194`, `ADM-195`, `ADM-196`, `ADM-197`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-189` Component Inventory & Availability Matrix
+
+**Provide one centralized matrix showing availability for every component within every active bundle.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW`, `PRODUCT_VIEW` (2 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `itemId` (navigation) |
+| Route | `/commercial/component-inventory-availability-matrix-adm-189` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Detail panel** (detail panel): One record, read-only.
+
+**Data it reads**: `listComponentInventoryAvailability` (onLoad, Component Inventory & Availability Matrix); `getInventoryKitDefinition` (onLoad, Show kit components)
+
+**Where the user goes next**
+
+- → `ADM-188` Dynamic Bundle Operations Command Center: *Returns to the board's landing screen*; calls `listComponentInventoryAvailability`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The component inventory availability list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the component inventory availability untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No component inventory availability yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the component inventory availability are still there. The pack's own statuses are t ry ty le — the state names which is selected. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listComponentInventoryAvailability` → `PRICE_VIEW` (read) · staff
+- `getInventoryKitDefinition` → `PRODUCT_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A72** Design a generic, configurable multi-stage approval-workflow engine (approve / reject / return / request-more-information, AI-generated summary, audit trail) applicable to procurement, pricing changes, product creation … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 18 Aug 2026 · workshop tracker · keyword 'procurement')*
+- **A87** Design the Inventory & Procurement module: an Item Master with UOM/pack-size conversions supporting both Weighted-Average and FIFO costing, a customizable warehouse/location hierarchy with batch/date-level expiry … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 18 Aug 2026 · workshop tracker · keyword 'procurement')*
+- **A101** Schedule and hold the outstanding F&B, Retail, Procurement & Inventory workshop *(Chinmay Parab / Allam · High · Done → 30 Sep: Closed, Done (as recorded earlier) · 21 Aug 2026 · workshop tracker · keyword 'procurement')*
+- **A301** Build maintenance vendor/procurement ops and analytics *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 17 Sep 2026 · workshop tracker · keyword 'procurement')*
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-189` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-189`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 2: Works in Component Inventory & Availability Matrix → Provide one centralized matrix showing availability for every component within every active bundle.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-189?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-188`.
+- [ ] Every gated control is gated: `PRICE_VIEW`, `PRODUCT_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-190` Bundle Sellability & Dependency Rule Engine
+
+**Determine whether the overall bundle can be sold based on the state of its underlying components.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/bundle-sellability-dependency-rule-engine-adm-190` |
+
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Partner component required. Each needs an operation, or needs removing from the screen; this is the Phase 3 … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Partner component required (primary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listBundleSellabilityDependency` (onLoad, Bundle Sellability & Dependency Rule Engine)
+
+**Where the user goes next**
+
+- → `ADM-188` Dynamic Bundle Operations Command Center: *Returns to the board's landing screen*; calls `listBundleSellabilityDependency`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The bundle sellability dependency list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the bundle sellability dependency untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No bundle sellability dependency yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the bundle sellability dependency are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listBundleSellabilityDependency` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-190` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-190`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 4: Works in Bundle Sellability & Dependency Rule Engine → Determine whether the overall bundle can be sold based on the state of its underlying components.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-190?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Partner component required.
+- [ ] Every transition is wired: `ADM-188`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-191` Capacity Pool & Reservation Manager
+
+**Manage how bundle sales consume capacity from underlying products. This is particularly important because a bundle must not create artificial inventory separate from the actual attraction/product capacity.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | `bundleId` (navigation) |
+| Route | `/commercial/capacity-pool-reservation-manager-adm-191` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Temporary reservation | select field | — | — | — | — | — | — |
+| Hold duration | select field | — | — | — | — | — | — |
+| Release timeout | select field | — | — | — | — | — | — |
+| Hard allocation | select field | — | — | — | — | — | — |
+| Soft allocation | select field | — | — | — | — | — | — |
+| Overbooking policy | select field | — | — | — | — | — | — |
+| Waitlist behavior | select field | — | — | — | — | — | — |
+
+**Form: Save bundle capacity policy** (modal, opened by *Save bundle capacity policy*; *Save bundle capacity policy* calls `setBundleCapacityPolicy`, *Cancel* sends nothing)
+
+**Collects what `setBundleCapacityPolicy` sends before it is called.** Required: `policies`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Policies `policies` | repeatable rows | required | — | at most 200 | — | — | `setBundleCapacityPolicy` body |
+| Bundle `policies[].bundleId` | picker: choose a bundle | required | — | — | shows names, sends the id | — | `setBundleCapacityPolicy` body |
+| Channel `policies[].channel` | select | optional | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | — | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing at nothing. | `setBundleCapacityPolicy` body |
+| Venue `policies[].venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | Where the policy differs by venue for a multi-venue bundle. | `setBundleCapacityPolicy` body |
+| Partner `policies[].partnerId` | picker: choose a partner | optional | — | — | shows names, sends the id | — | `setBundleCapacityPolicy` body |
+| Capacity source `policies[].capacitySource` | select | required | — | Shared pool · Dedicated bundle allocation · Channel allocation · Partner allocation · Event capacity · Timeslot capacity · Seat inventory · Resource capacity | — | — | `setBundleCapacityPolicy` body |
+| Allocation mode `policies[].allocationMode` | segmented control | optional | Hard | Hard · Soft | — | Hard allocation is ring-fenced for the bundle; soft is released back when unsold. | `setBundleCapacityPolicy` body |
+| Capacity ceiling `policies[].capacityCeiling` | number field | optional | — | min 0 | — | — | `setBundleCapacityPolicy` body |
+| Hold duration minutes `policies[].holdDurationMinutes` | number field (minutes) | optional | — | min 1 | — | How long a temporary reservation of the components lasts. | `setBundleCapacityPolicy` body |
+| Booking cutoff minutes `policies[].bookingCutoffMinutes` | number field (minutes) | optional | — | min 0 | — | Minutes before the experience after which the bundle is no longer sold. | `setBundleCapacityPolicy` body |
+| Allow overbooking `policies[].allowOverbooking` | toggle | optional | off | — | — | — | `setBundleCapacityPolicy` body |
+| Allow waitlist `policies[].allowWaitlist` | toggle | optional | off | — | — | — | `setBundleCapacityPolicy` body |
+
+Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Two rows share a (channel, venueId, partnerId), there is no default row, or an `id` names a policy of another bundle.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every bundle capacity policy** (data table, from `listBundleCapacityPolicies`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Bundle | the name it points at, never the id | — |
+| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing … |
+| Venue | the name it points at, never the id | Where the policy differs by venue for a multi-venue bundle. |
+| Partner | the name it points at, never the id | — |
+| Capacity source | chip: Shared pool, Dedicated bundle allocation, Channel allocation, Partner allocation … | — |
+| Allocation mode | chip: Hard, Soft | Hard allocation is ring-fenced for the bundle; soft is released back when unsold. |
+| Capacity ceiling | 1,234 | — |
+| Hold duration minutes | 1,234 | How long a temporary reservation of the components lasts. |
+| Booking cutoff minutes | 1,234 | Minutes before the experience after which the bundle is no longer sold. |
+| Allow overbooking | yes / no (icon or chip) | — |
+| Allow waitlist | yes / no (icon or chip) | — |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save bundle capacity policy (primary button) | `setBundleCapacityPolicy` PUT `/bundles/{bundleId}/capacity-policies` | inline | inline | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Two rows share a (channel, venueId, partnerId), there is no default row, or an `id` names a policy of another … | gated `PRODUCT_CONFIGURE`; opens modal first |
+
+**Data it reads**: `listCapacityPoolReservation` (onLoad, Capacity Pool & Reservation Manager); `listBundleCapacityPolicies` (onLoad, List a bundle's capacity policies)
+
+**Where the user goes next**
+
+- → `ADM-188` Dynamic Bundle Operations Command Center: *Returns to the board's landing screen*; calls `listCapacityPoolReservation`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The capacity pool reservation configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the capacity pool reservation untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No capacity pool reservation configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 422 Two rows share a (channel, venueId, partnerId), there is no default row, or an `id` names a policy of another bundle. |
+
+#### Permissions
+
+- `listCapacityPoolReservation` → `PRICE_VIEW` (read) · staff
+- `listBundleCapacityPolicies` → `PRODUCT_VIEW` (read) · staff
+- `setBundleCapacityPolicy` → `PRODUCT_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Inventory pools split capacity by ticket type (e.g. 50% GA, 30% child, 20% senior) and/or sales channel (e.g. 50% online, 50% on-site), configurable at venue/event level, under a hierarchy global → attraction → product → variant → time slot. On cancel/refund/reschedule the business chooses whether capacity is released or held. *(agreed · MoM 25 Aug 2026, 4.6 Performances & Capacity Management; 4.11 UX Simplification & Distributed Inventory · DI-457)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-191` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-191`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 6: Works in Capacity Pool & Reservation Manager → Manage how bundle sales consume capacity from underlying products. This is particularly important because a bundle must not create artificial inventory separate from the actual attraction/product …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (19), with its required mark, default, format and its error state (404, 422).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-191?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save bundle capacity policy.
+- [ ] Every transition is wired: `ADM-188`.
+- [ ] Every gated control is gated: `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-192` Dynamic Component Substitution Engine
+
+**Automatically replace unavailable bundle components according to predefined commercial rules.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§For each component define; Define whether substitute) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/dynamic-component-substitution-engine-adm-192` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Primary component | select field | — | — | — | — | — | — |
+| Alternative 1 | select field | — | — | — | — | — | — |
+| Alternative 2 | select field | — | — | — | — | — | — |
+| Alternative 3 | select field | — | — | — | — | — | — |
+| Fallback action | select field | — | — | — | — | — | — |
+| Maintains same bundle price | text field | — | — | — | — | — | — |
+| Adds surcharge | select field | — | — | — | — | — | — |
+| Reduces bundle price | select field | — | — | — | — | — | — |
+| Requires customer approval | select field | — | — | — | — | — | — |
+| Requires operator approval | select field | — | — | — | — | — | — |
+
+#### Outputs: what the screen shows and produces
+
+**Data it reads**: `listDynamicComponentSubstitution` (onLoad, Dynamic Component Substitution Engine)
+
+**Where the user goes next**
+
+- → `ADM-188` Dynamic Bundle Operations Command Center: *Returns to the board's landing screen*; calls `listDynamicComponentSubstitution`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The dynamic component substitution configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the dynamic component substitution untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No dynamic component substitution configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listDynamicComponentSubstitution` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-192` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-192`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 8: Works in Dynamic Component Substitution Engine → Automatically replace unavailable bundle components according to predefined commercial rules.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (10), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-192?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-188`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-193` Dynamic Bundle Rule & Composition Engine
+
+**Allow the actual composition of a bundle to change dynamically according to business and guest conditions. This builds upon the matrix requirement for dynamic bundles where guests select attractions, experiences, F&B, Retail, or services from predefined categories.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/dynamic-bundle-rule-composition-engine-adm-193` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Data it reads**: `listDynamicBundleRule` (onLoad, Dynamic Bundle Rule & Composition Engine)
+
+**Where the user goes next**
+
+- → `ADM-188` Dynamic Bundle Operations Command Center: *Returns to the board's landing screen*; calls `listDynamicBundleRule`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The dynamic bundle rule list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the dynamic bundle rule untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No dynamic bundle rule yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the dynamic bundle rule are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listDynamicBundleRule` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-193` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-193`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 10: Works in Dynamic Bundle Rule & Composition Engine → Allow the actual composition of a bundle to change dynamically according to business and guest conditions. This builds upon the matrix requirement for dynamic bundles where guests select attractions …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-193?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-188`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-194` Real-Time Availability & Checkout Validation
+
+**Perform the final authoritative validation immediately before transaction confirmation. This is essential because availability may change between browsing and payment.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Payment authorization/capture) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/real-time-availability-checkout-validation-adm-194` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| ↓ | select field | — | — | — | — | — | — |
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Data it reads**: `listRealTimeAvailability` (onLoad, Real-Time Availability & Checkout Validation)
+
+**Where the user goes next**
+
+- → `ADM-188` Dynamic Bundle Operations Command Center: *Returns to the board's landing screen*; calls `listRealTimeAvailability`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The real-time availability checkout configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the real-time availability checkout untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No real-time availability checkout configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listRealTimeAvailability` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A27** Research current market best practices for ticket-booking UX (web and mobile) *(Softlabs Design Team · Medium · Partial → 30 Sep: Closed, Rolled into S9 (final UI/UX) · workshop tracker · keyword 'ticket-booking ux')*
+- **A46** Evaluate a dynamic bundle/package builder that auto-applies a discount when a guest adds multiple product types (ticket + F&B + retail) to cart, in addition to pre-defined packages *(Reshma Bandiwdekar · Medium · Done → 30 Sep: Closed, Done (as recorded earlier) · workshop tracker · keyword 'cart')*
+- **A96** Build the journey library (abandoned cart with min-value/product filters, birthday, anniversary, cross-sell, survey — all consent-gated) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 20 Aug 2026 · workshop tracker · keyword 'cart')*
+- **A100** Design the B2C checkout journey as a 3–4 step flow (step indicator, in-page ticket browsing, optional add-ons step, dual-OTP guest checkout, per-person name capture, deferred profile completion) *(Softlabs Design Team · High · Ongoing → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 21 Aug 2026 · workshop tracker · keyword 'b2c checkout')*
+- **A157** Keep F&B and retail online sale entirely within the platform (browse, cart, checkout, pickup or ship) with no redirect to a separate app *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 26 Aug 2026 · workshop tracker · keyword 'cart')*
+- **A158** Obtain the resource-management reference documentation, review the hardware/ticketing docs, route follow-up questions to Qossai, and review the House of Wisdom booking flow as a UX reference *(Allam / Chinmay Parab / Aishwarya More · Medium · With client → 30 Sep: Closed, Moved to T8 (TICVAI to act) · 26 Aug 2026 · workshop tracker · keyword 'booking flow')*
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-194` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-194`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 12: Works in Real-Time Availability & Checkout Validation → Perform the final authoritative validation immediately before transaction confirmation. This is essential because availability may change between browsing and payment.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (1), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-194?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-188`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-195` Bundle Availability by Channel, Venue & Partner
+
+**Control where a bundle is sellable based on operational availability.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | `bundleId` (navigation) |
+| Route | `/commercial/bundle-availability-by-channel-venue-partner-adm-195` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Venue-specific availability | select field | — | — | — | — | — | — |
+| Attraction-specific availability | select field | — | — | — | — | — | — |
+| Operating area | select field | — | — | — | — | — | — |
+| Country/market | select field | — | — | — | — | — | — |
+| Sales location | select field | — | — | — | — | — | — |
+
+**Form: Save bundle capacity policy** (modal, opened by *Save bundle capacity policy*; *Save bundle capacity policy* calls `setBundleCapacityPolicy`, *Cancel* sends nothing)
+
+**Collects what `setBundleCapacityPolicy` sends before it is called.** Required: `policies`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Policies `policies` | repeatable rows | required | — | at most 200 | — | — | `setBundleCapacityPolicy` body |
+| Bundle `policies[].bundleId` | picker: choose a bundle | required | — | — | shows names, sends the id | — | `setBundleCapacityPolicy` body |
+| Channel `policies[].channel` | select | optional | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | — | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing at nothing. | `setBundleCapacityPolicy` body |
+| Venue `policies[].venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | Where the policy differs by venue for a multi-venue bundle. | `setBundleCapacityPolicy` body |
+| Partner `policies[].partnerId` | picker: choose a partner | optional | — | — | shows names, sends the id | — | `setBundleCapacityPolicy` body |
+| Capacity source `policies[].capacitySource` | select | required | — | Shared pool · Dedicated bundle allocation · Channel allocation · Partner allocation · Event capacity · Timeslot capacity · Seat inventory · Resource capacity | — | — | `setBundleCapacityPolicy` body |
+| Allocation mode `policies[].allocationMode` | segmented control | optional | Hard | Hard · Soft | — | Hard allocation is ring-fenced for the bundle; soft is released back when unsold. | `setBundleCapacityPolicy` body |
+| Capacity ceiling `policies[].capacityCeiling` | number field | optional | — | min 0 | — | — | `setBundleCapacityPolicy` body |
+| Hold duration minutes `policies[].holdDurationMinutes` | number field (minutes) | optional | — | min 1 | — | How long a temporary reservation of the components lasts. | `setBundleCapacityPolicy` body |
+| Booking cutoff minutes `policies[].bookingCutoffMinutes` | number field (minutes) | optional | — | min 0 | — | Minutes before the experience after which the bundle is no longer sold. | `setBundleCapacityPolicy` body |
+| Allow overbooking `policies[].allowOverbooking` | toggle | optional | off | — | — | — | `setBundleCapacityPolicy` body |
+| Allow waitlist `policies[].allowWaitlist` | toggle | optional | off | — | — | — | `setBundleCapacityPolicy` body |
+
+Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Two rows share a (channel, venueId, partnerId), there is no default row, or an `id` names a policy of another bundle.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every bundle capacity policy** (data table, from `listBundleCapacityPolicies`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Bundle | the name it points at, never the id | — |
+| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing … |
+| Venue | the name it points at, never the id | Where the policy differs by venue for a multi-venue bundle. |
+| Partner | the name it points at, never the id | — |
+| Capacity source | chip: Shared pool, Dedicated bundle allocation, Channel allocation, Partner allocation … | — |
+| Allocation mode | chip: Hard, Soft | Hard allocation is ring-fenced for the bundle; soft is released back when unsold. |
+| Capacity ceiling | 1,234 | — |
+| Hold duration minutes | 1,234 | How long a temporary reservation of the components lasts. |
+| Booking cutoff minutes | 1,234 | Minutes before the experience after which the bundle is no longer sold. |
+| Allow overbooking | yes / no (icon or chip) | — |
+| Allow waitlist | yes / no (icon or chip) | — |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save bundle capacity policy (primary button) | `setBundleCapacityPolicy` PUT `/bundles/{bundleId}/capacity-policies` | inline | inline | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Two rows share a (channel, venueId, partnerId), there is no default row, or an `id` names a policy of another … | gated `PRODUCT_CONFIGURE`; opens modal first |
+
+**Data it reads**: `listBundleAvailabilityChannel` (onLoad, Bundle Availability by Channel, Venue & Partner); `listBundleCapacityPolicies` (onLoad, List a bundle's capacity policies)
+
+**Where the user goes next**
+
+- → `ADM-188` Dynamic Bundle Operations Command Center: *Returns to the board's landing screen*; calls `listBundleAvailabilityChannel`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The bundle availability channel configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the bundle availability channel untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No bundle availability channel configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 422 Two rows share a (channel, venueId, partnerId), there is no default row, or an `id` names a policy of another bundle. |
+
+#### Permissions
+
+- `listBundleAvailabilityChannel` → `PRICE_VIEW` (read) · staff
+- `listBundleCapacityPolicies` → `PRODUCT_VIEW` (read) · staff
+- `setBundleCapacityPolicy` → `PRODUCT_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-195` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-195`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 14: Works in Bundle Availability by Channel, Venue & Partner → Control where a bundle is sellable based on operational availability.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (404, 422).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-195?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save bundle capacity policy.
+- [ ] Every transition is wired: `ADM-188`.
+- [ ] Every gated control is gated: `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-196` Bundle Availability Forecast, Alerts & Recovery
+
+**Predict bundle availability problems before they affect sales.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/bundle-availability-forecast-alerts-recovery-adm-196` |
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every bundle availability forecast** (data table, from `listBundleAvailabilityForecast`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Historical demand | text | Historical demand |
+| Current booking velocity | text | Current booking velocity |
+| Inventory | text | Inventory |
+| Capacity | 1,234 | Capacity |
+| Timeslot utilization | 1,234.5 | Timeslot utilization |
+| Seasonality | text | Seasonality |
+| Day of week | text | Day of week |
+| Campaign activity | text | Campaign activity |
+| Partner reservations | text | Partner reservations |
+
+**The selected bundle availability forecast** (detail panel): The pack groups this record's detail under its own headings: “Alert Levels”, “AED 186,500”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Historical demand | text | Historical demand |
+| Current booking velocity | text | Current booking velocity |
+| Inventory | text | Inventory |
+| Capacity | 1,234 | Capacity |
+| Timeslot utilization | 1,234.5 | Timeslot utilization |
+| Seasonality | text | Seasonality |
+| Day of week | text | Day of week |
+| Campaign activity | text | Campaign activity |
+| Partner reservations | text | Partner reservations |
+
+**Data it reads**: `listBundleAvailabilityForecast` (onLoad, Bundle Availability Forecast, Alerts & Recovery)
+
+**Where the user goes next**
+
+- → `ADM-188` Dynamic Bundle Operations Command Center: *Returns to the board's landing screen*; calls `listBundleAvailabilityForecast`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The bundle availability forecast list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the bundle availability forecast untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No bundle availability forecast yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the bundle availability forecast are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listBundleAvailabilityForecast` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-196` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-196`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 16: Works in Bundle Availability Forecast, Alerts & Recovery → Predict bundle availability problems before they affect sales.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-196?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-188`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-197` Dynamic Bundle Simulation & AI Optimization
+
+**Test how a bundle behaves under different operational scenarios before activating dynamic rules.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/dynamic-bundle-simulation-ai-optimization-adm-197` |
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every dynamic bundle simulation** (data table, from `listDynamicBundle2`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Bundle status | 1,234 | Bundle status |
+| Components selected | text | Components selected |
+| Substitutions | 1,234 | Substitutions |
+| Price impact | AED 1,234.50 | Price impact |
+| Margin impact | 1,234.5 | Margin impact |
+| Capacity impact | 1,234 | Capacity impact |
+| Customer impact | text | Customer impact |
+| Revenue impact | AED 1,234.50 | Revenue impact |
+
+**The selected dynamic bundle simulation** (detail panel): The pack groups this record's detail under its own headings: “Scenario A”, “Scenario B”, “Scenario C”, “Scenario D”, “Scenario E”, “Photo”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Bundle status | 1,234 | Bundle status |
+| Components selected | text | Components selected |
+| Substitutions | 1,234 | Substitutions |
+| Price impact | AED 1,234.50 | Price impact |
+| Margin impact | 1,234.5 | Margin impact |
+| Capacity impact | 1,234 | Capacity impact |
+| Customer impact | text | Customer impact |
+| Revenue impact | AED 1,234.50 | Revenue impact |
+
+**Data it reads**: `listDynamicBundle2` (onLoad, Dynamic Bundle Simulation & AI Optimization); `listDynamicBundle` (onLoad, Dynamic Bundle Operations Command Center); `listDynamicBundleRule` (onLoad, Dynamic Bundle Rule & Composition Engine)
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The dynamic bundle simulation list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the dynamic bundle simulation untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No dynamic bundle simulation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the dynamic bundle simulation are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listDynamicBundle2` → `PRICE_VIEW` (read) · staff
+- `listDynamicBundle` → `PRICE_VIEW` (read) · staff
+- `listDynamicBundleRule` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-197` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-197`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
+- Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 18: Works in Dynamic Bundle Simulation & AI Optimization → Test how a bundle behaves under different operational scenarios before activating dynamic rules.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-197?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] No transition is declared; back returns where the user came from.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+
+
+## Reference designs and the trackers for this platform
+
+**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+
+- `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
+- `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
+
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+
+## Design inputs from the client meetings
+
+**What the client asked for in the meetings and design reviews, for these screens.** Apply every item. They are the client's own requirements and they are later than the reference files: where a reference design or a screen's fields disagree with an item here, the item wins. Newest first; where two items disagree, the newer one wins (anything a later meeting replaced is already left out). An **Open question** is not settled: build the default it states and keep it easy to change. The text in brackets is for traceability and, like everything else in this bundle, never appears on a screen.
+
+### Everywhere, on every app
+
+- Allam (platform-wide requirement): every calendar throughout the platform, not just maintenance, must support day, week and month views, with the day view further broken down by hour from a defined start hour through the day. *(agreed · MoM 17 Sep 2026, 4.2 Preventive Maintenance Planning · DI-907)*
+- Minimise the number of separate screens an end user navigates: consolidate related information wherever it can reasonably be shown together, rather than mirroring every workshop board as its own screen. *(agreed · MoM 7 Sep 2026, 4.10 Screen consolidation / 5. Key Decisions · DI-671)*
+- Region-configurable tax on pre-discount price (e.g. Egypt: AED 100 ticket with 20% off is paid at AED 80 but taxed on AED 100). Rounding must support up to three decimal places without dropping the third decimal where the currency requires it. *(agreed · MoM 1 Sep 2026, 4.5 Taxes, Fees & Price Calculation · DI-598)*
+- "Powered by TICVAI" is shown consistently across staff and guest-facing surfaces. *(agreed · MoM 14 Aug 2026, 8. POS / Kiosk Branding · DI-297)*
+- Full multi-language support (Arabic and others such as Chinese) consistent with the agreed i18n/RTL architecture. *(agreed · MoM 10 Aug 2026, 4.7 Account Creation, Localisation & Multi-Currency · DI-210)*
+- The reference system is a functional reference only: its dated UI/UX is not to be replicated; TICVAI delivers equivalent depth with a modern, AI-friendly, easy-to-configure experience. *(agreed · MoM 7 Aug 2026, 23. Reference System Access & Documentation · DI-186)*
+- Direction: modern, minimalistic, spacious, cross-device designs that still convey a sense of place (venue or park); Softlabs proposes two to three enhanced visual concepts for TICVAI to steer. *(agreed · MoM 3 Aug 2026, 11. Design Alignment & Team Input · DI-126)*
+- Languages: English and Arabic at minimum, with Russian, Spanish and Mandarin. *(agreed · MoM 31 Jul 2026, 13. Internationalization & Localization · DI-080)*
+- Clarity first; reduce cognitive load (simple layouts, familiar patterns); consistency ("Use the system. Do not recreate."); accessibility; hierarchy (guide attention with contrast, spacing and visual weight); feedback (every action has a clear response). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Design Principles in Action · DI-051)*
+- Standard components: search bar with Cmd+K; tabs (Overview, Events, Sales, Reports); pagination; badges (New, Pending, Sold Out, Completed); toggle (Off/On); dropdown; removable chip ("VIP x"). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Example UI Components · DI-050)*
+- Spacing on an 8px base grid: 4, 8, 12, 16, 24, 32, 40, 48, 64, 80. Border radius scale 4, 8, 12, 16, 24px, consistent across the platform. Soft shadows: sm 0 1px 2px rgba(0,0,0,.05); md 0 4px 6px rgba(0,0,0,.08); lg 0 10px 15px rgba(0,0,0,.10); xl 0 20px 40px rgba(0,0,0,.14). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 6. Spacing / 7. Border Radius / 8. Shadows · DI-049)*
+- Icons: line style, outline, 2px stroke, round corners, clean and consistent. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 5. Icons · DI-048)*
+- Component principles: clarity first; consistent spacing on an 8px grid; meaningful colour (colours communicate status and guide the user); accessible by design; mobile ready (components adapt across all screen sizes). Components are consistent, flexible, accessible and composable. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Component principles · DI-045)*
+- Empty states have a title, one explanatory line and one action: "No events yet / Create your first event to get started / Create Event"; "No data available / We couldn't find anything to show here / Refresh". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Empty States · DI-044)*
+- Notification list: status icon, title, one-line detail and relative time (e.g. "Payment received ... 2m ago", "High demand detected ... 10m ago"), with "View all notifications". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Notifications · DI-042)*
+- Forms: label above field; text input, select ("Choose an option"), date picker, toggle, checkbox. Input states: Default, Focused, Filled, Disabled and Error with inline message (e.g. "This field is required"). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Forms; 08 Design System (p8) - 4. Inputs · DI-040)*
+- Card types: event card (title, date and time, venue, "From 120.00 AED"); KPI card (label, value, delta, "vs last 7 days"); onboarding checklist card ("3 of 6 completed": Create Event, Add Staff, Configure Seating, Connect Payment). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Cards · DI-038)*
+- Button hierarchy Primary, Secondary, Tertiary (text) and Icon buttons, each with Default, Hover, Pressed and Disabled states. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Buttons; 08 Design System (p8) - 3. Buttons · DI-036)*
+- Regardless of the module a user is working in, the experience should feel like one product, not a collection of separate applications. *(agreed · Design Vision Book 29 Jul 2026, 07 Modules Overview (p7) · DI-034)*
+- DO: focus on clarity and hierarchy, use clear simple interactive elements, give relevant information at a glance (card example: "Annual Membership / All Venues / 4.4 (388) / BESTSELLER"). DON'T: clutter and overload (e.g. "-10% NEW PROMO AED 450.00 !!! BOOK NOW!!!"), complex forms and flows, hard-to-read data visualisations. *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - DO / DON'T · DI-033)*
+- Eight principles on every screen: User-Centric, AI-First, Simple & Clear (clean layouts, clear hierarchy, minimal noise), Fast & Efficient (optimised for quick actions), Reliable & Secure (permissions, data protection), Data-Driven (data visual, actionable, easy to understand), Scalable, Consistent (same patterns, components and interactions across the ecosystem). *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - Our Design Principles · DI-032)*
+- Accessibility: high contrast, readable text, keyboard navigation and inclusive components throughout; WCAG AA standards minimum ("Design for everyone"). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Better Accessibility; 06 Component principles (p6); 08 Design principles in action (p8) · DI-029)*
+- AI everywhere: AI insights, recommendations and smart assistance are embedded across the platform, not hidden. AI is not an add-on: it assists, predicts, recommends and automates. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - How TICVAI improves this concept; 05 Design Principles (p5) - 2. AI-First · DI-027)*
+- Global Search: prominent, AI-powered search that finds anything, in the top bar with a Cmd+K shortcut (placeholder e.g. "Search events, customers, orders, venues or ask AI..."). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - UI inspiration reference, item 1; 08 Design System (p8) - Search Bar · DI-025)*
+- Visual direction: Purposeful (every element has a clear purpose), Consistent (one visual system across all modules and devices), Clear (easy to scan, understand and act on), Modern. Key takeaway: clean, modern, product-first layout with clear hierarchy and minimal visual noise; deep, modern, trustworthy; built for enterprise scale. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) · DI-024)*
+- The brand is presented consistently across Web Platform, Mobile App and Admin Portal (and print). Ticvai identity, colours and typography are applied consistently across all screens and devices. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand in action; 03 Visual Direction (p3) - Consistent Branding · DI-023)*
+- Copy is Professional, Friendly, Clear, Confident, Concise and Helpful. Avoid jargon, overly technical language, clutter, outdated language and complexity. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand voice · DI-022)*
+- Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
+- Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
+
+### Across P09 TICVAI Web
+
+- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
+- Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
+- Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
+- Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+
+**2 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+
+---
+
+## Raw data
+
+The same package data the blocks above are built from. `screens.json` is in the folder and not repeated here: every field of it is in the blocks.
+
+### `operations.json`
 
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
 {
- "getInventoryKitDefinition": {
-  "method": "GET",
-  "path": "/inventory-items/{itemId}/kit-definition",
-  "contract": "inventory",
-  "summary": "The components a kit item is made of",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "InventoryKitDefinition"
- },
- "listBundleAvailabilityChannel": {
-  "method": "GET",
-  "path": "/bundle-availability-channel",
-  "contract": "promotions",
-  "summary": "Bundle Availability by Channel, Venue & Partner",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "BundleAvailabilityByChannelVenuePartnerView"
- },
- "listBundleAvailabilityForecast": {
-  "method": "GET",
-  "path": "/bundle-availability-forecast",
-  "contract": "promotions",
-  "summary": "Bundle Availability Forecast, Alerts & Recovery",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "BundleAvailabilityForecastAlertsRecoveryView"
- },
- "listBundleCapacityPolicies": {
-  "method": "GET",
-  "path": "/bundles/{bundleId}/capacity-policies",
-  "contract": "promotions",
-  "summary": "List a bundle's capacity policies",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listBundleSellabilityDependency": {
-  "method": "GET",
-  "path": "/bundle-sellability-dependency",
-  "contract": "promotions",
-  "summary": "Bundle Sellability & Dependency Rule Engine",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "BundleSellabilityDependencyRuleEngineView"
- },
- "listCapacityPoolReservation": {
-  "method": "GET",
-  "path": "/capacity-pool-reservation",
-  "contract": "promotions",
-  "summary": "Capacity Pool & Reservation Manager",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CapacityPoolReservationManagerView"
- },
- "listComponentInventoryAvailability": {
-  "method": "GET",
-  "path": "/component-inventory-availability",
-  "contract": "promotions",
-  "summary": "Component Inventory & Availability Matrix",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ComponentInventoryAvailabilityMatrixView"
- },
- "listDynamicBundle": {
-  "method": "GET",
-  "path": "/dynamic-bundle",
-  "contract": "promotions",
-  "summary": "Dynamic Bundle Operations Command Center",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "DynamicBundleOperationsCommandCenterView"
- },
- "listDynamicBundle2": {
-  "method": "GET",
-  "path": "/dynamic-bundle-2",
-  "contract": "promotions",
-  "summary": "Dynamic Bundle Simulation & AI Optimization",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "DynamicBundleSimulationAiOptimizationView"
- },
- "listDynamicBundleRule": {
-  "method": "GET",
-  "path": "/dynamic-bundle-rule",
-  "contract": "promotions",
-  "summary": "Dynamic Bundle Rule & Composition Engine",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "DynamicBundleRuleCompositionEngineView"
- },
- "listDynamicComponentSubstitution": {
-  "method": "GET",
-  "path": "/dynamic-component-substitution",
-  "contract": "promotions",
-  "summary": "Dynamic Component Substitution Engine",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "DynamicComponentSubstitutionEngineView"
- },
- "listRealTimeAvailability": {
-  "method": "GET",
-  "path": "/real-time-availability",
-  "contract": "promotions",
-  "summary": "Real-Time Availability & Checkout Validation",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "RealTimeAvailabilityCheckoutValidationView"
- },
- "setBundleCapacityPolicy": {
-  "method": "PUT",
-  "path": "/bundles/{bundleId}/capacity-policies",
-  "contract": "promotions",
-  "summary": "Set a bundle's capacity policies",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- }
+"getInventoryKitDefinition": {"method":"GET","path":"/inventory-items/{itemId}/kit-definition","contract":"inventory","summary":"The components a kit item is made of","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"InventoryKitDefinition"},
+"listBundleAvailabilityChannel": {"method":"GET","path":"/bundle-availability-channel","contract":"promotions","summary":"Bundle Availability by Channel, Venue & Partner","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BundleAvailabilityByChannelVenuePartnerView"},
+"listBundleAvailabilityForecast": {"method":"GET","path":"/bundle-availability-forecast","contract":"promotions","summary":"Bundle Availability Forecast, Alerts & Recovery","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"BundleAvailabilityForecastAlertsRecoveryView"},
+"listBundleCapacityPolicies": {"method":"GET","path":"/bundles/{bundleId}/capacity-policies","contract":"promotions","summary":"List a bundle's capacity policies","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listBundleSellabilityDependency": {"method":"GET","path":"/bundle-sellability-dependency","contract":"promotions","summary":"Bundle Sellability & Dependency Rule Engine","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BundleSellabilityDependencyRuleEngineView"},
+"listCapacityPoolReservation": {"method":"GET","path":"/capacity-pool-reservation","contract":"promotions","summary":"Capacity Pool & Reservation Manager","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CapacityPoolReservationManagerView"},
+"listComponentInventoryAvailability": {"method":"GET","path":"/component-inventory-availability","contract":"promotions","summary":"Component Inventory & Availability Matrix","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ComponentInventoryAvailabilityMatrixView"},
+"listDynamicBundle": {"method":"GET","path":"/dynamic-bundle","contract":"promotions","summary":"Dynamic Bundle Operations Command Center","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"DynamicBundleOperationsCommandCenterView"},
+"listDynamicBundle2": {"method":"GET","path":"/dynamic-bundle-2","contract":"promotions","summary":"Dynamic Bundle Simulation & AI Optimization","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"DynamicBundleSimulationAiOptimizationView"},
+"listDynamicBundleRule": {"method":"GET","path":"/dynamic-bundle-rule","contract":"promotions","summary":"Dynamic Bundle Rule & Composition Engine","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"DynamicBundleRuleCompositionEngineView"},
+"listDynamicComponentSubstitution": {"method":"GET","path":"/dynamic-component-substitution","contract":"promotions","summary":"Dynamic Component Substitution Engine","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"DynamicComponentSubstitutionEngineView"},
+"listRealTimeAvailability": {"method":"GET","path":"/real-time-availability","contract":"promotions","summary":"Real-Time Availability & Checkout Validation","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"RealTimeAvailabilityCheckoutValidationView"},
+"setBundleCapacityPolicy": {"method":"PUT","path":"/bundles/{bundleId}/capacity-policies","contract":"promotions","summary":"Set a bundle's capacity policies","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null}
 }
 ```
 
-## `schemas.json`
+### `schemas.json`
 
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
 {
- "BundleAvailabilityByChannelVenuePartnerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Bundle Availability by Channel, Venue & Partner displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "channelsType": {
-    "type": "string",
-    "enum": [
-     "b2c",
-     "b2b",
-     "pos",
-     "mobilePos",
-     "mobileApp",
-     "kiosk",
-     "callCenter",
-     "api",
-     "ota",
-     "reseller",
-     "partner"
-    ],
-    "description": "Vocabulary listed under Channels."
-   },
-   "venueSpecificAvailability": {
-    "type": "string",
-    "description": "Venue-specific availability"
-   },
-   "attractionSpecificAvailability": {
-    "type": "string",
-    "description": "Attraction-specific availability"
-   },
-   "operatingArea": {
-    "type": "string",
-    "description": "Operating area"
-   },
-   "countryMarket": {
-    "type": "string",
-    "description": "Country/market"
-   },
-   "salesLocation": {
-    "type": "string",
-    "description": "Sales location"
-   },
-   "dedicatedAllocation": {
-    "type": "string",
-    "description": "Dedicated allocation"
-   },
-   "sharedAllocation": {
-    "type": "string",
-    "description": "Shared allocation"
-   },
-   "capacityCeiling": {
-    "type": "integer",
-    "description": "Capacity ceiling"
-   },
-   "bookingCutoff": {
-    "type": "string",
-    "description": "Booking cutoff"
-   }
-  }
- },
- "BundleAvailabilityForecastAlertsRecoveryView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Bundle Availability Forecast, Alerts & Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "historicalDemand": {
-    "type": "string",
-    "description": "Historical demand"
-   },
-   "currentBookingVelocity": {
-    "type": "string",
-    "description": "Current booking velocity"
-   },
-   "inventory": {
-    "type": "string",
-    "description": "Inventory"
-   },
-   "capacity": {
-    "type": "integer",
-    "description": "Capacity"
-   },
-   "timeslotUtilization": {
-    "type": "number",
-    "description": "Timeslot utilization"
-   },
-   "seasonality": {
-    "type": "string",
-    "description": "Seasonality"
-   },
-   "dayOfWeek": {
-    "type": "string",
-    "description": "Day of week"
-   },
-   "campaignActivity": {
-    "type": "string",
-    "description": "Campaign activity"
-   },
-   "partnerReservations": {
-    "type": "string",
-    "description": "Partner reservations"
-   },
-   "levelsType": {
-    "type": "string",
-    "enum": [
-     "information",
-     "warning",
-     "critical"
-    ],
-    "description": "Vocabulary listed under Alert Levels."
-   },
-   "switchChoiceGroup": {
-    "type": "string",
-    "description": "Switch choice group"
-   },
-   "restrictChannel": {
-    "type": "string",
-    "description": "Restrict channel"
-   },
-   "reduceBundleAllocation": {
-    "type": "string",
-    "description": "Reduce bundle allocation"
-   },
-   "increaseAlternativeInventory": {
-    "type": "string",
-    "description": "Increase alternative inventory"
-   },
-   "recommendAnotherTimeslot": {
-    "type": "string",
-    "description": "Recommend another timeslot"
-   },
-   "potentialRevenueRecoverableThroughSubstitution": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Potential Revenue Recoverable Through Substitution"
-   }
-  }
- },
- "BundleCapacityPolicy": {
-  "x-ticvai-persistence": "promotions.bundle_capacity_policy",
-  "type": "object",
-  "description": "How a bundle draws on capacity, per channel where it differs: the capacity source, dedicated or shared and hard or soft allocation, the ceiling, how long a hold lasts, the booking cut-off, and whether overbooking or a waitlist is allowed (Capacity Pool & Reservation Manager; Bundle Availability by Channel, Venue & Partner). The capacity itself is the catalogue's (`catalogue.channel_capacity`, `catalogue.inventory_hold`). A row with no channel is the bundle's default. (DM5, 29 September: data model for the agreed operations)\n**Written by setBundleCapacityPolicy; read by listBundleCapacityPolicies, listCapacityPoolReservation and listBundleAvailabilityChannel** (decided 29 September, writers pass).",
-  "required": [
-   "id",
-   "bundleId",
-   "capacitySource"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "bundleId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "channel": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
-     }
-    ],
-    "nullable": true
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Where the policy differs by venue for a multi-venue bundle."
-   },
-   "partnerId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "capacitySource": {
-    "type": "string",
-    "enum": [
-     "sharedPool",
-     "dedicatedBundleAllocation",
-     "channelAllocation",
-     "partnerAllocation",
-     "eventCapacity",
-     "timeslotCapacity",
-     "seatInventory",
-     "resourceCapacity"
-    ]
-   },
-   "allocationMode": {
-    "type": "string",
-    "enum": [
-     "hard",
-     "soft"
-    ],
-    "default": "hard",
-    "description": "Hard allocation is ring-fenced for the bundle; soft is released back when unsold."
-   },
-   "capacityCeiling": {
-    "type": "integer",
-    "minimum": 0,
-    "nullable": true
-   },
-   "holdDurationMinutes": {
-    "type": "integer",
-    "minimum": 1,
-    "nullable": true,
-    "description": "How long a temporary reservation of the components lasts."
-   },
-   "bookingCutoffMinutes": {
-    "type": "integer",
-    "minimum": 0,
-    "nullable": true,
-    "description": "Minutes before the experience after which the bundle is no longer sold."
-   },
-   "allowOverbooking": {
-    "type": "boolean",
-    "default": false
-   },
-   "allowWaitlist": {
-    "type": "boolean",
-    "default": false
-   }
-  }
- },
- "BundleSellabilityDependencyRuleEngineView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Bundle Sellability & Dependency Rule Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "dependencyRule": {
-    "type": "string",
-    "enum": [
-     "allComponentsRequired",
-     "atLeastXOfY",
-     "atLeastOneFromCategory",
-     "optionalComponent",
-     "conditionalComponent",
-     "substituteAllowed",
-     "partnerComponentRequired"
-    ],
-    "description": "The sellability rule."
-   },
-   "bundleId": {
-    "type": "string",
-    "description": "Bundle ID"
-   },
-   "componentIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Components the rule covers"
-   },
-   "minimumCount": {
-    "type": "integer",
-    "description": "For atLeastXOfY: X"
-   }
-  }
- },
- "CapacityPoolReservationManagerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Capacity Pool & Reservation Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "temporaryReservation": {
-    "type": "string",
-    "description": "Temporary reservation"
-   },
-   "holdDuration": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Hold duration"
-   },
-   "hardAllocation": {
-    "type": "string",
-    "description": "Hard allocation"
-   },
-   "softAllocation": {
-    "type": "string",
-    "description": "Soft allocation"
-   },
-   "overbookingPolicy": {
-    "type": "string",
-    "description": "Overbooking policy"
-   },
-   "waitlistBehavior": {
-    "type": "string",
-    "description": "Waitlist behavior"
-   },
-   "capacitySource": {
-    "type": "string",
-    "enum": [
-     "sharedPool",
-     "dedicatedBundleAllocation",
-     "channelAllocation",
-     "partnerAllocation",
-     "eventCapacity",
-     "timeslotCapacity",
-     "seatInventory",
-     "resourceCapacity"
-    ],
-    "description": "Capacity source."
-   }
-  }
- },
- "ComponentInventoryAvailabilityMatrixView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Component Inventory & Availability Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "availabilitySource": {
-    "type": "string",
-    "enum": [
-     "ticketInventory",
-     "attractionCapacity",
-     "eventCapacity",
-     "seatInventory",
-     "timeslots",
-     "fBAvailability",
-     "retailStock",
-     "resourceAvailability",
-     "parking",
-     "rental",
-     "externalPartnerApi"
-    ],
-    "description": "Where the component's availability comes from."
-   },
-   "componentStatus": {
-    "type": "string",
-    "enum": [
-     "available",
-     "limited",
-     "low",
-     "soldOut",
-     "closed",
-     "suspended",
-     "unpublished",
-     "apiUnavailable"
-    ],
-    "description": "Component status."
-   },
-   "componentId": {
-    "type": "string",
-    "description": "Component ID"
-   },
-   "componentName": {
-    "type": "string",
-    "description": "Component"
-   },
-   "inventory": {
-    "type": "integer",
-    "description": "Inventory"
-   },
-   "capacity": {
-    "type": "integer",
-    "description": "Capacity"
-   },
-   "schedule": {
-    "type": "string",
-    "description": "Schedule"
-   }
-  }
- },
- "DynamicBundleOperationsCommandCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Dynamic Bundle Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "activeDynamicBundles": {
-    "type": "integer",
-    "description": "Active Dynamic Bundles"
-   },
-   "sellableBundles": {
-    "type": "integer",
-    "description": "Sellable Bundles"
-   },
-   "partiallyAvailableBundles": {
-    "type": "integer",
-    "description": "Partially Available Bundles"
-   },
-   "unavailableBundles": {
-    "type": "integer",
-    "description": "Unavailable Bundles"
-   },
-   "bundlesWithLowCapacity": {
-    "type": "integer",
-    "description": "Bundles with Low Capacity"
-   },
-   "componentsSoldOut": {
-    "type": "string",
-    "description": "Components Sold Out"
-   },
-   "substitutionsTriggered": {
-    "type": "string",
-    "description": "Substitutions Triggered"
-   },
-   "bundleSalesToday": {
-    "type": "string",
-    "description": "Bundle Sales Today"
-   },
-   "failedBundleAttempts": {
-    "type": "integer",
-    "description": "Failed Bundle Attempts"
-   },
-   "capacityReserved": {
-    "type": "integer",
-    "description": "Capacity Reserved"
-   },
-   "revenueAtRisk": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue at Risk"
-   },
-   "recoveredRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Recovered Revenue"
-   },
-   "unavailable": {
-    "type": "string",
-    "description": "Unavailable"
-   },
-   "health": {
-    "type": "string",
-    "enum": [
-     "healthy",
-     "warning",
-     "critical"
-    ],
-    "description": "Bundle health."
-   }
-  }
- },
- "DynamicBundleRuleCompositionEngineView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Dynamic Bundle Rule & Composition Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "guestSegment": {
-    "type": "string",
-    "description": "Guest segment"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "loyaltyTier": {
-    "type": "string",
-    "description": "Loyalty tier"
-   },
-   "purchaseHistory": {
-    "type": "string",
-    "description": "Purchase history"
-   },
-   "numberOfGuests": {
-    "type": "integer",
-    "description": "Number of guests"
-   },
-   "guestType": {
-    "type": "string",
-    "description": "Guest type"
-   },
-   "salesChannel": {
-    "type": "string",
-    "description": "Sales channel"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "season": {
-    "type": "string",
-    "description": "Season"
-   },
-   "day": {
-    "type": "string",
-    "description": "Day"
-   },
-   "time": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time"
-   },
-   "capacity": {
-    "type": "integer",
-    "description": "Capacity"
-   },
-   "inventory": {
-    "type": "string",
-    "description": "Inventory"
-   },
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
-   },
-   "productPopularity": {
-    "type": "string",
-    "description": "Product popularity"
-   }
-  }
- },
- "DynamicBundleSimulationAiOptimizationView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Dynamic Bundle Simulation & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "bundleStatus": {
-    "type": "integer",
-    "description": "Bundle status"
-   },
-   "componentsSelected": {
-    "type": "string",
-    "description": "Components selected"
-   },
-   "substitutions": {
-    "type": "integer",
-    "description": "Substitutions"
-   },
-   "priceImpact": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price impact"
-   },
-   "marginImpact": {
-    "type": "number",
-    "description": "Margin impact"
-   },
-   "capacityImpact": {
-    "type": "integer",
-    "description": "Capacity impact"
-   },
-   "customerImpact": {
-    "type": "string",
-    "description": "Customer impact"
-   },
-   "revenueImpact": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue impact"
-   }
-  }
- },
- "DynamicComponentSubstitutionEngineView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Dynamic Component Substitution Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "primaryComponent": {
-    "type": "string",
-    "description": "Primary component"
-   },
-   "alternative1": {
-    "type": "string",
-    "description": "Alternative 1"
-   },
-   "alternative2": {
-    "type": "string",
-    "description": "Alternative 2"
-   },
-   "alternative3": {
-    "type": "string",
-    "description": "Alternative 3"
-   },
-   "fallbackAction": {
-    "type": "string",
-    "description": "Fallback action"
-   },
-   "maintainsSameBundlePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maintains same bundle price"
-   },
-   "addsSurcharge": {
-    "type": "string",
-    "description": "Adds surcharge"
-   },
-   "reducesBundlePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Reduces bundle price"
-   },
-   "requiresCustomerApproval": {
-    "type": "string",
-    "description": "Requires customer approval"
-   },
-   "requiresOperatorApproval": {
-    "type": "string",
-    "description": "Requires operator approval"
-   },
-   "substitutionTriggers": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "soldOut",
-      "capacityExhausted",
-      "productSuspended",
-      "venueClosed",
-      "externalApiUnavailable",
-      "inventoryBelowThreshold"
-     ]
-    },
-    "description": "When substitution may occur."
-   }
-  }
- },
- "InventoryKitComponent": {
-  "x-ticvai-persistence": "inventory.kit_component",
-  "type": "object",
-  "description": "4.4.20. One component of a kit and the quantity one kit consumes.",
-  "required": [
-   "componentItemId",
-   "quantity"
-  ],
-  "properties": {
-   "kitItemId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "componentItemId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "quantity": {
-    "type": "number",
-    "exclusiveMinimum": 0
-   },
-   "unit": {
-    "type": "string",
-    "nullable": true,
-    "description": "The component's base unit where omitted."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Written at the kit item's venue scope."
-   }
-  }
- },
- "InventoryKitDefinition": {
-  "x-ticvai-persistence": "none — composed of the item's inventory.kit_component rows",
-  "type": "object",
-  "description": "4.4.20. Also the `setInventoryKitDefinition` body.",
-  "required": [
-   "components"
-  ],
-  "properties": {
-   "kitItemId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "components": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/InventoryKitComponent"
-    }
-   }
-  }
- },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
-   }
-  }
- },
- "RealTimeAvailabilityCheckoutValidationView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Real-Time Availability & Checkout Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "failedChecks": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "productInactive",
-      "inventoryUnavailable",
-      "capacityUnavailable",
-      "timeslotUnavailable",
-      "resourceUnavailable",
-      "priceInvalid",
-      "promotionInvalid",
-      "partnerComponentInvalid",
-      "componentMappingInvalid"
-     ]
-    },
-    "description": "Checkout validations that failed; empty means the bundle is sellable."
-   },
-   "bundleId": {
-    "type": "string",
-    "description": "Bundle ID"
-   },
-   "sellable": {
-    "type": "boolean",
-    "description": "Whether the bundle can be sold now"
-   }
-  }
- }
+"BundleAvailabilityByChannelVenuePartnerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Availability by Channel, Venue & Partner displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"channelsType":{"type":"string","enum":["b2c","b2b","pos","mobilePos","mobileApp","kiosk","callCenter","api","ota","reseller","partner"],"description":"Vocabulary listed under Channels."},"venueSpecificAvailability":{"type":"string","description":"Venue-specific availability"},"attractionSpecificAvailability":{"type":"string","description":"Attraction-specific availability"},"operatingArea":{"type":"string","description":"Operating area"},"countryMarket":{"type":"string","description":"Country/market"},"salesLocation":{"type":"string","description":"Sales location"},"dedicatedAllocation":{"type":"string","description":"Dedicated allocation"},"sharedAllocation":{"type":"string","description":"Shared allocation"},"capacityCeiling":{"type":"integer","description":"Capacity ceiling"},"bookingCutoff":{"type":"string","description":"Booking cutoff"}}},
+"BundleAvailabilityForecastAlertsRecoveryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Availability Forecast, Alerts & Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"historicalDemand":{"type":"string","description":"Historical demand"},"currentBookingVelocity":{"type":"string","description":"Current booking velocity"},"inventory":{"type":"string","description":"Inventory"},"capacity":{"type":"integer","description":"Capacity"},"timeslotUtilization":{"type":"number","description":"Timeslot utilization"},"seasonality":{"type":"string","description":"Seasonality"},"dayOfWeek":{"type":"string","description":"Day of week"},"campaignActivity":{"type":"string","description":"Campaign activity"},"partnerReservations":{"type":"string","description":"Partner reservations"},"levelsType":{"type":"string","enum":["information","warning","critical"],"description":"Vocabulary listed under Alert Levels."},"switchChoiceGroup":{"type":"string","description":"Switch choice group"},"restrictChannel":{"type":"string","description":"Restrict channel"},"reduceBundleAllocation":{"type":"string","description":"Reduce bundle allocation"},"increaseAlternativeInventory":{"type":"string","description":"Increase alternative inventory"},"recommendAnotherTimeslot":{"type":"string","description":"Recommend another timeslot"},"potentialRevenueRecoverableThroughSubstitution":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Potential Revenue Recoverable Through Substitution"}}},
+"BundleCapacityPolicy": {"x-ticvai-persistence":"promotions.bundle_capacity_policy","type":"object","description":"How a bundle draws on capacity, per channel where it differs: the capacity source, dedicated or shared and hard or soft allocation, the ceiling, how long a hold lasts, the booking cut-off, and whether overbooking or a waitlist is allowed (Capacity Pool & Reservation Manager; Bundle Availability by Channel, Venue & Partner). The capacity itself is the catalogue's (`catalogue.channel_capacity`, `catalogue.inventory_hold`). A row with no channel is the bundle's default. (DM5, 29 September: data model for the agreed operations)\n**Written by setBundleCapacityPolicy; read by listBundleCapacityPolicies, listCapacityPoolReservation and listBundleAvailabilityChannel** (decided 29 September, writers pass).","required":["id","bundleId","capacitySource"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"bundleId":{"type":"string","format":"uuid"},"channel":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}],"nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true,"description":"Where the policy differs by venue for a multi-venue bundle."},"partnerId":{"type":"string","format":"uuid","nullable":true},"capacitySource":{"type":"string","enum":["sharedPool","dedicatedBundleAllocation","channelAllocation","partnerAllocation","eventCapacity","timeslotCapacity","seatInventory","resourceCapacity"]},"allocationMode":{"type":"string","enum":["hard","soft"],"default":"hard","description":"Hard allocation is ring-fenced for the bundle; soft is released back when unsold."},"capacityCeiling":{"type":"integer","minimum":0,"nullable":true},"holdDurationMinutes":{"type":"integer","minimum":1,"nullable":true,"description":"How long a temporary reservation of the components lasts."},"bookingCutoffMinutes":{"type":"integer","minimum":0,"nullable":true,"description":"Minutes before the experience after which the bundle is no longer sold."},"allowOverbooking":{"type":"boolean","default":false},"allowWaitlist":{"type":"boolean","default":false}}},
+"BundleSellabilityDependencyRuleEngineView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Sellability & Dependency Rule Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"dependencyRule":{"type":"string","enum":["allComponentsRequired","atLeastXOfY","atLeastOneFromCategory","optionalComponent","conditionalComponent","substituteAllowed","partnerComponentRequired"],"description":"The sellability rule."},"bundleId":{"type":"string","description":"Bundle ID"},"componentIds":{"type":"array","items":{"type":"string"},"description":"Components the rule covers"},"minimumCount":{"type":"integer","description":"For atLeastXOfY: X"}}},
+"CapacityPoolReservationManagerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Capacity Pool & Reservation Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"temporaryReservation":{"type":"string","description":"Temporary reservation"},"holdDuration":{"type":"string","format":"date-time","description":"Hold duration"},"hardAllocation":{"type":"string","description":"Hard allocation"},"softAllocation":{"type":"string","description":"Soft allocation"},"overbookingPolicy":{"type":"string","description":"Overbooking policy"},"waitlistBehavior":{"type":"string","description":"Waitlist behavior"},"capacitySource":{"type":"string","enum":["sharedPool","dedicatedBundleAllocation","channelAllocation","partnerAllocation","eventCapacity","timeslotCapacity","seatInventory","resourceCapacity"],"description":"Capacity source."}}},
+"ComponentInventoryAvailabilityMatrixView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Component Inventory & Availability Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"availabilitySource":{"type":"string","enum":["ticketInventory","attractionCapacity","eventCapacity","seatInventory","timeslots","fBAvailability","retailStock","resourceAvailability","parking","rental","externalPartnerApi"],"description":"Where the component's availability comes from."},"componentStatus":{"type":"string","enum":["available","limited","low","soldOut","closed","suspended","unpublished","apiUnavailable"],"description":"Component status."},"componentId":{"type":"string","description":"Component ID"},"componentName":{"type":"string","description":"Component"},"inventory":{"type":"integer","description":"Inventory"},"capacity":{"type":"integer","description":"Capacity"},"schedule":{"type":"string","description":"Schedule"}}},
+"DynamicBundleOperationsCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Dynamic Bundle Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"activeDynamicBundles":{"type":"integer","description":"Active Dynamic Bundles"},"sellableBundles":{"type":"integer","description":"Sellable Bundles"},"partiallyAvailableBundles":{"type":"integer","description":"Partially Available Bundles"},"unavailableBundles":{"type":"integer","description":"Unavailable Bundles"},"bundlesWithLowCapacity":{"type":"integer","description":"Bundles with Low Capacity"},"componentsSoldOut":{"type":"string","description":"Components Sold Out"},"substitutionsTriggered":{"type":"string","description":"Substitutions Triggered"},"bundleSalesToday":{"type":"string","description":"Bundle Sales Today"},"failedBundleAttempts":{"type":"integer","description":"Failed Bundle Attempts"},"capacityReserved":{"type":"integer","description":"Capacity Reserved"},"revenueAtRisk":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue at Risk"},"recoveredRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Recovered Revenue"},"unavailable":{"type":"string","description":"Unavailable"},"health":{"type":"string","enum":["healthy","warning","critical"],"description":"Bundle health."}}},
+"DynamicBundleRuleCompositionEngineView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Dynamic Bundle Rule & Composition Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"guestSegment":{"type":"string","description":"Guest segment"},"membership":{"type":"string","description":"Membership"},"loyaltyTier":{"type":"string","description":"Loyalty tier"},"purchaseHistory":{"type":"string","description":"Purchase history"},"numberOfGuests":{"type":"integer","description":"Number of guests"},"guestType":{"type":"string","description":"Guest type"},"salesChannel":{"type":"string","description":"Sales channel"},"venue":{"type":"string","description":"Venue"},"season":{"type":"string","description":"Season"},"day":{"type":"string","description":"Day"},"time":{"type":"string","format":"date-time","description":"Time"},"capacity":{"type":"integer","description":"Capacity"},"inventory":{"type":"string","description":"Inventory"},"campaign":{"type":"string","description":"Campaign"},"productPopularity":{"type":"string","description":"Product popularity"}}},
+"DynamicBundleSimulationAiOptimizationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Dynamic Bundle Simulation & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"bundleStatus":{"type":"integer","description":"Bundle status"},"componentsSelected":{"type":"string","description":"Components selected"},"substitutions":{"type":"integer","description":"Substitutions"},"priceImpact":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price impact"},"marginImpact":{"type":"number","description":"Margin impact"},"capacityImpact":{"type":"integer","description":"Capacity impact"},"customerImpact":{"type":"string","description":"Customer impact"},"revenueImpact":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue impact"}}},
+"DynamicComponentSubstitutionEngineView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Dynamic Component Substitution Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"primaryComponent":{"type":"string","description":"Primary component"},"alternative1":{"type":"string","description":"Alternative 1"},"alternative2":{"type":"string","description":"Alternative 2"},"alternative3":{"type":"string","description":"Alternative 3"},"fallbackAction":{"type":"string","description":"Fallback action"},"maintainsSameBundlePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Maintains same bundle price"},"addsSurcharge":{"type":"string","description":"Adds surcharge"},"reducesBundlePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Reduces bundle price"},"requiresCustomerApproval":{"type":"string","description":"Requires customer approval"},"requiresOperatorApproval":{"type":"string","description":"Requires operator approval"},"substitutionTriggers":{"type":"array","items":{"type":"string","enum":["soldOut","capacityExhausted","productSuspended","venueClosed","externalApiUnavailable","inventoryBelowThreshold"]},"description":"When substitution may occur."}}},
+"InventoryKitComponent": {"x-ticvai-persistence":"inventory.kit_component","type":"object","description":"4.4.20. One component of a kit and the quantity one kit consumes.","required":["componentItemId","quantity"],"properties":{"kitItemId":{"type":"string","format":"uuid","readOnly":true},"componentItemId":{"type":"string","format":"uuid"},"quantity":{"type":"number","exclusiveMinimum":0},"unit":{"type":"string","nullable":true,"description":"The component's base unit where omitted."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Written at the kit item's venue scope."}}},
+"InventoryKitDefinition": {"x-ticvai-persistence":"none — composed of the item's inventory.kit_component rows","type":"object","description":"4.4.20. Also the `setInventoryKitDefinition` body.","required":["components"],"properties":{"kitItemId":{"type":"string","format":"uuid","readOnly":true},"components":{"type":"array","items":{"$ref":"#/components/schemas/InventoryKitComponent"}}}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"RealTimeAvailabilityCheckoutValidationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Real-Time Availability & Checkout Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"failedChecks":{"type":"array","items":{"type":"string","enum":["productInactive","inventoryUnavailable","capacityUnavailable","timeslotUnavailable","resourceUnavailable","priceInvalid","promotionInvalid","partnerComponentInvalid","componentMappingInvalid"]},"description":"Checkout validations that failed; empty means the bundle is sellable."},"bundleId":{"type":"string","description":"Bundle ID"},"sellable":{"type":"boolean","description":"Whether the bundle can be sold now"}}}
 }
 ```

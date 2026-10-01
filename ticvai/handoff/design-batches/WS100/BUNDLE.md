@@ -1,6 +1,6 @@
 # WS100 — Subscription Licensing AI Self Service board 3
 
-**10 screens · 9 operations · 11 schemas · 3 permissions**
+**10 screens · 0 operations · 0 schemas · 0 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -41,35 +41,42 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `PLATFORM_BILLING_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 0 permissions apply here:
+  ``. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `ADM-389` | Commercial Rules Engine Overview | commandCentre | 1 | 0 | — |
-| `ADM-390` | VSI Model Builder | configEditor | 2 | 0 | — |
-| `ADM-391` | VSI Scoring & Tier Threshold Configuration | listDetail | 1 | 0 | — |
-| `ADM-392` | Subscription Tier Configuration | listDetail | 2 | 0 | — |
-| `ADM-393` | Tier Included Allowances | configEditor | 1 | 0 | — |
-| `ADM-394` | Commercial & Licensing Model Configuration | configEditor | 1 | 0 | — |
-| `ADM-395` | Billable Unit, Minimum Guarantee & Enforcement Rules | configEditor | 1 | 0 | — |
-| `ADM-396` | Overage Pricing & Capacity Packs | configEditor | 2 | 0 | — |
-| `ADM-397` | Commercial Model & Rule Simulation | listDetail | 1 | 0 | — |
-| `ADM-398` | Rule Versioning, Approval & Publication | listDetail | 1 | 0 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `ADM-389` | Commercial Rules Engine Overview | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-390` | VSI Model Builder | B–D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-391` | VSI Scoring & Tier Threshold Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-392` | Subscription Tier Configuration | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-393` | Tier Included Allowances | B–D | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-394` | Commercial & Licensing Model Configuration | B–D | 23 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-395` | Billable Unit, Minimum Guarantee & Enforcement Rules | B–D | 17 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-396` | Overage Pricing & Capacity Packs | B–D | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-397` | Commercial Model & Rule Simulation | B–D | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-398` | Rule Versioning, Approval & Publication | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -77,2336 +84,1061 @@ convincingly. It is never a caption.
 
 ---
 
-## `screens.json`
+## Screen by screen
 
-Every field of every screen in this batch. **`machine` is what a screen is in the middle of**, `overlays` is what opens over it and what closing it does, and `navigation.transitions` is how you leave, with `carries` naming the state that travels.
+**One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-```json
-[
- {
-  "id": "ADM-389",
-  "name": "Commercial Rules Engine Overview",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "3",
-   "number": "1",
-   "page": 31
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/commercial-rules-engine-overview-adm-389",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialRulesEngineOverview.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-002"
-   ],
-   "exitTo": [
-    "ADM-002",
-    "ADM-390",
-    "ADM-391",
-    "ADM-392",
-    "ADM-393",
-    "ADM-394",
-    "ADM-395",
-    "ADM-396",
-    "ADM-397",
-    "ADM-398"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-002",
-     "trigger": "Back to Platform Dashboard",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
-    },
-    {
-     "to": "ADM-390",
-     "trigger": "VSI Model Builder",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-391",
-     "trigger": "VSI Scoring & Tier Threshold Configuration",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-392",
-     "trigger": "Subscription Tier Configuration",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-393",
-     "trigger": "Tier Included Allowances",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-394",
-     "trigger": "Commercial & Licensing Model Configuration",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-395",
-     "trigger": "Billable Unit, Minimum Guarantee & Enforcement Rules",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-396",
-     "trigger": "Overage Pricing & Capacity Packs",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-397",
-     "trigger": "Commercial Model & Rule Simulation",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-398",
-     "trigger": "Rule Versioning, Approval & Publication",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Provide TICVAI administrators with the central configuration overview for all commercial and licensing rules.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Active Commercial Models",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Tiers",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active VSI Model",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Customers by Commercial Model",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average VSI",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Customers Near Threshold",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Customers Above Allowance",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Per-Ticket Contracts",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Minimum Guarantee Contracts",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Pending Rule Changes",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The commercial rules overview list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the commercial rules overview untouched.",
-   "emptyFirstRun": "No commercial rules overview yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the commercial rules overview are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listLicensingModels",
-    "contract": "subscription",
-    "purpose": "The rules engine",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-389",
-   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-389"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 31. 0 of 0 labels bound to a contract property; 10 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-390",
-  "name": "VSI Model Builder",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "3",
-   "number": "2",
-   "page": 32
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/vsi-model-builder-adm-390",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/VsiModelBuilder.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-389"
-   ],
-   "exitTo": [
-    "ADM-389"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-389",
-     "trigger": "Back to Commercial Rules Engine Overview",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configuration Fields) and no display directory — it is settings, not a population",
-  "purpose": "Configure how TICVAI determines the operational size and complexity of a customer. VSI remains important even where VSI does not determine customer pricing.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**VSI Model Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Factor Name",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Weight",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Data Source",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Minimum Value",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Maximum Value",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Scoring Method",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Mandatory/Optional",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Venue Type Applicability",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Market Applicability",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective Date",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The vsi model configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the vsi model untouched.",
-   "emptyFirstRun": "No vsi model configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
-  },
-  "apis": [
-   {
-    "operationId": "getVsiModel",
-    "contract": "subscription",
-    "purpose": "The VSI model",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "setVsiModel",
-    "contract": "subscription",
-    "purpose": "Build it",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getVsiModel"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-390",
-   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-390"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 32. 0 of 0 labels bound to a contract property; 10 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-391",
-  "name": "VSI Scoring & Tier Threshold Configuration",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "3",
-   "number": "3",
-   "page": 33
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/vsi-scoring-tier-threshold-configuration-adm-391",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/VsiScoringTierThresholdConfiguration.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-389"
-   ],
-   "exitTo": [
-    "ADM-389"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-389",
-     "trigger": "Back to Commercial Rules Engine Overview",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Translate actual customer characteristics into a standardized VSI score and recommended operational tier.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 33"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 33"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setVsiModel",
-       "label": "Save VSI model",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setVsiModel"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The vsi scoring tier list.",
-   "error": "Could not load. Names which read failed and leaves the vsi scoring tier untouched.",
-   "emptyFirstRun": "No vsi scoring tier yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the vsi scoring tier are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setVsiModel",
-    "contract": "subscription",
-    "purpose": "Scoring and tier thresholds",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getVsiModel"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-391",
-   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-391"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 1 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-392",
-  "name": "Subscription Tier Configuration",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "3",
-   "number": "4",
-   "page": 34
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/subscription-tier-configuration-adm-392",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/SubscriptionTierConfiguration.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-389"
-   ],
-   "exitTo": [
-    "ADM-389"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-389",
-     "trigger": "Back to Commercial Rules Engine Overview",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure TICVAI's standard subscription tiers for customers using tier-based commercial models.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 34"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 34"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createPlan",
-       "label": "Create plan",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPlans",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPlan"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The subscription tier list.",
-   "error": "Could not load. Names which read failed and leaves the subscription tier untouched.",
-   "emptyFirstRun": "No subscription tier yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the subscription tier are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "createPlan",
-    "contract": "subscription",
-    "purpose": "Tier configuration",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listPlans",
-    "contract": "subscription",
-    "purpose": "Tiers defined",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-392",
-   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-392"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-393",
-  "name": "Tier Included Allowances",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "3",
-   "number": "5",
-   "page": 35
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/tier-included-allowances-adm-393",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/TierIncludedAllowances.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-389"
-   ],
-   "exitTo": [
-    "ADM-389"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-389",
-     "trigger": "Back to Commercial Rules Engine Overview",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configuration per Allowance) and no display directory — it is settings, not a population",
-  "purpose": "Configure the resources included within each standard subscription tier.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Metric",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
-      },
-      {
-       "kind": "selectField",
-       "label": "Quantity",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
-      },
-      {
-       "kind": "selectField",
-       "label": "Measurement Period",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
-      },
-      {
-       "kind": "selectField",
-       "label": "Reset Period",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
-      },
-      {
-       "kind": "selectField",
-       "label": "Warning Threshold",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
-      },
-      {
-       "kind": "selectField",
-       "label": "Enforcement Type",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
-      },
-      {
-       "kind": "selectField",
-       "label": "Overage Allowed",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
-      },
-      {
-       "kind": "selectField",
-       "label": "Overage Rate",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
-      },
-      {
-       "kind": "selectField",
-       "label": "Additional Pack Allowed",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The tier included allowances configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the tier included allowances untouched.",
-   "emptyFirstRun": "No tier included allowances configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
-  },
-  "apis": [
-   {
-    "operationId": "setLicensingModel",
-    "contract": "subscription",
-    "purpose": "Tier allowances",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listLicensingModels"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-393",
-   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-393"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 35. 0 of 0 labels bound to a contract property; 9 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-394",
-  "name": "Commercial & Licensing Model Configuration",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "3",
-   "number": "6",
-   "page": 36
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/commercial-licensing-model-configuration-adm-394",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialLicensingModelConfiguration.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-389"
-   ],
-   "exitTo": [
-    "ADM-389"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-389",
-     "trigger": "Back to Commercial Rules Engine Overview",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Commercial Configuration Fields; Separately configure) and no display directory — it is settings, not a population",
-  "purpose": "This is the major revised screen. Configure how TICVAI charges a customer independently from how TICVAI technically licenses the customer. A. Commercial Charging Model",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Commercial Model",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Charging Unit",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Rate",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Currency",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Billing Period",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Included Volume",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Minimum Guarantee",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Guarantee Period",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Percentage Rate",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Fixed Base Fee",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Module Charging",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective Date",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Expiry",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "Contract Applicability",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
-      },
-      {
-       "kind": "selectField",
-       "label": "POS Limit",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Access Device Limit",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "User Limit",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Venue Limit",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "API Limit",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Storage Limit",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Module Entitlements",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Technical Capacity Profile",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Hard/Soft/Approval Enforcement",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The commercial licensing model configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the commercial licensing model untouched.",
-   "emptyFirstRun": "No commercial licensing model configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
-  },
-  "apis": [
-   {
-    "operationId": "setLicensingModel",
-    "contract": "subscription",
-    "purpose": "Commercial and licensing model",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listLicensingModels"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-394",
-   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-394"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 36. 0 of 0 labels bound to a contract property; 23 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-395",
-  "name": "Billable Unit, Minimum Guarantee & Enforcement Rules",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "3",
-   "number": "7",
-   "page": 38
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/billable-unit-minimum-guarantee-enforcement-rules-adm-395",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/BillableUnitMinimumGuaranteeEnforcementRules.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-389"
-   ],
-   "exitTo": [
-    "ADM-389"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-389",
-     "trigger": "Back to Commercial Rules Engine Overview",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configuration should support; Commercial rule can specify; Configure) and no display directory — it is settings, not a population",
-  "purpose": "Define exactly what TICVAI counts commercially and what happens when contractual or technical thresholds are reached.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Ticket Sold",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
-      },
-      {
-       "kind": "selectField",
-       "label": "Ticket Issued",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
-      },
-      {
-       "kind": "selectField",
-       "label": "Paid Ticket",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
-      },
-      {
-       "kind": "selectField",
-       "label": "Transaction",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
-      },
-      {
-       "kind": "selectField",
-       "label": "Admission/Redemption",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
-      },
-      {
-       "kind": "selectField",
-       "label": "Gross Transaction Value",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
-      },
-      {
-       "kind": "selectField",
-       "label": "Net Transaction Value",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
-      },
-      {
-       "kind": "selectField",
-       "label": "Custom Billable Event",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
-      },
-      {
-       "kind": "selectField",
-       "label": "50 billable tickets",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Commercial rule can specify"
-      },
-      {
-       "kind": "selectField",
-       "label": "1 billable transaction",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Commercial rule can specify"
-      },
-      {
-       "kind": "selectField",
-       "label": "Guarantee Amount",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
-      },
-      {
-       "kind": "textField",
-       "label": "Monthly / Quarterly / Annual",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Carry Forward Allowed",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Carry Forward Period",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Reconciliation Method",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Currency",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective Dates",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The billable unit minimum configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the billable unit minimum untouched.",
-   "emptyFirstRun": "No billable unit minimum configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
-  },
-  "apis": [
-   {
-    "operationId": "setLicensingModel",
-    "contract": "subscription",
-    "purpose": "Billable unit and minimum guarantee",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listLicensingModels"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-395",
-   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-395"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 38. 0 of 0 labels bound to a contract property; 17 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-396",
-  "name": "Overage Pricing & Capacity Packs",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "3",
-   "number": "8",
-   "page": 39
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/overage-pricing-capacity-packs-adm-396",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/OveragePricingCapacityPacks.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-389"
-   ],
-   "exitTo": [
-    "ADM-389"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-389",
-     "trigger": "Back to Commercial Rules Engine Overview",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Pack Configuration) and no display directory — it is settings, not a population",
-  "purpose": "Configure additional consumption pricing and purchasable capacity.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Pack Name",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Resource",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Quantity",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Price",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Recurring/One-Time",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Validity",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Applicable Tier",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Applicable Commercial Model",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Auto-Renew",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Proration",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective Dates",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The overage pricing capacity configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the overage pricing capacity untouched.",
-   "emptyFirstRun": "No overage pricing capacity configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
-  },
-  "apis": [
-   {
-    "operationId": "setLicensingModel",
-    "contract": "subscription",
-    "purpose": "Overage pricing",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listLicensingModels"
-    ]
-   },
-   {
-    "operationId": "addCapacityPack",
-    "contract": "subscription",
-    "purpose": "Capacity packs",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getLicenceEnforcement",
-     "getEntitlementUsage"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-396",
-   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-396"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 39. 0 of 0 labels bound to a contract property; 11 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-397",
-  "name": "Commercial Model & Rule Simulation",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "3",
-   "number": "9",
-   "page": 40
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/commercial-model-rule-simulation-adm-397",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialModelRuleSimulation.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-389"
-   ],
-   "exitTo": [
-    "ADM-389"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-389",
-     "trigger": "Back to Commercial Rules Engine Overview",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Allow TICVAI to test commercial models before applying them. This screen now becomes more powerful than the original Board 3 simulator.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 40 §Show"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every commercial model rule",
-       "columns": [
-        "Customer Annual Cost",
-        "TICVAI Revenue",
-        "Variable Revenue",
-        "Minimum Guarantee",
-        "Capacity",
-        "Projected Overage",
-        "Contract Value",
-        "Commercial Risk"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 40 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected commercial model rule",
-       "bindsTo": null,
-       "columns": [
-        "Customer Annual Cost",
-        "TICVAI Revenue",
-        "Variable Revenue",
-        "Minimum Guarantee",
-        "Capacity",
-        "Projected Overage",
-        "Contract Value",
-        "Commercial Risk"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Customer Inputs”, “AED 145K/year”, “AED 150K/year”, “AED 120K/year”.",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 40 §Show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The commercial model rule list.",
-   "error": "Could not load. Names which read failed and leaves the commercial model rule untouched.",
-   "emptyFirstRun": "No commercial model rule yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the commercial model rule are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "simulateCommercialPackage",
-    "contract": "subscription",
-    "purpose": "Simulate the model",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "Customer Annual Cost",
-    "TICVAI Revenue",
-    "Variable Revenue",
-    "Minimum Guarantee",
-    "Capacity",
-    "Projected Overage"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-397",
-   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-397"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 40. 0 of 8 labels bound to a contract property; 8 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-398",
-  "name": "Rule Versioning, Approval & Publication",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "3",
-   "number": "10",
-   "page": 41
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/rule-versioning-approval-publication-adm-398",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/RuleVersioningApprovalPublication.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-389"
-   ],
-   "exitTo": [
-    "ADM-389"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-389",
-     "trigger": "Back to Commercial Rules Engine Overview",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Govern changes to all commercial, VSI, licensing, billable-unit and pricing rules.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Revised Board 3 — Critical Architecture, 1. Operational Classification. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 41 §Actions"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 41"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 41"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Revised Board 3 — Critical Architecture",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 41 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "1. Operational Classification",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 41 §Actions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "components": []
-    }
-   ]
-  },
-  "states": {
-   "loading": "The rule versioning approval list.",
-   "error": "Could not load. Names which read failed and leaves the rule versioning approval untouched.",
-   "emptyFirstRun": "No rule versioning approval yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the rule versioning approval are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "createPlanVersion",
-    "contract": "subscription",
-    "purpose": "Publish a version",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-398",
-   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-398"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 41. 0 of 0 labels bound to a contract property; 2 of 73 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "planId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- }
-]
-```
+### `ADM-389` Commercial Rules Engine Overview
 
-## `operations.json`
+**Provide TICVAI administrators with the central configuration overview for all commercial and licensing rules.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/commercial-rules-engine-overview-adm-389` |
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Active Commercial Models** (metric tile)
+
+**Active Tiers** (metric tile)
+
+**Active VSI Model** (metric tile)
+
+**Customers by Commercial Model** (metric tile)
+
+**Average VSI** (metric tile)
+
+**Customers Near Threshold** (metric tile)
+
+**Customers Above Allowance** (metric tile)
+
+**Per-Ticket Contracts** (metric tile)
+
+**Minimum Guarantee Contracts** (metric tile)
+
+**Pending Rule Changes** (metric tile)
+
+**Data it reads**: `listLicensingModels` (onLoad, The rules engine)
+
+**Where the user goes next**
+
+- → `ADM-002` Platform Dashboard: *Back to Platform Dashboard*
+- → `ADM-390` VSI Model Builder: *VSI Model Builder*
+- → `ADM-391` VSI Scoring & Tier Threshold Configuration: *VSI Scoring & Tier Threshold Configuration*
+- → `ADM-392` Subscription Tier Configuration: *Subscription Tier Configuration*
+- → `ADM-393` Tier Included Allowances: *Tier Included Allowances*
+- → `ADM-394` Commercial & Licensing Model Configuration: *Commercial & Licensing Model Configuration*
+- → `ADM-395` Billable Unit, Minimum Guarantee & Enforcement Rules: *Billable Unit, Minimum Guarantee & Enforcement Rules*
+- → `ADM-396` Overage Pricing & Capacity Packs: *Overage Pricing & Capacity Packs*
+- → `ADM-397` Commercial Model & Rule Simulation: *Commercial Model & Rule Simulation*
+- → `ADM-398` Rule Versioning, Approval & Publication: *Rule Versioning, Approval & Publication*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The commercial rules overview list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the commercial rules overview untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No commercial rules overview yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commercial rules overview are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-389` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-389`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 3
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 1: Opens Commercial Rules Engine Overview → Provide TICVAI administrators with the central configuration overview for all commercial and licensing rules.
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 3: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 5: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 7: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 9: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 11: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 13: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 15: Returns to the board's landing screen → Ready for the next screen on this board
+- … and 1 more flow steps (`flows/`)
+- Flow F209 branch at step 1 (expected): when Nothing has been set up on Commercial Rules Engine Overview yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
+- Flow F209 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-389?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-002`, `ADM-390`, `ADM-391`, `ADM-392`, `ADM-393`, `ADM-394`, `ADM-395`, `ADM-396`, `ADM-397`, `ADM-398`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-390` VSI Model Builder
+
+**Configure how TICVAI determines the operational size and complexity of a customer. VSI remains important even where VSI does not determine customer pricing.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration Fields) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/vsi-model-builder-adm-390` |
+
+**Known gaps.** **VSI Model Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations …
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Factor Name | select field | — | — | — | — | — | — |
+| Weight | select field | — | — | — | — | — | — |
+| Data Source | select field | — | — | — | — | — | — |
+| Minimum Value | select field | — | — | — | — | — | — |
+| Maximum Value | select field | — | — | — | — | — | — |
+| Scoring Method | select field | — | — | — | — | — | — |
+| Mandatory/Optional | select field | — | — | — | — | — | — |
+| Venue Type Applicability | select field | — | — | — | — | — | — |
+| Market Applicability | select field | — | — | — | — | — | — |
+| Effective Date | select field | — | — | — | — | — | — |
+
+#### Outputs: what the screen shows and produces
+
+**Data it reads**: `getVsiModel` (onLoad, The VSI model)
+
+**Where the user goes next**
+
+- → `ADM-389` Commercial Rules Engine Overview: *Back to Commercial Rules Engine Overview*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The vsi model configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the vsi model untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No vsi model configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- VSI is a weighted composite of onboarding factors - annual attendance (illustrated ~30% weight), POS terminals, access-control devices, venues, users, annual transaction volume - each configurable as mandatory or optional. *(agreed · MoM 10 Sep 2026, 4.2 Venue Size Index (VSI) Model & Tier Threshold Configuration · DI-817)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-390` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-390`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 3
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 2: Works in VSI Model Builder → Configure how TICVAI determines the operational size and complexity of a customer. VSI remains important even where VSI does not determine customer pricing.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (10), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-390?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-389`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-391` VSI Scoring & Tier Threshold Configuration
+
+**Translate actual customer characteristics into a standardized VSI score and recommended operational tier.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/vsi-scoring-tier-threshold-configuration-adm-391` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save VSI model (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `ADM-389` Commercial Rules Engine Overview: *Back to Commercial Rules Engine Overview*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The vsi scoring tier list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the vsi scoring tier untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No vsi scoring tier yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the vsi scoring tier are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Tier thresholds map VSI ranges to tiers (0-30 Essential, 31-60 Professional, 61-80 Enterprise, 81-100 Enterprise Plus) with per-factor sub-thresholds (attendance 100-100,000 = 10 pts; 100,000-500,000 = 40); the system calculates the score and recommends the tier automatically. *(agreed · MoM 10 Sep 2026, 4.2 Venue Size Index (VSI) Model & Tier Threshold Configuration · DI-818)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-391` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-391`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 3
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 4: Works in VSI Scoring & Tier Threshold Configuration → Translate actual customer characteristics into a standardized VSI score and recommended operational tier.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-391?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save VSI model, Cancel.
+- [ ] Every transition is wired: `ADM-389`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-392` Subscription Tier Configuration
+
+**Configure TICVAI's standard subscription tiers for customers using tier-based commercial models.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/subscription-tier-configuration-adm-392` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Create plan (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listPlans` (onLoad, Tiers defined)
+
+**Where the user goes next**
+
+- → `ADM-389` Commercial Rules Engine Overview: *Back to Commercial Rules Engine Overview*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The subscription tier list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the subscription tier untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No subscription tier yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the subscription tier are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 20.2.1 | Subscription Plans - System shall support configurable subscription plans. | Subscription & Licensing Management | CONTRACTED | `createPlan` |
+| 20.4.8 | Module Pricing - System shall support module-specific pricing. | Subscription & Licensing Management | CONTRACTED | `createPlan` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Each tier has its own price payable monthly, annually or in advance (cheque/bank transfer), with a configurable trial period; tier-included allowances (e.g. Professional up to 10 POS devices and 20 users) at the same price anywhere within the range. *(client request · MoM 10 Sep 2026, 4.3 Subscription Tiers, Allowances & Usage Thresholds · DI-819)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-392` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-392`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 3
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 6: Works in Subscription Tier Configuration → Configure TICVAI's standard subscription tiers for customers using tier-based commercial models.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-392?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Create plan, Cancel.
+- [ ] Every transition is wired: `ADM-389`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-393` Tier Included Allowances
+
+**Configure the resources included within each standard subscription tier.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration per Allowance) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/tier-included-allowances-adm-393` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Metric | select field | — | — | — | — | — | — |
+| Quantity | select field | — | — | — | — | — | — |
+| Measurement Period | select field | — | — | — | — | — | — |
+| Reset Period | select field | — | — | — | — | — | — |
+| Warning Threshold | select field | — | — | — | — | — | — |
+| Enforcement Type | select field | — | — | — | — | — | — |
+| Overage Allowed | select field | — | — | — | — | — | — |
+| Overage Rate | select field | — | — | — | — | — | — |
+| Additional Pack Allowed | select field | — | — | — | — | — | — |
+
+#### Outputs: what the screen shows and produces
+
+**Where the user goes next**
+
+- → `ADM-389` Commercial Rules Engine Overview: *Back to Commercial Rules Engine Overview*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The tier included allowances configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the tier included allowances untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No tier included allowances configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Each tier has its own price payable monthly, annually or in advance (cheque/bank transfer), with a configurable trial period; tier-included allowances (e.g. Professional up to 10 POS devices and 20 users) at the same price anywhere within the range. *(client request · MoM 10 Sep 2026, 4.3 Subscription Tiers, Allowances & Usage Thresholds · DI-819)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-393` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-393`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 3
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 8: Works in Tier Included Allowances → Configure the resources included within each standard subscription tier.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-393?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-389`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-394` Commercial & Licensing Model Configuration
+
+**This is the major revised screen. Configure how TICVAI charges a customer independently from how TICVAI technically licenses the customer. A. Commercial Charging Model**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Commercial Configuration Fields; Separately configure) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/commercial-licensing-model-configuration-adm-394` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Commercial Model | select field | — | — | — | — | — | — |
+| Charging Unit | select field | — | — | — | — | — | — |
+| Rate | select field | — | — | — | — | — | — |
+| Currency | select field | — | — | — | — | — | — |
+| Billing Period | select field | — | — | — | — | — | — |
+| Included Volume | select field | — | — | — | — | — | — |
+| Minimum Guarantee | select field | — | — | — | — | — | — |
+| Guarantee Period | select field | — | — | — | — | — | — |
+| Percentage Rate | select field | — | — | — | — | — | — |
+| Fixed Base Fee | select field | — | — | — | — | — | — |
+| Module Charging | select field | — | — | — | — | — | — |
+| Effective Date | select field | — | — | — | — | — | — |
+| Expiry | select field | — | — | — | — | — | — |
+| Contract Applicability | select field | — | — | — | — | — | — |
+| POS Limit | select field | — | — | — | — | — | — |
+| Access Device Limit | select field | — | — | — | — | — | — |
+| User Limit | select field | — | — | — | — | — | — |
+| Venue Limit | select field | — | — | — | — | — | — |
+| API Limit | select field | — | — | — | — | — | — |
+| Storage Limit | select field | — | — | — | — | — | — |
+| Module Entitlements | select field | — | — | — | — | — | — |
+| Technical Capacity Profile | select field | — | — | — | — | — | — |
+| Hard/Soft/Approval Enforcement | select field | — | — | — | — | — | — |
+
+#### Outputs: what the screen shows and produces
+
+**Where the user goes next**
+
+- → `ADM-389` Commercial Rules Engine Overview: *Back to Commercial Rules Engine Overview*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The commercial licensing model configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the commercial licensing model untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No commercial licensing model configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Commercial models, combinable per client: tier-based, tier plus usage, per-ticket, per-transaction, percentage-based, minimum guarantee, hybrid, fixed multi-year contract. *(agreed · MoM 10 Sep 2026, 4.4 Commercial & Licensing Pricing Models · DI-821)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-394` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-394`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 3
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 10: Works in Commercial & Licensing Model Configuration → This is the major revised screen. Configure how TICVAI charges a customer independently from how TICVAI technically licenses the customer. A. Commercial Charging Model
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (23), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-394?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-389`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-395` Billable Unit, Minimum Guarantee & Enforcement Rules
+
+**Define exactly what TICVAI counts commercially and what happens when contractual or technical thresholds are reached.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration should support; Commercial rule can specify; Configure) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/billable-unit-minimum-guarantee-enforcement-rules-adm-395` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Ticket Sold | select field | — | — | — | — | — | — |
+| Ticket Issued | select field | — | — | — | — | — | — |
+| Paid Ticket | select field | — | — | — | — | — | — |
+| Transaction | select field | — | — | — | — | — | — |
+| Admission/Redemption | select field | — | — | — | — | — | — |
+| Gross Transaction Value | select field | — | — | — | — | — | — |
+| Net Transaction Value | select field | — | — | — | — | — | — |
+| Custom Billable Event | select field | — | — | — | — | — | — |
+| 50 billable tickets | select field | — | — | — | — | — | — |
+| 1 billable transaction | select field | — | — | — | — | — | — |
+| Guarantee Amount | select field | — | — | — | — | — | — |
+| Monthly / Quarterly / Annual | text field | — | — | — | — | — | — |
+| Carry Forward Allowed | select field | — | — | — | — | — | — |
+| Carry Forward Period | select field | — | — | — | — | — | — |
+| Reconciliation Method | select field | — | — | — | — | — | — |
+| Currency | select field | — | — | — | — | — | — |
+| Effective Dates | select field | — | — | — | — | — | — |
+
+#### Outputs: what the screen shows and produces
+
+**Where the user goes next**
+
+- → `ADM-389` Commercial Rules Engine Overview: *Back to Commercial Rules Engine Overview*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The billable unit minimum configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the billable unit minimum untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No billable unit minimum configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Billable/excludable ticket rules (e.g. complimentary, voided and refunded tickets excluded), minimum guarantee and overage rate are configured together; a commercial model simulator tests a model before it is assigned to a customer. *(client request · MoM 10 Sep 2026, 4.4 Commercial & Licensing Pricing Models · DI-822)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-395` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-395`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 3
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 12: Works in Billable Unit, Minimum Guarantee & Enforcement Rules → Define exactly what TICVAI counts commercially and what happens when contractual or technical thresholds are reached.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (17), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-395?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-389`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-396` Overage Pricing & Capacity Packs
+
+**Configure additional consumption pricing and purchasable capacity.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Pack Configuration) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/overage-pricing-capacity-packs-adm-396` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Pack Name | select field | — | — | — | — | — | — |
+| Resource | select field | — | — | — | — | — | — |
+| Quantity | select field | — | — | — | — | — | — |
+| Price | select field | — | — | — | — | — | — |
+| Recurring/One-Time | select field | — | — | — | — | — | — |
+| Validity | select field | — | — | — | — | — | — |
+| Applicable Tier | select field | — | — | — | — | — | — |
+| Applicable Commercial Model | select field | — | — | — | — | — | — |
+| Auto-Renew | select field | — | — | — | — | — | — |
+| Proration | select field | — | — | — | — | — | — |
+| Effective Dates | select field | — | — | — | — | — | — |
+
+#### Outputs: what the screen shows and produces
+
+**Where the user goes next**
+
+- → `ADM-389` Commercial Rules Engine Overview: *Back to Commercial Rules Engine Overview*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The overage pricing capacity configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the overage pricing capacity untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No overage pricing capacity configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Billable/excludable ticket rules (e.g. complimentary, voided and refunded tickets excluded), minimum guarantee and overage rate are configured together; a commercial model simulator tests a model before it is assigned to a customer. *(client request · MoM 10 Sep 2026, 4.4 Commercial & Licensing Pricing Models · DI-822)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-396` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-396`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 3
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 14: Works in Overage Pricing & Capacity Packs → Configure additional consumption pricing and purchasable capacity.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-396?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-389`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-397` Commercial Model & Rule Simulation
+
+**Allow TICVAI to test commercial models before applying them. This screen now becomes more powerful than the original Board 3 simulator.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/commercial-model-rule-simulation-adm-397` |
+
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every commercial model rule** (data table)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Customer annual cost | text | not in the schema: `Customer Annual Cost` |
+| TICVAI revenue | text | not in the schema: `TICVAI Revenue` |
+| Variable revenue | text | not in the schema: `Variable Revenue` |
+| Minimum guarantee | text | not in the schema: `Minimum Guarantee` |
+| Capacity | text | not in the schema: `Capacity` |
+| Projected overage | text | not in the schema: `Projected Overage` |
+| Contract value | text | not in the schema: `Contract Value` |
+| Commercial risk | text | not in the schema: `Commercial Risk` |
+
+**The selected commercial model rule** (detail panel): The pack groups this record's detail under its own headings: “Customer Inputs”, “AED 145K/year”, “AED 150K/year”, “AED 120K/year”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Customer annual cost | text | not in the schema: `Customer Annual Cost` |
+| TICVAI revenue | text | not in the schema: `TICVAI Revenue` |
+| Variable revenue | text | not in the schema: `Variable Revenue` |
+| Minimum guarantee | text | not in the schema: `Minimum Guarantee` |
+| Capacity | text | not in the schema: `Capacity` |
+| Projected overage | text | not in the schema: `Projected Overage` |
+| Contract value | text | not in the schema: `Contract Value` |
+| Commercial risk | text | not in the schema: `Commercial Risk` |
+
+**Where the user goes next**
+
+- → `ADM-389` Commercial Rules Engine Overview: *Back to Commercial Rules Engine Overview*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The commercial model rule list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the commercial model rule untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No commercial model rule yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commercial model rule are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Billable/excludable ticket rules (e.g. complimentary, voided and refunded tickets excluded), minimum guarantee and overage rate are configured together; a commercial model simulator tests a model before it is assigned to a customer. *(client request · MoM 10 Sep 2026, 4.4 Commercial & Licensing Pricing Models · DI-822)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-397` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-397`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 3
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 16: Works in Commercial Model & Rule Simulation → Allow TICVAI to test commercial models before applying them. This screen now becomes more powerful than the original Board 3 simulator.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-397?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-389`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-398` Rule Versioning, Approval & Publication
+
+**Govern changes to all commercial, VSI, licensing, billable-unit and pricing rules.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `planId` (navigation) |
+| Route | `/tenants-licensing/rule-versioning-approval-publication-adm-398` |
+
+**Known gaps.** **The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Revised Board 3 — Critical Architecture, 1. Operational Classification. Each needs an operation, or needs … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Revised Board 3 — Critical Architecture (primary button) | navigation or local | — | — | — | — |
+| 1. Operational Classification (secondary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `ADM-389` Commercial Rules Engine Overview: *Back to Commercial Rules Engine Overview*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The rule versioning approval list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the rule versioning approval untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No rule versioning approval yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rule versioning approval are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A72** Design a generic, configurable multi-stage approval-workflow engine (approve / reject / return / request-more-information, AI-generated summary, audit trail) applicable to procurement, pricing changes, product creation … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 18 Aug 2026 · workshop tracker · keyword 'multi-stage approval')*
+- **A256** Build approval workflow builder: amount/authority rules, N-of-M groups, delegation, SLA tracking *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 8 Sep 2026 · workshop tracker · keyword 'approval workflow')*
+- **C48** Share BI/reporting and approval workflow documentation *(Allam · Pending → 30 Sep: Closed, Moved to T7 · 8 Sep 2026 · workshop tracker · keyword 'approval workflow')*
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-398` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-398`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 3
+- Flow F209 *Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview*, step 18: Works in Rule Versioning, Approval & Publication → Govern changes to all commercial, VSI, licensing, billable-unit and pricing rules.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-398?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Revised Board 3 — Critical Architecture, 1. Operational Classification.
+- [ ] Every transition is wired: `ADM-389`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+
+
+## Reference designs and the trackers for this platform
+
+**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+
+- `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
+- `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
+
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+
+## Design inputs from the client meetings
+
+**What the client asked for in the meetings and design reviews, for these screens.** Apply every item. They are the client's own requirements and they are later than the reference files: where a reference design or a screen's fields disagree with an item here, the item wins. Newest first; where two items disagree, the newer one wins (anything a later meeting replaced is already left out). An **Open question** is not settled: build the default it states and keep it easy to change. The text in brackets is for traceability and, like everything else in this bundle, never appears on a screen.
+
+### Everywhere, on every app
+
+- Allam (platform-wide requirement): every calendar throughout the platform, not just maintenance, must support day, week and month views, with the day view further broken down by hour from a defined start hour through the day. *(agreed · MoM 17 Sep 2026, 4.2 Preventive Maintenance Planning · DI-907)*
+- Minimise the number of separate screens an end user navigates: consolidate related information wherever it can reasonably be shown together, rather than mirroring every workshop board as its own screen. *(agreed · MoM 7 Sep 2026, 4.10 Screen consolidation / 5. Key Decisions · DI-671)*
+- Region-configurable tax on pre-discount price (e.g. Egypt: AED 100 ticket with 20% off is paid at AED 80 but taxed on AED 100). Rounding must support up to three decimal places without dropping the third decimal where the currency requires it. *(agreed · MoM 1 Sep 2026, 4.5 Taxes, Fees & Price Calculation · DI-598)*
+- "Powered by TICVAI" is shown consistently across staff and guest-facing surfaces. *(agreed · MoM 14 Aug 2026, 8. POS / Kiosk Branding · DI-297)*
+- Full multi-language support (Arabic and others such as Chinese) consistent with the agreed i18n/RTL architecture. *(agreed · MoM 10 Aug 2026, 4.7 Account Creation, Localisation & Multi-Currency · DI-210)*
+- The reference system is a functional reference only: its dated UI/UX is not to be replicated; TICVAI delivers equivalent depth with a modern, AI-friendly, easy-to-configure experience. *(agreed · MoM 7 Aug 2026, 23. Reference System Access & Documentation · DI-186)*
+- Direction: modern, minimalistic, spacious, cross-device designs that still convey a sense of place (venue or park); Softlabs proposes two to three enhanced visual concepts for TICVAI to steer. *(agreed · MoM 3 Aug 2026, 11. Design Alignment & Team Input · DI-126)*
+- Languages: English and Arabic at minimum, with Russian, Spanish and Mandarin. *(agreed · MoM 31 Jul 2026, 13. Internationalization & Localization · DI-080)*
+- Clarity first; reduce cognitive load (simple layouts, familiar patterns); consistency ("Use the system. Do not recreate."); accessibility; hierarchy (guide attention with contrast, spacing and visual weight); feedback (every action has a clear response). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Design Principles in Action · DI-051)*
+- Standard components: search bar with Cmd+K; tabs (Overview, Events, Sales, Reports); pagination; badges (New, Pending, Sold Out, Completed); toggle (Off/On); dropdown; removable chip ("VIP x"). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Example UI Components · DI-050)*
+- Spacing on an 8px base grid: 4, 8, 12, 16, 24, 32, 40, 48, 64, 80. Border radius scale 4, 8, 12, 16, 24px, consistent across the platform. Soft shadows: sm 0 1px 2px rgba(0,0,0,.05); md 0 4px 6px rgba(0,0,0,.08); lg 0 10px 15px rgba(0,0,0,.10); xl 0 20px 40px rgba(0,0,0,.14). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 6. Spacing / 7. Border Radius / 8. Shadows · DI-049)*
+- Icons: line style, outline, 2px stroke, round corners, clean and consistent. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 5. Icons · DI-048)*
+- Component principles: clarity first; consistent spacing on an 8px grid; meaningful colour (colours communicate status and guide the user); accessible by design; mobile ready (components adapt across all screen sizes). Components are consistent, flexible, accessible and composable. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Component principles · DI-045)*
+- Empty states have a title, one explanatory line and one action: "No events yet / Create your first event to get started / Create Event"; "No data available / We couldn't find anything to show here / Refresh". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Empty States · DI-044)*
+- Notification list: status icon, title, one-line detail and relative time (e.g. "Payment received ... 2m ago", "High demand detected ... 10m ago"), with "View all notifications". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Notifications · DI-042)*
+- Forms: label above field; text input, select ("Choose an option"), date picker, toggle, checkbox. Input states: Default, Focused, Filled, Disabled and Error with inline message (e.g. "This field is required"). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Forms; 08 Design System (p8) - 4. Inputs · DI-040)*
+- Card types: event card (title, date and time, venue, "From 120.00 AED"); KPI card (label, value, delta, "vs last 7 days"); onboarding checklist card ("3 of 6 completed": Create Event, Add Staff, Configure Seating, Connect Payment). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Cards · DI-038)*
+- Button hierarchy Primary, Secondary, Tertiary (text) and Icon buttons, each with Default, Hover, Pressed and Disabled states. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Buttons; 08 Design System (p8) - 3. Buttons · DI-036)*
+- Regardless of the module a user is working in, the experience should feel like one product, not a collection of separate applications. *(agreed · Design Vision Book 29 Jul 2026, 07 Modules Overview (p7) · DI-034)*
+- DO: focus on clarity and hierarchy, use clear simple interactive elements, give relevant information at a glance (card example: "Annual Membership / All Venues / 4.4 (388) / BESTSELLER"). DON'T: clutter and overload (e.g. "-10% NEW PROMO AED 450.00 !!! BOOK NOW!!!"), complex forms and flows, hard-to-read data visualisations. *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - DO / DON'T · DI-033)*
+- Eight principles on every screen: User-Centric, AI-First, Simple & Clear (clean layouts, clear hierarchy, minimal noise), Fast & Efficient (optimised for quick actions), Reliable & Secure (permissions, data protection), Data-Driven (data visual, actionable, easy to understand), Scalable, Consistent (same patterns, components and interactions across the ecosystem). *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - Our Design Principles · DI-032)*
+- Accessibility: high contrast, readable text, keyboard navigation and inclusive components throughout; WCAG AA standards minimum ("Design for everyone"). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Better Accessibility; 06 Component principles (p6); 08 Design principles in action (p8) · DI-029)*
+- AI everywhere: AI insights, recommendations and smart assistance are embedded across the platform, not hidden. AI is not an add-on: it assists, predicts, recommends and automates. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - How TICVAI improves this concept; 05 Design Principles (p5) - 2. AI-First · DI-027)*
+- Global Search: prominent, AI-powered search that finds anything, in the top bar with a Cmd+K shortcut (placeholder e.g. "Search events, customers, orders, venues or ask AI..."). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - UI inspiration reference, item 1; 08 Design System (p8) - Search Bar · DI-025)*
+- Visual direction: Purposeful (every element has a clear purpose), Consistent (one visual system across all modules and devices), Clear (easy to scan, understand and act on), Modern. Key takeaway: clean, modern, product-first layout with clear hierarchy and minimal visual noise; deep, modern, trustworthy; built for enterprise scale. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) · DI-024)*
+- The brand is presented consistently across Web Platform, Mobile App and Admin Portal (and print). Ticvai identity, colours and typography are applied consistently across all screens and devices. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand in action; 03 Visual Direction (p3) - Consistent Branding · DI-023)*
+- Copy is Professional, Friendly, Clear, Confident, Concise and Helpful. Avoid jargon, overly technical language, clutter, outdated language and complexity. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand voice · DI-022)*
+- Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
+- Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
+
+### Across P09 TICVAI Web
+
+- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
+- Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
+- Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
+- Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+
+**8 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+
+---
+
+## Raw data
+
+The same package data the blocks above are built from. `screens.json` is in the folder and not repeated here: every field of it is in the blocks.
+
+### `operations.json`
 
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
 {
- "addCapacityPack": {
-  "method": "POST",
-  "path": "/capacity-packs",
-  "contract": "subscription",
-  "summary": "Buy headroom without changing tier",
-  "permission": "PLATFORM_BILLING_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CapacityPack",
-  "responds": "CapacityPack"
- },
- "createPlan": {
-  "method": "POST",
-  "path": "/plans",
-  "contract": "subscription",
-  "summary": "Create a subscription plan",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreatePlanRequest",
-  "responds": "Plan"
- },
- "createPlanVersion": {
-  "method": "POST",
-  "path": "/plans/{planId}",
-  "contract": "subscription",
-  "summary": "Publish a new version of a plan",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreatePlanRequest",
-  "responds": "Plan"
- },
- "getVsiModel": {
-  "method": "GET",
-  "path": "/vsi-models",
-  "contract": "subscription",
-  "summary": "How a customer's scale is scored into a tier",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "VsiModel"
- },
- "listLicensingModels": {
-  "method": "GET",
-  "path": "/licensing-models",
-  "contract": "subscription",
-  "summary": "Billable units, minimum guarantees and overage",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "LicensingModel"
- },
- "listPlans": {
-  "method": "GET",
-  "path": "/plans",
-  "contract": "subscription",
-  "summary": "List subscription plans",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "offeredToTenantId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "packageKind",
-    "in": "query",
-    "required": false
-   }
-  ],
-  "requestBody": null,
-  "responds": "Plan"
- },
- "setLicensingModel": {
-  "method": "PUT",
-  "path": "/licensing-models",
-  "contract": "subscription",
-  "summary": "Define the billable unit and what happens at the edges",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LicensingModel",
-  "responds": "LicensingModel"
- },
- "setVsiModel": {
-  "method": "PUT",
-  "path": "/vsi-models",
-  "contract": "subscription",
-  "summary": "Weights, thresholds and the tiers they map to",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "VsiModel",
-  "responds": "VsiModel"
- },
- "simulateCommercialPackage": {
-  "method": "POST",
-  "path": "/package-simulations",
-  "contract": "subscription",
-  "summary": "What this package would cost, and what it would provision",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PackageSimulationRequest",
-  "responds": "PackageSimulation"
- }
+
 }
 ```
 
-## `schemas.json`
+### `schemas.json`
 
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
 {
- "CapacityPack": {
-  "type": "object",
-  "x-ticvai-persistence": "subscription.capacity_pack",
-  "description": "Board 3.8. **A good season should not require renegotiating a contract in August.**\n",
-  "required": [
-   "tenantId",
-   "unit",
-   "quantity"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "unit": {
-    "type": "string"
-   },
-   "quantity": {
-    "type": "integer"
-   },
-   "price": {
-    "x-ticvai-column": "list_price",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "temporary": {
-    "type": "boolean",
-    "default": true
-   },
-   "approvedBy": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "invoiceId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   }
-  }
- },
- "CellTier": {
-  "type": "string",
-  "enum": [
-   "shared",
-   "dedicated",
-   "isolated",
-   "clientHosted"
-  ]
- },
- "CreatePlanRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "cellTier",
-   "licensedModules",
-   "limits",
-   "basePrice"
-  ],
-  "properties": {
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string",
-    "maxLength": 1000
-   },
-   "cellTier": {
-    "$ref": "#/components/schemas/CellTier"
-   },
-   "licensedModules": {
-    "type": "array",
-    "minItems": 1,
-    "description": "**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n",
-    "items": {
-     "$ref": "#/components/schemas/ModuleKey"
-    }
-   },
-   "limits": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/EntitlementLimit"
-    }
-   },
-   "basePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "billingPeriod": {
-    "type": "string",
-    "enum": [
-     "monthly",
-     "quarterly",
-     "annual"
-    ]
-   },
-   "includesBrandedApp": {
-    "type": "boolean",
-    "description": "Branded native publishing carries per-tenant operational cost and is priced, not absorbed.\n"
-   },
-   "includedAiTokens": {
-    "type": "integer",
-    "nullable": true,
-    "description": "AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."
-   },
-   "requestLimits": {
-    "$ref": "#/components/schemas/PlanRequestLimits"
-   },
-   "packageKind": {
-    "type": "string",
-    "enum": [
-     "standard",
-     "custom"
-    ],
-    "default": "standard",
-    "description": "**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."
-   },
-   "offeredToTenantId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**Private to one tenant** (decided 29 September, Chinmay): a custom package offered only to this tenant; `listPlans` shows it to no other tenant and `setSubscription` refuses it for any other (422 `plan-not-offered`). Null for a package any tenant may buy. Custom packages only."
-   }
-  }
- },
- "EntitlementLimit": {
-  "type": "object",
-  "required": [
-   "metric",
-   "limit"
-  ],
-  "properties": {
-   "metric": {
-    "$ref": "#/components/schemas/UsageMetric"
-   },
-   "limit": {
-    "type": "integer",
-    "nullable": true,
-    "x-ticvai-column": "limit_value",
-    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."
-   },
-   "overageAllowed": {
-    "type": "boolean",
-    "default": false
-   },
-   "overageUnitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   }
-  }
- },
- "LicensingModel": {
-  "type": "object",
-  "x-ticvai-persistence": "subscription.licensing_model",
-  "description": "Boards 3.6 and 3.7. **The single most consequential commercial decision in the product.**\n",
-  "required": [
-   "code",
-   "billableUnit"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "billableUnit": {
-    "type": "string",
-    "enum": [
-     "perVenue",
-     "perAdmission",
-     "perTransaction",
-     "perActiveUser",
-     "perDevice",
-     "perModule",
-     "flatFee",
-     "revenueShare"
-    ]
-   },
-   "unitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "revenueSharePercent": {
-    "type": "number",
-    "nullable": true
-   },
-   "minimumGuarantee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "minimumGuaranteePeriod": {
-    "type": "string",
-    "enum": [
-     "monthly",
-     "quarterly",
-     "annual"
-    ],
-    "nullable": true
-   },
-   "onBelowMinimum": {
-    "type": "string",
-    "enum": [
-     "chargeMinimum",
-     "carryForward",
-     "waive"
-    ],
-    "default": "chargeMinimum",
-    "description": "**A minimum guarantee with no enforcement rule is a number in a contract.**"
-   },
-   "includedAllowances": {
-    "type": "object",
-    "additionalProperties": {
-     "type": "integer"
-    }
-   },
-   "overagePricing": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "unit": {
-       "type": "string"
-      },
-      "fromQuantity": {
-       "type": "integer"
-      },
-      "unitPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      }
-     }
-    }
-   },
-   "tierCode": {
-    "type": "string",
-    "nullable": true
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   }
-  }
- },
- "ModuleKey": {
-  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
- },
- "PackageSimulation": {
-  "type": "object",
-  "description": "Boards 3.9 and 4.8. **Refused at quote time rather than at go-live.**",
-  "properties": {
-   "lines": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "baseTier",
-        "module",
-        "addOn",
-        "capacityPack",
-        "overage",
-        "professionalServices",
-        "discount"
-       ]
-      },
-      "label": {
-       "type": "string"
-      },
-      "quantity": {
-       "type": "number",
-       "nullable": true
-      },
-      "unitPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "amount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      }
-     }
-    }
-   },
-   "recurringTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "oneOffTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "contractTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "minimumGuarantee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "findings": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "severity": {
-       "type": "string",
-       "enum": [
-        "blocking",
-        "warning",
-        "advisory"
-       ]
-      },
-      "code": {
-       "type": "string"
-      },
-      "message": {
-       "type": "string"
-      }
-     }
-    }
-   },
-   "provisionable": {
-    "type": "boolean"
-   }
-  }
- },
- "PackageSimulationRequest": {
-  "type": "object",
-  "required": [
-   "tierCode"
-  ],
-  "properties": {
-   "tierCode": {
-    "type": "string"
-   },
-   "licensingModelId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "moduleCodes": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "venueCount": {
-    "type": "integer",
-    "default": 1
-   },
-   "projectedVolumes": {
-    "type": "object",
-    "additionalProperties": {
-     "type": "integer"
-    }
-   },
-   "contractMonths": {
-    "type": "integer",
-    "default": 12
-   },
-   "billingCycle": {
-    "type": "string",
-    "nullable": true
-   },
-   "currency": {
-    "type": "string",
-    "nullable": true
-   }
-  }
- },
- "Plan": {
-  "x-ticvai-persistence": "subscription.plan + subscription.plan_module + subscription.plan_limit",
-  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `subscription.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreatePlanRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "id",
-     "version",
-     "isActive",
-     "subscriberCount"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "version": {
-      "type": "string",
-      "description": "Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n"
-     },
-     "isActive": {
-      "type": "boolean"
-     },
-     "subscriberCount": {
-      "type": "integer"
-     },
-     "publishedAt": {
-      "type": "string",
-      "format": "date-time"
-     }
-    }
-   }
-  ]
- },
- "PlanRequestLimits": {
-  "type": "object",
-  "nullable": true,
-  "x-ticvai-persistence": "none — embedded in subscription.plan as its request_limits jsonb column",
-  "description": "**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default**, which starts at twice the tenant's expected peak from its sizing tier (`handoff/sizing.json` venue tiers) and is recalibrated after the benchmark and after four weeks of production. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.",
-  "properties": {
-   "guest": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "staff": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "service": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "partner": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "replicaSharePercent": {
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 100,
-    "default": 25,
-    "description": "The most of one replica's request slots one tenant may hold while the share is enforced."
-   },
-   "shareEnforcedAbovePercent": {
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 100,
-    "default": 70,
-    "description": "The replica load, as a percent of its limit, above which the share is enforced."
-   }
-  }
- },
- "VsiModel": {
-  "type": "object",
-  "x-ticvai-persistence": "subscription.vsi_model",
-  "description": "Board 3.2. **The number the whole commercial model hangs on**, and configurable so a prospect reaches a package without a sales call.\n",
-  "properties": {
-   "version": {
-    "type": "integer"
-   },
-   "factors": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "code": {
-       "type": "string",
-       "enum": [
-        "annualVisitors",
-        "peakDailyCapacity",
-        "venueCount",
-        "salesChannels",
-        "moduleCount",
-        "integrationComplexity",
-        "seasonality",
-        "operatingHours",
-        "staffCount"
-       ]
-      },
-      "label": {
-       "type": "string"
-      },
-      "weight": {
-       "type": "number"
-      },
-      "bands": {
-       "type": "array",
-       "items": {
-        "type": "object",
-        "properties": {
-         "upTo": {
-          "type": "number",
-          "nullable": true
-         },
-         "points": {
-          "type": "number"
-         }
-        }
-       }
-      }
-     }
-    }
-   },
-   "tiers": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "code": {
-       "type": "string"
-      },
-      "name": {
-       "type": "string"
-      },
-      "minimumScore": {
-       "type": "number"
-      },
-      "maximumScore": {
-       "type": "number",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "publishedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- }
+
 }
 ```

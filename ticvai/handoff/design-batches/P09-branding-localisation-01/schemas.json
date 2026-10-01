@@ -277,15 +277,6 @@
    }
   }
  },
- "CellTier": {
-  "type": "string",
-  "enum": [
-   "shared",
-   "dedicated",
-   "isolated",
-   "clientHosted"
-  ]
- },
  "ChangeScope": {
   "type": "string",
   "description": "Whether a change reaches guests on publish or needs a store release.\n",
@@ -427,87 +418,6 @@
    }
   }
  },
- "CreatePlanRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "cellTier",
-   "licensedModules",
-   "limits",
-   "basePrice"
-  ],
-  "properties": {
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string",
-    "maxLength": 1000
-   },
-   "cellTier": {
-    "$ref": "#/components/schemas/CellTier"
-   },
-   "licensedModules": {
-    "type": "array",
-    "minItems": 1,
-    "description": "**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n",
-    "items": {
-     "$ref": "#/components/schemas/ModuleKey"
-    }
-   },
-   "limits": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/EntitlementLimit"
-    }
-   },
-   "basePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "billingPeriod": {
-    "type": "string",
-    "enum": [
-     "monthly",
-     "quarterly",
-     "annual"
-    ]
-   },
-   "includesBrandedApp": {
-    "type": "boolean",
-    "description": "Branded native publishing carries per-tenant operational cost and is priced, not absorbed.\n"
-   },
-   "includedAiTokens": {
-    "type": "integer",
-    "nullable": true,
-    "description": "AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."
-   },
-   "requestLimits": {
-    "$ref": "#/components/schemas/PlanRequestLimits"
-   },
-   "packageKind": {
-    "type": "string",
-    "enum": [
-     "standard",
-     "custom"
-    ],
-    "default": "standard",
-    "description": "**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."
-   },
-   "offeredToTenantId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**Private to one tenant** (decided 29 September, Chinmay): a custom package offered only to this tenant; `listPlans` shows it to no other tenant and `setSubscription` refuses it for any other (422 `plan-not-offered`). Null for a package any tenant may buy. Custom packages only."
-   }
-  }
- },
  "CustomDomain": {
   "type": "object",
   "x-ticvai-persistence": "whitelabel.custom_domain",
@@ -606,31 +516,6 @@
    "failureReason": {
     "type": "string",
     "nullable": true
-   }
-  }
- },
- "EntitlementLimit": {
-  "type": "object",
-  "required": [
-   "metric",
-   "limit"
-  ],
-  "properties": {
-   "metric": {
-    "$ref": "#/components/schemas/UsageMetric"
-   },
-   "limit": {
-    "type": "integer",
-    "nullable": true,
-    "x-ticvai-column": "limit_value",
-    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."
-   },
-   "overageAllowed": {
-    "type": "boolean",
-    "default": false
-   },
-   "overageUnitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
    }
   }
  },
@@ -1077,9 +962,6 @@
    }
   }
  },
- "ModuleKey": {
-  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
- },
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_item",
   "type": "object",
@@ -1371,78 +1253,6 @@
    "PROCUREMENT_RECEIVE"
   ]
  },
- "Plan": {
-  "x-ticvai-persistence": "subscription.plan + subscription.plan_module + subscription.plan_limit",
-  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `subscription.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreatePlanRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "id",
-     "version",
-     "isActive",
-     "subscriberCount"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "version": {
-      "type": "string",
-      "description": "Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n"
-     },
-     "isActive": {
-      "type": "boolean"
-     },
-     "subscriberCount": {
-      "type": "integer"
-     },
-     "publishedAt": {
-      "type": "string",
-      "format": "date-time"
-     }
-    }
-   }
-  ]
- },
- "PlanRequestLimits": {
-  "type": "object",
-  "nullable": true,
-  "x-ticvai-persistence": "none — embedded in subscription.plan as its request_limits jsonb column",
-  "description": "**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default**, which starts at twice the tenant's expected peak from its sizing tier (`handoff/sizing.json` venue tiers) and is recalibrated after the benchmark and after four weeks of production. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.",
-  "properties": {
-   "guest": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "staff": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "service": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "partner": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "replicaSharePercent": {
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 100,
-    "default": 25,
-    "description": "The most of one replica's request slots one tenant may hold while the share is enforced."
-   },
-   "shareEnforcedAbovePercent": {
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 100,
-    "default": 70,
-    "description": "The replica load, as a percent of its limit, above which the share is enforced."
-   }
-  }
- },
  "PlatformStaffGrant": {
   "type": "object",
   "x-ticvai-persistence": "identity.platform_staff_grant",
@@ -1594,125 +1404,6 @@
    "expiresAt": {
     "type": "string",
     "format": "date-time"
-   }
-  }
- },
- "SuspensionMode": {
-  "type": "string",
-  "description": "Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n",
-  "enum": [
-   "readOnly",
-   "noNewSales",
-   "fullLockout"
-  ]
- },
- "Tenant": {
-  "x-ticvai-persistence": "control.tenant",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name",
-   "status",
-   "createdAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "status": {
-    "$ref": "#/components/schemas/TenantStatus"
-   },
-   "suspensionMode": {
-    "$ref": "#/components/schemas/SuspensionMode"
-   },
-   "suspensionReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "suspensionEffectiveAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
-   },
-   "suspensionNoticeMessage": {
-    "$ref": "#/components/schemas/LocalisedText",
-    "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
-   },
-   "terminationScheduledAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "When `terminateTenant` started the retention window. Null when no termination is under way."
-   },
-   "terminationRetentionUntil": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."
-   },
-   "terminationReason": {
-    "type": "string",
-    "maxLength": 1000,
-    "nullable": true
-   },
-   "terminationRequestedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "planId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "planName": {
-    "type": "string",
-    "nullable": true
-   },
-   "cellCount": {
-    "type": "integer"
-   },
-   "venueCount": {
-    "type": "integer"
-   },
-   "regionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"
-   },
-   "billingEmail": {
-    "type": "string"
-   },
-   "billingAddress": {
-    "type": "string",
-    "maxLength": 500,
-    "nullable": true,
-    "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
-   },
-   "accountManagerPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "activatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
    }
   }
  },
@@ -1918,16 +1609,6 @@
     }
    }
   }
- },
- "TenantStatus": {
-  "type": "string",
-  "enum": [
-   "onboarding",
-   "active",
-   "suspended",
-   "terminating",
-   "terminated"
-  ]
  },
  "Theme": {
   "x-ticvai-persistence": "none — embedded in tenant_config",

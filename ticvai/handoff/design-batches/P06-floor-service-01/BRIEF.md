@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -56,21 +57,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `EMP-051` | Restaurant Service Command Center | listDetail | 3 | 0 | — |
-| `EMP-052` | Floor Plan & Table Map | statusTracker | 2 | 1 | — |
-| `EMP-053` | Table & Seating Configuration | configEditor | 4 | 0 | — |
-| `EMP-054` | Reservation Calendar & Timeline | listDetail | 1 | 0 | — |
-| `EMP-055` | Create / Edit Reservation | configEditor | 2 | 1 | — |
-| `EMP-056` | Walk-In & Waitlist Management | configEditor | 2 | 1 | — |
-| `EMP-057` | Guest Profile & Dining History | listDetail | 5 | 2 | — |
-| `EMP-058` | Live Table & Service Management | configEditor | 17 | 14 | — |
-| `EMP-059` | Table Order, Bill & Payment Management | statusTracker | 8 | 7 | — |
-| `EMP-060` | Reservation & Table Performance | listDetail | 2 | 0 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `EMP-051` | Restaurant Service Command Center | B–D | 3 | 41 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `EMP-052` | Floor Plan & Table Map | B–D | 11 | 3 | 5 | 2 | 6 | 1 | — | notStarted (generated) |
+| `EMP-053` | Table & Seating Configuration | B–D | 17 | 0 | 5 | 1 | 1 | 6 | — | notStarted (generated) |
+| `EMP-054` | Reservation Calendar & Timeline | B–D | 3 | 46 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-055` | Create / Edit Reservation | B–D | 32 | 0 | 5 | 4 | 2 | 0 | — | notStarted (generated) |
+| `EMP-056` | Walk-In & Waitlist Management | B–D | 21 | 0 | 5 | 7 | 1 | 0 | — | notStarted (generated) |
+| `EMP-057` | Guest Profile & Dining History | B–D | 13 | 33 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
+| `EMP-058` | Live Table & Service Management | B–D | 74 | 15 | 5 | 17 | 4 | 1 | — | notStarted (generated) |
+| `EMP-059` | Table Order, Bill & Payment Management | B–D | 51 | 8 | 5 | 16 | 2 | 1 | — | notStarted (generated) |
+| `EMP-060` | Reservation & Table Performance | B–D | 3 | 29 | 6 | 1 | 0 | 1 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

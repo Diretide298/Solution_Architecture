@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -56,21 +57,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `EMP-031` | Queue monitor | listDetail | 8 | 3 | — |
-| `EMP-032` | Manual wait entry | listDetail | 5 | 1 | — |
-| `EMP-033` | Capacity view | listDetail | 6 | 4 | — |
-| `EMP-034` | Walk-up sale | listDetail | 23 | 13 | — |
-| `EMP-025` | Break management | listDetail | 2 | 1 | — |
-| `EMP-026` | Incident report | listDetail | 5 | 3 | — |
-| `EMP-027` | Incident detail | listDetail | 3 | 1 | — |
-| `EMP-028` | Lost & found | listDetail | 7 | 5 | — |
-| `EMP-029` | Guest assistance | listDetail | 12 | 8 | — |
-| `EMP-030` | Venue map | listDetail | 4 | 0 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `EMP-031` | Queue monitor | B–D | 10 | 56 | 6 | 19 | 1 | 6 | — | notStarted (generated) |
+| `EMP-032` | Manual wait entry | B–D | 4 | 56 | 6 | 6 | 1 | 0 | — | notStarted (generated) |
+| `EMP-033` | Capacity view | B–D | 24 | 30 | 6 | 14 | 0 | 0 | — | notStarted (generated) |
+| `EMP-034` | Walk-up sale | B–D | 144 | 87 | 6 | 110 | 1 | 0 | — | notStarted (generated) |
+| `EMP-025` | Break management | B–D | 9 | 27 | 6 | 4 | 2 | 0 | — | notStarted (generated) |
+| `EMP-026` | Incident report | B–D | 31 | 44 | 6 | 10 | 1 | 0 | — | notStarted (generated) |
+| `EMP-027` | Incident detail | B–D | 11 | 44 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `EMP-028` | Lost & found | B–D | 32 | 44 | 6 | 13 | 1 | 0 | — | notStarted (generated) |
+| `EMP-029` | Guest assistance | B–D | 60 | 72 | 6 | 23 | 1 | 0 | — | notStarted (generated) |
+| `EMP-030` | Venue map | B–D | 2 | 38 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

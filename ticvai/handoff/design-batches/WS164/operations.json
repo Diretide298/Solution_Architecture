@@ -208,45 +208,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listMemberExceptionOverride": {
-  "method": "GET",
-  "path": "/member-exception-override",
-  "contract": "subscription",
-  "summary": "Member Exceptions, Overrides & Service Recovery",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "exceptionType",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "approvalStatus",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "membershipId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listResourceCosts": {
   "method": "GET",
   "path": "/resource-costs",
