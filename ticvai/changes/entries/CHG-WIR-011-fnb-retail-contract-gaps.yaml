@@ -11,7 +11,8 @@ decision:
   quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
 why: Design-note corrections for fnb-retail (handoff/design-notes/fnb-retail.yaml) name operations that do not exist;
   the brief for the wiring fixes (Chinmay, 2 October 2026) says to log such a gap as an open contract-gap change
-  and not invent the operation.
+  and not invent the operation. Each gap cites its correction below; the class is the audit's A28 missing-operation
+  class (R254 re-derivation exposed these).
 keys_touched:
   screens:
   - BO-065

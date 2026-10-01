@@ -10,8 +10,9 @@ decision:
   date: '2026-10-02'
   quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
 why: 'Design-note corrections for ticketing-backoffice (handoff/design-notes/ticketing-backoffice.yaml): the purposes
-  were generator templates, board titles with their date, or text copied from another screen; a designer cannot
-  act on them. The old text is kept in each screen''s purposeNote.'
+  were generator templates, board titles with their date, or text copied from another screen (the boilerplate the
+  26 September audit traced under R250 and R260); a designer cannot act on them. Each screen''s correction is cited
+  below. The old text is kept in each screen''s purposeNote.'
 keys_touched:
   screens:
   - ADM-110
