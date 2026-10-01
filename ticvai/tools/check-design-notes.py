@@ -54,7 +54,12 @@ RULE_LISTS = ("inputs", "outputs", "actions", "edgeCases", "corrections", "openQ
 
 
 def _load(path: pathlib.Path):
-    return yaml.load(path.read_text(encoding="utf-8"), Loader=LOADER)
+    text = path.read_text(encoding="utf-8")
+    try:
+        return yaml.load(text, Loader=LOADER)
+    except yaml.YAMLError:
+        # libyaml rejects escaped surrogate pairs (contracts/satellite/subscription.yaml); the pure-Python loader reads them
+        return yaml.load(text, Loader=yaml.SafeLoader)
 
 
 class Index:
