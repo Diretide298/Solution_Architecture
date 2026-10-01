@@ -1033,6 +1033,14 @@ paths:
         Where the venue requires approval on close, the shift waits in `pendingClosure` for
         `approveShiftClose` (SHIFT_APPROVE_CLOSE).
 
+        **The cashier never sees the expected cash** (decided 2 October 2026, Chinmay; CHG-FIN-003).
+        This response carries `expectedCash` and `variance`, so it is the **supervisor and back-office
+        close** (BO-039, BO-040: closing a shift on a cashier's behalf). A cashier counting their own
+        drawer at the till or on the staff app submits the count with `submitShiftCount`, which returns
+        neither figure. A caller closing a shift they opened themselves, without OVERSHORT_ACCEPT, is
+        refused 403 `blind-count-required`. Retail practice and the client's reason are in
+        docs/active/research-uae-vat-and-blind-close-2-october.md (MoM 9 Sep 2026 4.18, DI-271, DI-806).
+
         **Online only** (F32, 26 September pull audit R257). Closing needs the server's total — a
         variance computed against a stale local journal is not a variance — and POS-007 and
         `states/shift.yaml` (`pendingClosure` is not offline-reachable) already said so.
@@ -1058,6 +1066,15 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ShiftCloseResult' }
+        '403':
+          description: >
+            The caller is the cashier whose shift it is and does not hold OVERSHORT_ACCEPT (problem
+            type `blind-count-required`): their count goes through `submitShiftCount`, which never
+            returns the expected figure (CHG-FIN-003).
+          x-ticvai-problem-types: [blind-count-required]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
@@ -1150,6 +1167,81 @@ paths:
           description: >
             Shift is not `pendingVariance` (problem type `shift-not-pending-variance`) — within
             tolerance, still open, or already accepted.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /shifts/{shiftId}/count:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: submitShiftCount
+      x-ticvai-audience: [staff]
+      summary: The cashier's blind count, closing their own shift
+      description: >
+        **Blind close: the cashier never sees the expected cash** (decided 2 October 2026, Chinmay;
+        CHG-FIN-003; MoM 12 Aug 2026 section 19, DI-271; MoM 9 Sep 2026 4.18, DI-803 to DI-806). The
+        cashier counts the drawer by denomination and submits it. The server measures the count against
+        the expected figure (opening float + cash takings − cash refunds paid out + float entries −
+        lifts and withdrawals, `Shift.liftsTotal`) and records the variance, **and returns neither the
+        expected figure nor the variance, nor whether the drawer is over or short**. The receipt says
+        only what happens next: `closed` (within the venue's `shiftVarianceThreshold`),
+        `referredToSupervisor` (beyond it: the shift is `pendingVariance`) or `awaitingCloseApproval`
+        (the venue supervises every close: `pendingClosure`).
+
+        **The variance goes to the supervisor, not the cashier.** Beyond the threshold an alert is
+        raised to the supervisors holding OVERSHORT_ACCEPT at the venue, on the venue's alerting
+        channel (`tenancy.VenueSettings.alerting`); the shift appears on BO-040 and on the till's
+        exceptions list (POS-020) for a supervisor, and the supervisor sees counted, expected and
+        variance there (`getShift`, `closeShift`, `acceptShiftVariance`). The cashier may give a
+        reason and a note with the count (`cashierReason`, `notes`; DI-803) without being told the
+        amount. **A recount the supervisor asks for** (DI-804) is submitted the same way from
+        `pendingVariance`; every count is kept (`CashCountLine`, `countKind` close) and the latest
+        is the one measured.
+
+        `Shift.expectedCash` and `Shift.variance` stay null to the shift's own cashier on every read;
+        they are returned to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.
+
+        Online only, as `closeShift`: the expected figure is the server's.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_CLOSE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CloseShiftRequest' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Count recorded; the receipt says what happens next and nothing about the variance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShiftCountReceipt' }
+        '403':
+          description: >
+            The shift is not the caller's own (problem type `not-shift-operator`): a supervisor closing
+            somebody else's shift uses `closeShift` (SHIFT_CLOSE_OTHER).
+          x-ticvai-problem-types: [not-shift-operator]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: >
+            The shift is neither `open`, `suspended` nor `pendingVariance` (problem type
+            `shift-not-countable`).
+          x-ticvai-problem-types: [shift-not-countable]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1726,7 +1818,20 @@ components:
             properties:
               tender: { type: string }
               amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        notes: { type: string, maxLength: 1000 }
+        notes:
+          type: string
+          maxLength: 1000
+          description: >
+            The cashier's note on the count. Asked of every cashier on a blind count, never only
+            after a variance is shown (CHG-FIN-003, DI-803).
+        cashierReason:
+          type: string
+          nullable: true
+          enum: [tillError, unrecordedRefund, miscount, other]
+          description: >
+            Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund,
+            miscount, other). Optional and given without seeing the variance (CHG-FIN-003); the
+            supervisor reads it beside the variance on BO-040.
         releaseHeldLeases:
           type: boolean
           default: true
@@ -1766,6 +1871,30 @@ components:
               declared: { $ref: '../shared/common.yaml#/components/schemas/Money' }
               captured: { $ref: '../shared/common.yaml#/components/schemas/Money' }
               variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    ShiftCountReceipt:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      description: >
+        **What `submitShiftCount` returns to the cashier: what happens next, never the figure**
+        (CHG-FIN-003). No expected cash, no variance, no over or short.
+      required: [shiftId, status, outcome, countedAt]
+      properties:
+        shiftId: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/ShiftStatus' }
+        outcome:
+          type: string
+          enum: [closed, referredToSupervisor, awaitingCloseApproval]
+          description: >
+            `closed`: within the venue's threshold, the shift is closed. `referredToSupervisor`: a
+            supervisor reviews the count (`pendingVariance`); the till says "Your count is with your
+            supervisor" and nothing about the amount. `awaitingCloseApproval`: the venue supervises
+            every close (`pendingClosure`).
+        countedAt: { type: string, format: date-time }
+        countNumber:
+          type: integer
+          minimum: 1
+          description: 1 for the first count of the close, 2 for a recount the supervisor asked for, and so on.
 
     Shift:
       x-ticvai-persistence: "orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident"
@@ -1857,6 +1986,8 @@ components:
             revealed once the count is in — null until then. Until this date only
             `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show
             the over/short it exists to accept.
+            **Null to the shift's own cashier on every read** (CHG-FIN-003, 2 October): returned only to
+            a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.
         countedCash:
           x-ticvai-column: counted_cash_amount
           allOf:
@@ -1871,6 +2002,7 @@ components:
           readOnly: true
           nullable: true
           description: Counted minus expected, as `ShiftCloseResult.variance`. Negative is short.
+            Null to the shift's own cashier, as `expectedCash` (CHG-FIN-003).
         heldLeaseCount:
           type: integer
           description: >

@@ -80,6 +80,9 @@ paths:
         audit R282).** Code, what it shows, its data source, and the screen that runs it:
 
         - `terminalDayView`: sales, tenders, voids and refunds for one terminal today (`orders`); POS-008.
+        **Its cash-tender figures are withheld from the cashier of an open shift** (CHG-FIN-003, 2 October
+        2026): float plus cash takings is the expected drawer, so showing them would undo the blind count.
+        What else a cashier sees of it is the per-role switch of DI-802.
 
         - `salesByChannel`: net sales per sales channel for the period (`orders`); BO-059.
 
@@ -87,7 +90,8 @@ paths:
         (`scanEvents`); BO-060.
 
         - `shiftSummary`: each till shift''s takings, expected against counted cash, and variance
-        (`shifts`); POS-020.
+        (`shifts`); POS-020. **Supervisors only**: the expected and variance columns need OVERSHORT_ACCEPT
+        at the venue and are never shown to the cashier whose shift it is (CHG-FIN-003).
 
         - `refunds`: refunds by reason, operator and tender (`refunds`).
 
@@ -99,6 +103,15 @@ paths:
         - `fnbSales`: F&B sales by outlet, item and hour (`orderLines`, F&B outlets only).
 
         Each is run with `runReport` naming its `reportId`; a screen that runs a report names which.
+
+        **One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721,
+        DI-702). Analytics (P16) is the reporting area. The till reports (POS-008, POS-020) and the
+        back-office report screens (BO-058, BO-059, BO-060, BO-1081 and the module report screens) are
+        scoped windows onto the same seeded definitions and the same seeded KPIs (`ReportingSystemKpi`),
+        run by `runReport` and `getKpiValues` against the same replica: a figure on a till or a back-office
+        screen is the figure Analytics shows for the same scope, period and as-of time. A screen never
+        computes a total of its own from another read, and a module never keeps a second definition of
+        a measure.
 
         '
       tags:
@@ -1448,6 +1461,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A tile's report lacks the column encodings its visualisation needs (problem type
+            `tile-encoding-missing`, CHG-FIN-007; the rule is on `DashboardTile.visualisation`).
+          x-ticvai-problem-types:
+          - tile-encoding-missing
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dashboards/{dashboardId}:
@@ -1555,6 +1577,15 @@ paths:
             check.
 
             '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A tile's report lacks the column encodings its visualisation needs (problem type
+            `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`.
+          x-ticvai-problem-types:
+          - tile-encoding-missing
           content:
             application/problem+json:
               schema:
@@ -2067,10 +2098,18 @@ paths:
 
         **Takings and admissions are always offered (decided 28 September, audit R283).** Two system KPIs
         are seeded at provisioning for every tenant, so a hub can ask for them by code without knowing
-        an id: `takings`, the gross value of payments taken in the period (currency, from `orders`
-        payments less refunds), and `admissions`, admitted in-direction scans in the period (count, from
-        `access.scan_event`). With no `period`, the period is today in the venue''s time zone. The
-        back-office hubs and the Queue Monitor read their takings and admissions tiles here.
+        an id: `takings`, the money taken in the period less the money paid back (currency; defined in
+        `ReportingSystemKpi`, CHG-FIN-010), and `admissions`, admitted in-direction scans in the period
+        (count, from `access.scan_event`). With no `period`, the period is today in the venue''s time zone.
+        The back-office hubs and the Queue Monitor read their takings and admissions tiles here.
+        **Takings is not revenue** and never feeds a Gross sales, Net revenue, Recognised revenue or
+        Deferred revenue tile (CHG-FIN-002).
+
+        **The finance measures are seeded too** (decided 2 October 2026, Chinmay; CHG-FIN-007):
+        `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue` and
+        `taxCollected`, each with its formula in `ReportingSystemKpi`. The formulas follow the D-185
+        default (gross sales excluding VAT; net revenue is gross sales less discounts less refunds);
+        **client finance sign-off is pending**.
 
 
         **Accreditation KPIs are seeded too, where the accreditation module is on** (12.1.50, 29 September,
@@ -2789,7 +2828,14 @@ components:
 
         | Code | Unit | Source | Seeded for |
         |---|---|---|---|
-        | `takings` | currency | `orders` payments less refunds in the period | every tenant (R283) |
+        | `takings` | currency | **Money taken through the tills and channels, less money paid back** (CHG-FIN-010, 2 October 2026): captured `orders.payment.amount` (base currency) in the period less completed `orders.refund.amount` in the period, by tender; `groupBy=tender`, `workstationId` or `shiftId`. **A cash-control measure, not revenue**: it includes VAT, deposits and gift-card sales, and it is what a drawer and a settlement are reconciled against. For one shift, cash takings + opening float + float entries − lifts is the expected drawer, which the cashier never sees (CHG-FIN-003) | every tenant (R283) |
+        | `grossSales` | currency | Sales at the price before discounts, **excluding VAT**: the sum of `orders.order_line.net_amount` plus its `orders.order_line_discount.amount`, on orders paid in the period (D-185 default; CHG-FIN-007) | every tenant |
+        | `discounts` | currency | The sum of `orders.order_line_discount.amount` on orders paid in the period, excluding VAT (CHG-FIN-007) | every tenant |
+        | `refunds` | currency | Completed `orders.refund.amount` in the period less the tax it reversed (`taxReversalEntryId`), excluding VAT (CHG-FIN-007) | every tenant |
+        | `netRevenue` | currency | `grossSales` − `discounts` − `refunds` (D-185 default, BOARDREQ MOM-2760; client finance sign-off pending; CHG-FIN-007) | every tenant |
+        | `recognisedRevenue` | currency | Credits less debits of `ledger.journal_line` on `revenue` accounts posted in the period: what the recognition rules (`RecognitionMethod`) released, POS sales on the day, tickets on the visit (CHG-FIN-007) | every tenant |
+        | `deferredRevenue` | currency | The balance of the deferred-revenue liability accounts at period end (`finance.getDeferredRevenue`): paid and not yet recognised (CHG-FIN-007) | every tenant |
+        | `taxCollected` | currency | Output tax: `orders.order_line.tax_amount` on orders paid in the period less the tax reversed by refunds completed in it; labelled with the jurisdiction''s tax name (VAT in the UAE) (CHG-FIN-007) | every tenant |
         | `admissions` | count | admitted in-direction `access.scan_event` in the period | every tenant (R283) |
         | `accreditationApplications` | count | `accreditation.application` submitted in the period; `groupBy=status` gives applications by status | accreditation module (12.1.50) |
         | `accreditationTimeToDecision` | duration | mean `decided_at` minus `submitted_at` of `accreditation.application` decided in the period (`higherIsBetter` false) | accreditation module |
@@ -2802,10 +2848,22 @@ components:
         dashboard; the formula and source are the platform''s, so *time to decision* means the same thing on
         every screen that shows it.
 
+        **Labels are fixed with the measures** (decided 2 October 2026, Chinmay; CHG-FIN-002): Takings,
+        Gross sales, Discounts, Refunds, Net revenue, Recognised revenue, Deferred revenue, VAT (or the
+        jurisdiction''s tax name). **Never a bare "Revenue"** on a tile, a column or a chart axis; a
+        tile bound to one of these KPIs takes its label from the KPI.
+
         '
       enum:
       - takings
       - admissions
+      - grossSales
+      - discounts
+      - refunds
+      - netRevenue
+      - recognisedRevenue
+      - deferredRevenue
+      - taxCollected
       - accreditationApplications
       - accreditationTimeToDecision
       - accreditationCredentialsIssued
@@ -3655,7 +3713,23 @@ components:
       - accreditationActiveHolders
       - accreditationRenewalsDue
       - staffingShortfall
+      - grossSales
+      - discounts
+      - refunds
+      - netRevenue
+      - recognisedRevenue
+      - deferredRevenue
+      - taxCollected
+      - takings
       x-ticvai-money-valued:
+      - grossSales
+      - discounts
+      - refunds
+      - netRevenue
+      - recognisedRevenue
+      - deferredRevenue
+      - taxCollected
+      - takings
       - inventoryValuation
       - resaleCommission
       - revenuePerEntitlement
@@ -3698,6 +3772,11 @@ components:
         `challengeCompletionRate` and `attributedRevenue`.
 
         '
+      x-ticvai-extended-2-october: '**Eight finance measures added 2 October 2026** (Chinmay; CHG-FIN-007,
+        CHG-FIN-010), each with the source and formula of the seeded KPI of the same code in
+        `ReportingSystemKpi`: `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`,
+        `deferredRevenue`, `taxCollected` and `takings`, so an alert rule can watch them (a refund spike,
+        takings below a target). Formulas are the D-185 default; client finance sign-off is pending.'
       x-ticvai-money-valued-note: '**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not
         listed because the package does not say whether they count sales or sum their value.** Until
         that is decided, a rule on them carries a plain number.
@@ -3888,6 +3967,66 @@ components:
         format:
           type: string
           nullable: true
+        role:
+          type: string
+          nullable: true
+          enum:
+          - dimension
+          - measure
+          description: '**What the column is to a chart** (decided 2 October 2026, Chinmay; CHG-FIN-007).
+            A `dimension` groups (date, venue, channel, product); a `measure` is aggregated (sum of net
+            revenue, count of admissions). Null on a column only a table shows.'
+        encoding:
+          type: string
+          nullable: true
+          enum:
+          - category
+          - x
+          - y
+          - series
+          - value
+          - size
+          - colour
+          - location
+          - stage
+          - source
+          - target
+          - row
+          - column
+          - hierarchyLevel
+          - label
+          - tooltip
+          description: '**Which field well the column fills** (CHG-FIN-007), the binding the twenty marks
+            of `DashboardTile.visualisation` need. The per-mark rule is on that field.'
+        axis:
+          type: string
+          nullable: true
+          enum:
+          - primary
+          - secondary
+          description: For a measure on a `combo`, the axis it is drawn against. A secondary axis needs
+            its own `unitLabel` (CHG-FIN-007).
+        seriesType:
+          type: string
+          nullable: true
+          enum:
+          - bar
+          - line
+          - area
+          description: For a measure on a `combo`, how that series is drawn (CHG-FIN-007).
+        hierarchyLevel:
+          type: integer
+          nullable: true
+          minimum: 1
+          description: For `matrix` rows and columns, `treemap` nesting and `decompositionTree` levels, the
+            depth of this dimension, 1 outermost. Levels must follow a real hierarchy (DI-709), for example
+            year, month, day, or region, venue, outlet (CHG-FIN-007).
+        unitLabel:
+          type: string
+          nullable: true
+          maxLength: 40
+          description: The unit an axis states, for example "AED" or "Admissions". Required on a secondary
+            axis (CHG-FIN-007).
     ReportFilter:
       x-ticvai-persistence: reporting.report_filter
       type: object
@@ -4531,13 +4670,32 @@ components:
             cohort: '**Not one of the eighteen.** It appears once in the source as a *usage* — *"the
               Customer & Membership dashboard shall use cards, cohort and trend charts"* — never as a
               specified component. A cohort view is a `matrix` or `heatmap` over a cohort dimension.'
-          x-ticvai-note: '**These marks cannot yet bind data.** `ReportColumn` carries `field`,
-            `label`, `aggregation` and `format` and **no encoding role** — no axis, series, size or
-            colour. A `number` needs none and an eight-mark enum survived without one; a `scatter`
-            needs x, y, size and colour, and a `combo` needs a secondary axis with stated units.
-            **Adding `ReportColumn.role` is the harder half of this decision and is deliberately not
-            made here** — it is the field-wells model the source''s builder specifies, and it belongs
-            with the engine and semantic-layer split that needs an ADR first.
+          x-ticvai-note: '**The marks bind through the report''s column encodings** (decided 2 October 2026,
+            Chinmay; CHG-FIN-007: build the nine). Superseding the note of 22 September, which left
+            `ReportColumn.role` undecided. Each column of the tile''s report carries `role` and
+            `encoding` (and `axis`, `seriesType`, `hierarchyLevel`, `unitLabel` where the mark needs them),
+            and `createDashboard` / `updateDashboard` refuse 422 `tile-encoding-missing` a tile whose report
+            lacks what its mark requires:
+
+
+            | Mark | Requires |
+            |---|---|
+            | `combo` | one `x` dimension; two or more measures, each with `axis` and `seriesType`; `unitLabel` on a secondary axis |
+            | `matrix` | `row` dimensions (with `hierarchyLevel`), optional `column` dimensions, one or more `value` measures |
+            | `funnel` | one `stage` dimension in order (`sortOrder`), one `value` measure |
+            | `waterfall` | one `category` dimension of ordered steps, one `value` measure; the steps are a named measure set (for example Gross sales, Discounts, Refunds, Net revenue) and the last is the total |
+            | `treemap` | one or more `category` dimensions with `hierarchyLevel`, one `size` measure, optional `colour` measure |
+            | `scatter` | an `x` and a `y` measure, a `label` dimension, optional `size` and `colour` |
+            | `map` | one `location` dimension (venue, zone or venue-map point), one `value` measure |
+            | `ribbon` | an `x` dimension (period), a `series` dimension, one `value` measure (rank flow) |
+            | `decompositionTree` | one `value` measure and two or more dimensions with `hierarchyLevel` |
+
+
+            The other eleven marks bind as before (`number` one measure; `line`, `area`, `bar` and the
+            stacked bars an `x` dimension, optional `series`, one or more `y` measures; `pie`, `donut`,
+            `gauge`, `heatmap`, `table` as their names). **Unchanged**: at most 24 tiles a dashboard, and every
+            tile shows its as-of time and goes stale past its refresh (`KpiValue.asOf`, `stale`;
+            BOARDREQ MOM-2713/2714).
 
             '
         parameters:

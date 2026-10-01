@@ -1644,6 +1644,8 @@ ledger.journal_entry,via postOrderRevenue,platform.idempotency_record,ambient,li
 ledger.journal_entry,via postOrderRevenue,platform.outbox,ambient,lineage,yes,
 ledger.journal_entry,via runFxRevaluation,ledger.posting,ambient,lineage,,
 ledger.journal_entry,via runRecognition,ledger.posting,ambient,lineage,,
+ledger.journal_entry,via submitShiftCount,orders.cash_count_line,ambient,lineage,yes,
+ledger.journal_entry,via submitShiftCount,orders.pos_shift,ambient,lineage,yes,
 ledger.journal_line,account_id,ledger.account,reference,convention,,
 ledger.journal_line,cost_center_id,ledger.cost_center,reference,convention,,
 ledger.journal_line,journal_entry_id,ledger.journal_entry,reference,declared,,yes
@@ -2292,6 +2294,7 @@ orders.reservation_line,recommendation_id,orders.resale_recommendation,reference
 orders.reservation_line,reservation_id,orders.reservation,child,declared,,yes
 orders.reservation_line,resource_hold_id,resources.resource_hold,reference,convention,yes,
 orders.reservation_line,variant_id,catalogue.variant,reference,convention,yes,
+orders.sales_order,charge_fx_rate_id,ledger.fx_rate,reference,convention,yes,
 orders.sales_order,principal_id,identity.principal,reference,declared,yes,
 orders.sales_order,shift_id,orders.pos_shift,reference,declared,,
 orders.sales_order,subject_id,pii.subject,reference,declared,yes,
