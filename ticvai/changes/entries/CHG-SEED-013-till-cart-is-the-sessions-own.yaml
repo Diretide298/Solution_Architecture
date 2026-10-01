@@ -35,6 +35,7 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-subject.py
-status: open
+status: closed
+closed_by_commit: 820e47d3
 notes: 'check-contract-compat: additive against r1. The cart descriptions reach the handoffs and ticket text at
   the next refresh (refresh-safe).'

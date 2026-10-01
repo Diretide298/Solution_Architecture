@@ -32,7 +32,8 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-cited-sources.py
-status: open
+status: closed
+closed_by_commit: 820e47d3
 notes: 'check-cited-sources (gating) reads docs/registers, docs/active, docs/adr, changes/entries, handoff/design-inputs
   and CLAUDE.md. The findings older than this change (other documents citing audit/ working files, renamed files,
   and sources/designs/TICVAI_POS_Terminal_v2.html, which .git/info/exclude keeps out of git) are its baseline in
