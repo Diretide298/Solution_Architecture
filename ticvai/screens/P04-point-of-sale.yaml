@@ -347,7 +347,6 @@ screens:
       escalatable: true
       carries:
       - shiftId
-      - expectedCash
       - cashMovements
       provenance: board TICVAI POS Terminal · goClose (4891); flow F32 step 6
     - to: POS-009
@@ -430,7 +429,19 @@ screens:
     Opening Float Management; Shift Opening & Login. **Owns POS board frame(s) POS-2A, POS-3D** (client
     pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts
     at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse
-    off than one who has none.'
+    off than one who has none.
+
+
+    **Blind close (decided 2 October 2026, Chinmay; CHG-FIN-003).** The cashier never sees the expected
+    cash: not while counting, not after submitting, not as a sales or takings total from which it could
+    be worked out (MoM 12 Aug 2026 section 19, DI-271; MoM 9 Sep 2026 4.18, DI-806: "if a cashier knew
+    they had a small surplus, they could pocket it"). The count is submitted with `submitShiftCount`,
+    which answers only what happens next (closed, with your supervisor, or awaiting close approval); the
+    variance alerts the supervisors on the venue''s alerting channel and appears on BO-040. The cashier
+    may add a reason and a note with every count (DI-803). A recount the supervisor asks for is counted
+    blind again (DI-804). Retail practice: docs/active/research-uae-vat-and-blind-close-2-october.md.
+    On this screen: the edge to POS-007 no longer carries `expectedCash`, the shift panels no longer show
+    sales, refunds or lifts totals, and closing goes through POS-007''s blind count.'
   density: touchLarge
   boardFrames:
   - POS Board 3.dc.html#pos-3d
@@ -554,9 +565,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getShift
         provenance: contract shift.yaml GET /shifts/{shiftId}
       - kind: detailPanel
@@ -582,9 +590,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getCurrentShift
         provenance: contract shift.yaml GET /shifts/current
     - name: actionBar
@@ -598,13 +603,14 @@ screens:
         label: Accept shift variance
         operation: acceptShiftVariance
         provenance: contract shift.yaml POST /shifts/{shiftId}/accept-variance
+        permission: OVERSHORT_ACCEPT
       - kind: secondaryButton
         label: Approve shift open
         operation: approveShiftOpen
         provenance: contract shift.yaml POST /shifts/{shiftId}/approve-open
       - kind: destructiveButton
         label: Close shift
-        operation: closeShift
+        operation: submitShiftCount
         provenance: contract shift.yaml POST /shifts/{shiftId}/close
       - kind: secondaryButton
         label: Create cash movement
@@ -648,14 +654,14 @@ screens:
     provenance: client-verified
     confirm:
       label: Close the shift
-      operation: closeShift
-      carries: &id003
+      operation: submitShiftCount
+      carries: &id006
       - shiftId
       - countedFloat
       - varianceReason
     dismiss:
       label: Not yet
-      discards: &id004 []
+      discards: &id003 []
     bindsTo: CloseShiftRequest
   - id: confirmSuspendShift
     component: confirmDialog
@@ -667,11 +673,11 @@ screens:
     confirm:
       label: Suspend
       operation: suspendShift
-      carries: &id005
+      carries: &id004
       - shiftId
     dismiss:
       label: Cancel
-      discards: &id006 []
+      discards: &id005 []
   - id: formOpenShift
     component: modal
     trigger: Open shift
@@ -848,9 +854,10 @@ screens:
     trigger: onAction
     invalidates:
     - listCashMovements
-  - operationId: closeShift
+  - operationId: submitShiftCount
     contract: shift
-    purpose: Blind close-out
+    purpose: 'The cashier''s blind count: returns closed, with the supervisor or awaiting approval, never
+      the expected cash (CHG-FIN-003)'
     trigger: onAction
     invalidates:
     - listCashMovements
@@ -3323,7 +3330,13 @@ screens:
     till does not navigate to a back office and a guest app does not navigate to either** — those are
     device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there
     is a link. **Reaches the counter screens from 24 August.** **A till has one tender flow, not one per
-    module** — a food order and a ticket both settle here and return to whichever board they came from.'
+    module** — a food order and a ticket both settle here and return to whichever board they came from.
+
+
+    **Receipt** (CHG-FIN-011): the receipt printed or emailed on payment is the simplified tax invoice
+    titled "Tax Invoice", issued automatically when the order is paid (POS-026). Foreign cash tendered
+    here is recorded at its base equivalent and change is given in base currency (DI-282, unchanged by
+    CHG-FIN-001).'
   density: touchLarge
   boardFrames:
   - Retail Board 3.dc.html#ret-3e
@@ -4409,23 +4422,20 @@ screens:
       trigger: Close and sign out
       control: primaryButton#lockShift
       precondition: closeStep == 'summary'
-      operation: closeShift
+      operation: submitShiftCount
       carries:
       - shiftId
       - countedCash
-      - variance
       discards:
       - cart
       - guest
       - table
       - discount
       onFailure:
-      - when: requiresAcceptance
+      - when: referredToSupervisor
         to: POS-007#pendingVariance
-        note: '**No pre-close PIN hold** (decided 28 September, audit R080 (e)). `closeShift` is submitted
-          with the blind count; when `ShiftCloseResult.requiresAcceptance` is true the shift is `pendingVariance`
-          and a supervisor accepts it on this till with `acceptShiftVariance` (OVERSHORT_ACCEPT, PIN step-up),
-          the only path for a variance. The expected figure is never shown before the count (blindCount).'
+        note: '`submitShiftCount` answered `referredToSupervisor`: the shift is `pendingVariance` and
+          the supervisor is alerted; the till shows no amount (CHG-FIN-003; audit R080 (e)).'
       provenance: board TICVAI POS Terminal · signOut (5641) + lockShift (5687); flow F32 step 6
     - to: POS-008
       trigger: The day is reported
@@ -4446,7 +4456,17 @@ screens:
     Management; Shift Closing & Settlements. **Owns POS board frame(s) POS-2F, POS-3F** (client pack,
     24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving
     that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one
-    who has none.'
+    who has none.
+
+
+    **Blind close (decided 2 October 2026, Chinmay; CHG-FIN-003).** The cashier never sees the expected
+    cash: not while counting, not after submitting, not as a sales or takings total from which it could
+    be worked out (MoM 12 Aug 2026 section 19, DI-271; MoM 9 Sep 2026 4.18, DI-806: "if a cashier knew
+    they had a small surplus, they could pocket it"). The count is submitted with `submitShiftCount`,
+    which answers only what happens next (closed, with your supervisor, or awaiting close approval); the
+    variance alerts the supervisors on the venue''s alerting channel and appears on BO-040. The cashier
+    may add a reason and a note with every count (DI-803). A recount the supervisor asks for is counted
+    blind again (DI-804). Retail practice: docs/active/research-uae-vat-and-blind-close-2-october.md.'
   density: touchLarge
   boardFrames:
   - POS Board 3.dc.html#pos-3f
@@ -4459,15 +4479,15 @@ screens:
       count:
         note: Counting the drawer down, denomination by denomination, against the float declared at open.
       summary:
-        operation: closeShift
-        note: The count is entered. `closeShift` submits it; nothing holds the close for a PIN first (audit
-          R080 (e)).
+        operation: submitShiftCount
+        note: 'The count is entered. `submitShiftCount` submits it blind: the till learns only whether
+          the shift closed or went to the supervisor (CHG-FIN-003).'
       pendingVariance:
         operation: acceptShiftVariance
-        note: '**The shift is closed as counted and the over/short is beyond the threshold** (`ShiftCloseResult.requiresAcceptance`).
-          A supervisor holding OVERSHORT_ACCEPT accepts it here on the till with a PIN step-up; the acceptance
-          is recorded against their name. Not the cashier whose shift it is (decided 28 September, audit
-          R080 (e)).'
+        note: '**Counted, and the supervisor has been alerted.** The cashier sees "Your count is with
+          your supervisor" and nothing about the amount. A supervisor holding OVERSHORT_ACCEPT, after
+          a PIN step-up, sees counted, expected and variance and accepts it here or on BO-040, or asks
+          for a recount (counted blind again). Not the cashier whose shift it is (audit R080 (e); CHG-FIN-003).'
     transitions:
     - from: count
       'on': Submit count
@@ -4476,7 +4496,7 @@ screens:
       'on': Back to count
       to: count
     - from: summary
-      'on': closeShift returns requiresAcceptance
+      'on': submitShiftCount returns referredToSupervisor
       to: pendingVariance
       note: Within the threshold the shift closes and the screen leaves for POS-001; beyond it the shift
         is `pendingVariance` (audit R080 (e)).
@@ -4540,13 +4560,15 @@ screens:
         provenance: contract shift.yaml GET /denominations
       - kind: numberField
         label: Counted by denomination
-        notes: '**Blind count.** The expected figure is withheld until submission — a counter who can
-          see the expected total reconciles to it rather than to the drawer'
+        notes: '**Blind count.** Count by denomination; no expected total, no running variance and no
+          takings figure on this screen at any step (CHG-FIN-003). A reason (till error, unrecorded refund,
+          miscount, other) and a note are offered with every count, not only after a variance (DI-803).'
         provenance: carried from the previous definition
       - kind: banner
-        bindsTo: ShiftCloseResult.variance
-        notes: Revealed only after submission. Above the venue threshold the shift is `pendingVariance`
-          and a supervisor accepts it with `acceptShiftVariance` (audit R080 (e))
+        bindsTo: ShiftCountReceipt.outcome
+        notes: 'After submission: "Shift closed" within the venue threshold, or "Your count is with your
+          supervisor" beyond it; never the amount and never over or short (CHG-FIN-003). The supervisor
+          sees the variance only after their own PIN step-up, in the acceptance form.'
         provenance: carried from the previous definition
       - kind: timeline
         notes: No-sale count, manual discounts, voids — the numbers a supervisor reviews
@@ -4591,9 +4613,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getShift
         provenance: contract shift.yaml GET /shifts/{shiftId}
       - kind: detailPanel
@@ -4613,9 +4632,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getCurrentShift
         provenance: contract shift.yaml GET /shifts/current
     - name: actionBar
@@ -4623,12 +4639,15 @@ screens:
       components:
       - kind: destructiveButton
         label: Close shift
-        operation: closeShift
+        operation: submitShiftCount
         provenance: contract shift.yaml POST /shifts/{shiftId}/close
       - kind: secondaryButton
         label: Accept shift variance
         operation: acceptShiftVariance
         provenance: contract shift.yaml POST /shifts/{shiftId}/accept-variance
+        permission: OVERSHORT_ACCEPT
+        notes: Supervisor only, after their PIN step-up on this till; shows counted, expected and variance
+          to them (CHG-FIN-003).
       - kind: secondaryButton
         label: Record no sale
         operation: recordNoSale
@@ -4676,18 +4695,20 @@ screens:
   - id: confirmCloseShift
     component: confirmDialog
     trigger: Close shift
-    body: '**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than
-      the verb. A close shift this affects should be identified in the dialog, not just counted. **Collects
-      what `closeShift` sends before it is called.** Required: `countedCash`, `recordedAt`. Optional:
-      `nonCashDeclared`, `notes`, `releaseHeldLeases`.'
+    body: '**Collects what `submitShiftCount` sends.** Required: `countedCash` (by denomination), `recordedAt`.
+      Optional: `cashierReason`, `notes`, `nonCashDeclared`, `releaseHeldLeases`. Says "Your count is
+      final once submitted" and shows no expected figure (CHG-FIN-003).'
     provenance: client-verified
     confirm:
-      label: Close the shift
-      operation: closeShift
-      carries: *id003
+      label: Submit count
+      operation: submitShiftCount
+      carries:
+      - shiftId
+      - countedFloat
+      - cashierReason
     dismiss:
       label: Not yet
-      discards: *id004
+      discards: *id003
     bindsTo: CloseShiftRequest
   - id: confirmSuspendShift
     component: confirmDialog
@@ -4699,10 +4720,10 @@ screens:
     confirm:
       label: Suspend
       operation: suspendShift
-      carries: *id005
+      carries: *id004
     dismiss:
       label: Cancel
-      discards: *id006
+      discards: *id005
   - id: confirmCloseDepositBoxes
     component: confirmDialog
     trigger: Close deposit boxes
@@ -4874,15 +4895,14 @@ screens:
     denied: '`acceptShiftVariance` was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is
       the cashier whose shift it is. The shift stays `pendingVariance` against the same count, and a supervisor
       accepts it on this till (audit R080 (e)).'
-    pendingVariance: '**Closed as counted, over/short waiting for a supervisor.** `closeShift` returned
-      `requiresAcceptance`; a supervisor holding OVERSHORT_ACCEPT accepts the variance on this till with
-      a PIN step-up. There is no pre-close PIN hold and no approval request (decided 28 September, audit
-      R080 (e)).'
+    pendingVariance: '**Counted; with the supervisor.** `submitShiftCount` answered `referredToSupervisor`.
+      The cashier sees "Your count is with your supervisor" and no amount; the supervisor, after a PIN
+      step-up, accepts the variance or asks for a recount (CHG-FIN-003; audit R080 (e)).'
   apis:
-  - operationId: closeShift
+  - operationId: submitShiftCount
     contract: shift
-    purpose: Submit the blind count; ShiftCloseResult.requiresAcceptance says whether a supervisor must
-      accept the variance
+    purpose: Submit the blind count; the receipt says closed, with the supervisor or awaiting close approval,
+      and never the expected cash or the variance (CHG-FIN-003)
     trigger: onAction
     invalidates:
     - listCashMovements
@@ -5003,6 +5023,8 @@ screens:
         plus every cash transaction') are shown live side by side, which contradicts the YAML note 'The
         blind count is the whole control'. It adds an expected-by-tender table, a handover checklist and
         an approval record. There is no per-currency count, no deposit-box close and no suspend/reopen.
+        **Design correction (decided 2 October 2026, CHG-FIN-003):** remove the EXPECTED total and the
+        expected-by-tender table; the cashier counts blind and never sees expected or variance.
     derivedFrom: wireframes/reference/TICVAI Boards v2.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `TICVAI Boards v2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
@@ -5038,7 +5060,19 @@ screens:
   notes: 'Design: Park_POS_dc.html reports view. Read routing is analytical — never the primary, under
     any load. **Authoring operations removed 24 August**: createReport, updateReport. **A till sells the
     catalogue; it does not author it.** These arrived in the 18 August bulk attach — the same defect that
-    put 21 of 39 review rows in one bucket — and a flow walking a ticket sale is what surfaced them.'
+    put 21 of 39 review rows in one bucket — and a flow walking a ticket sale is what surfaced them.
+
+
+    **One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721,
+    DI-702). This screen is a scoped window onto the reporting area (Analytics, P16): it runs the same
+    seeded report definitions and reads the same seeded KPIs, so its figures equal what Analytics shows
+    for the same scope, period and as-of time. It computes no total of its own and shows the as-of time
+    on every figure.
+
+
+    **On the till** (CHG-FIN-003): the terminal day view withholds its cash-tender figures from the cashier
+    of an open shift, since float plus cash takings is the expected drawer; what else a cashier sees is
+    the per-role switch of DI-802.'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listReports` reads the population and `getFinancialReport` reads one of them — list,
@@ -5332,7 +5366,13 @@ screens:
     the client design board**, answering 2 board screen(s): Shift & Operator Dashboard; Operator & Workstation
     Assignment. **Owns POS board frame(s) POS-3A** (client pack, 24 August). **Assigned by board purpose
     rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense,
-    and a reader who trusts a bad table is worse off than one who has none.'
+    and a reader who trusts a bad table is worse off than one who has none.
+
+
+    **Blind close** (decided 2 October 2026, Chinmay; CHG-FIN-003): closing from here submits the cashier''s
+    blind count with `submitShiftCount` (no expected cash, no variance shown; the supervisor is alerted
+    beyond the threshold); `closeShift`, which returns the expected figure, is the supervisor''s path
+    on BO-039 and BO-040.'
   density: touchLarge
   boardFrames:
   - POS Board 3.dc.html#pos-3a
@@ -5479,9 +5519,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getCurrentShift
         provenance: contract shift.yaml GET /shifts/current
       - kind: detailPanel
@@ -5501,9 +5538,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getShift
         provenance: contract shift.yaml GET /shifts/{shiftId}
     - name: actionBar
@@ -5513,13 +5547,14 @@ screens:
         label: Accept shift variance
         operation: acceptShiftVariance
         provenance: contract shift.yaml POST /shifts/{shiftId}/accept-variance
+        permission: OVERSHORT_ACCEPT
       - kind: secondaryButton
         label: Approve shift open
         operation: approveShiftOpen
         provenance: contract shift.yaml POST /shifts/{shiftId}/approve-open
       - kind: destructiveButton
         label: Close shift
-        operation: closeShift
+        operation: submitShiftCount
         provenance: contract shift.yaml POST /shifts/{shiftId}/close
       - kind: secondaryButton
         label: Open shift
@@ -5586,11 +5621,11 @@ screens:
     provenance: designed
     confirm:
       label: Close the shift
-      operation: closeShift
-      carries: *id003
+      operation: submitShiftCount
+      carries: *id006
     dismiss:
       label: Not yet
-      discards: *id004
+      discards: *id003
     bindsTo: CloseShiftRequest
   - id: confirmSuspendShift
     component: confirmDialog
@@ -5602,10 +5637,10 @@ screens:
     confirm:
       label: Suspend
       operation: suspendShift
-      carries: *id005
+      carries: *id004
     dismiss:
       label: Cancel
-      discards: *id006
+      discards: *id005
   - id: formAcceptShiftVariance
     component: modal
     trigger: Accept shift variance
@@ -5756,9 +5791,10 @@ screens:
     trigger: onAction
     invalidates:
     - listShifts
-  - operationId: closeShift
+  - operationId: submitShiftCount
     contract: shift
-    purpose: Blind close-out
+    purpose: 'The cashier''s blind count: returns closed, with the supervisor or awaiting approval, never
+      the expected cash (CHG-FIN-003)'
     trigger: onAction
     invalidates:
     - listShifts
@@ -6153,7 +6189,19 @@ screens:
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-2B** (client pack, 24 August). **Assigned by board purpose rather
     than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense,
-    and a reader who trusts a bad table is worse off than one who has none.'
+    and a reader who trusts a bad table is worse off than one who has none.
+
+
+    **Tax documents, as the UAE requires them** (research 2 October 2026, CHG-FIN-011; Executive Regulation
+    Art. 59-60): the document a paid order gets is titled "Tax Invoice" (a simplified tax invoice for
+    a guest, a full one with the buyer''s name, address and TRN on request), never "Receipt" or "VAT receipt"
+    as the title, and a correction is a "Tax Credit Note" (the contract calls it a credit memo). A simplified
+    tax invoice is issued automatically when the order is paid; a full one is offered for a VAT-registered
+    buyer and is the only kind above AED 10,000 for them. Amounts and VAT are in AED; a guest who paid
+    in another currency sees the amount paid, the currency and the rate as payment information (CHG-FIN-001).
+    **Refunds** (CHG-FIN-001): a card or wallet payment taken in a guest-selected currency is refunded
+    in that currency at the sale rate (`Refund.tenderCurrency`, `tenderAmount`), shown beside the base
+    amount ("USD 81.72 = AED 300.00 at 3.6710"); foreign cash at a till is refunded in base currency (DI-282).'
   density: touchLarge
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2b
@@ -8459,7 +8507,13 @@ screens:
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-3E** (client pack, 24 August). **Assigned by board purpose rather
     than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense,
-    and a reader who trusts a bad table is worse off than one who has none.'
+    and a reader who trusts a bad table is worse off than one who has none.
+
+
+    **Cash variances are for the supervisor, not the cashier** (decided 2 October 2026, Chinmay; CHG-FIN-003).
+    A shift counted beyond the venue threshold raises an alert to the supervisors holding OVERSHORT_ACCEPT;
+    the `shiftSummary` report (expected against counted, variance) runs only for them, and is never shown
+    to the cashier whose shift it is. The cashier''s own till shows no expected cash anywhere.'
   density: touchLarge
   boardFrames:
   - POS Board 3.dc.html#pos-3e
@@ -8568,6 +8622,7 @@ screens:
         notes: Runs the seeded report `shiftSummary` (each till shift's takings, expected against counted
           cash, and variance), its `reportId` taken from `listSeededReports` (proposed, client to correct;
           decided 28 September, audit R282).
+        permission: OVERSHORT_ACCEPT
   states:
     loading: The shift exceptions alerts list.
     error: Could not load. Names which read failed and leaves the shift exceptions alerts untouched.
@@ -10054,7 +10109,22 @@ screens:
         holds invoiceId, orderId, so an edge into it carries them
   notes: '**`reprintReceipt` has existed in the contracts all along and no screen called it.** The prototype
     puts it at the counter because that is where the guest is standing — a reprint requested from the
-    back office is a different, slower thing.'
+    back office is a different, slower thing.
+
+
+    **Tax documents, as the UAE requires them** (research 2 October 2026, CHG-FIN-011; Executive Regulation
+    Art. 59-60): the document a paid order gets is titled "Tax Invoice" (a simplified tax invoice for
+    a guest, a full one with the buyer''s name, address and TRN on request), never "Receipt" or "VAT receipt"
+    as the title, and a correction is a "Tax Credit Note" (the contract calls it a credit memo). A simplified
+    tax invoice is issued automatically when the order is paid; a full one is offered for a VAT-registered
+    buyer and is the only kind above AED 10,000 for them. Amounts and VAT are in AED; a guest who paid
+    in another currency sees the amount paid, the currency and the rate as payment information (CHG-FIN-001).
+    **The receipt is the simplified tax invoice** (`FinTaxInvoiceTemplate.autoIssueOnPayment`, always
+    on for a UAE VAT-registered entity; Decree-Law Art. 65(1), Executive Regulation Art. 59(13)(1)): the
+    till prints it on payment from the issued invoice (`getTaxInvoice`, `getTaxDocumentRendition`) with
+    the words "Tax Invoice", the supplier''s name, address and TRN, the date, what was sold, the total
+    and the VAT in AED. A reprint is marked "Copy" and keeps the invoice number. A VAT-registered buyer
+    may ask for a full tax invoice here (`issueTaxInvoice` `full`, name, address and TRN).'
   density: touchLarge
   pattern: detail
   patternReason: One order is named and acted on — detail, not a list
@@ -10560,7 +10630,16 @@ screens:
     two**: the cart history is this journal opened from the cart, filtered to this terminal and today.
     **No CSV or Excel export in r2**: v2 draws both, and an export is a later change (no operation exports
     orders). The customer, terminal and payment-method filters were added to `listOrders` the same day
-    as optional query parameters, an additive change.'
+    as optional query parameters, an additive change.
+
+
+    **Tax documents, as the UAE requires them** (research 2 October 2026, CHG-FIN-011; Executive Regulation
+    Art. 59-60): the document a paid order gets is titled "Tax Invoice" (a simplified tax invoice for
+    a guest, a full one with the buyer''s name, address and TRN on request), never "Receipt" or "VAT receipt"
+    as the title, and a correction is a "Tax Credit Note" (the contract calls it a credit memo). A simplified
+    tax invoice is issued automatically when the order is paid; a full one is offered for a VAT-registered
+    buyer and is the only kind above AED 10,000 for them. Amounts and VAT are in AED; a guest who paid
+    in another currency sees the amount paid, the currency and the rate as payment information (CHG-FIN-001).'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listOrders` reads the till''s sales and `getOrder` reads one of them — list, select,

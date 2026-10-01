@@ -14979,6 +14979,29 @@ screens:
       - kind: selectField
         label: Owner
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure
+      - kind: selectField
+        label: Taxable base
+        operation: setTaxProfileJurisdiction
+        notes: '**The one place the taxable base is set** (decided 2 October 2026, Chinmay; CHG-FIN-004):
+          "Price after discount" (default) or "Price before discount" (`TaxProfile.taxBase`). Shown with
+          a worked example that recalculates as it changes: Egypt, VAT 14%, a ticket listed at EGP 100.00
+          with 20% off is paid at EGP 80.00; after discount the VAT is EGP 11.20 (guest pays EGP 91.20),
+          before discount it is EGP 14.00 (guest pays EGP 94.00). The tax calculation reads it from here
+          and nowhere else.'
+        provenance: contract catalogue.yaml TaxProfile.taxBase; MoM 1 Sep 2026 4.5 (DI-598); CHG-FIN-004
+      - kind: textField
+        label: Document title
+        operation: setTaxInvoiceTemplate
+        notes: 'Per language. In the UAE fixed by law: "Tax Invoice" for the tax invoice and the simplified
+          tax invoice, "Tax Credit Note" for the credit note (Executive Regulation Art. 59(1)(a), 59(2)(a),
+          60(1)(a); CHG-FIN-011). The Arabic wording is the client''s tax adviser''s to confirm.'
+        provenance: contract finance.yaml FinTaxInvoiceTemplate.title; CHG-FIN-011
+      - kind: toggle
+        label: Issue a tax invoice on every paid order
+        operation: setTaxInvoiceTemplate
+        notes: '`autoIssueOnPayment`. On and locked for a UAE VAT-registered legal entity (Decree-Law
+          Art. 65(1), Executive Regulation Art. 59(13)(1)); CHG-FIN-011.'
+        provenance: contract finance.yaml FinTaxInvoiceTemplate.autoIssueOnPayment; CHG-FIN-011
     - name: actionBar
       slot: publish
       components:
@@ -15038,6 +15061,12 @@ screens:
     0 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  notes: '**Taxable base: one setting, here** (decided 2 October 2026, Chinmay; CHG-FIN-004). It was set
+    in two places, the tax profile (`TaxProfile.taxBase`) and a venue policy flag on the tax calculation
+    (`discountsAreTaxInclusive`), which could disagree; the flag is deprecated and ignored. The setting
+    shows the Egypt worked example. **Tax documents** (CHG-FIN-011): the template sets the title the law
+    prescribes, the auto-issue of the simplified tax invoice (on for a UAE registrant), and the AED 10,000
+    limit above which a VAT-registered buyer gets a full tax invoice.'
 - id: ADM-070
   name: Tax Rule & Treatment Builder
   module: Commercial
@@ -20943,9 +20972,10 @@ screens:
       slot: headline
       components:
       - kind: metricTile
-        label: Revenue
+        label: Forecast net revenue
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 120 §Forecast
         bindsTo: RevenueDemandImpactForecastingView.revenue
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: metricTile
         label: Demand
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 120 §Forecast
@@ -21003,6 +21033,11 @@ screens:
     9 labels bound to a contract property; 9 of 32 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: ADM-113
   name: AI Recommendation Review & Decision Queue
   module: Commercial
@@ -34278,9 +34313,10 @@ screens:
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 142 §KPI Cards
         bindsTo: PromotionPerformanceCommandCenterView.discountGranted
       - kind: metricTile
-        label: Net Revenue
+        label: Net revenue
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 142 §KPI Cards
         bindsTo: PromotionPerformanceCommandCenterView.netRevenue
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: metricTile
         label: Gross Margin
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 142 §KPI Cards
@@ -34318,8 +34354,9 @@ screens:
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 142 §KPI Cards
         bindsTo: PromotionPerformanceCommandCenterView.activeCampaigns
       - kind: metricTile
-        label: Revenue vs Discount Cost vs Incremental Revenue
+        label: Net revenue vs discount cost vs incremental net revenue
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 142 §Show
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
   states:
     loading: The promotion performance list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the promotion performance untouched.
@@ -34359,6 +34396,11 @@ screens:
     27 of 27 labels bound to a contract property; 28 of 35 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: ADM-229
   name: Campaign & Promotion Performance Explorer
   module: Commercial
@@ -34652,17 +34694,19 @@ screens:
       slot: headline
       components:
       - kind: metricTile
-        label: Gross Revenue
+        label: Gross sales
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 145 §Core Metrics
         bindsTo: DiscountMarginProfitabilityAnalyticsView.grossRevenue
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: metricTile
         label: Discount Value
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 145 §Core Metrics
         bindsTo: DiscountMarginProfitabilityAnalyticsView.discountValue
       - kind: metricTile
-        label: Net Revenue
+        label: Net revenue
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 145 §Core Metrics
         bindsTo: DiscountMarginProfitabilityAnalyticsView.netRevenue
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: metricTile
         label: Product Cost
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 145 §Core Metrics
@@ -34726,6 +34770,11 @@ screens:
     11 of 11 labels bound to a contract property; 11 of 22 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: ADM-232
   name: Bundle, BOGO & Advanced Offer Analytics
   module: Commercial
@@ -35058,9 +35107,10 @@ screens:
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 148 §Customer/Segment KPIs
         bindsTo: CustomerSegmentChannelPartnerAnalyticsView.conversion
       - kind: metricTile
-        label: Revenue
+        label: Net revenue
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 148 §Customer/Segment KPIs
         bindsTo: CustomerSegmentChannelPartnerAnalyticsView.revenue
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: metricTile
         label: Discount
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 148 §Customer/Segment KPIs
@@ -35150,6 +35200,11 @@ screens:
     26 of 26 labels bound to a contract property; 26 of 37 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: ADM-235
   name: Incrementality, Attribution & Cannibalization Analysis
   module: Commercial
@@ -62514,8 +62569,9 @@ screens:
         label: Product Demand
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields
       - kind: selectField
-        label: Revenue
+        label: Net revenue
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: selectField
         label: Channel Demand
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields
@@ -62609,6 +62665,11 @@ screens:
     params:
     - name: definitionKey
       from: navigation
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: ADM-501
   name: Forecast Data & Signal Configuration
   module: Analytics
@@ -63091,8 +63152,9 @@ screens:
         label: Revenue per Visitor
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
       - kind: metricTile
-        label: Revenue vs Budget / Target where available
+        label: Net revenue vs budget or target
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: metricTile
         label: Revenue Confidence Range
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs
@@ -63119,6 +63181,11 @@ screens:
     page 15. 0 of 0 labels bound to a contract property; 9 of 48 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: ADM-506
   name: Forecast Drivers, Confidence & Explainability
   module: Analytics
@@ -76117,6 +76184,10 @@ screens:
     bound to a contract property; 18 of 32 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  notes: '**Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit
+    R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank
+    and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider''s
+    monthly file (DI-268) is matched day by day.'
 - id: ADM-620
   name: Reconciliation Source & Import Manager\t141
   module: Commercial
@@ -76530,6 +76601,10 @@ screens:
     bound to a contract property; 16 of 29 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  notes: '**Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit
+    R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank
+    and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider''s
+    monthly file (DI-268) is matched day by day.'
 - id: ADM-624
   name: Fees, Commission, FX & Settlement Economics\t145
   module: Commercial
@@ -76955,6 +77030,10 @@ screens:
     bound to a contract property; 7 of 35 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  notes: '**Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit
+    R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank
+    and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider''s
+    monthly file (DI-268) is matched day by day.'
 - id: ADM-628
   name: Reconciliation Simulator, Forecast & AI Operations Advisor\t150
   module: Commercial
@@ -78636,8 +78715,9 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
-        label: Revenue
+        label: Net revenue
         provenance: pack Upsell,CrossSellEngine.pdf, page 11 §Support
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: secondaryButton
         label: Incremental revenue
         provenance: pack Upsell,CrossSellEngine.pdf, page 11 §Support
@@ -78677,6 +78757,11 @@ screens:
     params:
     - name: strategyId
       from: navigation
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: ADM-642
   name: Recommendation Type & Product Relationship Manager
   module: Commercial
@@ -82830,8 +82915,9 @@ screens:
         label: Historical acceptance
         provenance: pack Upsell,CrossSellEngine.pdf, page 132 §Support
       - kind: secondaryButton
-        label: Revenue
+        label: Net revenue
         provenance: pack Upsell,CrossSellEngine.pdf, page 132 §Support
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: secondaryButton
         label: Incremental revenue
         provenance: pack Upsell,CrossSellEngine.pdf, page 132 §Support
@@ -82873,6 +82959,11 @@ screens:
     params:
     - name: strategyId
       from: navigation
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: ADM-685
   name: Customer Preference, Fatigue & Suppression Intelligence
   module: Commercial
@@ -83600,8 +83691,9 @@ screens:
         label: Attach rate
         provenance: pack Upsell,CrossSellEngine.pdf, page 156 §Measure
       - kind: metricTile
-        label: Revenue
+        label: Net revenue
         provenance: pack Upsell,CrossSellEngine.pdf, page 156 §Measure
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: metricTile
         label: Incremental revenue
         provenance: pack Upsell,CrossSellEngine.pdf, page 156 §Measure
@@ -83646,6 +83738,11 @@ screens:
   apisNote: Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 156. 0 of 0 labels bound
     to a contract property; 8 of 27 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: ADM-692
   name: Experiment Results & Winner Decision Workspace
   module: Commercial

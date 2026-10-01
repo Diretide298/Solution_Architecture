@@ -81,7 +81,7 @@ steps:
   - step: 7
     screen: POS-007
     action: There is a variance of 40 dirhams short.
-    operations: [acceptShiftVariance, closeShift]
+    operations: [acceptShiftVariance, submitShiftCount]
     outcome: >
       **The variance is accepted with a reason, not corrected.** A till that balances every night
       is a till nobody is counting, and **a variance silently adjusted away is the shrinkage the
@@ -117,7 +117,8 @@ branches:
   - at: 7
     condition: The variance is above the venue's threshold.
     behaviour: >
-      `closeShift` is submitted and the shift waits in `pendingVariance`. **A supervisor accepts the
+      The blind count is submitted (`submitShiftCount`, which shows the cashier no figure; CHG-FIN-003)
+      and the shift waits in `pendingVariance` while the supervisor is alerted. **A supervisor accepts the
       variance on the till with `acceptShiftVariance`** (OVERSHORT_ACCEPT, PIN step-up). That is the
       only path: no approval request is raised and nothing holds the close for a Duty Manager PIN
       beforehand (decided 28 September, audit R080 (e)).
@@ -127,11 +128,11 @@ branches:
   - at: 6
     condition: The cashier's shift ends and the till stays open for the next one.
     behaviour: >
-      `closeShift` on the operator, not the workstation. **A workstation runs three shifts a day
+      `submitShiftCount` on the operator, not the workstation (the cashier's blind count; CHG-FIN-003). **A workstation runs three shifts a day
       and each one settles its own drawer** — conflating them means one cashier answering for
       another's variance.
     severity: medium
-    resolvedBy: closeShift
+    resolvedBy: submitShiftCount
 
 exitStates:
   - state: settled

@@ -4581,6 +4581,18 @@ components:
             rates to these. Null or empty shows the trading currency only. A code the region has no
             rate for is refused `400`.
           items: { type: string, pattern: '^[A-Z]{3}$' }
+        chargeCurrencies:
+          type: array
+          nullable: true
+          description: >
+            **Which currencies a guest may select and pay in** (decided 2 October 2026, Chinmay;
+            CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). A subset of `displayCurrencies`:
+            each code must also be one the venue's payment provider can charge
+            (`orders.PaymentProvider.presentmentCurrencies`) and one the region holds a `tender` rate
+            for; anything else is refused `400`. Null or empty: guests pay in the trading (base)
+            currency only and the other display currencies stay approximate. The ledger is always
+            in the base currency, with the rate recorded on every payment and refund.
+          items: { type: string, pattern: '^[A-Z]{3}$' }
         cartLeaseSeconds:
           type: integer
           nullable: true

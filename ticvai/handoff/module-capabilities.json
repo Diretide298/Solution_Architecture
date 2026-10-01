@@ -3272,10 +3272,11 @@
      "key": "SHIFT_CLOSE",
      "label": null,
      "group": "Shift and cash",
-     "operationCount": 2,
+     "operationCount": 3,
      "operations": [
       "closeDepositBoxes",
-      "closeShift"
+      "closeShift",
+      "submitShiftCount"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -4319,7 +4320,8 @@
    ],
    "SHIFT_CLOSE": [
     "closeDepositBoxes",
-    "closeShift"
+    "closeShift",
+    "submitShiftCount"
    ],
    "SHIFT_OPEN": [
     "allocateDepositBox",

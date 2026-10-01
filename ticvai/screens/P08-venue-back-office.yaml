@@ -8066,9 +8066,21 @@ screens:
         holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
         BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
         its own'
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **Tax documents, as the UAE requires them** (research 2 October 2026, CHG-FIN-011; Executive Regulation
+    Art. 59-60): the document a paid order gets is titled "Tax Invoice" (a simplified tax invoice for
+    a guest, a full one with the buyer''s name, address and TRN on request), never "Receipt" or "VAT receipt"
+    as the title, and a correction is a "Tax Credit Note" (the contract calls it a credit memo). A simplified
+    tax invoice is issued automatically when the order is paid; a full one is offered for a VAT-registered
+    buyer and is the only kind above AED 10,000 for them. Amounts and VAT are in AED; a guest who paid
+    in another currency sees the amount paid, the currency and the rate as payment information (CHG-FIN-001).
+    **Refunds** (CHG-FIN-001): a card or wallet payment taken in a guest-selected currency is refunded
+    in that currency at the sale rate (`Refund.tenderCurrency`, `tenderAmount`), shown beside the base
+    amount ("USD 81.72 = AED 300.00 at 3.6710"); foreign cash at a till is refunded in base currency (DI-282).'
   density: compact
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getOrder` reads one of them — list, select, act'
@@ -8581,12 +8593,24 @@ screens:
       provenance: flow F09 step 3→4
       carries:
       - refundId
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **`getRefundPolicy`
     wired 24 August.** **A refunds screen that cannot read the refund policy** judges every request by
     memory — and F09 was reaching it through `BO-003 Queue Integration Setup`, which held the operation
     only because of the 18 August bulk attach.
+
+
+    **Tax documents, as the UAE requires them** (research 2 October 2026, CHG-FIN-011; Executive Regulation
+    Art. 59-60): the document a paid order gets is titled "Tax Invoice" (a simplified tax invoice for
+    a guest, a full one with the buyer''s name, address and TRN on request), never "Receipt" or "VAT receipt"
+    as the title, and a correction is a "Tax Credit Note" (the contract calls it a credit memo). A simplified
+    tax invoice is issued automatically when the order is paid; a full one is offered for a VAT-registered
+    buyer and is the only kind above AED 10,000 for them. Amounts and VAT are in AED; a guest who paid
+    in another currency sees the amount paid, the currency and the rate as payment information (CHG-FIN-001).
+    **Refunds** (CHG-FIN-001): a card or wallet payment taken in a guest-selected currency is refunded
+    in that currency at the sale rate (`Refund.tenderCurrency`, `tenderAmount`), shown beside the base
+    amount ("USD 81.72 = AED 300.00 at 3.6710"); foreign cash at a till is refunded in base currency (DI-282).'
   density: compact
   pattern: listDetail
   patternReason: '`listOrderRefunds` reads the population and `getOrder` reads one of them — list, select,
@@ -10422,9 +10446,16 @@ screens:
         holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
         BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
         its own'
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721,
+    DI-702). This screen is a scoped window onto the reporting area (Analytics, P16): it runs the same
+    seeded report definitions and reads the same seeded KPIs, so its figures equal what Analytics shows
+    for the same scope, period and as-of time. It computes no total of its own and shows the as-of time
+    on every figure.'
   density: compact
   pattern: listDetail
   patternReason: '`listReports` reads the population and `getFinancialReport` reads one of them — list,
@@ -13836,9 +13867,18 @@ screens:
         holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
         BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
         its own'
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **Where the variance goes** (decided 2 October 2026, Chinmay; CHG-FIN-003). The cashier counts blind
+    (`submitShiftCount`) and never sees expected cash or the variance; a count beyond the venue threshold
+    (`shiftVarianceThreshold`, proposed AED 20.00) alerts the supervisors holding OVERSHORT_ACCEPT on
+    the venue''s alerting channel and lands here. The supervisor sees counted, expected, the variance
+    (over or short), the cashier''s reason and note, and accepts it (`acceptShiftVariance`, never their
+    own shift) or asks for a blind recount at the till. Over and short are both exceptions: an overage
+    is as much a control failure as a shortage.'
   density: compact
   pattern: approvalInbox
   patternReason: '`approveShiftOpen` decides items that `listShifts` queues — every row is waiting for
@@ -13858,7 +13898,8 @@ screens:
       - kind: textField
         label: Status
         operation: listShifts
-        notes: Sends `?status=` to `listShifts`.
+        notes: Sends `?status=` to `listShifts`; opens on `pendingVariance` (counts beyond the threshold,
+          waiting for a supervisor).
         provenance: contract shift.yaml GET /shifts
       - kind: datePicker
         label: Opened from
@@ -13886,6 +13927,11 @@ screens:
         - Shift.currencyScale
         - Shift.depositBoxCode
         - Shift.bagNumber
+        - Shift.countedCash
+        - Shift.expectedCash
+        - Shift.variance
+        - Shift.cashierReason
+        - Shift.cashierNote
         operation: listShifts
         provenance: contract shift.yaml GET /shifts
       - kind: dataTable
@@ -13929,6 +13975,11 @@ screens:
         - Shift.salesTotal
         - Shift.refundsTotal
         - Shift.liftsTotal
+        - Shift.countedCash
+        - Shift.expectedCash
+        - Shift.variance
+        - Shift.cashierReason
+        - Shift.cashierNote
         operation: getCurrentShift
         provenance: contract shift.yaml GET /shifts/current
       - kind: detailPanel
@@ -13951,6 +14002,11 @@ screens:
         - Shift.salesTotal
         - Shift.refundsTotal
         - Shift.liftsTotal
+        - Shift.countedCash
+        - Shift.expectedCash
+        - Shift.variance
+        - Shift.cashierReason
+        - Shift.cashierNote
         operation: getShift
         provenance: contract shift.yaml GET /shifts/{shiftId}
     - name: actionBar
@@ -14690,9 +14746,15 @@ screens:
       provenance: flow F98 step 1→2
       carries:
       - accountId
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit R110 (b)).
+    The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank and wallet
+    against the ledger for that day. A longer range reviews days already reconciled; a provider''s monthly
+    file (DI-268) is matched day by day.'
   density: compact
   pattern: listDetail
   patternReason: '`listSettlements` reads the population and `getTrialBalance` reads one of them — list,
@@ -18773,7 +18835,14 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Retail board
     operations wired 24 August.** **Cross-platform navigation removed 24 August**: EMP-020. **A till does
     not navigate to a back office and a guest app does not navigate to either** — those are device handovers,
-    and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
+    and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.
+
+
+    **One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721,
+    DI-702). This screen is a scoped window onto the reporting area (Analytics, P16): it runs the same
+    seeded report definitions and reads the same seeded KPIs, so its figures equal what Analytics shows
+    for the same scope, period and as-of time. It computes no total of its own and shows the as-of time
+    on every figure.'
   density: compact
   boardFrames:
   - Retail Board 6.dc.html#ret-6h
@@ -19156,9 +19225,16 @@ screens:
         holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
         BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
         its own'
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721,
+    DI-702). This screen is a scoped window onto the reporting area (Analytics, P16): it runs the same
+    seeded report definitions and reads the same seeded KPIs, so its figures equal what Analytics shows
+    for the same scope, period and as-of time. It computes no total of its own and shows the as-of time
+    on every figure.'
   density: compact
   pattern: listDetail
   patternReason: '`listReports` reads the population and `getFinancialReport` reads one of them — list,
@@ -19477,9 +19553,16 @@ screens:
     entryFrom:
     - BO-061
     - BO-108
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721,
+    DI-702). This screen is a scoped window onto the reporting area (Analytics, P16): it runs the same
+    seeded report definitions and reads the same seeded KPIs, so its figures equal what Analytics shows
+    for the same scope, period and as-of time. It computes no total of its own and shows the as-of time
+    on every figure.'
   density: compact
   pattern: listDetail
   patternReason: '`listScans` reads the population and `getFinancialReport` reads one of them — list,
@@ -23756,7 +23839,14 @@ screens:
     board** — needs drawing. Pulled to Wave 1 (CF-101). Without a mapping every sale posts to suspense.
     **Cross-platform navigation removed 24 August**: ADM-020. **A till does not navigate to a back office
     and a guest app does not navigate to either** — those are device handovers, and a flow declares them
-    with `crossesDevice` rather than a screen pretending there is a link.'
+    with `crossesDevice` rather than a screen pretending there is a link.
+
+
+    **One switch, not two** (decided 2 October 2026, Chinmay; CHG-FIN-004). "Price includes tax" on a
+    tax code (`isInclusive`) says whether the price already contains the tax. Whether tax is computed
+    before or after a discount is not set here: it is the jurisdiction''s taxable base on its tax profile
+    (ADM-069, `TaxProfile.taxBase`), shown here read-only with the Egypt example. The calculation''s own
+    `discountsAreTaxInclusive` is deprecated and ignored.'
   density: compact
   pattern: commandCentre
   patternReason: 3 independent reads and no read of one record — the screen watches a population rather
@@ -24193,8 +24283,14 @@ screens:
       provenance: 'derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-077 holds
         none of them. The edge carries nothing: taxCodeId only pre-selects (deep link or optional); BO-075
         finds exemptionId (listTaxExemptions) itself, and BO-075 opens on its own'
-  notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
+  notes: 'Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+
+
+    **The tender rate now charges guests** (decided 2 October 2026, Chinmay; CHG-FIN-001). A `tender`
+    rate is what a guest who selects a currency is charged at (locked on the order at checkout) and refunded
+    at; a rate change never moves an order already quoted. Per region, as before (audit R120 (a)); the
+    venue chooses which currencies it shows and which it charges (`VenueSettings.displayCurrencies`, `chargeCurrencies`).'
   density: compact
   pattern: approvalInbox
   patternReason: '`reviewPriceVariance` decides items that `listFxRates` queues — every row is waiting
@@ -27167,8 +27263,17 @@ screens:
       provenance: 'derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-089 holds
         none of them. The edge carries nothing: taxCodeId only pre-selects (deep link or optional); BO-075
         finds exemptionId (listTaxExemptions) itself, and BO-075 opens on its own'
-  notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
+  notes: 'Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+
+
+    **Every manual journal needs approval** (decided 2 October 2026, Chinmay; CHG-FIN-008; DI-265): a
+    finance user prepares it, a finance manager or director approves it, and only then does it reach the
+    ledger. There is no threshold below which it posts itself (the state model''s "above the venue threshold"
+    is wrong). **Posted entries are never edited, only reversed** (CHG-FIN-005): a posted entry offers
+    Reverse, never Edit or Delete; a reversal a person asks for waits for approval like any manual journal.
+    **The approver is never the preparer**: Approve is hidden on an entry the viewer prepared and refused
+    by the server (`approver-is-preparer`).'
   density: compact
   pattern: approvalInbox
   patternReason: '`approveJournalEntry` decides items that `listJournalEntries` queues — every row is
@@ -27196,7 +27301,7 @@ screens:
         notes: Sends `?source=` to `listJournalEntries`.
         provenance: contract finance.yaml GET /journal-entries
       - kind: dataTable
-        label: Waiting for a decision
+        label: Journal entries
         bindsTo: JournalEntry
         columns:
         - JournalEntry.id
@@ -27213,6 +27318,7 @@ screens:
         - JournalEntry.postedByPrincipalId
         operation: listJournalEntries
         provenance: contract finance.yaml GET /journal-entries
+        notes: Opens on `pendingApproval`; drafts, posted and reversed entries are a filter away.
     - name: contextPanel
       slot: item
       components:
@@ -29763,7 +29869,16 @@ screens:
     to a 99-screen back office — it exits to four queue screens, and **93 screens hung off nothing.**
     A back office entered through a queue list. **The module was also one bucket holding 72 of 99 screens**,
     so there was nothing for a home screen to point at; sections were derived from the contract each screen
-    principally calls.'
+    principally calls.
+
+
+    **Takings, defined** (decided 2 October 2026, Chinmay; CHG-FIN-010; resolves the contradiction "gross
+    value of payments" against "payments less refunds"). Takings is the money taken through the tills
+    and channels less the money paid back, by tender, VAT included: a cash-control figure, not revenue.
+    It is what a drawer and a settlement are reconciled against, and for a till shift it is the hidden
+    half of the blind count: float plus cash takings is the expected cash, which the cashier never sees
+    (CHG-FIN-003; MoM 9 Sep 2026 4.18). On this hub the tile reads "Takings today" from the seeded `takings`
+    KPI and is never labelled revenue.'
   density: compact
   pattern: listDetail
   patternReason: '`listShifts` reads the population and `getVenueSettings` reads one of them — list, select,
@@ -29824,8 +29939,8 @@ screens:
         - KpiValue.comparison
         - KpiValue.direction
         operation: getKpiValues
-        notes: '**Takings and admissions**, from `getKpiValues?kpiCodes=takings,admissions`; with no `period`
-          the period is today in the venue''s time zone (decided 28 September, audit R283).'
+        notes: '`getKpiValues?kpiCodes=takings,admissions`. Takings: money taken less money paid back,
+          VAT included, a cash-control figure and not revenue (CHG-FIN-010).'
         provenance: contract reporting.yaml GET /kpi-values
       - kind: metricTile
         label: Open shifts
@@ -84246,8 +84361,9 @@ screens:
         label: Group Bookings
         provenance: pack Rental_Management.pdf, page 51 §KPI Cards
       - kind: metricTile
-        label: Revenue Today
+        label: Gross sales today
         provenance: pack Rental_Management.pdf, page 51 §KPI Cards
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: metricTile
         label: Booking Alerts
         provenance: pack Rental_Management.pdf, page 51 §KPI Cards
@@ -84281,6 +84397,11 @@ screens:
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 51. 0 of 8 labels bound to a
     contract property; 18 of 34 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: BO-535
   name: New Rental Booking Wizard
   module: Rentals
@@ -89332,6 +89453,11 @@ screens:
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 126. 0 of 8 labels bound to a
     contract property; 18 of 25 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  notes: '**One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721,
+    DI-702). This screen is a scoped window onto the reporting area (Analytics, P16): it runs the same
+    seeded report definitions and reads the same seeded KPIs, so its figures equal what Analytics shows
+    for the same scope, period and as-of time. It computes no total of its own and shows the as-of time
+    on every figure.'
 - id: BO-586
   name: Utilization & Capacity Analytics
   module: Rentals
@@ -138371,7 +138497,8 @@ screens:
         - KpiValue.comparison
         - KpiValue.direction
         operation: getKpiValues
-        notes: '`takings` is the only seeded money KPI.'
+        notes: '`getKpiValues?kpiCodes=netRevenue` (CHG-FIN-007). Never the `takings` KPI (CHG-FIN-002,
+          CHG-FIN-010).'
         provenance: contract reporting.yaml GET /kpi-values
       - kind: metricTile
         label: Average ticket price
@@ -138387,7 +138514,7 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Revenue by section
+        label: Net revenue by section
         bindsTo: KpiValue
         columns:
         - KpiValue.scopePath
@@ -138397,7 +138524,7 @@ screens:
         - KpiValue.variancePercent
         - KpiValue.status
         - Section
-        - Gross revenue
+        - Gross sales
         - Tax
         - Fees
         - Discounts
@@ -138405,7 +138532,8 @@ screens:
         - '% of performance total'
         - Reconciliation status
         operation: getKpiValues
-        notes: KpiValue has no section dimension; the section columns are pack labels.
+        notes: 'KpiValue has no section dimension; the section columns are pack labels. (CHG-FIN-002:
+          never a bare "Revenue")'
         provenance: pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47
   states:
     loading: The revenue section list.
@@ -138433,6 +138561,11 @@ screens:
     v1.0.pdf p.47; contract reporting.yaml GET /kpi-values. Pack labels with no schema field yet (shown
     as plain labels): Section dimension, Gross revenue, Tax, Fees, Discounts, Refunds, % of performance
     total, Yield, Price band, Reconciliation status.'
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: BO-1055
   name: Revenue by Seat Category
   module: Access & Venue
@@ -141179,6 +141312,86 @@ screens:
         notes: 'The pack filters this screen by company: uae01, site: all sites, attraction: all, currency:
           aed, period: august 2026 — which are present is a decision the pack already made.'
         provenance: pack TICVAI Finance Backend Structure Reference v1.0.pdf, page 106 §Global filters
+    - name: tiles
+      slot: collection
+      components:
+      - bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        kind: metricTile
+        label: Gross sales
+        notes: '`getKpiValues?kpiCodes=grossSales`, with its as-of time; formula in `ReportingSystemKpi`
+          (D-185 default, client finance sign-off pending; CHG-FIN-007).'
+        operation: getKpiValues
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+      - bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        kind: metricTile
+        label: Discounts
+        notes: '`getKpiValues?kpiCodes=discounts`, with its as-of time; formula in `ReportingSystemKpi`
+          (D-185 default, client finance sign-off pending; CHG-FIN-007).'
+        operation: getKpiValues
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+      - bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        kind: metricTile
+        label: Refunds
+        notes: '`getKpiValues?kpiCodes=refunds`, with its as-of time; formula in `ReportingSystemKpi`
+          (D-185 default, client finance sign-off pending; CHG-FIN-007).'
+        operation: getKpiValues
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+      - bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        kind: metricTile
+        label: Net revenue
+        notes: '`getKpiValues?kpiCodes=netRevenue`, with its as-of time; formula in `ReportingSystemKpi`
+          (D-185 default, client finance sign-off pending; CHG-FIN-007).'
+        operation: getKpiValues
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+      - bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        kind: metricTile
+        label: Recognised revenue
+        notes: '`getKpiValues?kpiCodes=recognisedRevenue`, with its as-of time; formula in `ReportingSystemKpi`
+          (D-185 default, client finance sign-off pending; CHG-FIN-007).'
+        operation: getKpiValues
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+      - bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        kind: metricTile
+        label: Deferred revenue
+        notes: '`getKpiValues?kpiCodes=deferredRevenue`, with its as-of time; formula in `ReportingSystemKpi`
+          (D-185 default, client finance sign-off pending; CHG-FIN-007).'
+        operation: getKpiValues
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+      - bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        kind: metricTile
+        label: VAT collected
+        notes: '`getKpiValues?kpiCodes=taxCollected`, with its as-of time; formula in `ReportingSystemKpi`
+          (D-185 default, client finance sign-off pending; CHG-FIN-007).'
+        operation: getKpiValues
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
   states:
     loading: The finance list.
     error: Could not load. Names which read failed and leaves the finance untouched.
@@ -141221,6 +141434,17 @@ screens:
     106. 0 of 5 labels bound to a contract property; 5 of 28 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`). The tiles bind the seeded finance KPIs (`grossSales`, `discounts`,
+    `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue`, `taxCollected`; CHG-FIN-007) and
+    never the `takings` KPI. **One reporting area, one set of numbers** (decided 2 October 2026, Chinmay;
+    CHG-FIN-006; DI-721, DI-702). This screen is a scoped window onto the reporting area (Analytics, P16):
+    it runs the same seeded report definitions and reads the same seeded KPIs, so its figures equal what
+    Analytics shows for the same scope, period and as-of time. It computes no total of its own and shows
+    the as-of time on every figure.'
 - id: BO-1082
   name: Admissions Revenue
   module: Orders & Money
@@ -141305,6 +141529,11 @@ screens:
     params:
     - name: reportId
       from: navigation
+  notes: '**One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721,
+    DI-702). This screen is a scoped window onto the reporting area (Analytics, P16): it runs the same
+    seeded report definitions and reads the same seeded KPIs, so its figures equal what Analytics shows
+    for the same scope, period and as-of time. It computes no total of its own and shows the as-of time
+    on every figure.'
 - id: BO-1083
   name: Wallet Command Center
   module: Orders & Money
@@ -153268,6 +153497,10 @@ screens:
     to the exception workbench); Export Audit dropped (export exists on the audit/reporting screens);
     Send to Finance … dropped (no hand-off step: wallet postings reach the ledger through the accounting
     mapping).'
+  notes: '**Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit
+    R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank
+    and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider''s
+    monthly file (DI-268) is matched day by day.'
 - id: BO-1173
   name: Wallet Integration Command Center
   module: Orders & Money

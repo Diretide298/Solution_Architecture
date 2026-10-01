@@ -1,0 +1,50 @@
+id: CHG-FIN-006
+date: '2026-10-02'
+source: mom
+kind: spec
+summary: The till and back-office reports are windows onto the reporting area (P16) and show the same numbers as
+  Analytics for the same scope, period and as-of time.
+decision:
+  what: 'Write the rule on listSeededReports and on POS-008, BO-058, BO-059, BO-060, BO-1081, BO-1082, BO-585, BO-029:
+    same seeded definitions and KPIs, no screen-local totals, as-of shown.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'MoM 8 Sep 2026 (BI reporting; DI-721, DI-702): one consolidated permission-based reporting area, not dashboards
+  duplicated per module; finance-insights corrections list duplicated report screens (BO-029, BO-058, BO-059, BO-585,
+  BO-1060). Chinmay, 2 Oct 2026.'
+keys_touched:
+  operations:
+  - listSeededReports
+  - runReport
+  - getKpiValues
+  screens:
+  - POS-008
+  - BO-058
+  - BO-059
+  - BO-060
+  - BO-1081
+  - BO-1082
+  - BO-585
+  - BO-029
+root_class: 'new: duplicated-definition'
+tickets:
+  started: []
+  unstarted:
+  - SVC-REPORTING-EXECUTION-1 (#17806)
+  - VM-REPORTING-REPORTING-1 (#18424)
+  - APP-POS-POS-008 (#18125)
+  - VM-BO-058 (#18236)
+  - VM-BO-059 (#18238)
+release_tag: pending
+decision_owner: Chinmay
+client_signoff: pending
+prevention:
+  type: none
+  reason: Whether a screen computes its own total is in the frontend code, not the spec; the spec rule is stated
+    on the operations and screens, and the screens declare only runReport/getKpiValues reads. A frontend test that
+    compares a till figure with the Analytics figure for one scope is the real guard and belongs to the frontend
+    test plan.
+  approved_by: pending (Chinmay)
+status: open
+notes: 'Branch finance-decisions, not yet merged or released (release_tag: the next release). Started tickets: none;
+  Block A starts Monday 5 October.'

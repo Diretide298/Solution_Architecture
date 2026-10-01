@@ -72753,5 +72753,42 @@
    "postgres",
    "redis"
   ]
+ },
+ "submitShiftCount": {
+  "contract": "shift",
+  "verb": "POST",
+  "path": "/shifts/{shiftId}/count",
+  "reads": [
+   "cache:idempotency",
+   "ledger.fx_rate",
+   "orders.cash_count_line",
+   "orders.cash_movement",
+   "orders.payment",
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident",
+   "platform.venue_settings"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "ledger.journal_entry",
+   "orders.cash_count_line",
+   "orders.pos_shift"
+  ],
+  "routing": "",
+  "scope": "workstation",
+  "perm": "SHIFT_CLOSE",
+  "offline": false,
+  "summary": "The cashier's blind count, closing their own shift",
+  "source": "hand-mapped",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "CHG-FIN-003 (2 October 2026): the cashier-facing blind close; reads and writes as closeShift, returns no expected figure"
  }
 }

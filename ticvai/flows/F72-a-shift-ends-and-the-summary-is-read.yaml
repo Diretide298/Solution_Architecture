@@ -39,9 +39,9 @@ steps:
   crossesDevice: true
 - step: 3
   screen: EMP-009
-  action: The supervisor closes it.
+  action: The cashier submits a blind count; beyond the threshold the supervisor accepts the variance (CHG-FIN-003).
   operations:
-  - closeShift
+  - submitShiftCount
   - acceptShiftVariance
   - listCashMovements
   outcome: '**Closing and accepting a variance are supervisor acts** and now live only here.'

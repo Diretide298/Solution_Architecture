@@ -2611,7 +2611,20 @@ screens:
 
 
     **29 September.** **W1:** a guest who proved the contact with the code arrives here with it; only
-    the T&Cs tick (and the unticked marketing opt-in, M18-15) remains.'
+    the T&Cs tick (and the unticked marketing opt-in, M18-15) remains.
+
+
+    **The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses
+    the display-only rule, CF-37 and "payment will be processed in AED", in favour of option (b) of MoM
+    10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`,
+    a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked
+    `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate
+    is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the
+    payment request goes to the payment partner in that currency. The ledger stays in the venue''s base
+    currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the
+    currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the
+    venue shows but does not charge is still an approximate price, marked "approx.", with "You pay in
+    <base currency>" beside it.'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getCart` reads one record and nothing reads a population — the screen is about that
@@ -2645,6 +2658,14 @@ screens:
         - Cart.maxExtensions
         operation: getCart
         provenance: contract orders.yaml GET /carts/{cartId}
+      - kind: banner
+        label: You pay in
+        bindsTo: Order.chargeTotal
+        operation: checkoutCart
+        notes: 'After checkout: the amount in the selected currency, the base amount and the rate, and
+          how long the rate holds (`Order.chargeCurrency`, `chargeTotal`, `chargeFxRate`, `chargeRateLockedUntil`;
+          CHG-FIN-001).'
+        provenance: contract orders.yaml Order.chargeTotal (CHG-FIN-001, 2 October 2026)
       - kind: detailPanel
         label: The payment link
         bindsTo: PaymentLinkView
@@ -4782,7 +4803,18 @@ screens:
     **A guest surface is one product with two renderings** — a screen named differently on web and app
     is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added
     transferOrderTickets. **A guest does not know which surface they are on** — the same named screen
-    on web and app now calls the same guest-callable operations.'
+    on web and app now calls the same guest-callable operations.
+
+
+    **Tax documents, as the UAE requires them** (research 2 October 2026, CHG-FIN-011; Executive Regulation
+    Art. 59-60): the document a paid order gets is titled "Tax Invoice" (a simplified tax invoice for
+    a guest, a full one with the buyer''s name, address and TRN on request), never "Receipt" or "VAT receipt"
+    as the title, and a correction is a "Tax Credit Note" (the contract calls it a credit memo). A simplified
+    tax invoice is issued automatically when the order is paid; a full one is offered for a VAT-registered
+    buyer and is the only kind above AED 10,000 for them. Amounts and VAT are in AED; a guest who paid
+    in another currency sees the amount paid, the currency and the rate as payment information (CHG-FIN-001).
+    A refund shows where the money went and in which currency: "USD 81.72 back to your Visa ending 4417"
+    (CHG-FIN-001).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getOrder` reads one of them — list, select, act'
@@ -4893,6 +4925,9 @@ screens:
         - Order.lines
         - Order.payments
         - Order.principalId
+        - Order.chargeCurrency
+        - Order.chargeTotal
+        - Order.chargeFxRate
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
     - name: actionBar
@@ -9828,12 +9863,25 @@ screens:
 
 
     **Rev 3 (decided 29 September).** The web and app waves of this capability differ; they are aligned
-    to one wave once the client picks it (GAP-D2, open).'
+    to one wave once the client picks it (GAP-D2, open).
+
+
+    **The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses
+    the display-only rule, CF-37 and "payment will be processed in AED", in favour of option (b) of MoM
+    10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`,
+    a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked
+    `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate
+    is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the
+    payment request goes to the payment partner in that currency. The ledger stays in the venue''s base
+    currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the
+    currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the
+    venue shows but does not charge is still an approximate price, marked "approx.", with "You pay in
+    <base currency>" beside it.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listFxRates` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: See prices in your own currency, in the app, before and during the visit.
+  purpose: Choose the currency you see prices in and pay in.
   layout:
     template: split
     regions:
@@ -9848,33 +9896,33 @@ screens:
           per region and each venue picks which currencies it shows (decided 28 September, audit R120
           (a)).
         provenance: contract finance.yaml GET /fx-rates
-      - kind: datePicker
-        label: As at
+      - kind: selectField
+        label: Pay in
         operation: listFxRates
-        notes: Sends `?asAt=` to `listFxRates`.
+        notes: 'Sends `?venueId=&chargeable=true` to `listFxRates`: the currencies this venue lets a guest
+          pay in, base currency first. The choice is kept for the session and sent at checkout as `chargeCurrency`
+          (CHG-FIN-001).'
         provenance: contract finance.yaml GET /fx-rates
-      - kind: textField
-        label: Purpose
+      - kind: banner
+        label: How you pay
         operation: listFxRates
-        notes: Sends `?purpose=` to `listFxRates`.
+        notes: '"You pay in USD. Your card is charged USD 81.72; the venue records AED 300.00 at 3.6710."
+          For a currency shown but not chargeable: "Prices in EUR are approximate. You pay in AED." (CHG-FIN-001).
+          The purpose filter is fixed to `tender`, never typed by a guest.'
         provenance: contract finance.yaml GET /fx-rates
       - kind: dataTable
-        label: Every FX rate
+        label: Currencies
         bindsTo: FxRate
         columns:
-        - FxRate.id
         - FxRate.fromCurrency
         - FxRate.toCurrency
         - FxRate.rate
-        - FxRate.purpose
-        - FxRate.source
-        - FxRate.effectiveFrom
-        - FxRate.effectiveTo
-        - FxRate.setByPrincipalId
-        - FxRate.providerReference
         - FxRate.fetchedAt
+        - FxRate.chargeable
         operation: listFxRates
         provenance: contract finance.yaml GET /fx-rates
+        notes: 'One row per currency: code and name, the rate against the base currency with its age ("updated
+          06:00"), and whether you can pay in it or see an approximate price only (CHG-FIN-001).'
       - kind: dataTable
         label: Every product
         bindsTo: Product
@@ -9897,20 +9945,14 @@ screens:
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected FX rate
+        label: The selected currency
         bindsTo: FxRate
         columns:
-        - FxRate.id
         - FxRate.fromCurrency
         - FxRate.toCurrency
         - FxRate.rate
-        - FxRate.purpose
-        - FxRate.source
-        - FxRate.effectiveFrom
-        - FxRate.effectiveTo
-        - FxRate.setByPrincipalId
-        - FxRate.providerReference
         - FxRate.fetchedAt
+        - FxRate.chargeable
         operation: listFxRates
         provenance: contract finance.yaml GET /fx-rates
   states:
@@ -9928,8 +9970,8 @@ screens:
   apis:
   - operationId: listFxRates
     contract: finance
-    purpose: The rates in force for the venue's shown currencies — always called with `venueId` (decided
-      28 September, audit R120 (a))
+    purpose: The currencies the venue shows, each marked chargeable or approximate — called with `venueId`
+      (audit R120 (a)) and `chargeable` (CHG-FIN-001)
     trigger: onLoad
   - operationId: listProducts
     contract: catalogue

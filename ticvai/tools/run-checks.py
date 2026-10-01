@@ -47,6 +47,9 @@ CHECKS = [
     # 1 October (plan item 1C, C3): after the tag r1 the baseline migrations are frozen; a table change is
     # a new forward migration. check-key-stability (C4) and check-contract-compat also compare with r1.
     "check-migration-freeze",
+    # 2 October (Chinmay's finance decisions, CHG-FIN-001..011): revenue labels, blind close, one taxable base,
+    # the finance KPIs and chart encodings, the guest-selected currency.
+    "check-finance-rules",
     # 1 October (plan item 1F, C12): the audit-class guards (docs/active/root-classes.md). Each fails
     # only on a member not in handoff/audit-baseline.json; --update-baseline after a fix tightens it.
     "check-ticket-text", "check-screen-wiring", "check-navigation", "check-contract-shapes",

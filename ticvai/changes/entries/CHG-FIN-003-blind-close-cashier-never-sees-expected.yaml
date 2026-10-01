@@ -1,0 +1,71 @@
+id: CHG-FIN-003
+date: '2026-10-02'
+source: mom
+kind: contract
+summary: 'Blind close: the cashier counts through submitShiftCount and never sees expected cash or the variance;
+  the variance alerts the supervisor.'
+decision:
+  what: 'New operation submitShiftCount (receipt: closed, referred to supervisor or awaiting approval; no figures);
+    Shift.expectedCash and variance null to the shift''s own cashier; closeShift becomes the supervisor and back-office
+    path; cashier reason and note with every count; cashier screens never show sales, refunds, lifts, expected or
+    variance.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'MoM 12 Aug 2026 section 19 (DI-271: the cashier does not see the expected total; supervisor review) and MoM
+  9 Sep 2026 4.18 (DI-803, DI-804, DI-806: "if a cashier knew they had a small surplus, they could pocket it").
+  The package contradicted it: closeShift returned expectedCash and variance to the till, POS-007 showed the variance
+  after submission, POS-001 carried expectedCash into the close and the client prototype shows EXPECTED live (POSV2-3,
+  audit R080 (e)). Chinmay, 2 Oct 2026. Practice: docs/active/research-uae-vat-and-blind-close-2-october.md.'
+keys_touched:
+  operations:
+  - submitShiftCount
+  - closeShift
+  - getShift
+  - getCurrentShift
+  - acceptShiftVariance
+  - listSeededReports
+  schemas:
+  - ShiftCountReceipt
+  - CloseShiftRequest
+  - Shift
+  screens:
+  - POS-001
+  - POS-007
+  - POS-008
+  - POS-009
+  - POS-020
+  - EMP-003
+  - EMP-008
+  - EMP-009
+  - BO-040
+  flows:
+  - F08
+  - F32
+  - F72
+  - F74
+  files:
+  - handoff/api-data-lineage.json
+  - docs/active/research-uae-vat-and-blind-close-2-october.md
+root_class: 'new: control-leak'
+tickets:
+  started: []
+  unstarted:
+  - SVC-ORDER-SHIFT-1 (#17852)
+  - SVC-ORDER-SHIFT-2 (#17853)
+  - SVC-ORDER-SHIFT-5 (#17856)
+  - APP-POS-POS-001 (#17978)
+  - APP-POS-POS-007 (#18000)
+  - APP-POS-POS-008 (#18125)
+  - APP-POS-POS-020 (#17890)
+  - VM-BO-040 (#18255)
+release_tag: pending
+decision_owner: Chinmay
+client_signoff: pending
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: closed
+closed_by_commit: 7a84e41a
+notes: 'submitShiftCount is a new operation: the next refresh puts it in a shift ticket (build-service-docs). DI-805
+  (may a cashier log out when no supervisor is free) stays open with Qossai/Allam. Branch finance-decisions, not
+  yet merged or released (release_tag: the next release). Started tickets: none; Block A starts Monday 5 October.'

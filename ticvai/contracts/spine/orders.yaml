@@ -3302,6 +3302,15 @@ paths:
         **A line''s `recommendationId` is carried to the order line** (design 2.2 A step 8), so
         `order.completed` attributes the purchase to the recommendation it came from.
 
+        **The guest may pay in the currency they selected** (decided 2 October 2026, Chinmay;
+        CHG-FIN-001; reverses the display-only rule of 10 August, MoM 10 Aug 2026 4.7 option (a) and
+        DI-211, in favour of its option (b), charging in the guest''s currency at the gateway).
+        `chargeCurrency` names it. The order stays in the venue''s base currency (ADR-0018) and the
+        ledger posts in base currency; the order carries the charge currency, the rate used, its
+        source and the converted total, locked until `chargeRateLockedUntil` (the cart lease,
+        `VenueSettings.cartLeaseSeconds`). A payment started after the lock lapses is re-quoted at
+        the rate then in force and the guest sees the new amount before confirming.
+
         '
       tags:
       - cart
@@ -3324,6 +3333,18 @@ paths:
                   description: The guest the order is for. A guest caller may name only themselves
                     (`guestAuth` never widens to another subject); omitted, the cart's own `subjectId`
                     is used.
+                chargeCurrency:
+                  type: string
+                  pattern: ^[A-Z]{3}$
+                  nullable: true
+                  description: '**The currency the guest selected to pay in** (decided 2 October 2026,
+                    Chinmay; CHG-FIN-001). One of the venue''s `VenueSettings.chargeCurrencies`, or the base
+                    currency. Omitted: the base currency. The order is priced and recorded in the base
+                    currency as always; the server converts the total at the region''s `tender` rate,
+                    locks it on the order (`Order.chargeCurrency`, `chargeFxRate`, `chargeTotal`,
+                    `chargeRateLockedUntil`) and the payment request goes to the provider in this
+                    currency. A currency the venue does not take is refused 400
+                    `currency-not-chargeable`.'
                 marketingConsents:
                   type: array
                   description: '**Marketing opt-ins given at checkout** (29 September, M18-15). Shown unticked beside
@@ -3408,6 +3429,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/CartProblem'
+        '400':
+          description: '`chargeCurrency` is not one the venue takes (problem type `currency-not-chargeable`,
+            CHG-FIN-001). The cart is kept.'
+          x-ticvai-problem-types:
+          - currency-not-chargeable
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: 'A required consent question is unanswered (`consentRequired`), or an answer blocks
             the booking (`consentAnswerBlocks`), with the lines in `lineIds` (decided 29 September, rev 3
@@ -5032,6 +5062,13 @@ paths:
         attempt records what was tried, and the provider health and payment performance reads count
         them. Also appends to `orders.order_event` when the order''s payment state changes (decided 29
         September, writers pass; DM6).
+
+        **A guest-selected currency is what the provider is asked for** (decided 2 October 2026, Chinmay;
+        CHG-FIN-001). Where the order has a `chargeCurrency`, a card or wallet payment from the guest web,
+        app or kiosk is sent to the provider in that currency for `Order.chargeTotal`; the server sets
+        `tenderCurrency`, `tenderAmount` and `fxRate` from the order''s locked quote and ignores different
+        values from the client. `amount` stays the base-currency amount, and that is what the ledger posts.
+        Foreign cash handed over at a till is unchanged: recorded at its base equivalent, change in base.
 
         '
       tags:
@@ -21631,6 +21668,45 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         refundedAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        chargeCurrency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          nullable: true
+          readOnly: true
+          description: >-
+            **The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null
+            or equal to `currency` for a sale in the base currency. Everything else on the order,
+            and every ledger posting, stays in the base currency `currency`.
+        chargeFxRate:
+          allOf:
+          - $ref: '#/components/schemas/ExchangeRateDecimal'
+          nullable: true
+          readOnly: true
+          description: >-
+            Units of `chargeCurrency` per one unit of the base currency, from the region's `tender`
+            rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the
+            receipt, the tax invoice and any refund use the same rate (CHG-FIN-001).
+        chargeFxRateId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The `finance.FxRate` row the rate was taken from, for audit.
+        chargeTotal:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: >-
+            `grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale:
+            what the guest pays and what the payment request to the provider asks for (CHG-FIN-001).
+        chargeRateLockedUntil:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: >-
+            The quote holds until then (the cart lease). After it, the next payment attempt re-quotes
+            at the rate then in force and the guest confirms the new amount (CHG-FIN-001).
         droppedPromotions:
           type: array
           readOnly: true
@@ -21989,6 +22065,23 @@ components:
             class of movement and this is the same act at a smaller scale.
 
             '
+        tenderCurrency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          nullable: true
+          readOnly: true
+          description: >-
+            **A refund goes back in the currency the guest paid** (decided 2 October 2026, Chinmay;
+            CHG-FIN-001). For a card or wallet payment taken in a guest-selected currency, the refund
+            request to the provider is in that currency, and `tenderAmount` is the refunded share of the
+            original `Payment.tenderAmount` at the sale rate (`fxRate`), so a full refund returns exactly
+            what was charged. `amount` stays in base currency for the ledger. Null for a refund in the
+            base currency. Foreign cash refunded at a till is paid in base currency (DI-282).
+        tenderAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001).
         amount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         appliedPercentage:
@@ -22056,7 +22149,9 @@ components:
           pattern: ^[A-Z]{3}$
           nullable: true
           description: The currency the guest handed over, where it is not the venue's — becomes
-            `Payment.tenderCurrency`. Omit for a payment in the venue's own currency.
+            `Payment.tenderCurrency`. Omit for a payment in the venue's own currency. For a guest-channel
+            card or wallet payment on an order with a `chargeCurrency`, the server sets it from the order
+            (CHG-FIN-001).
         tenderAmount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -22154,6 +22249,9 @@ components:
           description: '4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.**
             A till giving change in five currencies needs five floats and five counts, and the variance
             becomes unattributable.
+
+            **Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made
+            in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).
 
             '
         amount:

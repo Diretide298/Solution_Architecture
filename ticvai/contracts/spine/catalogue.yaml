@@ -38571,6 +38571,11 @@ components:
           default: discountedPrice
           description: >-
             Region-configurable; `preDiscountPrice` where the region taxes the undiscounted price (MoM 1 Sep 2026 §4.5).
+            **The one source of truth for the taxable base** (decided 2 October 2026, Chinmay; CHG-FIN-004):
+            `finance.calculateTax` reads it per tax code and its own `discountsAreTaxInclusive` is deprecated
+            and ignored. Worked example shown where it is set (ADM-069): Egypt, 14% VAT, a ticket listed at
+            EGP 100.00 with 20% off is paid at EGP 80.00; on `discountedPrice` the VAT is EGP 11.20, on
+            `preDiscountPrice` it is EGP 14.00 and the guest pays EGP 94.00.
         effectiveFrom:
           type: string
           format: date

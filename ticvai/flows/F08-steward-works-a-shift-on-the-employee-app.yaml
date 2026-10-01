@@ -73,9 +73,9 @@ steps:
   outcome: What the next shift needs to know
 - step: 8
   screen: EMP-009
-  action: Ends the shift
+  action: Ends the shift with a blind count (no expected cash shown; CHG-FIN-003)
   operations:
-  - closeShift
+  - submitShiftCount
   outcome: Tasks reassigned, notes handed over
 branches:
 - at: 6

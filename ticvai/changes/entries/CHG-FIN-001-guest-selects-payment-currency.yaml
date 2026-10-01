@@ -1,0 +1,89 @@
+id: CHG-FIN-001
+date: '2026-10-02'
+source: mom
+kind: contract
+summary: The guest selects the currency, the payment partner is asked in it, refunds go back in the currency paid;
+  the ledger stays in base currency with the rate recorded per transaction.
+decision:
+  what: 'Reverse the display-only (AED-only) rule for card and wallet: chargeable currencies per venue, chargeCurrency
+    at checkout, a locked rate and converted total on the order, the provider request in that currency, refunds
+    in the currency paid at the sale rate; foreign cash at a till unchanged (DI-282).'
+  by: Chinmay
+  date: '2026-10-02'
+why: Chinmay, 2 Oct 2026. The kickoff MoM of 10 Aug 2026 (sources/mom/TICVAI_Kickoff_MoM_2026-08-10.docx, 4.7) recorded
+  two options, display-only conversion and full dynamic currency conversion at the gateway with records in base
+  currency (DI-211); the package took only the first (CF-37, finance-insights notes "AED only"). The client prototype
+  already switches the storefront currency (WEB-035 prototype difference). Refunding at the sale rate keeps the
+  venue from refunding at today's rate (BL-087, CF-118). Reverses the 10 Aug quote in listFxRates ("refund for the
+  base currency value").
+keys_touched:
+  operations:
+  - checkoutCart
+  - createPayment
+  - createRefund
+  - listFxRates
+  - setVenueSettings
+  - issueTaxInvoice
+  schemas:
+  - Order
+  - Refund
+  - CreatePaymentRequest
+  - Payment
+  - FxRate
+  - VenueSettings
+  - FinTaxInvoice
+  tables:
+  - orders.sales_order
+  - orders.refund
+  - platform.venue_settings
+  - ledger.tax_invoice
+  screens:
+  - WEB-035
+  - GST-044
+  - WEB-012
+  - GST-009
+  - WEB-010
+  - KSK-007
+  - GST-019
+  - WEB-019
+  - BO-022
+  - BO-023
+  - POS-011
+  - BO-077
+  files:
+  - backend/tenant/V0100__after_r1_20261002.sql
+  - handoff/design-notes/finance-insights.yaml (design-notes branch)
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted:
+  - SVC-ORDER-CART-1 (#17844)
+  - SVC-ORDER-PAYMENT-1 (#17849)
+  - SVC-ORDER-REFUND-1 (#17851)
+  - SVC-LEDGER-LEDGER-1 (#17822)
+  - SVC-TENANCY-TENANCY-1 (#17884)
+  - MIG-ORDERS (#17827)
+  - APP-WEB-WEB-035 (#17871)
+  - APP-MOB-GST-044 (#18130)
+  - APP-WEB-WEB-012 (#17989)
+  - APP-MOB-GST-009 (#17996)
+  - APP-WEB-WEB-010 (#18014)
+  - APP-MOB-GST-019 (#18142)
+  - APP-WEB-WEB-019 (#17923)
+  - VM-BO-022 (#18256)
+  - VM-BO-023 (#18257)
+  - APP-POS-POS-011 (#18002)
+  - APP-SETUP-BO-077 (#17838)
+release_tag: pending
+decision_owner: Chinmay
+client_signoff: pending
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: closed
+closed_by_commit: 7a84e41a
+notes: 'Open for Chinmay: does "refunds go back in the currency paid" also cover foreign cash at a till (DI-282
+  says base currency)? Kept as DI-282 for cash. The tax adviser decides whether a guest-selected currency makes
+  the supply a foreign-currency supply (Decree-Law Art. 69, Central Bank rate) or an AED supply paid in another
+  currency; the contract records both rates. Branch finance-decisions, not yet merged or released (release_tag:
+  the next release). Started tickets: none; Block A starts Monday 5 October.'
