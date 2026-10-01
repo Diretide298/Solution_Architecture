@@ -1,0 +1,379 @@
+id: CHG-WIR-004
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'Contract gap (venue-operations): 82 wiring fixes need an operation the contracts do not have; logged,
+  not invented.'
+decision:
+  what: 'Log, do not invent: each wiring fix below needs an operation (or an audience) the contracts lack. The gap
+    is recorded on the screen (gaps, operation: null) and here, open, for the contract owner.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: Design-note corrections for venue-operations (handoff/design-notes/venue-operations.yaml) name operations that
+  do not exist; the brief for the wiring fixes (Chinmay, 2 October 2026) says to log such a gap as an open contract-gap
+  change and not invent the operation.
+keys_touched:
+  screens:
+  - ANL-070
+  - BO-023
+  - BO-038
+  - BO-146
+  - BO-147
+  - BO-149
+  - BO-150
+  - BO-153
+  - BO-165
+  - BO-168
+  - BO-169
+  - BO-172
+  - BO-173
+  - BO-175
+  - BO-180
+  - BO-183
+  - BO-185
+  - BO-186
+  - BO-191
+  - BO-193
+  - BO-197
+  - BO-198
+  - BO-200
+  - BO-202
+  - BO-205
+  - BO-208
+  - BO-213
+  - BO-215
+  - BO-230
+  - BO-232
+  - BO-237
+  - BO-240
+  - BO-251
+  - BO-252
+  - BO-345
+  - BO-347
+  - BO-348
+  - BO-349
+  - BO-350
+  - BO-351
+  - BO-353
+  - BO-358
+  - BO-398
+  - BO-403
+  - BO-427
+  - BO-432
+  - BO-440
+  - BO-445
+  - BO-453
+  - BO-454
+  - BO-456
+  - BO-458
+  - BO-473
+  - BO-478
+  - BO-484
+  - BO-485
+  - BO-509
+  - BO-574
+  - BO-587
+  - BO-621
+  - BO-624
+  - BO-631
+  - BO-646
+  - BO-651
+  - BO-660
+  - BO-666
+  - BO-674
+  - BO-675
+  - BO-681
+  - BO-862
+  - BO-881
+  - BO-884
+  - BO-887
+  - BO-892
+  - BO-897
+  - BO-902
+  - BO-942
+  - BO-981
+  - EMP-007
+  - EMP-024
+  - EMP-047
+  - EMP-049
+  tickets:
+  - APP-SETUP-BO-168
+  - VM-BO-023
+  - VM-BO-038
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-168
+  - VM-BO-023
+  - VM-BO-038
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: open
+notes: 'type: contract-gap. Open until the contract change is decided; the wiring fix that needs it lands with it.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - BO-038: gap: Confirm that scan rejections are served by orders.listSyncRejections/resolveSyncRejection, or add
+  access-side equivalents for refused scan replays. — listSyncRejections and resolveSyncRejection live in the orders
+  contract (till sales) while F06 step 6 names them for scans; no access-side equivalent exists.
+
+  - EMP-049: gap: No operation hands an unsynced scan journal from one device to another or to the edge node. —
+  Handing over an unsynced journal (device to device, or to the edge node) has no contract operation, so the screen
+  cannot be built (F71 step 3).
+
+  - BO-168: gap: No read lists the registered BLE beacons and geofences (setBleBeaconGeofence has no list or get).
+  — Write-only screen; no list read of registered beacons or geofences exists in the access contract, so the registry
+  cannot be shown or edited.
+
+  - BO-023: gap: No operation lists message dispatches (for F09 step 5, confirming guests of a cancelled performance
+  were notified). — F09 step 5 ("confirms guests were notified") needs a read of the message dispatches for the
+  cancelled performance; marketing-crm has retryMessageDispatch but no list of dispatches.
+
+  - BO-454: gap: No staff-audience read of a game card (getGameCard is guest-only; used on BO-396, BO-454, BO-455,
+  BO-457, BO-462, BO-486). — getGameCard is guest-audience only, yet six back-office card screens (BO-396, BO-454,
+  BO-455, BO-457, BO-462, BO-486) read a guest''s card with it; a staff read is needed before the guest operation
+  can come off them.
+
+  - EMP-007: gap: No operation reads or writes a shift handover note (who it is for, the post, the carried items).
+  — The handover needs its own read and write (or a note on the shift); announcements are the wrong carrier (F65
+  step 5, F08 step 7).
+
+  - EMP-024: gap: No read returns the caller''s own attendance records without WORKFORCE_VIEW. — The screen is the
+  person''s own clock card; listAttendance is the venue attendance list (WORKFORCE_VIEW).
+
+  - EMP-047: gap: No staff all-clear (announcement kind or operation) ends emergency mode. — The staff AnnouncementKind
+  has no all-clear or stand-down, so phones have no defined way out of emergency mode except expiresAt; the guest
+  broadcast has allClear.
+
+  - BO-146: gap: No read lists access areas and zones (setAccessAreaZone has no list or get). — Write-only screen
+  (setAccessAreaZone); without a read the zone tree cannot be drawn or edited.
+
+  - BO-147: gap: No read lists attraction access records (setAttractionAccess has no list or get). — Write-only
+  screen (setAttractionAccess); the editor cannot show current settings.
+
+  - BO-149: gap: No read lists gates and lanes (setGateLane has no list or get). — Write-only screen (setGateLane);
+  a lane list is needed to show and edit identity, direction, gate type, mode and size.
+
+  - BO-150: gap: No read of the saved access map (setAccessGraphicalMap has no get), and no operation accepts an
+  AI-proposed topology. — The canvas cannot open a saved map; the contract notes "Accept AI proposed topology (no
+  operation yet)".
+
+  - BO-153: gap: No read lists access configuration versions with their validation results. — The version list and
+  its validation results have nothing to read; only publish and rollback exist.
+
+  - BO-165: gap: No read of dynamic QR security profiles (setDynamicSecurityProfile has no list or get). — listDigitalCredentialSecurity
+  feeds the command centre; the builder needs to open one profile.
+
+  - BO-169: gap: No operation saves the credential transfer and rebinding policy. — listCredentialTransferRebinding
+  has no write; the transfer policy cannot be saved.
+
+  - BO-172: gap: No read of the embedded entitlement payload and no payload size or optimisation estimate operation.
+  — The designer needs the current payload and an estimate; only the PUT exists.
+
+  - BO-173: gap: No operation runs a credential security simulation or publishes, versions or rolls back a credential
+  security configuration. — The screen''s purpose is test and publish; only two audit reads are bound.
+
+  - BO-175: gap: Merge the two media-type catalogues into one record, one read and one write that every media picker
+  reads (BO-175, BO-337). — Two catalogues of media types (listMediaTypeTechnology, listMediaTypeCredential) with
+  different fields and vocabularies; one media type must mean one record (VO-R14).
+
+  - BO-180: gap: No read of RFID and NFC reader profiles (setRfidNfc has no list or get). — Write-only; rfidNfcProfileId
+  required, so a new profile has no id (VO-R03).
+
+  - BO-183: gap: No operation runs a media compatibility test and returns its results, and no read of the compatibility
+  matrix. — Warnings are produced by the test, not sent by the user; the matrix and test console have no source.
+
+  - BO-185: gap: No read of biometric verification profiles (setBiometricVerificationProfile has no list or get).
+  — The editor must open with current rows (VO-R04).
+
+  - BO-186: gap: No read of the Face Pass enrolment configuration (setFacePassEnrollment has no get). — The form
+  must open pre-filled (VO-R04).
+
+  - BO-191: gap: No operation saves biometric validation at the gate (outcome mapping, exit capture). — The outcome
+  mapping and exitCaptureEnabled read by listBiometricValidationGate have no write.
+
+  - BO-193: gap: No operation disables biometrics in an emergency with a fallback method. — The pack requires emergency
+  disable with fallback; the contract lists it as "no operation yet".
+
+  - BO-197: gap: No read of turnstile and lane behaviour (setTurnstileLaneBehavior has no list or get). — Write-only;
+  the editor needs a read of current values.
+
+  - BO-198: gap: No read of validation outcome and guest feedback profiles (setValidationOutcomeGuest has no list
+  or get). — Write-only; the designer needs a read of existing responses, and a new profile has no id (VO-R03).
+
+  - BO-200: gap: No read of handheld device configurations and no remote-revoke operation for a lost device. — The
+  pack''s lost-device action needs a write, and the editor needs a read.
+
+  - BO-202: gap: No read of the device software package, its versions or its rollout progress, and no rollback.
+  — The form cannot open pre-filled, versions cannot be compared or rolled back (MoM 15 Sep) and rollout progress
+  has nothing to read.
+
+  - BO-205: gap: No read lists edge nodes (setEdgeNodeLocal has no list or get). — The form cannot open with current
+  values and the topology has nothing to draw (VO-R04).
+
+  - BO-208: gap: No read returns the whole gate offline policy row (setGateOfflinePolicy has no get). — BO-171,
+  BO-208 and BO-210 write slices of one whole-row PUT (setGateOfflinePolicy) and no read returns the whole row;
+  saving one screen resets the others.
+
+  - BO-213: gap: No operation rolls back an edge policy version or runs the four edge emergency actions. — The pack
+  makes rollback and the emergency actions the screen''s purpose; the only write is updateSecurityAlert.
+
+  - BO-215: gap: No read of group admission profiles (setGroupAdmissionProfile has no list or get). — Write-only;
+  the form cannot open with current values (VO-R04).
+
+  - BO-230: gap: No operation switches a gate''s direction live, and no bulk gate-mode command. — The client''s
+  "more entry gates in the morning, more exit in the evening" has no operation (direction is fixed per access point),
+  and five gates cannot change together in one audited command.
+
+  - BO-232: gap: No read lists or loads access operational incidents. — Write-only; an incident workspace cannot
+  show its incidents, evidence or status history.
+
+  - BO-237: gap: No read of context, time, event and capacity policies (setContextTimeEvent has no list or get).
+  — Write-only, with policyId a required input (VO-R04, VO-R03).
+
+  - BO-240: gap: No operation creates, approves or revokes a temporary or emergency access grant. — Temporary and
+  emergency grants must be created, approved and revoked; the screen is read-only.
+
+  - BO-251: gap: No read of security response playbooks (setRealTimeSecurity has no list or get). — The form cannot
+  open saved playbooks (VO-R04).
+
+  - BO-252: gap: No read lists or opens security investigations. — A case workspace must load its cases, timeline
+  and evidence.
+
+  - BO-345: gap: No read of digital QR and barcode ticket designs. — The designer cannot open an existing template''s
+  working design (VO-R04).
+
+  - BO-347: gap: No read of Apple Wallet pass designs and no preview operation. — The designer cannot open an existing
+  template, and the pack requires a wallet-style preview before publication.
+
+  - BO-348: gap: No read of Google Wallet pass designs and no preview operation. — Same gap as the other designers
+  (VO-R04).
+
+  - BO-349: gap: No read of RFID, NFC, card and wristband media designs. — Same gap as the other designers (VO-R04).
+
+  - BO-350: gap: No read of digital card, membership and wearable designs and no preview operation. — Same gap as
+  the other designers (VO-R04).
+
+  - BO-351: gap: No read lists the dynamic field library. — setDynamicFieldData writes one field; nothing lists
+  the library, so neither this screen nor the designers can show the fields.
+
+  - BO-353: gap: No read of media templates, rendered previews or server-run check results, and no version list.
+  — The server must run the checks and return results, or a client can claim checks it never ran; there is also
+  no way to list versions.
+
+  - BO-358: gap: No read lists media bindings pending assignment or activation. — The workspace lists credentials
+  awaiting assignment or activation.
+
+  - BO-398: gap: No read of a game''s operational configuration (no GET /games/{gameId}/operations). — setGameOperationalConfiguration
+  is a whole-row PUT with no GET on /games/{gameId}/operations (VO-R04).
+
+  - BO-403: gap: No read of attraction configuration changes and their dependencies. — The games contract has no
+  configuration-change audit read for attractions (DI-866 asks for a dependency log).
+
+  - BO-427: gap: No get, update or deactivate operation for a game entitlement. — The editor cannot change an existing
+  pass or its status; isActive can only be set at creation.
+
+  - BO-432: gap: No read returns past gameplay authorisations with their decision trace. — GameplayAuthorisation
+  (persisted, with trace) has no read operation, and GameplayTransaction carries no trace.
+
+  - BO-440: gap: No read lists stored retry prices. — There is no read of stored retry prices to list.
+
+  - BO-445: gap: No read of redemption rules (setRedemptionRules has no get). — setRedemptionRules is a whole-record
+  PUT and no operation returns the stored rules (VO-R04).
+
+  - BO-453: gap: No read lists prize redemptions. — The ledger needs prize redemptions; no operation lists them.
+
+  - BO-456: gap: No read of game card expiry rules. — setGameCardExpiryRules is a whole-record PUT with no matching
+  GET (VO-R04).
+
+  - BO-458: gap: No read lists game cards by expiry date with their remaining value. — The expiry monitor needs
+  cards by expiry date with their value.
+
+  - BO-473: gap: No games analytics or reconciliation read (plays, rates, revenue, uptime). — Total plays, rates,
+  revenue, uptime and the reconciliation have no operation; only the offline sync status is bound.
+
+  - BO-478: gap: No bulk reader deploy, rollback, version compare or deployment status read. — deployReaderConfiguration
+  sends one reader''s current configuration only.
+
+  - BO-484: gap: No read of game kiosks and their session counts. — The self-service overview needs the kiosk devices
+  and session counts; session counts are held nowhere.
+
+  - BO-485: gap: No read of the game kiosk configuration. — setGameKioskConfiguration is a whole-record PUT with
+  no GET (VO-R04).
+
+  - BO-509: gap: No operation generates or prints asset labels. — The pack requires single and bulk label printing.
+
+  - BO-574: gap: No maintenance KPI read (counts by state, average downtime). — Inspection required, Ready for return
+  to service and Average downtime need an aggregate; downtimeMinutes is per work order.
+
+  - BO-587: gap: No rental equipment performance read (utilisation, rentals and revenue per asset). — Fleet counts,
+  utilisation and revenue per asset need rental bookings joined to the asset register.
+
+  - BO-621: gap: No read of accreditation requirements (only PUT /accreditation-requirements exists); affects BO-621
+  and BO-622. — There is no GET for the requirements matrix, so the editor cannot open pre-filled and a PUT wipes
+  rows it never loaded (also BO-622).
+
+  - BO-624: gap: No operation validates a programme before it opens (form, categories, requirements, validity, notifications).
+  — The publication checklist cannot be computed from what is bound.
+
+  - BO-631: gap: resolveIdentityConflict has no link or escalate outcome. — The contract offers only merged and
+  rejected; link (two records knowingly kept) and escalate have no outcome.
+
+  - BO-646: gap: No operation reads or saves the credential media configuration of a programme. — The screen configures
+  the credential technologies per programme and no operation holds them.
+
+  - BO-651: gap: No operation records a physical credential collection (collected by, when, issued by, collection
+  point, acknowledgement). — deliverAccreditationCredential covers email, sms and holderApp only; physical hand-over
+  cannot be recorded, so Delivered is unreachable for badges and cards.
+
+  - BO-660: gap: No read of HolderAccess (per holder or across holders); affects BO-660, BO-661, BO-668. — There
+  is no get operation for HolderAccess, yet setHolderAccess replaces the whole record; the active-grants list (BO-661)
+  and the BO-654 tile cannot be filled either.
+
+  - BO-666: gap: No read of AccreditationValidity. — A PUT that replaces the record cannot be edited safely without
+  the current values (VO-R04).
+
+  - BO-674: gap: No read of accreditation notification sends and delivery outcomes (or an accreditation filter on
+  listDeliveryQueueFailure). — No read returns accreditation notification sends or delivery outcomes.
+
+  - BO-675: gap: No read of AccreditationNotificationRules; affects BO-675 and BO-676. — A whole-list PUT cannot
+  be edited safely without the current rules (VO-R04); also BO-676.
+
+  - BO-681: gap: No read lists accreditation import batches or loads one. — The monitor needs a list of import batches
+  and a get by batch.
+
+  - BO-862: gap: No read returns a resource''s current venue assignment. — The write is a full replace (VO-R04);
+  without a read the form opens blank and overwrites blind.
+
+  - BO-881: gap: No read of staffing rules (no getStaffingRules); affects BO-881 and BO-885. — setStaffingRules
+  replaces the whole record, including every minimumCover row; saving overtime on BO-881 erases BO-885''s minimum
+  cover and vice versa.
+
+  - BO-884: gap: No read returns candidates for a rota position (skill, availability, suitability). — The roster
+  needs suitable candidates for each role.
+
+  - BO-887: gap: No operation publishes, releases or withdraws an open shift, and none approves or rejects a swap
+  request. — listOpenShifts and claimOpenShift exist but nothing publishes the rows they read, and swap requests
+  cannot be approved or rejected.
+
+  - BO-892: gap: No roster generation or optimisation operation. — Only the current coverage can be read.
+
+  - BO-897: gap: No read of the resource selection policy. — The form opens blank and overwrites the ticket type''s
+  policy.
+
+  - BO-902: gap: No read lists the bookings affected by a resource becoming unavailable. — Recovery is per booking
+  only; the pack starts from the unavailable resource and its affected bookings.
+
+  - BO-942: gap: No read of mobile resource-operation sync state per handset. — The Employee App''s handsets and
+  pending resource actions have no sync read.
+
+  - BO-981: gap: No seating operation computes the impact of a layout change. — diffSeatMapVersions gives counts
+  only.
+
+  - ANL-070: gap: No analytics governance read (report and dataset access, sharing, sensitivity). — BI and analytics
+  governance needs its own read beside the audit trail and AI usage.'

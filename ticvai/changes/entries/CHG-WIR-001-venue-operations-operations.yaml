@@ -1,0 +1,1089 @@
+id: CHG-WIR-001
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'venue-operations: 151 screens rewired — 212 operations taken off screens they do not belong on (bulk-attached,
+  another module''s, guest-, device- or service-only on staff screens, writes on read-only lists), 103 existing
+  operations declared where the screen needed them, 2 duplicate screen(s) merged; 16 flows repointed to match.'
+decision:
+  what: 'Fix the wrong wiring now: take each listed operation off the screen it does not belong on, declare the
+    existing operation the screen needs instead, merge the duplicate screens into the one kept, and repoint the
+    flow steps that called them.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Process-agent design-note corrections for venue-operations (handoff/design-notes/venue-operations.yaml, 1-2
+  October 2026) found these screens wired by the 18 August bulk attach, by name resemblance or from the wrong contract,
+  against the adopted audit decision R254 (re-derive each screen''s operations from its purpose and journeys) and
+  R276 (duplicate screens). Each screen''s reason and source is below and on the screen itself (gaps with removed:
+  true).'
+keys_touched:
+  screens:
+  - ACC-003
+  - ACC-006
+  - ACC-008
+  - ANL-070
+  - BO-001
+  - BO-002
+  - BO-004
+  - BO-005
+  - BO-006
+  - BO-023
+  - BO-030
+  - BO-031
+  - BO-034
+  - BO-035
+  - BO-038
+  - BO-064
+  - BO-066
+  - BO-069
+  - BO-071
+  - BO-096
+  - BO-098
+  - BO-103
+  - BO-108
+  - BO-144
+  - BO-148
+  - BO-155
+  - BO-156
+  - BO-160
+  - BO-163
+  - BO-164
+  - BO-169
+  - BO-171
+  - BO-174
+  - BO-180
+  - BO-184
+  - BO-191
+  - BO-194
+  - BO-206
+  - BO-207
+  - BO-208
+  - BO-210
+  - BO-214
+  - BO-219
+  - BO-222
+  - BO-225
+  - BO-234
+  - BO-236
+  - BO-241
+  - BO-243
+  - BO-334
+  - BO-355
+  - BO-358
+  - BO-394
+  - BO-396
+  - BO-398
+  - BO-401
+  - BO-403
+  - BO-405
+  - BO-406
+  - BO-407
+  - BO-412
+  - BO-425
+  - BO-427
+  - BO-432
+  - BO-445
+  - BO-447
+  - BO-449
+  - BO-450
+  - BO-451
+  - BO-453
+  - BO-458
+  - BO-459
+  - BO-475
+  - BO-477
+  - BO-484
+  - BO-576
+  - BO-578
+  - BO-581
+  - BO-587
+  - BO-615
+  - BO-619
+  - BO-623
+  - BO-624
+  - BO-627
+  - BO-628
+  - BO-635
+  - BO-636
+  - BO-640
+  - BO-643
+  - BO-644
+  - BO-645
+  - BO-646
+  - BO-647
+  - BO-648
+  - BO-649
+  - BO-650
+  - BO-651
+  - BO-653
+  - BO-656
+  - BO-657
+  - BO-658
+  - BO-660
+  - BO-667
+  - BO-668
+  - BO-669
+  - BO-672
+  - BO-673
+  - BO-674
+  - BO-681
+  - BO-682
+  - BO-714
+  - BO-863
+  - BO-875
+  - BO-877
+  - BO-882
+  - BO-884
+  - BO-887
+  - BO-894
+  - BO-895
+  - BO-900
+  - BO-903
+  - BO-910
+  - BO-911
+  - BO-918
+  - BO-942
+  - BO-981
+  - CMS-071
+  - EMP-004
+  - EMP-005
+  - EMP-007
+  - EMP-010
+  - EMP-017
+  - EMP-022
+  - EMP-024
+  - EMP-027
+  - EMP-032
+  - EMP-037
+  - EMP-038
+  - EMP-039
+  - EMP-047
+  - EMP-048
+  - EMP-050
+  - POS-029
+  - SCN-002
+  - SCN-003
+  - SCN-007
+  - SCN-008
+  - SCN-009
+  - SCN-013
+  - SCN-014
+  - SCN-015
+  operations:
+  - acceptWorkOrder
+  - acknowledgeAnnouncement
+  - actOnWorkflowInstance
+  - allocateResources
+  - amendAttendance
+  - approveRefund
+  - attachWorkOrderEvidence
+  - authoriseGameplay
+  - callNextParties
+  - cancelPerformance
+  - cancelWorkOrder
+  - claimOpenShift
+  - closeWorkOrder
+  - completeWorkOrder
+  - createAccessPoint
+  - createAccreditationApplication
+  - createAccreditationProgramme
+  - createAdmissionRules
+  - createApprovalRequest
+  - createAsset
+  - createBadgePrintJob
+  - createBulkRefund
+  - createCampaign
+  - createEvent
+  - createGameEntitlement
+  - createInspectionTemplate
+  - createPerformances
+  - createPrize
+  - createQueue
+  - createResource
+  - createResourceCost
+  - createRotaAssignment
+  - createWorkOrder
+  - decideAccreditationApplication
+  - enrolDevice
+  - exportReportResult
+  - getAccreditationHolder
+  - getAiUsage
+  - getAnnouncementReach
+  - getAsset
+  - getAssetHistory
+  - getCampaign
+  - getCampaignPerformance
+  - getCurrentShift
+  - getDevice
+  - getEntitlement
+  - getEntitlementCredential
+  - getEntitlementHistory
+  - getEvent
+  - getExperienceResourceRequirements
+  - getGameCard
+  - getGameEligibility
+  - getGamePricing
+  - getGameplaySyncStatus
+  - getGameplayValidationRules
+  - getOfflinePackage
+  - getPerformance
+  - getQueue
+  - getQueueFeedHealth
+  - getResourceQualifications
+  - getSeatAvailability
+  - getStaffingCoverage
+  - getStockPositions
+  - getVenueSettings
+  - getWaitTimes
+  - importAccreditationHolders
+  - issueAccreditationCredential
+  - launchCampaign
+  - listAccessPoints
+  - listAccessProfiles
+  - listAccreditationAccessActivity
+  - listAccreditationApplications
+  - listAccreditationAudit
+  - listAccreditationCredentials
+  - listAccreditationDocuments
+  - listAccreditationHolders
+  - listAccreditationIdentityConflicts
+  - listAccreditationProgrammes
+  - listAdmissionRules
+  - listAiInteractions
+  - listAnnouncements
+  - listApprovalRequests
+  - listAssets
+  - listAttendance
+  - listAuditRecords
+  - listBadgePrintJobs
+  - listBadgeTemplates
+  - listBlacklist
+  - listCampaigns
+  - listCredential
+  - listCredentialGenerationIssuance
+  - listDeviceTypeHardware
+  - listDevices
+  - listDynamicAccessPolicy
+  - listEntryExitRule
+  - listEntryTemporaryExit
+  - listEvents
+  - listGameEntitlements
+  - listGameplayTransactions
+  - listGames
+  - listInspectionTemplates
+  - listMediaTypeCredential
+  - listMultiParkCrossover
+  - listPerformances
+  - listPolicies
+  - listPrizes
+  - listQueueEntries
+  - listQueues
+  - listReaders
+  - listResourceCosts
+  - listRotaAssignments
+  - listScans
+  - listSecurityDetectionGovernance
+  - listShiftSwapRequests
+  - listSyncRejections
+  - listVirtualTicketArchitecture
+  - listVirtualTicketStatus
+  - listWalletTransactions
+  - listWorkOrders
+  - listWorkflow
+  - lookupAsset
+  - lookupTicket
+  - overrideAccess
+  - pauseCampaign
+  - pauseWorkOrder
+  - publishAnnouncement
+  - recommendSeats
+  - recordAuthorityNotification
+  - recordGamePlay
+  - recordRentalInspection
+  - recordWorkOrderParts
+  - recordWorkOrderTime
+  - redeemPrize
+  - registerDevice
+  - releaseCredentialDevice
+  - releaseResourceBlock
+  - replaceAccreditationCredential
+  - resolveSyncRejection
+  - resumeWorkOrder
+  - runReport
+  - setAccreditationNotificationRules
+  - setAccreditationValidity
+  - setAssetStatus
+  - setBadgeTemplate
+  - setBiometricVerificationProfile
+  - setConnectivityThresholds
+  - setContextTimeEvent
+  - setDeviceBindingPolicy
+  - setDynamicSecurityProfile
+  - setEdgeNodeLocal
+  - setExperienceResourceRequirements
+  - setFacePassEnrollment
+  - setGameCardExpiryRules
+  - setGateOfflinePolicy
+  - setHardwareModel
+  - setOfflinePolicy
+  - setPrizeCost
+  - setQueueStatus
+  - setReaderConfiguration
+  - setReaderProfile
+  - setRedemptionRules
+  - setResourceAllocationPolicy
+  - setResourceQualifications
+  - setRfidNfcCard
+  - setRolePermissions
+  - setTurnstileMode
+  - setVirtualTicketCredential
+  - setVisualDynamicPolicy
+  - setVisualWorkflow
+  - setWaitTime
+  - simulateGameplayAuthorisation
+  - simulatePolicyConflictImpact
+  - simulateWorkflowTestingImpact
+  - startPodiumShift
+  - startWorkOrder
+  - stopCampaign
+  - syncGamePlays
+  - syncOrders
+  - syncScans
+  - testSendCampaign
+  - unscheduleCampaign
+  - updateAccessDevicePlacement
+  - updateAccessPoint
+  - updateAccreditationProgramme
+  - updateAsset
+  - updateCampaign
+  - updateEvent
+  - updateGame
+  - updateMaintenancePlan
+  - updatePerformance
+  - updateQueue
+  - updateResource
+  - updateResourcePackage
+  - updateWorkOrder
+  - validateAccess
+  - validateGroupAccess
+  - verifyAccreditationDocument
+  - verifyWorkOrder
+  flows:
+  - F06
+  - F08
+  - F09
+  - F112
+  - F117
+  - F118
+  - F12
+  - F120
+  - F170
+  - F18
+  - F23
+  - F61
+  - F62
+  - F63
+  - F69
+  - F72
+  tickets:
+  - APP-POS-POS-029
+  - APP-SETUP-BO-001
+  - APP-SETUP-BO-005
+  - APP-SETUP-BO-006
+  - APP-SETUP-BO-064
+  - APP-SETUP-BO-155
+  - APP-SETUP-BO-164
+  - APP-SETUP-BO-184
+  - APP-SETUP-BO-222
+  - APP-SETUP-BO-234
+  - APP-SETUP-BO-243
+  - APP-SETUP-BO-863
+  - APP-SETUP-BO-877
+  - APP-SETUP-EMP-048
+  - VM-BO-002
+  - VM-BO-004
+  - VM-BO-023
+  - VM-BO-030
+  - VM-BO-031
+  - VM-BO-034
+  - VM-BO-035
+  - VM-BO-038
+  - VM-BO-066
+  - VM-BO-069
+  - VM-BO-096
+  - VM-BO-098
+  - VM-BO-103
+  - VM-BO-108
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-029
+  - APP-SETUP-BO-001
+  - APP-SETUP-BO-005
+  - APP-SETUP-BO-006
+  - APP-SETUP-BO-064
+  - APP-SETUP-BO-155
+  - APP-SETUP-BO-164
+  - APP-SETUP-BO-184
+  - APP-SETUP-BO-222
+  - APP-SETUP-BO-234
+  - APP-SETUP-BO-243
+  - APP-SETUP-BO-863
+  - APP-SETUP-BO-877
+  - APP-SETUP-EMP-048
+  - VM-BO-002
+  - VM-BO-004
+  - VM-BO-023
+  - VM-BO-030
+  - VM-BO-031
+  - VM-BO-034
+  - VM-BO-035
+  - VM-BO-038
+  - VM-BO-066
+  - VM-BO-069
+  - VM-BO-096
+  - VM-BO-098
+  - VM-BO-103
+  - VM-BO-108
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-STAFF-AUDIENCE (a staff screen calling a guest-, device-, service- or partner-only
+  operation) beside the existing S-DUP-SCREEN and S-CONSUMED-MIRROR rules, and check-screens keeps its R254 attachment
+  warnings; check-flows rule 3 holds every repointed flow step to its screen. Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key naming a touched screen. Per screen and
+  flow:
+
+  - POS-029: removed getQueue, getQueueFeedHealth, listQueueEntries — Ride-queue and sensor-feed operations (listQueueEntries,
+  getQueue, getQueueFeedHealth) sat on an F&B order board; an outlet''s order flow reads listFnbOrders (ADR-0012;
+  design-notes correction venue-operations POS-029).
+
+  - EMP-048: removed createInspectionTemplate — Template authoring (createInspectionTemplate, INSPECTION_MANAGE)
+  is tenant-level management in the back office; the opening checklist only works today''s checks (design-notes
+  correction venue-operations EMP-048).
+
+  - EMP-010: removed getOfflinePackage, listScans, syncScans — Scan history, sync and offline-package panels on
+  the scan screen; as on SCN-003 the scan screen is idle by design, history is SCN-009''s, sync EMP-017''s and the
+  package EMP-018''s (F06 step 4; design-notes correction venue-operations EMP-010).
+
+  - EMP-017: removed syncOrders — syncOrders replays till sales; a staff phone replays scans, and till order sync
+  is POS work (design-notes correction venue-operations EMP-017).
+
+  - EMP-032: removed listQueueEntries, listQueues — The waiting-guest table and queue list do not serve manual wait
+  entry; only the chosen ride''s wait and its source are needed (design-notes correction venue-operations EMP-032).
+
+  - SCN-002: removed setTurnstileMode — Setting the gate''s operating mode is the live podium act on SCN-016 Gate
+  mode (R221); on SCN-002 the primary act is confirming the access point and starting the podium shift (design-notes
+  corrections venue-operations SCN-002, BO-064).
+
+  - SCN-003: removed getOfflinePackage, listBlacklist, listScans, syncScans — F06 step 4 says the ready screen calls
+  nothing and is idle by design; the scan history (listScans needs the venue report permission) belongs to SCN-009,
+  sync to SCN-014, the package to SCN-015, and the blacklist travels in the offline package (design-notes correction
+  venue-operations SCN-003).
+
+  - SCN-007: removed listScans, overrideAccess, syncScans, validateAccess; exits added SCN-014 — Scan history, sync,
+  override and single-validate actions were generated from the scanner set; the group screen needs the group counter
+  and the admit stepper (validateGroupAccess) (design-notes correction venue-operations SCN-007).
+
+  - SCN-008: removed listScans, overrideAccess, syncScans, validateGroupAccess — Manual entry needs the reference
+  field and the validate result only; the scan table, sync, override and group validation were generated from the
+  scanner set (design-notes correction venue-operations SCN-008).
+
+  - SCN-009: removed overrideAccess, syncScans, validateAccess, validateGroupAccess — Validate, group validate,
+  sync and override contradict the screen''s own purpose ("Reads. Does not admit, does not decrement") and lookupTicket''s
+  contract (design-notes correction venue-operations SCN-009).
+
+  - SCN-013: removed listScans — The offline journal is local to the device and needs no server read; listScans
+  returns server scans and needs the venue report permission (F63 step 2; design-notes correction venue-operations
+  SCN-013).
+
+  - SCN-014: removed syncOrders — A scanner replays scans; syncOrders replays till sales and belongs to the POS
+  (design-notes correction venue-operations SCN-014).
+
+  - SCN-015: removed listScans, overrideAccess, syncScans, validateAccess, validateGroupAccess — The package screen
+  shows the package; the scan table, override, validate and sync actions were the generated scanner set (design-notes
+  correction venue-operations SCN-015).
+
+  - BO-001: removed createEvent, createPerformances, getEvent, listEvents, listPerformances, updateEvent — Event
+  and performance operations were wired from flow F09 (event cancellation); events and performances are the ticketing
+  back office (BO-015), not the ride queue directory (F09 step 1; design-notes correction venue-operations BO-001).
+
+  - BO-002: removed cancelPerformance, getPerformance, getSeatAvailability, listQueueEntries, recommendSeats, updatePerformance;
+  exits dropped BO-023 — Seat and performance operations (getSeatAvailability, recommendSeats, getPerformance, updatePerformance,
+  cancelPerformance) were carried from a seat-board frame and flow F09 and have no place on ride queue configuration;
+  the waiting-guest list belongs to the monitor BO-005 (F09 step 2; design-notes…
+
+  - BO-004: removed approveRefund, createBulkRefund, createQueue, setQueueStatus, updateQueue; exits dropped BO-005;
+  entries dropped BO-023 — Refund operations (createBulkRefund, approveRefund) and queue create/update/status were
+  carried from flow F09 and BO-001; this screen sets waits (F09 step 4; design-notes correction venue-operations
+  BO-004).
+
+  - BO-005: removed createCampaign, getCampaign, getCampaignPerformance, launchCampaign, listCampaigns, pauseCampaign,
+  stopCampaign, testSendCampaign, unscheduleCampaign, updateCampaign — A queue monitor does not run marketing campaigns;
+  the queue''s guest notifications come from setQueueStatus and callNextParties and are transactional. The second
+  primary button "Call next" (no operation) duplicated "Call next parties" (contracts/satellite/queue.yaml#setQueueStatus;
+  F09 step 5; R254;…
+
+  - BO-006: removed listAccessPoints, updateAccessPoint — Parking configuration needs only the facility read and
+  write; editing access points belongs to BO-064, and the venue comes from the session (ADR-0030; design-notes correction
+  venue-operations BO-006).
+
+  - BO-030: removed acceptWorkOrder, attachWorkOrderEvidence, cancelWorkOrder, closeWorkOrder, completeWorkOrder,
+  createWorkOrder; exits dropped BO-031; exits added BO-069 — The screen exists to verify or reject completed work;
+  create, accept, complete, cancel, close and attach-evidence belong to BO-070 and the technician''s app (F12 step
+  4; design-notes correction venue-operations BO-030). F12 step 5 now returns the asset to service on BO-069, the
+  kept asset register.
+
+  - BO-023: declared createBulkRefund — F09 step 4 authorised the bulk refund on BO-004 Manual Wait Time Entry,
+  a queue screen; a refund is worked on the refunds screen (F09 step 3 note, 24 August), so createBulkRefund is
+  declared here and the step moves with it (design-notes correction venue-operations BO-004).
+
+  - BO-031: removed createAsset, getAsset, getAssetHistory, listAssets, lookupAsset, setAssetStatus, updateAsset;
+  merged into BO-069 — BO-031 and BO-069 are the same asset register (same seven maintenance operations, near-identical
+  layouts); keep BO-069 and retire BO-031 (DI-671, DI-987; design-notes corrections venue-operations BO-031, BO-069).
+
+  - BO-069: removed listGames, recordGamePlay, syncGamePlays, updateGame — recordGamePlay and syncGamePlays are
+  device-audience operations and game configuration belongs to the games boards (BO-395); keep only the asset register
+  (design-notes correction venue-operations BO-069).
+
+  - BO-034: removed getOfflinePackage, overrideAccess, syncScans, validateAccess, validateGroupAccess — Sync, validate,
+  group-validate, override and the offline package are workstation-scoped scanner operations the contract refuses
+  (403) for a back-office browser; back-office screens read through listScans (design-notes correction venue-operations
+  BO-034).
+
+  - BO-035: removed getOfflinePackage, overrideAccess, syncScans, validateAccess, validateGroupAccess — An audit
+  screen performs none of override, validate, group-validate or sync; the scanner operations are refused for a back-office
+  session, and overriding belongs at the gate (SCN-003) (F06 step 5; design-notes correction venue-operations BO-035).
+
+  - BO-038: removed callNextParties, createQueue, getQueue, getWaitTimes, listQueueEntries, listQueues, setQueueStatus,
+  setWaitTime, updateQueue; declared listSyncRejections, resolveSyncRejection; set requiresModule=access — Every
+  operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection
+  read and resolve action named by F06 step 6 replace them, and the screen leaves the queue module (design-notes
+  corrections venue-operations BO-038).
+
+  - BO-064: removed setTurnstileMode — The operating mode is a live podium action (R221) that belongs on BO-201
+  and SCN-016; on this configuration screen it invites changing a gate''s live state from a setup form (design-notes
+  correction venue-operations BO-064).
+
+  - BO-066: removed acknowledgeAnnouncement — Acknowledging an announcement is the recipient''s act on the Staff
+  App, not a back-office action (design-notes correction venue-operations BO-066).
+
+  - BO-096: see the screen — Two primary buttons for one act ("Book" with no operation and "Book resource" on bookResource);
+  one Book action (design-notes correction venue-operations BO-096).
+
+  - BO-098: declared getResourceQualifications — A write-only screen (setResourceQualifications) with no read of
+  the current qualifications; the list sorted by expiry needs getResourceQualifications, which exists (design-notes
+  correction venue-operations BO-098).
+
+  - BO-103: removed getVenueSettings — Venue settings are not access state and getVenueSettings carries no module
+  enablement (R279); the hub''s "What is enabled here" panel cannot be filled from it (design-notes correction venue-operations
+  BO-103).
+
+  - BO-108: removed getVenueSettings — A hub shows state and links; the venue settings panel does not belong on
+  it and getVenueSettings carries no module enablement (R279) (design-notes correction venue-operations BO-108).
+
+  - BO-155: declared listAdmissionRules — No read was bound, so the builder could not open an existing rule; the
+  rule lives in AdmissionRules.ruleConditions, read by listAdmissionRules (design-notes correction venue-operations
+  BO-155).
+
+  - BO-164: removed setDeviceBindingPolicy, setDynamicSecurityProfile — The command centre monitors; the device-binding
+  and dynamic-profile writes belong to BO-167 and BO-165, which declare them (ADR-0041, DI-653; design-notes correction
+  venue-operations BO-164).
+
+  - BO-184: removed setBiometricVerificationProfile, setFacePassEnrollment — The command centre is a dashboard (VO-R02);
+  the verification-profile and enrolment writes belong to BO-185 and BO-186, which declare them (ADR-0041; design-notes
+  correction venue-operations BO-184).
+
+  - BO-222: removed setContextTimeEvent — setContextTimeEvent is the context policy builder''s write (BO-237, which
+  declares it); a context policy is a different object from a special-event admission (design-notes correction venue-operations
+  BO-222).
+
+  - BO-234: removed setVisualDynamicPolicy — A policy write on the command centre; writes belong to BO-236 and BO-237
+  (VO-R02, ADR-0041; design-notes correction venue-operations BO-234).
+
+  - BO-243: removed listPolicies — listPolicies reads the white-label legal policies (privacy, terms, refund, cookie),
+  the wrong domain; access policies come from listDynamicAccessPolicy and listDynamicPolicyEffectiveness, both declared
+  (design-notes correction venue-operations BO-243).
+
+  - BO-863: removed createResource, updateResource — Creating and editing resources is BO-095 and BO-857; this screen
+  governs the lifecycle (design-notes correction venue-operations BO-863).
+
+  - BO-877: removed setResourceQualifications — Recording a person''s qualifications is BO-098 and BO-876; this
+  screen defines requirements (design-notes correction venue-operations BO-877).
+
+  - EMP-004: removed attachWorkOrderEvidence, cancelWorkOrder, closeWorkOrder, completeWorkOrder, pauseWorkOrder,
+  recordWorkOrderParts, recordWorkOrderTime, resumeWorkOrder, startWorkOrder, updateWorkOrder, verifyWorkOrder —
+  Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only;
+  doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are
+  supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correctio…
+
+  - EMP-005: removed cancelWorkOrder, closeWorkOrder, updateWorkOrder, verifyWorkOrder — Verify, Close, Cancel and
+  Save (reassign, reprioritise) are supervisor acts (the verifier may not be the technician); they belong to BO-030
+  and BO-070, not the technician''s task screen (F12 step 4; design-notes correction venue-operations EMP-005).
+
+  - EMP-007: removed acknowledgeAnnouncement, getAnnouncementReach, listAnnouncements, publishAnnouncement; declared
+  listWorkOrders — A handover is not a staff announcement: publishing needs ANNOUNCEMENT_PUBLISH, which a steward
+  does not hold, and reaches the whole audience, not the next person on the post. F65 says the handover is generated
+  from open tasks, so the carried items are read from listWorkOrders; the handover note its…
+
+  - EMP-022: removed getCurrentShift — getCurrentShift reads the till session (SHIFT_OPEN, workstation scope); a
+  rota assignment is not a cash shift and most positions never touch a till (design-notes correction venue-operations
+  EMP-022).
+
+  - EMP-024: removed amendAttendance — Amending attendance is a supervisor act (WORKFORCE_MANAGE); it was removed
+  from EMP-025 for that reason and goes from the staff member''s own clock screen too (design-notes correction venue-operations
+  EMP-024).
+
+  - EMP-050: removed recordAuthorityNotification — Recording the authority notification is a step of following up
+  the incident (EMP-027), not of restoring the venue; the screen''s own note says notification belongs where the
+  incident is handled (F69 step 3; design-notes corrections venue-operations EMP-050, EMP-027).
+
+  - EMP-027: declared recordAuthorityNotification — The supervisor following up the incident records the notification
+  to the authorities; the operation sat on EMP-050 (F69 step 3; design-notes correction venue-operations EMP-027).
+
+  - EMP-037: removed publishAnnouncement; declared listApprovalRequests — The inbox is where staff read; publishing
+  belongs to EMP-038 (and BO-066 on the back office). F14 routes a manager''s mobile approval of a discount here
+  and DI-229 asks for action-required items, so the approvals read is added; without it the Action required tab
+  is empty except for acknowledgements…
+
+  - EMP-038: removed acknowledgeAnnouncement — Acknowledging is the recipient''s act (EMP-039, EMP-037), not the
+  sender''s (design-notes correction venue-operations EMP-038).
+
+  - EMP-039: removed getAnnouncementReach, publishAnnouncement — Staff read here: publishing is EMP-038 and BO-066,
+  and the reach roll call is for the publisher and supervisors, not for every reader (design-notes correction venue-operations
+  EMP-039).
+
+  - EMP-047: removed getAnnouncementReach, publishAnnouncement — Emergency mode is a full-screen takeover with one
+  action (acknowledge); the generic announcements set put publish and the reach roll call on it. Declaring goes
+  out from EMP-038 (F69 step 4 repointed) (F08 step 2; design-notes correction venue-operations EMP-047).
+
+  - BO-071: removed setRolePermissions; declared updateMaintenancePlan — Bulk-attach residue: role permissions are
+  tenant identity administration and have nothing to do with maintenance plans. Only createMaintenancePlan was bound;
+  updateMaintenancePlan (PATCH, suspend) exists and a plan library that cannot change a plan is incomplete (design-notes
+  correction venue-opera…
+
+  - BO-144: removed createAccessPoint — The command centre monitors (VO-R02); creating an access point belongs on
+  the Access Point Directory BO-148 (design-notes correction venue-operations BO-144).
+
+  - BO-148: declared createAccessPoint, updateAccessPoint — The Access Point Directory had no write at all; the
+  create moved off the command centre BO-144 belongs here, with the update (design-notes corrections venue-operations
+  BO-144, BO-148).
+
+  - BO-156: removed listEntryExitRule — listEntryExitRule returns its own rule rows (entryMode, exitMode, designatedGateRequired)
+  while the write is the admission profile; two shapes for one block. The block is read from listAdmissionRules,
+  already declared (VO-R14; design-notes correction venue-operations BO-156).
+
+  - BO-160: removed listMultiParkCrossover — listMultiParkCrossover names its fields differently from AdmissionRules.crossover
+  (allowedParks vs allowedParkOrgUnitIds, crossoverTime vs crossoverAfterTime); the section reads and writes the
+  profile''s crossover block only, through listAdmissionRules (design-notes correction venue-operations BO-16…
+
+  - BO-163: declared createApprovalRequest — Submit for approval was not bound; the rule lifecycle needs createApprovalRequest
+  (design-notes correction venue-operations BO-163).
+
+  - BO-169: removed releaseCredentialDevice — Releasing a device binding belongs to BO-167 Device Binding; this
+  screen edits transfer policies, not a binding (design-notes correction venue-operations BO-169).
+
+  - BO-171: removed setOfflinePolicy — Save was bound to setOfflinePolicy (tenancy, TENANT_CONFIGURE), the POS workstation
+  offline policy; the gate policy is setGateOfflinePolicy (ACCESS_POINT_CONFIGURE), already declared here (design-notes
+  correction venue-operations BO-171).
+
+  - BO-174: removed listMediaTypeCredential — listMediaTypeCredential is the Ticket Media registry of BO-337; the
+  hub needs no media-type catalogue, and the library belongs to BO-175 (VO-R14; design-notes correction venue-operations
+  BO-174).
+
+  - BO-180: removed setRfidNfcCard — setRfidNfcCard is the physical card and wristband designer of the ticket media
+  pack (BO-349); artwork, printing and deposit do not belong on reader-side RFID configuration (design-notes correction
+  venue-operations BO-180).
+
+  - BO-191: removed setBiometricVerificationProfile — setBiometricVerificationProfile is the profile write of BO-185
+  and has no outcome mapping or exit capture; the gate mapping read by listBiometricValidationGate has no write
+  yet (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-191).
+
+  - BO-194: removed registerDevice, setTurnstileMode, updateAccessDevicePlacement — The command centre monitors
+  (VO-R02): placement and registration belong to BO-196, gate mode changes to the gate mode screens (BO-201, SCN-016)
+  (design-notes correction venue-operations BO-194).
+
+  - BO-206: removed setOfflinePolicy; declared setGateOfflinePolicy — The gate offline validation policy is written
+  by setGateOfflinePolicy (access, ACCESS_POINT_CONFIGURE); setOfflinePolicy is the tenancy POS till policy (sales,
+  refunds, value ceilings). Same fault as BO-171, BO-208 and BO-210 (design-notes corrections venue-operations BO-171,
+  BO-208).
+
+  - BO-207: removed getOfflinePackage — getOfflinePackage is workstation-scoped (ACCESS_VALIDATE) and refuses a
+  back-office browser with 403; the screen reads listEdgePackageData (design-notes correction venue-operations BO-207).
+
+  - BO-208: removed setOfflinePolicy — Save was bound to setOfflinePolicy (tenancy, the POS till policy) with TENANT_CONFIGURE;
+  the gate revocation policy is written by setGateOfflinePolicy, already declared here (design-notes correction
+  venue-operations BO-208).
+
+  - BO-210: removed setConnectivityThresholds, setOfflinePolicy — The gate degraded-mode policy is setGateOfflinePolicy;
+  setOfflinePolicy and setConnectivityThresholds are tenancy policies for POS workstations, keyed by scopePath (design-notes
+  correction venue-operations BO-210).
+
+  - BO-214: removed createAdmissionRules — Admission profiles are created on BO-032; a second create path on the
+  command centre duplicates it (VO-R14) and a command centre carries no create forms (VO-R02) (design-notes correction
+  venue-operations BO-214).
+
+  - BO-219: removed listEntryTemporaryExit — listEntryTemporaryExit returns a separate re-entry rule (ruleId, maximum,
+  name) beside the admission profile; re-entry is a block of the profile, read by listAdmissionRules (already declared),
+  and a second rule list invites two truths (design-notes correction venue-operations BO-219).
+
+  - BO-225: removed startPodiumShift — Starting a shift signs the caller onto a podium they stand at; it belongs
+  on the podium device (P07 SCN-002, which declares it). The back office ends shifts and supervises (design-notes
+  correction venue-operations BO-225).
+
+  - BO-236: declared listDynamicAccessPolicy — Write-only builder; listDynamicAccessPolicy exists so a policy can
+  be opened and edited (VO-R04; design-notes correction venue-operations BO-236).
+
+  - BO-241: removed setEdgeNodeLocal, setOfflinePolicy — Edge nodes are configured on BO-205 and the tenancy till
+  policy governs POS; this screen writes setPolicyEvaluationSetting only (design-notes correction venue-operations
+  BO-241).
+
+  - BO-334: removed listVirtualTicketArchitecture, listVirtualTicketStatus — listVirtualTicketStatus and listVirtualTicketArchitecture
+  are the reads of BO-336 and BO-343; the hub needs neither, and the second needs AUDIT_VIEW, which operations staff
+  lack (design-notes correction venue-operations BO-334).
+
+  - BO-355: removed setVirtualTicketCredential; declared getEntitlement, getEntitlementCredential, getEntitlementHistory
+  — The 360 workspace was bound to setVirtualTicketCredential, a PUT, as its data; the contract itself says the
+  screen writes nothing. It reads the entitlement, its credential (masked) and its history (design-notes correction
+  venue-operations BO-355).
+
+  - BO-358: declared lookupTicket — The table was bound to the write setMediaBindingActivation (a PUT returns one
+  binding, not a list); the workspace needs the ticket read to find what to bind. The list of pending assignments
+  has no operation (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-358).
+
+  - BO-394: declared listReaders — The reader KPIs (Active readers, Reader faults) had no bound read; listGames
+  carries no reader status (design-notes correction venue-operations BO-394).
+
+  - BO-396: removed getGameCard; declared listGames — getGameCard reads a guest card''s balances (guest audience,
+  by cardCode) and has nothing to do with an attraction; the editor reads the Game from listGames (design-notes
+  correction venue-operations BO-396).
+
+  - BO-398: declared updateGame — The screen sets whether an attraction is available for transactions; its state
+  is written by updateGame, which was not bound (design-notes correction venue-operations BO-398).
+
+  - BO-401: removed createGameEntitlement — The pack keeps entitlement creation on Board 4 (BO-427 to BO-430); this
+  screen reads and navigates, and a create here duplicates them (design-notes correction venue-operations BO-401).
+
+  - BO-403: removed listGameplayTransactions — Gameplay transactions are guest taps, not configuration changes;
+  the audit timeline has no read in the games contract yet (contract gap CHG-WIR-004) (DI-866; design-notes correction
+  venue-operations BO-403).
+
+  - BO-405: declared listDevices — Serial, firmware and heartbeat live on the tenancy device register (ADR-0067)
+  but no read of it was bound; the directory reads the register alongside listReaders (design-notes correction venue-operations
+  BO-405).
+
+  - BO-406: removed setReaderProfile; declared listReaders, setReaderConfiguration, getDevice — setReaderProfile
+  writes the shared display and retry profile, not one reader''s identity and location; the per-reader write is
+  setReaderConfiguration, with the reader read and the tenancy device read for its facts (design-notes correction
+  venue-operations BO-406).
+
+  - BO-407: removed enrolDevice; declared listReaders, getGamePricing, getGameplayValidationRules — Enrolment belongs
+  to the device register; this screen sets acceptance and price source and needs the reader, the effective price
+  and the validation rules to show them (design-notes correction venue-operations BO-407).
+
+  - BO-412: removed setReaderConfiguration; declared setReaderProfile — Per-outcome responses (what the reader shows
+  and does) live on ReaderProfile.displayBehaviour, written by setReaderProfile; the screen was bound to the per-reader
+  setReaderConfiguration as "Theme and experience" (design-notes correction venue-operations BO-412).
+
+  - BO-425: declared getGameplayValidationRules — setGameplayValidationRules is a whole-record PUT and needs getGameplayValidationRules
+  to pre-fill (VO-R04); the read was bound only on BO-424 (design-notes correction venue-operations BO-425).
+
+  - BO-427: declared listGameEntitlements — Only createGameEntitlement was bound, so the editor could not show existing
+  passes; listGameEntitlements exists. Update and deactivate have no operation (contract gap CHG-WIR-004) (design-notes
+  correction venue-operations BO-427).
+
+  - BO-432: removed authoriseGameplay — authoriseGameplay (ACCESS_VALIDATE) decides and charges a live tap at a
+  reader; calling it from the back office would charge a guest. The stored decision trace has no read yet (contract
+  gap CHG-WIR-004) (design-notes correction venue-operations BO-432).
+
+  - BO-445: removed listPrizes — The prize catalogue has nothing to do with how games earn credits; it belongs to
+  BO-449 and BO-450 (design-notes correction venue-operations BO-445).
+
+  - BO-447: declared listGames — The games list was unbound; listGames carries the reader, minimum and maximum points
+  and points awarded today (design-notes correction venue-operations BO-447).
+
+  - BO-449: removed setRedemptionRules — A counter attendant does not change earn rules; the binding gave a till
+  a configuration write (design-notes correction venue-operations BO-449).
+
+  - BO-450: removed redeemPrize; declared createPrize, setPrizeCost — The catalogue configures prizes; handing one
+  over (redeemPrize) belongs to the counter BO-449. The catalogue''s writes are createPrize and setPrizeCost (design-notes
+  corrections venue-operations BO-450).
+
+  - BO-451: declared getStockPositions — The inventory view (available, reserved, reorder level, status) had no
+  read bound; it needs the inventory stock positions (design-notes correction venue-operations BO-451).
+
+  - BO-453: removed setPrizeCost; declared listGameplayTransactions, listWalletTransactions — A ledger needs reads
+  of plays with credits earned and of card movements; setPrizeCost is a configuration write, and the ledger is entered
+  from the dashboard with no prize (design-notes correction venue-operations BO-453).
+
+  - BO-458: removed setGameCardExpiryRules — A monitoring list needs a read of cards by expiry date; setGameCardExpiryRules
+  is the configuration write of BO-456. No read of cards by expiry exists (contract gap CHG-WIR-004) (design-notes
+  correction venue-operations BO-458).
+
+  - BO-459: removed authoriseGameplay; declared simulateGameplayAuthorisation — authoriseGameplay decides a real
+  tap now and charges for it; a back-office check uses simulateGameplayAuthorisation, which returns the decision
+  and trace without consuming anything (design-notes correction venue-operations BO-459).
+
+  - BO-475: removed setReaderProfile; declared listDeviceTypeHardware, setHardwareModel — ReaderProfile holds display
+  behaviour, retry and replay window, not manufacturer, model or capabilities; the model belongs to the hardware
+  model library (design-notes correction venue-operations BO-475).
+
+  - BO-477: removed setReaderConfiguration — Command and event mapping is the vendor adaptor''s, per model (ADR-0015);
+  setReaderConfiguration writes one reader, and the screen is reached from the integration command centre with no
+  reader (design-notes correction venue-operations BO-477).
+
+  - BO-484: removed getGameEligibility — getGameEligibility answers what one card can play; the overview needs the
+  kiosk devices and session counts, which have no read yet (contract gap CHG-WIR-004) (design-notes correction venue-operations
+  BO-484).
+
+  - BO-576: declared listWorkOrders — The calendar read only getDueMaintenance, so scheduled corrective jobs never
+  appeared; listWorkOrders (from, to, categoryId) returns them (design-notes correction venue-operations BO-576).
+
+  - BO-578: declared pauseWorkOrder, resumeWorkOrder, attachWorkOrderEvidence — Only start, time and complete were
+  declared; Pause and Awaiting parts are on the pack page and the evidence buttons need attachWorkOrderEvidence
+  (design-notes correction venue-operations BO-578).
+
+  - BO-581: declared setAssetStatus — verifyWorkOrder moves the work order to Verified but does not change the asset;
+  without setAssetStatus the item never becomes rentable again (design-notes correction venue-operations BO-581).
+
+  - BO-587: removed getAssetHistory — getAssetHistory is one asset''s service history; fleet counts, utilisation
+  and revenue per asset need a rental analytics read that does not exist (contract gap CHG-WIR-004) (DI-771; design-notes
+  correction venue-operations BO-587).
+
+  - BO-615: declared listAccreditationCredentials, listAccreditationDocuments, listAccreditationIdentityConflicts
+  — Active credentials, expired documents and the duplicate alert had no read; only applications and holders were
+  read (design-notes correction venue-operations BO-615).
+
+  - BO-619: declared updateAccreditationProgramme — Categories are saved through updateAccreditationProgramme (the
+  categories array); without it the screen was read-only (design-notes correction venue-operations BO-619).
+
+  - BO-623: declared listAccreditationIdentityConflicts — Duplicate candidates had no read; it needs listAccreditationIdentityConflicts
+  (design-notes correction venue-operations BO-623).
+
+  - BO-624: removed createAccreditationProgramme — createAccreditationProgramme was bound as "Publish the rules";
+  publishing an existing programme is updateAccreditationProgramme with status open (already declared), and the
+  screen creates nothing (design-notes correction venue-operations BO-624).
+
+  - BO-627: declared getAccreditationHolder — updateAccreditationHolder is a full replace and no read was bound;
+  the tab must load the holder first or it overwrites fields it never saw (VO-R04; same fault as the correction
+  on BO-628, design-notes correction venue-operations BO-628).
+
+  - BO-628: declared getAccreditationHolder — updateAccreditationHolder is a full replace; a photo tab must send
+  every holder field unchanged (VO-R04), which needs the holder loaded first, and no read was bound (design-notes
+  correction venue-operations BO-628).
+
+  - BO-635: declared actOnWorkflowInstance, decideAccreditationApplication — Assign, reassign, bulk assign and escalate
+  were not bound; assignment lives in approvals (actOnWorkflowInstance) and escalation in decideAccreditationApplication
+  (design-notes correction venue-operations BO-635).
+
+  - BO-636: removed listAccreditationApplications; declared verifyAccreditationDocument, listAccreditationAudit
+  — The workspace reads one application (getAccreditationApplication); listAccreditationApplications bound as "The
+  application" is redundant. It shows and verifies documents and previous accreditations, so verify and the audit
+  read are needed (design-notes correction venue-operations BO-636).
+
+  - BO-640: declared listAccreditationApplications — Only one application was read; the screen manages the refused
+  and returned ones, so it needs listAccreditationApplications filtered to rejected and informationRequested (design-notes
+  correction venue-operations BO-640).
+
+  - BO-643: declared listWorkflow, simulateWorkflowTestingImpact, setVisualWorkflow — The screen validates, simulates
+  and publishes approval workflows, which belong to approvals (listWorkflow, simulateWorkflowTestingImpact, setVisualWorkflow);
+  none was bound, so nothing on the screen could act (design-notes correction venue-operations BO-643).
+
+  - BO-644: removed listCredentialGenerationIssuance; declared listAccreditationCredentials, listAccreditationHolders,
+  listBadgePrintJobs — listCredentialGenerationIssuance is the guest ticket-media generation monitor; accreditation
+  credentials live in the accreditation contract (design-notes correction venue-operations BO-644).
+
+  - BO-645: declared issueAccreditationCredential — The board-4 bindings were shifted by one screen: issueAccreditationCredential
+  belongs on the generation workspace, not on BO-646 (design-notes correction venue-operations BO-645).
+
+  - BO-646: removed issueAccreditationCredential — Issuing a credential is BO-645''s act; this screen configures
+  media and has no operation in the contract yet (contract gap CHG-WIR-004) (design-notes correction venue-operations
+  BO-646).
+
+  - BO-647: declared listBadgeTemplates — setBadgeTemplate is bound but the read was bound to BO-648, so the designer
+  could not open an existing template (design-notes correction venue-operations BO-647).
+
+  - BO-648: removed listBadgeTemplates, setBadgeTemplate; declared listBadgePrintJobs, createBadgePrintJob — The
+  badge-template read and write belong to the designer BO-647; the print queue needs listBadgePrintJobs and createBadgePrintJob,
+  which were bound to BO-649 (design-notes correction venue-operations BO-648).
+
+  - BO-649: removed createBadgePrintJob, listBadgePrintJobs; declared listAccreditationCredentials — Print jobs
+  belong to BO-648; this screen delivers mobile credentials (deliverAccreditationCredential) and lists the digital
+  ones (design-notes correction venue-operations BO-649).
+
+  - BO-650: declared listAccreditationHolders, listAccreditationCredentials, replaceAccreditationCredential — No
+  holder search, no list of the holder''s existing credentials and no replace call: the officer encoded blind and
+  could create two live cards (design-notes correction venue-operations BO-650).
+
+  - BO-651: removed issueAccreditationCredential; declared listAccreditationCredentials — The issue call here was
+  labelled "NFC and RFID encoding"; encoding is BO-650''s job. This screen activates and delivers, and needs the
+  credential list with delivery status (design-notes correction venue-operations BO-651).
+
+  - BO-653: removed listCredential; declared listAccreditationCredentials, listAccreditationAudit — listCredential
+  is the guest credential operations list; accreditation credentials are read by listAccreditationCredentials and
+  their lifecycle timeline by listAccreditationAudit (design-notes correction venue-operations BO-653).
+
+  - BO-656: declared listAccessProfiles — Write bound with no read; the matrix cannot be drawn without the current
+  profiles, and a PUT needs every current value (VO-R04; design-notes correction venue-operations BO-656).
+
+  - BO-657: declared listAccessProfiles — Write bound with no read; listAccessProfiles is needed to pre-fill (VO-R04;
+  design-notes correction venue-operations BO-657).
+
+  - BO-658: declared listAccessProfiles — Write bound with no read; listAccessProfiles is needed to pre-fill (VO-R04;
+  design-notes correction venue-operations BO-658).
+
+  - BO-660: declared listAccreditationHolders, listAccessProfiles — No read was bound; the holder list exists (listAccreditationHolders),
+  while the holder''s current HolderAccess has no read (contract gap CHG-WIR-004) (design-notes correction venue-operations
+  BO-660).
+
+  - BO-667: removed createAccreditationProgramme; declared listAccreditationProgrammes, updateAccreditationProgramme
+  — Assigning scope edits an existing programme (the screen opens with a programmeId); it needs the programme read
+  and updateAccreditationProgramme, not a create (design-notes correction venue-operations BO-667).
+
+  - BO-668: declared listAccessProfiles — Write bound with no read; the table needs listAccessProfiles (the holder''s
+  access has no read, see BO-660) (design-notes correction venue-operations BO-668).
+
+  - BO-672: declared listAccreditationDocuments — listAccreditationDocuments (expiringWithinDays) was not bound;
+  DI-663''s document-before-event case cannot be shown from holders alone (design-notes correction venue-operations
+  BO-672).
+
+  - BO-673: removed setAccreditationValidity — setAccreditationValidity is programme-level rule configuration; the
+  screen renews one holder, and the validity rules belong in BO-666 (design-notes correction venue-operations BO-673).
+
+  - BO-674: removed setAccreditationNotificationRules — The only bound operation was the rule write, used "at a
+  glance"; the rules are edited on BO-675. No read returns accreditation notification sends or delivery outcomes
+  (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-674).
+
+  - BO-681: removed importAccreditationHolders — importAccreditationHolders (a POST that runs an import) was bound
+  on load, so opening the monitor would start an import; the import is run from BO-680. A list of import batches
+  does not exist (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-681).
+
+  - BO-682: removed exportReportResult, runReport — runReport and exportReportResult were a second export path beside
+  exportAccreditationData; the accreditation export is the one the pack describes, and reports export from the reporting
+  screens (design-notes correction venue-operations BO-682).
+
+  - BO-714: declared listRotaAssignments, createRotaAssignment — A roster screen reads and writes rota assignments
+  (listRotaAssignments, createRotaAssignment); it was bound to the shift template and coverage only (design-notes
+  correction venue-operations BO-714).
+
+  - BO-875: declared getResourceQualifications — setResourceQualifications replaces the whole set; without getResourceQualifications
+  the screen overwrites blind (design-notes correction venue-operations BO-875).
+
+  - BO-882: removed listRotaAssignments — listRotaAssignments was bound as "Rota synchronisation"; the rota has
+  nothing to do with the integration and synchronisation centre (design-notes correction venue-operations BO-882).
+
+  - BO-884: declared listRotaAssignments, getStaffingCoverage, listAttendance — Only createRotaAssignment was bound;
+  nothing read the roster, the coverage or who has checked in (rule 4). The candidate read does not exist (contract
+  gap CHG-WIR-004) (design-notes correction venue-operations BO-884).
+
+  - BO-887: removed claimOpenShift; declared listShiftSwapRequests — Claiming an open shift is an employee act on
+  the Staff App; the manager publishes and approves here. The manager''s queue needs the swap requests (design-notes
+  correction venue-operations BO-887).
+
+  - BO-894: removed setResourceQualifications; declared getExperienceResourceRequirements, setExperienceResourceRequirements
+  — setResourceQualifications writes a person''s certificates; this screen defines what an experience requires,
+  so it binds the experience requirements read and write and takes the experience, not a resource (design-notes
+  correction venue-operations BO-894).
+
+  - BO-895: declared updateResourcePackage — Only create was bound; editing a combination needs updateResourcePackage
+  (design-notes correction venue-operations BO-895).
+
+  - BO-900: removed allocateResources; declared setResourceAllocationPolicy — allocateResources was bound as a live
+  action on a configuration screen; the save is setResourceAllocationPolicy, which was not bound (design-notes correction
+  venue-operations BO-900).
+
+  - BO-903: removed createResourceCost, listResourceCosts — A resource cost table and a primary "Create resource
+  cost" button sat on the command centre; cost entry belongs on cost analytics (BO-945, which declares both) (design-notes
+  correction venue-operations BO-903).
+
+  - BO-910: declared releaseResourceBlock — releaseResourceBlock was not bound, so a resource blocked for maintenance
+  could never be returned to service from this screen (design-notes correction venue-operations BO-910).
+
+  - BO-911: removed recordRentalInspection; declared listInspectionTemplates, createInspectionTemplate — recordRentalInspection
+  records a rental booking''s pre- or post-rental condition; a compliance inspection of a resource is not tied to
+  a booking. submitInspection and listInspections fit, with the inspection templates (design-notes correction venue-operations
+  BO-911).
+
+  - BO-918: declared updateResourcePackage — Only create was bound; editing a template needs updateResourcePackage
+  (design-notes correction venue-operations BO-918).
+
+  - BO-942: removed getGameplaySyncStatus — getGameplaySyncStatus reports game readers'' offline plays; the Employee
+  App''s handsets and pending resource actions are not game readers. No read of mobile resource sync exists (contract
+  gap CHG-WIR-004) (design-notes correction venue-operations BO-942).
+
+  - BO-981: removed simulatePolicyConflictImpact — simulatePolicyConflictImpact tests dynamic access policies against
+  a scan (BO-242); this screen simulates seat-layout changes, which no seating operation computes yet (contract
+  gap CHG-WIR-004) (design-notes correction venue-operations BO-981).
+
+  - ACC-003: removed createAccreditationApplication — By step four a draft already exists; Submit calls submitAccreditationApplication
+  only, and creating again would make a second application (design-notes correction venue-operations ACC-003).
+
+  - ACC-006: declared decideAccreditationApplication — Approve was drawn but no decision operation was bound (design-notes
+  correction venue-operations ACC-006).
+
+  - ACC-008: declared listAccreditationAccessActivity — Last used comes from listAccreditationAccessActivity by
+  credential; nothing read it (design-notes correction venue-operations ACC-008).
+
+  - CMS-071: removed listAssets — The screen is about media files in the DAM (assets.yaml); maintenance listAssets
+  returns rides, turnstiles and pumps from the physical asset register (design-notes correction venue-operations
+  CMS-071).
+
+  - ANL-070: removed listSecurityDetectionGovernance; declared listAuditRecords, getAiUsage, listAiInteractions
+  — listSecurityDetectionGovernance is access fraud analytics (BO-253); this screen governs BI and analytics, whose
+  data is the platform audit trail and AI usage and interactions. An analytics governance read does not exist yet
+  (contract gap CHG-WIR-004) (design-notes correction venue-operations ANL-07…
+
+  - BO-669: removed setAccreditationValidity; merged into BO-666 — BO-669 binds the same single operation (setAccreditationValidity)
+  on the same record as BO-666 Validity Period Configuration; temporary and seasonal periods are presets inside
+  the validity editor (VO-R14; DI-671, DI-987; design-notes correction venue-operations BO-669).
+
+  - EMP-038: see the screen — With acknowledgeAnnouncement (the recipient''s act, offline-capable) off the broadcast
+  screen, its offline promise to queue no longer holds: publishAnnouncement is not offline-capable (R257; design-notes
+  correction venue-operations EMP-038).
+
+  - F09: entryScreen BO-001 -> BO-015; step 1 screen BO-001 -> BO-015; step 2 screen BO-002 -> BO-015; step 2 note;
+  step 4 screen BO-004 -> BO-023; step 4 note; step 5 screen BO-005 -> BO-023; step 5 operations [''listCampaigns'']
+  -> []; step 5 note
+
+  - F12: step 5 screen BO-031 -> BO-069; step 5 note
+
+  - F18: step 3 screen BO-069 -> BO-395; step 3 crossesDevice; step 3 operations [''recordGamePlay'', ''syncGamePlays'']
+  -> []; step 3 note; step 4 screen BO-069 -> BO-395; step 4 note
+
+  - F06: step 2 operations [''listAccessPoints'', ''setTurnstileMode''] -> [''listAccessPoints'']
+
+  - F23: step 5 operations [''listBlacklist''] -> [''validateAccess'']; step 5 note
+
+  - F61: step 4 operations [''validateAccess'', ''listScans''] -> [''validateAccess'']; step 5 operations [''validateGroupAccess'',
+  ''listScans''] -> [''validateGroupAccess'']; step 6 operations [''listScans''] -> []; step 7 screen SCN-003 ->
+  SCN-014; step 7 note
+
+  - F62: step 3 operations [''validateAccess'', ''listScans''] -> [''validateAccess'']
+
+  - F63: step 2 operations [''listScans''] -> []; step 2 note
+
+  - F72: step 2 operations [''syncScans'', ''syncOrders'', ''listSyncRejections''] -> [''syncScans'', ''listSyncRejections'']
+
+  - F120: step 18 operations [''listPolicies''] -> [''listDynamicAccessPolicy'']
+
+  - F08: step 7 operations [''listAnnouncements'', ''publishAnnouncement''] -> [''listWorkOrders'']; step 7 note
+
+  - F69: step 3 screen EMP-050 -> EMP-027; step 3 operations [''recordAuthorityNotification'', ''listIncidents'']
+  -> [''recordAuthorityNotification'']; step 3 note; step 4 screen EMP-047 -> EMP-038; step 4 operations [''publishAnnouncement'',
+  ''acknowledgeAnnouncement'', ''getAnnouncementReach''] -> [''publishAnnouncement'', ''getAnnouncementReach''];
+  step 4 note
+
+  - F112: step 4 operations [''listEntryExitRule''] -> [''listAdmissionRules'']; step 4 note; step 12 operations
+  [''listMultiParkCrossover''] -> [''listAdmissionRules'']; step 12 note
+
+  - F117: step 4 operations [''setOfflinePolicy''] -> [''setGateOfflinePolicy'']; step 4 note
+
+  - F118: step 10 operations [''listEntryTemporaryExit''] -> [''listAdmissionRules'']; step 10 note
+
+  - F170: step 2 operations [''setVirtualTicketCredential''] -> [''getEntitlement'']; step 2 note'

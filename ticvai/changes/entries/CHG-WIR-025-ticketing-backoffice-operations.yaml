@@ -1,0 +1,1399 @@
+id: CHG-WIR-025
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'ticketing-backoffice: 223 screens rewired — 66 operations taken off screens they do not belong on (bulk-attached,
+  another module''s, guest-, device- or service-only on staff screens, writes on read-only lists), 226 existing
+  operations declared where the screen needed them; 8 flows repointed to match.'
+decision:
+  what: 'Fix the wrong wiring now: take each listed operation off the screen it does not belong on, declare the
+    existing operation the screen needs instead, merge the duplicate screens into the one kept, and repoint the
+    flow steps that called them.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Process-agent design-note corrections for ticketing-backoffice (handoff/design-notes/ticketing-backoffice.yaml,
+  1-2 October 2026) found these screens wired by the 18 August bulk attach, by name resemblance or from the wrong
+  contract, against the adopted audit decision R254 (re-derive each screen''s operations from its purpose and journeys)
+  and R276 (duplicate screens). Each screen''s reason and source is below and on the screen itself (gaps with removed:
+  true).'
+keys_touched:
+  screens:
+  - ADM-049
+  - ADM-051
+  - ADM-083
+  - ADM-089
+  - ADM-090
+  - ADM-091
+  - ADM-106
+  - ADM-129
+  - ADM-130
+  - ADM-132
+  - ADM-140
+  - ADM-141
+  - ADM-157
+  - ADM-159
+  - ADM-160
+  - ADM-164
+  - ADM-177
+  - ADM-180
+  - ADM-181
+  - ADM-187
+  - ADM-199
+  - ADM-223
+  - ADM-224
+  - ADM-226
+  - ADM-234
+  - ADM-272
+  - ADM-279
+  - ADM-281
+  - ADM-284
+  - ADM-287
+  - ADM-316
+  - ADM-383
+  - ADM-561
+  - ADM-562
+  - ADM-563
+  - ADM-564
+  - ADM-565
+  - ADM-566
+  - ADM-568
+  - ADM-571
+  - ADM-574
+  - ADM-578
+  - ADM-583
+  - ADM-591
+  - ADM-598
+  - ADM-600
+  - ADM-605
+  - ADM-610
+  - ADM-611
+  - ADM-613
+  - ADM-616
+  - ADM-620
+  - ADM-635
+  - ADM-638
+  - ADM-641
+  - ADM-643
+  - ADM-644
+  - ADM-645
+  - ADM-646
+  - ADM-647
+  - ADM-648
+  - ADM-651
+  - ADM-652
+  - ADM-653
+  - ADM-654
+  - ADM-655
+  - ADM-656
+  - ADM-658
+  - ADM-660
+  - ADM-663
+  - ADM-664
+  - ADM-665
+  - ADM-666
+  - ADM-668
+  - ADM-670
+  - ADM-671
+  - ADM-672
+  - ADM-673
+  - ADM-674
+  - ADM-675
+  - ADM-681
+  - ADM-684
+  - ADM-688
+  - ADM-698
+  - BO-011
+  - BO-014
+  - BO-018
+  - BO-023
+  - BO-024
+  - BO-027
+  - BO-028
+  - BO-037
+  - BO-062
+  - BO-063
+  - BO-097
+  - BO-1001
+  - BO-1002
+  - BO-1005
+  - BO-1006
+  - BO-1007
+  - BO-1008
+  - BO-1009
+  - BO-1014
+  - BO-1015
+  - BO-1016
+  - BO-1019
+  - BO-1020
+  - BO-1021
+  - BO-1025
+  - BO-1026
+  - BO-1027
+  - BO-1028
+  - BO-1034
+  - BO-1035
+  - BO-1036
+  - BO-1037
+  - BO-1039
+  - BO-1040
+  - BO-1041
+  - BO-1057
+  - BO-1070
+  - BO-1072
+  - BO-1079
+  - BO-1085
+  - BO-1087
+  - BO-1089
+  - BO-1090
+  - BO-1091
+  - BO-1092
+  - BO-1094
+  - BO-1095
+  - BO-1096
+  - BO-1097
+  - BO-1098
+  - BO-1099
+  - BO-1100
+  - BO-1101
+  - BO-1104
+  - BO-1105
+  - BO-1108
+  - BO-1110
+  - BO-1111
+  - BO-1112
+  - BO-1114
+  - BO-1115
+  - BO-1116
+  - BO-1117
+  - BO-1118
+  - BO-1120
+  - BO-1121
+  - BO-1125
+  - BO-1127
+  - BO-1130
+  - BO-1132
+  - BO-1133
+  - BO-1146
+  - BO-1147
+  - BO-1148
+  - BO-1149
+  - BO-115
+  - BO-1150
+  - BO-1151
+  - BO-1161
+  - BO-117
+  - BO-1174
+  - BO-1176
+  - BO-1180
+  - BO-1181
+  - BO-119
+  - BO-130
+  - BO-268
+  - BO-273
+  - BO-305
+  - BO-315
+  - BO-318
+  - BO-374
+  - BO-417
+  - BO-418
+  - BO-420
+  - BO-422
+  - BO-443
+  - BO-444
+  - BO-488
+  - BO-601
+  - BO-642
+  - BO-696
+  - BO-697
+  - BO-698
+  - BO-699
+  - BO-701
+  - BO-702
+  - BO-703
+  - BO-704
+  - BO-705
+  - BO-706
+  - BO-707
+  - BO-709
+  - BO-711
+  - BO-712
+  - BO-713
+  - BO-715
+  - BO-716
+  - BO-717
+  - BO-719
+  - BO-720
+  - BO-723
+  - BO-724
+  - BO-725
+  - BO-726
+  - BO-914
+  - BO-957
+  - BO-958
+  - BO-959
+  - BO-960
+  - BO-961
+  - BO-972
+  - BO-976
+  - BO-978
+  - BO-982
+  - BO-990
+  - BO-995
+  - BO-997
+  - BO-998
+  operations:
+  - acquireInventoryHold
+  - addTip
+  - approveDecision
+  - approveRefund
+  - cancelPerformance
+  - createEvent
+  - createOrder
+  - createPayment
+  - createPerformances
+  - createProduct
+  - createRefund
+  - createRefundRequest
+  - decideApprovalRequest
+  - decidePricingRecommendation
+  - endPromotion
+  - evaluatePromotions
+  - exchangeOrderLines
+  - extendSeatHold
+  - generateCouponCodes
+  - getAccessibleSeating
+  - getBundle
+  - getCouponCodeBatch
+  - getCreditConsumptionPolicy
+  - getEvent
+  - getEventResourcePlan
+  - getGiftCard
+  - getGroupBooking
+  - getImportJob
+  - getMediaAsset
+  - getMixedTenderRules
+  - getOfflinePackage
+  - getOrder
+  - getOrderStatement
+  - getPaymentPerformance
+  - getPaymentRules
+  - getPerformance
+  - getPromotion
+  - getPromotionUsage
+  - getRefundPolicy
+  - getRentalBooking
+  - getResaleMarketplaceConfig
+  - getSeatAvailability
+  - getSeatInventory
+  - getSeatMap
+  - getSeatRecommendationRules
+  - getSeatReconciliation
+  - getSeatRules
+  - getWallet
+  - getWalletBalance
+  - getWalletFundingRules
+  - holdOrder
+  - listAccreditationAudit
+  - listAlternativeCodes
+  - listApprovalMatrices
+  - listApprovalRequests
+  - listAuditRecords
+  - listChannelCustomerSegment
+  - listChargebacks
+  - listConfigurationProfiles
+  - listCouponCampaigns
+  - listCouponCodes
+  - listCreditLots
+  - listCreditTypes
+  - listDeliveryLocations
+  - listDeposits
+  - listDiningOutlets
+  - listDynamicPriceRules
+  - listDynamicPricingStrategy
+  - listEvents
+  - listGroupPackages
+  - listGroupSeatRequests
+  - listInventoryHolds
+  - listOrderRefunds
+  - listPaymentMethods
+  - listPaymentProviderConnections
+  - listPaymentReconciliationException
+  - listPaymentRoutingRules
+  - listPaymentTerminals
+  - listPerformanceTemplates
+  - listPerformances
+  - listPriceLists
+  - listPrices
+  - listPricing
+  - listProductRelationships
+  - listProductVariants
+  - listPromotions
+  - listRealTimeAvailability
+  - listRecommendationStrategies
+  - listReconciliationSources
+  - listRedemption
+  - listRotaAssignments
+  - listSaleBoards
+  - listSaleChannel
+  - listSeatBlocks
+  - listSeatHoldPools
+  - listSeatHoldTypes
+  - listSeatMaps
+  - listSharedWallets
+  - listSpaces
+  - listUpgrades
+  - listUpsellRules
+  - listVoidReversalSame
+  - listVoucherTypes
+  - listWalletConfigurationVersions
+  - listWalletTransactions
+  - listWalletTypes
+  - listWebhookSubscriptions
+  - modifyOrder
+  - pausePromotion
+  - publishBundle
+  - publishChannelAvailability
+  - publishPromotion
+  - publishSeatMap
+  - recommendSeats
+  - relinquishInventoryHold
+  - relinquishSeatHold
+  - renewInventoryHold
+  - replaceCredential
+  - replaceMediaAsset
+  - reportBundleApplied
+  - requestPricingRollback
+  - requestSuggestion
+  - rescheduleOrder
+  - resolveProductByCode
+  - resolveSyncRejection
+  - resolveWalletDispute
+  - resumeOrder
+  - runReport
+  - setAlternativeCodes
+  - setChannelAllocations
+  - setChannelListing
+  - setEligibilityRule
+  - setOrderAmendment
+  - setOrderDetailTransaction
+  - setProductAttributes
+  - setPromotionVariants
+  - setResaleEligibilityRule
+  - setRuleTestRecommendation
+  - setWalletChannelRules
+  - simulateCreditConsumption
+  - simulatePromotion
+  - syncOrders
+  - unschedulePromotion
+  - updateEvent
+  - updatePerformance
+  - updateProduct
+  - updateRecommendationStrategy
+  - updateSaleBoard
+  flows:
+  - F140
+  - F141
+  - F154
+  - F155
+  - F33
+  - F77
+  - F89
+  - F99
+  tickets:
+  - APP-SETUP-ADM-049
+  - APP-SETUP-ADM-051
+  - APP-SETUP-ADM-090
+  - APP-SETUP-ADM-091
+  - APP-SETUP-ADM-159
+  - APP-SETUP-ADM-164
+  - APP-SETUP-ADM-180
+  - APP-SETUP-ADM-181
+  - APP-SETUP-ADM-199
+  - APP-SETUP-BO-011
+  - APP-SETUP-BO-1094
+  - APP-SETUP-BO-1111
+  - APP-SETUP-BO-1146
+  - APP-SETUP-BO-117
+  - APP-SETUP-BO-696
+  - APP-SETUP-BO-716
+  - VM-BO-014
+  - VM-BO-018
+  - VM-BO-023
+  - VM-BO-024
+  - VM-BO-027
+  - VM-BO-028
+  - VM-BO-037
+  - VM-BO-062
+  - VM-BO-063
+  - VM-BO-097
+  - VM-BO-115
+  - VM-BO-119
+  - VM-BO-130
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-049
+  - APP-SETUP-ADM-051
+  - APP-SETUP-ADM-090
+  - APP-SETUP-ADM-091
+  - APP-SETUP-ADM-159
+  - APP-SETUP-ADM-164
+  - APP-SETUP-ADM-180
+  - APP-SETUP-ADM-181
+  - APP-SETUP-ADM-199
+  - APP-SETUP-BO-011
+  - APP-SETUP-BO-1094
+  - APP-SETUP-BO-1111
+  - APP-SETUP-BO-1146
+  - APP-SETUP-BO-117
+  - APP-SETUP-BO-696
+  - APP-SETUP-BO-716
+  - VM-BO-014
+  - VM-BO-018
+  - VM-BO-023
+  - VM-BO-024
+  - VM-BO-027
+  - VM-BO-028
+  - VM-BO-037
+  - VM-BO-062
+  - VM-BO-063
+  - VM-BO-097
+  - VM-BO-115
+  - VM-BO-119
+  - VM-BO-130
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-STAFF-AUDIENCE (a staff screen calling a guest-, device-, service- or partner-only
+  operation) beside the existing S-DUP-SCREEN and S-CONSUMED-MIRROR rules, and check-screens keeps its R254 attachment
+  warnings; check-flows rule 3 holds every repointed flow step to its screen. Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key naming a touched screen. Per screen and
+  flow:
+
+  - BO-062: removed listDeliveryLocations, listDiningOutlets — listDiningOutlets and listDeliveryLocations are guest-audience
+  reads with no permission; a staff screen calling them bypasses the staff permission model, as corrected on BO-065
+  and EMP-030 (design-notes corrections fnb-retail BO-065, EMP-030; R254).
+
+  - BO-028: removed createRefundRequest; declared approveRefund — The Refund Approval Queue''s only operation was
+  createRefundRequest, the guest''s own refund request (guest audience, no permission); a staff approval queue approves
+  refunds held for approval (approveRefund, which came off BO-004 in CHG-WIR-001). Guest-only operations on staff
+  screens are wrong wirin…
+
+  - ADM-199: removed setResaleEligibilityRule — The promotion Eligibility Rule Builder also wrote setResaleEligibilityRule
+  (which tickets may enter resale, ORDER_CREATE); resale eligibility is a different concept and is written on its
+  own screen, ADM-279 Resale Eligibility Rule Configuration (design-notes correction ticketing-backoffice ADM-199).
+
+  - ADM-279: removed setEligibilityRule — The Resale Eligibility Rule Configuration also wrote setEligibilityRule,
+  the promotion eligibility rule; promotion eligibility is a different concept and is written on ADM-199 Eligibility
+  Rule Builder (design-notes correction ticketing-backoffice ADM-279).
+
+  - ADM-610: removed createRefundRequest; declared createRefund — The staff refund workspace raised refunds with
+  createRefundRequest, the guest app''s own request (guest audience, no permission; the order must belong to the
+  caller); staff refunds go through createRefund (ORDER_REFUND), which checks the refund policy the screen already
+  reads (design-notes correctio…
+
+  - ADM-157: removed setRuleTestRecommendation; declared evaluatePromotions, simulatePromotion — setRuleTestRecommendation
+  was a PUT for a test that took its inputs as strings; evaluatePromotions already evaluates a basket and returns
+  the working (which rules matched and why), and simulatePromotion replays a promotion against real history for
+  the exposure and revenue the purpose asks for (desi…
+
+  - ADM-141: declared publishPromotion, pausePromotion, endPromotion, unschedulePromotion — A status manager that
+  could not change status: the lifecycle moves exist (publishPromotion, pausePromotion, endPromotion, unschedulePromotion)
+  and were not declared (design-notes correction ticketing-backoffice ADM-141).
+
+  - ADM-132: declared requestPricingRollback — The rollback screen listed rollbacks but could not start one; requestPricingRollback
+  writes the rollback record and handles subject product as well as pricing (design-notes correction ticketing-backoffice
+  ADM-132).
+
+  - ADM-272: declared setChannelAllocations — Rebalancing had no write on the screen that exists to rebalance; setChannelAllocations
+  is the allocation writer (BO-013 uses it) (design-notes correction ticketing-backoffice ADM-272).
+
+  - ADM-160: declared generateCouponCodes, getCouponCodeBatch — A code generation and batch manager that only read;
+  generateCouponCodes generates codes in bulk and getCouponCodeBatch reports a batch''s progress and export (design-notes
+  correction ticketing-backoffice ADM-160).
+
+  - ADM-226: declared setPromotionVariants — An A/B test manager that only read; setPromotionVariants splits traffic
+  between two versions of a promotion (design-notes correction ticketing-backoffice ADM-226).
+
+  - ADM-647: declared updateRecommendationStrategy — The recommendation policy screen read the strategies and could
+  not change them; a strategy carries its guardrails and the AI authority over it, and updateRecommendationStrategy
+  is its writer (design-notes correction ticketing-backoffice ADM-647).
+
+  - ADM-670: declared updateRecommendationStrategy — The journey and touchpoint designer read the strategies and
+  could not change them; placements are part of the strategy, and updateRecommendationStrategy is its writer (design-notes
+  correction ticketing-backoffice ADM-670).
+
+  - ADM-177: declared evaluatePromotions, simulatePromotion — The offer simulator was a GET list with no input,
+  so a basket could not be sent; evaluatePromotions tests a basket and returns the working, simulatePromotion replays
+  history (design-notes correction ticketing-backoffice ADM-177).
+
+  - ADM-083: declared listApprovalMatrices — The screen declared only approvePricingWorkflowAuthority and opened
+  as an empty form where a configuration exists (PR-9); listApprovalMatrices is the existing read of the same record
+  (design-notes correction ticketing-backoffice ADM-083).
+
+  - ADM-129: declared listApprovalMatrices — The screen declared only approveWorkflow and opened as an empty form
+  where a configuration exists (PR-9); listApprovalMatrices is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-129).
+
+  - ADM-223: declared listApprovalMatrices — The screen declared only approveCampaignWorkflow and opened as an empty
+  form where a configuration exists (PR-9); listApprovalMatrices is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-223).
+
+  - ADM-130: declared listApprovalRequests — The screen declared only approveReviewDecision and opened as an empty
+  form where a configuration exists (PR-9); listApprovalRequests is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-130).
+
+  - ADM-224: declared listApprovalRequests — The screen declared only approveDecision and opened as an empty form
+  where a configuration exists (PR-9); listApprovalRequests is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-224).
+
+  - ADM-089: declared listDynamicPricingStrategy — The screen declared only setDynamicPricingStrategy, transitionDynamicPricingStrategy
+  and opened as an empty form where a configuration exists (PR-9); listDynamicPricingStrategy is the existing read
+  of the same record (design-notes correction ticketing-backoffice ADM-089).
+
+  - ADM-090: declared listDynamicPriceRules — The screen declared only setDemandOccupancyAvailability and opened
+  as an empty form where a configuration exists (PR-9); listDynamicPriceRules is the existing read of the same record
+  (design-notes correction ticketing-backoffice ADM-090).
+
+  - ADM-091: declared listDynamicPriceRules — The screen declared only setBookingVelocityTime and opened as an empty
+  form where a configuration exists (PR-9); listDynamicPriceRules is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-091).
+
+  - ADM-159: declared listCouponCampaigns — The screen declared only setCouponPromoCode and opened as an empty form
+  where a configuration exists (PR-9); listCouponCampaigns is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-159).
+
+  - ADM-164: declared listCouponCodes — The screen declared only setCodeDistributionManager and opened as an empty
+  form where a configuration exists (PR-9); listCouponCodes is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-164).
+
+  - ADM-180: declared getBundle — The screen declared only setBundleComponent and opened as an empty form where
+  a configuration exists (PR-9); getBundle is the existing read of the same record (design-notes correction ticketing-backoffice
+  ADM-180).
+
+  - ADM-181: declared getBundle — The screen declared only setGuestChoiceBuild and opened as an empty form where
+  a configuration exists (PR-9); getBundle is the existing read of the same record (design-notes correction ticketing-backoffice
+  ADM-181).
+
+  - ADM-187: declared getBundle — The screen declared only simulateBundlePreviewRecommendation and opened as an
+  empty form where a configuration exists (PR-9); getBundle is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-187).
+
+  - ADM-281: declared getResaleMarketplaceConfig — The screen declared only createListingSeller and opened as an
+  empty form where a configuration exists (PR-9); getResaleMarketplaceConfig is the existing read of the same record
+  (design-notes correction ticketing-backoffice ADM-281).
+
+  - ADM-284: declared getResaleMarketplaceConfig — The screen declared only approveListingModeration and opened
+  as an empty form where a configuration exists (PR-9); getResaleMarketplaceConfig is the existing read of the same
+  record (design-notes correction ticketing-backoffice ADM-284).
+
+  - ADM-287: declared getResaleMarketplaceConfig — The screen declared only setResaleMarketplaceRecommendation and
+  opened as an empty form where a configuration exists (PR-9); getResaleMarketplaceConfig is the existing read of
+  the same record (design-notes correction ticketing-backoffice ADM-287).
+
+  - ADM-316: declared listUpgrades — The screen declared only createUpgradeCredentialRegeneration and opened as
+  an empty form where a configuration exists (PR-9); listUpgrades is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-316).
+
+  - ADM-561: declared listPaymentMethods — The screen declared only updatePaymentMethod and opened as an empty form
+  where a configuration exists (PR-9); listPaymentMethods is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-561).
+
+  - ADM-562: declared listPaymentMethods — The screen declared only updatePaymentMethod and opened as an empty form
+  where a configuration exists (PR-9); listPaymentMethods is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-562).
+
+  - ADM-563: declared listPaymentMethods — The screen declared only updatePaymentMethod and opened as an empty form
+  where a configuration exists (PR-9); listPaymentMethods is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-563).
+
+  - ADM-591: declared listPaymentMethods — The screen declared only updatePaymentMethod and opened as an empty form
+  where a configuration exists (PR-9); listPaymentMethods is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-591).
+
+  - ADM-564: declared getPaymentRules — The screen declared only updatePaymentMethod and opened as an empty form
+  where a configuration exists (PR-9); getPaymentRules is the existing read of the same record (design-notes correction
+  ticketing-backoffice ADM-564).
+
+  - ADM-565: declared getPaymentRules — The screen declared only updatePaymentMethod and opened as an empty form
+  where a configuration exists (PR-9); getPaymentRules is the existing read of the same record (design-notes correction
+  ticketing-backoffice ADM-565).
+
+  - ADM-566: declared getPaymentRules — The screen declared only updatePaymentMethod and opened as an empty form
+  where a configuration exists (PR-9); getPaymentRules is the existing read of the same record (design-notes correction
+  ticketing-backoffice ADM-566).
+
+  - ADM-568: declared getPaymentRules — The screen declared only simulatePaymentConfiguration and opened as an empty
+  form where a configuration exists (PR-9); getPaymentRules is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-568).
+
+  - ADM-598: declared getPaymentRules, getPaymentPerformance — The screen declared only simulatePaymentConfiguration
+  and opened as an empty form where a configuration exists (PR-9); getPaymentRules and getPaymentPerformance is
+  the existing read of the same record (design-notes correction ticketing-backoffice ADM-598).
+
+  - ADM-638: declared getPaymentPerformance — The screen declared only simulatePaymentConfiguration, backtestRiskStrategy
+  and opened as an empty form where a configuration exists (PR-9); getPaymentPerformance is the existing read of
+  the same record (design-notes correction ticketing-backoffice ADM-638).
+
+  - ADM-571: declared listPaymentProviderConnections — The screen declared only createPaymentProviderConnection,
+  testPaymentProviderConnection and opened as an empty form where a configuration exists (PR-9); listPaymentProviderConnections
+  is the existing read of the same record (design-notes correction ticketing-backoffice ADM-571).
+
+  - ADM-574: declared listPaymentRoutingRules — The screen declared only setPaymentRoutingRules and opened as an
+  empty form where a configuration exists (PR-9); listPaymentRoutingRules is the existing read of the same record
+  (design-notes correction ticketing-backoffice ADM-574).
+
+  - ADM-578: declared listPaymentRoutingRules — The screen declared only simulatePaymentRouting and opened as an
+  empty form where a configuration exists (PR-9); listPaymentRoutingRules is the existing read of the same record
+  (design-notes correction ticketing-backoffice ADM-578).
+
+  - ADM-583: declared listPaymentTerminals — The screen declared only setPaymentTerminalConfiguration and opened
+  as an empty form where a configuration exists (PR-9); listPaymentTerminals is the existing read of the same record
+  (design-notes correction ticketing-backoffice ADM-583).
+
+  - ADM-600: declared getMixedTenderRules — The screen declared only setMixedTenderRules and opened as an empty
+  form where a configuration exists (PR-9); getMixedTenderRules is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-600).
+
+  - ADM-605: declared getMixedTenderRules — The screen declared only setMixedTenderRules and opened as an empty
+  form where a configuration exists (PR-9); getMixedTenderRules is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-605).
+
+  - ADM-611: declared getRefundPolicy — The screen declared only setRefundPolicy and opened as an empty form where
+  a configuration exists (PR-9); getRefundPolicy is the existing read of the same record (design-notes correction
+  ticketing-backoffice ADM-611).
+
+  - ADM-613: declared listVoidReversalSame — The screen declared only voidPayment and opened as an empty form where
+  a configuration exists (PR-9); listVoidReversalSame is the existing read of the same record (design-notes correction
+  ticketing-backoffice ADM-613).
+
+  - ADM-616: declared listOrderRefunds — The screen declared only createRefund and opened as an empty form where
+  a configuration exists (PR-9); listOrderRefunds is the existing read of the same record (design-notes correction
+  ticketing-backoffice ADM-616).
+
+  - ADM-620: declared listReconciliationSources — The screen declared only setReconciliationSource, ingestSettlementFile
+  and opened as an empty form where a configuration exists (PR-9); listReconciliationSources is the existing read
+  of the same record (design-notes correction ticketing-backoffice ADM-620).
+
+  - ADM-635: declared listChargebacks — The screen declared only submitChargebackEvidence and opened as an empty
+  form where a configuration exists (PR-9); listChargebacks is the existing read of the same record (design-notes
+  correction ticketing-backoffice ADM-635).
+
+  - ADM-641: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-641).
+
+  - ADM-643: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-643).
+
+  - ADM-644: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-644).
+
+  - ADM-645: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-645).
+
+  - ADM-646: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-646).
+
+  - ADM-651: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-651).
+
+  - ADM-655: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-655).
+
+  - ADM-656: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-656).
+
+  - ADM-665: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-665).
+
+  - ADM-666: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-666).
+
+  - ADM-671: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-671).
+
+  - ADM-672: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-672).
+
+  - ADM-673: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-673).
+
+  - ADM-674: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-674).
+
+  - ADM-675: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-675).
+
+  - ADM-681: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-681).
+
+  - ADM-684: declared listRecommendationStrategies — The screen declared only updateRecommendationStrategy and opened
+  as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read of the
+  same record (design-notes correction ticketing-backoffice ADM-684).
+
+  - ADM-648: declared listRecommendationStrategies — The screen declared only simulateRecommendationStrategy and
+  opened as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read
+  of the same record (design-notes correction ticketing-backoffice ADM-648).
+
+  - ADM-658: declared listRecommendationStrategies — The screen declared only simulateRecommendationStrategy and
+  opened as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read
+  of the same record (design-notes correction ticketing-backoffice ADM-658).
+
+  - ADM-668: declared listRecommendationStrategies — The screen declared only simulateRecommendationStrategy and
+  opened as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read
+  of the same record (design-notes correction ticketing-backoffice ADM-668).
+
+  - ADM-688: declared listRecommendationStrategies — The screen declared only simulateRecommendationStrategy and
+  opened as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read
+  of the same record (design-notes correction ticketing-backoffice ADM-688).
+
+  - ADM-698: declared listRecommendationStrategies — The screen declared only simulateRecommendationStrategy and
+  opened as an empty form where a configuration exists (PR-9); listRecommendationStrategies is the existing read
+  of the same record (design-notes correction ticketing-backoffice ADM-698).
+
+  - ADM-660: declared listProductRelationships — The screen declared only setProductRelationships and opened as
+  an empty form where a configuration exists (PR-9); listProductRelationships is the existing read of the same record
+  (design-notes correction ticketing-backoffice ADM-660).
+
+  - ADM-663: declared listProductRelationships — The screen declared only setProductRelationships and opened as
+  an empty form where a configuration exists (PR-9); listProductRelationships is the existing read of the same record
+  (design-notes correction ticketing-backoffice ADM-663).
+
+  - ADM-664: declared listProductRelationships — The screen declared only setProductRelationships and opened as
+  an empty form where a configuration exists (PR-9); listProductRelationships is the existing read of the same record
+  (design-notes correction ticketing-backoffice ADM-664).
+
+  - ADM-652: declared listProductRelationships — The screen declared only quoteUpgrade and opened as an empty form
+  where a configuration exists (PR-9); listProductRelationships is the existing read of the same record; quoteUpgrade
+  prices one order and reads no configuration (design-notes correction ticketing-backoffice ADM-652).
+
+  - ADM-653: declared listProductRelationships — The screen declared only quoteUpgrade and opened as an empty form
+  where a configuration exists (PR-9); listProductRelationships is the existing read of the same record; quoteUpgrade
+  prices one order and reads no configuration (design-notes correction ticketing-backoffice ADM-653).
+
+  - ADM-654: declared listProductRelationships — The screen declared only quoteUpgrade and opened as an empty form
+  where a configuration exists (PR-9); listProductRelationships is the existing read of the same record; quoteUpgrade
+  prices one order and reads no configuration (design-notes correction ticketing-backoffice ADM-654).
+
+  - BO-014: removed createProduct, listAlternativeCodes, listProductVariants, resolveProductByCode, setAlternativeCodes,
+  setProductAttributes, updateProduct — The publishing screen repeated the whole product editor of BO-007 and BO-008
+  (create, attributes, alternative codes, variants, code lookup, update); it keeps the pending list (listProducts,
+  listPrices) and the release acts (transitionProductLifecycle, publishBundle) that F78 step 4 calls, and editi…
+
+  - BO-023: removed createOrder, holdOrder, resumeOrder — createOrder, holdOrder and resumeOrder are till operations
+  at workstation scope; a refunds desk does not park sales or create orders, they belong to the POS (design-notes
+  correction ticketing-backoffice BO-023)
+
+  - BO-024: removed addTip, createPayment; declared listPaymentReconciliationException, listDeposits — Taking a
+  new payment (createPayment) or adding a tip (addTip) is a till act at workstation scope, and the exceptions screen
+  resolves existing payments; it also had no read, so it opened empty (PR-9): listPaymentReconciliationException
+  and listDeposits return the payments and deposits it resolves. F…
+
+  - BO-011: removed publishBundle, reportBundleApplied — reportBundleApplied is a workstation reporting that it
+  applied a catalogue release, which no person on a back-office screen does, and publishBundle publishes the whole
+  catalogue release (BO-014), not the sellable bundle; the name collision (catalogue bundle vs bundle) put both
+  here. F77 step 2 keep…
+
+  - BO-018: removed acquireInventoryHold, relinquishInventoryHold, renewInventoryHold — Acquire, renew and relinquish
+  a lease are terminal and order-service calls (workstation scope; guests never call them); the supervisor''s act
+  on the holds screen is force release (forceReleaseInventoryHold), which stays with the list (design-notes correction
+  ticketing-backoffice BO-018)
+
+  - BO-027: removed getMediaAsset, replaceMediaAsset; declared replaceCredential — getMediaAsset and replaceMediaAsset
+  are the image library; media here is a ticket credential, and the replacement act was missing: replaceCredential
+  (access) replaces a credential''s media (design-notes correction ticketing-backoffice BO-027)
+
+  - BO-037: removed getOfflinePackage — getOfflinePackage is workstation-scoped (the session''s access point); a
+  back-office screen cannot read another device''s package with it. F89 step 3 keeps listCatalogueBundles; the venue-scoped
+  read is recorded as a contract gap (design-notes correction ticketing-backoffice BO-037)
+
+  - BO-063: removed cancelPerformance, createEvent, createPerformances, getEvent, getPerformance, getSeatAvailability,
+  listEvents, listPerformances, recommendSeats, updateEvent, updatePerformance — Opening hours are venue and outlet
+  settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the
+  rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes
+  correction ticketing-backoffice BO-063)
+
+  - BO-115: removed listSaleBoards, requestSuggestion, runReport — Sale boards (POS layout, POS-4A), a report runner
+  and a generic suggestion form sat on the category tree; the category tree (listProductCategories, setProductCategories,
+  F86 step 1) is the screen''s job (design-notes correction ticketing-backoffice BO-115)
+
+  - BO-117: removed listSaleBoards, requestSuggestion, updateSaleBoard — Sale boards are a POS layout concern (POS
+  board 4C) unrelated to product import, and the assistant here is generateConfiguration, not a generic thirteen-kind
+  suggestion form; F86 step 3 keeps importProductCatalogue and generateConfiguration (design-notes correction ticketing-backoffice
+  BO-117)
+
+  - BO-130: removed createOrder, syncOrders; declared resolveSyncRejection — Devices replay their own journals (syncOrders
+  is POS-013''s) and a supervisor resolves a rejection rather than typing a sync batch or a new order; resolveSyncRejection
+  is the act the screen needs. F33 step 8 is repointed to it (design-notes correction ticketing-backoffice BO-130)
+
+  - BO-305: removed setOrderDetailTransaction; declared getOrder, getOrderStatement — The 360 view of one order
+  declared only a write (setOrderDetailTransaction with order number and lines), which would edit lines outside
+  modify, exchange and refund; a view of an order reads getOrder and getOrderStatement. F140 step 2 is repointed
+  (design-notes correction ticketing-backoffice BO-305)
+
+  - BO-315: removed setOrderAmendment; declared getOrder, modifyOrder, exchangeOrderLines, rescheduleOrder — setOrderAmendment
+  takes the new values as loose strings with no order id and duplicates modify, exchange and reschedule without
+  their rules; the workspace reads the order (getOrder) and amends it through modifyOrder, exchangeOrderLines and
+  rescheduleOrder. F141 step 2 is repointed (design-notes cor…
+
+  - BO-374: removed approveDecision; declared listApprovalRequests, decideApprovalRequest — The approval workspace
+  (board 4, children BO-375 to BO-383) declared approveDecision from the promotions contract (PRICE_CONFIGURE),
+  which names no request; the approvals contract reads the requests awaiting a decision (listApprovalRequests) and
+  records the decision on one (decideApprovalRequest) (…
+
+  - BO-642: removed approveDecision; declared listAccreditationAudit — A decision history is a read-only record,
+  yet it declared only a write from the promotions contract (approveDecision); the accreditation decision record
+  is listAccreditationAudit (design-notes correction ticketing-backoffice BO-642)
+
+  - BO-443: removed listPricing — listPricing is the AI pricing intelligence view, not the population of a pricing
+  audit and publication screen; the screen keeps listDynamicPriceRules (the rules reviewed and published here) (design-notes
+  correction ticketing-backoffice BO-443)
+
+  - BO-444: removed listRedemption — listRedemption is coupon redemption analytics (promotions); the games redemption
+  dashboard is about prize redemption (DI-878), two meanings of redemption (design-notes correction ticketing-backoffice
+  BO-444)
+
+  - BO-601: removed setChannelListing; declared listPrices, publishChannelAvailability — setChannelListing lists
+  products on OTAs (subscription, PARTNER_MANAGE), not on the venue''s own channels; first-time channel setup is
+  publishChannelAvailability. The screen also had no read: listPrices returns the prices setPrices writes (PR-9)
+  (design-notes correction ticketing-backoffice BO-601)
+
+  - BO-978: removed publishSeatMap; declared updatePerformance — publishSeatMap publishes a map (BO-982''s act);
+  assigning a map to performances is updatePerformance with its seatMapId (design-notes correction ticketing-backoffice
+  BO-978)
+
+  - BO-997: removed listRealTimeAvailability; declared getSeatInventory — listRealTimeAvailability is promotions
+  checkout validation, not seat locks; seat locks are seating''s, and getSeatInventory returns every seat''s state
+  for a performance (design-notes correction ticketing-backoffice BO-997)
+
+  - BO-998: removed extendSeatHold, relinquishSeatHold — Lock timeouts are configured here, not performed: extending
+  or relinquishing one hold (extendSeatHold, relinquishSeatHold) is a selection-time act; the missing policy write
+  and read are recorded as a contract gap (design-notes correction ticketing-backoffice BO-998)
+
+  - BO-1057: removed listInventoryHolds; declared listSeatHoldPools — listInventoryHolds lists terminal and basket
+  leases, not stakeholder seat holds; VIP, sponsor and media holds are seating''s pools (listSeatHoldPools) (design-notes
+  correction ticketing-backoffice BO-1057)
+
+  - BO-1079: removed getSeatReconciliation; declared listAuditRecords — The only read was the seat reconciliation,
+  not an audit log; the audit view reads listAuditRecords (design-notes correction ticketing-backoffice BO-1079)
+
+  - BO-1072: removed listSeatMaps — An API catalogue read seat maps (listSeatMaps); the operation does not serve
+  the purpose, and the published API definitions have no staff read (recorded as a contract gap) (design-notes correction
+  ticketing-backoffice BO-1072)
+
+  - BO-1174: removed listWalletTypes — The wallet API catalogue read wallet types (listWalletTypes); the operation
+  does not serve the purpose, and the API definitions have no staff read (recorded as a contract gap) (design-notes
+  correction ticketing-backoffice BO-1174)
+
+  - BO-1133: removed setWalletChannelRules — A command centre declared only the channel-rules write (setWalletChannelRules),
+  which its children BO-1134 to BO-1140 own; usage needs a read of transactions by channel, recorded as a contract
+  gap (design-notes correction ticketing-backoffice BO-1133)
+
+  - BO-1161: removed simulateCreditConsumption — simulateCreditConsumption simulates credit spending, not risk rule
+  testing; a security sandbox needs a rule backtest, recorded as a contract gap (design-notes correction ticketing-backoffice
+  BO-1161)
+
+  - BO-1151: declared resolveWalletDispute — The dispute queue cannot resolve a dispute; resolveWalletDispute exists
+  but was declared only on BO-1179, and the work happens here (design-notes correction ticketing-backoffice BO-1151)
+
+  - BO-725: declared listPerformances — The command centre listed only templates, which carry no bookings; a command
+  centre of performances needs performance occupancy (listPerformances) (design-notes correction ticketing-backoffice
+  BO-725)
+
+  - ADM-106: declared decidePricingRecommendation — No operation accepted or dismissed a recommendation, and the
+  decision is the point of the screen; decidePricingRecommendation records a human decision on an AI pricing recommendation
+  (design-notes correction ticketing-backoffice ADM-106)
+
+  - ADM-140: removed listPromotions; declared getPromotion, getPromotionUsage — The overview of one selected promotion
+  listed every promotion (listPromotions); it reads the selected promotion (getPromotion) and its usage (getPromotionUsage).
+  F154 step 4 is repointed (design-notes correction ticketing-backoffice ADM-140)
+
+  - ADM-234: removed listChannelCustomerSegment — listChannelCustomerSegment is the dynamic pricing rules view (catalogue),
+  not promotion analytics (design-notes correction ticketing-backoffice ADM-234)
+
+  - ADM-383: removed listSaleChannel — listSaleChannel reads a live tenant''s configured channels, and a prospect
+  has no cell and no channels; the assessment uses the answers only (scoreVsiAssessment) (design-notes correction
+  ticketing-backoffice ADM-383)
+
+  - BO-097: declared getRentalBooking — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getRentalBooking returns the booking being checked out or in, with its timeline
+  (design-notes correction ticketing-backoffice BO-097)
+
+  - BO-119: declared listUpsellRules — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listUpsellRules returns the upsell and cross-sell rules createUpsellRule and deleteUpsellRule
+  change (design-notes correction ticketing-backoffice BO-119)
+
+  - BO-268: declared listGroupPackages — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listGroupPackages returns the group packages on offer that the builder starts from
+  (design-notes correction ticketing-backoffice BO-268)
+
+  - BO-273: declared getGroupBooking — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getGroupBooking returns the confirmed group booking, its leader and its name-capture
+  duty, that is handed over (design-notes correction ticketing-backoffice BO-273)
+
+  - BO-318: declared getRefundPolicy — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getRefundPolicy returns the venue''s refund policy that setRefundPolicy replaces
+  (design-notes correction ticketing-backoffice BO-318)
+
+  - BO-1146: declared getRefundPolicy — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getRefundPolicy returns the venue''s refund policy that setRefundPolicy replaces
+  (design-notes correction ticketing-backoffice BO-1146)
+
+  - BO-488: declared getWallet — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getWallet returns the wallet being topped up and its balances (design-notes correction ticketing-backoffice
+  BO-488)
+
+  - BO-422: declared getWallet — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getWallet returns the wallet and balances adjustWallet changes (design-notes correction ticketing-backoffice
+  BO-422)
+
+  - BO-1100: declared getWallet — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getWallet returns the wallet and balances the reversal or adjustment changes (design-notes correction
+  ticketing-backoffice BO-1100)
+
+  - BO-1150: declared getWallet — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getWallet returns the wallet, its state and its restrictions (design-notes correction ticketing-backoffice
+  BO-1150)
+
+  - BO-1149: declared getWallet, listApprovalMatrices — The screen declared only writes, so it opens as an empty
+  form even where a configuration exists (PR-9); getWallet, listApprovalMatrices return the wallet being adjusted
+  and the approval matrices setApprovalMatrix replaces (design-notes correction ticketing-backoffice BO-1149)
+
+  - BO-1148: declared listWalletTransactions — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); listWalletTransactions returns the wallet transactions a reversal corrects
+  (design-notes correction ticketing-backoffice BO-1148)
+
+  - BO-1147: declared getOrder, listOrderRefunds — The screen declared only writes, so it opens as an empty form
+  even where a configuration exists (PR-9); getOrder, listOrderRefunds return the order whose value is restored
+  and the refunds already made against it (design-notes correction ticketing-backoffice BO-1147)
+
+  - BO-417: declared getWalletFundingRules — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getWalletFundingRules returns the funding rules setWalletFundingRules replaces
+  (design-notes correction ticketing-backoffice BO-417)
+
+  - BO-418: declared getWalletFundingRules — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getWalletFundingRules returns the funding rules setWalletFundingRules replaces
+  (design-notes correction ticketing-backoffice BO-418)
+
+  - BO-1094: declared getWalletFundingRules — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getWalletFundingRules returns the funding rules setWalletFundingRules replaces
+  (design-notes correction ticketing-backoffice BO-1094)
+
+  - BO-1095: declared getWalletFundingRules — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getWalletFundingRules returns the funding rules setWalletFundingRules replaces
+  (design-notes correction ticketing-backoffice BO-1095)
+
+  - BO-1096: declared getWalletFundingRules — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getWalletFundingRules returns the funding rules setWalletFundingRules replaces
+  (design-notes correction ticketing-backoffice BO-1096)
+
+  - BO-1097: declared getWalletFundingRules — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getWalletFundingRules returns the funding rules setWalletFundingRules replaces
+  (design-notes correction ticketing-backoffice BO-1097)
+
+  - BO-1098: declared getWalletFundingRules — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getWalletFundingRules returns the funding rules setWalletFundingRules replaces
+  (design-notes correction ticketing-backoffice BO-1098)
+
+  - BO-1099: declared getWalletFundingRules — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getWalletFundingRules returns the funding rules setWalletFundingRules replaces
+  (design-notes correction ticketing-backoffice BO-1099)
+
+  - BO-1101: declared getWalletFundingRules — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getWalletFundingRules returns the funding rules setWalletFundingRules replaces
+  (design-notes correction ticketing-backoffice BO-1101)
+
+  - BO-420: declared listCreditTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listCreditTypes returns the credit types, with their validity and expiry, that
+  updateCreditType changes (design-notes correction ticketing-backoffice BO-420)
+
+  - BO-1104: declared listCreditTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listCreditTypes returns the credit types, with their validity and expiry, that
+  updateCreditType changes (design-notes correction ticketing-backoffice BO-1104)
+
+  - BO-1108: declared listCreditTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listCreditTypes returns the credit types, with their validity and expiry, that
+  updateCreditType changes (design-notes correction ticketing-backoffice BO-1108)
+
+  - BO-1105: declared listCreditTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listCreditTypes returns the credit types updateCreditType changes (design-notes
+  correction ticketing-backoffice BO-1105)
+
+  - BO-1085: declared listWalletTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listWalletTypes returns the wallet types updateWalletType changes (design-notes
+  correction ticketing-backoffice BO-1085)
+
+  - BO-1087: declared listWalletTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listWalletTypes returns the wallet types updateWalletType changes (design-notes
+  correction ticketing-backoffice BO-1087)
+
+  - BO-1089: declared listWalletTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listWalletTypes returns the wallet types updateWalletType changes (design-notes
+  correction ticketing-backoffice BO-1089)
+
+  - BO-1090: declared listWalletTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listWalletTypes returns the wallet types updateWalletType changes (design-notes
+  correction ticketing-backoffice BO-1090)
+
+  - BO-1091: declared listWalletTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listWalletTypes returns the wallet types updateWalletType changes (design-notes
+  correction ticketing-backoffice BO-1091)
+
+  - BO-1092: declared listWalletConfigurationVersions — The screen declared only writes, so it opens as an empty
+  form even where a configuration exists (PR-9); listWalletConfigurationVersions returns the wallet configuration
+  versions publishWalletConfiguration records (design-notes correction ticketing-backoffice BO-1092)
+
+  - BO-1132: declared listWalletConfigurationVersions — The screen declared only writes, so it opens as an empty
+  form even where a configuration exists (PR-9); listWalletConfigurationVersions returns the wallet configuration
+  versions publishWalletConfiguration records (design-notes correction ticketing-backoffice BO-1132)
+
+  - BO-1180: declared listWalletConfigurationVersions — The screen declared only writes, so it opens as an empty
+  form even where a configuration exists (PR-9); listWalletConfigurationVersions returns the wallet configuration
+  versions publishWalletConfiguration records (design-notes correction ticketing-backoffice BO-1180)
+
+  - BO-1181: declared listWalletConfigurationVersions, listApprovalRequests — The screen declared only writes, so
+  it opens as an empty form even where a configuration exists (PR-9); listWalletConfigurationVersions, listApprovalRequests
+  return the configuration versions publishWalletConfiguration records and the approval requests createApprovalRequest
+  raises (design-notes cor…
+
+  - BO-1110: declared getCreditConsumptionPolicy — The screen declared only writes, so it opens as an empty form
+  even where a configuration exists (PR-9); getCreditConsumptionPolicy returns the consumption policy setCreditConsumptionPolicy
+  replaces (design-notes correction ticketing-backoffice BO-1110)
+
+  - BO-1112: declared getCreditConsumptionPolicy — The screen declared only writes, so it opens as an empty form
+  even where a configuration exists (PR-9); getCreditConsumptionPolicy returns the consumption policy the simulation
+  tests (design-notes correction ticketing-backoffice BO-1112)
+
+  - BO-1111: declared listCreditLots — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listCreditLots returns the credit lots near expiry, the customer-level view of
+  balances and expiry dates DI-527 asks for (design-notes correction ticketing-backoffice BO-1111)
+
+  - BO-1130: declared listCreditLots — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listCreditLots returns the credit lots and their expiry that expireCreditLots acts
+  on (design-notes correction ticketing-backoffice BO-1130)
+
+  - BO-1114: declared listSharedWallets — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listSharedWallets returns the shared-wallet structures createSharedWallet adds
+  to (design-notes correction ticketing-backoffice BO-1114)
+
+  - BO-1115: declared listSharedWallets — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listSharedWallets returns the shared wallets with their members, allowances and
+  controls that setSharedWalletMembers replaces (design-notes correction ticketing-backoffice BO-1115)
+
+  - BO-1117: declared listSharedWallets — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listSharedWallets returns the shared wallets with their members, allowances and
+  controls that setSharedWalletMembers replaces (design-notes correction ticketing-backoffice BO-1117)
+
+  - BO-1118: declared listSharedWallets — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listSharedWallets returns the shared wallets with their members, allowances and
+  controls that setSharedWalletMembers replaces (design-notes correction ticketing-backoffice BO-1118)
+
+  - BO-1120: declared listSharedWallets, listApprovalMatrices — The screen declared only writes, so it opens as
+  an empty form even where a configuration exists (PR-9); listSharedWallets, listApprovalMatrices return the shared
+  wallets with their members and budgets, and the approval matrices setApprovalMatrix replaces (design-notes correction
+  ticketing-backoffic…
+
+  - BO-1116: declared listSharedWallets, getWalletBalance — The screen declared only writes, so it opens as an empty
+  form even where a configuration exists (PR-9); listSharedWallets, getWalletBalance return the shared wallet with
+  its members and the balance being distributed (design-notes correction ticketing-backoffice BO-1116)
+
+  - BO-1121: declared getWalletBalance — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getWalletBalance returns the balance being reallocated (design-notes correction
+  ticketing-backoffice BO-1121)
+
+  - BO-1125: declared getGiftCard — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getGiftCard returns the gift card and its balance (design-notes correction ticketing-backoffice
+  BO-1125)
+
+  - BO-1127: declared listVoucherTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listVoucherTypes returns the voucher types createVoucherType adds to (design-notes
+  correction ticketing-backoffice BO-1127)
+
+  - BO-1176: declared listWebhookSubscriptions — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); listWebhookSubscriptions returns the webhook subscriptions createWebhookSubscription
+  adds to (design-notes correction ticketing-backoffice BO-1176)
+
+  - BO-696: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-696)
+
+  - BO-697: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-697)
+
+  - BO-698: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-698)
+
+  - BO-699: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-699)
+
+  - BO-703: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-703)
+
+  - BO-704: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-704)
+
+  - BO-705: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-705)
+
+  - BO-706: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-706)
+
+  - BO-707: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-707)
+
+  - BO-709: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-709)
+
+  - BO-716: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-716)
+
+  - BO-717: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-717)
+
+  - BO-719: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-719)
+
+  - BO-720: declared getEvent — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getEvent returns the event the screen configures (design-notes correction ticketing-backoffice
+  BO-720)
+
+  - BO-711: declared getEventResourcePlan — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getEventResourcePlan returns the event''s resource plan that setEventResourcePlan
+  replaces (design-notes correction ticketing-backoffice BO-711)
+
+  - BO-713: declared getEventResourcePlan — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getEventResourcePlan returns the event''s resource plan that setEventResourcePlan
+  replaces (design-notes correction ticketing-backoffice BO-713)
+
+  - BO-715: declared getEventResourcePlan — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getEventResourcePlan returns the event''s resource plan that setEventResourcePlan
+  replaces (design-notes correction ticketing-backoffice BO-715)
+
+  - BO-914: declared getEventResourcePlan — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getEventResourcePlan returns the event''s resource plan that setEventResourcePlan
+  replaces (design-notes correction ticketing-backoffice BO-914)
+
+  - BO-712: declared getEventResourcePlan, listRotaAssignments — The screen declared only writes, so it opens as
+  an empty form even where a configuration exists (PR-9); getEventResourcePlan, listRotaAssignments return the event''s
+  resource plan and the rota assignments createRotaAssignment adds to (design-notes correction ticketing-backoffice
+  BO-712)
+
+  - BO-701: declared listSpaces — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); listSpaces returns the spaces setSpace defines (design-notes correction ticketing-backoffice BO-701)
+
+  - BO-702: declared listSpaces — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); listSpaces returns the spaces setSpace defines (design-notes correction ticketing-backoffice BO-702)
+
+  - BO-723: declared listPerformanceTemplates — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); listPerformanceTemplates returns the slot templates setPerformanceTemplate
+  changes (design-notes correction ticketing-backoffice BO-723)
+
+  - BO-724: declared listPerformanceTemplates — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); listPerformanceTemplates returns the slot templates setPerformanceTemplate
+  changes (design-notes correction ticketing-backoffice BO-724)
+
+  - BO-726: declared getPerformance — The screen declared only writes, so it opens as an empty form even where a
+  configuration exists (PR-9); getPerformance returns the performance whose participants receive the media (design-notes
+  correction ticketing-backoffice BO-726)
+
+  - BO-957: declared getSeatMap — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getSeatMap returns the seat map with its structure and zones (design-notes correction ticketing-backoffice
+  BO-957)
+
+  - BO-958: declared getSeatMap — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getSeatMap returns the seat map with its structure and zones (design-notes correction ticketing-backoffice
+  BO-958)
+
+  - BO-959: declared getSeatMap — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getSeatMap returns the seat map with its structure and zones (design-notes correction ticketing-backoffice
+  BO-959)
+
+  - BO-960: declared getSeatMap — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getSeatMap returns the seat map with its structure and zones (design-notes correction ticketing-backoffice
+  BO-960)
+
+  - BO-961: declared getSeatMap — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getSeatMap returns the seat map with its structure and zones (design-notes correction ticketing-backoffice
+  BO-961)
+
+  - BO-976: declared getSeatMap — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getSeatMap returns the seat map with its structure and zones (design-notes correction ticketing-backoffice
+  BO-976)
+
+  - BO-982: declared getSeatMap — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); getSeatMap returns the seat map with its structure and zones (design-notes correction ticketing-backoffice
+  BO-982)
+
+  - BO-972: declared getImportJob, getSeatMap — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getImportJob, getSeatMap return the import job''s progress and findings,
+  and the map being published (design-notes correction ticketing-backoffice BO-972)
+
+  - BO-1070: declared getSeatMap, listConfigurationProfiles — The screen declared only writes, so it opens as an
+  empty form even where a configuration exists (PR-9); getSeatMap, listConfigurationProfiles return the source map
+  and the configuration profiles setConfigurationProfile changes (design-notes correction ticketing-backoffice BO-1070)
+
+  - BO-990: declared listSeatBlocks — The screen declared only writes, so it opens as an empty form even where a
+  configuration exists (PR-9); listSeatBlocks returns the seat blocks createSeatBlock adds to (design-notes correction
+  ticketing-backoffice BO-990)
+
+  - BO-995: declared getSeatAvailability — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getSeatAvailability returns the seat status of the performance the recommendation
+  or assignment works on (design-notes correction ticketing-backoffice BO-995)
+
+  - BO-1001: declared getSeatAvailability — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getSeatAvailability returns the seat status of the performance the recommendation
+  or assignment works on (design-notes correction ticketing-backoffice BO-1001)
+
+  - BO-1002: declared getSeatAvailability — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getSeatAvailability returns the seat status of the performance the recommendation
+  or assignment works on (design-notes correction ticketing-backoffice BO-1002)
+
+  - BO-1039: declared getSeatAvailability — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getSeatAvailability returns the seat status of the performance the recommendation
+  or assignment works on (design-notes correction ticketing-backoffice BO-1039)
+
+  - BO-1040: declared getSeatAvailability — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); getSeatAvailability returns the seat status of the performance the recommendation
+  or assignment works on (design-notes correction ticketing-backoffice BO-1040)
+
+  - BO-1005: declared listSeatHoldPools — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listSeatHoldPools returns the hold pools, with what is left and when it releases
+  (design-notes correction ticketing-backoffice BO-1005)
+
+  - BO-1008: declared listSeatHoldPools — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listSeatHoldPools returns the hold pools, with what is left and when it releases
+  (design-notes correction ticketing-backoffice BO-1008)
+
+  - BO-1009: declared listSeatHoldPools — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listSeatHoldPools returns the hold pools, with what is left and when it releases
+  (design-notes correction ticketing-backoffice BO-1009)
+
+  - BO-1006: declared listSeatHoldTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listSeatHoldTypes returns the hold types setSeatHoldType changes (design-notes
+  correction ticketing-backoffice BO-1006)
+
+  - BO-1007: declared listSeatHoldTypes — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listSeatHoldTypes returns the hold types setSeatHoldType changes (design-notes
+  correction ticketing-backoffice BO-1007)
+
+  - BO-1014: declared getSeatRules — The screen declared only writes, so it opens as an empty form even where a
+  configuration exists (PR-9); getSeatRules returns the kill, buffer, companion and spacing rules setSeatRules replaces
+  (design-notes correction ticketing-backoffice BO-1014)
+
+  - BO-1015: declared getSeatRules — The screen declared only writes, so it opens as an empty form even where a
+  configuration exists (PR-9); getSeatRules returns the kill, buffer, companion and spacing rules setSeatRules replaces
+  (design-notes correction ticketing-backoffice BO-1015)
+
+  - BO-1016: declared getSeatRules — The screen declared only writes, so it opens as an empty form even where a
+  configuration exists (PR-9); getSeatRules returns the kill, buffer, companion and spacing rules setSeatRules replaces
+  (design-notes correction ticketing-backoffice BO-1016)
+
+  - BO-1021: declared getSeatRules — The screen declared only writes, so it opens as an empty form even where a
+  configuration exists (PR-9); getSeatRules returns the kill, buffer, companion and spacing rules setSeatRules replaces
+  (design-notes correction ticketing-backoffice BO-1021)
+
+  - BO-1019: declared getAccessibleSeating — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getAccessibleSeating returns the accessible seating configuration setAccessibleSeating
+  replaces (design-notes correction ticketing-backoffice BO-1019)
+
+  - BO-1020: declared getAccessibleSeating — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); getAccessibleSeating returns the accessible seating configuration setAccessibleSeating
+  replaces (design-notes correction ticketing-backoffice BO-1020)
+
+  - BO-1025: declared listGroupSeatRequests — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); listGroupSeatRequests returns the group requests with their status and allocation
+  (design-notes correction ticketing-backoffice BO-1025)
+
+  - BO-1026: declared listGroupSeatRequests — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); listGroupSeatRequests returns the group requests with their status and allocation
+  (design-notes correction ticketing-backoffice BO-1026)
+
+  - BO-1027: declared listGroupSeatRequests — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); listGroupSeatRequests returns the group requests with their status and allocation
+  (design-notes correction ticketing-backoffice BO-1027)
+
+  - BO-1028: declared listGroupSeatRequests — The screen declared only writes, so it opens as an empty form even
+  where a configuration exists (PR-9); listGroupSeatRequests returns the group requests with their status and allocation
+  (design-notes correction ticketing-backoffice BO-1028)
+
+  - BO-1034: declared getSeatRecommendationRules — The screen declared only writes, so it opens as an empty form
+  even where a configuration exists (PR-9); getSeatRecommendationRules returns the scoring rules setSeatRecommendationRules
+  replaces (design-notes correction ticketing-backoffice BO-1034)
+
+  - BO-1035: declared getSeatRecommendationRules — The screen declared only writes, so it opens as an empty form
+  even where a configuration exists (PR-9); getSeatRecommendationRules returns the scoring rules setSeatRecommendationRules
+  replaces (design-notes correction ticketing-backoffice BO-1035)
+
+  - BO-1036: declared getSeatRecommendationRules — The screen declared only writes, so it opens as an empty form
+  even where a configuration exists (PR-9); getSeatRecommendationRules returns the scoring rules setSeatRecommendationRules
+  replaces (design-notes correction ticketing-backoffice BO-1036)
+
+  - BO-1037: declared getSeatRecommendationRules — The screen declared only writes, so it opens as an empty form
+  even where a configuration exists (PR-9); getSeatRecommendationRules returns the scoring rules setSeatRecommendationRules
+  replaces (design-notes correction ticketing-backoffice BO-1037)
+
+  - BO-1041: declared getSeatRecommendationRules — The screen declared only writes, so it opens as an empty form
+  even where a configuration exists (PR-9); getSeatRecommendationRules returns the scoring rules setSeatRecommendationRules
+  replaces (design-notes correction ticketing-backoffice BO-1041)
+
+  - ADM-049: declared listPriceLists — The screen declared only writes, so it opens as an empty form even where
+  a configuration exists (PR-9); listPriceLists returns the price lists the master configuration holds (design-notes
+  correction ticketing-backoffice ADM-049)
+
+  - ADM-051: declared listPrices — The screen declared only writes, so it opens as an empty form even where a configuration
+  exists (PR-9); listPrices returns the rates already in the price list (design-notes correction ticketing-backoffice
+  ADM-051)
+
+  - F155: step 18 operations [''setRuleTestRecommendation''] -> [''evaluatePromotions'']; step 18 note
+
+  - F33: step 8 operations [''listSyncRejections'', ''createOrder''] -> [''listSyncRejections'', ''resolveSyncRejection''];
+  step 8 note
+
+  - F77: step 2 operations [''createBundle'', ''publishBundle''] -> [''createBundle'']; step 2 note
+
+  - F89: step 3 operations [''getOfflinePackage'', ''listCatalogueBundles''] -> [''listCatalogueBundles'']; step
+  3 note
+
+  - F99: step 2 operations [''addTip'', ''capturePayment'', ''closeDepositBoxes'', ''createPayment'', ''inquirePaymentStatus'',
+  ''settleDeposit''] -> [''capturePayment'', ''closeDepositBoxes'', ''inquirePaymentStatus'', ''settleDeposit''];
+  step 2 note
+
+  - F140: step 2 operations [''setOrderDetailTransaction''] -> [''getOrder'', ''getOrderStatement'']; step 2 note
+
+  - F141: step 2 operations [''setOrderAmendment''] -> [''getOrder'', ''modifyOrder'']; step 2 note
+
+  - F154: step 4 operations [''listPromotions''] -> [''getPromotion'', ''getPromotionUsage'']; step 4 note'

@@ -1,0 +1,111 @@
+id: CHG-WIR-015
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'white-label: 7 screens rewired — 8 operations taken off screens they do not belong on (bulk-attached,
+  another module''s, guest-, device- or service-only on staff screens, writes on read-only lists), 8 existing operations
+  declared where the screen needed them; 2 flows repointed to match.'
+decision:
+  what: 'Fix the wrong wiring now: take each listed operation off the screen it does not belong on, declare the
+    existing operation the screen needs instead, merge the duplicate screens into the one kept, and repoint the
+    flow steps that called them.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Process-agent design-note corrections for white-label (handoff/design-notes/white-label.yaml, 1-2 October
+  2026) found these screens wired by the 18 August bulk attach, by name resemblance or from the wrong contract,
+  against the adopted audit decision R254 (re-derive each screen''s operations from its purpose and journeys) and
+  R276 (duplicate screens). Each screen''s reason and source is below and on the screen itself (gaps with removed:
+  true).'
+keys_touched:
+  screens:
+  - ADM-016
+  - ADM-017
+  - BO-599
+  - CMS-003
+  - CMS-006
+  - CMS-011
+  - CMS-014
+  operations:
+  - createPreview
+  - diffConfigVersion
+  - getBookingFlowConfig
+  - getBrandIdentity
+  - getFonts
+  - getTenantConfig
+  - getTheme
+  - listConfigVersions
+  - proposeTranslations
+  - publishTenantConfig
+  - restoreConfigVersion
+  - setTheme
+  flows:
+  - F102
+  - F103
+  tickets:
+  - APP-WL-ADM-016
+  - APP-WL-ADM-017
+  - APP-WL-CMS-003
+  - APP-WL-CMS-006
+  - APP-WL-CMS-011
+  - APP-WL-CMS-014
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-ADM-016
+  - APP-WL-ADM-017
+  - APP-WL-CMS-003
+  - APP-WL-CMS-006
+  - APP-WL-CMS-011
+  - APP-WL-CMS-014
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-STAFF-AUDIENCE (a staff screen calling a guest-, device-, service- or partner-only
+  operation) beside the existing S-DUP-SCREEN and S-CONSUMED-MIRROR rules, and check-screens keeps its R254 attachment
+  warnings; check-flows rule 3 holds every repointed flow step to its screen. Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key naming a touched screen. Per screen and
+  flow:
+
+  - CMS-003: removed getTheme, setTheme — Typography also read and saved the Theme (getTheme, setTheme); the theme
+  belongs to CMS-005, and two save points for one record drift. The entry parameters bannerId, pageId, policyKind
+  and version were left from the 41-operation bulk attach (design-notes corrections white-label CMS-003).
+
+  - CMS-006: removed diffConfigVersion, listConfigVersions, publishTenantConfig, restoreConfigVersion; declared
+  getTheme, getFonts, getBrandIdentity, getBookingFlowConfig — The screen was wired to the version table and publish
+  gate (listConfigVersions, diffConfigVersion, publishTenantConfig, restoreConfigVersion), which are CMS-015 and
+  CMS-014; Component Preview needs the theme, fonts, brand and booking-flow reads and createPreview (design-notes
+  correction white-label…
+
+  - CMS-011: declared getTenantConfig, proposeTranslations — The screen declared only setLanguages and no read,
+  so it could not show the current languages or the translation gaps it exists for (getTenantConfig); the translation
+  workflow the client asked for (machine draft, then review) is proposeTranslations, wired only to BO-785 and BO-793
+  (DI-081, DI-083;…
+
+  - CMS-014: declared diffConfigVersion, createPreview — A review step needs a field-level diff (the contract''s
+  own reason for diffConfigVersion) and the client asked for a Review and Publish step with a preview (DI-194);
+  neither was declared (design-notes correction white-label CMS-014).
+
+  - ADM-016: see the screen — The entry parameters bannerId, pageId and policyKind are left from the bulk attach;
+  branding is per tenant (design-notes correction white-label ADM-016).
+
+  - ADM-017: see the screen — The entry parameters bannerId, pageId, policyKind and version are bulk-attach leftovers;
+  the tenant claims on CMS-017, ADM-017 is the support path (design-notes correction white-label ADM-017).
+
+  - BO-599: removed getTenantConfig — The screen is navigation; a full configuration read (getTenantConfig) is not
+  needed (design-notes correction white-label BO-599).
+
+  - CMS-011: removed proposeTranslations — proposeTranslations answers 202 and nothing on the screen can follow
+  the job (R288); the machine-translation step stays on BO-785 and BO-793 until a status read exists (logged as
+  a contract gap).
+
+  - F102: step 3 operations [''createPreview'', ''diffConfigVersion''] -> [''createPreview'']; step 4 screen ADM-016
+  -> CMS-014; step 4 operations [''createPreview'', ''diffConfigVersion'', ''getAppIcons'', ''getBrandIdentity'',
+  ''setAppIcons''] -> [''diffConfigVersion'', ''publishTenantConfig'']; step 4 note
+
+  - F103: step 1 screen ADM-017 -> CMS-017; step 1 note'

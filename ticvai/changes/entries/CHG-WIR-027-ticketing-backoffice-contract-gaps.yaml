@@ -1,0 +1,817 @@
+id: CHG-WIR-027
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'Contract gap (ticketing-backoffice): 145 wiring fixes need an operation the contracts do not have; logged,
+  not invented.'
+decision:
+  what: 'Log, do not invent: each wiring fix below needs an operation (or an audience) the contracts lack. The gap
+    is recorded on the screen (gaps, operation: null) and here, open, for the contract owner.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: Design-note corrections for ticketing-backoffice (handoff/design-notes/ticketing-backoffice.yaml) name operations
+  that do not exist; the brief for the wiring fixes (Chinmay, 2 October 2026) says to log such a gap as an open
+  contract-gap change and not invent the operation.
+keys_touched:
+  screens:
+  - ADM-052
+  - ADM-055
+  - ADM-059
+  - ADM-060
+  - ADM-061
+  - ADM-062
+  - ADM-063
+  - ADM-064
+  - ADM-065
+  - ADM-066
+  - ADM-067
+  - ADM-070
+  - ADM-072
+  - ADM-073
+  - ADM-076
+  - ADM-079
+  - ADM-084
+  - ADM-093
+  - ADM-109
+  - ADM-110
+  - ADM-111
+  - ADM-115
+  - ADM-120
+  - ADM-123
+  - ADM-124
+  - ADM-127
+  - ADM-148
+  - ADM-149
+  - ADM-150
+  - ADM-151
+  - ADM-152
+  - ADM-153
+  - ADM-154
+  - ADM-155
+  - ADM-156
+  - ADM-161
+  - ADM-162
+  - ADM-163
+  - ADM-169
+  - ADM-170
+  - ADM-172
+  - ADM-173
+  - ADM-174
+  - ADM-176
+  - ADM-184
+  - ADM-186
+  - ADM-197
+  - ADM-199
+  - ADM-206
+  - ADM-209
+  - ADM-210
+  - ADM-214
+  - ADM-220
+  - ADM-259
+  - ADM-260
+  - ADM-261
+  - ADM-266
+  - ADM-267
+  - ADM-276
+  - ADM-279
+  - ADM-309
+  - ADM-310
+  - ADM-311
+  - ADM-312
+  - ADM-313
+  - ADM-314
+  - ADM-575
+  - ADM-585
+  - ADM-592
+  - ADM-594
+  - ADM-595
+  - ADM-596
+  - ADM-597
+  - ADM-603
+  - ADM-612
+  - ADM-615
+  - ADM-621
+  - ADM-631
+  - ADM-632
+  - ADM-645
+  - ADM-677
+  - ADM-682
+  - ADM-685
+  - ADM-694
+  - BO-007
+  - BO-008
+  - BO-019
+  - BO-028
+  - BO-037
+  - BO-1024
+  - BO-1044
+  - BO-1049
+  - BO-1051
+  - BO-1072
+  - BO-1105
+  - BO-1106
+  - BO-1114
+  - BO-1124
+  - BO-1129
+  - BO-1133
+  - BO-1134
+  - BO-1135
+  - BO-1136
+  - BO-1137
+  - BO-1138
+  - BO-1139
+  - BO-1140
+  - BO-1144
+  - BO-1145
+  - BO-1146
+  - BO-1148
+  - BO-1153
+  - BO-1154
+  - BO-1155
+  - BO-1156
+  - BO-1158
+  - BO-1159
+  - BO-1161
+  - BO-1164
+  - BO-1169
+  - BO-1174
+  - BO-1175
+  - BO-1178
+  - BO-269
+  - BO-271
+  - BO-275
+  - BO-306
+  - BO-307
+  - BO-308
+  - BO-309
+  - BO-316
+  - BO-317
+  - BO-321
+  - BO-322
+  - BO-399
+  - BO-414
+  - BO-419
+  - BO-444
+  - BO-637
+  - BO-720
+  - BO-770
+  - BO-946
+  - BO-985
+  - BO-991
+  - BO-998
+  tickets:
+  - APP-SETUP-ADM-055
+  - APP-SETUP-ADM-148
+  - APP-SETUP-ADM-169
+  - APP-SETUP-ADM-172
+  - APP-SETUP-ADM-173
+  - APP-SETUP-ADM-174
+  - APP-SETUP-ADM-199
+  - APP-SETUP-ADM-603
+  - APP-SETUP-BO-007
+  - APP-SETUP-BO-008
+  - APP-SETUP-BO-1146
+  - VM-BO-019
+  - VM-BO-028
+  - VM-BO-037
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-055
+  - APP-SETUP-ADM-148
+  - APP-SETUP-ADM-169
+  - APP-SETUP-ADM-172
+  - APP-SETUP-ADM-173
+  - APP-SETUP-ADM-174
+  - APP-SETUP-ADM-199
+  - APP-SETUP-ADM-603
+  - APP-SETUP-BO-007
+  - APP-SETUP-BO-008
+  - APP-SETUP-BO-1146
+  - VM-BO-019
+  - VM-BO-028
+  - VM-BO-037
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: open
+notes: 'type: contract-gap. Open until the contract change is decided; the wiring fix that needs it lands with it.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - BO-028: gap: No read lists refunds held for approval across orders. — An approval queue needs the refunds held
+  for approval; no operation lists them (listOrderRefunds is per order).
+
+  - ADM-072: gap: No read of the fee applicability and charging rules (setFeeApplicabilityCharging has no get).
+  — The screen declares only setFeeApplicabilityCharging and nothing returns the current configuration, so it opens
+  empty where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-072).
+
+  - ADM-076: gap: simulatePriceBreakdownCalculation is a PUT with no read of the calculation sequence it explains.
+  — The screen declares only simulatePriceBreakdownCalculation and nothing returns the current configuration, so
+  it opens empty where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-076).
+
+  - ADM-079: gap: No read of a pricing change request (setPricingChangeRequest, submitPricingChangeRequest and decidePricingChangeRequest
+  have no get or list). — The screen declares only setPricingChangeRequest and nothing returns the current configuration,
+  so it opens empty where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice
+  ADM-079).
+
+  - ADM-084: gap: No read of scheduled pricing publications (publishPricingEffectiveDate has no list). — The screen
+  declares only publishPricingEffectiveDate and nothing returns the current configuration, so it opens empty where
+  one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-084).
+
+  - ADM-109: gap: No read of saved pricing scenarios; the simulation itself is a PUT named setPricing. — The screen
+  declares only setPricing and nothing returns the current configuration, so it opens empty where one exists (PR-9);
+  no read of it exists (design-notes correction ticketing-backoffice ADM-109).
+
+  - ADM-111: gap: No read of pricing experiments (setPricingExperiment has no get or list). — The screen declares
+  only setPricingExperiment and nothing returns the current configuration, so it opens empty where one exists (PR-9);
+  no read of it exists (design-notes correction ticketing-backoffice ADM-111).
+
+  - ADM-115: gap: No read lists live dynamic price executions and their deployment state. — The monitor''s only
+  operation executes a price (createLiveDynamicPrice) and nothing lists executions; a monitor needs the list (design-notes
+  correction ticketing-backoffice ADM-115).
+
+  - ADM-120: gap: No read of the lifecycle status workflow (setLifecycleStatuWorkflow has no get). — The screen
+  declares only setLifecycleStatuWorkflow and nothing returns the current configuration, so it opens empty where
+  one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-120).
+
+  - ADM-123: gap: No read of product context and ownership assignments. — The screen declares only setProductContextOwnership
+  and nothing returns the current configuration, so it opens empty where one exists (PR-9); no read of it exists
+  (design-notes correction ticketing-backoffice ADM-123).
+
+  - ADM-124: gap: No read of what is published to which channel (publishChannelAvailability has no get). — The screen
+  declares only publishChannelAvailability and nothing returns the current configuration, so it opens empty where
+  one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-124).
+
+  - ADM-127: gap: No read of a catalogue review (setCatalogueReview has no get). — The screen declares only setCatalogueReview
+  and nothing returns the current configuration, so it opens empty where one exists (PR-9); no read of it exists
+  (design-notes correction ticketing-backoffice ADM-127).
+
+  - ADM-148: gap: No read of a promotion rule written by setPromotionRule (or the screen moves to getPromotion with
+  createPromotion/updatePromotion; see the duplicate-writer proposal). — The screen declares only setPromotionRule
+  and nothing returns the current configuration, so it opens empty where one exists (PR-9); no read of it exists
+  (design-notes correction ticketing-backoffice ADM-148).
+
+  - ADM-210: gap: No read of promotion stacking rules (setPromotionStackingRule has no get). — The screen declares
+  only setPromotionStackingRule and nothing returns the current configuration, so it opens empty where one exists
+  (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-210).
+
+  - ADM-169: gap: No read of the offer written by setBuyGetBogo (or the offer is a typed Discount on createPromotion,
+  read by getPromotion). — The screen declares only setBuyGetBogo and nothing returns the current configuration,
+  so it opens empty where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice
+  ADM-169).
+
+  - ADM-172: gap: No read of the offer written by setFixedPriceOffer (or the offer is a typed Discount on createPromotion,
+  read by getPromotion). — The screen declares only setFixedPriceOffer and nothing returns the current configuration,
+  so it opens empty where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice
+  ADM-172).
+
+  - ADM-173: gap: No read of the offer written by setGiftFreeProduct (or the offer is a typed Discount on createPromotion,
+  read by getPromotion). — The screen declares only setGiftFreeProduct and nothing returns the current configuration,
+  so it opens empty where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice
+  ADM-173).
+
+  - ADM-174: gap: No read of the offer written by setCrossCategoryPromotion (or the offer is a typed Discount on
+  createPromotion, read by getPromotion). — The screen declares only setCrossCategoryPromotion and nothing returns
+  the current configuration, so it opens empty where one exists (PR-9); no read of it exists (design-notes correction
+  ticketing-backoffice ADM-174).
+
+  - ADM-199: gap: No read of promotion eligibility rules (setEligibilityRule has no get). — The screen declares
+  only setEligibilityRule and nothing returns the current configuration, so it opens empty where one exists (PR-9);
+  no read of it exists (design-notes correction ticketing-backoffice ADM-199).
+
+  - ADM-279: gap: No read of resale eligibility rules (setResaleEligibilityRule has no get). — The screen declares
+  only setResaleEligibilityRule and nothing returns the current configuration, so it opens empty where one exists
+  (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-279).
+
+  - ADM-259: gap: No read of a channel profile (createChannelProfile has no get or list). — The screen declares
+  only createChannelProfile and nothing returns the current configuration, so it opens empty where one exists (PR-9);
+  no read of it exists (design-notes correction ticketing-backoffice ADM-259).
+
+  - ADM-260: gap: No read of product-to-channel catalogue assignments. — The screen declares only setProductCatalogue
+  and nothing returns the current configuration, so it opens empty where one exists (PR-9); no read of it exists
+  (design-notes correction ticketing-backoffice ADM-260).
+
+  - ADM-261: gap: No read of channel pricing and commercial profile assignments. — The screen declares only setChannelPricingCommercial
+  and nothing returns the current configuration, so it opens empty where one exists (PR-9); no read of it exists
+  (design-notes correction ticketing-backoffice ADM-261).
+
+  - ADM-266: gap: No read of channel fee, payment and fulfilment configuration. — The screen declares only setChannelFeePayment
+  and nothing returns the current configuration, so it opens empty where one exists (PR-9); no read of it exists
+  (design-notes correction ticketing-backoffice ADM-266).
+
+  - ADM-267: gap: No read of channel readiness and validation results. — The screen declares only publishChannelReadinessValidation
+  and nothing returns the current configuration, so it opens empty where one exists (PR-9); no read of it exists
+  (design-notes correction ticketing-backoffice ADM-267).
+
+  - ADM-309: gap: No read of upgrade and conversion paths (setUpgradeConversionPath has no get or list). — The screen
+  declares only setUpgradeConversionPath and nothing returns the current configuration, so it opens empty where
+  one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-309).
+
+  - ADM-313: gap: No read of pro-rata and residual value configuration. — The screen declares only setProRataResidual
+  and nothing returns the current configuration, so it opens empty where one exists (PR-9); no read of it exists
+  (design-notes correction ticketing-backoffice ADM-313).
+
+  - ADM-575: gap: No read of the payment failover policy (setPaymentFailoverPolicy has no get). — The screen declares
+  only setPaymentFailoverPolicy and nothing returns the current configuration, so it opens empty where one exists
+  (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-575).
+
+  - ADM-592: gap: No staff read of payment links (getPaymentLink is guest/anonymous by token; there is no list).
+  — The screen declares only createPaymentLink and nothing returns the current configuration, so it opens empty
+  where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-592).
+
+  - ADM-594: gap: No read of the hosted checkout configuration (setHostedCheckoutConfiguration has no get). — The
+  screen declares only setHostedCheckoutConfiguration and nothing returns the current configuration, so it opens
+  empty where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-594).
+
+  - ADM-596: gap: No read of the payment authentication policy (setPaymentAuthenticationPolicy has no get). — The
+  screen declares only setPaymentAuthenticationPolicy and nothing returns the current configuration, so it opens
+  empty where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-596).
+
+  - ADM-595: gap: No read lists digital payment sessions and their state. — A session monitor whose only operation
+  queries one payment (inquirePaymentStatus); nothing lists digital payment sessions (design-notes correction ticketing-backoffice
+  ADM-595).
+
+  - ADM-597: gap: No read lists digital payment exceptions (failed, abandoned, expired sessions). — The exception
+  and recovery center declares only setHostedCheckoutConfiguration and inquirePaymentStatus; nothing lists failed,
+  abandoned or expired digital payments (design-notes correction ticketing-backoffice ADM-597).
+
+  - ADM-585: gap: No read lists card-present payment attempts by terminal. — The card-present transaction monitor
+  reads terminals (listPaymentTerminals), not payment attempts (design-notes correction ticketing-backoffice ADM-585).
+
+  - ADM-603: gap: No read of a B2B account''s payment terms (setB2bPaymentTerms has no get). — The screen saves
+  B2B terms (setB2bPaymentTerms) and nothing reads the current terms of an account; B2bCreditAccount carries no
+  terms (design-notes correction ticketing-backoffice ADM-603).
+
+  - ADM-612: gap: No read of the wallet refund policy (setWalletRefundPolicy has no get). — The screen declares
+  only setWalletRefundPolicy and nothing returns the current configuration, so it opens empty where one exists (PR-9);
+  no read of it exists (design-notes correction ticketing-backoffice ADM-612).
+
+  - ADM-615: gap: No read lists refunds across orders by provider status (same gap as BO-028). — The refund processing
+  center declares only inquirePaymentStatus for one payment; nothing lists refunds in flight across orders (listOrderRefunds
+  is per order) (design-notes correction ticketing-backoffice ADM-615).
+
+  - ADM-621: gap: No read of reconciliation matching rules (setReconciliationMatchingRules has no get). — The screen
+  declares only setReconciliationMatchingRules and nothing returns the current configuration, so it opens empty
+  where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-621).
+
+  - ADM-631: gap: No read of payment risk rules (setPaymentRiskRules has no get). — The screen declares only setPaymentRiskRules
+  and nothing returns the current configuration, so it opens empty where one exists (PR-9); no read of it exists
+  (design-notes correction ticketing-backoffice ADM-631).
+
+  - ADM-632: gap: No read of payment risk lists and signals (setPaymentRiskRules has no get). — The screen declares
+  only setPaymentRiskRules and nothing returns the current configuration, so it opens empty where one exists (PR-9);
+  no read of it exists (design-notes correction ticketing-backoffice ADM-632).
+
+  - ADM-645: gap: No read of recommendation suppression settings (setRecommendationSuppression has no get). — The
+  screen declares only setRecommendationSuppression and nothing returns the current configuration, so it opens empty
+  where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-645).
+
+  - ADM-677: gap: No read of recommendation suppression settings (setRecommendationSuppression has no get). — The
+  screen declares only setRecommendationSuppression and nothing returns the current configuration, so it opens empty
+  where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-677).
+
+  - ADM-685: gap: No read of recommendation suppression settings (setRecommendationSuppression has no get). — The
+  screen declares only setRecommendationSuppression and nothing returns the current configuration, so it opens empty
+  where one exists (PR-9); no read of it exists (design-notes correction ticketing-backoffice ADM-685).
+
+  - ADM-073: gap: No write for fee waiver and tax exemption rules. — A configuration screen (Fee Waiver, Tax Exemption
+  & Exception Rules) declares only listFeeWaiverTax; nothing it shows can be changed and no existing operation writes
+  it (design-notes correction ticketing-backoffice ADM-073).
+
+  - ADM-093: gap: No write for channel, segment and location dynamic pricing rules (unless setDynamicPriceRule carries
+  them). — A configuration screen (Channel, Customer Segment & Location Dynamic Rules) declares only listChannelCustomerSegment;
+  nothing it shows can be changed and no existing operation writes it (design-notes correction ticketing-backoffice
+  ADM-093).
+
+  - ADM-149: gap: No write for the rules listPercentageFixedDiscount lists (or the rule is a typed Discount/PromotionConditions
+  on createPromotion/updatePromotion; see the promotions proposal). — A configuration screen (Percentage & Fixed
+  Discount Configurator) declares only listPercentageFixedDiscount; nothing it shows can be changed and no existing
+  operation writes it (design-notes correction ticketing-backoffice ADM-149).
+
+  - ADM-150: gap: No write for the rules listCartTransactionThreshold lists (or the rule is a typed Discount/PromotionConditions
+  on createPromotion/updatePromotion; see the promotions proposal). — A configuration screen (Cart & Transaction
+  Threshold Rules) declares only listCartTransactionThreshold; nothing it shows can be changed and no existing operation
+  writes it (design-notes correction ticketing-backoffice ADM-150).
+
+  - ADM-151: gap: No write for the rules listVolumeBulkTier lists (or the rule is a typed Discount/PromotionConditions
+  on createPromotion/updatePromotion; see the promotions proposal). — A configuration screen (Volume, Bulk & Tier
+  Discount Configurator) declares only listVolumeBulkTier; nothing it shows can be changed and no existing operation
+  writes it (design-notes correction ticketing-backoffice ADM-151).
+
+  - ADM-152: gap: No write for the rules listTimeBasedSeasonal lists (or the rule is a typed Discount/PromotionConditions
+  on createPromotion/updatePromotion; see the promotions proposal). — A configuration screen (Time-Based & Seasonal
+  Discount Rules) declares only listTimeBasedSeasonal; nothing it shows can be changed and no existing operation
+  writes it (design-notes correction ticketing-backoffice ADM-152).
+
+  - ADM-153: gap: No write for the rules listCustomerMembershipSegment lists (or the rule is a typed Discount/PromotionConditions
+  on createPromotion/updatePromotion; see the promotions proposal). — A configuration screen (Customer, Membership
+  & Segment Discount Rules) declares only listCustomerMembershipSegment; nothing it shows can be changed and no
+  existing operation writes it (design-notes correction ticketing-backoffice ADM-153).
+
+  - ADM-154: gap: No write for the rules listPaymentMethodBank lists (or the rule is a typed Discount/PromotionConditions
+  on createPromotion/updatePromotion; see the promotions proposal). — A configuration screen (Payment Method, Bank
+  & Partner Discount Rules) declares only listPaymentMethodBank; nothing it shows can be changed and no existing
+  operation writes it (design-notes correction ticketing-backoffice ADM-154).
+
+  - ADM-155: gap: No write for the rules listSpecialPriceGuest lists (or the rule is a typed Discount/PromotionConditions
+  on createPromotion/updatePromotion; see the promotions proposal). — A configuration screen (Special Price & Guest
+  Offer Configurator) declares only listSpecialPriceGuest; nothing it shows can be changed and no existing operation
+  writes it (design-notes correction ticketing-backoffice ADM-155).
+
+  - ADM-170: gap: No write for the rules listMultiBuyQuantity lists (or the rule is a typed Discount/PromotionConditions
+  on createPromotion/updatePromotion; see the promotions proposal). — A configuration screen (Multi-Buy & Quantity
+  Offer Configurator) declares only listMultiBuyQuantity; nothing it shows can be changed and no existing operation
+  writes it (design-notes correction ticketing-backoffice ADM-170).
+
+  - ADM-156: gap: No write for what listDiscountLimitGuardrail lists. — A configuration screen (Discount Limits,
+  Guardrails & Commercial Controls) declares only listDiscountLimitGuardrail; nothing it shows can be changed and
+  no existing operation writes it (design-notes correction ticketing-backoffice ADM-156).
+
+  - ADM-161: gap: No write for what listCodeEligibilityRestriction lists. — A configuration screen (Code Eligibility
+  & Restriction Manager) declares only listCodeEligibilityRestriction; nothing it shows can be changed and no existing
+  operation writes it (design-notes correction ticketing-backoffice ADM-161).
+
+  - ADM-162: gap: No write for what listUsageCapacityFrequency lists. — A configuration screen (Usage, Capacity
+  & Frequency Control) declares only listUsageCapacityFrequency; nothing it shows can be changed and no existing
+  operation writes it (design-notes correction ticketing-backoffice ADM-162).
+
+  - ADM-163: gap: No write for what listValidityDateTime lists. — A configuration screen (Validity, Date & Time
+  Control) declares only listValidityDateTime; nothing it shows can be changed and no existing operation writes
+  it (design-notes correction ticketing-backoffice ADM-163).
+
+  - ADM-176: gap: No write for what listAdvancedOfferGuardrail lists. — A configuration screen (Advanced Offer Guardrails
+  & Conflict Controls) declares only listAdvancedOfferGuardrail; nothing it shows can be changed and no existing
+  operation writes it (design-notes correction ticketing-backoffice ADM-176).
+
+  - ADM-184: gap: No write for what listBundleValidityScheduling lists. — A configuration screen (Bundle Validity,
+  Scheduling & Redemption Rules) declares only listBundleValidityScheduling; nothing it shows can be changed and
+  no existing operation writes it (design-notes correction ticketing-backoffice ADM-184).
+
+  - ADM-186: gap: No write for what listRevenueAllocationCost lists. — A configuration screen (Revenue Allocation,
+  Cost & Settlement Rules) declares only listRevenueAllocationCost; nothing it shows can be changed and no existing
+  operation writes it (design-notes correction ticketing-backoffice ADM-186).
+
+  - ADM-206: gap: No write for what listTargetingConflictFrequency lists. — A configuration screen (Targeting Conflict,
+  Frequency & Exclusion Controls) declares only listTargetingConflictFrequency; nothing it shows can be changed
+  and no existing operation writes it (design-notes correction ticketing-backoffice ADM-206).
+
+  - ADM-209: gap: No write for what listPromotionPriorityHierarchy lists. — A configuration screen (Promotion Priority
+  & Hierarchy Manager) declares only listPromotionPriorityHierarchy; nothing it shows can be changed and no existing
+  operation writes it (design-notes correction ticketing-backoffice ADM-209).
+
+  - ADM-214: gap: No write for what listDiscountCapMaximum lists. — A configuration screen (Discount Cap & Maximum
+  Benefit Controller) declares only listDiscountCapMaximum; nothing it shows can be changed and no existing operation
+  writes it (design-notes correction ticketing-backoffice ADM-214).
+
+  - ADM-220: gap: No write for what listRedemptionDiscountExposure lists. — A configuration screen (Redemption,
+  Discount & Exposure Limit Manager) declares only listRedemptionDiscountExposure; nothing it shows can be changed
+  and no existing operation writes it (design-notes correction ticketing-backoffice ADM-220).
+
+  - ADM-276: gap: No write for channel governance, SLA and partner controls. — A configuration screen (Channel Governance,
+  SLA & Partner Control) declares only listChannelGovernanceSla; nothing it shows can be changed and no existing
+  operation writes it (design-notes correction ticketing-backoffice ADM-276).
+
+  - ADM-310: gap: No write for the upgrade rules listUpgradeEligibilityQualification lists. — A configuration screen
+  (Upgrade Eligibility & Qualification Rules) declares only listUpgradeEligibilityQualification; nothing it shows
+  can be changed and no existing operation writes it (design-notes correction ticketing-backoffice ADM-310).
+
+  - ADM-311: gap: No write for the upgrade rules listUpgradeTimingUsage lists. — A configuration screen (Upgrade
+  Timing, Usage & Ticket Status Rules) declares only listUpgradeTimingUsage; nothing it shows can be changed and
+  no existing operation writes it (design-notes correction ticketing-backoffice ADM-311).
+
+  - ADM-312: gap: No write for the upgrade rules listUpgradeFinancialTreatment lists. — A configuration screen (Upgrade
+  Financial Treatment & Price Difference Rules) declares only listUpgradeFinancialTreatment; nothing it shows can
+  be changed and no existing operation writes it (design-notes correction ticketing-backoffice ADM-312).
+
+  - ADM-314: gap: No write for the upgrade rules listPersonTypeProduct lists. — A configuration screen (Person-Type,
+  Product & Entitlement Conversion Rules) declares only listPersonTypeProduct; nothing it shows can be changed and
+  no existing operation writes it (design-notes correction ticketing-backoffice ADM-314).
+
+  - ADM-682: gap: No operation configures or reads propensity models (getRecommendationPerformance is performance,
+  not propensity). — A configuration screen (Propensity Model & Customer Intent Manager) declares only getRecommendationPerformance;
+  nothing it shows can be changed and no existing operation writes it (design-notes correction ticketing-backoffice
+  ADM-682).
+
+  - BO-037: gap: A venue-scoped read of the offline package version each device holds (getOfflinePackage answers
+  only for the calling workstation). — The offline package status screen needs each device''s package version and
+  no venue-scoped operation returns it (design-notes correction ticketing-backoffice BO-037)
+
+  - BO-444: gap: A read of prize redemptions (redeemPrize records them; nothing lists them) for the redemption operations
+  dashboard. — With the coupon analytics removed the dashboard has no read of prize redemption activity, and none
+  exists (design-notes correction ticketing-backoffice BO-444)
+
+  - BO-998: gap: A seat-lock timeout and concurrency policy (default duration, warning, grace, extension and auto-release
+  by channel or event), with its read and write. — The lock timeout configuration has neither a policy write nor
+  a read; the hold operations it carried perform a lock, they do not configure one (design-notes correction ticketing-backoffice
+  BO-998)
+
+  - BO-1072: gap: A staff read of the published API definitions (endpoints, versions, scopes) for the seat management
+  API catalogue; listApiVersions declares only the public and partner audiences. — The API catalogue has no operation
+  returning API definitions (design-notes correction ticketing-backoffice BO-1072)
+
+  - BO-1174: gap: A staff read of the published wallet API definitions (endpoints, versions, scopes) and a write
+  for their exposure. — The wallet API catalogue has no operation returning or configuring API definitions (design-notes
+  correction ticketing-backoffice BO-1174)
+
+  - BO-1133: gap: A venue read of wallet usage and transactions aggregated by channel and touchpoint (listWalletTransactions
+  is per wallet). — The usage command centre has no read of usage by channel (design-notes correction ticketing-backoffice
+  BO-1133)
+
+  - BO-1161: gap: A wallet risk-rule backtest or simulation (rules against sample or historical transactions) and
+  a read of the rules under test. — The security sandbox has no operation that tests risk rules (design-notes correction
+  ticketing-backoffice BO-1161)
+
+  - BO-269: gap: A read (get or list) of the group quotation that setGroupQuotationProposal writes. — The screen
+  declares only setGroupQuotationProposal, so it opens as an empty form even where a configuration exists (PR-9),
+  and no existing operation returns the group quotation (design-notes correction ticketing-backoffice BO-269)
+
+  - BO-271: gap: A read (get or list) of the group discount exceptions awaiting a decision that approveGroupDiscountException
+  writes. — The screen declares only approveGroupDiscountException, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the group discount exceptions awaiting a decision (design-notes
+  correction ticketing-backoffice BO-271)
+
+  - BO-275: gap: A read (get or list) of the group operational plan and its tasks that setGroupOperationalPlanning
+  writes. — The screen declares only setGroupOperationalPlanning, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the group operational plan and its tasks (design-notes correction
+  ticketing-backoffice BO-275)
+
+  - BO-306: gap: A read (get or list) of the reservation and hold policy that setReservationHoldPolicy writes. —
+  The screen declares only setReservationHoldPolicy, so it opens as an empty form even where a configuration exists
+  (PR-9), and no existing operation returns the reservation and hold policy (design-notes correction ticketing-backoffice
+  BO-306)
+
+  - BO-307: gap: A read (get or list) of the order and reservation status configuration that setOrderReservationStatus
+  writes. — The screen declares only setOrderReservationStatus, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the order and reservation status configuration (design-notes
+  correction ticketing-backoffice BO-307)
+
+  - BO-308: gap: A read (get or list) of the order source and channel configuration that createOrderSourceChannel
+  writes. — The screen declares only createOrderSourceChannel, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the order source and channel configuration (design-notes correction
+  ticketing-backoffice BO-308)
+
+  - BO-309: gap: A read (get or list) of the customer, guest and account assignment rules that setCustomerGuestAccount
+  writes. — The screen declares only setCustomerGuestAccount, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the customer, guest and account assignment rules (design-notes
+  correction ticketing-backoffice BO-309)
+
+  - BO-316: gap: A read (get or list) of the amendment eligibility policy that setAmendmentEligibilityPolicy writes.
+  — The screen declares only setAmendmentEligibilityPolicy, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the amendment eligibility policy (design-notes correction ticketing-backoffice
+  BO-316)
+
+  - BO-317: gap: A read (get or list) of the cancellation and partial cancellation policy that setCancellationPartialPolicy
+  writes. — The screen declares only setCancellationPartialPolicy, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the cancellation and partial cancellation policy (design-notes
+  correction ticketing-backoffice BO-317)
+
+  - BO-321: gap: A read (get or list) of the after-sales financial settlements and adjustments that setAfterSaleFinancial
+  writes. — The screen declares only setAfterSaleFinancial, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the after-sales financial settlements and adjustments (design-notes
+  correction ticketing-backoffice BO-321)
+
+  - BO-322: gap: A read (get or list) of the after-sales exceptions awaiting approval that approveExceptionServiceRecovery
+  writes. — The screen declares only approveExceptionServiceRecovery, so it opens as an empty form even where a
+  configuration exists (PR-9), and no existing operation returns the after-sales exceptions awaiting approval (design-notes
+  correction ticketing-backoffice BO-322)
+
+  - BO-637: gap: A read (get or list) of the approval workflow definitions that approveWorkflow writes. — The screen
+  declares only approveWorkflow, so it opens as an empty form even where a configuration exists (PR-9), and no existing
+  operation returns the approval workflow definitions (design-notes correction ticketing-backoffice BO-637)
+
+  - BO-770: gap: A read (get or list) of the campaign approval workflow that approveCampaignWorkflow writes. — The
+  screen declares only approveCampaignWorkflow, so it opens as an empty form even where a configuration exists (PR-9),
+  and no existing operation returns the campaign approval workflow (design-notes correction ticketing-backoffice
+  BO-770)
+
+  - BO-399: gap: A read (get or list) of the credit eligibility (where a credit may be spent; CreditType does not
+  carry it) that setCreditEligibilityRules writes. — The screen declares only setCreditEligibilityRules, so it opens
+  as an empty form even where a configuration exists (PR-9), and no existing operation returns the credit eligibility
+  (where a credit may be spent; CreditType does not carry it) (design-notes correction ticketing-backoffice BO-399)
+
+  - BO-419: gap: A read (get or list) of the credit eligibility (where a credit may be spent; CreditType does not
+  carry it) that setCreditEligibilityRules writes. — The screen declares only setCreditEligibilityRules, so it opens
+  as an empty form even where a configuration exists (PR-9), and no existing operation returns the credit eligibility
+  (where a credit may be spent; CreditType does not carry it) (design-notes correction ticketing-backoffice BO-419)
+
+  - BO-1106: gap: A read (get or list) of the credit eligibility (where a credit may be spent; CreditType does not
+  carry it) that setCreditEligibilityRules writes. — The screen declares only setCreditEligibilityRules, so it opens
+  as an empty form even where a configuration exists (PR-9), and no existing operation returns the credit eligibility
+  (where a credit may be spent; CreditType does not carry it) (design-notes correction ticketing-backoffice BO-1106)
+
+  - BO-1124: gap: A read (get or list) of the gift card products that setGiftCardProduct writes. — The screen declares
+  only setGiftCardProduct, so it opens as an empty form even where a configuration exists (PR-9), and no existing
+  operation returns the gift card products (design-notes correction ticketing-backoffice BO-1124)
+
+  - BO-1134: gap: A read (get or list) of the wallet channel rules that setWalletChannelRules writes. — The screen
+  declares only setWalletChannelRules, so it opens as an empty form even where a configuration exists (PR-9), and
+  no existing operation returns the wallet channel rules (design-notes correction ticketing-backoffice BO-1134)
+
+  - BO-1135: gap: A read (get or list) of the wallet channel rules that setWalletChannelRules writes. — The screen
+  declares only setWalletChannelRules, so it opens as an empty form even where a configuration exists (PR-9), and
+  no existing operation returns the wallet channel rules (design-notes correction ticketing-backoffice BO-1135)
+
+  - BO-1136: gap: A read (get or list) of the wallet channel rules that setWalletChannelRules writes. — The screen
+  declares only setWalletChannelRules, so it opens as an empty form even where a configuration exists (PR-9), and
+  no existing operation returns the wallet channel rules (design-notes correction ticketing-backoffice BO-1136)
+
+  - BO-1138: gap: A read (get or list) of the wallet channel rules that setWalletChannelRules writes. — The screen
+  declares only setWalletChannelRules, so it opens as an empty form even where a configuration exists (PR-9), and
+  no existing operation returns the wallet channel rules (design-notes correction ticketing-backoffice BO-1138)
+
+  - BO-1140: gap: A read (get or list) of the wallet channel rules that setWalletChannelRules writes. — The screen
+  declares only setWalletChannelRules, so it opens as an empty form even where a configuration exists (PR-9), and
+  no existing operation returns the wallet channel rules (design-notes correction ticketing-backoffice BO-1140)
+
+  - BO-1139: gap: A read (get or list) of the wallet channel rules and authentication policy that setWalletChannelRules
+  and setWalletAuthenticationPolicy writes. — The screen declares only setWalletChannelRules and setWalletAuthenticationPolicy,
+  so it opens as an empty form even where a configuration exists (PR-9), and no existing operation returns the wallet
+  channel rules and authentication policy (design-notes correction ticketing-backoffice BO-1139)
+
+  - BO-1175: gap: A read (get or list) of the wallet channel rules and integration mappings that setWalletChannelRules
+  and setWalletIntegrationMapping writes. — The screen declares only setWalletChannelRules and setWalletIntegrationMapping,
+  so it opens as an empty form even where a configuration exists (PR-9), and no existing operation returns the wallet
+  channel rules and integration mappings (design-notes correction ticketing-backoffice BO-1175)
+
+  - BO-1137: gap: A read (get or list) of the credentials linked to a wallet that linkWalletCredential writes. —
+  The screen declares only linkWalletCredential, so it opens as an empty form even where a configuration exists
+  (PR-9), and no existing operation returns the credentials linked to a wallet (design-notes correction ticketing-backoffice
+  BO-1137)
+
+  - BO-1144: gap: A read (get or list) of the wallet transfer rules that setWalletTransferRules writes. — The screen
+  declares only setWalletTransferRules, so it opens as an empty form even where a configuration exists (PR-9), and
+  no existing operation returns the wallet transfer rules (design-notes correction ticketing-backoffice BO-1144)
+
+  - BO-1145: gap: A read (get or list) of the wallet transfer rules that setWalletTransferRules writes. — The screen
+  declares only setWalletTransferRules, so it opens as an empty form even where a configuration exists (PR-9), and
+  no existing operation returns the wallet transfer rules (design-notes correction ticketing-backoffice BO-1145)
+
+  - BO-1153: gap: A read (get or list) of the wallet risk rules that setWalletRiskRules writes. — The screen declares
+  only setWalletRiskRules, so it opens as an empty form even where a configuration exists (PR-9), and no existing
+  operation returns the wallet risk rules (design-notes correction ticketing-backoffice BO-1153)
+
+  - BO-1154: gap: A read (get or list) of the wallet risk rules that setWalletRiskRules writes. — The screen declares
+  only setWalletRiskRules, so it opens as an empty form even where a configuration exists (PR-9), and no existing
+  operation returns the wallet risk rules (design-notes correction ticketing-backoffice BO-1154)
+
+  - BO-1155: gap: A read (get or list) of the wallet risk rules that setWalletRiskRules writes. — The screen declares
+  only setWalletRiskRules, so it opens as an empty form even where a configuration exists (PR-9), and no existing
+  operation returns the wallet risk rules (design-notes correction ticketing-backoffice BO-1155)
+
+  - BO-1156: gap: A read (get or list) of the wallet risk rules that setWalletRiskRules writes. — The screen declares
+  only setWalletRiskRules, so it opens as an empty form even where a configuration exists (PR-9), and no existing
+  operation returns the wallet risk rules (design-notes correction ticketing-backoffice BO-1156)
+
+  - BO-1158: gap: A read (get or list) of the wallet risk rules that setWalletRiskRules writes. — The screen declares
+  only setWalletRiskRules, so it opens as an empty form even where a configuration exists (PR-9), and no existing
+  operation returns the wallet risk rules (design-notes correction ticketing-backoffice BO-1158)
+
+  - BO-1159: gap: A read (get or list) of the wallet risk rules and their automated actions that setWalletRiskRules
+  and setWalletRestriction writes. — The screen declares only setWalletRiskRules and setWalletRestriction, so it
+  opens as an empty form even where a configuration exists (PR-9), and no existing operation returns the wallet
+  risk rules and their automated actions (design-notes correction ticketing-backoffice BO-1159)
+
+  - BO-1164: gap: A read (get or list) of the wallet accounting mapping that setWalletAccountingMapping writes.
+  — The screen declares only setWalletAccountingMapping, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the wallet accounting mapping (design-notes correction ticketing-backoffice
+  BO-1164)
+
+  - BO-1169: gap: A read (get or list) of the wallet accounting mapping that setWalletAccountingMapping writes.
+  — The screen declares only setWalletAccountingMapping, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the wallet accounting mapping (design-notes correction ticketing-backoffice
+  BO-1169)
+
+  - BO-1049: gap: A read (get or list) of the saved what-if scenarios and their assumptions that simulatePriceBreakdownCalculation
+  writes. — The screen declares only simulatePriceBreakdownCalculation, so it opens as an empty form even where
+  a configuration exists (PR-9), and no existing operation returns the saved what-if scenarios and their assumptions
+  (design-notes correction ticketing-backoffice BO-1049)
+
+  - ADM-052: gap: A read (get or list) of the product and service price assignments that setProductServicePrice
+  writes. — The screen declares only setProductServicePrice, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the product and service price assignments (design-notes correction
+  ticketing-backoffice ADM-052)
+
+  - ADM-055: gap: A read (get or list) of the price hierarchy and inheritance configuration that setPriceHierarchyInheritance
+  writes. — The screen declares only setPriceHierarchyInheritance, so it opens as an empty form even where a configuration
+  exists (PR-9), and no existing operation returns the price hierarchy and inheritance configuration (design-notes
+  correction ticketing-backoffice ADM-055)
+
+  - ADM-070: gap: A read (get or list) of the tax rules and treatments that setTaxRuleTreatment writes. — The screen
+  declares only setTaxRuleTreatment, so it opens as an empty form even where a configuration exists (PR-9), and
+  no existing operation returns the tax rules and treatments (design-notes correction ticketing-backoffice ADM-070)
+
+  - BO-007: gap: A catalogue-contract bulk product write: bulkUpdateProducts lives in the inventory contract while
+  every other product write is catalogue''s. — The directory calls one product write in inventory and the rest in
+  catalogue, so permissions and audit for one record are split across two services; moving an operation between
+  contracts is a contract change, not a screen edit (design-notes correction ticketing-backoffice BO-007)
+
+  - BO-008: gap: An operation that renders the PDF ticket and Wallet pass preview of a product (printTicketProof
+  works on a template, not a product). — The client''s publish step needs every output format previewed (DI-444)
+  and no operation serves it (design-notes correction ticketing-backoffice BO-008)
+
+  - BO-019: gap: A write for product blackout dates and venue closure days from the closures screen (blackoutDates
+  sit on entitlement templates, edited on BO-012). — The closures screen only cancels performances and closes paths;
+  no operation it can call sets a blackout (design-notes correction ticketing-backoffice BO-019)
+
+  - BO-414: gap: A wallet operations dashboard read of aggregates across wallets (getWallet reads one guest wallet).
+  — The dashboard''s KPIs have no source (design-notes correction ticketing-backoffice BO-414)
+
+  - BO-720: gap: A write and read storing the default ticket, reservation and customer treatment per kind of event
+  change (rescheduleEvent performs one change). — The treatment configuration screen has no operation that stores
+  defaults; today the treatment is chosen per reschedule (design-notes correction ticketing-backoffice BO-720)
+
+  - BO-1024: gap: A group type definition (minimum and maximum size, hold days, deposit, release, cancellation)
+  with its read and write; listGroupSeatRequests lists requests, not types. — Group types are listed through group
+  requests and nothing defines a group type (design-notes correction ticketing-backoffice BO-1024)
+
+  - BO-1044: gap: A write for seat-level dynamic pricing rules (section, row and seat, with floor, ceiling and step)
+  and its read. — The screen only lists strategies (listDynamicPricingStrategy); nothing writes a seat pricing rule
+  (design-notes correction ticketing-backoffice BO-1044)
+
+  - BO-1105: gap: A credit issuance rule record (trigger to credit) with its read and write; updateCreditType changes
+  the credit type itself. — Issuance rules are written through updateCreditType, which is a different record (design-notes
+  correction ticketing-backoffice BO-1105)
+
+  - BO-1114: gap: A reusable shared-wallet model record with its read and write; createSharedWallet creates a wallet,
+  not a model. — The model configuration screen has no operation for models (design-notes correction ticketing-backoffice
+  BO-1114)
+
+  - BO-1129: gap: A write and read for wallet presentation (sections, order, labels). — The presentation configuration
+  has no write (design-notes correction ticketing-backoffice BO-1129)
+
+  - BO-1148: gap: Reversals of payments, transfers and refunds on a wallet (reverseWalletFunding reverses a top-up
+  only). — The listed reversal operations cannot be performed (design-notes correction ticketing-backoffice BO-1148)
+
+  - BO-1146: gap: A per-source refund destination in the wallet refund policy (ticket, event, F&B, retail, rental,
+  parking, membership, compensation), or a narrowed purpose. — The purpose lists refund sources the policy cannot
+  distinguish; setWalletRefundPolicy has one default destination for all (design-notes correction ticketing-backoffice
+  BO-1146)
+
+  - BO-1178: gap: A write and read for wallet synchronisation, retry and resilience settings. — No operation configures
+  retry or resilience; the screen has only a reconciliation read (design-notes correction ticketing-backoffice BO-1178)
+
+  - BO-985: gap: A seat status model (status codes, transitions, availability effect) with its read and write; the
+  screen''s operations are seat categories. — Categories are commercial and statuses are lifecycle; no operation
+  configures statuses (design-notes correction ticketing-backoffice BO-985)
+
+  - BO-991: gap: A read of one seat''s event history (locks, holds, sales, releases, scans, blocks) for a performance;
+  listSeats lists seats of a map. — A seat history needs an event read and none exists (design-notes correction
+  ticketing-backoffice BO-991)
+
+  - BO-1051: gap: A seat analytics read (occupancy, revenue, yield by section and performance); listSeats carries
+  no sales. — The analytics command centre has no reporting read (design-notes correction ticketing-backoffice BO-1051)
+
+  - BO-946: gap: A read of resource demand forecasts against actual resource use; listDemandBookingCurve is the
+  ticket booking curve. — Resource forecast accuracy has no source (design-notes correction ticketing-backoffice
+  BO-946)
+
+  - ADM-067: gap: A write that orders static pricing rule priority (setRulePriorityConflict covers dynamic rules
+  only). — The screen lists priorities but cannot change them (design-notes correction ticketing-backoffice ADM-067)
+
+  - ADM-059: gap: A write for the customer segment and profile pricing rules that listCustomerSegmentProfile lists.
+  — A configuration screen declares only a read (listCustomerSegmentProfile); nothing it shows can be changed and
+  no write exists (design-notes correction ticketing-backoffice ADM-059)
+
+  - ADM-060: gap: A write for the membership and loyalty pricing rules that listMembershipLoyaltyPricing lists.
+  — A configuration screen declares only a read (listMembershipLoyaltyPricing); nothing it shows can be changed
+  and no write exists (design-notes correction ticketing-backoffice ADM-060)
+
+  - ADM-061: gap: A write for the residency, nationality and market pricing rules that listResidencyNationalityMarket
+  lists. — A configuration screen declares only a read (listResidencyNationalityMarket); nothing it shows can be
+  changed and no write exists (design-notes correction ticketing-backoffice ADM-061)
+
+  - ADM-062: gap: A write for the channel-based pricing rules that listChannelBasedPricing lists. — A configuration
+  screen declares only a read (listChannelBasedPricing); nothing it shows can be changed and no write exists (design-notes
+  correction ticketing-backoffice ADM-062)
+
+  - ADM-063: gap: A write for the location, venue and event pricing rules that listLocationVenueEvent lists. — A
+  configuration screen declares only a read (listLocationVenueEvent); nothing it shows can be changed and no write
+  exists (design-notes correction ticketing-backoffice ADM-063)
+
+  - ADM-064: gap: A write for the quantity, group and volume pricing rules that listQuantityGroupVolume lists. —
+  A configuration screen declares only a read (listQuantityGroupVolume); nothing it shows can be changed and no
+  write exists (design-notes correction ticketing-backoffice ADM-064)
+
+  - ADM-065: gap: A write for the effective date, season and day-based pricing rules that listEffectiveDateSeason
+  lists. — A configuration screen declares only a read (listEffectiveDateSeason); nothing it shows can be changed
+  and no write exists (design-notes correction ticketing-backoffice ADM-065)
+
+  - ADM-066: gap: A write for the timeslot, performance and time-of-day pricing rules that listTimeslotPerformanceTime
+  lists. — A configuration screen declares only a read (listTimeslotPerformanceTime); nothing it shows can be changed
+  and no write exists (design-notes correction ticketing-backoffice ADM-066)
+
+  - ADM-110: gap: A write that saves a pricing what-if scenario and its assumptions (listScenarioModelingWhat only
+  lists). — A what-if screen needs a write for the scenario''s assumptions and nothing creates one (design-notes
+  correction ticketing-backoffice ADM-110)
+
+  - ADM-197: gap: An operation that runs a dynamic bundle simulation from a scenario sent to it; the screen has
+  only lists. — The simulation is a list with no input (design-notes correction ticketing-backoffice ADM-197)
+
+  - ADM-694: gap: An AI model performance and drift read (ai process); getRecommendationPerformance carries no model
+  metrics. — Model drift is read from recommendation performance, which carries no model metrics (design-notes correction
+  ticketing-backoffice ADM-694)'

@@ -1,0 +1,496 @@
+id: CHG-WIR-005
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'customer-marketing: 71 screens rewired — 53 operations taken off screens they do not belong on (bulk-attached,
+  another module''s, guest-, device- or service-only on staff screens, writes on read-only lists), 67 existing operations
+  declared where the screen needed them; 5 flows repointed to match.'
+decision:
+  what: 'Fix the wrong wiring now: take each listed operation off the screen it does not belong on, declare the
+    existing operation the screen needs instead, merge the duplicate screens into the one kept, and repoint the
+    flow steps that called them.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Process-agent design-note corrections for customer-marketing (handoff/design-notes/customer-marketing.yaml,
+  1-2 October 2026) found these screens wired by the 18 August bulk attach, by name resemblance or from the wrong
+  contract, against the adopted audit decision R254 (re-derive each screen''s operations from its purpose and journeys)
+  and R276 (duplicate screens). Each screen''s reason and source is below and on the screen itself (gaps with removed:
+  true).'
+keys_touched:
+  screens:
+  - ADM-328
+  - BO-073
+  - BO-118
+  - BO-223
+  - BO-618
+  - BO-678
+  - BO-679
+  - BO-737
+  - BO-738
+  - BO-740
+  - BO-742
+  - BO-743
+  - BO-745
+  - BO-746
+  - BO-748
+  - BO-750
+  - BO-751
+  - BO-755
+  - BO-757
+  - BO-758
+  - BO-760
+  - BO-766
+  - BO-768
+  - BO-773
+  - BO-774
+  - BO-777
+  - BO-783
+  - BO-788
+  - BO-797
+  - BO-798
+  - BO-799
+  - BO-804
+  - BO-807
+  - BO-808
+  - BO-809
+  - BO-812
+  - BO-813
+  - BO-817
+  - BO-822
+  - BO-824
+  - BO-826
+  - BO-827
+  - BO-831
+  - BO-838
+  - BO-841
+  - BO-845
+  - BO-846
+  - BO-847
+  - BO-848
+  - BO-850
+  - BO-852
+  - BO-938
+  - CMS-013
+  - CMS-021
+  - CMS-022
+  - CMS-037
+  - CMS-038
+  - CMS-042
+  - CMS-049
+  - CMS-055
+  - POS-002
+  - POS-027
+  - PTR-021
+  - SUP-004
+  - SUP-012
+  - SUP-013
+  - SUP-014
+  - SUP-017
+  - SUP-020
+  - SUP-022
+  - SUP-023
+  operations:
+  - addCaseMessage
+  - claimConversation
+  - completeUpload
+  - createCampaign
+  - createCase
+  - createChallenge
+  - createForm
+  - createInvitationCampaign
+  - createLoyaltyProgramme
+  - createUpload
+  - createUrlRedirect
+  - escalateCase
+  - getCase
+  - getForm
+  - getGuestConsents
+  - getGuestIntelligence
+  - getGuestLoyalty
+  - getGuestMatchPolicy
+  - getGuestProfile
+  - getGuestRelationships
+  - getGuestTimeline
+  - getJourneyPerformance
+  - getLocalizationBrandingCustomer
+  - getLostItemMatches
+  - getLoyaltyPosition
+  - getLoyaltyRules
+  - getMarketingSubscription
+  - getMyChallenges
+  - getSeoMetadata
+  - getSignatorySignatureGuardian
+  - handoverToAgent
+  - ingestKnowledgeDocument
+  - launchCampaign
+  - listBadges
+  - listCases
+  - listComplianceEvidenceWaiver
+  - listCustomerPrivacyConsent
+  - listCustomerSegmentProfile
+  - listForms
+  - listGuestJourney
+  - listJourneys
+  - listKnowledgeCollections
+  - listMessageTemplates
+  - listMyCases
+  - listOrders
+  - listParticipantWaiverStatus
+  - listPolicies
+  - listPrivacyComplianceExceptions
+  - listQueues
+  - listSaleBoards
+  - listSegments
+  - listVersioningEffectiveDate
+  - listWaiver
+  - listWaiverTemplateMaster
+  - listWaiverTriggerEligibility
+  - listWaiverVerificationQueue
+  - previewSegment
+  - raiseMyCase
+  - recordTouchPoint
+  - reopenCase
+  - runDataRetention
+  - searchMedia
+  - sendTransactionalMessage
+  - setApprovalSlaPolicy
+  - setCaseInvestigationResolution
+  - setCustomerServiceCopilot
+  - setDataProcessingPurpose
+  - setDataRetentionPolicy
+  - setDigitalWaiverForm
+  - setGuestMatchPolicy
+  - setGuestRelationships
+  - setLegalHold
+  - setLocalizationBrandingCustomer
+  - setMarketingSubscription
+  - setPrivacyRequest
+  - setRefundCompensationService
+  - setSignatorySignatureGuardian
+  - setSlaPolicy
+  - testSendCampaign
+  - topUpWallet
+  - updateCase
+  - updateSaleBoard
+  - uploadGuestDocument
+  flows:
+  - F05
+  - F118
+  - F135
+  - F34
+  - F58
+  tickets:
+  - APP-POS-POS-002
+  - APP-POS-POS-027
+  - APP-SETUP-BO-618
+  - APP-SETUP-BO-746
+  - APP-SETUP-BO-755
+  - APP-SETUP-BO-766
+  - APP-SETUP-BO-827
+  - APP-WL-CMS-013
+  - VM-BO-073
+  - VM-BO-118
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-002
+  - APP-POS-POS-027
+  - APP-SETUP-BO-618
+  - APP-SETUP-BO-746
+  - APP-SETUP-BO-755
+  - APP-SETUP-BO-766
+  - APP-SETUP-BO-827
+  - APP-WL-CMS-013
+  - VM-BO-073
+  - VM-BO-118
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-STAFF-AUDIENCE (a staff screen calling a guest-, device-, service- or partner-only
+  operation) beside the existing S-DUP-SCREEN and S-CONSUMED-MIRROR rules, and check-screens keeps its R254 attachment
+  warnings; check-flows rule 3 holds every repointed flow step to its screen. Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key naming a touched screen. Per screen and
+  flow:
+
+  - CMS-042: declared createForm; component Create New -> createForm — Only a list read was declared, so the master
+  could not be saved; the master needs a write and createForm exists (design-notes correction customer-marketing
+  CMS-042).
+
+  - CMS-049: declared getLocalizationBrandingCustomer — The list was bound to setLocalizationBrandingCustomer (a
+  write) and nothing read the current configuration; getLocalizationBrandingCustomer exists (design-notes correction
+  customer-marketing CMS-049).
+
+  - CMS-055: declared listWaiverVerificationQueue — The list was bound to setWaiverVerificationValidation (a write);
+  the queue of submissions awaiting review is read by listWaiverVerificationQueue (design-notes correction customer-marketing
+  CMS-055).
+
+  - CMS-038: declared listPrivacyComplianceExceptions — The list was bound to setPrivacyComplianceException (a write);
+  the exception queue is read by listPrivacyComplianceExceptions (design-notes correction customer-marketing CMS-038).
+
+  - CMS-037: declared runDataRetention, setLegalHold — Review, extend, archive, delete and hold actions had no operation;
+  runDataRetention and the legal-hold write setLegalHold exist (design-notes correction customer-marketing CMS-037).
+
+  - CMS-022: declared setDataProcessingPurpose — A read-only registry that is the foundation of consent must be
+  editable (design-notes correction customer-marketing CMS-022); setDataProcessingPurpose exists.
+
+  - CMS-021: removed listCustomerPrivacyConsent — listCustomerPrivacyConsent is one guest''s privacy 360, which
+  is CMS-032''s; a configuration command centre shows counts (design-notes correction customer-marketing CMS-021).
+
+  - POS-027: declared getGuestLoyalty, topUpWallet — At a till the caller is the cashier, so a named guest''s loyalty
+  position comes from getGuestLoyalty, not getLoyaltyPosition (decided 1 October as a screen change); wallet top-up
+  is client-verified in the prototype (DI-097) and topUpWallet exists with the staff audience (design-notes correction
+  cust…
+
+  - POS-002: removed getLoyaltyPosition; declared getGuestLoyalty — getLoyaltyPosition is the guest''s own read
+  (guest audience); at a till it would return the cashier''s points. A named guest''s position at the till is getGuestLoyalty
+  (decided 1 October as a screen change; design-notes correction customer-marketing POS-027).
+
+  - BO-618: declared listForms, getForm — createForm was declared without listForms or getForm, so existing forms
+  could not be opened or versioned; listForms is consumed by no screen (design-notes correction customer-marketing
+  BO-618).
+
+  - BO-755: declared listSegments — The screen had list states and no list operation, so an existing segment could
+  not be opened to edit (design-notes correction customer-marketing BO-755).
+
+  - BO-766: removed createInvitationCampaign; declared createCampaign, testSendCampaign, launchCampaign — The Campaign
+  Builder''s create action was createInvitationCampaign, the quota-bounded addressed invitation (press night); the
+  builder''s purpose is the general campaign, createCampaign with launchCampaign and testSendCampaign (design-notes
+  correction customer-marketing BO-766).
+
+  - BO-827: removed createLoyaltyProgramme; declared getLoyaltyRules — A whole-set replace (setLoyaltyRules) without
+  reading the current set erases rules, and getLoyaltyRules was consumed by no screen; programme creation belongs
+  on the programme list, not on a rules screen entered with a programmeId (design-notes corrections customer-marketing
+  BO-827).
+
+  - CMS-013: declared getSeoMetadata, createUrlRedirect — The editor must load the metadata in force before saving
+  (getSeoMetadata, consumed by no screen), and a slug change needs the redirect created here (createUrlRedirect,
+  declared only on BO-842) (design-notes corrections customer-marketing CMS-013).
+
+  - BO-073: declared getLostItemMatches — The "Find matches" button was wired to matchLostItem, which ties, claims,
+  returns or disposes; getLostItemMatches ("candidate matches, scored") is consumed by no screen. The find action
+  reads the matches and matchLostItem stays for the decisions (design-notes correction customer-marketing BO-073).
+
+  - BO-118: removed listSaleBoards, updateSaleBoard — A sale board is a workstation layout (WORKSTATION_CONFIGURE)
+  with nothing to do with campaign and audience management (design-notes correction customer-marketing BO-118).
+
+  - BO-737: removed listCustomerSegmentProfile; declared getGuestProfile, getGuestLoyalty, getGuestTimeline, getGuestConsents,
+  getGuestIntelligence — listCustomerSegmentProfile is catalogue segment pricing rules, not a guest view; the CRM
+  360 is getGuestProfile, getGuestLoyalty, getGuestTimeline, getGuestConsents and getGuestIntelligence, with the
+  service view kept for the support panel (design-notes correction customer-marketing BO-737).
+
+  - BO-738: removed getGuestIntelligence; declared getGuestTimeline — The timeline screen declared getGuestIntelligence
+  (scores) and not getGuestTimeline, while BO-743 AI Guest Intelligence declared the reverse; the two reads were
+  swapped (design-notes correction customer-marketing BO-738).
+
+  - BO-743: removed getGuestTimeline, uploadGuestDocument; declared getGuestIntelligence — The reads were swapped
+  with BO-738, and uploading documents has nothing to do with AI insight (design-notes corrections customer-marketing
+  BO-738, BO-743).
+
+  - BO-740: declared getGuestRelationships, setGuestRelationships — Family linking is getGuestRelationships and
+  setGuestRelationships (declared on BO-741); the Family & Guardians screen had only a preferences write (design-notes
+  correction customer-marketing BO-740).
+
+  - BO-742: removed setGuestRelationships; declared getGuestTimeline — A history screen needs reads; its only operation
+  was setGuestRelationships, and relationship editing belongs on BO-740 and BO-741 (design-notes correction customer-marketing
+  BO-742).
+
+  - BO-746: removed getGuestMatchPolicy, setGuestMatchPolicy — getGuestMatchPolicy and setGuestMatchPolicy configure
+  checkout matching, a policy setting that belongs with identity resolution (BO-745), not the duplicate review screen
+  (design-notes correction customer-marketing BO-746).
+
+  - BO-745: declared getGuestMatchPolicy, setGuestMatchPolicy — The checkout match policy moves here from BO-746:
+  how returning guests are recognised belongs with identity resolution (design-notes correction customer-marketing
+  BO-746).
+
+  - BO-748: removed listVersioningEffectiveDate; declared listPolicies — listVersioningEffectiveDate lists waiver
+  form versions, not consent statement versions; consent statement versions are policy versions (listPolicies) (design-notes
+  correction customer-marketing BO-748).
+
+  - BO-750: declared setPrivacyRequest — The queue could not move a request through its statuses; setPrivacyRequest
+  ("raise or progress a privacy request") is consumed by no screen. The back office owns the operating queue (design-notes
+  corrections customer-marketing BO-750, CMS-034).
+
+  - BO-751: removed setDataRetentionPolicy — Retention was set in two places on one screen; decided 29 September
+  that retention is a tenant setting per data class (setDataRetentionSetting), so the marketing-crm policy write
+  comes off the screen (design-notes correction customer-marketing BO-751).
+
+  - PTR-021: removed escalateCase, updateCase — A partner raises, reads and replies; assignment, status and escalation
+  are venue-side (design-notes correction customer-marketing PTR-021).
+
+  - BO-938: removed raiseMyCase — raiseMyCase is a guest-only operation for guest cases; an employee request is
+  raiseResourceRequest (design-notes correction customer-marketing BO-938).
+
+  - BO-757: declared listSegments, previewSegment — Only createSegment was declared; the purpose asks for a preview
+  of top behaviours and freshness (previewSegment) and existing segments (listSegments) (design-notes correction
+  customer-marketing BO-757).
+
+  - BO-758: declared previewSegment — Only createSegment was declared; reachable-by-channel is in the purpose and
+  needs previewSegment (design-notes correction customer-marketing BO-758).
+
+  - BO-760: declared previewSegment — Only createSegment was declared; the distribution preview needs previewSegment
+  (design-notes correction customer-marketing BO-760).
+
+  - BO-768: removed listSegments; declared listMessageTemplates — The composer starts from a template and does not
+  choose audiences; listSegments was declared and listMessageTemplates was not (design-notes correction customer-marketing
+  BO-768).
+
+  - BO-773: removed recordTouchPoint — recordTouchPoint is a service-audience operation (touches are recorded by
+  services), not a staff action (design-notes correction customer-marketing BO-773).
+
+  - BO-774: declared getJourneyPerformance — Goal rate and errors need getJourneyPerformance, which was not declared
+  (design-notes correction customer-marketing BO-774).
+
+  - BO-783: declared getJourneyPerformance — Node analytics need getJourneyPerformance, which was not declared (design-notes
+  correction customer-marketing BO-783).
+
+  - BO-777: declared listJourneys — The only operation was createJourney; branching needs the journey read (design-notes
+  correction customer-marketing BO-777).
+
+  - BO-223: removed listJourneys; declared listGuestJourney — "Journey" means two things here: this screen simulates
+  access journeys (listGuestJourney, beside simulateGuestJourney), not marketing automation journeys (listJourneys)
+  (design-notes correction customer-marketing BO-223).
+
+  - BO-678: removed setLocalizationBrandingCustomer — setLocalizationBrandingCustomer sets a waiver version''s languages,
+  branding and channels; accreditation communication branding is not a waiver version (design-notes correction customer-marketing
+  BO-678).
+
+  - BO-679: removed sendTransactionalMessage — sendTransactionalMessage declares the service and partner audiences
+  only, and is per message; a staff screen cannot call it (design-notes correction customer-marketing BO-679).
+
+  - BO-788: removed getMarketingSubscription, setMarketingSubscription — getMarketingSubscription and setMarketingSubscription
+  are guest-only operations; staff should not write a guest''s subscription (design-notes correction customer-marketing
+  BO-788).
+
+  - ADM-328: removed listVersioningEffectiveDate — listVersioningEffectiveDate lists waiver versions; workflow versions
+  come from the approvals contract''s workflow history (listRuleWorkflow, declared) (design-notes correction customer-marketing
+  ADM-328).
+
+  - BO-797: removed setCustomerServiceCopilot — The chatbot screen wrote setCustomerServiceCopilot, the agent-side
+  copilot (the same operation as BO-798); the guest-facing chatbot needs its own configuration (design-notes correction
+  customer-marketing BO-797).
+
+  - BO-798: declared listKnowledgeCollections, ingestKnowledgeDocument — Knowledge sources had no operation although
+  listKnowledgeCollections and ingestKnowledgeDocument exist in the AI contract (design-notes correction customer-marketing
+  BO-798).
+
+  - BO-799: removed handoverToAgent; declared claimConversation — handoverToAgent is the guest''s side of the handover
+  (guest audience); the agent claims the conversation (claimConversation) (design-notes correction customer-marketing
+  BO-799).
+
+  - BO-804: removed listMyCases — listMyCases is a guest-audience read of the caller''s own cases; a staff command
+  centre reads listCases (declared) (design-notes correction customer-marketing BO-804).
+
+  - BO-807: removed setCaseInvestigationResolution — setCaseInvestigationResolution links a record to a case, a
+  case-workspace act, not taxonomy (design-notes correction customer-marketing BO-807).
+
+  - BO-808: declared updateCase — Read-only; reassignment needs updateCase (assignee) on this screen (design-notes
+  correction customer-marketing BO-808).
+
+  - BO-809: removed setApprovalSlaPolicy — setApprovalSlaPolicy is the approval workflow SLA (approvals contract),
+  a different object from the case SLA (setSlaPolicy) (design-notes correction customer-marketing BO-809).
+
+  - BO-812: removed setRefundCompensationService — setRefundCompensationService raises one request on a case; the
+  service-recovery configuration (matrix, thresholds) is not it (design-notes correction customer-marketing BO-812).
+
+  - BO-822: removed setRefundCompensationService — setRefundCompensationService raises one request; nothing in it
+  defines the automation rules this screen configures (design-notes correction customer-marketing BO-822).
+
+  - BO-813: removed listMyCases — listMyCases is guest-audience; staff analytics read listCases (declared) (design-notes
+  correction customer-marketing BO-813).
+
+  - BO-817: removed createForm — Metric definitions and follow-up thresholds are not forms; createForm does not
+  configure NPS, CSAT or CES (design-notes correction customer-marketing BO-817).
+
+  - BO-824: removed getMyChallenges — getMyChallenges returns the caller''s own challenges; a command centre needs
+  programme-wide figures (design-notes correction customer-marketing BO-824).
+
+  - BO-826: removed createChallenge; declared listBadges — The screen manages badges and its primary action was
+  "Create challenge"; listBadges and setBadge are its main act (design-notes correction customer-marketing BO-826).
+
+  - BO-831: removed getLoyaltyPosition; declared getGuestLoyalty — Participant progress was bound to getLoyaltyPosition
+  (the caller''s own position, guest audience); staff read a named guest with getGuestLoyalty (design-notes correction
+  customer-marketing BO-831).
+
+  - BO-838: removed createForm, searchMedia — The screen is merged into P13 (DI-996) and still declared createForm
+  and searchMedia as its own operations; they are the CMS screens'' (design-notes correction customer-marketing
+  BO-838).
+
+  - BO-841: removed setLocalizationBrandingCustomer — setLocalizationBrandingCustomer sets a waiver version''s languages
+  and branding, unrelated to personalisation, and the screen is merged into P13 (DI-996) (design-notes correction
+  customer-marketing BO-841).
+
+  - BO-845: removed listWaiver; declared listWaiverTemplateMaster, setDigitalWaiverForm — The template builder declared
+  only listWaiver (the operations command centre read); it needs the waiver template list and the layout write (listWaiverTemplateMaster,
+  setDigitalWaiverForm) (design-notes correction customer-marketing BO-845).
+
+  - BO-846: removed setDigitalWaiverForm; declared listWaiverTriggerEligibility — setDigitalWaiverForm saves a waiver''s
+  layout; assignment is the trigger and eligibility rules (listWaiverTriggerEligibility, as on CMS-047) (design-notes
+  correction customer-marketing BO-846).
+
+  - BO-847: removed listWaiverTriggerEligibility; declared listVersioningEffectiveDate — BO-847 Version, Expiry
+  & Renewal declared listWaiverTriggerEligibility while BO-848 declared listVersioningEffectiveDate; the reads were
+  swapped, and versions belong here (design-notes correction customer-marketing BO-847).
+
+  - BO-848: removed listVersioningEffectiveDate; declared getSignatorySignatureGuardian, setSignatorySignatureGuardian
+  — The version history read was swapped with BO-847; the signing setup needs the signatory configuration (getSignatorySignatureGuardian,
+  setSignatorySignatureGuardian) (design-notes correction customer-marketing BO-848).
+
+  - BO-850: declared listParticipantWaiverStatus — Pre-arrival chasing needs the participant status (listParticipantWaiverStatus),
+  which was not declared (design-notes correction customer-marketing BO-850).
+
+  - BO-852: declared listComplianceEvidenceWaiver — The repository read (listComplianceEvidenceWaiver) belongs here
+  and was not declared (design-notes correction customer-marketing BO-852).
+
+  - SUP-004: removed addCaseMessage, createCase, escalateCase, getCase, listCases, reopenCase, updateCase — The
+  conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013
+  and SUP-005. Keep listConversations, claim and transfer (design-notes correction customer-marketing SUP-004).
+
+  - SUP-012: declared createCase — createCaseClassificationIntelligent "stores nothing" and createCase was not declared,
+  so the screen could classify but not raise the case (design-notes correction customer-marketing SUP-012).
+
+  - SUP-013: declared getCase, addCaseMessage, updateCase — The table was bound to setCaseInvestigationResolution
+  (a write) and getCase, addCaseMessage and updateCase were not declared, so the workspace could not read the case,
+  reply or resolve (design-notes correction customer-marketing SUP-013).
+
+  - SUP-014: declared listOrders — The list was bound to setOrderBookingTicket (a write) with no order read; the
+  agent must find the order first (listOrders) (design-notes correction customer-marketing SUP-014).
+
+  - SUP-017: declared updateCase — The screen governs closure but could not close; updateCase with a resolution
+  note closes a case (design-notes correction customer-marketing SUP-017).
+
+  - SUP-020: removed listQueues — listQueues reads ride and attraction virtual queues (queue contract); customer-service
+  queues are listServiceQueues (declared) (design-notes correction customer-marketing SUP-020).
+
+  - SUP-022: declared setSlaPolicy — The screen defines SLA policies it could not save; setSlaPolicy exists (design-notes
+  correction customer-marketing SUP-022).
+
+  - SUP-023: declared updateCase — Read-only; DI-546 asks for reassigning to balance load, which is updateCase (design-notes
+  correction customer-marketing SUP-023).
+
+  - BO-073: component Find matches for lost item -> Decide: tie, return or dispose — The button labelled "Find matches"
+  called matchLostItem, which ties, claims, returns or disposes; finding matches is getLostItemMatches (now the
+  Suggested matches list), and the button names the decision it makes (design-notes correction customer-marketing
+  BO-073).
+
+  - SUP-013: declared createUpload, completeUpload — addCaseMessage takes file references for attachments; the workspace
+  needs the upload pair to attach them (R196; design-notes correction customer-marketing SUP-013).
+
+  - BO-831: set permission=GUEST_VIEW — getGuestLoyalty needs GUEST_VIEW; the screen states a no-access case, so
+  it declares the permission (R255).
+
+  - F05: entryScreen SUP-004 -> SUP-005; step 1 screen SUP-004 -> SUP-005; step 1 note
+
+  - F34: step 2 operations [''identifyGuest'', ''getLoyaltyPosition'', ''evaluatePromotions''] -> [''identifyGuest'',
+  ''getGuestLoyalty'', ''evaluatePromotions'']
+
+  - F135: step 2 operations [''listQueues''] -> [''listServiceQueues'']
+
+  - F118: step 18 operations [''listJourneys''] -> [''listGuestJourney'']
+
+  - F58: step 3 operations getLoyaltyPosition -> getGuestLoyalty'

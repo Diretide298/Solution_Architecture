@@ -1,0 +1,95 @@
+id: CHG-WIR-003
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'venue-operations: 12 screen purposes rewritten that were copied from another screen, a generator template
+  or a pasted board placeholder.'
+decision:
+  what: 'Fix the wrong wiring now: give each screen its own one-sentence purpose, keeping what the screen is for.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Design-note corrections for venue-operations (handoff/design-notes/venue-operations.yaml): the purposes were
+  generator templates, board titles with their date, or text copied from another screen; a designer cannot act on
+  them. The old text is kept in each screen''s purposeNote.'
+keys_touched:
+  screens:
+  - BO-006
+  - BO-030
+  - BO-031
+  - BO-215
+  - BO-714
+  - BO-863
+  - BO-872
+  - BO-882
+  - BO-892
+  - BO-902
+  - BO-912
+  - BO-942
+  tickets:
+  - APP-SETUP-BO-006
+  - APP-SETUP-BO-863
+  - VM-BO-030
+  - VM-BO-031
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-006
+  - APP-SETUP-BO-863
+  - VM-BO-030
+  - VM-BO-031
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-PURPOSE-BOILERPLATE, which flags the generator and board-placeholder purposes.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - BO-030: purpose rewritten — The purpose "See every gate and what it is doing" was copied from a gate screen;
+  this is supervisor verification of completed work orders (F12 step 4; design-notes correction venue-operations
+  BO-030).
+
+  - BO-031: purpose rewritten — The purpose "Define what a gate is and where it is" belongs to BO-064 (gate definition);
+  this id is the asset register merged into BO-069 (design-notes correction venue-operations BO-031).
+
+  - BO-006: purpose rewritten — The purpose was the configuration-screen template ("Change how parking behaves here,
+  and see which level the current value came from") derived from the screen name while parking was a placeholder;
+  parking was answered by the 14 August MoM (DI-316; design-notes correction venue-operations BO-006).
+
+  - BO-714: purpose rewritten — The purpose, columns and governance headings came from pack page 85 (Screen 06 AI-Assisted
+  Event Creation); Event Shift and Roster Configuration is Screen 06 of board 6 on pages 46-47 of the same pack
+  (design-notes correction venue-operations BO-714).
+
+  - BO-215: purpose rewritten — The purpose was the screen name itself (a generator placeholder); the screen configures
+  group and B2B admission profiles (design-notes correction venue-operations BO-215, BO-162).
+
+  - BO-863: purpose rewritten — The purpose carried the board 2 introduction ("Provide TICVAI with a centralized,
+  real-time Resource Scheduling and Availability Engine ...") pasted after the screen''s own sentence.
+
+  - BO-872: purpose rewritten — The purpose carried the board 3 introduction ("Provide TICVAI with a centralized
+  backend configuration environment for treating employees ... as operational resources") pasted after the screen''s
+  own sentences.
+
+  - BO-882: purpose rewritten — The purpose carried the board 4 introduction ("Provide TICVAI with a centralized,
+  intelligent Workforce Operations and Rostering Engine ... Board 4 shall enable managers to ...") pasted after
+  the screen''s own sentence.
+
+  - BO-892: purpose rewritten — The purpose carried the board 5 introduction ("Provide TICVAI with a centralized
+  Resource Requirement and Assignment Engine ... Board 5 shall allow administrators to configure ...") after the
+  screen''s own text.
+
+  - BO-902: purpose rewritten — The purpose carried the board 6 introduction ("Provide TICVAI with a centralized
+  Physical Resource and Rental Operations Engine ... Board 6 shall manage resources such as ...") after the screen''s
+  own sentence.
+
+  - BO-912: purpose rewritten — The purpose carried the board 7 introduction ("Provide TICVAI with a centralized
+  Event Resource Planning Engine ... The board shall manage event requirements across ...") after the screen''s
+  own sentence.
+
+  - BO-942: purpose rewritten — The purpose carried the board 10 introduction ("Provide TICVAI with the executive
+  and administrative control layer ... Board 10 shall consolidate ...") after the screen''s own sentence.'

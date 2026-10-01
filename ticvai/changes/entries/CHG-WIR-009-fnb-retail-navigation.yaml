@@ -1,0 +1,93 @@
+id: CHG-WIR-009
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'fnb-retail: 10 screens lose inferred or misplaced navigation edges (or gain the edge a repointed flow
+  needs).'
+decision:
+  what: 'Fix the wrong wiring now: drop the derived exits to unrelated screens (and their entryFrom mirrors), and
+    add only the edges a repointed flow step needs.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: Design-note corrections for fnb-retail (handoff/design-notes/fnb-retail.yaml) and the adopted audit decision
+  R251 (re-derive navigation so a screen links only to screens it can pass ids to; inferred exits such as Stock
+  Count to Queue Directory are removed).
+keys_touched:
+  screens:
+  - BO-039
+  - BO-040
+  - BO-041
+  - BO-042
+  - BO-065
+  - BO-083
+  - BO-112
+  - EMP-060
+  - POS-002
+  - POS-018
+  tickets:
+  - APP-POS-POS-002
+  - APP-POS-POS-018
+  - APP-SETUP-BO-065
+  - VM-BO-039
+  - VM-BO-040
+  - VM-BO-041
+  - VM-BO-042
+  - VM-BO-083
+  - VM-BO-112
+root_class: A32 NAVIGATION
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-002
+  - APP-POS-POS-018
+  - APP-SETUP-BO-065
+  - VM-BO-039
+  - VM-BO-040
+  - VM-BO-041
+  - VM-BO-042
+  - VM-BO-083
+  - VM-BO-112
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-navigation.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-navigation (N-ENTRY-MIRROR, N-CARRIES-HELD) and check-flows (consecutive steps joined by navigation
+  or a declared device handover) guard the edges; an edge that is well formed but meaningless still needs review.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - BO-039: exits dropped BO-008 — Derived exit to BO-008 Product Detail & Variants with no meaning for a shift
+  directory (R251; design-notes correction fnb-retail BO-039).
+
+  - BO-040: exits dropped BO-008 — Derived exit to BO-008 Product Detail with no meaning for till variances (R251;
+  design-notes correction fnb-retail BO-040).
+
+  - BO-041: exits dropped BO-008 — Derived navigation to BO-008 Product Detail (R251; design-notes correction fnb-retail
+  BO-041).
+
+  - BO-042: exits dropped BO-008 — Derived navigation to BO-008 Product Detail (R251; design-notes correction fnb-retail
+  BO-042).
+
+  - BO-065: exits dropped BO-008 — Derived exit to BO-008 Product Detail & Variants with no meaning; venue configuration
+  belongs with the venue settings (R251; design-notes correction fnb-retail BO-065).
+
+  - BO-083: exits dropped BO-079, BO-080 — Inferred exits to Stock Count and Stock Transfers with no purpose; navigation
+  is re-derived from purpose (R251; design-notes correction fnb-retail BO-083).
+
+  - BO-112: exits dropped BO-009 — The transition to BO-009 Pricing Rules cites flow F78 step 3 to 4, but F78 has
+  no BO-112 step; the edge is invented (design-notes correction fnb-retail BO-112).
+
+  - EMP-060: exits dropped EMP-061 — A restaurant performance view does not lead to EMP-061 Retail Inventory Command
+  Center; the edge came from the board-walk flows F80 and F94, whose step marks the device change itself (F80 step
+  3, F94 step 2; design-notes correction fnb-retail EMP-060).
+
+  - POS-002: exits added POS-018 — F32 step 4 (the safe drop) moved from POS-013 to POS-018 with its operations
+  (CHG-WIR-008); the sell screen''s edge follows it, and the edge to POS-013 keeps its own meaning, offline sales
+  and sync (F32 steps 3-5).
+
+  - POS-018: exits added POS-020 — F32 step 5 (a no-sale on POS-020) follows the safe drop, which now runs on POS-018
+  (CHG-WIR-008).'

@@ -1,0 +1,159 @@
+id: CHG-WIR-018
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'ticketing-guest: 14 screens rewired — 59 operations taken off screens they do not belong on (bulk-attached,
+  another module''s, guest-, device- or service-only on staff screens, writes on read-only lists), 0 existing operations
+  declared where the screen needed them; 5 flows repointed to match.'
+decision:
+  what: 'Fix the wrong wiring now: take each listed operation off the screen it does not belong on, declare the
+    existing operation the screen needs instead, merge the duplicate screens into the one kept, and repoint the
+    flow steps that called them.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Process-agent design-note corrections for ticketing-guest (handoff/design-notes/ticketing-guest.yaml, 1-2
+  October 2026) found these screens wired by the 18 August bulk attach, by name resemblance or from the wrong contract,
+  against the adopted audit decision R254 (re-derive each screen''s operations from its purpose and journeys) and
+  R276 (duplicate screens). Each screen''s reason and source is below and on the screen itself (gaps with removed:
+  true).'
+keys_touched:
+  screens:
+  - EMP-014
+  - EMP-033
+  - EMP-034
+  - POS-002
+  - POS-003
+  - POS-004
+  - PTR-002
+  - PTR-005
+  - PTR-008
+  - PTR-010
+  - PTR-012
+  - PTR-013
+  - PTR-015
+  - PTR-016
+  operations:
+  - addTip
+  - analysePromotionConflicts
+  - applyManualDiscount
+  - createChannelCapacity
+  - createOrder
+  - createRefund
+  - createRetailReturn
+  - evaluateApprovalRequirement
+  - exchangeOrderLines
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - modifyOrder
+  - overrideCreditLimit
+  - relinquishInventoryHold
+  - renewInventoryHold
+  - rescheduleOrder
+  - resumeOrder
+  - setAlternativeCodes
+  - setB2bCreditLimit
+  - setChannelAllocations
+  - setProductAttributes
+  - syncOrders
+  - transferGameCard
+  - transitionProductLifecycle
+  - updateChannelCapacity
+  - updatePerformance
+  - voidOrder
+  flows:
+  - F10
+  - F33
+  - F58
+  - F67
+  - F81
+  tickets:
+  - APP-POS-POS-002
+  - APP-POS-POS-003
+  - APP-POS-POS-004
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-002
+  - APP-POS-POS-003
+  - APP-POS-POS-004
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-STAFF-AUDIENCE (a staff screen calling a guest-, device-, service- or partner-only
+  operation) beside the existing S-DUP-SCREEN and S-CONSUMED-MIRROR rules, and check-screens keeps its R254 attachment
+  warnings; check-flows rule 3 holds every repointed flow step to its screen. Tickets: none started (Block A starts
+  Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key naming a touched screen. Per screen and
+  flow:
+
+  - POS-002: removed createRefund, createRetailReturn, exchangeOrderLines, getOrderStatement, listOrderRefunds,
+  modifyOrder, rescheduleOrder, syncOrders, transferGameCard, voidOrder — Some 25 operation buttons sat on the sell
+  screen; post-sale actions (refunds, retail returns, exchanges, modify, reschedule, void, statements, balance transfer)
+  live on POS-011, POS-014, POS-026 and POS-030, and order sync is POS-013''s. The sell screen is tiles, cards and
+  the cart (DI-132; design-n…
+
+  - POS-003: removed relinquishInventoryHold, renewInventoryHold — The hold is taken when the line is added; the
+  cashier sees a countdown, not Acquire, Release and Renew controls (the approved build has none) (design-notes
+  correction ticketing-guest POS-003).
+
+  - POS-004: removed evaluateApprovalRequirement, updatePerformance — A till does not edit performances, and approval
+  is asked when a discount needs it, not as a button on the seat map (design-notes correction ticketing-guest POS-004).
+
+  - EMP-014: removed applyManualDiscount, createOrder, createRefund, exchangeOrderLines, holdOrder, modifyOrder,
+  rescheduleOrder, resumeOrder, voidOrder — Ten order-changing actions on a lookup screen whose purpose is to answer
+  a question without acting; the employee app has a basic validity lookup, not sales (DI-128; design-notes correction
+  ticketing-guest EMP-014).
+
+  - EMP-033: removed createChannelCapacity, setChannelAllocations, updateChannelCapacity — Capacity authoring (create
+  envelope, save allocations, save capacity) is a back-office job; the handheld''s purpose is to read (design-notes
+  correction ticketing-guest EMP-033).
+
+  - EMP-034: removed setAlternativeCodes, setProductAttributes, transitionProductLifecycle — Product authoring (alternative
+  codes, attributes, lifecycle) on a walk-up sale; a seller does not author the catalogue (design-notes correction
+  ticketing-guest EMP-034).
+
+  - PTR-002: removed applyManualDiscount, overrideCreditLimit, setB2bCreditLimit, voidOrder — A partner cannot set
+  or override its own credit limit, apply a manual discount or void an order; those are venue actions (design-notes
+  correction ticketing-guest PTR-002).
+
+  - PTR-005: removed applyManualDiscount, createOrder, exchangeOrderLines, holdOrder, modifyOrder, rescheduleOrder,
+  resumeOrder, voidOrder — Order actions (create, discount, exchange, hold, modify, void) on an inventory view;
+  booking is PTR-008 and this view reads and returns allocation (design-notes correction ticketing-guest PTR-005).
+
+  - PTR-008: removed applyManualDiscount, createRefund, voidOrder — The partner creates a booking; refund, void
+  and discount are venue-side (design-notes correction ticketing-guest PTR-008).
+
+  - PTR-010: removed analysePromotionConflicts — Promotion analysis (analysePromotionConflicts) is a venue tool,
+  not a partner''s cart action (design-notes correction ticketing-guest PTR-010).
+
+  - PTR-012: removed addTip — A partner checkout has no tip (design-notes correction ticketing-guest PTR-012).
+
+  - PTR-013: removed overrideCreditLimit, setB2bCreditLimit — Overriding and setting the credit limit are venue
+  actions; the partner reads (design-notes correction ticketing-guest PTR-013).
+
+  - PTR-015: removed applyManualDiscount, createRefund, voidOrder — Venue-side actions (refund, void, discount)
+  on the partner''s history; the partner requests changes and the venue performs them (design-notes correction ticketing-guest
+  PTR-015).
+
+  - PTR-016: removed applyManualDiscount, createOrder, exchangeOrderLines, holdOrder, modifyOrder, rescheduleOrder,
+  resumeOrder, voidOrder — Order-changing actions on a download screen; the screen downloads and resends only (design-notes
+  correction ticketing-guest PTR-016).
+
+  - F81: step 2 operations [''exchangeOrderLines'', ''getOrderStatement'', ''holdOrder'', ''listOrderRefunds'',
+  ''modifyOrder'', ''rescheduleOrder''] -> [''holdOrder'']
+
+  - F33: step 6 screen POS-002 -> POS-013; step 6 note
+
+  - F58: step 2 operations [''getAvailability'', ''acquireInventoryHold'', ''renewInventoryHold''] -> [''getAvailability'',
+  ''acquireInventoryHold'']
+
+  - F10: step 2 screen PTR-005 -> PTR-008; step 2 note
+
+  - F67: step 3 operations [''listChannelCapacities'', ''getChannelAllocations'', ''setChannelAllocations''] ->
+  [''listChannelCapacities'', ''getChannelAllocations'']'

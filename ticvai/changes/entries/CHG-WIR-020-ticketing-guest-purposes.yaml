@@ -1,0 +1,39 @@
+id: CHG-WIR-020
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'ticketing-guest: 2 screen purposes rewritten that were copied from another screen, a generator template
+  or a pasted board placeholder.'
+decision:
+  what: 'Fix the wrong wiring now: give each screen its own one-sentence purpose, keeping what the screen is for.'
+  by: Chinmay
+  date: '2026-10-02'
+  quote: 'Chinmay, 2 Oct 2026: fix the wrong wiring now'
+why: 'Design-note corrections for ticketing-guest (handoff/design-notes/ticketing-guest.yaml): the purposes were
+  generator templates, board titles with their date, or text copied from another screen; a designer cannot act on
+  them. The old text is kept in each screen''s purposeNote.'
+keys_touched:
+  screens:
+  - PTR-002
+  - PTR-007
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 16fd732e
+notes: 'check-screen-wiring gains S-PURPOSE-BOILERPLATE, which flags the generator and board-placeholder purposes.
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are every tasks.csv or pushed key
+  naming a touched screen. Per screen and flow:
+
+  - PTR-002: purpose rewritten — The purpose ("The screen this app sits on...") was the generic home template; the
+  dashboard is the partner''s credit and bookings overview (design-notes correction ticketing-guest PTR-002).
+
+  - PTR-007: purpose rewritten — The purpose was copied from the guest search ("Find something when the guest does
+  not know what it is called"); the screen is availability for the partner''s products (design-notes correction
+  ticketing-guest PTR-007).'
