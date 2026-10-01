@@ -1103,27 +1103,6 @@
    ],
    "enables": []
   },
-  "closeShift": {
-   "part": "core",
-   "service": "OrderService",
-   "contract": "shift",
-   "verb": "POST",
-   "path": "/shifts/{shiftId}/close",
-   "perm": "SHIFT_CLOSE",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "BO-039",
-    "BO-040",
-    "EMP-003",
-    "EMP-009",
-    "POS-001",
-    "POS-007",
-    "POS-009"
-   ],
-   "enables": []
-  },
   "closeTableVisit": {
    "part": "core",
    "service": "FnbService",
@@ -12011,6 +11990,25 @@
    "screens": [
     "GST-035",
     "WEB-026"
+   ],
+   "enables": []
+  },
+  "submitShiftCount": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/count",
+   "perm": "SHIFT_CLOSE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-003",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009"
    ],
    "enables": []
   },

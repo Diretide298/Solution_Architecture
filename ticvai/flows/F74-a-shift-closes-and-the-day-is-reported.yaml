@@ -19,9 +19,9 @@ offlineBehaviour: '**Reporting needs the network.** A day report from one till i
 steps:
 - step: 1
   screen: POS-007
-  action: The shift closes and settles.
+  action: The shift closes on a blind count and settles (CHG-FIN-003).
   operations:
-  - closeShift
+  - submitShiftCount
   - acceptShiftVariance
   - listDenominations
   outcome: F32 walks this in detail; here it is the input to the day.

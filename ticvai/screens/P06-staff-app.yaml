@@ -743,9 +743,16 @@ screens:
     - EMP-071
     - EMP-081
     - EMP-091
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. **createCashMovement removed 18 August** — attached by module resemblance, not by what
-    this screen does. A screen that does not handle money should not be able to move it (CF-87's class).
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. **createCashMovement removed 18 August** — attached by module resemblance, not
+    by what this screen does. A screen that does not handle money should not be able to move it (CF-87''s
+    class).
+
+
+    **Blind close** (decided 2 October 2026, Chinmay; CHG-FIN-003): closing from here submits the cashier''s
+    blind count with `submitShiftCount` (no expected cash, no variance shown; the supervisor is alerted
+    beyond the threshold); `closeShift`, which returns the expected figure, is the supervisor''s path
+    on BO-039 and BO-040.'
   density: comfortable
   pattern: approvalInbox
   patternReason: '`approveShiftOpen` decides items that `listIncidents` queues — every row is waiting
@@ -890,9 +897,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getShift
         provenance: contract shift.yaml GET /shifts/{shiftId}
       - kind: detailPanel
@@ -912,9 +916,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getCurrentShift
         provenance: contract shift.yaml GET /shifts/current
     - name: actionBar
@@ -924,13 +925,14 @@ screens:
         label: Accept shift variance
         operation: acceptShiftVariance
         provenance: contract shift.yaml POST /shifts/{shiftId}/accept-variance
+        permission: OVERSHORT_ACCEPT
       - kind: secondaryButton
         label: Approve shift open
         operation: approveShiftOpen
         provenance: contract shift.yaml POST /shifts/{shiftId}/approve-open
       - kind: destructiveButton
         label: Close shift
-        operation: closeShift
+        operation: submitShiftCount
         provenance: contract shift.yaml POST /shifts/{shiftId}/close
       - kind: secondaryButton
         label: Open shift
@@ -1172,9 +1174,10 @@ screens:
     trigger: onAction
     invalidates:
     - listIncidents
-  - operationId: closeShift
+  - operationId: submitShiftCount
     contract: shift
-    purpose: Blind close-out
+    purpose: 'The cashier''s blind count: returns closed, with the supervisor or awaiting approval, never
+      the expected cash (CHG-FIN-003)'
     trigger: onAction
     invalidates:
     - listIncidents
@@ -1498,8 +1501,18 @@ screens:
       provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-009 holds none of them.
         The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
         on its own'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+
+
+    **Blind close (decided 2 October 2026, Chinmay; CHG-FIN-003).** The cashier never sees the expected
+    cash: not while counting, not after submitting, not as a sales or takings total from which it could
+    be worked out (MoM 12 Aug 2026 section 19, DI-271; MoM 9 Sep 2026 4.18, DI-806: "if a cashier knew
+    they had a small surplus, they could pocket it"). The count is submitted with `submitShiftCount`,
+    which answers only what happens next (closed, with your supervisor, or awaiting close approval); the
+    variance alerts the supervisors on the venue''s alerting channel and appears on BO-040. The cashier
+    may add a reason and a note with every count (DI-803). A recount the supervisor asks for is counted
+    blind again (DI-804). Retail practice: docs/active/research-uae-vat-and-blind-close-2-october.md.'
   density: comfortable
   pattern: approvalInbox
   patternReason: '`approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting
@@ -1586,9 +1599,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getShift
         provenance: contract shift.yaml GET /shifts/{shiftId}
       - kind: detailPanel
@@ -1608,9 +1618,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getCurrentShift
         provenance: contract shift.yaml GET /shifts/current
     - name: actionBar
@@ -1618,12 +1625,13 @@ screens:
       components:
       - kind: destructiveButton
         label: Close shift
-        operation: closeShift
+        operation: submitShiftCount
         provenance: contract shift.yaml POST /shifts/{shiftId}/close
       - kind: secondaryButton
         label: Accept shift variance
         operation: acceptShiftVariance
         provenance: contract shift.yaml POST /shifts/{shiftId}/accept-variance
+        permission: OVERSHORT_ACCEPT
       - kind: secondaryButton
         label: Approve shift open
         operation: approveShiftOpen
@@ -1656,12 +1664,21 @@ screens:
   - id: confirmCloseShift
     component: confirmDialog
     trigger: Close shift
-    body: '**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than
-      the verb. A end shift this affects should be identified in the dialog, not just counted. **Collects
-      what `closeShift` sends before it is called.** Required: `countedCash`, `recordedAt`. Optional:
-      `nonCashDeclared`, `notes`, `releaseHeldLeases`.'
-    provenance: contract shift.yaml POST /shifts/{shiftId}/close
+    body: '**Collects what `submitShiftCount` sends.** Required: `countedCash` (by denomination), `recordedAt`.
+      Optional: `cashierReason`, `notes`, `nonCashDeclared`, `releaseHeldLeases`. Says "Your count is
+      final once submitted" and shows no expected figure (CHG-FIN-003).'
+    provenance: contract shift.yaml POST /shifts/{shiftId}/count (CHG-FIN-003)
     bindsTo: CloseShiftRequest
+    confirm:
+      carries:
+      - shiftId
+      - countedFloat
+      - cashierReason
+      label: Submit count
+      operation: submitShiftCount
+    dismiss:
+      discards: []
+      label: Not yet
   - id: confirmSuspendShift
     component: confirmDialog
     trigger: Suspend shift
@@ -1793,7 +1810,7 @@ screens:
     offline: '**Cannot close.** Closing needs the server total, and a locally computed variance is not
       a variance'
   apis:
-  - operationId: closeShift
+  - operationId: submitShiftCount
     contract: shift
     purpose: From the flow it appears in
     trigger: onAction
@@ -5282,7 +5299,13 @@ screens:
     rota a steward can rewrite is not a rota.** **Removed 24 August**: openShift, recordNoSale, reopenShift,
     resumeShift. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota
     view does not author the rota, a shift summary does not open a shift, and **authority notification
-    belongs where the incident is raised, not where it is read.**'
+    belongs where the incident is raised, not where it is read.**
+
+
+    **No figures from which the expected cash could be worked out** (decided 2 October 2026, Chinmay;
+    CHG-FIN-003). The summary shows what the person did (sales count, voids, no-sales, breaks), not sales,
+    refunds or lifts totals, and never expected cash or variance, for their own shift. A supervisor reads
+    those on BO-040.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listShifts` reads the population and `getCurrentShift` reads one of them — list, select,
@@ -5370,9 +5393,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getCurrentShift
         provenance: contract shift.yaml GET /shifts/current
       - kind: detailPanel
@@ -5392,9 +5412,6 @@ screens:
         - Shift.depositBoxCode
         - Shift.bagNumber
         - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
         operation: getShift
         provenance: contract shift.yaml GET /shifts/{shiftId}
     - name: actionBar

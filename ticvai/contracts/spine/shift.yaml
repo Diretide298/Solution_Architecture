@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Shift & Deposit Box
   version: 1.0.0
-  x-ticvai-screen-count: 20
+  x-ticvai-screen-count: 21
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales (cash handling)"
   x-ticvai-capabilities: [C01]
@@ -1004,11 +1004,6 @@ paths:
     post:
       operationId: closeShift
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
@@ -1181,6 +1176,12 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: submitShiftCount
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-009 End shift"
       x-ticvai-audience: [staff]
       summary: The cashier's blind count, closing their own shift
       description: >
@@ -1966,7 +1967,10 @@ components:
         salesTotal:
           x-ticvai-column: gross_sales_amount
           $ref: '../shared/common.yaml#/components/schemas/Money'
-          description: What the till took in sales, as the guest paid it — tax included.
+          description: >
+            What the till took in sales, as the guest paid it — tax included: the shift's takings, not
+            Gross sales (CHG-FIN-002, CHG-FIN-010). **Never shown to the shift's own cashier before
+            the count is in** (CHG-FIN-003): with the float and the lifts it gives away the expected cash.
         refundsTotal:
           x-ticvai-column: gross_refunded_amount
           $ref: '../shared/common.yaml#/components/schemas/Money'
@@ -2003,6 +2007,21 @@ components:
           nullable: true
           description: Counted minus expected, as `ShiftCloseResult.variance`. Negative is short.
             Null to the shift's own cashier, as `expectedCash` (CHG-FIN-003).
+        cashierReason:
+          type: string
+          nullable: true
+          readOnly: true
+          enum: [tillError, unrecordedRefund, miscount, other]
+          description: >
+            What the cashier said went wrong, given with the blind count (`CloseShiftRequest.cashierReason`,
+            DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040
+            (CHG-FIN-003).
+        cashierNote:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 1000
+          description: The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003).
         heldLeaseCount:
           type: integer
           description: >

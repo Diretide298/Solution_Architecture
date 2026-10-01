@@ -2109,7 +2109,9 @@ paths:
         `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue` and
         `taxCollected`, each with its formula in `ReportingSystemKpi`. The formulas follow the D-185
         default (gross sales excluding VAT; net revenue is gross sales less discounts less refunds);
-        **client finance sign-off is pending**.
+        **client finance sign-off is pending**. `groupBy` splits them by `venue`, `channel`, `product`,
+        `attraction` or `businessUnit` (the dimensions their order lines carry), and `takings` also by
+        `tender`, `workstationId` or `shiftId`.
 
 
         **Accreditation KPIs are seeded too, where the accreditation module is on** (12.1.50, 29 September,
