@@ -147,6 +147,11 @@ def build_plan():
         if not part or k in subs or k in done or base not in planned or not isinstance(mp[k], int):
             continue
         other = home.get(part)
+        if not re.match(r"^[a-z][A-Za-z0-9]+$", part) and "." not in part:
+            plan.append((k, "merge", f"**Not a separate piece of work** (1 October): `{part}` was a fragment of "
+                                     f"{base}'s title, read as an operation by mistake. {base} itself carries it, "
+                                     "so this sub-task is closed."))
+            continue
         if other and other in mp:
             plan.append((k, "merge", f"**Duplicate of #{mp[other]}** (decided 1 October): `{part}` moved to "
                                      f"{other.partition('#')[0]} when its task was regrouped; that sub-task carries "

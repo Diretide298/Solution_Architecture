@@ -68,6 +68,9 @@ def reduce_links(edges):
     return [(k, d) for k, d in edges if not any(d in before(o) for o in after[k] if o != d)]
 
 
+OP_ID = re.compile(r"^[a-z][A-Za-z0-9]+$")
+
+
 def sub_tasks(r, lineage):
     """The sub-tasks under a task row: one per operation, one per table, three per screen.
     [(key, parent key, subject, short text)]. tools/op-release.py reads the same list."""
@@ -75,7 +78,9 @@ def sub_tasks(r, lineage):
     if r["type"] != "Task":
         return out
     if r["track"] == "Backend" and ": " in r["subject"]:
-        for op in r["subject"].split(": ", 1)[1].split(", "):
+        # Only operation ids become sub-tasks: a task written by hand (docs/active/block-a-extra-tasks.json) may have
+        # a colon in its title, and the words after it are not operations (1 October: 16 such fragments were pushed).
+        for op in [x for x in r["subject"].split(": ", 1)[1].split(", ") if OP_ID.match(x)]:
             ln = lineage.get(op, {})
             out.append((f"{key}#{op}", key, f"[BE] {op}: {ln.get('verb', '')} {ln.get('path', '')}".strip(),
                         f"Build `{op}` to its contract, with tests for success and every listed error. "

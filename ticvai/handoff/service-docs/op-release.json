@@ -1,7 +1,7 @@
 {
 "release": "r1",
-"built_from": "61f9f5d6a13f40f89d719307896f1fd98345b81e",
-"built_at": "2026-10-01T01:57:55Z",
+"built_from": "4138ff6bab284e9c8f7b44d39a8d2554b92180f9",
+"built_at": "2026-10-01T01:58:27Z",
 "inputs": {
 "tasks.csv": "64e963abe246ddf5447d5350c53e63cf5328f7db",
 "pms-map.json": "efe0a062de17fb0a0efbccd296635d3b9306436c",
@@ -25264,82 +25264,6 @@
 "pointer": "**access:**\n\n- Key: `SETUP-HOSTS#access`\n- Builds: `operation access`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
 },
 {
-"key": "SETUP-HOSTS#operations and workers",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "SETUP-HOSTS",
-"subject": "[BE] operations and workers:",
-"priority_id": 9,
-"sequence": 143,
-"assignee": "Pranay Shinde",
-"responsible": "Hrushikant Patkar",
-"week": 1,
-"version": 70,
-"set_version": true,
-"summary": "operations and workers:",
-"builds": [
-"operation operations and workers"
-],
-"pointer": "**operations and workers:**\n\n- Key: `SETUP-HOSTS#operations and workers`\n- Builds: `operation operations and workers`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "SETUP-HOSTS#each composing its modules",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "SETUP-HOSTS",
-"subject": "[BE] each composing its modules:",
-"priority_id": 9,
-"sequence": 143,
-"assignee": "Pranay Shinde",
-"responsible": "Hrushikant Patkar",
-"week": 1,
-"version": 70,
-"set_version": true,
-"summary": "each composing its modules:",
-"builds": [
-"operation each composing its modules"
-],
-"pointer": "**each composing its modules:**\n\n- Key: `SETUP-HOSTS#each composing its modules`\n- Builds: `operation each composing its modules`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "SETUP-QDRANT#3 nodes",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "SETUP-QDRANT",
-"subject": "[BE] 3 nodes:",
-"priority_id": 9,
-"sequence": 144,
-"assignee": "Hrushikant Patkar",
-"responsible": "Hrushikant Patkar",
-"week": 1,
-"version": 70,
-"set_version": true,
-"summary": "3 nodes:",
-"builds": [
-"operation 3 nodes"
-],
-"pointer": "**3 nodes:**\n\n- Key: `SETUP-QDRANT#3 nodes`\n- Builds: `operation 3 nodes`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "SETUP-QDRANT#TLS",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "SETUP-QDRANT",
-"subject": "[BE] TLS:",
-"priority_id": 9,
-"sequence": 144,
-"assignee": "Hrushikant Patkar",
-"responsible": "Hrushikant Patkar",
-"week": 1,
-"version": 70,
-"set_version": true,
-"summary": "TLS:",
-"builds": [
-"operation TLS"
-],
-"pointer": "**TLS:**\n\n- Key: `SETUP-QDRANT#TLS`\n- Builds: `operation TLS`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
 "key": "SETUP-QDRANT#snapshots",
 "type": "Sub Task",
 "type_id": 10,
@@ -25378,63 +25302,6 @@
 "pointer": "**monitoring:**\n\n- Key: `SETUP-QDRANT#monitoring`\n- Builds: `operation monitoring`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
 },
 {
-"key": "ARCH-TESTS#no module references another",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "ARCH-TESTS",
-"subject": "[BE] no module references another:",
-"priority_id": 9,
-"sequence": 152,
-"assignee": "Tanmay Dukhande",
-"responsible": "Hrushikant Patkar",
-"week": 1,
-"version": 70,
-"set_version": true,
-"summary": "no module references another:",
-"builds": [
-"operation no module references another"
-],
-"pointer": "**no module references another:**\n\n- Key: `ARCH-TESTS#no module references another`\n- Builds: `operation no module references another`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "ARCH-TESTS#and no module's SQL names another's schema",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "ARCH-TESTS",
-"subject": "[BE] and no module's SQL names another's schema:",
-"priority_id": 9,
-"sequence": 152,
-"assignee": "Tanmay Dukhande",
-"responsible": "Hrushikant Patkar",
-"week": 1,
-"version": 70,
-"set_version": true,
-"summary": "and no module's SQL names another's schema:",
-"builds": [
-"operation and no module's SQL names another's schema"
-],
-"pointer": "**and no module's SQL names another's schema:**\n\n- Key: `ARCH-TESTS#and no module's SQL names another's schema`\n- Builds: `operation and no module's SQL names another's schema`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "KERNEL-ID#UUIDv7 from Id.New() in the kernel and in offline-core",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "KERNEL-ID",
-"subject": "[BE] UUIDv7 from Id.New() in the kernel and in offline-core:",
-"priority_id": 9,
-"sequence": 153,
-"assignee": "Tanmay Dukhande",
-"responsible": "Hrushikant Patkar",
-"week": 1,
-"version": 70,
-"set_version": true,
-"summary": "UUIDv7 from Id.New() in the kernel and in offline-core:",
-"builds": [
-"operation UUIDv7 from Id.New() in the kernel and in offline-core"
-],
-"pointer": "**UUIDv7 from Id.New() in the kernel and in offline-core:**\n\n- Key: `KERNEL-ID#UUIDv7 from Id.New() in the kernel and in offline-core`\n- Builds: `operation UUIDv7 from Id.New() in the kernel and in offline-core`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
 "key": "OFFLINE-JOURNAL#record",
 "type": "Sub Task",
 "type_id": 10,
@@ -25452,25 +25319,6 @@
 "operation record"
 ],
 "pointer": "**record:**\n\n- Key: `OFFLINE-JOURNAL#record`\n- Builds: `operation record`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "OFFLINE-JOURNAL#replay and the conflict policies",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "OFFLINE-JOURNAL",
-"subject": "[BE] replay and the conflict policies:",
-"priority_id": 9,
-"sequence": 154,
-"assignee": "Pradnya Yeram",
-"responsible": "Hrushikant Patkar",
-"week": 1,
-"version": 70,
-"set_version": true,
-"summary": "replay and the conflict policies:",
-"builds": [
-"operation replay and the conflict policies"
-],
-"pointer": "**replay and the conflict policies:**\n\n- Key: `OFFLINE-JOURNAL#replay and the conflict policies`\n- Builds: `operation replay and the conflict policies`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
 },
 {
 "key": "APP-MOB-GST-043#build",
@@ -30242,63 +30090,6 @@
 "pointer": "**catalogue.waitlist_entry**\n\n- Key: `MIG-CATALOGUE#catalogue.waitlist_entry`\n- Builds: `table catalogue.waitlist_entry`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
 },
 {
-"key": "PLATFORM-KERNEL#hostname to tenant routing",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "PLATFORM-KERNEL",
-"subject": "[BE] hostname to tenant routing:",
-"priority_id": 9,
-"sequence": 185,
-"assignee": "Tanmay Dukhande",
-"responsible": "Hrushikant Patkar",
-"week": 2,
-"version": 71,
-"set_version": true,
-"summary": "hostname to tenant routing:",
-"builds": [
-"operation hostname to tenant routing"
-],
-"pointer": "**hostname to tenant routing:**\n\n- Key: `PLATFORM-KERNEL#hostname to tenant routing`\n- Builds: `operation hostname to tenant routing`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "PLATFORM-KERNEL#per-transaction scope",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "PLATFORM-KERNEL",
-"subject": "[BE] per-transaction scope:",
-"priority_id": 9,
-"sequence": 185,
-"assignee": "Tanmay Dukhande",
-"responsible": "Hrushikant Patkar",
-"week": 2,
-"version": 71,
-"set_version": true,
-"summary": "per-transaction scope:",
-"builds": [
-"operation per-transaction scope"
-],
-"pointer": "**per-transaction scope:**\n\n- Key: `PLATFORM-KERNEL#per-transaction scope`\n- Builds: `operation per-transaction scope`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "PLATFORM-KERNEL#error model and 429",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "PLATFORM-KERNEL",
-"subject": "[BE] error model and 429:",
-"priority_id": 9,
-"sequence": 185,
-"assignee": "Tanmay Dukhande",
-"responsible": "Hrushikant Patkar",
-"week": 2,
-"version": 71,
-"set_version": true,
-"summary": "error model and 429:",
-"builds": [
-"operation error model and 429"
-],
-"pointer": "**error model and 429:**\n\n- Key: `PLATFORM-KERNEL#error model and 429`\n- Builds: `operation error model and 429`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
 "key": "MIG-LEDGER#ledger.account",
 "type": "Sub Task",
 "type_id": 10,
@@ -30658,63 +30449,6 @@
 "table ledger.tax_invoice_template"
 ],
 "pointer": "**ledger.tax_invoice_template**\n\n- Key: `MIG-LEDGER#ledger.tax_invoice_template`\n- Builds: `table ledger.tax_invoice_template`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "KERNEL-TENANT-LIMITS#a token bucket per tenant and audience",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "KERNEL-TENANT-LIMITS",
-"subject": "[BE] a token bucket per tenant and audience:",
-"priority_id": 9,
-"sequence": 187,
-"assignee": "Tanmay Dukhande",
-"responsible": "Hrushikant Patkar",
-"week": 2,
-"version": 71,
-"set_version": true,
-"summary": "a token bucket per tenant and audience:",
-"builds": [
-"operation a token bucket per tenant and audience"
-],
-"pointer": "**a token bucket per tenant and audience:**\n\n- Key: `KERNEL-TENANT-LIMITS#a token bucket per tenant and audience`\n- Builds: `operation a token bucket per tenant and audience`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "KERNEL-TENANT-LIMITS#and a load-aware share per replica",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "KERNEL-TENANT-LIMITS",
-"subject": "[BE] and a load-aware share per replica:",
-"priority_id": 9,
-"sequence": 187,
-"assignee": "Tanmay Dukhande",
-"responsible": "Hrushikant Patkar",
-"week": 2,
-"version": 71,
-"set_version": true,
-"summary": "and a load-aware share per replica:",
-"builds": [
-"operation and a load-aware share per replica"
-],
-"pointer": "**and a load-aware share per replica:**\n\n- Key: `KERNEL-TENANT-LIMITS#and a load-aware share per replica`\n- Builds: `operation and a load-aware share per replica`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "PLATFORM-IDEMPOTENCY#the Idempotency-Key store and middleware",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "PLATFORM-IDEMPOTENCY",
-"subject": "[BE] the Idempotency-Key store and middleware:",
-"priority_id": 9,
-"sequence": 191,
-"assignee": "Tanmay Dukhande",
-"responsible": "Hrushikant Patkar",
-"week": 3,
-"version": 72,
-"set_version": true,
-"summary": "the Idempotency-Key store and middleware:",
-"builds": [
-"operation the Idempotency-Key store and middleware"
-],
-"pointer": "**the Idempotency-Key store and middleware:**\n\n- Key: `PLATFORM-IDEMPOTENCY#the Idempotency-Key store and middleware`\n- Builds: `operation the Idempotency-Key store and middleware`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
 },
 {
 "key": "MIG-INVENTORY#inventory.goods_receipt",
@@ -31247,101 +30981,6 @@
 "table promotions.promotion_variant"
 ],
 "pointer": "**promotions.promotion_variant**\n\n- Key: `MIG-PROMOTIONS#promotions.promotion_variant`\n- Builds: `table promotions.promotion_variant`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "OFFLINE-SYNC#a result per entry",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "OFFLINE-SYNC",
-"subject": "[BE] a result per entry:",
-"priority_id": 9,
-"sequence": 196,
-"assignee": "Pranay Shinde",
-"responsible": "Hrushikant Patkar",
-"week": 2,
-"version": 71,
-"set_version": true,
-"summary": "a result per entry:",
-"builds": [
-"operation a result per entry"
-],
-"pointer": "**a result per entry:**\n\n- Key: `OFFLINE-SYNC#a result per entry`\n- Builds: `operation a result per entry`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "OFFLINE-SYNC#and a bad entry quarantined instead of blocking the till",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "OFFLINE-SYNC",
-"subject": "[BE] and a bad entry quarantined instead of blocking the till:",
-"priority_id": 9,
-"sequence": 196,
-"assignee": "Pranay Shinde",
-"responsible": "Hrushikant Patkar",
-"week": 2,
-"version": 71,
-"set_version": true,
-"summary": "and a bad entry quarantined instead of blocking the till:",
-"builds": [
-"operation and a bad entry quarantined instead of blocking the till"
-],
-"pointer": "**and a bad entry quarantined instead of blocking the till:**\n\n- Key: `OFFLINE-SYNC#and a bad entry quarantined instead of blocking the till`\n- Builds: `operation and a bad entry quarantined instead of blocking the till`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "PLATFORM-SAGA-PAID#the saga proven end to end",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "PLATFORM-SAGA-PAID",
-"subject": "[BE] the saga proven end to end:",
-"priority_id": 9,
-"sequence": 199,
-"assignee": "Tanmay Dukhande",
-"responsible": "Hrushikant Patkar",
-"week": 3,
-"version": 72,
-"set_version": true,
-"summary": "the saga proven end to end:",
-"builds": [
-"operation the saga proven end to end"
-],
-"pointer": "**the saga proven end to end:**\n\n- Key: `PLATFORM-SAGA-PAID#the saga proven end to end`\n- Builds: `operation the saga proven end to end`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "POS-KDS-ROUTING#routing online",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "POS-KDS-ROUTING",
-"subject": "[BE] routing online:",
-"priority_id": 9,
-"sequence": 200,
-"assignee": "Pranay Shinde",
-"responsible": "Hrushikant Patkar",
-"week": 1,
-"version": 70,
-"set_version": true,
-"summary": "routing online:",
-"builds": [
-"operation routing online"
-],
-"pointer": "**routing online:**\n\n- Key: `POS-KDS-ROUTING#routing online`\n- Builds: `operation routing online`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
-},
-{
-"key": "POS-KDS-ROUTING#and the LAN path decision",
-"type": "Sub Task",
-"type_id": 10,
-"parent": "POS-KDS-ROUTING",
-"subject": "[BE] and the LAN path decision:",
-"priority_id": 9,
-"sequence": 200,
-"assignee": "Pranay Shinde",
-"responsible": "Hrushikant Patkar",
-"week": 1,
-"version": 70,
-"set_version": true,
-"summary": "and the LAN path decision:",
-"builds": [
-"operation and the LAN path decision"
-],
-"pointer": "**and the LAN path decision:**\n\n- Key: `POS-KDS-ROUTING#and the LAN path decision`\n- Builds: `operation and the LAN path decision`\n- Pull via ADAM: `/ticket %ID%`\n- Written at release `r1`\n\nThe spec (contract, tables, screens, done-when) lives in ADAM at the release tag, not in this ticket. OpenProject holds who, when, state and order.\n"
 },
 {
 "key": "MIG-ORDERS#orders.cart",
@@ -78308,8 +77947,6 @@
 "KERNEL-TENANT-LIMITS",
 "PLATFORM-REPUBLISH",
 "OBS-TENANT-POOL",
-"KERNEL-TENANT-LIMITS#a token bucket per tenant and audience",
-"KERNEL-TENANT-LIMITS#and a load-aware share per replica",
 "MIG-ACCESS#access.device_placement",
 "SVC-CATALOGUE-EVENT-1#enterWaitingRoom",
 "SVC-CATALOGUE-EVENT-1#getWaitingRoomPosition",
@@ -109013,6 +108650,24 @@
 "note": "**Out of the first release** (decided 28 September): pauseCampaign, testSendCampaign and unscheduleCampaign are outside the first-release slice; listCampaigns, stopCampaign and updateCampaign are built on VM-MARKETING-CAMPAIGN-1 and SVC-MARKETING-CAMPAIGN-1. The ticket is on hold and off the board; it comes back when its release is planned."
 },
 {
+"key": "ARCH-TESTS#and no module's SQL names another's schema",
+"id": 20822,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `and no module's SQL names another's schema` was a fragment of ARCH-TESTS's title, read as an operation by mistake. ARCH-TESTS itself carries it, so this sub-task is closed."
+},
+{
+"key": "ARCH-TESTS#no module references another",
+"id": 20821,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `no module references another` was a fragment of ARCH-TESTS's title, read as an operation by mistake. ARCH-TESTS itself carries it, so this sub-task is closed."
+},
+{
+"key": "KERNEL-ID#UUIDv7 from Id.New() in the kernel and in offline-core",
+"id": 20823,
+"action": "defer",
+"note": "**Out of the plan** (decided 1 October): `UUIDv7 from Id.New() in the kernel and in offline-core` is no longer part of KERNEL-ID's work in this release. The sub-task is on hold and comes back if its work is planned again."
+},
+{
 "key": "MIG-ACCESS#access.access_device",
 "id": 20994,
 "action": "defer",
@@ -109071,6 +108726,90 @@
 "id": 19086,
 "action": "merge",
 "note": "**Duplicate of #21699** (decided 1 October): `promotions.upsell_rule` moved to VM-MIG-PROMOTIONS when its task was regrouped; that sub-task carries it now, so this one is closed."
+},
+{
+"key": "OFFLINE-JOURNAL#replay and the conflict policies",
+"id": 20825,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `replay and the conflict policies` was a fragment of OFFLINE-JOURNAL's title, read as an operation by mistake. OFFLINE-JOURNAL itself carries it, so this sub-task is closed."
+},
+{
+"key": "OFFLINE-SYNC#a result per entry",
+"id": 20985,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `a result per entry` was a fragment of OFFLINE-SYNC's title, read as an operation by mistake. OFFLINE-SYNC itself carries it, so this sub-task is closed."
+},
+{
+"key": "OFFLINE-SYNC#and a bad entry quarantined instead of blocking the till",
+"id": 20986,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `and a bad entry quarantined instead of blocking the till` was a fragment of OFFLINE-SYNC's title, read as an operation by mistake. OFFLINE-SYNC itself carries it, so this sub-task is closed."
+},
+{
+"key": "PLATFORM-IDEMPOTENCY#the Idempotency-Key store and middleware",
+"id": 20976,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `the Idempotency-Key store and middleware` was a fragment of PLATFORM-IDEMPOTENCY's title, read as an operation by mistake. PLATFORM-IDEMPOTENCY itself carries it, so this sub-task is closed."
+},
+{
+"key": "PLATFORM-KERNEL#error model and 429",
+"id": 20966,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `error model and 429` was a fragment of PLATFORM-KERNEL's title, read as an operation by mistake. PLATFORM-KERNEL itself carries it, so this sub-task is closed."
+},
+{
+"key": "PLATFORM-KERNEL#hostname to tenant routing",
+"id": 20964,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `hostname to tenant routing` was a fragment of PLATFORM-KERNEL's title, read as an operation by mistake. PLATFORM-KERNEL itself carries it, so this sub-task is closed."
+},
+{
+"key": "PLATFORM-KERNEL#per-transaction scope",
+"id": 20965,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `per-transaction scope` was a fragment of PLATFORM-KERNEL's title, read as an operation by mistake. PLATFORM-KERNEL itself carries it, so this sub-task is closed."
+},
+{
+"key": "PLATFORM-SAGA-PAID#the saga proven end to end",
+"id": 20987,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `the saga proven end to end` was a fragment of PLATFORM-SAGA-PAID's title, read as an operation by mistake. PLATFORM-SAGA-PAID itself carries it, so this sub-task is closed."
+},
+{
+"key": "POS-KDS-ROUTING#and the LAN path decision",
+"id": 20989,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `and the LAN path decision` was a fragment of POS-KDS-ROUTING's title, read as an operation by mistake. POS-KDS-ROUTING itself carries it, so this sub-task is closed."
+},
+{
+"key": "POS-KDS-ROUTING#routing online",
+"id": 20988,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `routing online` was a fragment of POS-KDS-ROUTING's title, read as an operation by mistake. POS-KDS-ROUTING itself carries it, so this sub-task is closed."
+},
+{
+"key": "SETUP-HOSTS#each composing its modules",
+"id": 20816,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `each composing its modules` was a fragment of SETUP-HOSTS's title, read as an operation by mistake. SETUP-HOSTS itself carries it, so this sub-task is closed."
+},
+{
+"key": "SETUP-HOSTS#operations and workers",
+"id": 20815,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `operations and workers` was a fragment of SETUP-HOSTS's title, read as an operation by mistake. SETUP-HOSTS itself carries it, so this sub-task is closed."
+},
+{
+"key": "SETUP-QDRANT#3 nodes",
+"id": 20817,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `3 nodes` was a fragment of SETUP-QDRANT's title, read as an operation by mistake. SETUP-QDRANT itself carries it, so this sub-task is closed."
+},
+{
+"key": "SETUP-QDRANT#TLS",
+"id": 20818,
+"action": "merge",
+"note": "**Not a separate piece of work** (1 October): `TLS` was a fragment of SETUP-QDRANT's title, read as an operation by mistake. SETUP-QDRANT itself carries it, so this sub-task is closed."
 },
 {
 "key": "SVC-ACCESS-ACCESS-1#createParkingEntitlement",
