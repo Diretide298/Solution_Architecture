@@ -47,7 +47,7 @@ steps:
   screen: EMP-003
   action: Sees the home screen on duty
   operations:
-  - getCurrentShift
+  - getWorkstationShift
   - listIncidents
   outcome: Today, at a glance
 - step: 5

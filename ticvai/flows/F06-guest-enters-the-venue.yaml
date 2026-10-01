@@ -31,8 +31,8 @@ steps:
   action: Steward signs in with PIN or badge
   operations:
   - login
-  - getCurrentShift
-  outcome: Session carries the workstation, so every scan is attributable
+  outcome: Session carries the workstation, so every scan is attributable. A scanner runs no cash shift,
+    so the door reads none (CHG-DOOR-003)
 - step: 2
   screen: SCN-002
   action: Confirms access point and direction

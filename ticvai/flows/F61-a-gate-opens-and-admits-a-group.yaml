@@ -40,7 +40,6 @@ steps:
   operations:
   - login
   - selectRole
-  - resolvePermissions
   outcome: '**The person carries the authority, not the device** (ADR-0002). A handheld passed to a
     colleague at a break carries nothing with it, which is the property that makes a shared device safe.
 

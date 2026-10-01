@@ -17909,6 +17909,29 @@ screens:
         - Principal.lastLoginAt
         operation: getPrincipal
         provenance: contract identity.yaml GET /principals/{principalId}
+      - kind: detailPanel
+        label: Signed in now
+        bindsTo: ActiveSession
+        columns:
+        - ActiveSession.principalName
+        - ActiveSession.roleName
+        - ActiveSession.workstationName
+        - ActiveSession.deviceInfo
+        - ActiveSession.hasOpenShift
+        - ActiveSession.startedAt
+        - ActiveSession.lastSeenAt
+        operation: listActiveSessions
+        notes: '**Session management lives here, not on the doors** (CHG-DOOR-003, 2 October 2026). The
+          selected person''s active session (`?principalId=`): where, since when, and whether a shift
+          is open on it. Shown only to a holder of SESSION_FORCE_LOGOUT; absent, not empty, for anyone
+          else. This is where a supervisor ends the session a door refused with 409 (audit R184).'
+        provenance: contract identity.yaml GET /auth/sessions
+      - kind: destructiveButton
+        label: End this session
+        operation: forceLogout
+        notes: SESSION_FORCE_LOGOUT. Ends the session and leaves the shift open and the float where it
+          is (ADR-0004); the person signs in again, it is never a refresh.
+        provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
     - name: actionBar
       slot: rowActions
       components:
@@ -17924,6 +17947,25 @@ screens:
         label: Reset principal credential
         operation: resetPrincipalCredential
         provenance: contract identity.yaml POST /principals/{principalId}/credential-reset
+      - kind: destructiveButton
+        label: Sign everyone out
+        operation: revokeAllSessions
+        notes: SESSION_FORCE_LOGOUT, for an incident (a lost device, a leaked password). Ends every session
+          in the venues in scope, the caller's own unless they choose otherwise; the confirmation asks
+          for the authentication code in place, because the request carries a `stepUpToken`.
+        provenance: contract identity.yaml POST /auth/sessions/revoke-all
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: Asked in place inside the Sign everyone out confirmation; its result is the `stepUpToken`.
+          Five wrong codes lock step-up for the lockout minutes (audit R126).
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: Opens the step-up challenge for Sign everyone out; the emailed code is the fallback to
+          the authenticator app (audit R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge
   states:
     loading: The staff list.
     error: Could not load. Names which read failed and leaves the staff untouched.
@@ -17990,9 +18032,38 @@ screens:
       before the principal exists)
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: listActiveSessions
+    contract: identity
+    purpose: Where the selected person is signed in now, so a supervisor can end a session a door refused
+      (audit R184; moved here from the doors, CHG-DOOR-003)
+    trigger: onLoad
+  - operationId: forceLogout
+    contract: identity
+    purpose: End one person's session; their shift and float stay as they are (ADR-0004)
+    trigger: onAction
+    invalidates:
+    - listActiveSessions
+  - operationId: revokeAllSessions
+    contract: identity
+    purpose: Sign everyone in scope out after an incident, under step-up (moved here from the doors, CHG-DOOR-003)
+    trigger: onAction
+    invalidates:
+    - listActiveSessions
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: The step-up challenge Sign everyone out asks for in place
+    trigger: onAction
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Answers the step-up challenge; its token goes into revokeAllSessions
+    trigger: onAction
   entryState:
     params:
     - name: principalId
+      from: session
+    - name: challengeId
+      from: navigation
+    - name: sessionId
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
@@ -18059,6 +18130,25 @@ screens:
       - validTo
       - primaryRoleId
     provenance: contract identity.yaml PATCH /principals/{principalId}
+  - id: confirmForceLogout
+    component: confirmDialog
+    trigger: End this session
+    body: '**Names whose session ends, where and since when, and that their shift stays open and their
+      float does not move.** Collects what `forceLogout` sends: Required: `reason`.'
+    confirm:
+      label: End session
+      operation: forceLogout
+    provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
+  - id: confirmRevokeAllSessions
+    component: confirmDialog
+    trigger: Sign everyone out
+    body: '**Says how many people in which venues are signed out, and whether the caller is one of them.**
+      Collects what `revokeAllSessions` sends: Required: `reason`, `stepUpToken` (the authentication code,
+      asked in place). Optional: `venueId`, `excludeSelf`.'
+    confirm:
+      label: Sign everyone out
+      operation: revokeAllSessions
+    provenance: contract identity.yaml POST /auth/sessions/revoke-all
 - id: BO-054
   name: Role Assignment
   module: People & Access Rights
@@ -31497,8 +31587,9 @@ screens:
     transitions:
     - to: BO-053
       trigger: Staff Directory
-      provenance: 'derived — BO-053 declares entryState.params  and BO-106 holds none of them. The edge
-        carries nothing: BO-053 needs nothing to open'
+      provenance: 'derived — BO-053 declares entryState.params challengeId and BO-106 holds none of them.
+        The edge carries nothing: BO-053 finds challengeId (createMfaChallenge) itself, and BO-053 opens
+        on its own'
     - to: BO-055
       trigger: Rota & Scheduling
       provenance: 'derived — BO-055 declares entryState.params assignmentId and BO-106 holds none of them.
@@ -44465,12 +44556,6 @@ screens:
       trigger: Works in Device Type & Hardware Library
       provenance: flow F116 step 1→2
       operation: listDeviceGate
-    - to: BO-196
-      trigger: Works in Physical Device Registration & Provisioning
-      provenance: flow F116 step 3→4
-      operation: listDeviceGate
-      carries:
-      - placementId
     - to: BO-197
       trigger: Works in Turnstile & Lane Behavior Configuration
       provenance: flow F116 step 5→6
@@ -44499,6 +44584,12 @@ screens:
       trigger: Works in Hardware Compatibility, Health, Testing & Deployment
       provenance: flow F116 step 17→18
       operation: listDeviceGate
+    - to: BO-196
+      trigger: Works in Physical Device Registration & Provisioning
+      provenance: flow F116 step 3→4
+      operation: listDeviceGate
+      carries:
+      - placementId
   density: compact
   purposeNote: Operations can identify every access-control device and its current operational/configuration
     state from one screen.
