@@ -1,0 +1,74 @@
+id: CHG-DOOR-003
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: ADM-001, SUP-001, PTR-001, EMP-001 and SCN-001 are rebuilt as sign-in forms (credentials, then the code when
+  a permission demands it, then the role prompt, then the landing); session management moves to the staff directory
+  BO-053, and the credit, permission-simulation and shift operations leave the doors.
+decision:
+  what: 'Each staff and partner door declares only signing in: login, SSO (browser doors and EMP-001),
+    createMfaChallenge and verifyMfaChallenge, the first enrolment (browser doors), selectRole (or the next screen''s,
+    EMP-002), changeOwnCredential and getCurrentSession. Removed: listActiveSessions, forceLogout, revokeAllSessions,
+    listMfaMethods, removeMfaMethod (all five doors); getB2bCredit, setB2bCreditLimit, overrideCreditLimit,
+    listPartnerAgreements (PTR-001); resolvePermissions and getCurrentShift (SCN-001). listActiveSessions, forceLogout
+    and revokeAllSessions (under step-up) are on BO-053 Staff Directory; MFA methods stay on WEB-024, GST-073 and
+    EMP-042; POS-000 keeps its in-place till takeover (R184). Flows F06, F10, F61, F64, F104, F109 and F110 follow.
+    (Chinmay, 2 Oct 2026, fix the Block A blockers now.)'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Platform-foundation process finding (corrections on ADM-001, SUP-001, PTR-001, EMP-001 and SCN-001): the doors
+  were generated as listDetail screens with session, MFA and SSO tables and Force logout on the sign-in screen ("a
+  person signing in has no session yet and must see none of that"); PTR-001 carried credit operations ("setting or
+  overriding a limit is the tenant''s act"); SCN-001 carried resolvePermissions ("an administration tool; a steward
+  signing in never calls it") and a SHIFT_OPEN no-access state. Sequence per R135, R126, R184 and ADR-0003.'
+keys_touched:
+  screens:
+  - ADM-001
+  - SUP-001
+  - PTR-001
+  - EMP-001
+  - SCN-001
+  - BO-053
+  operations:
+  - listActiveSessions
+  - forceLogout
+  - revokeAllSessions
+  - listMfaMethods
+  - removeMfaMethod
+  - resolvePermissions
+  - getB2bCredit
+  - setB2bCreditLimit
+  - overrideCreditLimit
+  - listPartnerAgreements
+  flows:
+  - F06
+  - F10
+  - F61
+  - F64
+  - F104
+  - F109
+  - F110
+root_class: A30
+tickets:
+  started: []
+  unstarted:
+  - APP-CONSOLE-ADM-001
+  - APP-SUPPORT-SUP-001
+  - APP-PARTNER-PTR-001
+  - APP-STAFF-EMP-001
+  - APP-SCANNER-SCN-001
+  - 'APP-SETUP-BO-053 (#17798; the session operations are outside its slice part and join the rest of BO-053)'
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-doors.py
+  reason: D-DOOR-PATTERN, D-DOOR-FOREIGN-OP, D-DOOR-MFA and D-DOOR-ROLE fail on a door that is a list, declares an
+    operation outside signing in, cannot ask for the code or has no role prompt.
+status: closed
+closed_by_commit: 6149ce92
+notes: 'On the parent commit 12d3f888 check-doors finds D-DOOR-PATTERN 5, D-DOOR-FOREIGN-OP 21 and D-DOOR-ROLE 3; none
+  on this branch. Not done here, for the lead: TICVAI platform operators have no signed-in screen of their own to
+  remove an MFA method or end a session (ADM-342 is the policy screen); the doors'' implementation.component names
+  still end in List.tsx (a frontend rename); the doors keep their names (Platform Login / MFA, Partner Login / MFA),
+  which the glossary would write as Sign in.'

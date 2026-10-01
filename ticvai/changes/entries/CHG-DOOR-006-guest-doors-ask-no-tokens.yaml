@@ -1,0 +1,42 @@
+id: CHG-DOOR-006
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The guest doors WEB-016 and GST-042 lose the overlays that asked a guest to type an idToken, a UAE Pass code
+  and redirect URI, and a refresh token; the client sends those itself and refreshToken runs in the background.
+decision:
+  what: Remove formGuestSocialLogin, formGuestUaePassLogin and formRefreshToken and the Refresh token button from
+    WEB-016 and GST-042; Continue with Apple or Google and Continue with UAE Pass call guestSocialLogin and
+    guestUaePassLogin directly with what the provider returns; refreshToken is declared trigger background. Guest
+    edits are limited to these two screens (the guest-fixes branch owns the rest of P01, P02 and P05). (Chinmay,
+    2 Oct 2026, fix the Block A blockers now.)
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Platform-foundation process finding (corrections on WEB-016 and GST-042): "Those come from the provider SDK, the
+  UAE Pass redirect and the client''s token store; no guest types them. The overlays should not exist." Generator
+  boilerplate (audit class A30).'
+keys_touched:
+  screens:
+  - WEB-016
+  - GST-042
+  operations:
+  - guestSocialLogin
+  - guestUaePassLogin
+  - refreshToken
+root_class: A30
+tickets:
+  started: []
+  unstarted:
+  - 'APP-WEB-WEB-016 (#17990)'
+  - 'APP-MOB-GST-042 (#17975)'
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-doors.py
+  reason: D-RAW-TOKEN fails on any door overlay that collects idToken, refreshToken or redirectUri.
+status: closed
+closed_by_commit: 6149ce92
+notes: 'On the parent commit 12d3f888 D-RAW-TOKEN finds 6 overlays; none on this branch. Not done here, being the
+  notes'' other WEB-016 and GST-042 corrections outside this brief: requiresModule ticketing on WEB-016, the 4-to-10
+  character code in verifyGuestOtp against the agreed six digits, and the channel field on formRequestGuestOtp.'

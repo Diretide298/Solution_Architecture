@@ -1,0 +1,52 @@
+id: CHG-DOOR-005
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: A new read, getWorkstationShift (GET /shifts/current/overview, REPORT_VIEW_WORKSTATION), lets the till home
+  POS-025 and the staff home EMP-003 load the shift on the workstation without the right to open one; getCurrentShift
+  keeps SHIFT_OPEN for the screens that act on the shift.
+decision:
+  what: Add getWorkstationShift to contracts/spine/shift.yaml (additive; the same Shift response, the view permission
+    getShift and listShifts already use, offline-capable, workstation scope) and bind POS-025 and EMP-003 to it, with
+    flows F08 and F64 step 4. getCurrentShift is unchanged, because changing its permission is a breaking change
+    against r1. (Chinmay, 2 Oct 2026, fix the Block A blockers now.)
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Platform-foundation process finding (correction on POS-025): "getCurrentShift requires SHIFT_OPEN; a supervisor
+  covering the till without a shift of their own cannot load the home ... Reading the current shift on a workstation
+  should need the shift-view permission, not the right to open one." check-doors found the same defect on EMP-003,
+  the staff app''s home. Permission must fit the caller (audit class A23).'
+keys_touched:
+  operations:
+  - getWorkstationShift
+  - getCurrentShift
+  screens:
+  - POS-025
+  - EMP-003
+  flows:
+  - F08
+  - F64
+  files:
+  - contracts/spine/shift.yaml
+root_class: A23
+tickets:
+  started: []
+  unstarted:
+  - 'APP-POS-POS-025 (#17916)'
+  - 'SVC-ORDER-SHIFT-2 (#17853, getCurrentShift; getWorkstationShift is a new operation the next plan build places)'
+  - APP-STAFF-EMP-003
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-doors.py
+  reason: D-LANDING-READ fails when a screen a door lands on loads a GET gated by a right to act (SHIFT_OPEN and the
+    like).
+status: closed
+closed_by_commit: 6149ce92
+notes: 'On the parent commit 12d3f888 D-LANDING-READ finds POS-025 and EMP-003; none on this branch. Two reads are
+  exempt in the check with their reasons: POS-001 Begin Shift reads getCurrentShift and listDenominations under
+  SHIFT_OPEN because opening the shift is its own act. New-operation gates: REPORT_VIEW_WORKSTATION is in
+  contracts/shared/permissions.yaml; not a list, so no paging; not configuration. Adding a SHIFT_VIEW key was not done:
+  a new value in the permission enum reaches Session.effectivePermissions, a response, which check-contract-compat
+  treats as breaking.'
