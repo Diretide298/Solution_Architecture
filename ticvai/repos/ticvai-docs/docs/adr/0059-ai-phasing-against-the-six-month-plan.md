@@ -5,7 +5,7 @@
 **Finding:** SD-062 (medium)
 **Source:** `docs/architecture/ai-system-design.md` section 7; `docs/active/six-month-plan-29-september.md` decisions 2, 3 and **10–11 (30 September)**; `audit/ticvai/steps/AI2/ai-functions-review.md` sections 5–6
 **Closes:** the "AI phasing" item under "Still needed" in the ADR index (CF-57, CF-14)
-**Related:** ADR-0051 (baseline and learning) · ADR-0054 (analytics, still a proposed draft) · ADR-0049 (vectors)
+**Related:** ADR-0051 (baseline and learning) · ADR-0054 (analytics, accepted 1 October) · ADR-0049 (vectors)
 
 ---
 

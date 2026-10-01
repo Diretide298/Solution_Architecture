@@ -1,10 +1,10 @@
 id: LLD-PlatformService
-title: PlatformService — 212 operations, 103 tables
+title: PlatformService — 216 operations, 104 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**Three contracts, two schemas, 103 tables.** Subscription, platform operations and the public
+why: '**Three contracts, two schemas, 104 tables.** Subscription, platform operations and the public
   API all write `control.*` — **they are one bounded context that was split into three contracts for
   API-surface reasons, not for data reasons.**
 
@@ -14,14 +14,14 @@ why: '**Three contracts, two schemas, 103 tables.** Subscription, platform opera
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 212
+  operations: 216
   inAFlow: 91
-  percent: 43%
+  percent: 42%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 80
+  tables: 81
   stores:
   - postgres
   largestTable: control.partner_agreement
@@ -1219,7 +1219,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: platform-ops
-  count: 33
+  count: 37
   operations:
   - operation: applyMigration
     verb: POST
@@ -1228,6 +1228,14 @@ operationsByContract:
     permission: PLATFORM_MIGRATION_APPLY
     offline: false
     reads: 6
+    writes: 3
+  - operation: cancelOutboxRepublish
+    verb: POST
+    path: /outbox-republishes/{republishId}/cancel
+    scope: platform
+    permission: PLATFORM_CELL_MANAGE
+    offline: false
+    reads: 1
     writes: 3
   - operation: createRelease
     verb: POST
@@ -1244,6 +1252,14 @@ operationsByContract:
     permission: PLATFORM_MIGRATION_VIEW
     offline: false
     reads: 5
+    writes: 0
+  - operation: getOutboxRepublish
+    verb: GET
+    path: /outbox-republishes/{republishId}
+    scope: platform
+    permission: PLATFORM_CELL_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: getRelease
     verb: GET
@@ -1322,6 +1338,14 @@ operationsByContract:
     path: /migrations
     scope: tenant
     permission: PLATFORM_MIGRATION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listOutboxRepublishes
+    verb: GET
+    path: /outbox-republishes
+    scope: platform
+    permission: PLATFORM_CELL_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -1420,6 +1444,14 @@ operationsByContract:
     permission: PLATFORM_CELL_MANAGE
     offline: false
     reads: 1
+    writes: 3
+  - operation: republishOutbox
+    verb: POST
+    path: /outbox-republishes
+    scope: platform
+    permission: PLATFORM_CELL_MANAGE
+    offline: false
+    reads: 2
     writes: 3
   - operation: rollbackMigrationRun
     verb: POST
@@ -1761,6 +1793,7 @@ tables:
   - approvePartnerStatuLifecycle
   - cancelDecommission
   - cancelInvoice
+  - cancelOutboxRepublish
   - cancelSubscription
   - certifyIntegration
   - createApiClient
@@ -1803,6 +1836,7 @@ tables:
   - removeLicenceAddOn
   - replayDeadLetter
   - replayEvents
+  - republishOutbox
   - requestBurstEnvironment
   - requestProductionAccess
   - resetSandbox
@@ -2193,6 +2227,13 @@ tables:
   store: postgres
   parent: control.cell_tenant
   writtenBy: []
+  foreignWriters: null
+- table: control.outbox_republish
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - platform-ops
   foreignWriters: null
 - table: control.partner
   columns: 28
@@ -2635,7 +2676,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: subscription.plan
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2695,7 +2736,7 @@ readsFrom:
 - service: OrderService
   operations: 31
 - service: TenancyService
-  operations: 23
+  operations: 24
 - service: LedgerService
   operations: 14
 - service: AccessService
@@ -2706,7 +2747,7 @@ readsFrom:
   operations: 2
 writesOutside:
 - service: TenancyService
-  operations: 17
+  operations: 19
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -2725,6 +2766,9 @@ writesOutside:
   - operation: approvePartnerStatuLifecycle
     tables:
     - approvals.request
+  - operation: cancelOutboxRepublish
+    tables:
+    - platform.audit_record
   - operation: createPartnerAgreement
     tables:
     - approvals.request
@@ -2744,6 +2788,9 @@ writesOutside:
     tables:
     - platform.dead_letter
     - platform.outbox
+  - operation: republishOutbox
+    tables:
+    - platform.audit_record
   - operation: setAgreementContractTerm
     tables:
     - approvals.request

@@ -1,4 +1,4 @@
--- control — 80 tables
+-- control — 81 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -529,6 +529,23 @@ CREATE TABLE IF NOT EXISTS control.outbox_relay (
     acquired_at                       timestamptz,
     renewed_at                        timestamptz,
     last_polled_at                    timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS control.outbox_republish (
+    id                                uuid PRIMARY KEY NOT NULL,
+    tenant_id                         uuid NOT NULL,
+    range_starts_at                   timestamptz NOT NULL,
+    range_ends_at                     timestamptz NOT NULL,
+    event_names                       text[],
+    reason                            text NOT NULL CONSTRAINT outbox_republish_reason_chk CHECK (char_length(reason) <= 500),
+    status                            text NOT NULL CONSTRAINT outbox_republish_status_chk CHECK (status IN ('queued', 'running', 'completed', 'failed', 'cancelled')),
+    cursor_at                         timestamptz,
+    rows_published                    integer NOT NULL DEFAULT 0,
+    last_error                        text,
+    requested_by_principal_id         uuid NOT NULL,
+    requested_at                      timestamptz NOT NULL,
+    started_at                        timestamptz,
+    finished_at                       timestamptz
 );
 
 -- Holds 28 columns. No description has been written for this table — the name is the only thing

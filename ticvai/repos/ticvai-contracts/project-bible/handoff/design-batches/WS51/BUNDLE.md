@@ -123,7 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-198 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-198 holds none of them. The edge carries nothing: ADM-198 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     },
     {
      "to": "ADM-199",

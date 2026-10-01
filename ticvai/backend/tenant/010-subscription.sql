@@ -243,7 +243,7 @@ CREATE TABLE IF NOT EXISTS subscription.membership_renewal_policy (
     early_renewal_start               text CONSTRAINT membership_renewal_policy_early_renewal_start_chk CHECK (early_renewal_start IN ('immediately', 'afterCurrentExpiry')),
     renewal_price_basis               text CONSTRAINT membership_renewal_policy_renewal_price_basis_chk CHECK (renewal_price_basis IN ('currentMembershipPrice', 'protectedRenewalPrice', 'renewalDiscount', 'loyaltyRate', 'fixedRenewalRate')),
     renewal_pricing_profile           text,
-    retry_intervals_days              text[],
+    retry_intervals_days              integer[],
     renewal_grace_days                integer,
     revalidate_on_renewal             text[],
     tier_movement_at_renewal          text[],
@@ -323,6 +323,7 @@ CREATE TABLE IF NOT EXISTS subscription.plan (
     billing_period                    text CONSTRAINT plan_billing_period_chk CHECK (billing_period IN ('monthly', 'quarterly', 'annual')),
     includes_branded_app              boolean,
     included_ai_tokens                integer,
+    request_limits                    jsonb,
     package_kind                      text DEFAULT 'standard' CONSTRAINT plan_package_kind_chk CHECK (package_kind IN ('standard', 'custom')),
     offered_to_tenant_id              uuid,
     id                                uuid PRIMARY KEY NOT NULL,
@@ -389,7 +390,7 @@ CREATE TABLE IF NOT EXISTS subscription.trial_config (
     usage_caps                        jsonb,
     payment_method_required_up_front  boolean DEFAULT false,
     conversion_offer_percent          numeric(18,4),
-    notice_days_before_expiry         text[],
+    notice_days_before_expiry         integer[],
     on_expiry                         text DEFAULT 'suspend' CONSTRAINT trial_config_on_expiry_chk CHECK (on_expiry IN ('suspend', 'convert', 'decommission')),
     retain_data_days                  integer DEFAULT 90
 );

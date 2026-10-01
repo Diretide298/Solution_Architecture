@@ -13,7 +13,7 @@
 | **Tables** | 137 |
 | **Screens** | 195 |
 | **Flows** | 11 |
-| **Documents** | 56 |
+| **Documents** | 64 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -586,6 +586,7 @@
 | [AI scope — for confirmation](..\docs\active\ai-scope-for-confirmation.md) |  | 1 |
 | [AI suggestion rules: one rule and a minimum history per kind](..\docs\active\ai-suggestion-rules-proposal.md) |  | 3 |
 | [BL-073 — cookie consent: what to buy, what to build, what is ours either way](..\docs\active\bl-073-cookie-consent-20-september.md) |  | 1 |
+| [The event broker: RabbitMQ or Kafka](..\docs\active\broker-decision-pack.md) |  | 2 |
 | [Build plan — 20 September 2026](..\docs\active\build-plan-20-september.md) |  | 1 |
 | [Validating the developer team's Change Log](..\docs\active\change-log-validation-18-september.md) |  | 2 |
 | [Configured limits: proposed values](..\docs\active\configured-limits-proposal.md) |  | 1 |
@@ -629,10 +630,17 @@
 | [ADR-0049: Vectors live in Qdrant from day one, one collection per tenant, each with its own token](..\docs\adr\0049-vectors-live-in-qdrant-one-collection-per-tenant.md) | Accepted · 30 September 2026 · Chinmay Parab | 2 |
 | [ADR-0050: One autonomy scale; the approval tier is not an autonomy level](..\docs\adr\0050-one-autonomy-scale.md) | Accepted · 30 September 2026 · Chinmay Parab — records AI-D0 | 1 |
 | [ADR-0051: Every AI function ships on a baseline and learns per tenant; a model goes live only on evidence](..\docs\adr\0051-ai-ships-on-a-baseline-and-learns-per-tenant.md) | Accepted · 30 September 2026 · Chinmay Parab | 5 |
+| [ADR-0052: One recommendation engine; runtime in AI, configuration in Promotions](..\docs\adr\0052-one-recommendation-engine.md) | Accepted · 1 October 2026 · Chinmay Parab — records AI-D07,  | 1 |
+| [ADR-0053: Owners keep their deterministic rules; AI owns cross-entity risk, alerts and cases](..\docs\adr\0053-risk-layer-ownership.md) | Accepted · 1 October 2026 · Chinmay Parab — records AI-D06,  | 2 |
+| [ADR-0054: Natural-language analytics goes through the semantic layer](..\docs\adr\0054-natural-language-analytics-goes-through-the-semantic-layer.md) | Accepted · 1 October 2026 · Chinmay Parab — records AI-D13 a | 3 |
 | [ADR-0055: A modular monolith, deployed as five units](..\docs\adr\0055-a-modular-monolith-deployed-as-five-units.md) | Accepted · 30 September 2026 · Chinmay Parab | 1 |
 | [ADR-0057: Events travel on RabbitMQ or Kafka, behind one kernel interface](..\docs\adr\0057-events-travel-on-rabbitmq-or-kafka.md) | Proposed · waiting on the client's choice between RabbitMQ a | 1 |
-| [ADR-0058: One relay per region reads every tenant's outbox, and every consumer has an inbox](..\docs\adr\0058-one-relay-per-region-and-an-inbox-per-tenant-database.md) | Accepted · 30 September 2026 · Chinmay Parab | 1 |
+| [ADR-0058: One relay per region reads every tenant's outbox, and every consumer has an inbox](..\docs\adr\0058-one-relay-per-region-and-an-inbox-per-tenant-database.md) | Accepted · 30 September 2026 · Chinmay Parab · amended 1 Oct | 1 |
 | [ADR-0059: AI phasing against the six-month plan](..\docs\adr\0059-ai-phasing-against-the-six-month-plan.md) | Accepted · 30 September 2026 · Chinmay Parab | 6 |
+| [ADR-0060: Availability targets per tier, and how they are met](..\docs\adr\0060-availability-targets-high-availability-and-disaster-recovery.md) | Proposed · waiting on the client (which services the 99.99%  | 1 |
+| [ADR-0061: Replica floors are set per deployable and per zone](..\docs\adr\0061-replica-floors-per-deployable.md) | Accepted · 1 October 2026 · Chinmay Parab | 1 |
+| [ADR-0063: Encryption and keys, and biometric templates stay with the biometric vendor](..\docs\adr\0063-encryption-keys-and-biometric-templates.md) | Proposed · waiting on the client's data protection officer ( | 1 |
+| [ADR-0064: Every tenant has a request budget, and a busy tenant cannot starve the others](..\docs\adr\0064-per-tenant-limits.md) | Accepted · 1 October 2026 · Chinmay Parab | 1 |
 | [AI provider credentials — where the key lives and who can reach it](..\docs\architecture\ai-credentials.md) |  | 3 |
 | [TICVAI AI subsystem: system design](..\docs\architecture\ai-system-design.md) |  | 162 |
 | [Data Model](..\docs\architecture\data-model.md) |  | 1 |

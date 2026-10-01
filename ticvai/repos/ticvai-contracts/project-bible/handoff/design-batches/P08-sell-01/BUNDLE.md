@@ -127,7 +127,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-007 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-007 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     },
     {
      "to": "BO-010",
@@ -1151,12 +1151,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-010 holds none of them, so the edge carries nothing and BO-007 opens cold"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-010 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-010 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-010 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     },
     {
      "to": "ANL-009",
@@ -2602,7 +2602,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-012 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-012 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     }
    ]
   },
@@ -3120,7 +3120,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-013 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-013 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     },
     {
      "to": "BO-011",
@@ -4180,12 +4180,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-015 holds none of them, so the edge carries nothing and BO-007 opens cold"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-015 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-015 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-015 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     },
     {
      "to": "BO-099",
@@ -4670,12 +4670,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-016 holds none of them, so the edge carries nothing and BO-007 opens cold"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-016 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-016 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-016 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     }
    ]
   },
@@ -4858,12 +4858,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-017 holds none of them, so the edge carries nothing and BO-007 opens cold"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-017 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-017 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-017 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     }
    ]
   },

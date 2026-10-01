@@ -48,7 +48,7 @@
 | [WEB-050](#web-050-plan-your-visit) | Plan Your Visit | Discovery & Browse | 1 | 7 |
 | [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 6 |
 | [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 2 | 6 |
-| [WEB-015](#web-015-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 2 | 3 |
+| [WEB-015](#web-015-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 2 | 2 |
 | [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 2 | 11 |
 | [WEB-022](#web-022-membership-plans) | Membership Plans | Membership, Loyalty & Value | 2 | 4 |
 | [WEB-023](#web-023-membership-management) | Membership Management | Membership, Loyalty & Value | 2 | 9 |
@@ -134,7 +134,6 @@
 | WEB-046 | In-Venue Notifications |  |  |
 | WEB-008 | Add-ons & Upsell |  |  |
 | WEB-009 | Wishlist |  |  |
-| WEB-015 | Branded Queue / Waiting Room |  |  |
 | WEB-017 | My Account Dashboard |  |  |
 | WEB-018 | My Tickets | entitlementId, orderId |  |
 | WEB-019 | Order History |  |  |
@@ -402,6 +401,7 @@
 | WEB-005 | Picks a time; the tickets for it appear | performanceId |  |
 | WEB-008 | Add-ons & Upsell |  |  |
 | WEB-010 | Reviews the cart and may enter a promotion code | cartId |  |
+| WEB-015 | Adds tickets for a performance whose on-sale waiting room is on | performanceId | `addCartLine` refused `403 admission-required`: this performance's room is on and the page holds no admission token for it |
 | WEB-007 | Selects seats on the map | eventId, performanceId |  |
 
 ## WEB-010 Shopping Cart
@@ -526,7 +526,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | WEB-016 | Chooses to sign in rather than continue as a guest | cartId | no verified guest session — this is the fork of matrix 2.6.1 §2.4, offered here rather than in front of the cart |
-| WEB-013 | Booking Confirmation |  |  |
 | WEB-012 | Pays |  |  |
 | WEB-012 | Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms) |  |  |
 | WEB-010 | They check out | cartId, performanceId |  |
@@ -1289,20 +1288,19 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | WEB-005 | Ticket Type Selection |  |  |
-| WEB-007 | Interactive Seat Selection |  |  |
 | WEB-006 | Date & Performance Selection | cartId, performanceId |  |
 | WEB-010 | Shopping Cart | cartId, code, performanceId |  |
 | WEB-016 | Continue — sign in or use a guest code (when sign-in is asked after add-ons) | cartId | the guest is not signed in |
 
 ## WEB-015 Branded Queue / Waiting Room
 
-**Virtual Waiting Room — the screen a person opens when they need to deal with virtual waiting room.**
+**The on-sale waiting room for one performance — the guest's place, the wait, and the way on to the sale once admitted.**
 
 |  |  |
 |---|---|
 | Module | High-Demand Access |
 | Wave | 2 |
-| Licensed module | queue |
+| Licensed module | ticketing |
 | Route | `/high-demand-access/virtual-waiting-room` |
 | Component | `apps/guest-web/src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx` |
 | Pattern | statusTracker |
@@ -1311,25 +1309,31 @@
 
 | Parameter | From |
 |---|---|
-| entryId | deepLink |
+| performanceId | WEB-006 |
+| waitingEntryId | WEB-015 |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onAction | Join a virtual queue | `None` |
-| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242) | `None` |
-| `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
+| `enterWaitingRoom` | [CatalogueService](../backend/CatalogueService.md#enterwaitingroom) | onAction | Take a place in the performance's on-sale waiting room (ADR-0066); `notRequired` when the room is off | `None` |
+| `getWaitingRoomPosition` | [CatalogueService](../backend/CatalogueService.md#getwaitingroomposition) | onInterval | The guest's place, polled every `pollAfterSeconds`; admitted, it carries the admission token for `addCartLine` | `None` |
 
 **States**
 
 | State | Behaviour |
 |---|---|
-| loading | Position in the queue, updating |
-| error | Lost the queue position. The worst failure on this screen: it re-queues rather than silently admitting, and says so, because a guest who thinks they lost their place will open a second tab and make it worse |
+| loading | Taking a place in the room. *Take my place* (`enterWaitingRoom`) answers with a position, or `notRequired` and the guest goes straight on to the sale |
+| error | Lost the place. The worst failure on this screen. A retry sends the same `Idempotency-Key` and gets the same entry back, so the guest is not sent to the back, and the screen says so, because a guest who thinks they lost their place will open a second tab and make it worse. `expired` (the admission was not used in time) offers to enter again; `closed` (the room was switched off or the performance stopped selling) says so and goes back to the event |
 | emptyFirstRun | — |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. The last known position stays on screen with its age. Joining, leaving and being admitted all need the connection. |
+| emptyNoAccess | There is no access to refuse. The room is anonymous (ADR-0066): no sign-in, no personal data, and the guest may not have an account yet. |
+| offline | The offline banner shows. The last known position stays on screen with its age, and polling resumes with the same entry when the connection is back. Admission needs the connection. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-006 | Continue to your tickets | performanceId | `getWaitingRoomPosition` answers `admitted`. The page keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt` |
 
 ## WEB-021 Wallet & Gift Cards
 
@@ -2155,7 +2159,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | WEB-005 | Ticket Type Selection |  |  |
-| WEB-007 | Interactive Seat Selection |  |  |
 | WEB-006 | Date & Performance Selection | performanceId |  |
 
 ## WEB-024 Devices, Wishlist & Consent
@@ -2438,7 +2441,7 @@
 | `listTransportStations` | [VenueOpsService](../backend/VenueOpsService.md#listtransportstations) | onLoad | The stations to pick From and To | `None` |
 | `listTransportRoutes` | [VenueOpsService](../backend/VenueOpsService.md#listtransportroutes) | onAction | The routes between two stations (the swap uses the paired route) | `None` |
 | `getTransportFareTable` | [VenueOpsService](../backend/VenueOpsService.md#gettransportfaretable) | onLoad | Passenger types and fares of the route | `None` |
-| `searchTransportDepartures` | [VenueOpsService](../backend/VenueOpsService.md#searchtransportdepartures) | onAction | Departures for the stations, date, period and party, with counts per period | `None` |
+| `searchTransportDepartures` | [VenueOpsService](../backend/VenueOpsService.md#searchtransportdepartures) | onLoad | Departures for the stations, date, period and party, with counts per period | `None` |
 | `getNextTransportDeparture` | [VenueOpsService](../backend/VenueOpsService.md#getnexttransportdeparture) | onAction | The next departure with room for the party | `None` |
 | `getTransportRoute` | [VenueOpsService](../backend/VenueOpsService.md#gettransportroute) | onLoad | The route and its stops | `None` |
 | `getTransportRouteMap` | [VenueOpsService](../backend/VenueOpsService.md#gettransportroutemap) | onLoad | Stop list, line and bounds for the map | `None` |

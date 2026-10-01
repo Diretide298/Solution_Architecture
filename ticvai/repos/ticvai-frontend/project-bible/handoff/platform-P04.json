@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "posTerminal",
  "offlineCapable": true,
- "generated": "2026-09-30",
+ "generated": "2026-10-01",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 30,
@@ -15,7 +15,7 @@
   "contracts": 20,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 153
+  "operationsWithNoScreen": 155
  },
  "waves": {
   "wave1": 27,
@@ -71,11 +71,11 @@
    "operations": 13
   },
   {
-   "contract": "tenancy",
+   "contract": "retail",
    "operations": 10
   },
   {
-   "contract": "retail",
+   "contract": "tenancy",
    "operations": 10
   },
   {
@@ -91,11 +91,11 @@
    "operations": 6
   },
   {
-   "contract": "finance",
+   "contract": "promotions",
    "operations": 5
   },
   {
-   "contract": "promotions",
+   "contract": "finance",
    "operations": 5
   },
   {
@@ -123,15 +123,15 @@
    "operations": 2
   },
   {
+   "contract": "wallet",
+   "operations": 1
+  },
+  {
    "contract": "inventory",
    "operations": 1
   },
   {
    "contract": "assets",
-   "operations": 1
-  },
-  {
-   "contract": "wallet",
    "operations": 1
   }
  ],
@@ -482,6 +482,12 @@
     "summary": "Which benefits a plan grants, and how much of each"
    },
    {
+    "operation": "getWaitingRoomStatus",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "A performance's waiting room, its setting and how it is moving"
+   },
+   {
     "operation": "listMembershipBenefits",
     "contract": "catalogue",
     "verb": "GET",
@@ -492,6 +498,12 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Membership schemes, the level above a plan"
+   },
+   {
+    "operation": "setWaitingRoomSetting",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Switch a performance's waiting room on or off, and set how fast it releases"
    },
    {
     "operation": "calculateTax",
@@ -614,13 +626,13 @@
     "summary": "Decide, now, and say why"
    },
    {
-    "operation": "getAccessPolicy",
+    "operation": "getAuthorisationPolicy",
     "contract": "identity",
     "verb": "GET",
     "summary": "One policy, at a version"
    },
    {
-    "operation": "getAccessPolicyBundle",
+    "operation": "getAuthorisationPolicyBundle",
     "contract": "identity",
     "verb": "GET",
     "summary": "The policies a device needs to decide for itself"
@@ -650,7 +662,7 @@
     "summary": "What was decided, for whom, where and why"
    },
    {
-    "operation": "listAccessPolicyTemplates",
+    "operation": "listAuthorisationPolicyTemplates",
     "contract": "identity",
     "verb": "GET",
     "summary": "Reusable policy shapes"

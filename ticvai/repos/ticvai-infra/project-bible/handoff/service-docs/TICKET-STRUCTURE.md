@@ -122,6 +122,10 @@ reaches OpenProject before Chinmay's go on the review workbook.
 | 10 | ADAM's board reads the build order from **Priority_No.** (found by name in the project's schema), falling back to the description, so a started ticket still sorts by the new order | ADAM, live after the deploy | ready (30 Sep) |
 | 11 | Re-audit a sample by pulling tickets as a developer would | audit kit | after 4-10 |
 
+**From release `r1` (decided 1 October), steps 4 to 8 are one run:** `tools/op-release.py` writes one bundle and
+`tools/op-release.rb` applies it on the server from a git checkout, dry run first, and new and unstarted tickets
+get a pointer to ADAM instead of the full text (`OPENPROJECT-PUSH.md`, "The release push").
+
 Steps 6, 7 and 10 were the gaps until 30 September: without them, tickets already in OpenProject kept yesterday's
 order numbers next to new tickets numbered today, and links the plan dropped stayed in place.
 

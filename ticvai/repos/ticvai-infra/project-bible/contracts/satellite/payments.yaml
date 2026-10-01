@@ -78,6 +78,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DunningPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setDunningPolicy
       x-ticvai-consumed-by:
@@ -139,6 +141,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/me/payment-issues:
     get:
       operationId: listMyPaymentIssues
@@ -177,6 +181,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/DunningCase'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-read-routing: replica
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -226,6 +232,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       - name: caseId
@@ -282,6 +290,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/DunningCase'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dunning-cases/{caseId}/resolve:
     post:
       operationId: resolveDunningCase
@@ -338,6 +348,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DunningCase'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-methods:
     get:
       operationId: listPaymentMethods
@@ -378,6 +390,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PaymentMethod'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPaymentMethod
       x-ticvai-consumed-by:
@@ -409,6 +423,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentMethod'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-methods/{methodId}:
     parameters:
     - name: methodId
@@ -464,6 +480,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentMethod'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-providers:
     get:
       operationId: listPaymentProviderConnections
@@ -494,6 +512,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PaymentProviderConnection'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPaymentProviderConnection
       x-ticvai-consumed-by:
@@ -530,6 +550,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentProviderConnection'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-providers/{connectionId}/test:
     parameters:
     - name: connectionId
@@ -568,6 +590,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProviderTestResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-providers/{provider}/webhooks:
     parameters:
     - name: provider
@@ -673,6 +697,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PaymentRoutingRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPaymentRoutingRules
       x-ticvai-consumed-by:
@@ -732,6 +758,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-routing/simulate:
     post:
       operationId: simulatePaymentRouting
@@ -765,6 +793,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RoutingDecision'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-failover-policy:
     put:
       operationId: setPaymentFailoverPolicy
@@ -812,6 +842,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentFailoverPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-providers/health:
     get:
       operationId: getPaymentProviderHealth
@@ -849,6 +881,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProviderHealth'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-providers/economics:
     get:
       operationId: getPaymentProviderEconomics
@@ -888,6 +922,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProviderEconomics'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-terminals:
     get:
       operationId: listPaymentTerminals
@@ -925,6 +961,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PaymentTerminal'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPaymentTerminalConfiguration
       x-ticvai-consumed-by:
@@ -978,6 +1016,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-terminals/{terminalId}/forwarded:
     parameters:
     - name: terminalId
@@ -1014,6 +1054,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/StoredForwardTransaction'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /hosted-checkout-config:
     put:
       operationId: setHostedCheckoutConfiguration
@@ -1056,6 +1098,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HostedCheckoutConfig'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-authentication-policy:
     put:
       operationId: setPaymentAuthenticationPolicy
@@ -1100,6 +1144,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentAuthenticationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /mixed-tender-rules:
     get:
       operationId: getMixedTenderRules
@@ -1120,6 +1166,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MixedTenderRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMixedTenderRules
       x-ticvai-consumed-by:
@@ -1167,6 +1215,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MixedTenderRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /b2b-credit-accounts:
     get:
       operationId: listB2bCreditAccounts
@@ -1205,6 +1255,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/B2bCreditAccount'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createB2bCreditAccount
       x-ticvai-consumed-by:
@@ -1235,6 +1287,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/B2bCreditAccount'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /b2b-credit-accounts/{accountId}/terms:
     parameters:
     - name: accountId
@@ -1281,6 +1335,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/B2bPaymentTerms'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reconciliation-sources:
     get:
       operationId: listReconciliationSources
@@ -1309,6 +1365,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReconciliationSource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setReconciliationSource
       x-ticvai-consumed-by:
@@ -1343,6 +1401,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReconciliationSource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reconciliation-rules:
     put:
       operationId: setReconciliationMatchingRules
@@ -1384,6 +1444,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReconciliationMatchingRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /merchant-accounts:
     get:
       operationId: listMerchantAccounts
@@ -1411,6 +1473,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MerchantAccount'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMerchantAccount
       x-ticvai-consumed-by:
@@ -1444,6 +1508,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MerchantAccount'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-risk-rules:
     put:
       operationId: setPaymentRiskRules
@@ -1498,6 +1564,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentRiskRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /chargebacks/{chargebackId}/evidence:
     parameters:
     - name: chargebackId
@@ -1545,6 +1613,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChargebackEvidence'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-performance:
     get:
       operationId: getPaymentPerformance
@@ -1595,6 +1665,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PaymentPerformanceRow'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-configuration/simulate:
     post:
       operationId: simulatePaymentConfiguration
@@ -1634,6 +1706,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentConfigurationSimulation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payments/rules:
     get:
       operationId: getPaymentRules
@@ -1663,6 +1737,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentRuleSet'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPaymentRules
       x-ticvai-consumed-by:
@@ -1700,6 +1776,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentRuleSet'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /deposits/{depositId}/activity:
     get:
       operationId: listDepositActivity
@@ -1736,6 +1814,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PaymentsDepositActivity'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: recordDepositActivity
       x-ticvai-consumed-by:
@@ -1776,6 +1856,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentsDepositActivity'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-terminal-certifications:
     get:
       operationId: listPaymentTerminalCertifications
@@ -1824,6 +1906,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/PayTerminalCertification'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-terminal-certifications/{modelCode}:
     parameters:
     - name: modelCode
@@ -1880,6 +1964,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /instalment-policy:
     get:
       operationId: getInstalmentPolicy
@@ -1903,6 +1989,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PayInstalmentPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setInstalmentPolicy
       x-ticvai-consumed-by:
@@ -1953,6 +2041,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /instalment-plans:
     get:
       operationId: listInstalmentPlans
@@ -2011,6 +2101,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/PayInstalmentPlan'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createInstalmentPlan
       x-ticvai-consumed-by:
@@ -2104,6 +2196,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   securitySchemes:

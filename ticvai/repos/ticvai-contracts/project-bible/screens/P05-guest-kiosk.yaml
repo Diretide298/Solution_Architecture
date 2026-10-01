@@ -146,8 +146,9 @@ screens:
       provenance: flow F07 step 2→3, F75 step 2→3
     - to: KSK-004
       trigger: Choose tickets
-      provenance: derived — KSK-004 declares entryState.params productId and KSK-002 holds none of them,
-        so the edge carries nothing and KSK-004 opens cold
+      provenance: 'derived — KSK-004 declares entryState.params productId and KSK-002 holds none of them.
+        The edge carries nothing: productId only pre-selects (deep link or optional), and KSK-004 opens
+        on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: touchLarge
@@ -259,12 +260,14 @@ screens:
       operation: listProducts
     - to: KSK-011
       trigger: Collect a booking
-      provenance: derived — KSK-011 declares entryState.params orderId and KSK-003 holds none of them,
-        so the edge carries nothing and KSK-011 opens cold
+      provenance: 'derived — KSK-011 declares entryState.params orderId and KSK-003 holds none of them.
+        The edge carries nothing: orderId only pre-selects (deep link or optional), and KSK-011 opens
+        on its own'
     - to: KSK-016
       trigger: Order Food
-      provenance: derived — KSK-016 declares entryState.params outletId and KSK-003 holds none of them,
-        so the edge carries nothing and KSK-016 opens cold
+      provenance: 'derived — KSK-016 declares entryState.params outletId and KSK-003 holds none of them.
+        The edge carries nothing: outletId only pre-selects (deep link or optional), and KSK-016 opens
+        on its own'
     - to: KSK-004
       trigger: Chooses tickets and quantities
       provenance: flow F07 step 3→4
@@ -404,8 +407,9 @@ screens:
       provenance: flow F07 step 4→5
     - to: KSK-015
       trigger: Assistant
-      provenance: derived — KSK-015 declares entryState.params conversationId, messageId and KSK-004 holds
-        none of them, so the edge carries nothing and KSK-015 opens cold
+      provenance: 'derived — KSK-015 declares entryState.params conversationId, messageId and KSK-004
+        holds none of them. The edge carries nothing: conversationId only pre-selects (deep link or optional);
+        KSK-015 finds messageId (sendAiMessage) itself, and KSK-015 opens on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: touchLarge

@@ -40,18 +40,6 @@ operations:
   - cache:idempotency
   - identity.session
   - platform.outbox
-- operation: createAccessPolicy
-  verb: POST
-  path: /access-policies
-  scope: tenant
-  permission: PERMISSION_MANAGE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - identity.access_policy
-  writes:
-  - identity.access_policy
 - operation: createAccessReviewCampaign
   verb: POST
   path: /access-review-campaigns
@@ -74,6 +62,18 @@ operations:
   - cache:idempotency
   - identity.access_review_campaign
   - identity.access_review_item
+- operation: createAuthorisationPolicy
+  verb: POST
+  path: /authorisation-policies
+  scope: tenant
+  permission: PERMISSION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.authorisation_policy
+  writes:
+  - identity.authorisation_policy
 - operation: createDelegatedAccess
   verb: POST
   path: /delegated-access
@@ -280,27 +280,27 @@ operations:
   writes:
   - cache:idempotency
   - identity.session
-- operation: getAccessPolicy
+- operation: getAuthorisationPolicy
   verb: GET
-  path: /access-policies/{policyId}
+  path: /authorisation-policies/{policyId}
   scope: venue
   permission: PERMISSION_VIEW
   audience:
   - staff
   offline: false
   reads:
-  - identity.access_policy
+  - identity.authorisation_policy
   writes: []
-- operation: getAccessPolicyBundle
+- operation: getAuthorisationPolicyBundle
   verb: GET
-  path: /access-policies/bundle
+  path: /authorisation-policies/bundle
   scope: venue
   permission: PERMISSION_VIEW
   audience:
   - staff
   offline: true
   reads:
-  - identity.access_policy
+  - identity.authorisation_policy
   writes: []
 - operation: getCurrentSession
   verb: GET
@@ -517,53 +517,6 @@ operations:
   - identity.access_decision
   - identity.authz_audit
   writes: []
-- operation: listAccessPolicies
-  verb: GET
-  path: /access-policies
-  scope: venue
-  permission: PERMISSION_VIEW
-  audience:
-  - staff
-  offline: false
-  reads:
-  - identity.access_policy
-  writes: []
-- operation: listAccessPolicyEffectiveness
-  verb: GET
-  path: /access-policy-effectiveness
-  scope: tenant
-  permission: PERMISSION_VIEW
-  audience:
-  - staff
-  offline: false
-  reads:
-  - identity.access_decision
-  - identity.access_override
-  - identity.access_policy
-  writes: []
-- operation: listAccessPolicyHistory
-  verb: GET
-  path: /access-policies/{policyId}/history
-  scope: tenant
-  permission: PERMISSION_VIEW
-  audience:
-  - staff
-  offline: false
-  reads:
-  - identity.access_policy
-  - identity.access_policy_version
-  writes: []
-- operation: listAccessPolicyTemplates
-  verb: GET
-  path: /access-policy-templates
-  scope: tenant
-  permission: PERMISSION_VIEW
-  audience:
-  - staff
-  offline: false
-  reads:
-  - identity.access_policy
-  writes: []
 - operation: listAccessReviewCampaigns
   verb: GET
   path: /access-review-campaigns
@@ -601,6 +554,53 @@ operations:
   reads:
   - identity.principal
   - identity.session
+  writes: []
+- operation: listAuthorisationPolicies
+  verb: GET
+  path: /authorisation-policies
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.authorisation_policy
+  writes: []
+- operation: listAuthorisationPolicyEffectiveness
+  verb: GET
+  path: /authorisation-policy-effectiveness
+  scope: tenant
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_decision
+  - identity.access_override
+  - identity.authorisation_policy
+  writes: []
+- operation: listAuthorisationPolicyHistory
+  verb: GET
+  path: /authorisation-policies/{policyId}/history
+  scope: tenant
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.authorisation_policy
+  - identity.authorisation_policy_version
+  writes: []
+- operation: listAuthorisationPolicyTemplates
+  verb: GET
+  path: /authorisation-policy-templates
+  scope: tenant
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.authorisation_policy
   writes: []
 - operation: listCapabilityTemplates
   verb: GET
@@ -721,7 +721,7 @@ operations:
   offline: false
   reads:
   - identity.access_decision
-  - identity.access_policy
+  - identity.authorisation_policy
   - identity.delegated_access
   - identity.principal
   - identity.role
@@ -973,9 +973,9 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
-- operation: restoreAccessPolicyVersion
+- operation: restoreAuthorisationPolicyVersion
   verb: POST
-  path: /access-policies/{policyId}/restore
+  path: /authorisation-policies/{policyId}/restore
   scope: tenant
   permission: PERMISSION_MANAGE
   audience:
@@ -983,12 +983,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - identity.access_policy
-  - identity.access_policy_version
+  - identity.authorisation_policy
+  - identity.authorisation_policy_version
   writes:
   - cache:idempotency
-  - identity.access_policy
-  - identity.access_policy_version
+  - identity.authorisation_policy
+  - identity.authorisation_policy_version
 - operation: revokeAllSessions
   verb: POST
   path: /auth/sessions/revoke-all
@@ -1020,16 +1020,16 @@ operations:
   writes:
   - cache:idempotency
   - identity.session
-- operation: setAccessPolicyState
+- operation: setAuthorisationPolicyState
   verb: POST
-  path: /access-policies/{policyId}/state
+  path: /authorisation-policies/{policyId}/state
   scope: tenant
   permission: PERMISSION_MANAGE
   audience:
   - staff
   offline: false
   reads:
-  - identity.access_policy
+  - identity.authorisation_policy
   writes: []
 - operation: setCapabilityTemplate
   verb: PUT
@@ -1114,9 +1114,9 @@ operations:
   - cache:idempotency
   - identity.sso_group_mapping
   - identity.sso_provider
-- operation: simulateAccessPolicy
+- operation: simulateAuthorisationPolicy
   verb: POST
-  path: /access-policies/simulate
+  path: /authorisation-policies/simulate
   scope: venue
   permission: PERMISSION_VIEW
   audience:
@@ -1125,7 +1125,7 @@ operations:
   reads:
   - identity.access_decision
   writes:
-  - identity.access_policy
+  - identity.authorisation_policy
 - operation: startSsoAuthorization
   verb: GET
   path: /auth/sso/{providerId}/authorize
@@ -1171,18 +1171,18 @@ operations:
   - workforce.employee
   - workforce.work_assignment
   writes: []
-- operation: updateAccessPolicy
+- operation: updateAuthorisationPolicy
   verb: PUT
-  path: /access-policies/{policyId}
+  path: /authorisation-policies/{policyId}
   scope: tenant
   permission: PERMISSION_MANAGE
   audience:
   - staff
   offline: false
   reads:
-  - identity.access_policy
+  - identity.authorisation_policy
   writes:
-  - identity.access_policy
+  - identity.authorisation_policy
 - operation: updatePrincipal
   verb: PATCH
   path: /principals/{principalId}

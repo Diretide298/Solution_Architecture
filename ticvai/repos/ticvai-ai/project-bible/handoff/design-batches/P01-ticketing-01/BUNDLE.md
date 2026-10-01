@@ -100,7 +100,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-031",
      "trigger": "My Reservations",
-     "provenance": "derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds none of them, so the edge carries nothing and WEB-031 opens cold"
+     "provenance": "derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId only pre-selects (deep link or optional); WEB-031 finds groupBookingId (requestGroupBooking), productId (listGroupPackages) itself; WEB-031 opens on listGroupPackages, and resourceId has no source on WEB-031 yet (a gap in WEB-031, not in this edge)"
     },
     {
      "to": "GST-014",
@@ -609,7 +609,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formRequestGroupBooking",
     "component": "modal",
     "trigger": "Request group booking",
-    "body": "**Collects what `requestGroupBooking` sends before it is called.** Required: `kind`, `packageProductId`, `preferredDate`, `expectedSize`. Optional: `organisationName`, `yearGroup`, `accessAndDietaryNeeds`, `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `requestGroupBooking` sends before it is called.** Required: `kind`, `packageProductId`, `preferredDate`, `expectedSize`. Optional: `organisationName`, `yearGroup`, `accessAndDietaryNeeds`, `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`. Dismissing sends nothing; the screen behind is unchanged.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 1).** The group ticket is chosen first (`packageProductId`: cards with the per-person price and the minimum group size), then *How many people* (`expectedSize`) as a number box the guest types into or steps with − and + (+10 on the app); no Group size dropdown. The estimate reads *<ticket> · Guests × <n>*.",
     "bindsTo": "GroupBookingRequest",
     "confirm": {
      "label": "Request group booking",
@@ -828,7 +828,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-030",
      "trigger": "Ticket Transfer",
-     "provenance": "derived — WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none of them, so the edge carries nothing and WEB-030 opens cold"
+     "provenance": "derived — WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none of them. The edge carries nothing: orderId, transferId only pre-select (deep link or optional), and WEB-030 opens on its own"
     },
     {
      "to": "WEB-031",

@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import filecmp
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -52,7 +53,22 @@ MIRRORED = ("contracts", "states", "flows", "events", "screens", "docs", "fronte
             "tools", "handoff", "sources", "diagrams")
 
 
-def sync(src: Path, dst: Path) -> tuple[int, int, int]:
+def ignored_at_root() -> set:
+    """Files under the mirrored folders that git ignores at the root (package-relative paths).
+
+    **A file the package keeps out of git is not mirrored** (1 October): the 24 MB single-file guest build
+    in sources/designs/ is excluded at the root and is copied into a refresh worktree as an input, and this
+    copied it into all six mirrors, where nothing ignores it -- 144 MB of untracked files one `git add`
+    away from a commit. The same rule keeps the design videos out."""
+    try:
+        out = subprocess.run(["git", "-C", str(ROOT), "ls-files", "--others", "--ignored", "--exclude-standard",
+                              "-z", "--", *MIRRORED], capture_output=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return set()
+    return {Path(p) for p in out.decode("utf-8", "replace").split("\0") if p}
+
+
+def sync(src: Path, dst: Path, skip: frozenset = frozenset()) -> tuple[int, int, int]:
     added = updated = removed = 0
     wanted: set = set()
 
@@ -64,6 +80,8 @@ def sync(src: Path, dst: Path) -> tuple[int, int, int]:
             if not f.is_file() or "__pycache__" in f.parts:
                 continue
             rel = f.relative_to(src)
+            if rel in skip:
+                continue
             wanted.add(rel)
             target = dst / rel
             if not target.exists():
@@ -116,8 +134,9 @@ def main() -> int:
             targets.append(bible)
 
     total = [0, 0, 0]
+    skip = frozenset(ignored_at_root())
     for t in targets:
-        a, u, r = sync(ROOT, t)
+        a, u, r = sync(ROOT, t, skip)
         total = [total[0] + a, total[1] + u, total[2] + r]
         if a or u or r:
             print(f"  {t.relative_to(ROOT)}: +{a} ~{u} -{r}")

@@ -99,7 +99,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-016 holds none of them, so the edge carries nothing and SCN-001 opens cold"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-016 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -112,7 +112,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SCN-003",
      "trigger": "Ready to scan",
-     "provenance": "derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-016 holds none of them, so the edge carries nothing and SCN-003 opens cold"
+     "provenance": "derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-016 holds none of them. The edge carries nothing: mediaCode, rightId only pre-select (deep link or optional), and SCN-003 opens on its own"
     }
    ]
   },

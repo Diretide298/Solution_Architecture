@@ -105,7 +105,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-009 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-009 holds none of them. The edge carries nothing: GST-009 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "BO-020",
@@ -544,7 +544,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-010 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-010 holds none of them. The edge carries nothing: GST-010 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -777,7 +777,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-041 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-041 holds none of them. The edge carries nothing: GST-041 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-059",
@@ -1045,9 +1045,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-041",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "partial",
     "view": "Cart (header basket, after a booking is added to the cart)",
     "differences": "Basket as a bottom bar on mobile."
@@ -1174,6 +1174,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

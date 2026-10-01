@@ -138,6 +138,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "placeAccessDevice": {
+  "method": "POST",
+  "path": "/device-placements",
+  "contract": "access",
+  "summary": "Place a registered device in the gate topology",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessDevicePlacement",
+  "responds": "AccessDevicePlacement"
+ },
  "publishHardwareDeployment": {
   "method": "POST",
   "path": "/hardware-deployments",
@@ -156,25 +175,6 @@
   ],
   "requestBody": "HardwareDeploymentInput",
   "responds": "HardwareDeploymentView"
- },
- "registerAccessDevice": {
-  "method": "POST",
-  "path": "/access-devices",
-  "contract": "access",
-  "summary": "Register a physical access-control device",
-  "permission": "DEVICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AccessAccessDevice",
-  "responds": "AccessAccessDevice"
  },
  "registerDevice": {
   "method": "POST",
@@ -347,11 +347,11 @@
   "requestBody": "ValidationOutcomeGuestFeedbackDesignerInput",
   "responds": "ValidationOutcomeGuestFeedbackDesignerView"
  },
- "updateAccessDevice": {
+ "updateAccessDevicePlacement": {
   "method": "PUT",
-  "path": "/access-devices/{deviceId}",
+  "path": "/device-placements/{placementId}",
   "contract": "access",
-  "summary": "Replace a registered device's registration",
+  "summary": "Replace a device's placement",
   "permission": "DEVICE_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -363,7 +363,7 @@
     "required": null
    }
   ],
-  "requestBody": "AccessAccessDevice",
-  "responds": "AccessAccessDevice"
+  "requestBody": "AccessDevicePlacement",
+  "responds": "AccessDevicePlacement"
  }
 }

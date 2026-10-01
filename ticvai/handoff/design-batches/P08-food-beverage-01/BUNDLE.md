@@ -106,7 +106,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "provenance": "derived — BO-104 declares entryState.params  and BO-020 holds none of them, so the edge carries nothing and BO-104 opens cold"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-020 holds none of them. The edge carries nothing: BO-020 is opened from BO-104, so this edge is the way back and BO-104 keeps its own state"
     },
     {
      "to": "GST-025",
@@ -597,7 +597,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "provenance": "derived — BO-104 declares entryState.params  and BO-021 holds none of them, so the edge carries nothing and BO-104 opens cold"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-021 holds none of them. The edge carries nothing: BO-021 is opened from BO-104, so this edge is the way back and BO-104 keeps its own state"
     },
     {
      "to": "POS-002",
@@ -778,7 +778,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "provenance": "derived — BO-104 declares entryState.params  and BO-045 holds none of them, so the edge carries nothing and BO-104 opens cold"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-045 holds none of them. The edge carries nothing: BO-045 is opened from BO-104, so this edge is the way back and BO-104 keeps its own state"
     },
     {
      "to": "POS-002",
@@ -1276,7 +1276,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "provenance": "derived — BO-104 declares entryState.params  and BO-046 holds none of them, so the edge carries nothing and BO-104 opens cold"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-046 holds none of them. The edge carries nothing: BO-046 is opened from BO-104, so this edge is the way back and BO-104 keeps its own state"
     }
    ]
   },
@@ -1585,12 +1585,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-020",
      "trigger": "F&B Order Management",
-     "provenance": "derived — BO-020 declares entryState.params orderId, ticketId and BO-104 holds none of them, so the edge carries nothing and BO-020 opens cold"
+     "provenance": "derived — BO-020 declares entryState.params orderId, ticketId and BO-104 holds none of them. The edge carries nothing: orderId, ticketId only pre-select (deep link or optional), and BO-020 opens on its own"
     },
     {
      "to": "BO-021",
      "trigger": "Order Search",
-     "provenance": "derived — BO-021 declares entryState.params orderId and BO-104 holds none of them, so the edge carries nothing and BO-021 opens cold"
+     "provenance": "derived — BO-021 declares entryState.params orderId and BO-104 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional), and BO-021 opens on its own"
     },
     {
      "to": "BO-045",
@@ -1604,22 +1604,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-046",
      "trigger": "Kitchen Display",
-     "provenance": "derived — BO-046 declares entryState.params ticketId and BO-104 holds none of them, so the edge carries nothing and BO-046 opens cold"
+     "provenance": "derived — BO-046 declares entryState.params ticketId and BO-104 holds none of them. The edge carries nothing: ticketId only pre-selects (deep link or optional), and BO-046 opens on its own"
     },
     {
      "to": "BO-134",
      "trigger": "Kitchen & Preparation Stations",
-     "provenance": "derived — BO-134 declares entryState.params  and BO-104 holds none of them, so the edge carries nothing and BO-134 opens cold"
+     "provenance": "derived — BO-134 declares entryState.params  and BO-104 holds none of them. The edge carries nothing: BO-134 needs nothing to open"
     },
     {
      "to": "BO-135",
      "trigger": "Order Routing & KDS/Printer Rules",
-     "provenance": "derived — BO-135 declares entryState.params  and BO-104 holds none of them, so the edge carries nothing and BO-135 opens cold"
+     "provenance": "derived — BO-135 declares entryState.params  and BO-104 holds none of them. The edge carries nothing: BO-135 needs nothing to open"
     },
     {
      "to": "BO-136",
      "trigger": "F&B Global Settings & Controls",
-     "provenance": "derived — BO-136 declares entryState.params planId and BO-104 holds none of them, so the edge carries nothing and BO-136 opens cold"
+     "provenance": "derived — BO-136 declares entryState.params planId and BO-104 holds none of them. The edge carries nothing: planId only pre-selects (deep link or optional), and BO-136 opens on its own"
     }
    ]
   },
@@ -1879,7 +1879,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "provenance": "derived — BO-104 declares entryState.params  and BO-134 holds none of them, so the edge carries nothing and BO-104 opens cold"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-134 holds none of them. The edge carries nothing: BO-134 is opened from BO-104, so this edge is the way back and BO-104 keeps its own state"
     }
    ]
   },
@@ -2101,7 +2101,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "provenance": "derived — BO-104 declares entryState.params  and BO-135 holds none of them, so the edge carries nothing and BO-104 opens cold"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-135 holds none of them. The edge carries nothing: BO-135 is opened from BO-104, so this edge is the way back and BO-104 keeps its own state"
     }
    ]
   },
@@ -2328,7 +2328,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "provenance": "derived — BO-104 declares entryState.params  and BO-136 holds none of them, so the edge carries nothing and BO-104 opens cold"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-136 holds none of them. The edge carries nothing: BO-136 is opened from BO-104, so this edge is the way back and BO-104 keeps its own state"
     }
    ]
   },

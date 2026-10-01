@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 676 |
-| Operations | 718 |
+| Operations | 722 |
 | Contracts | 20 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 162 |
+| Operations with no screen | 164 |
 | Waves | wave1 12 · wave2 16 · wave3 648 |
 
 ## Gaps
 
-### 162 operations with no screen here
+### 164 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -37,8 +37,10 @@
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
 | `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
+| `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
+| `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
 | `authoriseWalletSpend` | cross-region | POST | Hold funds against the guest's home-cell balance |
 | `captureWalletAuthorisation` | cross-region | POST | Capture a held amount |
 | `listCellConnections` | cross-region | GET | Which cells may talk to which |
@@ -53,14 +55,12 @@
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
 | `setFxProvider` | finance | PUT | Which provider serves which purpose |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
-| `getAccessPolicy` | identity | GET | One policy, at a version |
-| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| `getAuthorisationPolicy` | identity | GET | One policy, at a version |
+| `getAuthorisationPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
 | `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
-| `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
-| `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
-| … | | | 122 more |
+| … | | | 124 more |
 
 ### 4 modules split across waves
 
@@ -411,7 +411,7 @@
 | `ADM-315` | Bulk, Group & Assisted Upgrade Operations | Commercial | 3 | 1 | yes |
 | `ADM-316` | Upgrade Execution, Credential Regeneration & Channel Controls | Commercial | 3 | 1 | yes |
 | `ADM-317` | Upgrade History, Exception Management & Audit Explorer | Commercial | 3 | 1 | yes |
-| `ADM-318` | Dead Letters | Platform Ops | 1 | 2 | yes |
+| `ADM-318` | Dead Letters | Platform Ops | 1 | 6 | yes |
 | `ADM-319` | Approval Workflow Library | Platform | 3 | 2 | yes |
 | `ADM-320` | Create Approval Workflow | Platform | 3 | 1 | yes |
 | `ADM-322` | Approval Stage Configuration | Platform | 3 | 1 | yes |

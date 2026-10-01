@@ -561,6 +561,34 @@ def reconcile_keys(plan: dict[str, set], fixed: set, mp: dict, closed: frozenset
         if t not in final and k not in taken:
             final[t] = k
             taken.add(k)
+    # **Greedy can strand a pushed key** (1 October): the waiting-room operations entered the slice, the
+    # four-operation chunks of catalogue/event shifted, and the new second chunk overlapped pushed
+    # SVC-CATALOGUE-EVENT-1 most (3) -- so it took that key, and SVC-CATALOGUE-EVENT-2, whose work
+    # (updateEvent, updatePerformance) was on that same chunk, left the plan: a renamed key. A pushed key
+    # left unmatched while it overlaps planned work is given back by an augmenting path (planned task ->
+    # its key -> another planned task with no key yet that overlaps it), so every pushed key that can keep
+    # its work does. It changes nothing where greedy already matched every overlapping pushed key.
+    adj = defaultdict(list)                      # pushed key -> planned tasks overlapping it, best first
+    for ov, _, _, k, t in sorted(pairs):
+        if ov < 0:
+            adj[k].append(t)
+    owner = {k: t for t, k in final.items() if t not in fixed}
+
+    def augment(k, seen):
+        for t in adj[k]:
+            if t in seen or t in fixed:
+                continue
+            seen.add(t)
+            cur = final.get(t)
+            if cur is None or (cur in adj and augment(cur, seen)):
+                final[t] = k
+                owner[k] = t
+                return True
+        return False
+
+    for k in sorted(adj):
+        if k not in taken and augment(k, set()):
+            taken.add(k)
     notes = []
     for t in sorted(plan):
         if t not in final and t not in pitems and t not in taken:
@@ -1457,6 +1485,11 @@ def main() -> int:
         for e in ex.get("epics") or []:
             task(e["key"], "", "Epic", e["subject"], e["detail"], 1, area=e.get("area", "backend"))
         for t_ in ex.get("tasks") or []:
+            # **A task for a later block is recorded, not ticketed** (1 October): the ADRs of that day name
+            # build work for B1 (the waiting room, the admission rule evaluators), kept beside the Block A
+            # tasks so it is not lost, and cut into tickets when that block is planned.
+            if str(t_.get("block") or "A") != "A":
+                continue
             is_ai = t_["epic"] == "AI-ENGINE"
             pts = "" if is_ai else int(t_["points"])
             who = t_.get("assignee") or (min(backend_, key=lambda x: load[x]) if backend_ else "")

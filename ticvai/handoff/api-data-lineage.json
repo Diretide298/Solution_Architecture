@@ -72658,5 +72658,97 @@
   "audience": [
    "staff"
   ]
+ },
+ "enterWaitingRoom": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/performances/{performanceId}/waiting-room/entries",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Join the on-sale waiting room for a performance",
+  "source": "derived",
+  "audience": [
+   "anonymous",
+   "guest"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getWaitingRoomPosition": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/performances/{performanceId}/waiting-room/entries/{waitingEntryId}",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Where a waiting guest is, and the admission token once admitted",
+  "source": "derived",
+  "audience": [
+   "anonymous",
+   "guest"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getWaitingRoomStatus": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/performances/{performanceId}/waiting-room",
+  "reads": [
+   "catalogue.waiting_room_setting"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "A performance's waiting room, its setting and how it is moving",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWaitingRoomSetting": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/performances/{performanceId}/waiting-room",
+  "reads": [
+   "catalogue.waiting_room_setting"
+  ],
+  "writes": [
+   "catalogue.waiting_room_setting"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PERFORMANCE_CONFIGURE",
+  "offline": false,
+  "summary": "Switch a performance's waiting room on or off, and set how fast it releases",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

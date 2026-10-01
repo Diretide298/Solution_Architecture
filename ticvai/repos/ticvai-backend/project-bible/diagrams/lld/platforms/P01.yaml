@@ -20,18 +20,18 @@ deployment:
 why: null
 modulesUsed:
 - module: ticketing
-  screens: 20
+  screens: 21
 - module: marketing
   screens: 10
 - module: core
   screens: 4
-- module: queue
-  screens: 3
 - module: retail
   screens: 3
 - module: fnb
   screens: 3
 - module: access
+  screens: 2
+- module: queue
   screens: 2
 - module: resources
   screens: 2
@@ -47,9 +47,9 @@ servicesCalled:
 - service: OrderService
   operationCalls: 63
 - service: CatalogueService
-  operationCalls: 46
+  operationCalls: 48
 - service: VenueOpsService
-  operationCalls: 41
+  operationCalls: 38
 - service: IdentityService
   operationCalls: 23
 - service: FnbService
@@ -105,7 +105,6 @@ screens:
   - WEB-004
   - WEB-008
   - WEB-009
-  - WEB-015
   - WEB-016
   - WEB-017
   - WEB-018
@@ -304,6 +303,7 @@ screens:
   - WEB-007
   - WEB-008
   - WEB-010
+  - WEB-015
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-006
   inFlows:
@@ -375,7 +375,6 @@ screens:
   - WEB-001
   - WEB-005
   - WEB-006
-  - WEB-007
   - WEB-010
   - WEB-016
   boardFrames: null
@@ -405,7 +404,6 @@ screens:
   - WEB-001
   - WEB-005
   - WEB-006
-  - WEB-007
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-009
   inFlows: null
@@ -496,7 +494,6 @@ screens:
   - WEB-001
   - WEB-010
   - WEB-012
-  - WEB-013
   - WEB-016
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-011
@@ -595,13 +592,12 @@ screens:
 - screen: WEB-015
   name: Branded Queue / Waiting Room
   module: High-Demand Access
-  requiresModule: queue
+  requiresModule: ticketing
   wave: 2
   density: compact
   operations:
-  - getWaitTimes
-  - getWaitingGuest
-  - joinQueue
+  - enterWaitingRoom
+  - getWaitingRoomPosition
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -610,9 +606,11 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - entryId<-deepLink
+  - performanceId<-WEB-006
+  - waitingEntryId<-WEB-015
   goesTo:
   - WEB-001
+  - WEB-006
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-015
   inFlows: null

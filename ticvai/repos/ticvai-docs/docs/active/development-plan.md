@@ -299,7 +299,7 @@ Everyone now has some work past 2 April, from Surendra's 55 hours to Pranay's 12
 | E-invoicing | A provider adapter; four questions to the client | Client |
 | Availability, biometrics | 99.99% at gate and POS; face templates stay with the vendor | Client |
 
-The client's open questions (30, with hardware and suppliers added on 30 September) are in `handoff/TICVAI - Decisions Register.xlsx`. The decided records are in `docs/adr/`. The drafts still open (availability, replica floors, e-invoicing, encryption, per-tenant limits, the on-sale cache and waiting room, the device register, admission policy, risk ownership) are in `audit/ticvai/steps/SD/adr-drafts/`.
+The client's open questions (30, with hardware and suppliers added on 30 September) are in `handoff/TICVAI - Decisions Register.xlsx`. The architecture decisions are in `docs/adr/` (index: `docs/adr/README.md`). On 1 October ADR-0052, 0053, 0054, 0061 (replica floors), 0064 (per-tenant limits), 0066 (the on-sale waiting room), 0067 (one device register) and 0068 (admission policy in Access) were accepted there; four are still **Proposed** in the same folder and wait on a decision: ADR-0060 (availability and HA), ADR-0062 (e-invoicing), ADR-0063 (encryption and biometric templates) and ADR-0065 (the on-sale availability cache).
 
 ## 11. Release checklist
 

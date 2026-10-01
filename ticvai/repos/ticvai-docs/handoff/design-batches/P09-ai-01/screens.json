@@ -25,7 +25,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-037 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-037 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "BO-091",

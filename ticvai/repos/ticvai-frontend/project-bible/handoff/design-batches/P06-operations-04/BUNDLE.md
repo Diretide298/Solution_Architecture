@@ -118,17 +118,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-035 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-035 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-035 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-035 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-035 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-035 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -363,17 +363,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-036 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-036 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-036 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-036 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-036 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-036 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -565,17 +565,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-037 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-037 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-037 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-037 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-037 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-037 holds none of them. The edge carries nothing: EMP-037 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     }
    ]
   },
@@ -868,17 +868,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-039 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-039 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-039 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-039 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-039 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-039 holds none of them. The edge carries nothing: EMP-039 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     }
    ]
   },
@@ -1139,17 +1139,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-038 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-038 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-038 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-038 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-038 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-038 holds none of them. The edge carries nothing: EMP-038 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     }
    ]
   },
@@ -1413,17 +1413,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-040 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-040 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-040 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-040 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-040 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-040 holds none of them. The edge carries nothing: EMP-040 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     }
    ]
   },
@@ -1544,17 +1544,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-041 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-041 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-041 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-041 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-041 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-041 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -1736,17 +1736,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-042 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-042 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-042 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-042 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-042 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-042 holds none of them. The edge carries nothing: EMP-042 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     }
    ]
   },
@@ -2066,17 +2066,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-043 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-043 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-043 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-043 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-043 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-043 holds none of them. The edge carries nothing: EMP-043 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     }
    ]
   },
@@ -2307,17 +2307,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-044 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-044 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-044 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-044 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-044 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-044 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -3159,9 +3159,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "DeviceCapability": {
   "type": "string",
-  "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n",
+  "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n**Access's capabilities merged in** (ADR-0067, 1 October): `dynamicQr`, `rfid`, `nfc`, `facePass`, `offline` and `heightCheck` were the access register's own list, from the compatibility matrix.\n",
   "enum": [
-   "genderClassification"
+   "genderClassification",
+   "dynamicQr",
+   "rfid",
+   "nfc",
+   "facePass",
+   "offline",
+   "heightCheck"
   ]
  },
  "DeviceKind": {
@@ -3187,9 +3193,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "signaturePad",
    "scale",
    "camera",
-   "mobileHandset"
+   "mobileHandset",
+   "handheldScanner",
+   "accessPodium",
+   "bleBeacon"
   ],
-  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n"
+  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n**One kind vocabulary for every device** (ADR-0067, 1 October). `handheldScanner`, `accessPodium` and `bleBeacon` came from Access's register; the finer hardware type (a speed gate under `turnstileController`, a tablet under `handheldScanner`) is `RegisteredDevice.hardwareType` (common `DeviceHardwareType`).\n"
  },
  "EntitlementStatus": {
   "type": "string",
@@ -4022,7 +4031,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "RegisteredDevice": {
   "x-ticvai-persistence": "platform.device",
   "type": "object",
-  "description": "**The device register of record** (decided 29 September, build pass). Identity, enrolment, credential, firmware and push registration for every device in the estate live on this row. `access.access_device` places access-control devices in the gate topology and repeats serial, versions, health and lifecycle; the two are not merged yet, and where they disagree this row wins.\n",
+  "description": "**The only device register** (ADR-0067, accepted 1 October; the register of record since 29 September). Identity (kind, hardware type, model, serial), every version (firmware, configuration, rule package, credential package), health, heartbeat and one lifecycle (`enrolmentState`: registered, enrolled, provisioned, active, deactivated, retired) for every device in the estate live on this row. The access-control device row, which repeated serial, versions, health and lifecycle, is now `access.device_placement` and holds only where an access-control device is placed. Tenancy owns and migrates this table; Access reads it only through this contract.\n",
   "required": [
    "id",
    "kind",
@@ -4049,11 +4058,74 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September); `registerDevice` refuses either mistake with `422`.\n"
+    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September), and except an access-control device (one with a `hardwareType`), which is placed in the gate topology by access `placeAccessDevice` rather than bound to a workstation (ADR-0067); `registerDevice` refuses either mistake with `422`.\n"
    },
    "model": {
     "type": "string",
     "nullable": true
+   },
+   "hardwareType": {
+    "$ref": "../shared/common.yaml#/components/schemas/DeviceHardwareType",
+    "nullable": true,
+    "description": "**The specific hardware under `kind`** (ADR-0067, 1 October): Access's hardware types (a speed gate, a tripod turnstile, a podium) merged into the one register. Null for a device with no finer type than its kind.\n"
+   },
+   "hardwareModelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The model in the hardware library (access `setHardwareModel`; ADR-0067). Access owns the library; this names a model in it.\n"
+   },
+   "serialNumber": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 100,
+    "description": "The manufacturer's serial (ADR-0067: was on the access-control device row, now `access.device_placement`). A serial already registered in the tenant is refused `409` by `registerDevice`.\n"
+   },
+   "ipNetworkReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "Network address or reference the device is reached at (ADR-0067)."
+   },
+   "configurationVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Access configuration version the device reports running (ADR-0067)."
+   },
+   "localRuleVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Admission rule package the device reports running (ADR-0067)."
+   },
+   "credentialSecurityPackageVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Credential security package the device reports running (ADR-0067)."
+   },
+   "scannerHealth": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Component health as the device or vendor reports it on its heartbeat (ADR-0067)."
+   },
+   "controllerHealth": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "cameraHealth": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the device has a camera."
+   },
+   "connectivity": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Reported connectivity."
    },
    "pushToken": {
     "type": "string",
@@ -4108,9 +4180,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "error",
      "consumableLow",
      "needsAttention",
+     "localMode",
      "unknown"
     ],
-    "description": "What the device last said on its heartbeat; `unknown` until it has."
+    "description": "What the device last said on its heartbeat; `unknown` until it has. `localMode` is an access-control device validating from its offline package with its link down (ADR-0067).\n"
    },
    "batteryPercent": {
     "type": "integer",

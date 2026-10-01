@@ -355,7 +355,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "KIT-001",
      "trigger": "Kitchen Operations Command Center",
-     "provenance": "derived — KIT-001 declares entryState.params  and KIT-002 holds none of them, so the edge carries nothing and KIT-001 opens cold"
+     "provenance": "derived — KIT-001 declares entryState.params  and KIT-002 holds none of them. The edge carries nothing: KIT-002 is opened from KIT-001, so this edge is the way back and KIT-001 keeps its own state"
     },
     {
      "to": "KIT-003",
@@ -823,7 +823,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "KIT-001",
      "trigger": "Kitchen Operations Command Center",
-     "provenance": "derived — KIT-001 declares entryState.params  and KIT-003 holds none of them, so the edge carries nothing and KIT-001 opens cold"
+     "provenance": "derived — KIT-001 declares entryState.params  and KIT-003 holds none of them. The edge carries nothing: KIT-003 is opened from KIT-001, so this edge is the way back and KIT-001 keeps its own state"
     },
     {
      "to": "KIT-004",
@@ -1389,7 +1389,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "KIT-001",
      "trigger": "Kitchen Operations Command Center",
-     "provenance": "derived — KIT-001 declares entryState.params  and KIT-005 holds none of them, so the edge carries nothing and KIT-001 opens cold"
+     "provenance": "derived — KIT-001 declares entryState.params  and KIT-005 holds none of them. The edge carries nothing: KIT-005 is opened from KIT-001, so this edge is the way back and KIT-001 keeps its own state"
     }
    ]
   },
@@ -1635,7 +1635,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "KIT-001",
      "trigger": "Kitchen Operations Command Center",
-     "provenance": "derived — KIT-001 declares entryState.params  and KIT-006 holds none of them, so the edge carries nothing and KIT-001 opens cold"
+     "provenance": "derived — KIT-001 declares entryState.params  and KIT-006 holds none of them. The edge carries nothing: KIT-006 is opened from KIT-001, so this edge is the way back and KIT-001 keeps its own state"
     },
     {
      "to": "KIT-002",
@@ -1979,7 +1979,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "KIT-001",
      "trigger": "Kitchen Operations Command Center",
-     "provenance": "derived — KIT-001 declares entryState.params  and KIT-007 holds none of them, so the edge carries nothing and KIT-001 opens cold"
+     "provenance": "derived — KIT-001 declares entryState.params  and KIT-007 holds none of them. The edge carries nothing: KIT-007 is opened from KIT-001, so this edge is the way back and KIT-001 keeps its own state"
     }
    ]
   },
@@ -2228,7 +2228,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "KIT-001",
      "trigger": "Kitchen Operations Command Center",
-     "provenance": "derived — KIT-001 declares entryState.params  and KIT-008 holds none of them, so the edge carries nothing and KIT-001 opens cold"
+     "provenance": "derived — KIT-001 declares entryState.params  and KIT-008 holds none of them. The edge carries nothing: KIT-008 is opened from KIT-001, so this edge is the way back and KIT-001 keeps its own state"
     }
    ]
   },
@@ -2547,7 +2547,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "KIT-001",
      "trigger": "Kitchen Operations Command Center",
-     "provenance": "derived — KIT-001 declares entryState.params  and KIT-009 holds none of them, so the edge carries nothing and KIT-001 opens cold"
+     "provenance": "derived — KIT-001 declares entryState.params  and KIT-009 holds none of them. The edge carries nothing: KIT-009 is opened from KIT-001, so this edge is the way back and KIT-001 keeps its own state"
     }
    ]
   },
@@ -2753,7 +2753,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "KIT-001",
      "trigger": "Kitchen Operations Command Center",
-     "provenance": "derived — KIT-001 declares entryState.params  and KIT-010 holds none of them, so the edge carries nothing and KIT-001 opens cold"
+     "provenance": "derived — KIT-001 declares entryState.params  and KIT-010 holds none of them. The edge carries nothing: KIT-010 is opened from KIT-001, so this edge is the way back and KIT-001 keeps its own state"
     }
    ]
   },

@@ -20,7 +20,7 @@ deployment:
 why: null
 modulesUsed:
 - module: ticketing
-  screens: 30
+  screens: 31
 - module: core
   screens: 12
 - module: marketing
@@ -29,10 +29,10 @@ modulesUsed:
   screens: 7
 - module: access
   screens: 4
-- module: queue
-  screens: 4
 - module: transport
   screens: 4
+- module: queue
+  screens: 3
 - module: retail
   screens: 2
 - module: seating
@@ -47,9 +47,9 @@ servicesCalled:
 - service: OrderService
   operationCalls: 77
 - service: CatalogueService
-  operationCalls: 60
+  operationCalls: 62
 - service: VenueOpsService
-  operationCalls: 54
+  operationCalls: 51
 - service: MarketingService
   operationCalls: 46
 - service: IdentityService
@@ -151,7 +151,6 @@ screens:
   - GST-043
   - GST-044
   - GST-045
-  - GST-046
   - GST-047
   - GST-048
   - GST-049
@@ -367,6 +366,7 @@ screens:
   - GST-002
   - GST-003
   - GST-008
+  - GST-046
   - GST-049
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-007
@@ -789,7 +789,9 @@ screens:
   - emptyNoResults
   - error
   - loading
+  - map3dUnavailable
   - offline
+  - weakGps
   offlineState: true
   entryParams:
   - mapId<-deepLink
@@ -1279,7 +1281,9 @@ screens:
   - emptyNoResults
   - error
   - loading
+  - map3dUnavailable
   - offline
+  - weakGps
   offlineState: true
   entryParams: []
   goesTo:
@@ -1506,13 +1510,12 @@ screens:
 - screen: GST-046
   name: Branded Queue / Waiting Room
   module: High-Demand Access
-  requiresModule: queue
+  requiresModule: ticketing
   wave: 1
   density: comfortable
   operations:
-  - getWaitTimes
-  - getWaitingGuest
-  - joinQueue
+  - enterWaitingRoom
+  - getWaitingRoomPosition
   states:
   - emptyFirstRun
   - error
@@ -1520,10 +1523,12 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - entryId<-deepLink
+  - performanceId<-GST-007
+  - waitingEntryId<-GST-046
   goesTo:
   - GST-001
   - GST-002
+  - GST-007
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-046
   inFlows: null
@@ -2329,6 +2334,7 @@ screens:
   offlineState: true
   entryParams:
   - favouriteId<-GST-079
+  - routeId<-navigation
   goesTo:
   - GST-001
   - GST-077

@@ -86,6 +86,7 @@ Board 2C. **Retire a season, reprice a category, change a tax class across two h
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | The preview, or the result with per-item outcomes |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listSerialisedItems
 
@@ -138,6 +139,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Items |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: item
@@ -231,6 +233,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
 | 409 |  | SKU already in use in this venue |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setInventoryKitDefinition
 
@@ -289,6 +292,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | 200 |  | Set |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | A component that is itself a kit, the kit named as its own component, a component of another venue, or a kit item that already has movements of its own. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateInventoryItem
 
@@ -370,6 +374,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | Attempt to change costing method or base unit after movements exist |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: receipt
@@ -456,6 +461,7 @@ Receipt increments stock and creates the accrual the invoice will later match ag
 |---|---|---|
 | 201 |  | Received; stock incremented |
 | 409 |  | Over-receipt beyond VenueSettings.inventory.overReceiptTolerancePercent (proposed default 5, audit R094), or the purchase order is closed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### rejectReceivedGoods
 
@@ -533,6 +539,7 @@ Quality failure, damage, wrong item, expiry too near. Reverses the stock increme
 | 200 |  | Rejected; stock reversed and a return raised |
 | 400 |  | reason is other with no note (audit R222). |
 | 409 |  | A line rejects more than was received and not already rejected on it, or names a lineId the receipt does not hold (audit R171) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 

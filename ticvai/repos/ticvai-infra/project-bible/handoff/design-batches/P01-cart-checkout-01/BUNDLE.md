@@ -633,7 +633,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "WEB-001",
     "WEB-010",
     "WEB-012",
-    "WEB-013",
     "WEB-016"
    ],
    "transitions": [
@@ -646,11 +645,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      ],
      "returnsTo": "WEB-011",
      "provenance": "ADR-0045, 18 September 2026 — the gate is the checkout page, not the cart; moved from WEB-010 where it was placed on 17 September"
-    },
-    {
-     "to": "WEB-013",
-     "trigger": "Booking Confirmation",
-     "provenance": "derived — WEB-013 declares entryState.params orderId and WEB-011 holds none of them, so the edge carries nothing and WEB-013 opens cold"
     },
     {
      "to": "WEB-012",
@@ -1250,7 +1244,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-011",
      "trigger": "Guest Details & Attendee Forms",
-     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId and WEB-012 holds none of them, so the edge carries nothing and WEB-011 opens cold"
+     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId and WEB-012 holds none of them. The edge carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back and WEB-011 keeps its own state"
     },
     {
      "to": "WEB-016",
@@ -1600,7 +1594,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-011",
      "trigger": "Guest Details & Attendee Forms",
-     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId and WEB-013 holds none of them, so the edge carries nothing and WEB-011 opens cold"
+     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId and WEB-013 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and WEB-011 opens on its own"
     },
     {
      "to": "WEB-012",
@@ -1622,7 +1616,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-014",
      "trigger": "Pay for a Booking",
-     "provenance": "derived — WEB-014 declares entryState.params token and WEB-013 holds none of them, so the edge carries nothing and WEB-014 opens cold"
+     "provenance": "derived — WEB-014 declares entryState.params token and WEB-013 holds none of them. The edge carries nothing: token only pre-selects (deep link or optional), and WEB-014 opens on its own"
     }
    ]
   },
@@ -2060,6 +2054,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

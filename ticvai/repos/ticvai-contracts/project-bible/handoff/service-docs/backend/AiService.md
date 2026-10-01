@@ -135,6 +135,7 @@ BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Proposed as drafts, for review |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### proposeVenueLabels
 
@@ -169,6 +170,7 @@ Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Proposals, for review. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### requestSuggestion
 
@@ -252,6 +254,7 @@ Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
 |---|---|---|
 | 200 |  | The suggestion, with its basis and its reasoning |
 | 422 |  | A setting the answer cannot do without is missing (29 September, AI functions review). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAiCredential
 
@@ -326,6 +329,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 |---|---|---|
 | 200 |  | Stored, with a reference and no secret |
 | 409 |  | The provider is TICVAI-managed; its key is provisioned by the platform (provider-managed-by-ticvai). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setSuggestionProvider
 
@@ -384,6 +388,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: assist
@@ -440,6 +445,7 @@ Scoped to a module and a role, because the same question means different things 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Opened |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listAiConversations
 
@@ -488,6 +494,7 @@ Scoped to a module and a role, because the same question means different things 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Conversations |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### sendAiMessage
 
@@ -661,6 +668,7 @@ Providers, models and policy
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Policy |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAiByokEnablement
 
@@ -725,6 +733,7 @@ Providers, models and policy
 | 200 |  | Enable or disable bring-your-own-key for a tenant (platform) |
 | 403 |  | No platform-staff grant into this tenant is open (platform-grant-required, audit R098). |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAiPolicy
 
@@ -855,6 +864,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 |---|---|---|
 | 200 |  | Set — the row at scopePath existed and is replaced |
 | 201 |  | Set — this created the row at scopePath |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAiProvider
 
@@ -957,6 +967,7 @@ Credentials are a key-vault reference, never the key.
 | 403 |  | The caller lacks PLATFORM_TENANT_MANAGE on their platform token, or has no platform-staff grant into this tenant open (platform-grant-required, audit R203). |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The provider's residency is not in the tenant's region's allowedAiResidencies (residency-refused, audit R203), or it is tenant-managed (managedBy is tenant) and bring-your-own-key is not enabled for… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: configure
@@ -1020,6 +1031,7 @@ The configuration assistant and Help me choose suggestions (design C7)
 |---|---|---|
 | 200 |  | The reasons behind a Help me choose suggestion |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### suggestGuidedChoice
 
@@ -1088,6 +1100,7 @@ The configuration assistant and Help me choose suggestions (design C7)
 | 202 |  | Accepted: suggest a Help me choose set-up from the venue's catalogue |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | A suggestion for this venue is already running (suggestion-in-progress). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: forecast
@@ -1157,6 +1170,7 @@ Forecasting and operational requirements (design C8)
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Accepted: run a what-if |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### decideOperationalRequirement
 
@@ -1221,6 +1235,7 @@ Forecasting and operational requirements (design C8)
 | 200 |  | Accept, modify or reject a requirement |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The requirement is no longer issued (requirement-not-open). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getAiVenueSettings
 
@@ -1279,6 +1294,7 @@ Forecasting and operational requirements (design C8)
 |---|---|---|
 | 200 |  | The venue AI settings. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getVenueHistoryImport
 
@@ -1338,6 +1354,7 @@ The job's status, rows read, loaded and rejected, and each finding (a bad date, 
 |---|---|---|
 | 200 |  | The import |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### importVenueHistory
 
@@ -1410,6 +1427,7 @@ The job's status, rows read, loaded and rejected, and each finding (a bad date, 
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | An import of this venue and kind is already running (history-import-in-progress). |
 | 422 |  | The mapping names no date or no measure column, or the asset is not a CSV or spreadsheet (history-mapping-invalid). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listVenueHistoryImports
 
@@ -1473,6 +1491,7 @@ Imports of the venue's own history, newest first, with the months each covered a
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Imports |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishForecastVersion
 
@@ -1547,6 +1566,7 @@ Imports of the venue's own history, newest first, with the months each covered a
 | 200 |  | Publish a forecast version |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Not publishable: a quality gate failed (quality-gate-failed) or the version is not the latest draft (version-not-current). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### runForecast
 
@@ -1614,6 +1634,7 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 | 202 |  | Accepted: run a forecast now |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | A run of this definition is in progress. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAiVenueSettings
 
@@ -1699,6 +1720,7 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 |---|---|---|
 | 200 |  | Set |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: generate
@@ -1870,6 +1892,7 @@ Logging, approval, explainability and cost
 | 201 |  | Registered: the key had no entry |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The requested autonomyLevel is above the capability's autonomyCeiling (AIC-151). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createAiGovernancePolicyDraft
 
@@ -1955,6 +1978,7 @@ Logging, approval, explainability and cost
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Draft a governance policy, or a new version of one |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createAiPolicyException
 
@@ -2023,6 +2047,7 @@ Logging, approval, explainability and cost
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Grant a temporary exception to a governance policy |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### decideProposedAction
 
@@ -2093,6 +2118,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | 202 |  | Routed to Approvals — a tier 2 or matrix-caught action; approvalRequestId names the request that decides it |
 | 403 |  | The caller may not decide this proposal (audit R213 (3)): a level 2 proposal and the caller lacks AI_APPROVE (approval-level-requires-manager), a level 2 proposal the caller prompted themselves (appr… |
 | 409 |  | The action is no longer proposed — already decided, or expired (7 days after it was proposed, audit R213). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### evaluateAiGovernance
 
@@ -2150,6 +2176,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Ask the governance decision point (service callers) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getAiUsage
 
@@ -2213,6 +2240,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Usage |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishAiGovernancePolicy
 
@@ -2277,6 +2305,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | 200 |  | Publish a simulated policy version |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Not publishable: the version has not been simulated (policy-not-simulated), or the caller drafted it (approver-is-requester). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### resumeAiCapability
 
@@ -2343,6 +2372,7 @@ Resuming needs more authority than pausing (`AI_APPROVE`): stopping is always sa
 | 200 |  | Resume a paused capability |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Not paused. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### simulateAiGovernancePolicy
 
@@ -2398,6 +2428,7 @@ Resuming needs more authority than pausing (`AI_APPROVE`): stopping is always sa
 | 200 |  | Test a draft policy before it is published |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The version is not a draft (already published or superseded). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: insights
@@ -2478,12 +2509,13 @@ Moves an insight along new → reviewed → accepted/rejected → actioned (AIP-
 | 200 |  | Review, accept, reject or mark an insight actioned |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The move is not allowed from the insight's state. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### explainMetricChange
 
 **`POST /insights/explain-metric-change`**: Why did this metric change
 
-**Root cause over the semantic layer** (AIP-176..180; ANL-056, ADM-506). Decomposes the change in a governed metric by its dimensions, computed by Reporting on the analytical replica where RLS applies. **A number in the narrative can only come from a query result** (design 5.7, decision 29 September). Kept as a `rootCause` insight when `keep` is true.
+**Root cause over the semantic layer** (AIP-176..180; ANL-056, ADM-506). Decomposes the change in a governed metric by its dimensions, computed by Reporting on the analytical replica where RLS applies. **A number in the narrative can only come from a query result** (design 5.7, decision 29 September). **The decomposition by channel, product and time is plain arithmetic; the model only words the result** (ADR-0054, accepted 1 October). Kept as a `rootCause` insight when `keep` is true.
 
 |  |  |
 |---|---|
@@ -2543,6 +2575,7 @@ Moves an insight along new → reviewed → accepted/rejected → actioned (AIP-
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Why did this metric change |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: knowledge
@@ -2622,6 +2655,7 @@ Knowledge gaps, answer feedback and assistant profiles (design C4, C5)
 | 200 |  | Define an assistant profile |
 | 201 |  | Created: the key had no profile |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordAnswerFeedback
 
@@ -2679,6 +2713,7 @@ One label per message per person (AIC-062): helpful or not, and why. Guests can 
 |---|---|---|
 | 201 |  | Say whether an answer helped |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: models
@@ -2748,6 +2783,7 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 | 200 |  | Promote a release to its next stage (a person) |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Not promotable: the gate has not passed (gate-not-passed), an isolation case failed (isolation-cases-failed), or the stage cannot follow the current one (stage-out-of-order). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishPromptTemplate
 
@@ -2809,6 +2845,7 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 |---|---|---|
 | 201 |  | Publish a prompt template version |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### rollbackAiRelease
 
@@ -2870,6 +2907,7 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 | 200 |  | Roll a release back |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Nothing to roll back to (no-previous-release). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### runAiEvaluation
 
@@ -2929,6 +2967,7 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Accepted: evaluate a candidate |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAiModel
 
@@ -3036,6 +3075,7 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | 200 |  | Add or change a platform model (platform) |
 | 201 |  | Created |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: monitoring
@@ -3110,6 +3150,7 @@ Records containment and performs it: pause a capability, roll back a release, re
 | 200 |  | Contain an incident |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The incident is closed (incident-closed). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: recommend
@@ -3186,6 +3227,7 @@ The recommendation and upsell engine (design C11)
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Fill a recommendation slot |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordRecommendationEvents
 
@@ -3228,6 +3270,7 @@ Impressions, clicks, add-to-cart, dismissals and explicit declines, batched. A `
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Accepted: report what happened to recommended items |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: retrieval
@@ -3298,6 +3341,7 @@ Approved enterprise knowledge sources (8.4.38) — operating procedures, policie
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### ingestKnowledgeDocument
 
@@ -3369,6 +3413,7 @@ Sending both, or naming a document in another collection or in a state the trans
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Accepted for indexing |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### reindexSource
 
@@ -3428,6 +3473,7 @@ Needed for three reasons and worth naming them: the embedding model changed, the
 |---|---|---|
 | 202 |  | Rebuilding |
 | 409 |  | Already rebuilding |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### semanticSearch
 
@@ -3471,6 +3517,7 @@ Results are scoped to the principal, and each carries the collection it came fro
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Results |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setIndexSource
 
@@ -3543,6 +3590,7 @@ Names the table, the fields that carry retrievable text, the collection it lands
 |---|---|---|
 | 200 |  | Declared — the table's existing declaration replaced |
 | 201 |  | Declared — the table had no declaration |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 
@@ -4430,7 +4478,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | capacity | integer | no |  |
 | typical_weekday_attendance | integer | no |  |
 | typical_weekend_attendance | integer | no |  |
-| peak_months | text[] | no |  |
+| peak_months | integer[] | no |  |
 | average_spend | numeric(18,4) | no |  |
 | fnb_attach_rate | numeric | no |  |
 | staff_productivity | jsonb | no | Per role, units per staff hour, e.g. |

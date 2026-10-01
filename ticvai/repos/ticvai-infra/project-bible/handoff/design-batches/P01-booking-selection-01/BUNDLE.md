@@ -124,7 +124,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them, so the edge carries nothing and WEB-008 opens cold"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them. The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on WEB-008 yet (a gap in WEB-008, not in this edge)"
     },
     {
      "to": "WEB-010",
@@ -367,12 +367,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-005",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build)",
+    "verified": "2026-10-01",
     "match": "partial",
-    "view": "Header 'Book' (or any card's Book) → step 1 'Tickets' of the booking stepper; e.g. Tidewater Museum → 'Category → subcategory tickets'",
-    "differences": "Ticket choice is on the same step as date and time and comes last: 'Date → time → ticket' (Config 'Performance reveal', Rev 3 item 2), whereas YAML goes WEB-005 → WEB-006. Prototype adds category → subcategory browsing, info-only (not bookable) products, 'Help me choose' questions, location switcher ('Booking at' bar), quick tour. Promo codes are entered in the cart, not on this step (YAML keeps evaluatePromotions here)."
+    "view": "Engine controls → Theme park → Multi-park combo → Book → Fri → 2 park ticket → three adults (the counters take the 2 park ticket's price; one cart line)",
+    "differences": "Ticket choice is on the same step as date and time and comes last: 'Date → time → ticket' (Config 'Performance reveal', Rev 3 item 2), whereas YAML goes WEB-005 → WEB-006. Prototype adds category → subcategory browsing, info-only (not bookable) products, 'Help me choose' questions, location switcher ('Booking at' bar), quick tour. Promo codes are entered in the cart, not on this step (YAML keeps evaluatePromotions here). 30 September: the guest counters take their price from the ticket chosen (2 park ticket, three adults: one line, AED 1,425), and Group / school booking starts from four group tickets with a typed headcount. The same flow's Read more panel still prices guests at single-park rates (Adult AED 325, Infant AED 475): a prototype defect; the counters on the page are the reference."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -430,7 +430,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "provenance": "client-verified"
    }
   ],
-  "notes": "**Rev 3 (decided 29 September).** **Order (REV3-2):** in the dated flow the guest picks the date, then the time (WEB-006), then tickets here: tickets stay hidden until a time is picked and Continue stays off until both are chosen, per `BookingFlowConfig.performanceReveal` (`dateTimeTicket` default, `allAtOnce` shows all). The two steps may render as one staged page. This screen may also render as a side panel on WEB-002 and WEB-004 (23SEP-5). **Sign-in (REV3-3):** with `signInAt` `afterAddOns` (default) the sign-in or guest code is asked when the guest leaves Add-ons (WEB-008), or on Continue here when the booking has no add-ons step; `atPayment` asks at WEB-012. The basket is kept either way. **Filters:** categories (REV3-16), experience and level (REV3-19). **Info-only** products show their label and open details (REV3-14). **Help me choose** (REV3-11) is a region and a pop-up of this step, not a screen of its own: the prototype draws it as a dialog over the booking step with a banner under the products. **Quick tour** (REV3-20). **Cart (REV3-10):** `cartLayout` may be `floatingIcon`, a round basket button with the count that opens the cart; the cart stays on the right in Arabic unless `cartSideInRtl` is `mirror`. Card layout, size and density are enums (DG-6). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** W4: Help me choose filters. W8: in a product-first flow (workshop) this step comes first and the date follows. W5: surf levels appear only after a time slot.",
+  "notes": "**Rev 3 (decided 29 September).** **Order (REV3-2):** in the dated flow the guest picks the date, then the time (WEB-006), then tickets here: tickets stay hidden until a time is picked and Continue stays off until both are chosen, per `BookingFlowConfig.performanceReveal` (`dateTimeTicket` default, `allAtOnce` shows all). The two steps may render as one staged page. This screen may also render as a side panel on WEB-002 and WEB-004 (23SEP-5). **Sign-in (REV3-3):** with `signInAt` `afterAddOns` (default) the sign-in or guest code is asked when the guest leaves Add-ons (WEB-008), or on Continue here when the booking has no add-ons step; `atPayment` asks at WEB-012. The basket is kept either way. **Filters:** categories (REV3-16), experience and level (REV3-19). **Info-only** products show their label and open details (REV3-14). **Help me choose** (REV3-11) is a region and a pop-up of this step, not a screen of its own: the prototype draws it as a dialog over the booking step with a banner under the products. **Quick tour** (REV3-20). **Cart (REV3-10):** `cartLayout` may be `floatingIcon`, a round basket button with the count that opens the cart; the cart stays on the right in Arabic unless `cartSideInRtl` is `mirror`. Card layout, size and density are enums (DG-6). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** W4: Help me choose filters. W8: in a product-first flow (workshop) this step comes first and the date follows. W5: surf levels appear only after a time slot.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 1 and 2).** **Guest counters take the chosen ticket's prices:** the guest types (adult, child, senior, infant) are the chosen product's variants and are priced from it (`listProductVariants`), so *2 park ticket* with three adults is one line, *2 park ticket · Adult × 3*, never a ticket line plus a separate adult line; child and senior follow the chosen ticket, and an infant stays free where the ticket says so. **Group and school booking starts from the group tickets** (in the client build: School, Corporate, Tour operator and Community), each card with its per-person price and minimum group size, then **How many people** as a number box the guest can type into (for example 45) or step with − and + (the app adds a +10 step); there is no Group size dropdown. The estimate reads *<ticket> · Guests × <n>*, and the request is `requestGroupBooking` with the group ticket as `packageProductId` and the headcount as `expectedSize`. Supervisors listed separately and free, and a water-park group choosing a session, are not in the contract yet (questions of 1 October).",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -485,7 +485,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "WEB-005",
     "WEB-007",
     "WEB-008",
-    "WEB-010"
+    "WEB-010",
+    "WEB-015"
    ],
    "transitions": [
     {
@@ -499,7 +500,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them, so the edge carries nothing and WEB-008 opens cold"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them. The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on WEB-008 yet (a gap in WEB-008, not in this edge)"
     },
     {
      "to": "WEB-010",
@@ -509,6 +510,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "cartId"
      ]
+    },
+    {
+     "to": "WEB-015",
+     "trigger": "Adds tickets for a performance whose on-sale waiting room is on",
+     "operation": "addCartLine",
+     "precondition": "`addCartLine` refused `403 admission-required`: this performance's room is on and the page holds no admission token for it",
+     "carries": [
+      "performanceId"
+     ],
+     "returnsTo": "WEB-006",
+     "provenance": "ADR-0066 (accepted 1 October 2026) and its 1 October amendment"
     },
     {
      "to": "WEB-007",
@@ -522,7 +534,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
-  "notes": "Availability is read live and never cached beyond a few seconds. A guest selecting a session that filled while they were reading is a worse outcome than a slightly slower screen. **Wired 24 August from review**: acquireInventoryHold. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.\n\n**Rev 3 (decided 29 September).** **Date → time → ticket (REV3-2):** this step now comes before the ticket choice (WEB-005); the time sits right after the date and stays hidden until a date is picked, and tickets stay hidden until a time is picked (`BookingFlowConfig.performanceReveal`, default `dateTimeTicket`; `allAtOnce` shows everything). **Times (REV3-1):** compact tiles paged `timesPerPage` at a time, with Morning / Afternoon / Evening chips and counts (`dayPartFilter`, boundaries per venue, default before 12:00, 12:00-17:00, from 17:00, venue time zone). **Seated events (REV3-4, REV3-7):** `seatEventDateMode` `inlineStep` keeps this step before the seat map; `popupOnSeatMap` asks the date and time in a pop-up over WEB-007 instead. **This step is skipped when the event has exactly one on-sale performance.** For a seated event this step and WEB-007 may render as one page (date, time, show — plus language and format for cinema — and the seat map). **Language (REV3-17)**, **experience and level with a four-day calendar (REV3-19)**, **Booking at (REV3-18)**, **Quick tour (REV3-20)**. **Consent questions (REV3-26)** pop up once after the session or date is picked; the prototype's *Swim consent pop-up (on/off)* toggle is dropped because questions are attached per product or flow. Per-guest age and height eligibility, guardian signature and *Remove this guest* are `checkBookingEligibility`, unchanged (DG-3). **Guest-facing copy may say *Session*** (CFG-10, a glossary exception like *Booking* under audit R145); code and contracts keep `Performance`. Floating basket icon and cart side (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** M17-08: the date strip shows the next seven days, with a calendar for later dates. W5: surf products (beginner, intermediate …) only after a time slot. W8: the date-first default no longer overrides product-first flows: order comes from the flow. W11: tours stay date → language → time slot, unchanged.",
+  "notes": "Availability is read live and never cached beyond a few seconds. A guest selecting a session that filled while they were reading is a worse outcome than a slightly slower screen. **Wired 24 August from review**: acquireInventoryHold. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.\n\n**Rev 3 (decided 29 September).** **Date → time → ticket (REV3-2):** this step now comes before the ticket choice (WEB-005); the time sits right after the date and stays hidden until a date is picked, and tickets stay hidden until a time is picked (`BookingFlowConfig.performanceReveal`, default `dateTimeTicket`; `allAtOnce` shows everything). **Times (REV3-1):** compact tiles paged `timesPerPage` at a time, with Morning / Afternoon / Evening chips and counts (`dayPartFilter`, boundaries per venue, default before 12:00, 12:00-17:00, from 17:00, venue time zone). **Seated events (REV3-4, REV3-7):** `seatEventDateMode` `inlineStep` keeps this step before the seat map; `popupOnSeatMap` asks the date and time in a pop-up over WEB-007 instead. **This step is skipped when the event has exactly one on-sale performance.** For a seated event this step and WEB-007 may render as one page (date, time, show — plus language and format for cinema — and the seat map). **Language (REV3-17)**, **experience and level with a four-day calendar (REV3-19)**, **Booking at (REV3-18)**, **Quick tour (REV3-20)**. **Consent questions (REV3-26)** pop up once after the session or date is picked; the prototype's *Swim consent pop-up (on/off)* toggle is dropped because questions are attached per product or flow. Per-guest age and height eligibility, guardian signature and *Remove this guest* are `checkBookingEligibility`, unchanged (DG-3). **Guest-facing copy may say *Session*** (CFG-10, a glossary exception like *Booking* under audit R145); code and contracts keep `Performance`. Floating basket icon and cart side (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** M17-08: the date strip shows the next seven days, with a calendar for later dates. W5: surf products (beginner, intermediate …) only after a time slot. W8: the date-first default no longer overrides product-first flows: order comes from the flow. W11: tours stay date → language → time slot, unchanged.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 3 and 4).** **Choosing a session adds nothing to the cart.** Once a session is chosen its tickets appear (for a surf session: Surfer at the session price, Junior surfer 10–15, Spectator) and a line reaches the cart (`addCartLine`) only when a quantity is set; until a session is chosen the ticket area says *Choose a session above to see its tickets and prices.* **A question the flow already asks on the page is not asked again** in the consent pop-up: on the water park's swim-ability flow the *Are you able to swim?* answer given on the page stands.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getAvailability` reads one record and nothing reads a population — the screen is about that one thing",
@@ -709,12 +721,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-006",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build)",
+    "verified": "2026-10-01",
     "match": "partial",
-    "view": "Book → step 1; e.g. Summit Peaks → 'Timed access — 10-minute slots', Coastal Aqua → 'Surf sessions with filters'",
-    "differences": "Merged into the ticket step (date first, time revealed after the date, tickets after the time). Prototype adds morning/afternoon/evening filters, times-per-page paging, sold-out greying, per-guest age/height eligibility dialog with 'Remove this guest', and the water-park 'Are you able to swim?' pop-up. YAML's separate hold call (addCartLine / inventory hold) is implicit."
+    "view": "Engine controls → Water park → Surf sessions with filters → Book → Intermediate surf 09:00 → able to swim → one surfer (the session's tickets appear once it is chosen)",
+    "differences": "Merged into the ticket step (date first, time revealed after the date, tickets after the time). Prototype adds morning/afternoon/evening filters, times-per-page paging, sold-out greying, per-guest age/height eligibility dialog with 'Remove this guest', and the water-park 'Are you able to swim?' pop-up. YAML's separate hold call (addCartLine / inventory hold) is implicit. 30 September: a session's tickets (Surfer, Junior surfer, Spectator) appear once the session is chosen, and choosing it adds nothing to the cart."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -860,12 +872,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-005",
      "trigger": "Ticket Type Selection",
-     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-007 holds none of them, so the edge carries nothing and WEB-005 opens cold"
+     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-007 holds none of them. The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
     },
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them, so the edge carries nothing and WEB-008 opens cold"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them. The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on WEB-008 yet (a gap in WEB-008, not in this edge)"
     },
     {
      "to": "WEB-006",
@@ -1190,7 +1202,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "WEB-001",
     "WEB-005",
     "WEB-006",
-    "WEB-007",
     "WEB-010",
     "WEB-016"
    ],
@@ -1198,12 +1209,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-005",
      "trigger": "Ticket Type Selection",
-     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-008 holds none of them, so the edge carries nothing and WEB-005 opens cold"
-    },
-    {
-     "to": "WEB-007",
-     "trigger": "Interactive Seat Selection",
-     "provenance": "derived — WEB-007 declares entryState.params eventId, holdId, performanceId and WEB-008 holds none of them, so the edge carries nothing and WEB-007 opens cold"
+     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-008 holds none of them. The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
     },
     {
      "to": "WEB-006",
@@ -1235,7 +1241,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. Add-ons. **`listCatalogueBundles` removed** — Sanket noted the screen shows individual add-ons rather than bundles, and it does. **Rewired on the 20 August review.**\n\n**Rev 3 (decided 29 September).** **Sign-in gate (REV3-3):** with `BookingFlowConfig.signInAt` `afterAddOns` (default), leaving this step asks the guest to sign in, or for a guest code when guest checkout is on (WEB-016); the basket is kept. With `atPayment` the gate is at WEB-012. Floating basket icon and cart side (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. Add-ons. Sanket noted on the 20 August review that the screen shows individual add-ons rather than bundles, and it does. **Rewired on that review.** **Corrected 1 October (audit R269):** these notes said `listCatalogueBundles` had gone from this screen then; it never left `apis`, and it is still bound to the *Every bundle* table. It lists the signed catalogue snapshots terminals pull (ADR-0013), not the sellable bundles `promotions.listBundles` returns, so unbinding it is still owed; GST-056, in the same add-ons pair, calls it too, and the two change together.\n\n**Rev 3 (decided 29 September).** **Sign-in gate (REV3-3):** with `BookingFlowConfig.signInAt` `afterAddOns` (default), leaving this step asks the guest to sign in, or for a guest code when guest checkout is on (WEB-016); the basket is kept. With `atPayment` the gate is at WEB-012. Floating basket icon and cart side (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getUpsellSuggestions` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1414,7 +1420,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "differences": "Sign-in is asked when leaving Add-ons (Config 'Ask to sign in: After add-ons', Rev 3 item 3), so WEB-008 → WEB-016 is a transition YAML does not have. Add-ons also appear on the payment step (combo) and confirmation (upsells). 28 Sep flow review: all add-ons live here only."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the operations this screen then declared (six since the rev 3 build of 29 September), not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen. The suggestion panel reads `getUpsellSuggestions`, which `apis` does not declare yet.",
   "overlays": [
    {
     "id": "formAddCartLine",
@@ -1492,19 +1498,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "exitTo": [
     "WEB-001",
     "WEB-005",
-    "WEB-006",
-    "WEB-007"
+    "WEB-006"
    ],
    "transitions": [
     {
      "to": "WEB-005",
      "trigger": "Ticket Type Selection",
-     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-009 holds none of them, so the edge carries nothing and WEB-005 opens cold"
-    },
-    {
-     "to": "WEB-007",
-     "trigger": "Interactive Seat Selection",
-     "provenance": "derived — WEB-007 declares entryState.params eventId, holdId, performanceId and WEB-009 holds none of them, so the edge carries nothing and WEB-007 opens cold"
+     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-009 holds none of them. The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
     },
     {
      "to": "WEB-006",
@@ -2227,6 +2227,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

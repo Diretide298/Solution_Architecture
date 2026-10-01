@@ -99,7 +99,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-026 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-026 holds none of them. The edge carries nothing: GST-026 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "BO-069",
@@ -468,6 +468,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

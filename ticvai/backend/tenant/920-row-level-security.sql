@@ -228,7 +228,7 @@ BEGIN
 END
 $$;
 
--- **1009 tables: 570 scoped by `scope_path`, 80 by `venue_id`, 151 through the parent that owns them, 27 by subject, 180 to the tenant root only, 0 with no policy.**
+-- **1010 tables: 571 scoped by `scope_path`, 80 by `venue_id`, 151 through the parent that owns them, 27 by subject, 180 to the tenant root only, 0 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -246,7 +246,6 @@ CREATE POLICY scope_scope ON platform.scope
 -- Scoped by path.
 SELECT platform.apply_scope_rls('access.access_area'::regclass);
 SELECT platform.apply_scope_rls('access.access_attribute'::regclass);
-SELECT platform.apply_scope_rls('access.access_device'::regclass);
 SELECT platform.apply_scope_rls('access.access_incident'::regclass);
 SELECT platform.apply_scope_rls('access.access_map'::regclass);
 SELECT platform.apply_scope_rls('access.access_point'::regclass);
@@ -275,6 +274,7 @@ SELECT platform.apply_scope_rls('access.credential_security_profile'::regclass);
 SELECT platform.apply_scope_rls('access.credential_sharing_case'::regclass);
 SELECT platform.apply_scope_rls('access.device_binding'::regclass);
 SELECT platform.apply_scope_rls('access.device_configuration'::regclass);
+SELECT platform.apply_scope_rls('access.device_placement'::regclass);
 SELECT platform.apply_scope_rls('access.dynamic_field'::regclass);
 SELECT platform.apply_scope_rls('access.dynamic_policy'::regclass);
 SELECT platform.apply_scope_rls('access.dynamic_policy_version'::regclass);
@@ -487,6 +487,7 @@ SELECT platform.apply_scope_rls('catalogue.signal_registry'::regclass);
 SELECT platform.apply_scope_rls('catalogue.space'::regclass);
 SELECT platform.apply_scope_rls('catalogue.tax_profile'::regclass);
 SELECT platform.apply_scope_rls('catalogue.tax_rule'::regclass);
+SELECT platform.apply_scope_rls('catalogue.waiting_room_setting'::regclass);
 SELECT platform.apply_scope_rls('fnb.corrective_action'::regclass);
 SELECT platform.apply_scope_rls('fnb.course_rule'::regclass);
 SELECT platform.apply_scope_rls('fnb.delivery_policy'::regclass);
@@ -517,10 +518,10 @@ SELECT platform.apply_scope_rls('games.redemption_rules'::regclass);
 SELECT platform.apply_scope_rls('games.validation_rules'::regclass);
 SELECT platform.apply_scope_rls('identity.access_decision'::regclass);
 SELECT platform.apply_scope_rls('identity.access_override'::regclass);
-SELECT platform.apply_scope_rls('identity.access_policy'::regclass);
-SELECT platform.apply_scope_rls('identity.access_policy_version'::regclass);
 SELECT platform.apply_scope_rls('identity.access_review_campaign'::regclass);
 SELECT platform.apply_scope_rls('identity.access_review_item'::regclass);
+SELECT platform.apply_scope_rls('identity.authorisation_policy'::regclass);
+SELECT platform.apply_scope_rls('identity.authorisation_policy_version'::regclass);
 SELECT platform.apply_scope_rls('identity.capability_template'::regclass);
 SELECT platform.apply_scope_rls('identity.delegated_access'::regclass);
 SELECT platform.apply_scope_rls('identity.guest_verification_policy'::regclass);

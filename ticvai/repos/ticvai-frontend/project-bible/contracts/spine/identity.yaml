@@ -270,6 +270,8 @@ paths:
                 $ref: '#/components/schemas/PasswordPolicy'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPasswordPolicy
       x-ticvai-consumed-by:
@@ -310,6 +312,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PasswordPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /module-capabilities:
     get:
       operationId: listModuleCapabilities
@@ -349,6 +353,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ModuleCapabilitySet'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /principals/{principalId}/module-access:
     parameters:
     - name: principalId
@@ -381,6 +387,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ModuleAccess'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPrincipalModuleAccess
       x-ticvai-conflict-policy: serverWins
@@ -449,6 +457,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /capability-templates:
     get:
       operationId: listCapabilityTemplates
@@ -478,6 +488,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CapabilityTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCapabilityTemplate
       x-ticvai-consumed-by:
@@ -509,6 +521,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CapabilityTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /segregation-rules:
     get:
       operationId: listSegregationRules
@@ -537,6 +551,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SegregationRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSegregationRules
       x-ticvai-consumed-by:
@@ -585,6 +601,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SegregationRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /segregation-violations:
     get:
       operationId: listSegregationViolations
@@ -636,6 +654,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/SegregationViolation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/data-export:
     parameters:
     - name: subjectId
@@ -719,6 +739,8 @@ paths:
                     type: string
                     format: date-time
                     nullable: true
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/delegations:
     parameters:
     - name: subjectId
@@ -777,6 +799,8 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/DelegatedAccess'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: grantDelegation
       x-ticvai-consumed-by:
@@ -880,6 +904,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/select-role:
     post:
       operationId: selectRole
@@ -928,6 +954,8 @@ paths:
                 $ref: '#/components/schemas/Session'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/refresh:
     post:
       operationId: refreshToken
@@ -979,6 +1007,8 @@ paths:
                 $ref: '#/components/schemas/TokenPair'
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/credential:
     post:
       operationId: changeOwnCredential
@@ -1042,6 +1072,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/logout:
     post:
       operationId: logout
@@ -1068,6 +1100,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Session closed
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/sessions/{sessionId}/force-logout:
     post:
       operationId: forceLogout
@@ -1120,6 +1154,8 @@ paths:
           description: Session terminated and audited
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/session:
     get:
       operationId: getCurrentSession
@@ -1156,6 +1192,8 @@ paths:
                 $ref: '#/components/schemas/Session'
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /principals:
     get:
       operationId: listPrincipals
@@ -1213,6 +1251,8 @@ paths:
                         $ref: '#/components/schemas/Principal'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPrincipal
       x-ticvai-consumed-by:
@@ -1256,6 +1296,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /principals/{principalId}/credential-reset:
     parameters:
     - name: principalId
@@ -1312,6 +1354,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /principals/{principalId}:
     parameters:
     - name: principalId
@@ -1347,6 +1391,8 @@ paths:
                 $ref: '#/components/schemas/Principal'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updatePrincipal
       x-ticvai-consumed-by:
@@ -1401,6 +1447,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Principal'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /roles:
     get:
       operationId: listRoles
@@ -1453,6 +1501,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Role'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createRole
       x-ticvai-consumed-by:
@@ -1503,6 +1553,8 @@ paths:
                 $ref: '#/components/schemas/Role'
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delegated-access:
     get:
       operationId: listDelegatedAccess
@@ -1548,6 +1600,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/DelegatedAccess'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createDelegatedAccess
       x-ticvai-consumed-by:
@@ -1598,6 +1652,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delegated-access/{delegatedAccessId}:
     parameters:
     - name: delegatedAccessId
@@ -1635,6 +1691,8 @@ paths:
           description: Removed
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /permissions/resolve:
     post:
       operationId: resolvePermissions
@@ -1727,6 +1785,8 @@ paths:
                           enum:
                           - PERMIT
                           - DENY
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/guest/register:
     post:
       operationId: registerGuest
@@ -1778,6 +1838,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/guest/otp:
     post:
       operationId: requestGuestOtp
@@ -1917,6 +1979,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/guest/password:
     post:
       operationId: guestPasswordLogin
@@ -2079,6 +2143,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/guest/uae-pass:
     post:
       operationId: guestUaePassLogin
@@ -2140,6 +2206,8 @@ paths:
                 $ref: '#/components/schemas/GuestSession'
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/guest/session:
     get:
       operationId: getGuestSession
@@ -2169,6 +2237,8 @@ paths:
                 $ref: '#/components/schemas/GuestSession'
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: guestLogout
       x-ticvai-consumed-by:
@@ -2204,6 +2274,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Ended
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/guest/link-checkout:
     post:
       operationId: linkGuestCheckout
@@ -2268,6 +2340,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/guest/account:
     delete:
       operationId: deleteGuestAccount
@@ -2319,6 +2393,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/sso/providers:
     get:
       operationId: listSsoProviders
@@ -2352,6 +2428,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SsoProvider'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/sso/{providerId}/authorize:
     parameters:
     - name: providerId
@@ -2401,6 +2479,8 @@ paths:
                   expiresAt:
                     type: string
                     format: date-time
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/sso/{providerId}/callback:
     parameters:
     - name: providerId
@@ -2468,6 +2548,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/sso-config:
     get:
       operationId: getSsoConfig
@@ -2501,6 +2583,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SsoProviderConfig'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSsoConfig
       x-ticvai-consumed-by:
@@ -2543,6 +2627,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/mfa/methods:
     get:
       operationId: listMfaMethods
@@ -2594,6 +2680,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MfaMethod'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: enrolMfaMethod
       x-ticvai-consumed-by:
@@ -2687,6 +2775,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/mfa/methods/{methodId}:
     parameters:
     - name: methodId
@@ -2762,6 +2852,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: removeMfaMethod
       x-ticvai-consumed-by:
@@ -2817,6 +2909,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/mfa/challenge:
     post:
       operationId: createMfaChallenge
@@ -2921,6 +3015,8 @@ paths:
                   expiresAt:
                     type: string
                     format: date-time
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/mfa/challenge/{challengeId}/verify:
     parameters:
     - name: challengeId
@@ -3020,7 +3116,11 @@ paths:
 
             '
           x-ticvai-problem-types:
+          - rate-limited
           - step-up-locked
+          headers:
+            Retry-After:
+              $ref: '../shared/common.yaml#/components/headers/RetryAfter'
           content:
             application/problem+json:
               schema:
@@ -3087,6 +3187,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ActiveSession'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/sessions/revoke-all:
     post:
       operationId: revokeAllSessions
@@ -3168,17 +3270,24 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
-  /access-policies:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /authorisation-policies:
     get:
-      operationId: listAccessPolicies
+      operationId: listAuthorisationPolicies
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
         - "P08 BO-1177 API Security, Access & Integration Permissions"
         - "P09 ADM-356 Integration Security & Access Control"
         - "P13 CMS-086 Role-Based Asset Access & Permission Management"
         - "P16 ANL-047 Report Access & Sharing Control"
-      summary: Attribute-based access policies
-      description: '3.3.1. **`Grant` is principal → role → scope, and forty-two matrix rows ask for
+      summary: Attribute-based authorisation policies
+      description: '3.3.1. **Staff authorisation only, and named so** (ADR-0068, accepted 1 October): these
+        were "access policies" until then, beside access''s `AccessDynamicPolicy`, which decides guest
+        admission at a gate. The tables are `identity.authorisation_policy` and its versions, and every
+        operation here says *authorisation*, so "access policy" means one thing in the package.
+
+        **`Grant` is principal → role → scope, and forty-two matrix rows ask for
         something it cannot express.** *"Allows permissions to be granted dynamically based on attributes
         and context rather than fixed roles only."*
 
@@ -3200,7 +3309,7 @@ paths:
       parameters:
       - name: status
         in: query
-        description: Exact match on `AccessPolicy.status`. Omitted returns every status.
+        description: Exact match on `AuthorisationPolicy.status`. Omitted returns every status.
         schema:
           type: string
           enum:
@@ -3213,7 +3322,7 @@ paths:
         in: query
         description: 'Policies written at this node **or any node beneath it** — a prefix match on the
           materialised path (`shared/common.yaml`, ScopeRef). To see what applies *at* a node, which
-          includes policies inherited from above, use `getAccessPolicyBundle` or `simulateAccessPolicy`.
+          includes policies inherited from above, use `getAuthorisationPolicyBundle` or `simulateAuthorisationPolicy`.
 
           '
         schema:
@@ -3226,9 +3335,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AccessPolicy'
+                  $ref: '#/components/schemas/AuthorisationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
-      operationId: createAccessPolicy
+      operationId: createAuthorisationPolicy
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
         - "P13 CMS-086 Role-Based Asset Access & Permission Management"
@@ -3257,7 +3368,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AccessPolicy'
+              $ref: '#/components/schemas/AuthorisationPolicy'
       responses:
         '201':
           headers:
@@ -3267,8 +3378,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccessPolicy'
-  /access-policies/{policyId}:
+                $ref: '#/components/schemas/AuthorisationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /authorisation-policies/{policyId}:
     parameters:
     - name: policyId
       in: path
@@ -3277,7 +3390,7 @@ paths:
         type: string
         format: uuid
     get:
-      operationId: getAccessPolicy
+      operationId: getAuthorisationPolicy
       summary: One policy, at a version
       tags:
       - administration
@@ -3297,9 +3410,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccessPolicy'
+                $ref: '#/components/schemas/AuthorisationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
-      operationId: updateAccessPolicy
+      operationId: updateAuthorisationPolicy
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
       x-ticvai-conflict-policy: serverWins
@@ -3323,7 +3438,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AccessPolicy'
+              $ref: '#/components/schemas/AuthorisationPolicy'
       responses:
         '200':
           headers:
@@ -3333,8 +3448,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccessPolicy'
-  /access-policies/{policyId}/state:
+                $ref: '#/components/schemas/AuthorisationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /authorisation-policies/{policyId}/state:
     parameters:
     - name: policyId
       in: path
@@ -3343,7 +3460,7 @@ paths:
         type: string
         format: uuid
     post:
-      operationId: setAccessPolicyState
+      operationId: setAuthorisationPolicyState
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
       x-ticvai-conflict-policy: serverWins
@@ -3392,10 +3509,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccessPolicy'
-  /access-policies/simulate:
+                $ref: '#/components/schemas/AuthorisationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /authorisation-policies/simulate:
     post:
-      operationId: simulateAccessPolicy
+      operationId: simulateAuthorisationPolicy
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
       x-ticvai-conflict-policy: serverWins
@@ -3431,7 +3550,7 @@ paths:
                   format: uuid
                   nullable: true
                 policy:
-                  $ref: '#/components/schemas/AccessPolicy'
+                  $ref: '#/components/schemas/AuthorisationPolicy'
                 contexts:
                   type: array
                   items:
@@ -3450,6 +3569,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccessDecision'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-decisions:
     post:
       operationId: evaluateAccess
@@ -3467,10 +3588,10 @@ paths:
         this permission here, now. Admission at a gate or turnstile is decided by the access contract''s
         validation against `AccessDynamicPolicy`; a gate calls this only where a staff principal''s
         permission is the question (a supervisor authorising an override at the gate).
-        See `AccessPolicy` for the split.
+        See `AuthorisationPolicy` for the split.
 
         **Offline is a different operation on purpose.** 3.3.30 wants local evaluation when offline, and
-        that is `getAccessPolicyBundle` plus a device-side evaluator — not this call with a longer
+        that is `getAuthorisationPolicyBundle` plus a device-side evaluator — not this call with a longer
         timeout. A gate that waits for the network is a gate that stops working when the network does.
 
         '
@@ -3499,14 +3620,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessDecision'
-  /access-policies/bundle:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /authorisation-policies/bundle:
     get:
-      operationId: getAccessPolicyBundle
+      operationId: getAuthorisationPolicyBundle
       summary: The policies a device needs to decide for itself
       description: '3.3.28 and 3.3.30. **Caching and offline evaluation are the same mechanism at two
         durations.** A signed, versioned bundle of the policies relevant to this device and scope, with a
-        validity window — so a turnstile that loses the network keeps deciding, and stops deciding when
+        validity window — so a device that loses the network keeps deciding, and stops deciding when
         the bundle expires rather than drifting indefinitely.
+
+        **Staff permissions only** (ADR-0068, 1 October): what a staff principal may do on the device, such
+        as a supervisor authorising an override at a gate. Whether a guest may pass the gate is decided from
+        access''s `getOfflinePackage`, which carries the active admission policy version.
 
         **Expiry is the safety property.** A cached policy with no end date is a policy that outlives its
         own revocation.
@@ -3523,7 +3650,7 @@ paths:
       parameters:
       - name: deviceId
         in: query
-        description: The device the bundle is issued to; recorded as `AccessPolicyBundle.deviceId`.
+        description: The device the bundle is issued to; recorded as `AuthorisationPolicyBundle.deviceId`.
         schema:
           type: string
           format: uuid
@@ -3531,7 +3658,7 @@ paths:
         in: query
         description: 'The node the device decides at. The bundle holds the policies that **apply** there:
           those written at this node or at any node above it, since inheritance is the prefix walk
-          (`AccessPolicy.scopePath`).
+          (`AuthorisationPolicy.scopePath`).
 
           '
         schema:
@@ -3542,10 +3669,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccessPolicyBundle'
-  /access-policy-templates:
+                $ref: '#/components/schemas/AuthorisationPolicyBundle'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /authorisation-policy-templates:
     get:
-      operationId: listAccessPolicyTemplates
+      operationId: listAuthorisationPolicyTemplates
       summary: Reusable policy shapes
       description: '3.3.23. **A template is where the platform''s own experience lives.** *Shift-hours
         only*, *venue-local staff*, *capacity-gated entry* are policies every venue writes, and writing
@@ -3567,8 +3696,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AccessPolicy'
-  /access-policies/{policyId}/history:
+                  $ref: '#/components/schemas/AuthorisationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /authorisation-policies/{policyId}/history:
     parameters:
     - name: policyId
       in: path
@@ -3577,7 +3708,7 @@ paths:
         type: string
         format: uuid
     get:
-      operationId: listAccessPolicyHistory
+      operationId: listAuthorisationPolicyHistory
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
       summary: Every version, who changed it and why
@@ -3601,7 +3732,9 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AccessPolicyVersion'
+                  $ref: '#/components/schemas/AuthorisationPolicyVersion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-decisions/audit:
     get:
       operationId: listAccessDecisions
@@ -3651,6 +3784,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccessDecision'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-overrides:
     post:
       operationId: createEmergencyAccessOverride
@@ -3710,6 +3845,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmergencyAccessOverride'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /platform-staff-grants:
     get:
@@ -3757,6 +3894,8 @@ paths:
                         $ref: '#/components/schemas/PlatformStaffGrant'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: openPlatformStaffGrant
       x-ticvai-consumed-by:
@@ -3855,6 +3994,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /platform-staff-grants/mine:
     get:
       operationId: listOwnPlatformStaffGrants
@@ -3902,6 +4043,8 @@ paths:
                         $ref: '#/components/schemas/PlatformStaffGrant'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customers/{customerId}/memberships:
     get:
       operationId: listCustomerMemberships
@@ -3942,6 +4085,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IdentityCustomerMembership'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /memberships/{membershipId}:
     get:
       operationId: getMembership
@@ -3983,6 +4128,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /memberships/{membershipId}/benefit-usage:
     post:
       operationId: recordBenefitUsage
@@ -4034,6 +4181,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /modules:
     get:
       operationId: listModules
@@ -4062,6 +4211,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IdentityModule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /permissions:
     get:
       operationId: listPermissions
@@ -4105,7 +4256,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IdentityPermission'
-  /access-policies/{policyId}/restore:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /authorisation-policies/{policyId}/restore:
     parameters:
     - name: policyId
       in: path
@@ -4114,20 +4267,20 @@ paths:
         type: string
         format: uuid
     post:
-      operationId: restoreAccessPolicyVersion
+      operationId: restoreAuthorisationPolicyVersion
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
       x-ticvai-agreed: '29 September: our build plan (7.1.46 "allow rollback to previous approved versions");
         shape follows access rollbackAccessPolicy and restoreProductVersion'
       summary: Put a previously approved policy version back, as a new version
       description: '7.1.46 (decided 29 September, build pass). **Restoring writes a new version with the old
-        content; it never rewinds.** The version being replaced stays in `listAccessPolicyHistory`, because a
+        content; it never rewinds.** The version being replaced stays in `listAuthorisationPolicyHistory`, because a
         decision taken under it (`listAccessDecisions` names the version) must still be explainable.
 
 
-        **Only a version that was approved can be restored** (`AccessPolicyVersion.approvedBy` set): a draft
+        **Only a version that was approved can be restored** (`AuthorisationPolicyVersion.approvedBy` set): a draft
         that never passed approval is not a known-good state to go back to. The new version is
-        `pendingApproval` and goes through the same approval route as any policy change (`setAccessPolicyState`,
+        `pendingApproval` and goes through the same approval route as any policy change (`setAuthorisationPolicyState`,
         routed to `approvals`); the current version stays in force until it is approved. `409` when the target
         version was never approved, is the current version, or the policy is `retired`.
 
@@ -4161,7 +4314,7 @@ paths:
                   type: string
                   minLength: 3
                   maxLength: 300
-                  description: Kept on the new version as `AccessPolicyVersion.reason`.
+                  description: Kept on the new version as `AuthorisationPolicyVersion.reason`.
       responses:
         '200':
           headers:
@@ -4171,7 +4324,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccessPolicy'
+                $ref: '#/components/schemas/AuthorisationPolicy'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
@@ -4180,23 +4333,25 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
-  /access-policy-effectiveness:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /authorisation-policy-effectiveness:
     get:
-      operationId: listAccessPolicyEffectiveness
+      operationId: listAuthorisationPolicyEffectiveness
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
       x-ticvai-agreed: '29 September: our build plan (3.3.48 "reporting on policy effectiveness"); shape follows
         listLabourBudgets with the Page envelope'
       summary: How each software-permission policy has behaved over a period
       description: '3.3.48 for the policies in this contract (decided 29 September, build pass). One row per
-        `AccessPolicy`: how often it was evaluated, how often it matched, how often it was the deciding policy
+        `AuthorisationPolicy`: how often it was evaluated, how often it matched, how often it was the deciding policy
         for a permit or a deny, how many emergency overrides were opened against its scope, and a daily trend.
         Computed from `identity.access_decision` (`matchedPolicies` names the policy and version) and
         `identity.access_override`.
 
 
         **These are the software-permission policies.** Gate admission policies are the access contract''s
-        `AccessDynamicPolicy`, reported by `listDynamicPolicyEffectiveness`; see `AccessPolicy` for which engine
+        `AccessDynamicPolicy`, reported by `listDynamicPolicyEffectiveness`; see `AuthorisationPolicy` for which engine
         governs what.
 
         '
@@ -4227,7 +4382,7 @@ paths:
           format: uuid
       - name: scopePath
         in: query
-        description: Policies written at this node or beneath it (prefix match, as `listAccessPolicies`).
+        description: Policies written at this node or beneath it (prefix match, as `listAuthorisationPolicies`).
         schema:
           type: string
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -4245,13 +4400,15 @@ paths:
                     items:
                       type: array
                       items:
-                        $ref: '#/components/schemas/IdentityAccessPolicyEffectiveness'
+                        $ref: '#/components/schemas/AuthorisationPolicyEffectiveness'
         '422':
           description: '`to` is before `from`, or the range is longer than 366 days'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /permission-findings:
     get:
       operationId: listPermissionFindings
@@ -4262,7 +4419,7 @@ paths:
         permissions"); shape follows listSegregationViolations, paged with the Page envelope'
       summary: Excessive, missing and conflicting permissions, per principal or role
       description: '7.1.47 (decided 29 September, build pass). **The analysis half of the sandbox**:
-        `simulateAccessPolicy` shows what a draft would decide, and this says what is wrong with the grants as
+        `simulateAuthorisationPolicy` shows what a draft would decide, and this says what is wrong with the grants as
         they stand, or as they would stand with a draft policy active (`draftPolicyId`).
 
 
@@ -4328,7 +4485,7 @@ paths:
           default: 3
       - name: draftPolicyId
         in: query
-        description: Evaluate as if this draft `AccessPolicy` were active, so a policy can be checked for the
+        description: Evaluate as if this draft `AuthorisationPolicy` were active, so a policy can be checked for the
           grants it would widen or leave missing before it is submitted.
         schema:
           type: string
@@ -4349,6 +4506,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/IdentityPermissionFinding'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/guest/identity-verifications:
     post:
       operationId: submitGuestIdentityDocument
@@ -4418,6 +4577,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/guest/identity-verifications/current:
     get:
       operationId: getMyIdentityVerification
@@ -4453,6 +4614,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-identity-verifications:
     get:
       operationId: listGuestIdentityVerifications
@@ -4504,6 +4667,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/IdentityGuestVerification'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-identity-verifications/{verificationId}/decision:
     parameters:
     - name: verificationId
@@ -4590,6 +4755,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-verification-policy:
     get:
       operationId: getGuestVerificationPolicy
@@ -4612,6 +4779,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdentityGuestVerificationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestVerificationPolicy
       x-ticvai-consumed-by:
@@ -4655,6 +4824,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdentityGuestVerificationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /role-suggestions:
     get:
       operationId: suggestRoleAssignment
@@ -4770,6 +4941,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-review-campaigns:
     get:
       operationId: listAccessReviewCampaigns
@@ -4819,6 +4992,8 @@ paths:
                         $ref: '#/components/schemas/IdentityAccessReviewCampaign'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createAccessReviewCampaign
       x-ticvai-consumed-by:
@@ -4882,6 +5057,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-review-campaigns/{campaignId}/items:
     parameters:
     - name: campaignId
@@ -4953,6 +5130,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-review-items/{itemId}/decision:
     parameters:
     - name: itemId
@@ -5040,6 +5219,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   securitySchemes:
@@ -5302,11 +5483,11 @@ components:
           type: string
           maxLength: 1000
           nullable: true
-    IdentityAccessPolicyEffectiveness:
+    AuthorisationPolicyEffectiveness:
       type: object
       x-ticvai-persistence: none — computed from identity.access_decision and identity.access_override over the
         requested period
-      description: One `AccessPolicy` over a period (3.3.48; decided 29 September, build pass).
+      description: One `AuthorisationPolicy` over a period (3.3.48; decided 29 September, build pass).
       required:
       - policyId
       - evaluations
@@ -6048,9 +6229,9 @@ components:
           type: string
           format: uuid
           nullable: true
-    AccessPolicy:
+    AuthorisationPolicy:
       type: object
-      x-ticvai-persistence: identity.access_policy
+      x-ticvai-persistence: identity.authorisation_policy
       description: '3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are;
         a policy says under what circumstances that is enough.
 
@@ -6063,8 +6244,12 @@ components:
         employee''s admission at an access point, decided in the gate''s validation with results such as
         `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member''s badge
         opening a staff door is a gate decision (access); the same staff member approving a refund is a
-        permission decision (here). The overlap that remains is listed in the build readiness open items
-        rather than merged in this pass.
+        permission decision (here).
+
+        **Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps
+        staff authorisation and was renamed to say so: `identity.access_policy` became
+        `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its
+        operations `*AuthorisationPolicy*`. "Access policy" now means `AccessDynamicPolicy` and nothing else.
 
         '
       required:
@@ -6076,7 +6261,7 @@ components:
           type: string
           format: uuid
           readOnly: true
-          description: Assigned by the server on `createAccessPolicy`; the path names the policy on update.
+          description: Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update.
         code:
           type: string
         name:
@@ -6133,7 +6318,7 @@ components:
         status:
           type: string
           readOnly: true
-          description: '**Moved only by `setAccessPolicyState`.** A policy is created as a `draft`, and a
+          description: '**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a
             status sent in a create or update body is ignored — otherwise a write could skip the approval
             3.3.26 requires.
 
@@ -6148,7 +6333,7 @@ components:
           type: integer
           default: 1
           readOnly: true
-          description: Set by the server; every `updateAccessPolicy` writes a new version.
+          description: Set by the server; every `updateAuthorisationPolicy` writes a new version.
         effectiveFrom:
           type: string
           format: date-time
@@ -6357,7 +6542,7 @@ components:
           nullable: true
         scopePathIndex:
           type: string
-    AccessPolicyBundle:
+    AuthorisationPolicyBundle:
       type: object
       description: '3.3.28 and 3.3.30. **Signed, versioned and time-boxed**, so an offline gate decides
         correctly and then stops rather than drifting.
@@ -6376,7 +6561,7 @@ components:
         policies:
           type: array
           items:
-            $ref: '#/components/schemas/AccessPolicy'
+            $ref: '#/components/schemas/AuthorisationPolicy'
         issuedAt:
           type: string
           format: date-time
@@ -6385,9 +6570,9 @@ components:
           format: date-time
         signature:
           type: string
-    AccessPolicyVersion:
+    AuthorisationPolicyVersion:
       type: object
-      x-ticvai-persistence: identity.access_policy_version
+      x-ticvai-persistence: identity.authorisation_policy_version
       description: '3.3.36 and 3.3.39. **Who changed what, from what, and why.**'
       properties:
         policyId:
@@ -6409,9 +6594,9 @@ components:
           format: uuid
           nullable: true
         previous:
-          $ref: '#/components/schemas/AccessPolicy'
+          $ref: '#/components/schemas/AuthorisationPolicy'
         current:
-          $ref: '#/components/schemas/AccessPolicy'
+          $ref: '#/components/schemas/AuthorisationPolicy'
         scopePath:
           type: string
     EmergencyAccessOverride:

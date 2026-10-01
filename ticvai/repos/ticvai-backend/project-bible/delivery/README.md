@@ -9,6 +9,7 @@ Current wave, current context, open blockers, this week's gates.
 | Page | |
 |---|---|
 | [sprint-1](sprint-1.md) | Current sprint board |
+| [change-rules](change-rules.md) | **What a change request must say**: the audit classes no checker can see (1 October) |
 | [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
 | [seed-data-proposal](seed-data-proposal.md) | Client-facing draft, awaiting correction: UAE denominations and default staff roles SETUP-SEED loads (audit R229) |
 | [configured-limits-proposal](configured-limits-proposal.md) | Client-facing draft, awaiting correction: every "configured" limit with a proposed value |

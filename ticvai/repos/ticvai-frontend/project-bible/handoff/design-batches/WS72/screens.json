@@ -39,7 +39,7 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-041 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-041 holds none of them. The edge carries nothing: CMS-041 is opened from CMS-001, so this edge is the way back and CMS-001 keeps its own state"
     },
     {
      "to": "CMS-042",

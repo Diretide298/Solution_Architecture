@@ -1,5 +1,5 @@
 {
- "note": "Block A tasks that come from no screen or operation, so the slice cannot derive them. Read by tools/build-service-docs.py. Edit this file, not the task sheet. Added 30 September 2026 from the system-design review (audit/ticvai/steps/SD, findings SD-016, 024, 026, 028, 030-032, 034, 046-049, 051, 057, 059, 063) and the AI functions review (docs/active/ai-functions-review-30-september.md). `pool: backend` goes to the least-loaded backend owner; `assignee` names a person. AI engine tasks carry no points: they are sized in engineer-days in their text and planned by the two AI engineers, whose capacity is separate from the developers' (decided 30 September).",
+ "note": "Block A tasks that come from no screen or operation, so the slice cannot derive them. Read by tools/build-service-docs.py. Edit this file, not the task sheet. Added 30 September 2026 from the system-design review (audit/ticvai/steps/SD, findings SD-016, 024, 026, 028, 030-032, 034, 046-049, 051, 057, 059, 063) and the AI functions review (docs/active/ai-functions-review-30-september.md). `pool: backend` goes to the least-loaded backend owner; `assignee` names a person. AI engine tasks carry no points: they are sized in engineer-days in their text and planned by the two AI engineers, whose capacity is separate from the developers' (decided 30 September). Since 1 October a task may carry `block` (for example `B1`): it is recorded here with the ADR that asks for it and is not ticketed in the Block A sheet; build-service-docs.py skips it until that block is planned. A task without `block` is Block A.",
  "epics": [
   {
    "key": "PLATFORM",
@@ -54,7 +54,18 @@
     "SETUP-HOSTS"
    ],
    "subject": "Outbox, relay and inbox behind the kernel broker interface, on a local RabbitMQ",
-   "detail": "The transactional outbox per tenant database; one relay per region in the workers host, with a lease and a polling loop per tenant database, and an inbox per tenant database for exactly-once handling (ADR-0058); publishing and consuming only through the kernel interface (IEventPublisher, IEventSubscriber). The broker per ADR-0057 is the client's choice between RabbitMQ and Kafka: build behind the kernel interface on a local RabbitMQ until they answer, with ordering per aggregate by an ordering key and dead letters drained into platform.dead_letter. A relay-lag dashboard and alert per tenant database (SD-030, SD-031, SD-032). Done when: an event written in a transaction reaches its consumer once, survives a relay restart and a redelivery, a poison message lands in platform.dead_letter, and relay lag shows on the dashboard and alerts when unpublished rows are older than 60 seconds."
+   "detail": "The transactional outbox per tenant database; one relay per region in the workers host, with a lease and a polling loop per tenant database, and an inbox per tenant database for exactly-once handling (ADR-0058); modules enqueue through IOutbox inside their own transaction, the relay publishes through IBrokerPublisher and consumers subscribe through IEventSubscriber (ADR-0058 amendment, 1 October); the relay drains a full batch at once and its batch size is configuration (Relay:BatchSize, 1,000 in the flash-sale environment). The broker per ADR-0057 is the client's choice between RabbitMQ and Kafka: build behind the kernel interface on a local RabbitMQ until they answer, with ordering per aggregate by an ordering key and dead letters drained into platform.dead_letter. A relay-lag dashboard and alert per tenant database (SD-030, SD-031, SD-032). Done when: an event written in a transaction reaches its consumer once, survives a relay restart and a redelivery, a poison message lands in platform.dead_letter, and relay lag shows on the dashboard and alerts when unpublished rows are older than 60 seconds."
+  },
+  {
+   "key": "PLATFORM-REPUBLISH",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-OUTBOX"
+   ],
+   "subject": "Republish from the outbox by tenant and time range",
+   "detail": "The recovery path for a lost broker (ADR-0058 amendment, 1 October; the DR design in ADR-0060 relies on it): republishOutbox, listOutboxRepublishes, getOutboxRepublish and cancelOutboxRepublish in the operations host, carried out by the relay in workers with a keyset cursor over the outbox, published_at left untouched and live batches first; one job per tenant (control.outbox_republish). Done when: after a simulated broker loss, a republish of one tenant's last hour redelivers every event once to each consumer, the inbox drops the duplicates, and a second request for the same tenant while one runs is refused with 409."
   },
   {
    "key": "PLATFORM-SAGA-PAID",
@@ -142,7 +153,7 @@
     "SETUP-CI"
    ],
    "subject": "Hosts for the deployables on .NET 10: commerce, access, operations and workers, each composing its modules",
-   "detail": "In ticvai-backend, on .NET 10 LTS (decided 30 September; ADR-0055). Four .NET hosts in one solution: commerce (Identity, Tenancy, Catalogue, Order, Ledger, Wallet), access (Access), operations (F&B, Retail, Inventory, VenueOps, Marketing, WhiteLabel, Reporting, Platform, CrossRegion) and workers (the outbox relay, every module's event consumers, scheduled jobs), each composing its modules through IModule. ticvai-ai stays the Python service. Done when: each host starts locally with its modules registered and a health endpoint, CI builds one image per host, and moving a module to another host is a change of one registration."
+   "detail": "In **ticvai-backend**, on .NET 10 LTS (decided 30 September; ADR-0055). Four .NET hosts in one solution: commerce (Identity, Tenancy, Catalogue, Order, Ledger, Wallet), access (Access), operations (F&B, Retail, Inventory, VenueOps, Marketing, WhiteLabel, Reporting, Platform, CrossRegion) and workers (the outbox relay, every module's event consumers, scheduled jobs), each composing its modules through IModule. ticvai-ai stays the Python service. Done when: each host starts locally with its modules registered and a health endpoint, CI builds one image per host, and moving a module to another host is a change of one registration."
   },
   {
    "key": "ARCH-TESTS",
@@ -209,7 +220,7 @@
     "SETUP-ENV"
    ],
    "subject": "Qdrant cluster in dev and staging: 3 nodes, TLS, snapshots, monitoring",
-   "detail": "In ticvai-infra (Terraform): a self-hosted 3-node Qdrant cluster in Azure UAE North for dev and staging (ADR-0049), pinned to 1.16 or later, with TLS, JWT RBAC on and the signing key in the cell's Key Vault, snapshot storage in the UAE, and monitoring and alerts on node health, disk and latency. Check Qdrant Hybrid Cloud on our own AKS as an alternative before building. Done when: the cluster survives the loss of one node, a snapshot of a test collection restores into a fresh cluster, and a request without a valid token is refused."
+   "detail": "In **ticvai-infra** (Terraform): a self-hosted 3-node Qdrant cluster in Azure UAE North for dev and staging (ADR-0049), pinned to 1.16 or later, with TLS, JWT RBAC on and the signing key in the cell's Key Vault, snapshot storage in the UAE, and monitoring and alerts on node health, disk and latency. Check Qdrant Hybrid Cloud on our own AKS as an alternative before building. Done when: the cluster survives the loss of one node, a snapshot of a test collection restores into a fresh cluster, and a request without a valid token is refused."
   },
   {
    "key": "OFFLINE-JOURNAL",
@@ -356,6 +367,66 @@
    "depends": [
     "AI-ENGINE-GATEWAY"
    ]
+  },
+  {
+   "key": "KERNEL-TENANT-LIMITS",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "subject": "Per-tenant request budgets: a token bucket per tenant and audience, and a load-aware share per replica",
+   "detail": "ADR-0064 (accepted 1 October), in the kernel middleware of the commerce, access and operations hosts: a token bucket per tenant and audience (guest/public, staff, service, partner) with counts shared through Azure Managed Redis, sustained rate and a 2x burst for 10 seconds from the tenant's plan (Plan.requestLimits) or the platform default; one tenant held to 25% of a replica's request slots only while the replica is above 70% of its limit; shedding guest and public first, staff and service last (ADR-0032); 429 with Retry-After and the RateLimit-* headers; if Redis is unavailable each replica falls back to its own in-process buckets (the limit divided by the replica count). Done when: in a test with two tenants on one replica, the busy tenant gets the whole replica while the other is quiet, is held to 25% of the slots once the replica passes 70% while the quiet tenant's requests still succeed, a guest burst never spends a till's staff budget, and stopping Redis leaves requests served under the in-process limits."
+  },
+  {
+   "key": "OBS-TENANT-POOL",
+   "epic": "PLATFORM",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-OBSERVE",
+    "KERNEL-TENANT-LIMITS"
+   ],
+   "subject": "Alerts on one tenant's share of its connection pool and on max_connections",
+   "detail": "ADR-0064 item 4: per-tenant pool caps stay, and two alerts watch them: one tenant holding more than 60% of its pool for five minutes, and the instance passing 80% of max_connections; plus a dashboard panel of 429s per tenant and audience from KERNEL-TENANT-LIMITS. Done when: a load run that holds one tenant's pool fires the first alert after five minutes naming the tenant, and opening connections past 80% of max_connections fires the second."
+  },
+  {
+   "key": "EDGE-WAITING-ROOM",
+   "epic": "PLATFORM",
+   "points": 8,
+   "pool": "backend",
+   "block": "B1",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "KERNEL-TENANT-LIMITS"
+   ],
+   "subject": "The on-sale waiting room: Redis positions, the cached page, the release controller, admission tokens",
+   "detail": "ADR-0066 (accepted 1 October; B1, or Block A if an on-sale is booked in Block A): enterWaitingRoom gives a position from a Redis counter with no database write; the static branded waiting page is served from Front Door's cache and polls getWaitingRoomPosition; a release controller admits guests per second from the health of commerce (latency and the 429 rate, ADR-0064); an admitted guest gets a short-lived signed token (tenant, performance, expiry, unique id; key in Key Vault) that middleware checks by signature, with no database read, on addCartLine and acquireInventoryHold from guest channels only (till, kiosk and workstation holds are exempt, amendment of 1 October); activation follows the performance's onSaleFrom/onSaleTo or setWaitingRoomSetting. Done when: with the room on, a guest cart hold without a token is refused 403 admission-required, one with a valid token succeeds, a forged or expired token or one for another performance is refused, a till hold needs no token, and the release rate drops when commerce latency rises."
+  },
+  {
+   "key": "EDGE-WAITING-ROOM-LOAD",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Hrushikant Patkar",
+   "block": "B1",
+   "depends": [
+    "EDGE-WAITING-ROOM"
+   ],
+   "subject": "Load test the waiting room at 30,000 arrivals in the burst environment",
+   "detail": "ADR-0066 item 4, before the first large sale: 30,000 arrivals in the opening seconds against a burst environment (ADR-0035) with the waiting room on, recording position latency, the Front Door cache hit rate, the release rate the controller holds, commerce p95 and 429s, and the relay lag while admitted guests buy (ADR-0058 amendment: 3,500 events a second). Done when: all 30,000 get a position without a database write, admitted guests buy with commerce p95 inside its target, no cart hold succeeds without a token, and the results are recorded against the sizing figures."
+  },
+  {
+   "key": "ACC-RULE-EVAL",
+   "epic": "OFFLINE",
+   "points": 8,
+   "pool": "backend",
+   "block": "B1",
+   "depends": [
+    "OFFLINE-BUNDLE"
+   ],
+   "subject": "One admission rule format, two evaluators: .NET and TypeScript proven equal by shared test vectors",
+   "detail": "ADR-0068 (accepted 1 October; B1, with the scanner): the closed JSON rule format (AdmissionRule, AdmissionCondition; conditionRule on access.dynamic_policy versions) evaluated by validateAccess online in .NET and by the gate offline in TypeScript (packages/offline-core) against the same active policy version that getOfflinePackage carries; each scan_event records the policy version that decided it. Done when: one set of test vectors runs in CI against both evaluators and they agree on every vector, a rule the format cannot express is refused when the policy is saved, and an offline scan and an online scan of the same credential under the same policy version give the same decision."
   }
  ]
 }

@@ -18,30 +18,6 @@
   "requestBody": "WebhookSubscription",
   "responds": "WebhookSubscription"
  },
- "listAccessPolicies": {
-  "method": "GET",
-  "path": "/access-policies",
-  "contract": "identity",
-  "summary": "Attribute-based access policies",
-  "permission": "PERMISSION_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "scopePath",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AccessPolicy"
- },
  "listApiClients": {
   "method": "GET",
   "path": "/api-clients",
@@ -176,6 +152,30 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listAuthorisationPolicies": {
+  "method": "GET",
+  "path": "/authorisation-policies",
+  "contract": "identity",
+  "summary": "Attribute-based authorisation policies",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AuthorisationPolicy"
  },
  "listCrossModuleOrchestration": {
   "method": "GET",

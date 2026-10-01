@@ -1,9 +1,9 @@
 # ADR-0015: Standards-First Device Drivers
 
-**Status:** Accepted
+**Status:** Accepted · amended by [ADR-0067](0067-one-device-register.md), 1 October 2026: every device class, gate devices included, is registered once in `platform.device`; Access keeps only where a device is placed
 **Date:** 13 August 2026
 **Unblocks:** hardware-dependent work currently waiting on the model list and turnstile SDK
-**Related:** ADR-0012 adaptor-first integration
+**Related:** ADR-0012 adaptor-first integration (its Q2 waiting room amended by ADR-0066; the adaptor-first rule stands)
 
 ---
 

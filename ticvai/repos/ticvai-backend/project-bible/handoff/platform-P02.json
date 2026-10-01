@@ -7,11 +7,11 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-09-30",
+ "generated": "2026-10-01",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
-  "operations": 217,
+  "operations": 219,
   "contracts": 19,
   "modules": 17,
   "undrawn": 0,
@@ -167,7 +167,7 @@
   },
   {
    "contract": "catalogue",
-   "operations": 17
+   "operations": 19
   },
   {
    "contract": "fnb",
@@ -182,11 +182,11 @@
    "operations": 11
   },
   {
-   "contract": "wallet",
+   "contract": "venue-map",
    "operations": 8
   },
   {
-   "contract": "venue-map",
+   "contract": "wallet",
    "operations": 8
   },
   {
@@ -210,7 +210,11 @@
    "operations": 5
   },
   {
-   "contract": "payments",
+   "contract": "promotions",
+   "operations": 4
+  },
+  {
+   "contract": "retail",
    "operations": 4
   },
   {
@@ -218,11 +222,7 @@
    "operations": 4
   },
   {
-   "contract": "promotions",
-   "operations": 4
-  },
-  {
-   "contract": "retail",
+   "contract": "payments",
    "operations": 4
   },
   {
@@ -642,7 +642,7 @@
    "module": "High-Demand Access",
    "wave": 1,
    "route": "/general/branded-queue-waiting-room",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {

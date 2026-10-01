@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS payments.dunning_case (
 CREATE TABLE IF NOT EXISTS payments.dunning_policy (
     id                                uuid PRIMARY KEY,
     max_attempts                      integer NOT NULL DEFAULT 4,
-    attempt_offset_days               text[],
+    attempt_offset_days               integer[],
     minimum_hours_between_attempts    integer DEFAULT 24,
     retryable_decline_classes         text[],
     notify_guest_on_each_attempt      boolean DEFAULT false,

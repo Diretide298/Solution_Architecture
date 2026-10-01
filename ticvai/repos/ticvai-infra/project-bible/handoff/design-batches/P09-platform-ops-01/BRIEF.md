@@ -1,6 +1,6 @@
 # P09-platform-ops-01 — P09 · Platform Ops
 
-**1 screens · 2 operations · 1 schemas · 2 permissions**
+**1 screens · 6 operations · 4 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -60,4 +60,4 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-318` | Dead Letters | listDetail | 2 | 0 | — |
+| `ADM-318` | Dead Letters | listDetail | 6 | 2 | — |

@@ -1,6 +1,6 @@
 # P09-tenants-licensing-01 — P09 · Tenants & Licensing
 
-**9 screens · 40 operations · 46 schemas · 15 permissions**
+**9 screens · 40 operations · 47 schemas · 15 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

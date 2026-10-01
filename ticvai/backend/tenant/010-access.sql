@@ -62,41 +62,6 @@ CREATE TABLE IF NOT EXISTS access.access_change (
     changed_at                        timestamptz NOT NULL
 );
 
--- Holds 30 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS access.access_device (
-    id                                uuid PRIMARY KEY NOT NULL,
-    venue_id                          uuid NOT NULL,
-    hardware_model_id                 uuid,
-    hardware_type                     text NOT NULL CONSTRAINT access_device_hardware_type_chk CHECK (hardware_type IN ('standardTurnstile', 'fullHeightTurnstile', 'tripodTurnstile', 'speedGate', 'wideLane', 'accessiblePodGate', 'buggyGate', 'vipGate', 'staffGate', 'androidHandheld', 'iosDevice', 'tablet', 'qrBarcodeReader', 'rfidReader', 'nfcReader', 'multiTechnologyReader', 'biometricReader', 'podium', 'counter', 'beacon', 'cameraController', 'externalAccessDevice')),
-    name                              text,
-    serial_number                     text,
-    access_area_id                    uuid,
-    access_point_id                   uuid,
-    gate_lane_id                      uuid,
-    device_group_id                   text,
-    ip_network_reference              text,
-    controller_reference              text,
-    installation_date                 date,
-    provisioning_stage                text NOT NULL DEFAULT 'registered' CONSTRAINT access_device_provisioning_stage_chk CHECK (provisioning_stage IN ('registered', 'hardwareProfileAssigned', 'locationAssigned', 'authenticated', 'configurationDownloaded', 'securityPackageDownloaded', 'connectivityTested', 'active')),
-    lifecycle_status                  text DEFAULT 'registered' CONSTRAINT access_device_lifecycle_status_chk CHECK (lifecycle_status IN ('registered', 'configured', 'tested', 'approved', 'production')),
-    capabilities                      text[],
-    proximity_threshold_meters        integer,
-    is_active                         boolean NOT NULL DEFAULT true,
-    status                            text CONSTRAINT access_device_status_chk CHECK (status IN ('healthy', 'active', 'degraded', 'offline', 'localMode')),
-    connectivity                      text,
-    scanner_health                    text,
-    controller_health                 text,
-    camera_health                     text,
-    configuration_version             text,
-    local_rule_version                text,
-    credential_security_package_version text,
-    last_heartbeat_at                 timestamptz,
-    scope_path                        ltree NOT NULL,
-    created_at                        timestamptz,
-    updated_at                        timestamptz
-);
-
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.access_incident (
@@ -728,6 +693,29 @@ CREATE TABLE IF NOT EXISTS access.device_configuration (
     updated_at                        timestamptz
 );
 
+-- Holds 30 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS access.device_placement (
+    id                                uuid PRIMARY KEY NOT NULL,
+    venue_id                          uuid NOT NULL,
+    device_id                         uuid NOT NULL,
+    access_area_id                    uuid,
+    access_point_id                   uuid,
+    gate_lane_id                      uuid,
+    role                              text NOT NULL DEFAULT 'entryAndExit' CONSTRAINT device_placement_role_chk CHECK (role IN ('entry', 'exit', 'entryAndExit', 'validationOnly', 'proximity', 'monitoring')),
+    name                              text,
+    device_group_id                   text,
+    controller_reference              text,
+    proximity_threshold_meters        integer,
+    installation_date                 date,
+    provisioning_checklist            jsonb,
+    is_active                         boolean NOT NULL DEFAULT true,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz,
+    hardware_model_id                 uuid
+);
+
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.dynamic_field (
@@ -758,7 +746,7 @@ CREATE TABLE IF NOT EXISTS access.dynamic_policy (
     policy_type                       text NOT NULL CONSTRAINT dynamic_policy_policy_type_chk CHECK (policy_type IN ('guestAttribute', 'accreditation', 'occupancy', 'employee', 'risk', 'membership', 'timeEvent')),
     context_type                      text CONSTRAINT dynamic_policy_context_type_chk CHECK (context_type IN ('date', 'day', 'time', 'season', 'event', 'performance', 'specialEvent', 'holiday', 'operatingCalendar', 'occupancy', 'attractionStatus')),
     identity_type                     text CONSTRAINT dynamic_policy_identity_type_chk CHECK (identity_type IN ('guest', 'member', 'annualPassHolder', 'employee', 'contractor', 'vendor', 'performer', 'media', 'vip', 'security', 'emergencyServices', 'eventStaff')),
-    condition_expression              text NOT NULL,
+    condition_rule                    jsonb NOT NULL,
     result                            text NOT NULL CONSTRAINT dynamic_policy_result_chk CHECK (result IN ('allow', 'deny', 'review', 'requireId', 'requireBiometric', 'requireCompanion', 'requireSupervisor')),
     priority                          integer,
     allowed_zone_ids                  text[],
@@ -1513,6 +1501,7 @@ CREATE TABLE IF NOT EXISTS access.scan_event (
     dynamic_policy_result             text CONSTRAINT scan_event_dynamic_policy_result_chk CHECK (dynamic_policy_result IN ('allow', 'deny', 'review', 'requireId', 'requireBiometric', 'requireCompanion', 'requireSupervisor')),
     quantity                          integer DEFAULT 1,
     local_sequence                    integer,
+    policy_set_version                text,
     package_version                   text,
     recorded_at                       timestamptz NOT NULL,
     synced_at                         timestamptz,

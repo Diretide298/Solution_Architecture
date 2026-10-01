@@ -109,13 +109,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "GST-002",
     "GST-003",
     "GST-008",
+    "GST-046",
     "GST-049"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-007 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-007 holds none of them. The edge carries nothing: GST-007 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-003",
@@ -148,10 +149,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "performanceId"
      ],
      "provenance": "decided 29 September 2026, W8"
+    },
+    {
+     "to": "GST-046",
+     "trigger": "Adds tickets for a performance whose on-sale waiting room is on",
+     "operation": "addCartLine",
+     "precondition": "`addCartLine` refused `403 admission-required`: this performance's room is on and the app holds no admission token for it",
+     "carries": [
+      "performanceId"
+     ],
+     "returnsTo": "GST-007",
+     "provenance": "ADR-0066 (accepted 1 October 2026) and its 1 October amendment"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** **Date → time → ticket (REV3-2):** the time sits right after the date and stays hidden until a date is picked; tickets (GST-008) come after the time; Continue stays off until both are chosen (`performanceReveal`, default `dateTimeTicket`). **Times (REV3-1)** paged with part-of-day chips. **Seated events (REV3-4, REV3-7):** this step before the seat map, or a pop-up on it (`seatEventDateMode`); skipped when the event has one on-sale performance; may render with GST-049 as one step. **Language (REV3-17), experience and level (REV3-19), Booking at (REV3-18), Quick tour (REV3-20).** **Consent questions (REV3-26)** pop up once after the session or date; the *Swim consent pop-up (on/off)* toggle is dropped. Per-guest eligibility is `checkBookingEligibility`, unchanged (DG-3). Guest copy may say *Session* (CFG-10); code keeps `Performance`. Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September (MOB-29SEP).** **M17-08:** seven-day date strip plus a calendar icon. **W8:** a product-first flow (workshop, experience) comes here after the product is chosen on GST-008; the date-first default no longer overrides it, because the order is the flow's. **W5:** surf and session levels appear only after a time slot is chosen. **W11:** guided tours stay date → language → time slot, confirmed unchanged.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** **Date → time → ticket (REV3-2):** the time sits right after the date and stays hidden until a date is picked; tickets (GST-008) come after the time; Continue stays off until both are chosen (`performanceReveal`, default `dateTimeTicket`). **Times (REV3-1)** paged with part-of-day chips. **Seated events (REV3-4, REV3-7):** this step before the seat map, or a pop-up on it (`seatEventDateMode`); skipped when the event has one on-sale performance; may render with GST-049 as one step. **Language (REV3-17), experience and level (REV3-19), Booking at (REV3-18), Quick tour (REV3-20).** **Consent questions (REV3-26)** pop up once after the session or date; the *Swim consent pop-up (on/off)* toggle is dropped. Per-guest eligibility is `checkBookingEligibility`, unchanged (DG-3). Guest copy may say *Session* (CFG-10); code keeps `Performance`. Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September (MOB-29SEP).** **M17-08:** seven-day date strip plus a calendar icon. **W8:** a product-first flow (workshop, experience) comes here after the product is chosen on GST-008; the date-first default no longer overrides it, because the order is the flow's. **W5:** surf and session levels appear only after a time slot is chosen. **W11:** guided tours stay date → language → time slot, confirmed unchanged.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 3 and 4).** **Choosing a session adds nothing to the cart.** Once a session is chosen its tickets appear (for a surf session: Surfer at the session price, Junior surfer 10–15, Spectator) and a line reaches the cart (`addCartLine`) only when a quantity is set; until a session is chosen the ticket area says *Choose a session above to see its tickets and prices.* **A question the flow already asks on the page is not asked again** in the consent pop-up: on the water park's swim-ability flow the *Are you able to swim?* answer given on the page stands.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listPerformances` reads the population and `getAvailability` reads one of them — list, select, act",
@@ -377,9 +389,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-007",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "partial",
     "view": "Buy tickets → Timed entry → Book now (step 1: date, then entry window)",
     "differences": "Booking in the app runs the website booking engine; per-flow step order."
@@ -547,7 +559,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
-  "notes": "**Rev 3 (decided 29 September).** **Ticket selection moved onto this screen** (GAP-D3): the name promised choosing tickets and add-ons and the definition was a ticket transfer, which stays on GST-014 / GST-045 (one implementation with two ids). Tickets come after the date and time (REV3-2); categories (REV3-16); info-only products show their label and open details (REV3-14); ticket-type descriptions (23SEP-6) and tags (23SEP-3); Help me choose as a region and a sheet (REV3-11); Booking at (REV3-18). On mobile the basket stays a bottom bar with the running total (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** **W4:** Help me choose filters the products (`guidedAnswerIds`) with *Show everything*; `behaviour` `recommend` stays an option. **W8:** in a product-first flow (workshop, experience) this step comes first and the date and time follow (GST-007). **W5:** surf levels (beginner, intermediate …) appear only after the time slot.",
+  "notes": "**Rev 3 (decided 29 September).** **Ticket selection moved onto this screen** (GAP-D3): the name promised choosing tickets and add-ons and the definition was a ticket transfer, which stays on GST-014 / GST-045 (one implementation with two ids). Tickets come after the date and time (REV3-2); categories (REV3-16); info-only products show their label and open details (REV3-14); ticket-type descriptions (23SEP-6) and tags (23SEP-3); Help me choose as a region and a sheet (REV3-11); Booking at (REV3-18). On mobile the basket stays a bottom bar with the running total (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** **W4:** Help me choose filters the products (`guidedAnswerIds`) with *Show everything*; `behaviour` `recommend` stays an option. **W8:** in a product-first flow (workshop, experience) this step comes first and the date and time follow (GST-007). **W5:** surf levels (beginner, intermediate …) appear only after the time slot.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 1 and 2).** **Guest counters take the chosen ticket's prices:** the guest types (adult, child, senior, infant) are the chosen product's variants and are priced from it (`listProductVariants`), so *2 park ticket* with three adults is one line, *2 park ticket · Adult × 3*, never a ticket line plus a separate adult line; child and senior follow the chosen ticket, and an infant stays free where the ticket says so. **Group and school booking starts from the group tickets** (in the client build: School, Corporate, Tour operator and Community), each card with its per-person price and minimum group size, then **How many people** as a number box the guest can type into (for example 45) or step with − and + (the app adds a +10 step); there is no Group size dropdown. The estimate reads *<ticket> · Guests × <n>*, and the request is `requestGroupBooking` with the group ticket as `packageProductId` and the headcount as `expectedSize`. Supervisors listed separately and free, and a water-park group choosing a session, are not in the contract yet (questions of 1 October).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProductVariants` reads the ticket types of the product and a stepper sets each quantity — list, select, act (rewritten decided 29 September, rev 3 GAP-D3: the ticket-selection functions the name promises moved onto this screen)",
@@ -712,9 +724,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-008",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "partial",
     "view": "Buy tickets → Dated day pass → Book now → Fri 2 Oct (step 2: tickets; add-ons are step 3)",
     "differences": "Booking in the app runs the website booking engine."
@@ -798,7 +810,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-048 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-048 holds none of them. The edge carries nothing: GST-048 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -985,7 +997,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-049 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-049 holds none of them. The edge carries nothing: GST-049 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -1129,9 +1141,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-049",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "partial",
     "view": "Union Arena → Buy tickets → Direct seat map → 2D plan → section 104 (← Whole map)",
     "differences": "The app runs the website seat engine (2D and 3D)."
@@ -1270,7 +1282,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-050 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-050 holds none of them. The edge carries nothing: GST-050 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -1491,7 +1503,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-056 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-056 holds none of them. The edge carries nothing: GST-056 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-041",
@@ -1753,7 +1765,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-058 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-058 holds none of them. The edge carries nothing: GST-058 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-074",
@@ -2164,7 +2176,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formRequestGroupBooking",
     "component": "modal",
     "trigger": "Request group booking",
-    "body": "**Collects what `requestGroupBooking` sends before it is called.** Required: `kind`, `packageProductId`, `preferredDate`, `expectedSize`. Optional: `organisationName`, `yearGroup`, `accessAndDietaryNeeds`, `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `requestGroupBooking` sends before it is called.** Required: `kind`, `packageProductId`, `preferredDate`, `expectedSize`. Optional: `organisationName`, `yearGroup`, `accessAndDietaryNeeds`, `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`. Dismissing sends nothing; the screen behind is unchanged.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 1).** The group ticket is chosen first (`packageProductId`: cards with the per-person price and the minimum group size), then *How many people* (`expectedSize`) as a number box the guest types into or steps with − and + (+10 on the app); no Group size dropdown. The estimate reads *<ticket> · Guests × <n>*.",
     "bindsTo": "GroupBookingRequest",
     "confirm": {
      "label": "Request group booking",
@@ -2828,6 +2840,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

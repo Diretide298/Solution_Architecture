@@ -140,6 +140,8 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /merchandise-reservations/{reservationId}/cancel:
     parameters:
@@ -172,6 +174,8 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shop-and-drop/{dropId}/dispose:
     parameters:
@@ -218,6 +222,8 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /merchandise:
     get:
@@ -302,6 +308,8 @@ paths:
                             - $ref: '#/components/schemas/MerchandiseItem'
                             - $ref: '#/components/schemas/GuestMerchandiseItem'
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createMerchandise
@@ -341,6 +349,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /merchandise/{merchandiseId}:
     parameters:
@@ -408,6 +418,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /merchandise/lookup:
     get:
@@ -478,6 +490,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- sales
   /retail-sales:
@@ -525,6 +539,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/RetailSale' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createRetailSale
@@ -578,6 +594,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/StockConflictProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /retail-sales/{saleId}:
     parameters:
@@ -607,6 +625,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/RetailSale' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /retail-sales/lookup:
     get:
@@ -670,6 +690,8 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /retail-sales/{saleId}/reprint:
     parameters:
@@ -720,6 +742,8 @@ paths:
                 properties:
                   reprintCount: { type: integer }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- returns
   /retail-returns:
@@ -763,6 +787,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/RetailReturn' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createRetailReturn
@@ -844,6 +870,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /retail-exchanges:
     post:
@@ -882,6 +910,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/StockConflictProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /outlets/{outletId}/return-policy:
     parameters:
@@ -912,6 +942,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ReturnPolicy' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     put:
       operationId: setReturnPolicy
@@ -941,6 +973,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ReturnPolicy' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- wallet
 
@@ -997,6 +1031,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/OutletStockLine' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shop-and-drop:
     post:
@@ -1086,6 +1122,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/ShopAndDropProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shop-and-drop/lookup:
     get:
@@ -1132,6 +1170,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shop-and-drop/{dropId}/collect:
     parameters:
@@ -1185,6 +1225,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/ShopAndDropProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /outlets/{outletId}/reserve:
     parameters:
@@ -1276,6 +1318,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/StockConflictProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /store-rules:
     get:
@@ -1312,6 +1356,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/StoreRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setStoreRules
       x-ticvai-consumed-by:
@@ -1348,19 +1394,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StoreRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-recommendations:
     get:
       operationId: listRetailRecommendations
       summary: Upsell and pairing suggestions for retail
-      deprecated: true
-      x-ticvai-superseded-by: decideRecommendations
       description: >
-        **Deprecated for one release, 29 September (AI system design 5.4).** Forwarded to the AI
-        recommendation engine, ai `decideRecommendations` with placement `retailBasket`, which
-        answers every placement and channel from one engine (strategy, relationship and
-        suppression configuration stay in promotions). Kept, with its path and id, for callers
-        already built on it,
-        and removed after one release; new screens call `decideRecommendations`.
+        **A channel adapter of the one recommendation engine** (ADR-0052, accepted 1 October). This operation stays as the retail basket surface, with its path, id and response shape. **Block A**: the promotions module answers it from the relationship map (rules; strategy, relationships, business priority and suppression are configured in promotions). **Block B**: it forwards to the engine in `ticvai-ai` (ai `decideRecommendations`, placement `retailBasket`) with no contract change, under a hard 200 ms budget and failing open to the rules answer, so checkout never waits on it. New screens may bind either; the deprecation of 29 September is withdrawn.
 
         The retail half of the same table F&B keeps. **Separate because the merchandising is
         separate** — a coffee pairs with a pastry and a jacket pairs with a hat, and one list
@@ -1389,6 +1430,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/RetailProductRecommendation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     RetailProductRecommendation:

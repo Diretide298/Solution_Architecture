@@ -114,7 +114,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-030 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-030 holds none of them. The edge carries nothing: GST-030 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-031",
@@ -293,7 +293,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-031 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-031 holds none of them. The edge carries nothing: GST-031 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-032",
@@ -569,7 +569,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-032 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-032 holds none of them. The edge carries nothing: GST-032 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-033",
@@ -959,7 +959,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-033 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-033 holds none of them. The edge carries nothing: GST-033 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -1097,7 +1097,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-035 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-035 holds none of them. The edge carries nothing: GST-035 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -1298,7 +1298,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-040 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-040 holds none of them. The edge carries nothing: GST-040 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "WEB-034",
@@ -1750,9 +1750,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-051",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
     "view": "Plan tab (Plan your visit · 1 of 6)"
    }
@@ -2255,9 +2255,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-053",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
     "view": "Plan tab → the six questions → Make my plan (Your plan)"
    }
@@ -2488,9 +2488,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-054",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "partial",
     "view": "Ask Sahli (the assistant chat; v4 has no plan-specific chat)",
     "differences": "v4 draws the rules plan and a general assistant chat; it has no plan-specific chat. Built from this definition."
@@ -2603,6 +2603,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

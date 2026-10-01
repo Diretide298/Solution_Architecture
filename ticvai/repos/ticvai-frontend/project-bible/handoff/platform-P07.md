@@ -31,13 +31,13 @@
 | `listCrossCellRequests` | cross-region | GET | Calls that had to leave a cell |
 | `relinquishWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
-| `getAccessPolicy` | identity | GET | One policy, at a version |
-| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| `getAuthorisationPolicy` | identity | GET | One policy, at a version |
+| `getAuthorisationPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
 | `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
-| `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
+| `listAuthorisationPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `listCapabilityTemplates` | identity | GET | Saved tick-sets |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |

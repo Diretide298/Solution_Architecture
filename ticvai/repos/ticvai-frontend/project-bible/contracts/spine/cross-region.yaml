@@ -129,6 +129,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-links/{guestLinkId}:
     parameters:
     - name: guestLinkId
@@ -164,6 +166,8 @@ paths:
                 $ref: '#/components/schemas/GuestLink'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: revokeGuestLink
       x-ticvai-audience:
@@ -223,6 +227,8 @@ paths:
                           type: integer
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-links/resolve:
     get:
       operationId: resolveGuestLink
@@ -270,6 +276,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cross-region-entitlements:
     post:
       operationId: propagateCrossRegionEntitlement
@@ -319,6 +327,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CrossRegionEntitlement'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cross-region-entitlements/{rightId}:
     parameters:
     - name: rightId
@@ -351,6 +361,8 @@ paths:
                 $ref: '#/components/schemas/CrossRegionEntitlement'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: revokeCrossRegionEntitlement
       x-ticvai-audience:
@@ -382,6 +394,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cross-region-entitlements/{rightId}/consume:
     parameters:
     - name: rightId
@@ -454,6 +468,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cross-region-entitlements/reconcile:
     post:
       operationId: reconcileRedemptions
@@ -541,6 +557,8 @@ paths:
                           type: integer
                         detail:
                           type: string
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-authorisations:
     post:
       operationId: authoriseWalletSpend
@@ -625,6 +643,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-authorisations/{authorisationId}/capture:
     parameters:
     - name: authorisationId
@@ -681,6 +701,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-authorisations/{authorisationId}/release:
     parameters:
     - name: authorisationId
@@ -719,6 +741,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletAuthorisation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-allocations:
     get:
       operationId: getWalletAllocation
@@ -754,6 +778,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletAllocation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletAllocationPolicy
       x-ticvai-consumed-by:
@@ -805,6 +831,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletAllocation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dsar/requests:
     post:
       operationId: createDsarRequest
@@ -865,6 +893,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DsarRequest'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dsar/requests/{requestId}:
     parameters:
     - name: requestId
@@ -896,6 +926,8 @@ paths:
                 $ref: '#/components/schemas/DsarRequest'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cell-connections:
     get:
       operationId: listCellConnections
@@ -920,6 +952,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SyncCellConnection'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cross-cell-requests:
     get:
       operationId: listCrossCellRequests
@@ -956,6 +990,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/SyncCrossCellRequest'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     SyncCellConnection:

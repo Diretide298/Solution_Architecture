@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 445 operations, 134 tables
+title: CatalogueService — 449 operations, 135 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
@@ -16,14 +16,14 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 445
+  operations: 449
   inAFlow: 256
-  percent: 58%
+  percent: 57%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: catalogue
-  tables: 79
+  tables: 80
   stores:
   - postgres
   largestTable: catalogue.channel_sales_rule
@@ -44,7 +44,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 237
+  count: 241
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -270,6 +270,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 5
+  - operation: enterWaitingRoom
+    verb: POST
+    path: /performances/{performanceId}/waiting-room/entries
+    scope: venue
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
   - operation: estimateEventResourceCost
     verb: GET
     path: /events/{eventId}/resource-cost
@@ -401,6 +409,22 @@ operationsByContract:
   - operation: getProductEligibilityRule
     verb: GET
     path: /products/{productId}/eligibility-rule
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getWaitingRoomPosition
+    verb: GET
+    path: /performances/{performanceId}/waiting-room/entries/{waitingEntryId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getWaitingRoomStatus
+    verb: GET
+    path: /performances/{performanceId}/waiting-room
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
@@ -1822,6 +1846,14 @@ operationsByContract:
     offline: false
     reads: 5
     writes: 3
+  - operation: setWaitingRoomSetting
+    verb: PUT
+    path: /performances/{performanceId}/waiting-room
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: simulatePriceBreakdownCalculation
     verb: PUT
     path: /price-breakdown-calculation
@@ -4531,6 +4563,13 @@ tables:
   writtenBy:
   - catalogue
   foreignWriters: null
+- table: catalogue.waiting_room_setting
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
 - table: catalogue.waitlist_entry
   columns: 11
   store: postgres
@@ -5048,6 +5087,7 @@ screens:
 - P01:WEB-007 Interactive Seat Selection
 - P01:WEB-008 Add-ons & Upsell
 - P01:WEB-010 Shopping Cart
+- P01:WEB-015 Branded Queue / Waiting Room
 - P01:WEB-022 Membership Plans
 - P01:WEB-023 Membership Management
 - P01:WEB-031 My Reservations
@@ -5072,6 +5112,7 @@ screens:
 - P02:GST-038 At the Venue
 - P02:GST-041 Checkout Entry
 - P02:GST-044 Multi-Currency & Pricing
+- P02:GST-046 Branded Queue / Waiting Room
 - P02:GST-049 Interactive Seat Selection
 - P02:GST-050 Resource Booking – Cabana
 - P02:GST-051 Plan

@@ -816,12 +816,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-073",
      "trigger": "Lost & Found Register",
-     "provenance": "derived — BO-073 declares entryState.params itemId and BO-107 holds none of them, so the edge carries nothing and BO-073 opens cold"
+     "provenance": "derived — BO-073 declares entryState.params itemId and BO-107 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional), and BO-073 opens on its own"
     },
     {
      "to": "BO-091",
      "trigger": "AI Policy & Spend",
-     "provenance": "derived — BO-091 declares entryState.params profileKey and BO-107 holds none of them, so the edge carries nothing and BO-091 opens cold"
+     "provenance": "derived — BO-091 declares entryState.params profileKey and BO-107 holds none of them. The edge carries nothing: BO-091 finds profileKey (listAssistantProfiles) itself, and BO-091 opens on its own"
     }
    ]
   },

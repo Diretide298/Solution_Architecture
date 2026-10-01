@@ -25,12 +25,12 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-001 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-001 holds none of them. The edge carries nothing: ADM-001 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     },
     {
      "to": "ADM-004",
      "trigger": "Platform Audit Log",
-     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId and ADM-001 holds none of them, so the edge carries nothing and ADM-004 opens cold"
+     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId and ADM-001 holds none of them. The edge carries nothing: ADM-004 finds decisionRecordId (listAiInteractions) itself, and ADM-004 opens on its own"
     },
     {
      "to": "PTR-001",
@@ -508,12 +508,12 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-020 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-020 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-020 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-020 holds none of them. The edge carries nothing: ADM-020 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },
@@ -763,12 +763,12 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-021 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-021 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-021 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-021 holds none of them. The edge carries nothing: ADM-021 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },

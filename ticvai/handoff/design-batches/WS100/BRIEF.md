@@ -1,6 +1,6 @@
 # WS100 — Subscription Licensing AI Self Service board 3
 
-**10 screens · 9 operations · 10 schemas · 3 permissions**
+**10 screens · 9 operations · 11 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

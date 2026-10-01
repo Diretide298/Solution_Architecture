@@ -143,6 +143,10 @@ def _target_of(ref: str, schemas: dict):
     return target
 
 
+# The scalar item types whose arrays keep their type as a column (R227); everything else is text[].
+_SCALAR_ARRAY = {"integer": "integer[]", "boolean": "boolean[]"}
+
+
 def _array_type(items, schemas: dict, persisted: dict) -> str:
     """The column type of an array property, or '' where the array is a child table's rows.
 
@@ -155,6 +159,14 @@ def _array_type(items, schemas: dict, persisted: dict) -> str:
     **An array of `allOf` items is objects too.** It fell through to `text[]`, which is how
     `fnb.service_order.lines` became a `text[] NOT NULL` beside the `service_order_line` table
     that actually holds the lines (audit R111).
+
+    **An array of integers is `integer[]`, not `text[]`** (audit R227, 1 October). Every scalar
+    array fell through to `text[]`, so `ProductEligibilityRule.heightBandsCm` (`[120, 140]`)
+    became `height_bands_cm text[]` and the band edges would compare as strings (`'90' > '140'`);
+    six more integer arrays (`peakMonths`, `warnBeforeDays`, `attemptOffsetDays`, ...) with it.
+    Booleans keep their type the same way. Strings and enums stay `text[]`; a `number` array stays
+    `text[]` for now because the one in the package is `MediaFingerprint.embedding`, whose storage
+    is a vector-store question (ADR-0049), not a column type.
     """
     if not isinstance(items, dict):
         return "text[]"
@@ -171,6 +183,8 @@ def _array_type(items, schemas: dict, persisted: dict) -> str:
         if ref.rsplit("/", 1)[-1] in persisted:
             return ""                # rows of another table: a join or child table, not a column
         target = _target_of(ref, schemas)
+        if isinstance(target, dict) and "enum" not in target and target.get("type") in _SCALAR_ARRAY:
+            return _SCALAR_ARRAY[target["type"]]
         if isinstance(target, dict) and ("enum" in target or target.get("type") in
                                          ("string", "integer", "number", "boolean")):
             return "text[]"
@@ -178,6 +192,11 @@ def _array_type(items, schemas: dict, persisted: dict) -> str:
     if items.get("type") == "object" or items.get("properties") or items.get("oneOf") \
             or items.get("anyOf"):
         return ""
+    t = items.get("type")
+    if isinstance(t, list):          # OpenAPI 3.1: ["integer", "null"]
+        t = next((x for x in t if x != "null"), None)
+    if not items.get("enum") and t in _SCALAR_ARRAY:
+        return _SCALAR_ARRAY[t]
     return "text[]"
 
 

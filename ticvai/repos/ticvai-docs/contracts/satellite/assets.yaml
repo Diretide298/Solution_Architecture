@@ -163,6 +163,8 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/MediaAsset' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /media/{mediaId}:
     parameters:
@@ -200,6 +202,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MediaAssetDetail' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     patch:
       operationId: updateMediaAsset
@@ -278,6 +282,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MediaStatusRefusedProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     delete:
       operationId: deleteMediaAsset
@@ -312,6 +318,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MediaInUseProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /media/{mediaId}/replace:
     parameters:
@@ -372,6 +380,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/UploadRefusedProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /media/uploads:
     post:
@@ -425,6 +435,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /media/uploads/{uploadId}/complete:
     parameters:
@@ -498,6 +510,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/UploadRefusedProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /media/collections:
     get:
@@ -524,6 +538,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/Collection' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createCollection
@@ -562,6 +578,8 @@ paths:
               schema: { $ref: '#/components/schemas/Collection' }
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /media/rights-expiring:
     get:
@@ -599,6 +617,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/ExpiringMedia' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-taxonomy:
     get:
       operationId: getMediaTaxonomy
@@ -628,6 +648,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaTaxonomy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMediaTaxonomy
       x-ticvai-consumed-by:
@@ -658,6 +680,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaTaxonomy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/{assetId}/tags:
     parameters:
     - name: assetId
@@ -721,6 +745,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/{assetId}/analyse:
     parameters:
     - name: assetId
@@ -766,6 +792,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaTag'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/similar:
     get:
       operationId: findSimilarMediaAssets
@@ -806,6 +834,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaSimilarity'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/{assetId}/versions:
     parameters:
     - name: assetId
@@ -845,6 +875,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaAssetVersion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/{assetId}/renditions:
     parameters:
     - name: assetId
@@ -881,6 +913,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaRendition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: requestMediaRendition
       x-ticvai-consumed-by:
@@ -910,6 +944,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaRendition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/{assetId}/rights:
     parameters:
     - name: assetId
@@ -956,6 +992,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaRights'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/{assetId}/approval:
     parameters:
     - name: assetId
@@ -1018,6 +1056,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/MediaNotPublishableProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-shares:
     post:
       operationId: createMediaShare
@@ -1053,6 +1093,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaShare'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-distribution:
     get:
       operationId: getMediaDistribution
@@ -1089,6 +1131,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaDistribution'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-distribution/channels:
     put:
       operationId: setMediaDistributionChannels
@@ -1127,6 +1171,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaDistributionChannel'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/bulk:
     post:
       operationId: bulkUpdateMediaAssets
@@ -1198,6 +1244,8 @@ paths:
                     type: integer
                   applied:
                     type: boolean
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-usage:
     get:
       operationId: getMediaUsageAnalytics
@@ -1253,6 +1301,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaUsageRow'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/{assetId}/audit:
     parameters:
     - name: assetId
@@ -1287,6 +1337,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaAuditRecord'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

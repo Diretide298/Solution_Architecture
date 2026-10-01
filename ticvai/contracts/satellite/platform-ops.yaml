@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Platform Operations
   version: 0.1.0
-  x-ticvai-screen-count: 32
+  x-ticvai-screen-count: 36
   x-ticvai-tier: satellite
   x-ticvai-module: Cross-cutting — Control Plane release and environment management
   x-ticvai-capabilities:

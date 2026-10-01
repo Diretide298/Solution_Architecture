@@ -169,7 +169,8 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Device used (access.access_device)"
+    "x-ticvai-references": "platform.device",
+    "description": "Device used, from the one device register (platform.device, ADR-0067)"
    },
    "loginAt": {
     "type": "string",

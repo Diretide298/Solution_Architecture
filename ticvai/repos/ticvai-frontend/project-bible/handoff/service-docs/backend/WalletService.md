@@ -125,6 +125,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 |---|---|---|
 | 200 |  | Loaded |
 | 409 |  | The card is not active. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: giftCard
@@ -178,6 +179,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 |---|---|---|
 | 200 |  | Card |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: retail
@@ -233,6 +235,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 |---|---|---|
 | 200 |  | The setting; enabled false where none was set |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getWalletExitBalance
 
@@ -297,6 +300,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 |---|---|---|
 | 200 |  | Balance at exit |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setWalletAutoReloadSetting
 
@@ -377,6 +381,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The venue has auto-reload disabled for this wallet type, or the wallet is suspended or closed. |
 | 422 |  | An amount outside the venue's funding rules, or a payment token that is not the holder's. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### settleWalletAtExit
 
@@ -446,6 +451,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Nothing is due or refundable, or the action does not match the balance (collect on a wallet in credit), or waive by a guest. |
 | 422 |  | The card was declined, or waive without a reason. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### transferWalletBalance
 
@@ -517,6 +523,7 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 |---|---|---|
 | 200 |  | Transferred. |
 | 409 |  | Insufficient cash credit, distinct from insufficient balance — a guest with 200 of bonus credit and 10 of cash can transfer 10, and telling them they have 200 would be wrong. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: wallet
@@ -578,6 +585,7 @@ Turns a `held` hold into a debit (SD-027): under the same balance row lock the h
 |---|---|---|
 | 200 |  | The hold |
 | 409 |  | The hold is not held (already captured, released or expired) (hold-not-held). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### expireCreditLots
 
@@ -637,6 +645,7 @@ Extension exists because a venue will want it: a goodwill gesture, a closure, a 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | What would happen, or what did |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getWallet
 
@@ -699,6 +708,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 |---|---|---|
 | 200 |  | Wallet |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### holdWalletFunds
 
@@ -760,6 +770,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 |---|---|---|
 | 201 |  | The hold |
 | 409 |  | The available balance is less than the amount (insufficient-funds), or the wallet is suspended or closed (wallet-not-active). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listWalletTransactions
 
@@ -821,6 +832,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 |---|---|---|
 | 200 |  | Transactions |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishWalletConfiguration
 
@@ -874,6 +886,7 @@ Published as a version, so a change can be rolled back and so `getApprovalRecord
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Findings, and the version if published |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### releaseWalletHold
 
@@ -923,6 +936,7 @@ Returns a `held` hold to available under the balance row lock (SD-027); the swee
 |---|---|---|
 | 200 |  | The hold |
 | 409 |  | The hold is not held (already captured, released or expired) (hold-not-held). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### restoreWalletConfigurationVersion
 
@@ -977,6 +991,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 |---|---|---|
 | 200 |  | Restored into the working draft, unpublished |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setWalletFundingRules
 
@@ -1150,6 +1165,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setWalletRefundPolicy
 
@@ -1206,6 +1222,7 @@ Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different 
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 

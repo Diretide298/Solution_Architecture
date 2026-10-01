@@ -105,7 +105,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-034 holds none of them, so the edge carries nothing and BO-001 opens cold"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-034 holds none of them. The edge carries nothing: eventId, feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
     }
    ]
   },
@@ -475,7 +475,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-035 holds none of them, so the edge carries nothing and BO-001 opens cold"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-035 holds none of them. The edge carries nothing: eventId, feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
     }
    ]
   },
@@ -2441,7 +2441,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-094",
      "trigger": "Map Editor & Publish",
-     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-092 holds none of them, so the edge carries nothing and BO-094 opens cold"
+     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-092 holds none of them. The edge carries nothing: mapId, pathId only pre-select (deep link or optional), and BO-094 opens on its own"
     }
    ]
   },
@@ -3351,7 +3351,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-097",
      "trigger": "Check Out & Check In",
-     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId and BO-095 holds none of them, so the edge carries nothing and BO-097 opens cold"
+     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId and BO-095 holds none of them. The edge carries nothing: authorisationId, bookingId only pre-select (deep link or optional), and BO-097 opens on its own"
     },
     {
      "to": "BO-098",
@@ -5014,13 +5014,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "AccessDynamicPolicy": {
   "type": "object",
   "x-ticvai-persistence": "access.dynamic_policy",
-  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.",
+  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.authorisation_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Guest admission lives here and nowhere else** (ADR-0068, accepted 1 October). `validateAccess` online and the gate offline evaluate the same active version: `getOfflinePackage` carries it, and every `scan_event` records the policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`) and the set it was decided under (`policySetVersion`). The condition is `conditionRule`, a closed JSON format (`AdmissionRule`), not free text. Identity's staff-permission engine was renamed `AuthorisationPolicy` on the same day, so \"access policy\" means this.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AuthorisationPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAuthorisationPolicyEffectiveness` in identity.",
   "required": [
    "id",
    "scopePath",
    "name",
    "policyType",
-   "conditionExpression",
+   "conditionRule",
    "result",
    "status",
    "currentVersion"
@@ -5093,9 +5093,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "Identity-based policies (listIdentityMembershipAccreditation)"
    },
-   "conditionExpression": {
-    "type": "string",
-    "description": "Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN"
+   "conditionRule": {
+    "$ref": "#/components/schemas/AdmissionRule",
+    "description": "The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`)."
    },
    "result": {
     "type": "string",
@@ -6843,9 +6843,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
    },
+   "policySetVersion": {
+    "type": "string",
+    "description": "**The active admission policy version the package carries** (ADR-0068, 1 October): a fingerprint of the `(id, currentVersion)` of every policy in `dynamicPolicies`, computed the same way by `validateAccess` online. Every scan the gate records carries it (`ScanEvent.policySetVersion`), so a scan decided offline under a set that has since changed is visible at sync rather than assumed equal."
+   },
    "dynamicPolicies": {
     "type": "array",
-    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one.",
+    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), each at its active version with its `conditionRule` (ADR-0068), so an offline gate applies the same rules as an online one.",
     "items": {
      "$ref": "#/components/schemas/AccessDynamicPolicy"
     }
@@ -8464,6 +8468,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "policySetVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The admission policy set the scan was decided under (`OfflinePackage.policySetVersion`, or the same fingerprint computed online by `validateAccess`), beside the one policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`). ADR-0068, 1 October."
    },
    "packageVersion": {
     "type": "string",

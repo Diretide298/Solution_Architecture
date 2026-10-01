@@ -39,7 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "provenance": "derived — BO-100 declares entryState.params  and BO-194 holds none of them, so the edge carries nothing and BO-100 opens cold"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-194 holds none of them. The edge carries nothing: BO-194 is opened from BO-100, so this edge is the way back and BO-100 keeps its own state"
     },
     {
      "to": "BO-195",
@@ -51,7 +51,10 @@
      "to": "BO-196",
      "trigger": "Works in Physical Device Registration & Provisioning",
      "provenance": "flow F116 step 3→4",
-     "operation": "listDeviceGate"
+     "operation": "listDeviceGate",
+     "carries": [
+      "placementId"
+     ]
     },
     {
      "to": "BO-197",
@@ -260,10 +263,10 @@
       {
        "kind": "primaryButton",
        "label": "Save access device",
-       "operation": "updateAccessDevice",
+       "operation": "updateAccessDevicePlacement",
        "permission": "DEVICE_CONFIGURE",
-       "notes": "Changes where a registered device sits and what it is: name, hardware model, area, access point, lane, group label, network references, capabilities and `isActive`.",
-       "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+       "notes": "Changes where a placed device sits: area, access point, lane, role, label, group label, controller reference, proximity threshold and `isActive` (ADR-0067). What the device is (model, serial, versions) is the register's, tenancy `platform.device`.",
+       "provenance": "contract access.yaml PUT /device-placements/{placementId}"
       }
      ]
     }
@@ -307,9 +310,9 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "updateAccessDevice",
+    "operationId": "updateAccessDevicePlacement",
     "contract": "access",
-    "purpose": "Replace a registered device's registration",
+    "purpose": "Replace a device's placement",
     "trigger": "onAction",
     "invalidates": [
      "listDeviceGate",
@@ -335,6 +338,11 @@
      "name": "deviceId",
      "from": "navigation",
      "optional": true
+    },
+    {
+     "name": "placementId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
@@ -350,36 +358,32 @@
     "id": "formUpdateAccessDevice",
     "component": "modal",
     "trigger": "Save access device",
-    "body": "**Collects what `updateAccessDevice` sends before it is called.** Required: `id`, `venueId`, `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`, `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`, `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AccessAccessDevice",
+    "body": "**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `id`, `venueId`, `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`, `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessDevicePlacement",
     "confirm": {
      "label": "Save access device",
-     "operation": "updateAccessDevice"
+     "operation": "updateAccessDevicePlacement"
     },
     "dismiss": {
      "label": "Cancel",
      "discards": [
       "id",
       "venueId",
-      "hardwareType",
-      "provisioningStage",
+      "deviceId",
+      "role",
       "isActive",
       "scopePath",
-      "hardwareModelId",
-      "name",
-      "serialNumber",
       "accessAreaId",
       "accessPointId",
       "gateLaneId",
+      "name",
       "deviceGroupId",
-      "ipNetworkReference",
       "controllerReference",
-      "installationDate",
-      "lifecycleStatus",
-      "capabilities"
+      "proximityThresholdMeters",
+      "installationDate"
      ]
     },
-    "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+    "provenance": "contract access.yaml PUT /device-placements/{placementId}"
    }
   ],
   "_platform": {
@@ -616,7 +620,8 @@
      "operation": "listPhysicalDeviceRegistration",
      "carries": [
       "accessPointId",
-      "deviceId"
+      "deviceId",
+      "placementId"
      ]
     }
    ]
@@ -700,20 +705,28 @@
      "slot": "rowActions",
      "components": [
       {
+       "kind": "secondaryButton",
+       "label": "Register device",
+       "operation": "registerDevice",
+       "permission": "DEVICE_CONFIGURE",
+       "notes": "**Step one: the device into the one register** (ADR-0067, 1 October): kind, hardware type, hardware model, serial and network reference, in tenancy `platform.device`. An access-control device binds to no workstation; it is placed next.",
+       "provenance": "ADR-0067, accepted 1 October (register in the platform, then place in Access)"
+      },
+      {
        "kind": "primaryButton",
        "label": "Register access device",
-       "operation": "registerAccessDevice",
+       "operation": "placeAccessDevice",
        "permission": "DEVICE_CONFIGURE",
-       "notes": "**The write behind Physical Device Registration & Provisioning** (BO-196): registers one deployed device (a turnstile, reader, handheld, podium unit or beacon) against a hardware model and places it in the topology.",
-       "provenance": "contract access.yaml POST /access-devices"
+       "notes": "**Register in the platform, then place in Access** (ADR-0067, 1 October): tenancy `registerDevice` records the device (a turnstile, reader, handheld, podium unit or beacon) in the one register, and `placeAccessDevice` puts it in the topology.",
+       "provenance": "contract access.yaml POST /device-placements"
       },
       {
        "kind": "secondaryButton",
        "label": "Save access device",
-       "operation": "updateAccessDevice",
+       "operation": "updateAccessDevicePlacement",
        "permission": "DEVICE_CONFIGURE",
-       "notes": "Changes where a registered device sits and what it is: name, hardware model, area, access point, lane, group label, network references, capabilities and `isActive`.",
-       "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+       "notes": "Changes where a placed device sits: area, access point, lane, role, label, group label, controller reference, proximity threshold and `isActive` (ADR-0067). What the device is (model, serial, versions) is the register's, tenancy `platform.device`.",
+       "provenance": "contract access.yaml PUT /device-placements/{placementId}"
       }
      ]
     }
@@ -733,18 +746,25 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "registerAccessDevice",
+    "operationId": "registerDevice",
+    "contract": "tenancy",
+    "purpose": "Register the device in the one device register before it is placed",
+    "trigger": "onAction",
+    "provenance": "ADR-0067, accepted 1 October (register in the platform, then place in Access)"
+   },
+   {
+    "operationId": "placeAccessDevice",
     "contract": "access",
-    "purpose": "Register a physical access-control device",
+    "purpose": "Place a registered device in the gate topology",
     "trigger": "onAction",
     "invalidates": [
      "listPhysicalDeviceRegistration"
     ]
    },
    {
-    "operationId": "updateAccessDevice",
+    "operationId": "updateAccessDevicePlacement",
     "contract": "access",
-    "purpose": "Replace a registered device's registration",
+    "purpose": "Replace a device's placement",
     "trigger": "onAction",
     "invalidates": [
      "listPhysicalDeviceRegistration"
@@ -760,74 +780,91 @@
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 73. 0 of 0 labels bound to a contract property; 12 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "overlays": [
    {
+    "id": "formRegisterDevice",
+    "component": "modal",
+    "trigger": "Register device",
+    "body": "**Collects what `registerDevice` sends before it is called** (tenancy, the one device register, ADR-0067). Required: `kind`, `driver`. Optional: `hardwareType`, `hardwareModelId`, `serialNumber`, `model`, `identifier`, `ipNetworkReference`. An access-control device binds to no workstation. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RegisteredDevice",
+    "confirm": {
+     "label": "Register device",
+     "operation": "registerDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "driver",
+      "hardwareType",
+      "hardwareModelId",
+      "serialNumber",
+      "model",
+      "identifier",
+      "ipNetworkReference"
+     ]
+    },
+    "provenance": "ADR-0067, accepted 1 October"
+   },
+   {
     "id": "formRegisterAccessDevice",
     "component": "modal",
     "trigger": "Register access device",
-    "body": "**Collects what `registerAccessDevice` sends before it is called.** Required: `id`, `venueId`, `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`, `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`, `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AccessAccessDevice",
+    "body": "**Collects what `placeAccessDevice` sends before it is called.** Required: `id`, `venueId`, `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`, `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessDevicePlacement",
     "confirm": {
      "label": "Register access device",
-     "operation": "registerAccessDevice"
+     "operation": "placeAccessDevice"
     },
     "dismiss": {
      "label": "Cancel",
      "discards": [
       "id",
       "venueId",
-      "hardwareType",
-      "provisioningStage",
+      "deviceId",
+      "role",
       "isActive",
       "scopePath",
-      "hardwareModelId",
-      "name",
-      "serialNumber",
       "accessAreaId",
       "accessPointId",
       "gateLaneId",
+      "name",
       "deviceGroupId",
-      "ipNetworkReference",
       "controllerReference",
-      "installationDate",
-      "lifecycleStatus",
-      "capabilities"
+      "proximityThresholdMeters",
+      "installationDate"
      ]
     },
-    "provenance": "contract access.yaml POST /access-devices"
+    "provenance": "contract access.yaml POST /device-placements"
    },
    {
     "id": "formUpdateAccessDevice",
     "component": "modal",
     "trigger": "Save access device",
-    "body": "**Collects what `updateAccessDevice` sends before it is called.** Required: `id`, `venueId`, `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`, `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`, `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AccessAccessDevice",
+    "body": "**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `id`, `venueId`, `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`, `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessDevicePlacement",
     "confirm": {
      "label": "Save access device",
-     "operation": "updateAccessDevice"
+     "operation": "updateAccessDevicePlacement"
     },
     "dismiss": {
      "label": "Cancel",
      "discards": [
       "id",
       "venueId",
-      "hardwareType",
-      "provisioningStage",
+      "deviceId",
+      "role",
       "isActive",
       "scopePath",
-      "hardwareModelId",
-      "name",
-      "serialNumber",
       "accessAreaId",
       "accessPointId",
       "gateLaneId",
+      "name",
       "deviceGroupId",
-      "ipNetworkReference",
       "controllerReference",
-      "installationDate",
-      "lifecycleStatus",
-      "capabilities"
+      "proximityThresholdMeters",
+      "installationDate"
      ]
     },
-    "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+    "provenance": "contract access.yaml PUT /device-placements/{placementId}"
    }
   ],
   "entryState": {
@@ -835,6 +872,11 @@
     {
      "name": "deviceId",
      "from": "session"
+    },
+    {
+     "name": "placementId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
@@ -1868,7 +1910,7 @@
      "carries": [
       "deviceId"
      ],
-     "provenance": "derived — BO-194 declares entryState.params accessPointId, deviceId and BO-203 holds deviceId, so an edge into it carries them"
+     "provenance": "derived — BO-194 declares entryState.params accessPointId, deviceId, placementId and BO-203 holds deviceId, so an edge into it carries them"
     }
    ]
   },

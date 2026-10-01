@@ -1,6 +1,6 @@
 # WS10 — Access Control board 10
 
-**10 screens · 20 operations · 31 schemas · 6 permissions**
+**10 screens · 20 operations · 32 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -123,7 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "provenance": "derived — BO-100 declares entryState.params  and BO-234 holds none of them, so the edge carries nothing and BO-100 opens cold"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-234 holds none of them. The edge carries nothing: BO-234 is opened from BO-100, so this edge is the way back and BO-100 keeps its own state"
     },
     {
      "to": "BO-235",
@@ -2564,6 +2564,72 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "AdmissionRule": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded as the jsonb column condition_rule of access.dynamic_policy, and in each access.dynamic_policy_version definition",
+  "description": "**One rule format that runs on both sides** (ADR-0068, accepted 1 October). A guest-admission condition was free text (`conditionExpression`, \"AND, OR, NOT, IN and BETWEEN\"), which a .NET server and a TypeScript gate cannot be relied on to read the same way. This is a closed JSON format instead: every condition is drawn from the `policyType` and `contextType` enums already on `AccessDynamicPolicy`, with a fixed set of comparators, so `validateAccess` online and the gate offline evaluate the same active version to the same answer. **One evaluator in .NET and one in TypeScript, proven equal by a shared set of test vectors in CI** (ACC-RULE-EVAL, B1 with the scanner).\n\n`match` combines `conditions` and `groups` (`all` is AND, `any` is OR); each group is its own `all` or `any` over its conditions and counts as one condition of the rule; `negate` is NOT. **Two levels and no more**: every rule the Access Control pack shows fits in them, and a deeper tree is refused `400` rather than approximated. A rule that needs more than the closed set extends the set; free text does not come back (ADR-0068, Revisit).",
+  "required": [
+   "match",
+   "conditions"
+  ],
+  "properties": {
+   "formatVersion": {
+    "type": "integer",
+    "enum": [
+     1
+    ],
+    "default": 1,
+    "description": "The rule format's version. An evaluator refuses a version it does not know rather than guess."
+   },
+   "match": {
+    "type": "string",
+    "enum": [
+     "all",
+     "any"
+    ]
+   },
+   "conditions": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 50,
+    "items": {
+     "$ref": "#/components/schemas/AdmissionCondition"
+    }
+   },
+   "groups": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "object",
+     "required": [
+      "match",
+      "conditions"
+     ],
+     "properties": {
+      "match": {
+       "type": "string",
+       "enum": [
+        "all",
+        "any"
+       ]
+      },
+      "negate": {
+       "type": "boolean",
+       "default": false
+      },
+      "conditions": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 50,
+       "items": {
+        "$ref": "#/components/schemas/AdmissionCondition"
+       }
+      }
+     }
+    }
+   }
+  }
+ },
  "ApprovalDecision": {
   "type": "object",
   "x-ticvai-persistence": "approvals.decision",
@@ -2993,9 +3059,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "requireSupervisor"
     ]
    },
-   "conditionExpression": {
-    "type": "string",
-    "description": "e.g. Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59"
+   "conditionRule": {
+    "$ref": "#/components/schemas/AdmissionRule",
+    "description": "The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`). For example: Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59."
    },
    "name": {
     "type": "string"
@@ -3054,7 +3120,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "policyId",
    "name",
    "contextType",
-   "conditionExpression",
+   "conditionRule",
    "result"
   ]
  },
@@ -3076,9 +3142,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "requireSupervisor"
     ]
    },
-   "conditionExpression": {
-    "type": "string",
-    "description": "e.g. Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59"
+   "conditionRule": {
+    "$ref": "#/components/schemas/AdmissionRule",
+    "description": "The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`). For example: Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59."
    },
    "name": {
     "type": "string"
@@ -3116,7 +3182,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "policyId",
    "name",
    "contextType",
-   "conditionExpression",
+   "conditionRule",
    "result"
   ]
  },
@@ -3460,9 +3526,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "string"
     }
    },
-   "conditionExpression": {
-    "type": "string",
-    "description": "e.g. Employee Status = Active AND Current Shift = Active"
+   "conditionRule": {
+    "$ref": "#/components/schemas/AdmissionRule",
+    "description": "The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`). For example: Employee Status = Active AND Current Shift = Active."
    },
    "validFrom": {
     "type": "string",
@@ -3938,9 +4004,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Visual Dynamic Policy Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "conditionExpression": {
-    "type": "string",
-    "description": "Condition tree over catalogue attributes using AND, OR, NOT, IN and BETWEEN, e.g. Accreditation = VIP AND Zone = Backstage"
+   "conditionRule": {
+    "$ref": "#/components/schemas/AdmissionRule",
+    "description": "The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`). For example: Accreditation = VIP AND Zone = Backstage."
    },
    "name": {
     "type": "string",
@@ -3990,7 +4056,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "required": [
    "policyId",
    "name",
-   "conditionExpression",
+   "conditionRule",
    "result"
   ]
  },
@@ -4000,9 +4066,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Visual Dynamic Policy Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "conditionExpression": {
-    "type": "string",
-    "description": "Condition tree over catalogue attributes using AND, OR, NOT, IN and BETWEEN, e.g. Accreditation = VIP AND Zone = Backstage"
+   "conditionRule": {
+    "$ref": "#/components/schemas/AdmissionRule",
+    "description": "The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`). For example: Accreditation = VIP AND Zone = Backstage."
    },
    "name": {
     "type": "string",
@@ -4031,7 +4097,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "required": [
    "policyId",
    "name",
-   "conditionExpression",
+   "conditionRule",
    "result"
   ]
  }

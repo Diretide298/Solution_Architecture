@@ -104,7 +104,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-114 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-114 holds none of them. The edge carries nothing: BO-114 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },
@@ -295,7 +295,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-115 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-115 holds none of them. The edge carries nothing: BO-115 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     },
     {
      "to": "BO-116",
@@ -624,7 +624,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-116 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-116 holds none of them. The edge carries nothing: BO-116 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     },
     {
      "to": "BO-117",
@@ -999,7 +999,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-117 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-117 holds none of them. The edge carries nothing: BO-117 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     },
     {
      "to": "BO-118",
@@ -1342,7 +1342,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-118 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-118 holds none of them. The edge carries nothing: BO-118 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     },
     {
      "to": "BO-126",
@@ -1662,7 +1662,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-119 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-119 holds none of them. The edge carries nothing: BO-119 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },
@@ -1828,7 +1828,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-120 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-120 holds none of them. The edge carries nothing: BO-120 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },
@@ -2037,7 +2037,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-121 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-121 holds none of them. The edge carries nothing: BO-121 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },
@@ -2252,7 +2252,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-122 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-122 holds none of them. The edge carries nothing: BO-122 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },

@@ -31,7 +31,7 @@ schemas:
   tables: 27
   stores:
   - postgres
-  largestTable: platform.venue_settings
+  largestTable: platform.device
 - schema: workforce
   tables: 28
   stores:
@@ -2224,12 +2224,14 @@ tables:
   - inventory
   - orders
   - payments
+  - platform-ops
   - tenancy
   foreignWriters:
   - finance
   - inventory
   - orders
   - payments
+  - platform-ops
 - table: platform.cell_endpoint
   columns: 11
   store: postgres
@@ -2275,7 +2277,7 @@ tables:
   foreignWriters:
   - shift
 - table: platform.device
-  columns: 23
+  columns: 34
   store: postgres
   parent: null
   writtenBy:
@@ -2847,6 +2849,7 @@ screens:
 - P08:BO-171 Offline Cryptographic Validation Profile
 - P08:BO-192 Biometric Lifecycle, Retention & Deletion
 - P08:BO-194 Device & Gate Command Center
+- P08:BO-196 Physical Device Registration & Provisioning
 - P08:BO-206 Offline Validation Policy Builder
 - P08:BO-208 Offline Credential & Revocation Cache
 - P08:BO-210 Connectivity Failure & Degraded Mode Policy

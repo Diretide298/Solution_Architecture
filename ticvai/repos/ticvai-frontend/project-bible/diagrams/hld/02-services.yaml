@@ -1,7 +1,7 @@
 id: HLD
 title: TICVAI — seventeen modules in five tiers, five deployables
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,660 operations and 1,097 tables resolve into seventeen modules, deployed
+about: '**What ships together.** 2,668 operations and 1,099 tables resolve into seventeen modules, deployed
   as five units (ADR-0055), and **the data boundary decides where they split**: a module owns and migrates
   its schemas; another module reads them through published views and writes them only through the owner''s
   in-process API.
@@ -50,8 +50,8 @@ tiers:
   meaning: The sale path. Highest availability and the highest write rate in the platform.
   services:
   - service: CatalogueService
-    operations: 445
-    tables: 134
+    operations: 449
+    tables: 135
     schemas:
     - catalogue
     - pricing
@@ -61,7 +61,7 @@ tiers:
     - catalogue
     - promotions
     - seating
-    flowCoverage: 58%
+    flowCoverage: 57%
     scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output**
       (ADR-0013).
     ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
@@ -212,8 +212,8 @@ tiers:
   meaning: Provisioning, publishing, reporting, and the one path that crosses a region.
   services:
   - service: PlatformService
-    operations: 212
-    tables: 103
+    operations: 216
+    tables: 104
     schemas:
     - control
     - subscription
@@ -221,7 +221,7 @@ tiers:
     - subscription
     - platform-ops
     - public-api
-    flowCoverage: 43%
+    flowCoverage: 42%
     scale: Low volume, high consequence. Tenant provisioning and licensing.
     ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
     ref: diagrams/lld/services/PlatformService.yaml
@@ -312,8 +312,8 @@ crossServiceWrites:
   kind: strong
 - from: PlatformService
   to: TenancyService
-  writes: 18
-  reads: 24
+  writes: 20
+  reads: 25
   kind: strong
 - from: OrderService
   to: CatalogueService

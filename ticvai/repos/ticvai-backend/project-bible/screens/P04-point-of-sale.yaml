@@ -140,12 +140,13 @@ screens:
     transitions:
     - to: POS-001
       trigger: Begin Shift
-      provenance: derived — POS-001 declares entryState.params shiftId and POS-000 holds none of them,
-        so the edge carries nothing and POS-001 opens cold
+      provenance: 'derived — POS-001 declares entryState.params shiftId and POS-000 holds none of them.
+        The edge carries nothing: shiftId only pre-selects (deep link or optional), and POS-001 opens
+        on its own'
     - to: POS-025
       trigger: Till Home
-      provenance: derived — POS-025 declares entryState.params  and POS-000 holds none of them, so the
-        edge carries nothing and POS-025 opens cold
+      provenance: 'derived — POS-025 declares entryState.params  and POS-000 holds none of them. The edge
+        carries nothing: POS-025 needs nothing to open'
   layout:
     template: form
     regions:
@@ -355,12 +356,15 @@ screens:
       provenance: structural — POS-001 is P04's home screen and its exits are its launcher
     - to: POS-011
       trigger: Returns, Refunds & Exchanges
-      provenance: derived — POS-011 declares entryState.params invoiceId, orderId, outletId and POS-001
-        holds none of them, so the edge carries nothing and POS-011 opens cold
+      provenance: 'derived — POS-011 declares entryState.params invoiceId, orderId, outletId and POS-001
+        holds none of them. The edge carries nothing: orderId, outletId only pre-select (deep link or
+        optional); POS-011 opens on listDenominations, and invoiceId has no source on POS-011 yet (a gap
+        in POS-011, not in this edge)'
     - to: POS-012
       trigger: Omnichannel Order & Fulfilment Center
-      provenance: derived — POS-012 declares entryState.params orderId, outletId and POS-001 holds none
-        of them, so the edge carries nothing and POS-012 opens cold
+      provenance: 'derived — POS-012 declares entryState.params orderId, outletId and POS-001 holds none
+        of them. The edge carries nothing: orderId, outletId only pre-select (deep link or optional),
+        and POS-012 opens on its own'
     - to: POS-014
       trigger: Sales Exceptions, Controls & Operational Actions
       carries:
@@ -375,8 +379,9 @@ screens:
         edge into it carries them
     - to: POS-016
       trigger: Till Configuration
-      provenance: derived — POS-016 declares entryState.params deviceId and POS-001 holds none of them,
-        so the edge carries nothing and POS-016 opens cold
+      provenance: 'derived — POS-016 declares entryState.params deviceId and POS-001 holds none of them.
+        The edge carries nothing: POS-016 finds deviceId (listDevices) itself, and POS-016 opens on its
+        own'
     - to: POS-017
       trigger: Cash In / Cash Out Operations
       carries:
@@ -1071,12 +1076,14 @@ screens:
         holds orderId, so an edge into it carries them
     - to: POS-020
       trigger: Shift Exceptions & Alerts
-      provenance: derived — POS-020 declares entryState.params reportId, requestId, shiftId and POS-002
-        holds none of them, so the edge carries nothing and POS-020 opens cold
+      provenance: 'derived — POS-020 declares entryState.params reportId, requestId, shiftId and POS-002
+        holds none of them. The edge carries nothing: shiftId, reportId, requestId only pre-select (deep
+        link or optional), and POS-020 opens on its own'
     - to: POS-008
       trigger: Reports
-      provenance: derived — POS-008 declares entryState.params conversationId, reportId and POS-002 holds
-        none of them, so the edge carries nothing and POS-008 opens cold
+      provenance: 'derived — POS-008 declares entryState.params conversationId, reportId and POS-002 holds
+        none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or
+        optional), and POS-008 opens on its own'
     - to: POS-011
       trigger: Three days later the guest returns one item
       provenance: flow F34 step 5→6
@@ -2447,8 +2454,9 @@ screens:
         performanceId, so an edge into it carries them
     - to: POS-006
       trigger: Held Orders
-      provenance: derived — POS-006 declares entryState.params orderId and POS-003 holds none of them,
-        so the edge carries nothing and POS-006 opens cold
+      provenance: 'derived — POS-006 declares entryState.params orderId and POS-003 holds none of them.
+        The edge carries nothing: POS-006 finds orderId (createOrder) itself, and POS-006 opens on its
+        own'
     uses:
     - posSaleToPayment
   notes: 'Design: Park_POS_dc.html, "Aquarium Entry" timed entry. The demand indicator is a presentation
@@ -2786,8 +2794,9 @@ screens:
       provenance: board TICVAI POS Terminal · drawerConfirm (4118) then goCheckout (5157)
     - to: POS-003
       trigger: Sell — Timed Entry
-      provenance: derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-004
-        holds none of them, so the edge carries nothing and POS-003 opens cold
+      provenance: 'derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-004
+        holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (deep link or optional);
+        POS-003 finds productId (listProducts) itself, and POS-003 opens on its own'
     - to: POS-006
       trigger: Held Orders
       carries:
@@ -3174,8 +3183,8 @@ screens:
         edge into it carries them
     - to: POS-023
       trigger: Sell — Merchandise
-      provenance: derived — POS-023 declares entryState.params  and POS-005 holds none of them, so the
-        edge carries nothing and POS-023 opens cold
+      provenance: 'derived — POS-023 declares entryState.params  and POS-005 holds none of them. The edge
+        carries nothing: POS-023 needs nothing to open'
     - to: POS-022
       trigger: Charged — back to the pass, where the order already sent to the kitchen is handed over
         (send to kitchen, then charge; audit R261)
@@ -3737,8 +3746,9 @@ screens:
         sale while they are standing at the till.
     - to: POS-003
       trigger: Sell — Timed Entry
-      provenance: derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-006
-        holds none of them, so the edge carries nothing and POS-003 opens cold
+      provenance: 'derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-006
+        holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (deep link or optional);
+        POS-003 finds productId (listProducts) itself, and POS-003 opens on its own'
     - to: POS-004
       trigger: Sell — Seat Map
       carries:
@@ -4279,8 +4289,8 @@ screens:
       back: false
     - to: POS-009
       trigger: Staff Roster
-      provenance: derived — POS-009 declares entryState.params  and POS-007 holds none of them, so the
-        edge carries nothing and POS-009 opens cold
+      provenance: 'derived — POS-009 declares entryState.params  and POS-007 holds none of them. The edge
+        carries nothing: POS-009 needs nothing to open'
     uses:
     - posPrimaryRail
   notes: 'The blind count is the whole control. Not in the mockup, which shows only Begin Shift. **Improved
@@ -5164,8 +5174,9 @@ screens:
         edge into it carries them
     - to: POS-007
       trigger: Close Shift
-      provenance: derived — POS-007 declares entryState.params saleId and POS-009 holds none of them,
-        so the edge carries nothing and POS-007 opens cold
+      provenance: 'derived — POS-007 declares entryState.params saleId and POS-009 holds none of them.
+        The edge carries nothing: saleId only pre-selects (deep link or optional), and POS-007 opens on
+        its own'
   notes: 'Close counts each foreign currency separately (`foreignHoldings`). **A variance collapsed into
     a base-currency total cannot be attributed to the currency that caused it.** **createCashMovement
     removed 18 August** — attached by module resemblance, not by what this screen does. A screen that
@@ -5698,8 +5709,9 @@ screens:
         and POS-010 holds orderId, promotionId, so an edge into it carries them
     - to: POS-003
       trigger: Sell — Timed Entry
-      provenance: derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-010
-        holds none of them, so the edge carries nothing and POS-003 opens cold
+      provenance: 'derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-010
+        holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (deep link or optional);
+        POS-003 finds productId (listProducts) itself, and POS-003 opens on its own'
     - to: POS-004
       trigger: Sell — Seat Map
       carries:
@@ -8248,8 +8260,9 @@ screens:
       operation: recordNoSale
     - to: POS-002
       trigger: Sell — Ticket Catalogue
-      provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-020 holds none of them, so the edge carries nothing and POS-002 opens cold
+      provenance: 'derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
+        and POS-020 holds none of them. The edge carries nothing: cardCode, orderId, productId, promotionId
+        only pre-select (deep link or optional), and POS-002 opens on its own'
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-3E** (client pack, 24 August). **Assigned by board purpose rather
     than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense,
@@ -9389,8 +9402,9 @@ screens:
     transitions:
     - to: POS-002
       trigger: Sell — Ticket Catalogue
-      provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-024 holds none of them, so the edge carries nothing and POS-002 opens cold
+      provenance: 'derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
+        and POS-024 holds none of them. The edge carries nothing: cardCode, orderId, productId, promotionId
+        only pre-select (deep link or optional), and POS-002 opens on its own'
   notes: '**Configuration on the till, gated by permission rather than by device.** P04 is *Terminal and
     Tablet* (`reactNativeTablet`) and ADR-0002 makes authorisation user-driven — **a manager signs into
     the same till a cashier uses and sees screens the cashier does not.**
@@ -9766,8 +9780,9 @@ screens:
     transitions:
     - to: POS-025
       trigger: Till Home
-      provenance: derived — POS-025 declares entryState.params  and POS-026 holds none of them, so the
-        edge carries nothing and POS-025 opens cold
+      provenance: 'derived — POS-025 declares entryState.params  and POS-026 holds none of them. The edge
+        carries nothing: POS-026 is opened from POS-025, so this edge is the way back and POS-025 keeps
+        its own state'
     - to: POS-011
       trigger: Returns, Refunds & Exchanges
       carries:
@@ -9881,12 +9896,14 @@ screens:
     transitions:
     - to: POS-025
       trigger: Till Home
-      provenance: derived — POS-025 declares entryState.params  and POS-027 holds none of them, so the
-        edge carries nothing and POS-025 opens cold
+      provenance: 'derived — POS-025 declares entryState.params  and POS-027 holds none of them. The edge
+        carries nothing: POS-027 is opened from POS-025, so this edge is the way back and POS-025 keeps
+        its own state'
     - to: POS-002
       trigger: Sell — Ticket Catalogue
-      provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-027 holds none of them, so the edge carries nothing and POS-002 opens cold
+      provenance: 'derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
+        and POS-027 holds none of them. The edge carries nothing: cardCode, orderId, productId, promotionId
+        only pre-select (deep link or optional), and POS-002 opens on its own'
   notes: '**`identifyGuest` was called from the catalogue and had no screen of its own**, so the model
     could attach a guest to a sale and could not say how the cashier found them. The prototype makes lookup
     a surface, which is also where the wallet and open reservations become visible before the sale rather
@@ -9967,16 +9984,19 @@ screens:
     transitions:
     - to: POS-025
       trigger: Till Home
-      provenance: derived — POS-025 declares entryState.params  and POS-028 holds none of them, so the
-        edge carries nothing and POS-025 opens cold
+      provenance: 'derived — POS-025 declares entryState.params  and POS-028 holds none of them. The edge
+        carries nothing: POS-028 is opened from POS-025, so this edge is the way back and POS-025 keeps
+        its own state'
     - to: POS-005
       trigger: Payment
-      provenance: derived — POS-005 declares entryState.params paymentId, saleId and POS-028 holds none
-        of them, so the edge carries nothing and POS-005 opens cold
+      provenance: 'derived — POS-005 declares entryState.params paymentId, saleId and POS-028 holds none
+        of them. The edge carries nothing: paymentId, saleId only pre-select (deep link or optional),
+        and POS-005 opens on its own'
     - to: POS-021
       trigger: Sell — Food & Drink
-      provenance: derived — POS-021 declares entryState.params itemId and POS-028 holds none of them,
-        so the edge carries nothing and POS-021 opens cold
+      provenance: 'derived — POS-021 declares entryState.params itemId and POS-028 holds none of them.
+        The edge carries nothing: itemId only pre-selects (deep link or optional), and POS-021 opens on
+        its own'
   notes: '**Nineteen table operations existed and not one was on a till screen.** The F&B pack drew table
     service on board 4 and the package put the operations in the contracts; the surface that uses them
     was never specified. A venue running table service had a kitchen display, a menu configuration screen
@@ -10090,8 +10110,9 @@ screens:
     transitions:
     - to: POS-025
       trigger: Till Home
-      provenance: derived — POS-025 declares entryState.params  and POS-029 holds none of them, so the
-        edge carries nothing and POS-025 opens cold
+      provenance: 'derived — POS-025 declares entryState.params  and POS-029 holds none of them. The edge
+        carries nothing: POS-029 is opened from POS-025, so this edge is the way back and POS-025 keeps
+        its own state'
     - to: POS-022
       trigger: Send to Kitchen
       carries:

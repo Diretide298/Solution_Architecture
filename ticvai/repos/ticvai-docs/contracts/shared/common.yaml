@@ -130,6 +130,21 @@ components:
         '
       schema:
         type: string
+    AdmissionToken:
+      name: X-Admission-Token
+      in: header
+      required: false
+      description: '**The on-sale waiting room''s admission token** (ADR-0066, accepted 1 October). A short-lived
+        signed token (tenant, performance, expiry, a unique id; the signing key is a Key Vault secret) that catalogue
+        `getWaitingRoomPosition` returns once the guest is admitted. **Required for a performance whose waiting room
+        is on** (catalogue `WaitingRoomSetting`): the check is a signature check in middleware with no database read,
+        and a missing, expired, forged or other-performance token is refused `403 admission-required` before
+        anything is held. Ignored for a performance with the room off. A vendor''s token (the fallback, such as
+        Queue-it) is checked the same way.
+
+        '
+      schema:
+        type: string
   headers:
     ConsistencyToken:
       description: 'WAL LSN of the write that produced this response. A client that reads its own
@@ -144,6 +159,31 @@ components:
       description: 'Whole seconds to wait before retrying. **A real figure, jittered** (ADR-0032). A fixed
         value synchronises every client into the same retry instant. An offline till treats a `429`
         as *retry later*, never as a sync rejection.
+
+        '
+      schema:
+        type: integer
+        minimum: 0
+    RateLimitLimit:
+      description: '**The request budget that refused the call** (ADR-0064): requests per second of the tenant''s
+        bucket for the caller''s audience (`guest`/`public`, `staff`, `service` or `partner`), from the tenant''s plan
+        (subscription `Plan.requestLimits`) or the platform default. Sent as `RateLimit-Limit`.
+
+        '
+      schema:
+        type: integer
+        minimum: 0
+    RateLimitRemaining:
+      description: 'Requests left in the bucket when the response was sent; `0` on a `429`. Sent as
+        `RateLimit-Remaining` (ADR-0064).
+
+        '
+      schema:
+        type: integer
+        minimum: 0
+    RateLimitReset:
+      description: 'Whole seconds until the bucket has refilled enough for one request. Sent as `RateLimit-Reset`
+        (ADR-0064). `Retry-After` is what a client obeys; this is what it may show.
 
         '
       schema:
@@ -352,6 +392,43 @@ components:
         on* look identical, and only one of them is a decision.**
 
         '
+    DeviceHardwareType:
+      type: string
+      description: '**The specific hardware under a device''s `kind`** (ADR-0067, accepted 1 October: one device
+        register). Access''s hardware library (`AccessHardwareModel.hardwareType`) and the register of record
+        (tenancy `RegisteredDevice.hardwareType`, `platform.device`) use this one list, so a turnstile is the same
+        thing in both. Shared rather than copied for the reason `ModuleKey` above gives.
+
+        Under which `kind`: the turnstiles, gates and lanes (`standardTurnstile` to `staffGate`) are
+        `turnstileController`; `androidHandheld`, `iosDevice` and `tablet` are `handheldScanner`; `qrBarcodeReader`
+        is `barcodeScanner`; `rfidReader`, `nfcReader` and `biometricReader` are the kinds of the same name;
+        `multiTechnologyReader` and `externalAccessDevice` are `accessReader`; `podium` and `counter` are
+        `accessPodium`; `beacon` is `bleBeacon`; `cameraController` is `camera`.
+
+        '
+      enum:
+      - standardTurnstile
+      - fullHeightTurnstile
+      - tripodTurnstile
+      - speedGate
+      - wideLane
+      - accessiblePodGate
+      - buggyGate
+      - vipGate
+      - staffGate
+      - androidHandheld
+      - iosDevice
+      - tablet
+      - qrBarcodeReader
+      - rfidReader
+      - nfcReader
+      - multiTechnologyReader
+      - biometricReader
+      - podium
+      - counter
+      - beacon
+      - cameraController
+      - externalAccessDevice
     ScopeLevel:
       type: string
       description: '**The eight organisational levels, plus `subject`.** Restored 24 August.
@@ -532,8 +609,15 @@ components:
         rate-limited:
           status: 429
           title: Too many requests
-          when: The concurrency or rate limit is exceeded (ADR-0032). Carries `Retry-After`. Never
-            a sync rejection.
+          when: The concurrency or rate limit is exceeded (ADR-0032), including the tenant's request budget
+            for the caller's audience and its share of a busy replica (ADR-0064). Carries `Retry-After` and the
+            `RateLimit-*` headers. Never a sync rejection.
+        admission-required:
+          status: 403
+          title: Waiting-room admission required
+          when: The performance's on-sale waiting room is on and the request carries no valid admission token
+            (`X-Admission-Token` missing, expired, forged or for another performance; ADR-0066). The client
+            sends the guest to the waiting room; nothing was held or written.
         duplicate-code:
           status: 409
           title: Code already in use
@@ -665,12 +749,24 @@ components:
           schema:
             $ref: '#/components/schemas/Problem'
     TooManyRequests:
-      description: Rate limit exceeded for this tenant, venue or principal
+      description: 'Rate limit exceeded for this tenant, venue or principal. **Declared by every operation**
+        (ADR-0064, accepted 1 October; SD-043): each tenant has a request budget per audience, a token bucket with
+        a burst of twice the rate for ten seconds, and one tenant may hold at most 25% of a replica''s request
+        slots once the replica is above 70% of its limit. Shedding order stays ADR-0032''s: `guest` and `public`
+        first, `staff` and `service` last. Retry after `Retry-After`; nothing was written.
+
+        '
       x-ticvai-problem-types:
       - rate-limited
       headers:
         Retry-After:
           $ref: '#/components/headers/RetryAfter'
+        RateLimit-Limit:
+          $ref: '#/components/headers/RateLimitLimit'
+        RateLimit-Remaining:
+          $ref: '#/components/headers/RateLimitRemaining'
+        RateLimit-Reset:
+          $ref: '#/components/headers/RateLimitReset'
       content:
         application/problem+json:
           schema:
@@ -683,6 +779,17 @@ components:
       headers:
         Retry-After:
           $ref: '#/components/headers/RetryAfter'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    AdmissionRequired:
+      description: 'The performance''s on-sale waiting room is on and the request has no valid admission token
+        (ADR-0066). The client sends the guest to the waiting room (catalogue `enterWaitingRoom`); nothing was held.
+
+        '
+      x-ticvai-problem-types:
+      - admission-required
       content:
         application/problem+json:
           schema:

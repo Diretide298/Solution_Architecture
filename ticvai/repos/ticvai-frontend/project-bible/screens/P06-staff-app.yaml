@@ -289,12 +289,14 @@ screens:
       provenance: flow F08 step 2→3, F64 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-002 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-002 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-002 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-002 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createRole, forceLogout, listActiveSessions, revokeAllSessions.
     **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens.
@@ -531,16 +533,18 @@ screens:
       provenance: flow F08 step 4→5
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-003 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-003 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-003 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-051
       trigger: Restaurant Service Command Center
-      provenance: derived — EMP-051 declares entryState.params outletId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-051 opens cold
+      provenance: 'derived — EMP-051 declares entryState.params outletId and EMP-003 holds none of them.
+        The edge carries nothing: EMP-051 finds outletId (listTableReservations) itself, and EMP-051 opens
+        on its own'
     - to: EMP-052
       trigger: Floor Plan & Table Map
       provenance: derived — EMP-052 declares entryState.params outletId and EMP-003 holds none of them,
@@ -551,72 +555,84 @@ screens:
         of them, so the edge carries nothing and EMP-053 opens cold
     - to: EMP-054
       trigger: Reservation Calendar & Timeline
-      provenance: derived — EMP-054 declares entryState.params  and EMP-003 holds none of them, so the
-        edge carries nothing and EMP-054 opens cold
+      provenance: 'derived — EMP-054 declares entryState.params  and EMP-003 holds none of them. The edge
+        carries nothing: EMP-054 needs nothing to open'
     - to: EMP-055
       trigger: Create / Edit Reservation
-      provenance: derived — EMP-055 declares entryState.params  and EMP-003 holds none of them, so the
-        edge carries nothing and EMP-055 opens cold
+      provenance: 'derived — EMP-055 declares entryState.params  and EMP-003 holds none of them. The edge
+        carries nothing: EMP-055 needs nothing to open'
     - to: EMP-056
       trigger: Walk-In & Waitlist Management
-      provenance: derived — EMP-056 declares entryState.params entryId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-056 opens cold
+      provenance: 'derived — EMP-056 declares entryState.params entryId and EMP-003 holds none of them.
+        The edge carries nothing: EMP-056 finds entryId (joinRestaurantWaitlist) itself, and EMP-056 opens
+        on its own'
     - to: EMP-057
       trigger: Guest Profile & Dining History
-      provenance: derived — EMP-057 declares entryState.params subjectId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-057 opens cold
+      provenance: 'derived — EMP-057 declares entryState.params subjectId and EMP-003 holds none of them.
+        The edge carries nothing: EMP-057 finds subjectId (matchGuest) itself, and EMP-057 opens on its
+        own'
     - to: EMP-058
       trigger: Live Table & Service Management
-      provenance: derived — EMP-058 declares entryState.params entryId, reservationId, ticketId, visitId
-        and EMP-003 holds none of them, so the edge carries nothing and EMP-058 opens cold
+      provenance: 'derived — EMP-058 declares entryState.params entryId, reservationId, ticketId, visitId
+        and EMP-003 holds none of them. The edge carries nothing: reservationId, entryId, ticketId only
+        pre-select (deep link or optional); EMP-058 finds visitId (openTableVisit) itself, and EMP-058
+        opens on its own'
     - to: EMP-059
       trigger: Table Order, Bill & Payment Management
       provenance: derived — EMP-059 declares entryState.params visitId and EMP-003 holds none of them,
         so the edge carries nothing and EMP-059 opens cold
     - to: EMP-060
       trigger: Reservation & Table Performance
-      provenance: derived — EMP-060 declares entryState.params outletId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-060 opens cold
+      provenance: 'derived — EMP-060 declares entryState.params outletId and EMP-003 holds none of them.
+        The edge carries nothing: EMP-060 finds outletId (listTableReservations) itself, and EMP-060 opens
+        on its own'
     - to: EMP-061
       trigger: Retail Inventory Command Center
-      provenance: derived — EMP-061 declares entryState.params alertId, dashboardId and EMP-003 holds
-        none of them, so the edge carries nothing and EMP-061 opens cold
+      provenance: 'derived — EMP-061 declares entryState.params alertId, dashboardId and EMP-003 holds
+        none of them. The edge carries nothing: EMP-061 finds alertId (listAlerts) itself; EMP-061 opens
+        on getStockPositions, and dashboardId has no source on EMP-061 yet (a gap in EMP-061, not in this
+        edge)'
     - to: EMP-062
       trigger: Store Stock & SKU Availability
-      provenance: derived — EMP-062 declares entryState.params itemId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-062 opens cold
+      provenance: 'derived — EMP-062 declares entryState.params itemId and EMP-003 holds none of them.
+        The edge carries nothing: EMP-062 finds itemId (getStockPositions) itself, and EMP-062 opens on
+        its own'
     - to: EMP-063
       trigger: Requisition & Smart Store Replenishment
-      provenance: derived — EMP-063 declares entryState.params  and EMP-003 holds none of them, so the
-        edge carries nothing and EMP-063 opens cold
+      provenance: 'derived — EMP-063 declares entryState.params  and EMP-003 holds none of them. The edge
+        carries nothing: EMP-063 needs nothing to open'
     - to: EMP-064
       trigger: Store-to-Store & Warehouse Transfers
-      provenance: derived — EMP-064 declares entryState.params  and EMP-003 holds none of them, so the
-        edge carries nothing and EMP-064 opens cold
+      provenance: 'derived — EMP-064 declares entryState.params  and EMP-003 holds none of them. The edge
+        carries nothing: EMP-064 needs nothing to open'
     - to: EMP-065
       trigger: Receiving & Store Put-Away
-      provenance: derived — EMP-065 declares entryState.params receiptId, transferId and EMP-003 holds
-        none of them, so the edge carries nothing and EMP-065 opens cold
+      provenance: 'derived — EMP-065 declares entryState.params receiptId, transferId and EMP-003 holds
+        none of them. The edge carries nothing: transferId only pre-selects (deep link or optional); EMP-065
+        finds receiptId (createGoodsReceipt) itself, and EMP-065 opens on its own'
     - to: EMP-066
       trigger: Stock Count & Cycle Count Management
-      provenance: derived — EMP-066 declares entryState.params countId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-066 opens cold
+      provenance: 'derived — EMP-066 declares entryState.params countId and EMP-003 holds none of them.
+        The edge carries nothing: EMP-066 finds countId (startStockCount) itself, and EMP-066 opens on
+        its own'
     - to: EMP-067
       trigger: Damage, Loss, Shrinkage & Stock Adjustment
       provenance: derived — EMP-067 declares entryState.params actionId, outletId and EMP-003 holds none
         of them, so the edge carries nothing and EMP-067 opens cold
     - to: EMP-068
       trigger: Reservation, Allocation & Omnichannel Inventory
-      provenance: derived — EMP-068 declares entryState.params outletId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-068 opens cold
+      provenance: 'derived — EMP-068 declares entryState.params outletId and EMP-003 holds none of them.
+        The edge carries nothing: EMP-068 opens on getStockPositions, and outletId has no source on EMP-068
+        yet (a gap in EMP-068, not in this edge)'
     - to: EMP-069
       trigger: Barcode, RFID, Serialized Stock & Traceability
-      provenance: derived — EMP-069 declares entryState.params  and EMP-003 holds none of them, so the
-        edge carries nothing and EMP-069 opens cold
+      provenance: 'derived — EMP-069 declares entryState.params  and EMP-003 holds none of them. The edge
+        carries nothing: EMP-069 needs nothing to open'
     - to: EMP-070
       trigger: Inventory Exceptions, AI Replenishment & Action Center
-      provenance: derived — EMP-070 declares entryState.params alertId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-070 opens cold
+      provenance: 'derived — EMP-070 declares entryState.params alertId and EMP-003 holds none of them.
+        The edge carries nothing: EMP-070 finds alertId (listAlerts) itself, and EMP-070 opens on its
+        own'
     - to: EMP-071
       trigger: Rental Checkout Command Center
       provenance: structural — Rental board 6 on the staff app, 11 September 2026
@@ -628,32 +644,39 @@ screens:
       provenance: structural — Rental board 8 on the staff app, 11 September 2026
     - to: EMP-006
       trigger: Raise a task
-      provenance: derived — EMP-006 declares entryState.params workOrderId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-006 opens cold
+      provenance: 'derived — EMP-006 declares entryState.params workOrderId and EMP-003 holds none of
+        them. The edge carries nothing: workOrderId only pre-selects (deep link or optional), and EMP-006
+        opens on its own'
     - to: EMP-014
       trigger: Ticket lookup
-      provenance: derived — EMP-014 declares entryState.params orderId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-014 opens cold
+      provenance: 'derived — EMP-014 declares entryState.params orderId and EMP-003 holds none of them.
+        The edge carries nothing: orderId only pre-selects (deep link or optional), and EMP-014 opens
+        on its own'
     - to: EMP-019
       trigger: AI assistant — home
-      provenance: derived — EMP-019 declares entryState.params conversationId and EMP-003 holds none of
-        them, so the edge carries nothing and EMP-019 opens cold
+      provenance: 'derived — EMP-019 declares entryState.params conversationId and EMP-003 holds none
+        of them. The edge carries nothing: conversationId only pre-selects (deep link or optional), and
+        EMP-019 opens on its own'
     - to: EMP-021
       trigger: Roster
-      provenance: derived — EMP-021 declares entryState.params assignmentId and EMP-003 holds none of
-        them, so the edge carries nothing and EMP-021 opens cold
+      provenance: 'derived — EMP-021 declares entryState.params assignmentId and EMP-003 holds none of
+        them. The edge carries nothing: assignmentId only pre-selects (deep link or optional), and EMP-021
+        opens on its own'
     - to: EMP-022
       trigger: My rota
-      provenance: derived — EMP-022 declares entryState.params assignmentId and EMP-003 holds none of
-        them, so the edge carries nothing and EMP-022 opens cold
+      provenance: 'derived — EMP-022 declares entryState.params assignmentId and EMP-003 holds none of
+        them. The edge carries nothing: assignmentId only pre-selects (deep link or optional), and EMP-022
+        opens on its own'
     - to: EMP-024
       trigger: Clock in / out
-      provenance: derived — EMP-024 declares entryState.params recordId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-024 opens cold
+      provenance: 'derived — EMP-024 declares entryState.params recordId and EMP-003 holds none of them.
+        The edge carries nothing: recordId only pre-selects (deep link or optional), and EMP-024 opens
+        on its own'
     - to: EMP-025
       trigger: Break management
-      provenance: derived — EMP-025 declares entryState.params recordId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-025 opens cold
+      provenance: 'derived — EMP-025 declares entryState.params recordId and EMP-003 holds none of them.
+        The edge carries nothing: recordId only pre-selects (deep link or optional), and EMP-025 opens
+        on its own'
     - to: EMP-026
       trigger: Incident report
       carries:
@@ -662,8 +685,9 @@ screens:
         so an edge into it carries them
     - to: EMP-028
       trigger: Lost & found
-      provenance: derived — EMP-028 declares entryState.params caseId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-028 opens cold
+      provenance: 'derived — EMP-028 declares entryState.params caseId and EMP-003 holds none of them.
+        The edge carries nothing: caseId only pre-selects (deep link or optional), and EMP-028 opens on
+        its own'
     - to: EMP-029
       trigger: Guest assistance
       carries:
@@ -672,40 +696,49 @@ screens:
         so an edge into it carries them
     - to: EMP-030
       trigger: Venue map
-      provenance: derived — EMP-030 declares entryState.params mapId and EMP-003 holds none of them, so
-        the edge carries nothing and EMP-030 opens cold
+      provenance: 'derived — EMP-030 declares entryState.params mapId and EMP-003 holds none of them.
+        The edge carries nothing: mapId only pre-selects (deep link or optional), and EMP-030 opens on
+        its own'
     - to: EMP-031
       trigger: Queue monitor
-      provenance: derived — EMP-031 declares entryState.params queueId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-031 opens cold
+      provenance: 'derived — EMP-031 declares entryState.params queueId and EMP-003 holds none of them.
+        The edge carries nothing: queueId only pre-selects (deep link or optional), and EMP-031 opens
+        on its own'
     - to: EMP-033
       trigger: Capacity view
-      provenance: derived — EMP-033 declares entryState.params channelCapacityId and EMP-003 holds none
-        of them, so the edge carries nothing and EMP-033 opens cold
+      provenance: 'derived — EMP-033 declares entryState.params channelCapacityId and EMP-003 holds none
+        of them. The edge carries nothing: channelCapacityId only pre-selects (deep link or optional),
+        and EMP-033 opens on its own'
     - to: EMP-034
       trigger: Walk-up sale
-      provenance: derived — EMP-034 declares entryState.params orderId, productId and EMP-003 holds none
-        of them, so the edge carries nothing and EMP-034 opens cold
+      provenance: 'derived — EMP-034 declares entryState.params orderId, productId and EMP-003 holds none
+        of them. The edge carries nothing: orderId, productId only pre-select (deep link or optional),
+        and EMP-034 opens on its own'
     - to: EMP-037
       trigger: Notifications
-      provenance: derived — EMP-037 declares entryState.params announcementId, conversationId and EMP-003
-        holds none of them, so the edge carries nothing and EMP-037 opens cold
+      provenance: 'derived — EMP-037 declares entryState.params announcementId, conversationId and EMP-003
+        holds none of them. The edge carries nothing: announcementId only pre-selects (deep link or optional);
+        EMP-037 finds conversationId (listStaffConversations) itself, and EMP-037 opens on its own'
     - to: EMP-038
       trigger: Broadcast to team
-      provenance: derived — EMP-038 declares entryState.params announcementId and EMP-003 holds none of
-        them, so the edge carries nothing and EMP-038 opens cold
+      provenance: 'derived — EMP-038 declares entryState.params announcementId and EMP-003 holds none
+        of them. The edge carries nothing: announcementId only pre-selects (deep link or optional), and
+        EMP-038 opens on its own'
     - to: EMP-039
       trigger: Announcements
-      provenance: derived — EMP-039 declares entryState.params announcementId and EMP-003 holds none of
-        them, so the edge carries nothing and EMP-039 opens cold
+      provenance: 'derived — EMP-039 declares entryState.params announcementId and EMP-003 holds none
+        of them. The edge carries nothing: announcementId only pre-selects (deep link or optional), and
+        EMP-039 opens on its own'
     - to: EMP-047
       trigger: Emergency mode
-      provenance: derived — EMP-047 declares entryState.params announcementId and EMP-003 holds none of
-        them, so the edge carries nothing and EMP-047 opens cold
+      provenance: 'derived — EMP-047 declares entryState.params announcementId and EMP-003 holds none
+        of them. The edge carries nothing: announcementId only pre-selects (deep link or optional), and
+        EMP-047 opens on its own'
     - to: EMP-042
       trigger: Profile
-      provenance: derived — EMP-042 declares entryState.params methodId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-042 opens cold
+      provenance: 'derived — EMP-042 declares entryState.params methodId and EMP-003 holds none of them.
+        The edge carries nothing: EMP-042 finds methodId (enrolMfaMethod) itself, and EMP-042 opens on
+        its own'
     entryFrom:
     - EMP-071
     - EMP-081
@@ -1257,12 +1290,13 @@ screens:
       provenance: flow F08 step 3→4, F64 step 3→4
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-048 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-048 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-048 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-048 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -1452,16 +1486,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-009 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-009 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-009 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-009 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-009 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-009 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -1869,16 +1905,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-010 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-010 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-010 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-010 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-010 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-010 holds none of them.
+        The edge carries nothing: EMP-010 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. **Absorbed EMP-011, EMP-012, EMP-013, EMP-016 on 18 August.** A scanner is one screen
     the device sits on all day, and an outcome is a state of it — **routing to `/access/admitted` for
@@ -2165,16 +2203,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-014 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-014 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-014 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-014 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-014 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-014 holds none of them.
+        The edge carries nothing: EMP-014 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -2657,16 +2697,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-015 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-015 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-015 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-015 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-015 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-015 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -2951,20 +2993,23 @@ screens:
       provenance: flow F72 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-017 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-017 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-017 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-017 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-017 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-017 holds none of them.
+        The edge carries nothing: EMP-017 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
     - to: EMP-018
       trigger: Offline package
-      provenance: derived — EMP-018 declares entryState.params version and EMP-017 holds none of them,
-        so the edge carries nothing and EMP-018 opens cold
+      provenance: 'derived — EMP-018 declares entryState.params version and EMP-017 holds none of them.
+        The edge carries nothing: version only pre-selects (deep link or optional), and EMP-018 opens
+        on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -3278,16 +3323,18 @@ screens:
       provenance: flow F71 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-018 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-018 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-018 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-018 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-018 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-018 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: publishBundle. **Bulk-attach residue, found by walking
     a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund
@@ -3441,16 +3488,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-004 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-004 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-004 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-004 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-004 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-004 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
     - to: EMP-005
       trigger: Completes a task
       provenance: flow F08 step 5→6, F12 step 2→3, F65 step 2→3
@@ -3929,16 +3978,18 @@ screens:
       provenance: flow F08 step 6→7, F65 step 4→5
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-005 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-005 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-005 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-005 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-005 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-005 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
     - to: BO-078
       trigger: Raises a requisition against the work order
       provenance: flow F15 step 1→2
@@ -4472,16 +4523,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-006 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-006 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-006 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-006 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-006 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-006 holds none of them.
+        The edge carries nothing: EMP-006 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
     - to: EMP-004
       trigger: It appears on the list for whoever is free
       provenance: flow F65 step 1→2
@@ -4996,16 +5049,18 @@ screens:
       provenance: flow F08 step 7→8
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-007 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-007 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-007 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-007 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-007 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-007 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -5208,16 +5263,18 @@ screens:
       provenance: flow F72 step 1→2
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-008 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-008 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-008 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-008 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-008 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-008 holds none of them.
+        The edge carries nothing: EMP-008 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: acceptShiftVariance, approveShiftOpen, closeShift, createCashMovement.
     **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest
@@ -5433,16 +5490,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-019 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-019 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-019 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-019 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-019 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-019 holds none of them.
+        The edge carries nothing: EMP-019 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
     - to: EMP-020
       trigger: AI assistant — answer
       provenance: flow F101 step 1→2
@@ -5609,16 +5668,18 @@ screens:
       provenance: flow F101 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-020 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-020 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-020 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-020 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-020 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-020 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
     - to: BO-058
       trigger: Saves it as a report
       provenance: flow F20 step 2→3
@@ -5794,16 +5855,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-031 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-031 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-031 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-031 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-031 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-031 holds none of them.
+        The edge carries nothing: EMP-031 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
     - to: EMP-032
       trigger: The sensor is wrong, so a wait is entered by hand
       provenance: flow F67 step 1→2
@@ -6085,16 +6148,18 @@ screens:
       provenance: flow F67 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-032 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-032 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-032 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-032 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-032 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-032 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
     - to: BO-005
       trigger: Parties are called
       provenance: flow F21 step 4→5
@@ -6321,16 +6386,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-033 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-033 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-033 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-033 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-033 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-033 holds none of them.
+        The edge carries nothing: EMP-033 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -6571,20 +6638,23 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-034 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-034 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-034 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-034 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-034 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-034 holds none of them.
+        The edge carries nothing: EMP-034 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
     - to: EMP-036
       trigger: Issue media
-      provenance: derived — EMP-036 declares entryState.params mediaCode, mediaId and EMP-034 holds none
-        of them, so the edge carries nothing and EMP-036 opens cold
+      provenance: 'derived — EMP-036 declares entryState.params mediaCode, mediaId and EMP-034 holds none
+        of them. The edge carries nothing: mediaCode, mediaId only pre-select (deep link or optional),
+        and EMP-036 opens on its own'
     - to: EMP-035
       trigger: The guest taps a card on the device
       provenance: flow F66 step 1→2
@@ -7239,16 +7309,18 @@ screens:
       provenance: flow F66 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-035 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-035 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-035 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-035 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-035 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-035 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. Card on a handheld. **Tender currency equals base currency** — a staff member taking
     payment away from a till has no float and cannot accept foreign cash.
@@ -7412,16 +7484,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-036 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-036 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-036 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-036 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-036 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-036 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **9 assets operations removed 18 August (CF-114).** The whole media contract
     was attached to this screen. **A till adding an item to a ticket does not manage a media library**
@@ -7565,16 +7639,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-037 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-037 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-037 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-037 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-037 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-037 holds none of them.
+        The edge carries nothing: EMP-037 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -7795,16 +7871,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-039 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-039 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-039 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-039 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-039 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-039 holds none of them.
+        The edge carries nothing: EMP-039 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -8006,20 +8084,23 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-047 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-047 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-047 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-047 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-047 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-047 holds none of them.
+        The edge carries nothing: EMP-047 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
     - to: EMP-050
       trigger: Post-incident restore
-      provenance: derived — EMP-050 declares entryState.params incidentId and EMP-047 holds none of them,
-        so the edge carries nothing and EMP-050 opens cold
+      provenance: 'derived — EMP-050 declares entryState.params incidentId and EMP-047 holds none of them.
+        The edge carries nothing: EMP-047 is opened from EMP-050, so this edge is the way back and EMP-050
+        keeps its own state'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -8226,12 +8307,13 @@ screens:
       provenance: flow F69 step 3→4
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-050 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-050 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-050 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-050 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
       carries:
@@ -8464,16 +8546,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-021 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-021 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-021 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-021 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-021 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-021 holds none of them.
+        The edge carries nothing: EMP-021 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
     - to: EMP-022
       trigger: A steward reads their own shifts
       provenance: flow F68 step 1→2
@@ -8652,16 +8736,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-022 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-022 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-022 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-022 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-022 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-022 holds none of them.
+        The edge carries nothing: EMP-022 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
     - to: EMP-023
       trigger: They ask to swap one
       provenance: flow F68 step 2→3
@@ -8869,16 +8955,18 @@ screens:
       operation: requestShiftSwap
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-023 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-023 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-023 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-023 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-023 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-023 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach
     residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue
@@ -9072,16 +9160,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-024 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-024 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-024 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-024 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-024 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-024 holds none of them.
+        The edge carries nothing: EMP-024 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
     - to: EMP-025
       trigger: They take a break and come back
       provenance: flow F68 step 4→5
@@ -9291,16 +9381,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-025 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-025 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-025 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-025 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-025 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-025 holds none of them.
+        The edge carries nothing: EMP-025 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: amendAttendance. **Bulk-attach residue, found by walking
     a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund
@@ -9476,12 +9568,13 @@ screens:
       operation: reportIncident
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-026 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-026 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-026 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-026 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
       carries:
@@ -9756,12 +9849,13 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-027 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-027 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-027 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-027 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
       carries:
@@ -9972,16 +10066,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-028 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-028 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-028 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-028 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-028 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-028 holds none of them.
+        The edge carries nothing: EMP-028 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -10296,12 +10392,13 @@ screens:
       provenance: flow F70 step 1→2
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-029 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-029 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-029 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-029 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
       carries:
@@ -10772,16 +10869,18 @@ screens:
       provenance: flow F70 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-030 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-030 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-030 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-030 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-030 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-030 holds none of them.
+        The edge carries nothing: EMP-030 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Wired to the venue map 18 August (CF-123).** The published map with live state
     on it: 3.2.64 asks for access-control statistics drawn on a graphical map, and the same view carries
@@ -10967,16 +11066,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-038 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-038 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-038 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-038 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-038 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-038 holds none of them.
+        The edge carries nothing: EMP-038 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -11180,16 +11281,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-040 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-040 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-040 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-040 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-040 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-040 holds none of them.
+        The edge carries nothing: EMP-040 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -11269,16 +11372,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-041 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-041 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-041 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-041 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-041 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-041 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -11407,16 +11512,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-042 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-042 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-042 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-042 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-042 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-042 holds none of them.
+        The edge carries nothing: EMP-042 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: forceLogout, listActiveSessions, revokeAllSessions. **Bulk-attach
     residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does
@@ -11654,16 +11761,18 @@ screens:
       operation: listDevices
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-043 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-043 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-043 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-043 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-043 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-043 holds none of them.
+        The edge carries nothing: EMP-043 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: listGuestDevices, adjustLoyaltyPoints, getConsentHistory,
     getGuestConsents, getGuestLoyalty, getGuestProfile, getWishlist. **Bulk-attach residue, found by walking
@@ -11842,16 +11951,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-044 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-044 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-044 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-044 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-044 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-044 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -11906,16 +12017,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-045 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-045 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-045 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-045 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-045 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-045 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -11971,16 +12084,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-046 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-046 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-046 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-046 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-046 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-046 holds none of them.
+        The edge carries nothing: EMP-046 is opened from EMP-003, so this edge is the way back and EMP-003
+        keeps its own state'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -12054,16 +12169,18 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-049 holds none of them,
-        so the edge carries nothing and EMP-001 opens cold
+      provenance: 'derived — EMP-001 declares entryState.params challengeId and EMP-049 holds none of
+        them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001
+        opens on its own'
     - to: EMP-002
       trigger: Select venue & role
-      provenance: derived — EMP-002 declares entryState.params  and EMP-049 holds none of them, so the
-        edge carries nothing and EMP-002 opens cold
+      provenance: 'derived — EMP-002 declares entryState.params  and EMP-049 holds none of them. The edge
+        carries nothing: EMP-002 needs nothing to open'
     - to: EMP-003
       trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-049 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
+      provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-049 holds none of them.
+        The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
+        on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable

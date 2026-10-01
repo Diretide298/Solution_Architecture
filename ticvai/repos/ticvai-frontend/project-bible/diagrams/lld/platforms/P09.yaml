@@ -35,7 +35,7 @@ servicesCalled:
 - service: CatalogueService
   operationCalls: 364
 - service: PlatformService
-  operationCalls: 312
+  operationCalls: 316
 - service: AiService
   operationCalls: 274
 - service: OrderService
@@ -7858,8 +7858,12 @@ screens:
   wave: 1
   density: compact
   operations:
+  - cancelOutboxRepublish
+  - getOutboxRepublish
   - listDeadLetters
+  - listOutboxRepublishes
   - replayDeadLetter
+  - republishOutbox
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8721,7 +8725,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listAccessPolicies
+  - listAuthorisationPolicies
   states:
   - emptyFirstRun
   - emptyNoAccess

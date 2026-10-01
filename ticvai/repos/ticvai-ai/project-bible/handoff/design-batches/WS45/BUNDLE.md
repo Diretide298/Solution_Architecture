@@ -123,12 +123,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-138 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-138 holds none of them. The edge carries nothing: ADM-138 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     },
     {
      "to": "ADM-145",
      "trigger": "Promotion Approval Inbox",
-     "provenance": "derived — ADM-145 declares entryState.params requestId and ADM-138 holds none of them, so the edge carries nothing and ADM-145 opens cold"
+     "provenance": "derived — ADM-145 declares entryState.params requestId and ADM-138 holds none of them. The edge carries nothing: ADM-145 finds requestId (listApprovalRequests) itself, and ADM-145 opens on its own"
     },
     {
      "to": "ADM-140",
@@ -1338,7 +1338,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-138",
      "trigger": "Promotion Command Center Dashboard",
-     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-143 holds none of them, so the edge carries nothing and ADM-138 opens cold"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-143 holds none of them. The edge carries nothing: ADM-143 is opened from ADM-138, so this edge is the way back and ADM-138 keeps its own state"
     }
    ]
   },
@@ -1959,7 +1959,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-138",
      "trigger": "Promotion Command Center Dashboard",
-     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-146 holds none of them, so the edge carries nothing and ADM-138 opens cold"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-146 holds none of them. The edge carries nothing: ADM-146 is opened from ADM-138, so this edge is the way back and ADM-138 keeps its own state"
     }
    ]
   },

@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/audit-guest-parity.py",
- "generated": "2026-09-30",
+ "generated": "2026-10-01",
  "screens": {
   "P01": 50,
   "P02": 77
@@ -554,15 +554,8 @@
    "severity": "medium",
    "dimension": "design",
    "where": "Claude Design",
-   "detail": "web 13/14 batches drawn, app 19/19 — the web is designed and the app is generated boxes, and the only app reference (TICVAI_Mobile.dc.html) uses a different design system from the drawn web frames",
+   "detail": "web 14/14 batches drawn, app 19/19 — the web is designed and the app is generated boxes, and the only app reference (TICVAI_Mobile.dc.html) uses a different design system from the drawn web frames",
    "fix": "draw the app batches against the web's house style, or decide which system is the guest's"
-  },
-  {
-   "severity": "medium",
-   "dimension": "design",
-   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
-   "detail": "designer-drawn frame on the app only",
-   "fix": ""
   },
   {
    "severity": "medium",
@@ -995,7 +988,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
-   "detail": "the app calls createAiConversation, getCart, getWaitTimes, listCatalogueBundles, requestSuggestion, sendAiMessage here; the web calls createAiConversation on WEB-044; getCart on WEB-006/WEB-010/WEB-011; getWaitTimes on WEB-002/WEB-004/WEB-015/WEB-039/WEB-040; listCatalogueBundles on WEB-008; requestSuggestion on WEB-044; sendAiMessage on WEB-044",
+   "detail": "the app calls createAiConversation, getCart, getWaitTimes, listCatalogueBundles, requestSuggestion, sendAiMessage here; the web calls createAiConversation on WEB-044; getCart on WEB-006/WEB-010/WEB-011; getWaitTimes on WEB-002/WEB-004/WEB-039/WEB-040; listCatalogueBundles on WEB-008; requestSuggestion on WEB-044; sendAiMessage on WEB-044",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1353,6 +1346,13 @@
    "dimension": "states",
    "where": "venue-info (WEB-028 ↔ GST-029)",
    "detail": "web only ['emptyNoAccess'], app only ['emptyNoResults']",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "web only —, app only ['map3dUnavailable', 'weakGps']",
    "fix": ""
   },
   {
@@ -1988,7 +1988,7 @@
   {
    "severity": "low",
    "dimension": "documents",
-   "where": "contracts/spine/catalogue.yaml:974",
+   "where": "contracts/spine/catalogue.yaml:1002",
    "detail": "\"browses by category and cannot search\" — GST-063 Search exists since 17 August",
    "fix": "rewrite to the 12 September rule"
   },
@@ -2227,7 +2227,7 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
-   "detail": "leads on to ['date-and-session', 'seat-selection', 'sign-in', 'ticket-selection'] on the web only and ['browse'] on the app only",
+   "detail": "leads on to ['date-and-session', 'sign-in', 'ticket-selection'] on the web only and ['browse'] on the app only",
    "fix": ""
   },
   {
@@ -2521,7 +2521,7 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "wishlist (WEB-009 ↔ GST-020)",
-   "detail": "leads on to ['date-and-session', 'seat-selection', 'ticket-selection'] on the web only and ['browse'] on the app only",
+   "detail": "leads on to ['date-and-session', 'ticket-selection'] on the web only and ['browse'] on the app only",
    "fix": ""
   },
   {
@@ -2878,7 +2878,7 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "waiting-room (WEB-015 ↔ GST-046)",
-   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
+   "detail": "1 state(s) worded differently: error",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {

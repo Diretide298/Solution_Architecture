@@ -1,67 +1,29 @@
 {
- "AccessAccessDevice": {
+ "AccessDevicePlacement": {
   "type": "object",
-  "x-ticvai-persistence": "access.access_device",
-  "description": "One physical access-control device registered in a venue: a turnstile, reader, handheld, podium unit or BLE beacon, with its model, location, network references, reported versions and health, and provisioning stage. Merges access.gate_device and access.ble_beacon (a beacon is a device with a proximity threshold) (declared 29 September, data-model close-out DM1) Registered with registerAccessDevice and changed with updateAccessDevice; provisioning stage, versions and health are reported by the device; deviceGroupId is a free deployment label, not a key (decided 29 September, writers pass). **tenancy platform.device is the register of record** (29 September, build): this is the topology placement, and lifecycleStatus follows the register through the device.enrolmentChanged event.",
+  "x-ticvai-persistence": "access.device_placement",
+  "description": "**Where one registered device is placed in the gate topology, and nothing else about it** (ADR-0067, accepted 1 October). The device itself (kind and hardware type, hardware model, serial, every version, health, heartbeat and its one lifecycle) is `platform.device`, the only device register, owned and migrated by Tenancy and registered with tenancy `registerDevice`. This row names that device (`deviceId`) and says which access area, access point and lane it serves, in what role, at what proximity threshold for a beacon, and through which controller. Access reads device facts only through what Tenancy publishes (`getDevice`, `listDevices`), never with its own SQL.\n\n**Access's provisioning stages are a checklist on the placement, not a second lifecycle** (`provisioningChecklist`). Placed with `placeAccessDevice` and changed with `updateAccessDevicePlacement`. Was `access.access_device` (renamed 1 October, ADR-0067), which repeated the register's serial, versions, health and lifecycle; `device.enrolmentChanged` no longer keeps two registers in step. Not `access.device_binding`, which binds a guest's phone to an entitlement. `deviceGroupId` is a free deployment label, not a key (decided 29 September, writers pass).",
   "required": [
    "id",
    "venueId",
-   "hardwareType",
-   "provisioningStage",
+   "deviceId",
+   "role",
    "isActive",
    "scopePath"
   ],
   "properties": {
    "id": {
-    "type": "string",
-    "format": "uuid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "venueId": {
     "type": "string",
     "format": "uuid"
    },
-   "hardwareModelId": {
+   "deviceId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true,
-    "description": "Model from the hardware library (access.hardware_model)"
-   },
-   "hardwareType": {
-    "type": "string",
-    "enum": [
-     "standardTurnstile",
-     "fullHeightTurnstile",
-     "tripodTurnstile",
-     "speedGate",
-     "wideLane",
-     "accessiblePodGate",
-     "buggyGate",
-     "vipGate",
-     "staffGate",
-     "androidHandheld",
-     "iosDevice",
-     "tablet",
-     "qrBarcodeReader",
-     "rfidReader",
-     "nfcReader",
-     "multiTechnologyReader",
-     "biometricReader",
-     "podium",
-     "counter",
-     "beacon",
-     "cameraController",
-     "externalAccessDevice"
-    ],
-    "description": "Specific hardware type, as in the hardware library"
-   },
-   "name": {
-    "type": "string",
-    "nullable": true,
-    "description": "Device or beacon name, e.g. Gate A, HH-01"
-   },
-   "serialNumber": {
-    "type": "string",
-    "nullable": true
+    "x-ticvai-references": "platform.device",
+    "description": "The registered device placed here (`platform.device`, tenancy `registerDevice`). One active placement per device; replacing a failed unit gives its placement the new `deviceId`."
    },
    "accessAreaId": {
     "type": "string",
@@ -81,64 +43,32 @@
     "nullable": true,
     "description": "Lane the device is mounted on (access.gate_lane)"
    },
+   "role": {
+    "type": "string",
+    "enum": [
+     "entry",
+     "exit",
+     "entryAndExit",
+     "validationOnly",
+     "proximity",
+     "monitoring"
+    ],
+    "default": "entryAndExit",
+    "description": "What the device does at this place. `proximity` is a beacon; `monitoring` a camera controller that decides nothing."
+   },
+   "name": {
+    "type": "string",
+    "nullable": true,
+    "description": "Label at this place, e.g. Gate A, HH-01"
+   },
    "deviceGroupId": {
     "type": "string",
     "nullable": true,
-    "description": "Device group the device belongs to, as targeted by hardware deployments and device configurations"
-   },
-   "ipNetworkReference": {
-    "type": "string",
-    "nullable": true
+    "description": "Device group the placement belongs to, as targeted by hardware deployments and device configurations"
    },
    "controllerReference": {
     "type": "string",
     "nullable": true
-   },
-   "installationDate": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "provisioningStage": {
-    "type": "string",
-    "enum": [
-     "registered",
-     "hardwareProfileAssigned",
-     "locationAssigned",
-     "authenticated",
-     "configurationDownloaded",
-     "securityPackageDownloaded",
-     "connectivityTested",
-     "active"
-    ],
-    "default": "registered"
-   },
-   "lifecycleStatus": {
-    "type": "string",
-    "enum": [
-     "registered",
-     "configured",
-     "tested",
-     "approved",
-     "production"
-    ],
-    "default": "registered",
-    "description": "Certification stage; no device enters production until validated"
-   },
-   "capabilities": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "dynamicQr",
-      "rfid",
-      "nfc",
-      "facePass",
-      "offline",
-      "heightCheck"
-     ]
-    },
-    "description": "Capabilities this device supports, from the compatibility matrix"
    },
    "proximityThresholdMeters": {
     "type": "integer",
@@ -146,59 +76,51 @@
     "nullable": true,
     "description": "Beacons only: activation distance in metres"
    },
+   "installationDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "provisioningChecklist": {
+    "type": "object",
+    "description": "**Access's provisioning stages, as a checklist on the placement** (ADR-0067). Each item is the time the step was confirmed, null until it is. The device's lifecycle (registered, enrolled, provisioned, active, deactivated, retired) is `platform.device.enrolment_state`, not this.",
+    "properties": {
+     "hardwareProfileAssignedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "locationAssignedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "authenticatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "configurationDownloadedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "securityPackageDownloadedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "connectivityTestedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
+   },
    "isActive": {
     "type": "boolean",
     "default": true,
-    "description": "Active/inactive as configured (beacons: activeInactive)"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "healthy",
-     "active",
-     "degraded",
-     "offline",
-     "localMode"
-    ],
-    "nullable": true,
-    "description": "Health as reported by the device or vendor; TICVAI does not detect it"
-   },
-   "connectivity": {
-    "type": "string",
-    "nullable": true,
-    "description": "Reported connectivity"
-   },
-   "scannerHealth": {
-    "type": "string",
-    "nullable": true
-   },
-   "controllerHealth": {
-    "type": "string",
-    "nullable": true
-   },
-   "cameraHealth": {
-    "type": "string",
-    "nullable": true,
-    "description": "Where the device has a camera"
-   },
-   "configurationVersion": {
-    "type": "string",
-    "nullable": true,
-    "description": "Configuration version the device reports running"
-   },
-   "localRuleVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "credentialSecurityPackageVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "lastHeartbeatAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "Last heartbeat or, for a beacon, last detected"
+    "description": "Whether this placement is in use (beacons: activeInactive). A device that is `retired` or `deactivated` in the register is refused at the gate whatever this says."
    },
    "scopePath": {
     "type": "string",
@@ -323,31 +245,7 @@
     ]
    },
    "hardwareType": {
-    "type": "string",
-    "enum": [
-     "standardTurnstile",
-     "fullHeightTurnstile",
-     "tripodTurnstile",
-     "speedGate",
-     "wideLane",
-     "accessiblePodGate",
-     "buggyGate",
-     "vipGate",
-     "staffGate",
-     "androidHandheld",
-     "iosDevice",
-     "tablet",
-     "qrBarcodeReader",
-     "rfidReader",
-     "nfcReader",
-     "multiTechnologyReader",
-     "biometricReader",
-     "podium",
-     "counter",
-     "beacon",
-     "cameraController",
-     "externalAccessDevice"
-    ]
+    "$ref": "../shared/common.yaml#/components/schemas/DeviceHardwareType"
    },
    "supportedTechnologies": {
     "type": "array",
@@ -563,9 +461,15 @@
  },
  "DeviceCapability": {
   "type": "string",
-  "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n",
+  "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n**Access's capabilities merged in** (ADR-0067, 1 October): `dynamicQr`, `rfid`, `nfc`, `facePass`, `offline` and `heightCheck` were the access register's own list, from the compatibility matrix.\n",
   "enum": [
-   "genderClassification"
+   "genderClassification",
+   "dynamicQr",
+   "rfid",
+   "nfc",
+   "facePass",
+   "offline",
+   "heightCheck"
   ]
  },
  "DeviceGateCommandCenterView": {
@@ -722,9 +626,12 @@
    "signaturePad",
    "scale",
    "camera",
-   "mobileHandset"
+   "mobileHandset",
+   "handheldScanner",
+   "accessPodium",
+   "bleBeacon"
   ],
-  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n"
+  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n**One kind vocabulary for every device** (ADR-0067, 1 October). `handheldScanner`, `accessPodium` and `bleBeacon` came from Access's register; the finer hardware type (a speed gate under `turnstileController`, a tablet under `handheldScanner`) is `RegisteredDevice.hardwareType` (common `DeviceHardwareType`).\n"
  },
  "DeviceSoftwareContentRemoteConfigurationInput": {
   "type": "object",
@@ -1679,7 +1586,7 @@
  "RegisteredDevice": {
   "x-ticvai-persistence": "platform.device",
   "type": "object",
-  "description": "**The device register of record** (decided 29 September, build pass). Identity, enrolment, credential, firmware and push registration for every device in the estate live on this row. `access.access_device` places access-control devices in the gate topology and repeats serial, versions, health and lifecycle; the two are not merged yet, and where they disagree this row wins.\n",
+  "description": "**The only device register** (ADR-0067, accepted 1 October; the register of record since 29 September). Identity (kind, hardware type, model, serial), every version (firmware, configuration, rule package, credential package), health, heartbeat and one lifecycle (`enrolmentState`: registered, enrolled, provisioned, active, deactivated, retired) for every device in the estate live on this row. The access-control device row, which repeated serial, versions, health and lifecycle, is now `access.device_placement` and holds only where an access-control device is placed. Tenancy owns and migrates this table; Access reads it only through this contract.\n",
   "required": [
    "id",
    "kind",
@@ -1706,11 +1613,74 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September); `registerDevice` refuses either mistake with `422`.\n"
+    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September), and except an access-control device (one with a `hardwareType`), which is placed in the gate topology by access `placeAccessDevice` rather than bound to a workstation (ADR-0067); `registerDevice` refuses either mistake with `422`.\n"
    },
    "model": {
     "type": "string",
     "nullable": true
+   },
+   "hardwareType": {
+    "$ref": "../shared/common.yaml#/components/schemas/DeviceHardwareType",
+    "nullable": true,
+    "description": "**The specific hardware under `kind`** (ADR-0067, 1 October): Access's hardware types (a speed gate, a tripod turnstile, a podium) merged into the one register. Null for a device with no finer type than its kind.\n"
+   },
+   "hardwareModelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The model in the hardware library (access `setHardwareModel`; ADR-0067). Access owns the library; this names a model in it.\n"
+   },
+   "serialNumber": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 100,
+    "description": "The manufacturer's serial (ADR-0067: was on the access-control device row, now `access.device_placement`). A serial already registered in the tenant is refused `409` by `registerDevice`.\n"
+   },
+   "ipNetworkReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "Network address or reference the device is reached at (ADR-0067)."
+   },
+   "configurationVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Access configuration version the device reports running (ADR-0067)."
+   },
+   "localRuleVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Admission rule package the device reports running (ADR-0067)."
+   },
+   "credentialSecurityPackageVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Credential security package the device reports running (ADR-0067)."
+   },
+   "scannerHealth": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Component health as the device or vendor reports it on its heartbeat (ADR-0067)."
+   },
+   "controllerHealth": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "cameraHealth": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the device has a camera."
+   },
+   "connectivity": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Reported connectivity."
    },
    "pushToken": {
     "type": "string",
@@ -1765,9 +1735,10 @@
      "error",
      "consumableLow",
      "needsAttention",
+     "localMode",
      "unknown"
     ],
-    "description": "What the device last said on its heartbeat; `unknown` until it has."
+    "description": "What the device last said on its heartbeat; `unknown` until it has. `localMode` is an access-control device validating from its offline package with its link down (ADR-0067).\n"
    },
    "batteryPercent": {
     "type": "integer",

@@ -29,10 +29,13 @@ The autoscaler handles the rest, and it has all day to react.
 live`, warming happens before traffic arrives, and **the first seconds of a flash sale are the
 peak** — thirty thousand people do not arrive gradually.
 
-**Per deployable, since 30 September (ADR-0055).** The 17 services are modules deployed as five
-units, so the floor that matters is per deployable, not per module: each unit's floor is one replica
-per zone across two zones. `service-decomposition.json` says which unit each module ships in. The
-per-module figures stay, because a module's share of the load is still what drives its unit.
+**Per deployable, since 30 September (ADR-0055), with ADR-0061's floors since 1 October.** The 17
+services are modules deployed as five units, so the floor that matters is per deployable, not per
+module, and it is survivability: enough replicas to lose one zone and keep serving. `commerce` 3 (one
+per zone), `access`, `operations` and `workers` 2, and `ticvai-ai` as its three process groups,
+real-time 2 (3 in a large cell), interactive 1 and batch 0: **12 in the small cell**.
+`service-decomposition.json` says which unit each module ships in. The per-module figures stay,
+because a module's share of the load is still what drives its unit.
 
 Writes `handoff/sizing.json`.
 """
@@ -69,13 +72,30 @@ RPS_PER_REPLICA = {
 # autoscaler has all day to react to a busy afternoon.
 SURVIVABLE_FLOOR = 2
 
-# **Per deployable (ADR-0055): one replica per zone, two zones.** ADR-0061 is still a proposed draft;
-# it would raise `commerce` to 3 and split `ticvai-ai` into process groups (2 + 1 + 0), 12 in the small
-# cell. Until it is decided, every unit gets the survivable floor. `workers` serves no requests and
-# owns no module, so its load is queue depth and it sits at the floor here.
-ZONES = 2
-DEPLOYABLE_FLOOR = ZONES
+# **Per deployable (ADR-0055), floors from ADR-0061 (accepted 1 October).** A floor is survivability:
+# enough replicas to lose one zone and keep serving. With three zones and two replicas, losing the
+# wrong zone halves `commerce` at the moment it is needed, so `commerce` has one per zone. The gate
+# decides locally (ADR-0013), so the cloud side of `access` can lose one replica; back office tolerates
+# a short scale-out; relay leases fail over between the two `workers` replicas (ADR-0058). `workers`
+# serves no requests and owns no module, so its load is queue depth and it sits at its floor here.
+DEPLOYABLE_FLOORS = {"commerce": 3, "access": 2, "operations": 2, "workers": 2}
+# **`ticvai-ai` is three process groups with different failure profiles** (AI design 4.3), which one
+# floor cannot express. Real-time (fraud scoring, recommendations) fails open anyway; interactive
+# (assistants) tolerates a short outage; batch scales from zero on queue depth. Real-time is 3 in a
+# large cell, as the AI design asks.
+AI_PROCESS_GROUP_FLOORS = {"ai-realtime": 2, "ai-interactive": 1, "ai-batch": 0}
+AI_REALTIME_FLOOR_LARGE = 3
 DEPLOYABLE_ORDER = ("commerce", "access", "operations", "ticvai-ai", "workers")
+
+
+def deployable_floor(dep: str, large: bool) -> tuple[int, dict | None]:
+    """(floor, process-group floors or None) for one deployable. ADR-0061."""
+    if dep == "ticvai-ai":
+        groups = dict(AI_PROCESS_GROUP_FLOORS)
+        if large:
+            groups["ai-realtime"] = AI_REALTIME_FLOOR_LARGE
+        return sum(groups.values()), groups
+    return DEPLOYABLE_FLOORS[dep], None
 
 # **Every service scales on its own utilisation, and the target is 60% rather than full.**
 #
@@ -186,11 +206,13 @@ def size(load_rps: float, mix: dict, floor_is_peak: bool) -> dict:
     return out
 
 
-def size_deployables(load_rps: float, mix: dict, deployable_of: dict) -> dict:
+def size_deployables(load_rps: float, mix: dict, deployable_of: dict, large: bool = False) -> dict:
     """The same arithmetic per unit of deployment. A unit's replicas carry all of its modules, so its
-    need is the sum of each module's load against that module's own per-replica figure."""
+    need is the sum of each module's load against that module's own per-replica figure. The floor is
+    ADR-0061's for the unit; `ticvai-ai` carries its process groups' floors beside the total."""
     out = {}
     for dep in DEPLOYABLE_ORDER:
+        floor, groups = deployable_floor(dep, large)
         members = sorted(s for s, d in deployable_of.items() if d == dep)
         share = sum(mix.get(s, 0) for s in members)
         load = sum(load_rps * mix.get(s, 0) / 100 / (RPS_PER_REPLICA.get(s, 400) * TARGET_UTILISATION)
@@ -201,10 +223,12 @@ def size_deployables(load_rps: float, mix: dict, deployable_of: dict) -> dict:
             "share": round(share, 1),
             "rpsAtLoad": round(load_rps * share / 100, 1),
             "impliedByLoad": need,
-            "floor": DEPLOYABLE_FLOOR,
-            "steadyState": max(DEPLOYABLE_FLOOR, need),
-            "drivenBy": "load" if need > DEPLOYABLE_FLOOR else "survivability floor",
+            "floor": floor,
+            "steadyState": max(floor, need),
+            "drivenBy": "load" if need > floor else "survivability floor",
         }
+        if groups is not None:
+            out[dep]["processGroupFloors"] = groups
     return out
 
 
@@ -242,6 +266,7 @@ def main() -> int:
     for label, counts in (("small cell", {"small": 20, "medium": 4, "large": 0}),
                           ("medium cell", {"small": 60, "medium": 20, "large": 2}),
                           ("large cell", {"small": 120, "medium": 60, "large": 8})):
+        large = label == "large cell"
         mean = sum(venue_load(t)["meanRps"] * n for t, n in counts.items())
         peak = sum(venue_load(t)["peakRps"] * n for t, n in counts.items())
         cells[label] = {
@@ -251,15 +276,18 @@ def main() -> int:
             "replicasAtPeak": sum(v["steadyState"] for v in size(peak, normal_mix, False).values()),
             # **What is deployed (ADR-0055).** The two figures above are per module and are kept for
             # the load each module brings; these are the replicas that actually run.
-            "deployables": size_deployables(peak, normal_mix, deployable_of),
+            "deployables": size_deployables(peak, normal_mix, deployable_of, large),
             "deployableReplicasAtFloor": sum(
-                v["floor"] for v in size_deployables(peak, normal_mix, deployable_of).values()),
+                v["floor"] for v in size_deployables(peak, normal_mix, deployable_of, large).values()),
             "deployableReplicasAtPeak": sum(
-                v["steadyState"] for v in size_deployables(peak, normal_mix, deployable_of).values()),
+                v["steadyState"] for v in size_deployables(peak, normal_mix, deployable_of, large).values()),
             "note": ("**Floor is survivability, not peak.** The autoscaler has all day to react to "
                      "a busy afternoon, so paying for the peak all night buys nothing. **Per "
-                     "deployable** (ADR-0055) the floor is one replica per zone for each of the five "
-                     "units; ADR-0061, still a proposed draft, would set it at 12 in the small cell."),
+                     "deployable** (ADR-0055, floors from ADR-0061, accepted 1 October): enough "
+                     "replicas to lose one zone and keep serving. `commerce` 3, `access`, "
+                     "`operations` and `workers` 2, `ticvai-ai` as its process groups (real-time 2, "
+                     "3 in a large cell; interactive 1; batch 0): 12 in the small cell. Above the "
+                     "floor each deployable autoscales on RPS."),
         }
 
     out = {
@@ -299,6 +327,9 @@ def main() -> int:
                                        encoding="utf-8")
 
     print(f"  normal: {len(normal_mix)} services · {len(cells)} cell sizes")
+    for label, c in cells.items():
+        print(f"    {label}: {c['deployableReplicasAtFloor']} deployable replicas at the floor, "
+              f"{c['deployableReplicasAtPeak']} at peak")
     print(f"  sale:   {len(sale_mix)} services at {a.sale_rps} RPS")
     if not a.apply:
         print("  nothing written — pass --apply")

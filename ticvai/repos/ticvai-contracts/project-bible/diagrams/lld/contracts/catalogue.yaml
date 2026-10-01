@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 237 operations
+title: catalogue — 241 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -469,6 +469,17 @@ operations:
   - catalogue.pricing_recommendation
   - catalogue.pricing_recommendation_decision
   - platform.outbox
+- operation: enterWaitingRoom
+  verb: POST
+  path: /performances/{performanceId}/waiting-room/entries
+  scope: venue
+  permission: null
+  audience:
+  - anonymous
+  - guest
+  offline: false
+  reads: []
+  writes: []
 - operation: estimateEventResourceCost
   verb: GET
   path: /events/{eventId}/resource-cost
@@ -681,6 +692,28 @@ operations:
   offline: false
   reads:
   - catalogue.product_eligibility_rule
+  writes: []
+- operation: getWaitingRoomPosition
+  verb: GET
+  path: /performances/{performanceId}/waiting-room/entries/{waitingEntryId}
+  scope: venue
+  permission: null
+  audience:
+  - anonymous
+  - guest
+  offline: false
+  reads: []
+  writes: []
+- operation: getWaitingRoomStatus
+  verb: GET
+  path: /performances/{performanceId}/waiting-room
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.waiting_room_setting
   writes: []
 - operation: importProductCatalogue
   verb: POST
@@ -3289,6 +3322,18 @@ operations:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.tax_rule
+- operation: setWaitingRoomSetting
+  verb: PUT
+  path: /performances/{performanceId}/waiting-room
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.waiting_room_setting
+  writes:
+  - catalogue.waiting_room_setting
 - operation: simulatePriceBreakdownCalculation
   verb: PUT
   path: /price-breakdown-calculation

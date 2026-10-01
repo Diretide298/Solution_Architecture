@@ -857,13 +857,13 @@
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listAccessPolicies",
+       "impliedBy": "listAuthorisationPolicies",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "createAccessPolicy",
+       "impliedBy": "createAuthorisationPolicy",
        "label": "Create access policy",
        "notes": "The act the screen exists for."
       },
@@ -872,7 +872,7 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "createAccessPolicy"
+       "impliedBy": "createAuthorisationPolicy"
       }
      ]
     }
@@ -887,44 +887,44 @@
   },
   "apis": [
    {
-    "operationId": "listAccessPolicies",
+    "operationId": "listAuthorisationPolicies",
     "contract": "identity",
     "purpose": "Who may see and change what",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "createAccessPolicy",
+    "operationId": "createAuthorisationPolicy",
     "contract": "identity",
     "purpose": "Write a policy",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "simulateAccessPolicy",
+    "operationId": "simulateAuthorisationPolicy",
     "contract": "identity",
     "purpose": "What this policy would decide, before it decides anything",
     "trigger": "onAction",
     "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it"
    },
    {
-    "operationId": "updateAccessPolicy",
+    "operationId": "updateAuthorisationPolicy",
     "contract": "identity",
     "purpose": "Change a data-access policy, as a new version",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listAccessPolicies"
+     "listAuthorisationPolicies"
     ]
    },
    {
-    "operationId": "setAccessPolicyState",
+    "operationId": "setAuthorisationPolicyState",
     "contract": "identity",
     "purpose": "Submit, approve, activate or retire a policy",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listAccessPolicies"
+     "listAuthorisationPolicies"
     ]
    },
    {
@@ -934,25 +934,25 @@
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listAccessPolicies"
+     "listAuthorisationPolicies"
     ]
    },
    {
-    "operationId": "listAccessPolicyHistory",
+    "operationId": "listAuthorisationPolicyHistory",
     "contract": "identity",
     "purpose": "Versions of a policy, to compare and pick one to restore",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "restoreAccessPolicyVersion",
+    "operationId": "restoreAuthorisationPolicyVersion",
     "contract": "identity",
     "purpose": "Restore an approved version as a new version",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "listAccessPolicyEffectiveness",
+    "operationId": "listAuthorisationPolicyEffectiveness",
     "contract": "identity",
     "purpose": "How each permission policy has behaved over a period",
     "trigger": "onAction",

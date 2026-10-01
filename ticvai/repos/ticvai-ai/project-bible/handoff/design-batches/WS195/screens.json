@@ -1268,7 +1268,7 @@
     "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
    },
    {
-    "operationId": "listAccessPolicies",
+    "operationId": "listAuthorisationPolicies",
     "contract": "identity",
     "purpose": "API access and permissions",
     "trigger": "onLoad",

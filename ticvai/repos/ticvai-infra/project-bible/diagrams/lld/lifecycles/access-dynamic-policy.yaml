@@ -14,7 +14,7 @@ description: One guest-admission dynamic (attribute-based) policy with its curre
   29 September, writers pass). `setVisualDynamicPolicy` writes attribute and identity policies and `setContextTimeEvent`
   context, time, event and occupancy policies; each write is a new `AccessDynamicPolicyVersion`. Both
   carry `status`, where **`inactive` switches the policy off at once and `active` on a new or inactive
-  policy submits it for approval** (`pendingApproval`), plus `validFrom` and `validTo`. **Not `identity.access_policy`,
+  policy submits it for approval** (`pendingApproval`), plus `validFrom` and `validTo`. **Not `identity.authorisation_policy`,
   which is staff permission.**
 initial:
 - pendingApproval

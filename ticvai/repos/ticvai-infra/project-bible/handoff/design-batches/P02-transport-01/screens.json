@@ -54,7 +54,7 @@
     }
    ]
   },
-  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope — stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a route map). **One-way:** From and To stations with a swap, the travel date (timetables are released 30 days ahead), the passengers (adult; child and student half fare; a person of determination travels free — proof is checked by the driver at boarding), a time period with its departure count, then departure cards (departs, arrives, duration, seats left, fare). **Next Available Trip** jumps to the first departure with room. A chosen departure shows a price card and the stop list with *Show full route* and a street map. **The street map needs the internet** and a third-party tile provider approved under audit R038; the stop list and schematic line need neither. Buying a trip is `addCartLine` with `attributes.transport` (route, stations, passenger type); the price comes from `quoteTransportFare`, and a departure with a seat map goes through seat selection on its `performanceId`. **Multi-trip:** 5- and 10-trip cards and weekly or monthly unlimited passes for the station pair, with the saving. **Favourites:** saved routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before departure* is the proposed default of the venue's modification policy, client to correct. **The real network (stations, fares, timetable) is an open value from the client**; the prototype's Emirates Link data is illustrative. **On the app this is four screens** (this one, GST-077 route and passengers, GST-078 multi-trip cards, GST-079 favourites), as the prototype draws them; the web draws one (WEB-049).",
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope — stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a route map). **One-way:** From and To stations with a swap, the travel date (timetables are released 30 days ahead), the passengers (adult; child and student half fare; a person of determination travels free — proof is checked by the driver at boarding), a time period with its departure count, then departure cards (departs, arrives, duration, seats left, fare). **Next Available Trip** jumps to the first departure with room. A chosen departure shows a price card and the stop list with *Show full route* and a street map. **The street map needs the internet** and a third-party tile provider approved under audit R038; the stop list and schematic line need neither. Buying a trip is `addCartLine` with `attributes.transport` (route, stations, passenger type); the price comes from `quoteTransportFare`, and a departure with a seat map goes through seat selection on its `performanceId`. **Multi-trip:** 5- and 10-trip cards and weekly or monthly unlimited passes for the station pair, with the saving. **Favourites:** saved routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before departure* is the proposed default of the venue's modification policy, client to correct. **The real network (stations, fares, timetable) is an open value from the client**; the prototype's Emirates Link data is illustrative. **On the app this is four screens** (this one, GST-077 route and passengers, GST-078 multi-trip cards, GST-079 favourites), as the prototype draws them; the web draws one (WEB-049).\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 5 and 6).** **A route opens with its stations filled in:** entered from a route (a transport product or a route card), From and To are that route's first and last stops (for example E201: Abu Dhabi Central Bus Station to Al Ain Central Bus Station); the guest can still change or swap them. **Departures show straight away** for those stations and the date (`searchTransportDepartures` on load and on every change), with no need to press *Search Trips*; the time-period buttons filter the departures listed, and pressing the chosen period again shows them all. **Passengers appear only after a departure is chosen** (the departure first, then the tickets). The client build also has a *Popular routes* card view (route cards with a from-fare and *Book*, then the date, the departures and the passengers; on the app the first transport product); a route list with a from-fare is not in the contract yet (a question of 1 October), so it is not specified here.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`searchTransportDepartures` reads the population of departures; one is chosen and opens GST-077",
@@ -172,7 +172,7 @@
     "operationId": "searchTransportDepartures",
     "contract": "transport",
     "purpose": "Departures for the stations, date, period and party, with counts per period",
-    "trigger": "onAction"
+    "trigger": "onLoad"
    },
    {
     "operationId": "getNextTransportDeparture",
@@ -187,20 +187,26 @@
      "name": "favouriteId",
      "from": "GST-079",
      "optional": true
+    },
+    {
+     "name": "routeId",
+     "from": "navigation",
+     "optional": true
     }
    ],
-   "coldEntry": "Arrives with nothing; a saved route from GST-079 prefills both stations."
+   "coldEntry": "Arrives with nothing. **Opened from a route** (a route card or a transport product, client feedback 30 September), `routeId` fills From and To with that route's first and last stops, and the departures show at once; the guest can still change or swap them. A saved route from GST-079 prefills both stations."
   },
   "wireframe": {
-   "status": "notStarted",
+   "status": "review",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-076",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "Account → All screens → Rev 3 feedback → Intercity bus · one-way (r3bus)"
+    "view": "Emirates Link → Buy → Sharjah – Dubai – Abu Dhabi → Book now → a date (Plan your trip: stations filled in, the route map and the departures)",
+    "differences": "Mobile puts stations, date, departures and passengers on one screen (Plan your trip). The route opens with its stations filled in and the departures listed without a search (30 September); Popular routes, the route cards, is the first transport product. The route map needs a street-map tile provider (the capture shows the provider's API-key watermark; audit R038)."
    }
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
@@ -286,11 +292,14 @@
      "to": "GST-076",
      "trigger": "Back to departures",
      "back": true,
-     "provenance": "decided 29 September, rev 3 REV3-21"
+     "provenance": "decided 29 September, rev 3 REV3-21",
+     "carries": [
+      "routeId"
+     ]
     }
    ]
   },
-  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope — stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a route map). **One-way:** From and To stations with a swap, the travel date (timetables are released 30 days ahead), the passengers (adult; child and student half fare; a person of determination travels free — proof is checked by the driver at boarding), a time period with its departure count, then departure cards (departs, arrives, duration, seats left, fare). **Next Available Trip** jumps to the first departure with room. A chosen departure shows a price card and the stop list with *Show full route* and a street map. **The street map needs the internet** and a third-party tile provider approved under audit R038; the stop list and schematic line need neither. Buying a trip is `addCartLine` with `attributes.transport` (route, stations, passenger type); the price comes from `quoteTransportFare`, and a departure with a seat map goes through seat selection on its `performanceId`. **Multi-trip:** 5- and 10-trip cards and weekly or monthly unlimited passes for the station pair, with the saving. **Favourites:** saved routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before departure* is the proposed default of the venue's modification policy, client to correct. **The real network (stations, fares, timetable) is an open value from the client**; the prototype's Emirates Link data is illustrative.",
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope — stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a route map). **One-way:** From and To stations with a swap, the travel date (timetables are released 30 days ahead), the passengers (adult; child and student half fare; a person of determination travels free — proof is checked by the driver at boarding), a time period with its departure count, then departure cards (departs, arrives, duration, seats left, fare). **Next Available Trip** jumps to the first departure with room. A chosen departure shows a price card and the stop list with *Show full route* and a street map. **The street map needs the internet** and a third-party tile provider approved under audit R038; the stop list and schematic line need neither. Buying a trip is `addCartLine` with `attributes.transport` (route, stations, passenger type); the price comes from `quoteTransportFare`, and a departure with a seat map goes through seat selection on its `performanceId`. **Multi-trip:** 5- and 10-trip cards and weekly or monthly unlimited passes for the station pair, with the saving. **Favourites:** saved routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before departure* is the proposed default of the venue's modification policy, client to correct. **The real network (stations, fares, timetable) is an open value from the client**; the prototype's Emirates Link data is illustrative.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 5).** **Passengers come after the departure:** this screen opens on a chosen departure and asks for the passengers here, never before a departure is chosen (the client build draws both on one scrolling screen, departures above the passengers).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getTransportRoute` reads the one route of the chosen departure; the screen is about that one trip",
@@ -428,15 +437,16 @@
    "coldEntry": "**A departure that has left or was cancelled** says which and offers the next departure on the same route."
   },
   "wireframe": {
-   "status": "notStarted",
+   "status": "review",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-077",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Rev 3 feedback → Bus route & passengers (r3route)"
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
+    "match": "partial",
+    "view": "… Plan your trip → departure 07:00 → one adult (the passengers under the chosen departure)",
+    "differences": "The chosen departure's stops are the route map above the departures, not a stop list; the passengers sit under the departures on the same screen (Plan your trip)."
    }
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
@@ -505,7 +515,10 @@
      "to": "GST-076",
      "trigger": "One-way instead",
      "back": true,
-     "provenance": "decided 29 September, rev 3 REV3-21; prototype r3busmulti"
+     "provenance": "decided 29 September, rev 3 REV3-21; prototype r3busmulti",
+     "carries": [
+      "routeId"
+     ]
     }
    ]
   },
@@ -609,15 +622,15 @@
    "coldEntry": "Arrives with the stations last chosen on GST-076, or asks for them."
   },
   "wireframe": {
-   "status": "notStarted",
+   "status": "review",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-078",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "Account → All screens → Rev 3 feedback → Bus multi-trip cards (r3busmulti)"
+    "view": "… Plan your trip → Multi-trip (multi-trip cards for this route)"
    }
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
@@ -769,15 +782,15 @@
    "coldEntry": "Needs a signed-in guest; one who is not signed in is offered sign-in first."
   },
   "wireframe": {
-   "status": "notStarted",
+   "status": "review",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-079",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "Account → All screens → Rev 3 feedback → Bus favourite routes (r3busfav)"
+    "view": "… Plan your trip → Save this route → Favourites (the saved route)"
    }
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",

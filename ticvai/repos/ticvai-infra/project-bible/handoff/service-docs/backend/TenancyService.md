@@ -153,6 +153,7 @@
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Approval Matrix & Multi-Level Approval Configuration |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### approveRoleAuthorityDelegation
 
@@ -245,6 +246,7 @@
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Roles, Authority, Delegation & Approval Limits |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: delegation
@@ -319,6 +321,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | 201 |  | Delegated |
 | 400 |  | The delegation is malformed. |
 | 403 |  | The delegation would hand over authority that is not there. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: devices
@@ -389,6 +392,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 |---|---|---|
 | 200 |  | Assigned |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: matrix
@@ -481,6 +485,7 @@ What requires approval, and who grants it
 | 200 |  | Set — an existing provider with this code, replaced |
 | 201 |  | Created — no provider had this code |
 | 422 |  | The endpoint is not https, the API client is not an active client of the tenant, or the decision mapping has no value for approve or for reject |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setApprovalMatrix
 
@@ -592,6 +597,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | 201 |  | Created — no matrix existed for this kind and scope, so this is version 1 |
 | 400 |  | Validation failed. |
 | 409 |  | Refused, and nothing is stored. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: region
@@ -668,6 +674,7 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Currency or scale change rejected because transactions exist in this region. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: request
@@ -798,6 +805,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 |---|---|---|
 | 201 |  | Raised, and routed |
 | 409 |  | An open request already exists for this subject. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### decideApprovalRequest
 
@@ -916,6 +924,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | 200 |  | Decided. |
 | 403 |  | The approver may not decide this request. |
 | 409 |  | The request is no longer open for a decision. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### evaluateApprovalRequirement
 
@@ -1000,6 +1009,7 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Whether approval is required, and who would grant it |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: rota
@@ -1088,6 +1098,7 @@ Where the position needs a till, the assignment names the workstation their shif
 |---|---|---|
 | 201 |  | Assigned |
 | 409 |  | Overlaps an existing assignment, or the person lacks the required role |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listRotaAssignments
 
@@ -1152,6 +1163,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Assignments |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: scope
@@ -1208,6 +1220,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 | Conflict | Idempotency conflict or optimistic concurrency failure. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listOrgUnits
 
@@ -1259,6 +1272,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | 200 |  | Nodes at or beneath the session's granted scopes |
 | 401 | Unauthorized | Missing, expired or superseded session |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateOrgUnit
 
@@ -1314,6 +1328,7 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 | Conflict | Idempotency conflict or optimistic concurrency failure. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: tenancy
@@ -1446,6 +1461,7 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 | 200 |  | Settings, or the defaults where none are saved |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getWorkstationHealth
 
@@ -1491,6 +1507,7 @@ Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and
 |---|---|---|
 | 200 |  | Health |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setVenueSettings
 
@@ -1721,6 +1738,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | An enable the venue cannot evidence. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: workstation
@@ -1819,6 +1837,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | A shift is open on this workstation. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createOutlet
 
@@ -1886,6 +1905,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | Code already in use in this venue |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createSaleBoard
 
@@ -1961,13 +1981,14 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 | 201 |  | Created |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 400 |  | A tile references an unknown or unsellable variant |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listDevices
 
 **`GET /devices`**: List registered devices
 
 Physical devices bound to workstations, and staff handsets (`mobileHandset`), which are bound to no workstation. Distinct from Device Management, which covers the full estate lifecycle — this is the binding a workstation needs at boot.
-**`platform.device` is the device register of record** (decided 29 September, build pass). Every device's identity, enrolment, credential, firmware and push registration lives here, whatever else refers to it. `access.access_device` (access `registerAccessDevice`) is the access topology's placement of an access-control device — gate, lane, hardware model, network references — and holds a second copy of serial, versions, health and lifecycle. That duplication is known and recorded, not merged yet; where the two disagree, this register wins.
+**`platform.device` is the only device register** (ADR-0067, accepted 1 October). Every device's identity (kind, hardware type, model, serial), every version (firmware, configuration, rule package, credential package), health, heartbeat and its one lifecycle live here, whatever else refers to it, POS printers and turnstiles alike. Access keeps only where an access-control device is placed (`access.device_placement`, access `placeAccessDevice`), and reads the device through this contract, never with its own SQL.
 **`pushToken` is never in a row** (pull audit R164). It is `writeOnly`: a push token is a credential, and a list at venue level is not where a credential is read back.
 
 |  |  |
@@ -2001,20 +2022,31 @@ Physical devices bound to workstations, and staff handsets (`mobileHandset`), wh
 | items[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
 | items[].driver | string | yes | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. |
 | items[].identifier | string |  | (nullable) |
-| items[].workstationId | string (uuid) |  | Required for every kind except mobileHandset, which is bound to no workstation (18.1.5, 29 September); registerDevice refuses either mistake with 422. (nullable) |
+| items[].workstationId | string (uuid) |  | Required for every kind except mobileHandset, which is bound to no workstation (18.1.5, 29 September), and except an access-control device (one with a hardwareType), which is placed in the gate topol… (nullable) |
 | items[].model | string |  | (nullable) |
+| items[].hardwareType | DeviceHardwareType: enum (standardTurnstile, fullHeightTurnstile, tripodTurnstile, speedGate, wideLane, accessiblePodGate, buggyGate, vipGate, …) |  | The specific hardware under a device's kind (ADR-0067, accepted 1 October: one device register). |
+| items[].hardwareModelId | string (uuid) |  | The model in the hardware library (access setHardwareModel; ADR-0067). (nullable) |
+| items[].serialNumber | string |  | The manufacturer's serial (ADR-0067: was on the access-control device row, now access.device_placement). (max length 100; nullable) |
+| items[].ipNetworkReference | string |  | Network address or reference the device is reached at (ADR-0067). (nullable) |
+| items[].configurationVersion | string |  | Access configuration version the device reports running (ADR-0067). (read-only; nullable) |
+| items[].localRuleVersion | string |  | Admission rule package the device reports running (ADR-0067). (read-only; nullable) |
+| items[].credentialSecurityPackageVersion | string |  | Credential security package the device reports running (ADR-0067). (read-only; nullable) |
+| items[].scannerHealth | string |  | Component health as the device or vendor reports it on its heartbeat (ADR-0067). (read-only; nullable) |
+| items[].controllerHealth | string |  | (read-only; nullable) |
+| items[].cameraHealth | string |  | Where the device has a camera. (read-only; nullable) |
+| items[].connectivity | string |  | Reported connectivity. (read-only; nullable) |
 | items[].pushToken | string (password) |  | BL-163. (nullable) |
 | items[].pushPlatform | enum (ios, android, web, windows) |  | (nullable) |
 | items[].pushFailureCount | integer |  | Consecutive failures. (default 0; read-only) |
 | items[].offlineScope | enum (none, readOnly, sellAndScan, fullVenue) |  | BL-163. (nullable) |
 | items[].firmwareVersion | string |  | As the device last reported it on its heartbeat. (read-only; nullable) |
 | items[].isRequired | boolean |  | True blocks shift open when the device is unreachable. |
-| items[].status | enum (online, offline, error, consumableLow, needsAttention, unknown) |  | What the device last said on its heartbeat; unknown until it has. (read-only) |
+| items[].status | enum (online, offline, error, consumableLow, needsAttention, localMode, unknown) |  | What the device last said on its heartbeat; unknown until it has. (read-only) |
 | items[].batteryPercent | integer |  | Board 1 of the client's POS design set, 20 August. (min 0; max 100; read-only; nullable) |
 | items[].lastCheckedAt | string (date-time) |  | Distinct from lastHeartbeatAt. (read-only; nullable) |
 | items[].health | enum (healthy, warning, degraded, offline, unknown) |  | Derived, not reported. (default unknown; read-only) |
 | items[].lastHeartbeatAt | string (date-time) |  | (read-only; nullable) |
-| items[].capabilities | array of DeviceCapability: enum (genderClassification) |  | BL-179. (read-only) |
+| items[].capabilities | array of DeviceCapability: enum (genderClassification, dynamicQr, rfid, nfc, facePass, offline, heightCheck) |  | BL-179. (read-only) |
 | items[].enrolmentState | enum (registered, enrolled, provisioned, active, deactivated, retired) |  | BL-160. (default registered; read-only) |
 | items[].retiredAt | string (date-time) |  | Set when enrolmentState reaches retired, and null otherwise. (read-only; nullable) |
 | items[].configurationProfileId | string (uuid) |  | The profile this device was provisioned with. (read-only; nullable) |
@@ -2026,6 +2058,7 @@ Physical devices bound to workstations, and staff handsets (`mobileHandset`), wh
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Devices |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listOutlets
 
@@ -2059,6 +2092,7 @@ An outlet is not a workstation. Several workstations sit in one outlet, and the 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Outlets |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listSaleBoards
 
@@ -2091,6 +2125,7 @@ The configured front ends a workstation may load. A board determines presentatio
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Sale boards |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listWorkstations
 
@@ -2164,6 +2199,7 @@ The configured front ends a workstation may load. A board determines presentatio
 |---|---|---|
 | 200 |  | Workstations |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordDeviceHeartbeat
 
@@ -2183,7 +2219,7 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | Reads | `platform.device` |
 | Writes | `platform.device`, `platform.outbox` |
 | Called by | BO-036, BO-124, BO-125, POS-016 |
-| State model | Registered device ([states/registered-device.yaml](../../../states/registered-device.yaml)): moves `offline` -> `online`, `online` -> `error`, `online` -> `consumableLow`, `consumableLow` -> `online`, `error` -> `online`, `online` -> `needsAttention`, `needsAttention` -> `online`, `unknown` -> `online` |
+| State model | Registered device ([states/registered-device.yaml](../../../states/registered-device.yaml)): moves `offline` -> `online`, `online` -> `error`, `online` -> `consumableLow`, `consumableLow` -> `online`, `error` -> `online`, `online` -> `needsAttention`, `needsAttention` -> `online`, `online` -> `localMode`, `localMode` -> `online`, `offline` -> `localMode`, `unknown` -> `online` |
 
 **Parameters**
 
@@ -2196,9 +2232,16 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| status | enum (online, offline, error, consumableLow, needsAttention) | yes |  |
+| status | enum (online, offline, error, consumableLow, needsAttention, localMode) | yes | localMode: an access-control device validating from its offline package with its link to the platform down (ADR-0067; was access's device status). |
 | detail | string |  | (max length 500) |
 | firmwareVersion | string |  |  |
+| configurationVersion | string |  | Access configuration the device runs (ADR-0067). |
+| localRuleVersion | string |  | Admission rule package the device runs (ADR-0067). |
+| credentialSecurityPackageVersion | string |  | Credential security package the device runs (ADR-0067). |
+| scannerHealth | string |  | (max length 100) |
+| controllerHealth | string |  | (max length 100) |
+| cameraHealth | string |  | (max length 100) |
+| connectivity | string |  | (max length 100) |
 | recordedAt | string (date-time) | yes |  |
 
 **Responses**
@@ -2207,6 +2250,7 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 |---|---|---|
 | 204 |  | Recorded |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateOutlet
 
@@ -2270,6 +2314,7 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateSaleBoard
 
@@ -2348,6 +2393,7 @@ Changes reach terminals with the next catalogue bundle, not immediately — a bo
 | 400 |  | A tile references an unknown or unsellable variant |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 
@@ -2481,8 +2527,19 @@ Every table this service owns that the slice reads or writes, with its columns a
 | kind | text | yes |  |
 | driver | text | yes | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. |
 | identifier | text | no |  |
-| workstation_id | uuid | no | Required for every kind except mobileHandset, which is bound to no workstation (18.1.5, 29 September); registerDevice refuses either mistake with 422. |
+| workstation_id | uuid | no | Required for every kind except mobileHandset, which is bound to no workstation (18.1.5, 29 September), and except an access-control device (one with a hardwareType), which is placed in the gate topol… |
 | model | text | no |  |
+| hardware_type | text | no | The specific hardware under kind (ADR-0067, 1 October): Access's hardware types (a speed gate, a tripod turnstile, a podium) merged into the one register. |
+| hardware_model_id | uuid | no | The model in the hardware library (access setHardwareModel; ADR-0067). |
+| serial_number | text | no | The manufacturer's serial (ADR-0067: was on the access-control device row, now access.device_placement). |
+| ip_network_reference | text | no | Network address or reference the device is reached at (ADR-0067). |
+| configuration_version | text | no | Access configuration version the device reports running (ADR-0067). |
+| local_rule_version | text | no | Admission rule package the device reports running (ADR-0067). |
+| credential_security_package_version | text | no | Credential security package the device reports running (ADR-0067). |
+| scanner_health | text | no | Component health as the device or vendor reports it on its heartbeat (ADR-0067). |
+| controller_health | text | no |  |
+| camera_health | text | no | Where the device has a camera. |
+| connectivity | text | no | Reported connectivity. |
 | push_token | text | no | BL-163. |
 | push_platform | text | no |  |
 | push_failure_count | integer | no | Consecutive failures. |

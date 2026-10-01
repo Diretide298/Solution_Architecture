@@ -36,7 +36,19 @@ changelog DEV-001 shows (ADR-0026).
 A breaking change goes out as a new major version: bump `info.version`, and the check says the
 baseline needs re-freezing instead of failing.
 
+**Every contract against the release `r1`** (plan item 1C, council of 1 October). Once the git tag
+`r1` exists, every contract is compared with its own text at r1, whether or not it was frozen with
+`--freeze`, and each change is labelled additive or breaking by the rules above. A ticket pins the
+release it was pulled at, so a producer and a consumer of one operation can be building against
+different tags; **a breaking change is only safe when both move to the same tag**, and that is a
+decision somebody has to make and record. So a breaking change fails unless it is listed in
+`docs/active/breaking-changes.yaml` (authored) with its id, contract, operation, reason, who
+approved it, the tag the producer and consumer tickets move to, and those tickets. A major version
+bump does not excuse it here: the consumers built at r1 are still built at r1. An entry that no
+longer matches any change is reported, not failed. Without the tag this passes: no baseline.
+
 Run: python3 tools/check-contract-compat.py            (gate; passes when nothing is frozen)
+     python3 tools/check-contract-compat.py --baseline HEAD   (testing: any commit-ish in place of r1)
      python3 tools/check-contract-compat.py --freeze orders
      python3 tools/check-contract-compat.py --changes orders   (ApiVersion.changes rows, JSON)
 """
@@ -44,8 +56,12 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
 import sys
+import tempfile
 from pathlib import Path
+
+import yaml
 
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -54,6 +70,12 @@ except Exception:
 
 ROOT = Path(__file__).resolve().parents[1]
 FROZEN = ROOT / "contracts" / "frozen"
+BREAKING = ROOT / "docs" / "active" / "breaking-changes.yaml"
+BREAKING_FIELDS = ("id", "contract", "operation", "reason", "approved-by", "tag", "producer-tickets",
+                   "consumer-tickets")
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from release_baseline import baseline_commit, changed_since, describe, ls_tree, show  # noqa: E402
 
 _spec = importlib.util.spec_from_file_location("sd", ROOT / "tools" / "build-service-docs.py")
 sd = importlib.util.module_from_spec(_spec)
@@ -116,8 +138,8 @@ def semantics(op: dict, c: dict) -> dict:
     return out
 
 
-def shape(contract_name: str) -> dict:
-    f = next(ROOT.glob(f"contracts/*/{contract_name}.yaml"), None)
+def shape(contract_name: str, root: Path = ROOT) -> dict:
+    f = next(root.glob(f"contracts/*/{contract_name}.yaml"), None)
     if f is None:
         raise SystemExit(f"no contract named {contract_name}")
     c = sd.contract(f)
@@ -219,7 +241,149 @@ def changes(old: dict, new: dict) -> list[dict]:
     return rows
 
 
+def additive(old: dict, new: dict) -> list[str]:
+    """The changes `compare` allows, named: what a consumer built at the baseline does not notice."""
+    out = [f"{o}: new operation" for o in sorted(set(new["operations"]) - set(old["operations"]))]
+    for o, a in sorted(old["operations"].items()):
+        b = new["operations"].get(o)
+        if b is None:
+            continue
+        for where, inbound in (("params", True), ("request", True), ("response", False)):
+            fa, fb = a[where], b[where]
+            for k, y in sorted(fb.items()):
+                x = fa.get(k)
+                if x is None:
+                    if not (inbound and y["required"]):
+                        out.append(f"{o}: new {'optional ' if inbound else ''}{where} `{k}`")
+                    continue
+                if inbound and set(y["enum"]) - set(x["enum"]):
+                    out.append(f"{o}: {where} `{k}` accepts new value(s) {sorted(set(y['enum']) - set(x['enum']))}")
+                if inbound and x["required"] and not y["required"]:
+                    out.append(f"{o}: {where} `{k}` is no longer required")
+                if not inbound and y["required"] and not x["required"]:
+                    out.append(f"{o}: response `{k}` is now always present")
+    return out
+
+
+def load_breaking() -> tuple[list[dict], list[str]]:
+    """The approved breaking changes, and what is wrong with any entry. **An entry missing its approval
+    or its tickets approves nothing**: the point of the file is that a person decided and said who
+    moves."""
+    if not BREAKING.exists():
+        return [], []
+    doc = yaml.safe_load(BREAKING.read_text(encoding="utf-8")) or {}
+    entries, errors = [], []
+    for i, e in enumerate(doc.get("changes") or []):
+        if not isinstance(e, dict):
+            errors.append(f"entry {i + 1} is not a mapping")
+            continue
+        missing = [f for f in BREAKING_FIELDS if not e.get(f)]
+        if missing:
+            errors.append(f"{e.get('id') or f'entry {i + 1}'}: missing {', '.join(missing)}; it approves nothing")
+            continue
+        entries.append(e)
+    return entries, errors
+
+
+def approval(entries: list[dict], contract: str, line: str) -> dict | None:
+    """The entry that approves one breaking change: same contract, same operation, and, when the entry
+    names a `change`, a change whose description contains it."""
+    o, _, why = line.partition(": ")
+    for e in entries:
+        if str(e["contract"]) == contract and str(e["operation"]) == o and str(e.get("change") or "") in why:
+            return e
+    return None
+
+
+def release_shapes(commit: str, names: set) -> dict:
+    """Shapes of the named contracts as they were at `commit`. The contracts tree is written to a temporary
+    directory, because a contract's `$ref`s are relative paths to its neighbours at the same commit."""
+    tmp = Path(tempfile.mkdtemp(prefix="ticvai-contracts-"))
+    try:
+        for path in ls_tree(commit, "contracts"):
+            if path.endswith(".yaml"):
+                dest = tmp / path
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_bytes(show(commit, path) or b"")
+        return {f.stem: shape(f.stem, tmp) for f in sorted(tmp.glob("contracts/*/*.yaml")) if f.stem in names}
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def against_release(ref: str | None) -> int | None:
+    """Compare every contract with the release; the number of unapproved breaking changes, or None
+    when the release tag does not exist."""
+    commit = baseline_commit(ref)
+    if not commit:
+        return None
+    at = describe(ref, commit)
+    entries, entry_errors = load_breaking()
+    failures = len(entry_errors)
+    for e in entry_errors:
+        print(f"  FAIL  {BREAKING.relative_to(ROOT).as_posix()}: {e}")
+    changed = [p for _, p in changed_since(commit, "contracts") if p.endswith(".yaml")]
+    if not changed:
+        print(f"  ok    no contract changed since {at}")
+        for e in entries:
+            print(f"  NOTE  {e['id']} approves {e['contract']} {e['operation']}, which has not changed since {at}")
+        return failures
+    # **Only what a change can reach is re-read**: the changed contracts, and every contract that refers
+    # to one of them. A change to shared/ reaches everything.
+    current = {f.stem: f for f in ROOT.glob("contracts/*/*.yaml")}
+    names = {Path(p).stem for p in changed}
+    if any(p.startswith("contracts/shared/") for p in changed):
+        names |= set(current) | {Path(p).stem for p in ls_tree(commit, "contracts") if p.endswith(".yaml")}
+    else:
+        files = {Path(p).name for p in changed}
+        names |= {n for n, f in current.items() if any(x in f.read_text(encoding="utf-8") for x in files)}
+    old_shapes = release_shapes(commit, names)
+    used = set()
+    n_add = n_ok = 0
+    for name in sorted(names):
+        empty = {"contract": name, "version": "", "operations": {}}
+        old = old_shapes.get(name, empty)
+        new = shape(name) if name in current else empty
+        bad, add = compare(old, new), additive(old, new)
+        n_add += len(add)
+        if not old["operations"] and not new["operations"]:
+            continue
+        unapproved = []
+        for b in bad:
+            e = approval(entries, name, b)
+            if e:
+                used.add(e["id"])
+                print(f"  ok    {name}: {b} -- breaking, approved by {e['approved-by']} ({e['id']}); "
+                      f"producer and consumer move to {e['tag']}")
+            else:
+                unapproved.append(b)
+        if unapproved:
+            failures += len(unapproved)
+            print(f"  FAIL  {name}: {len(unapproved)} breaking change(s) since {at}, not in "
+                  f"{BREAKING.relative_to(ROOT).as_posix()}")
+            for b in unapproved:
+                print(f"        {b}")
+        elif add or bad:
+            n_ok += 1
+            print(f"  ok    {name}: {len(add)} additive change(s) since {at}"
+                  + (f", {len(bad)} approved breaking" if bad else ""))
+    for e in entries:
+        if e["id"] not in used:
+            print(f"  NOTE  {e['id']} ({e['contract']} {e['operation']}) matches no breaking change since {at}; "
+                  "remove it, or check the operation and change it names")
+    print(f"  {len(names)} contract(s) compared with {at}: {n_add} additive change(s), "
+          f"{failures - len(entry_errors)} unapproved breaking change(s)"
+          + (f", {len(entry_errors)} incomplete approval(s)" if entry_errors else ""))
+    return failures
+
 def main() -> int:
+    argv = sys.argv[1:]
+    ref = None
+    if "--baseline" in argv:
+        i = argv.index("--baseline")
+        ref = argv[i + 1] if i + 1 < len(argv) else None
+        del argv[i:i + 2]
+        sys.argv = sys.argv[:1] + argv
+
     if len(sys.argv) >= 3 and sys.argv[1] == "--freeze":
         FROZEN.mkdir(parents=True, exist_ok=True)
         for name in sys.argv[2:]:
@@ -238,11 +402,13 @@ def main() -> int:
         print(json.dumps(rows, indent=1))
         return 0
 
+    release = against_release(ref)          # None: no r1 tag
     baselines = sorted(FROZEN.glob("*.json")) if FROZEN.exists() else []
-    if not baselines:
-        print("PASS - no contract is frozen yet; freeze one with --freeze <contract>")
+    if not baselines and release is None:
+        print(f"PASS - no baseline: no {ref or 'r1'} tag and no contract frozen yet "
+              "(freeze one with --freeze <contract>)")
         return 0
-    failures, refreeze = 0, []
+    failures, refreeze = release or 0, []
     for f in baselines:
         old = json.loads(f.read_text(encoding="utf-8"))
         new = shape(old["contract"])
@@ -261,11 +427,14 @@ def main() -> int:
     for r in refreeze:
         print(f"  NOTE  {r}: new major version, re-freeze with --freeze")
     if failures:
-        print(f"FAIL - {failures} breaking change(s) in frozen contracts. Make it additive, or bump the major version.")
+        print(f"FAIL - {failures} breaking change(s) or incomplete approval(s): make a change additive, or list it in "
+              f"{BREAKING.relative_to(ROOT).as_posix()} with its approval and the tag producer and consumer move to")
         return 1
-    print(f"PASS - {len(baselines)} frozen contract(s) changed additively or not at all")
+    what = [f"{len(baselines)} frozen contract(s) changed additively or not at all"] if baselines else []
+    if release is not None:
+        what.insert(0, f"every contract compatible with {ref or 'r1'} or its breaking changes approved")
+    print("PASS - " + "; ".join(what))
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

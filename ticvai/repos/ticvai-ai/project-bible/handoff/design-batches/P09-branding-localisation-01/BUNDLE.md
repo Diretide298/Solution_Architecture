@@ -1,6 +1,6 @@
 # P09-branding-localisation-01 — P09 · Branding & Localisation
 
-**4 screens · 28 operations · 41 schemas · 6 permissions**
+**4 screens · 28 operations · 42 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -100,12 +100,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-016 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-016 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-016 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-016 holds none of them. The edge carries nothing: ADM-016 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },
@@ -630,12 +630,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-017 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-017 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-017 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-017 holds none of them. The edge carries nothing: ADM-017 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     },
     {
      "to": "ADM-016",
@@ -958,12 +958,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-018 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-018 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-018 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-018 holds none of them. The edge carries nothing: ADM-018 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },
@@ -1314,12 +1314,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-019 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-019 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-019 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-019 holds none of them. The edge carries nothing: ADM-019 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },
@@ -2722,6 +2722,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."
    },
+   "requestLimits": {
+    "$ref": "#/components/schemas/PlanRequestLimits"
+   },
    "packageKind": {
     "type": "string",
     "enum": [
@@ -3639,6 +3642,40 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    }
   ]
+ },
+ "PlanRequestLimits": {
+  "type": "object",
+  "nullable": true,
+  "x-ticvai-persistence": "none — embedded in subscription.plan as its request_limits jsonb column",
+  "description": "**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default**, which starts at twice the tenant's expected peak from its sizing tier (`handoff/sizing.json` venue tiers) and is recalibrated after the benchmark and after four weeks of production. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.",
+  "properties": {
+   "guest": {
+    "$ref": "#/components/schemas/RequestBudget"
+   },
+   "staff": {
+    "$ref": "#/components/schemas/RequestBudget"
+   },
+   "service": {
+    "$ref": "#/components/schemas/RequestBudget"
+   },
+   "partner": {
+    "$ref": "#/components/schemas/RequestBudget"
+   },
+   "replicaSharePercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "default": 25,
+    "description": "The most of one replica's request slots one tenant may hold while the share is enforced."
+   },
+   "shareEnforcedAbovePercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "default": 70,
+    "description": "The replica load, as a percent of its limit, above which the share is enforced."
+   }
+  }
  },
  "PlatformStaffGrant": {
   "type": "object",

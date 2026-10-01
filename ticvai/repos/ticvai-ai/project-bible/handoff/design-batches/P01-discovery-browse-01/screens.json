@@ -20,7 +20,6 @@
     "WEB-004",
     "WEB-008",
     "WEB-009",
-    "WEB-015",
     "WEB-016",
     "WEB-017",
     "WEB-018",
@@ -132,22 +131,17 @@
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them, so the edge carries nothing and WEB-008 opens cold"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them. The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on WEB-008 yet (a gap in WEB-008, not in this edge)"
     },
     {
      "to": "WEB-009",
      "trigger": "Wishlist",
-     "provenance": "derived — WEB-009 declares entryState.params itemId and WEB-001 holds none of them, so the edge carries nothing and WEB-009 opens cold"
-    },
-    {
-     "to": "WEB-015",
-     "trigger": "Branded Queue / Waiting Room",
-     "provenance": "derived — WEB-015 declares entryState.params entryId and WEB-001 holds none of them, so the edge carries nothing and WEB-015 opens cold"
+     "provenance": "derived — WEB-009 declares entryState.params itemId and WEB-001 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional), and WEB-009 opens on its own"
     },
     {
      "to": "WEB-017",
      "trigger": "My Account Dashboard",
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-001 holds none of them, so the edge carries nothing and WEB-017 opens cold"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or optional), and WEB-017 opens on its own"
     },
     {
      "to": "WEB-018",
@@ -161,12 +155,12 @@
     {
      "to": "WEB-019",
      "trigger": "Order History",
-     "provenance": "derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-001 holds none of them, so the edge carries nothing and WEB-019 opens cold"
+     "provenance": "derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-001 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId has no source on WEB-019 yet (a gap in WEB-019, not in this edge)"
     },
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none of them, so the edge carries nothing and WEB-021 opens cold"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021 finds walletId (getWallet) itself, and WEB-021 opens on its own"
     },
     {
      "to": "WEB-022",
@@ -179,32 +173,32 @@
     {
      "to": "WEB-023",
      "trigger": "Membership Management",
-     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-001 holds none of them, so the edge carries nothing and WEB-023 opens cold"
+     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-001 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements, and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)"
     },
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-001 holds none of them, so the edge carries nothing and WEB-024 opens cold"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist, and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)"
     },
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-001 holds none of them, so the edge carries nothing and WEB-027 opens cold"
+     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and WEB-027 opens on its own"
     },
     {
      "to": "WEB-032",
      "trigger": "Offers & Promotions",
-     "provenance": "derived — WEB-032 declares entryState.params promotionId and WEB-001 holds none of them, so the edge carries nothing and WEB-032 opens cold"
+     "provenance": "derived — WEB-032 declares entryState.params promotionId and WEB-001 holds none of them. The edge carries nothing: promotionId only pre-selects (deep link or optional), and WEB-032 opens on its own"
     },
     {
      "to": "WEB-033",
      "trigger": "Shop",
-     "provenance": "derived — WEB-033 declares entryState.params outletId and WEB-001 holds none of them, so the edge carries nothing and WEB-033 opens cold"
+     "provenance": "derived — WEB-033 declares entryState.params outletId and WEB-001 holds none of them. The edge carries nothing: outletId only pre-selects (deep link or optional), and WEB-033 opens on its own"
     },
     {
      "to": "WEB-034",
      "trigger": "Lost & Found",
-     "provenance": "derived — WEB-034 declares entryState.params caseId and WEB-001 holds none of them, so the edge carries nothing and WEB-034 opens cold"
+     "provenance": "derived — WEB-034 declares entryState.params caseId and WEB-001 holds none of them. The edge carries nothing: caseId only pre-selects (deep link or optional), and WEB-034 opens on its own"
     },
     {
      "to": "WEB-020",
@@ -950,7 +944,7 @@
     {
      "to": "WEB-002",
      "trigger": "Event & Attraction Listing",
-     "provenance": "derived — WEB-002 declares entryState.params eventId and WEB-003 holds none of them, so the edge carries nothing and WEB-002 opens cold"
+     "provenance": "derived — WEB-002 declares entryState.params eventId and WEB-003 holds none of them. The edge carries nothing: eventId only pre-selects (deep link or optional), and WEB-002 opens on its own"
     },
     {
      "to": "WEB-004",
@@ -1801,15 +1795,16 @@
    "coldEntry": "Starts at the first question; a saved-plan link opens the plan, or says it has passed and offers to plan again. `itemId` is the plan item the guest taps Swap on, picked on this screen."
   },
   "wireframe": {
-   "status": "notStarted",
+   "status": "review",
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-050",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Visit Planner.dc.html",
-    "rev": "Visit Planner (29 September build)",
-    "verified": "2026-09-29",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Visit Planner.dc.html",
+    "rev": "Visit Planner (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "Header *Plan your visit* (web build), or the Visit Planner file: questions, then Your plan and Book this plan"
+    "view": "Visit Planner → the six questions (defaults) → Make my plan (Your plan)",
+    "differences": "Single-park planner: no \"Which park each day?\" step, no shops or kiosks as plan stops and no preferenceNotAtVenue (MoM 4.7, 30 September); these are pending in design: specified, and built from the definition until the design shows it (handoff/design-batches/apps/1-guest-app/README.md)."
    }
   },
   "_platform": {

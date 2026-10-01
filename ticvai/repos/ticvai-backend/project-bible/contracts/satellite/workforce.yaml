@@ -126,6 +126,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/RotaAssignment' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createRotaAssignment
@@ -171,6 +173,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /guest-broadcast:
     post:
@@ -248,6 +252,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /rota-assignments/{assignmentId}:
     parameters:
@@ -282,6 +288,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/RotaAssignment' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /rota-assignments/{assignmentId}/swap:
     parameters:
@@ -352,6 +360,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /attendance:
     get:
@@ -393,6 +403,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/AttendanceRecord' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /attendance/clock:
     post:
@@ -457,6 +469,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /attendance/{recordId}/amend:
     parameters:
@@ -508,6 +522,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/AttendanceRecord' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /announcements:
     get:
@@ -549,6 +565,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/Announcement' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: publishAnnouncement
@@ -615,6 +633,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /announcements/{announcementId}/acknowledge:
     parameters:
@@ -649,6 +669,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Acknowledged
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /announcements/{announcementId}/reach:
     parameters:
@@ -682,6 +704,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/AnnouncementReach' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /training-records:
     get:
@@ -710,6 +734,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TrainingRecord'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /shift-swaps:
     get:
       operationId: listShiftSwapRequests
@@ -738,6 +764,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ShiftSwap'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /shift-templates:
     get:
       operationId: listShiftTemplates
@@ -766,6 +794,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ShiftTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setShiftTemplate
       x-ticvai-consumed-by:
@@ -797,6 +827,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ShiftTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /staffing-rules:
     put:
       operationId: setStaffingRules
@@ -841,6 +873,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StaffingRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /staffing-coverage:
     get:
       operationId: getStaffingCoverage
@@ -920,6 +954,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/StaffingCoverage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /leave-requests:
     get:
       operationId: listLeaveRequests
@@ -947,6 +983,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/LeaveRequest'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: requestLeave
       x-ticvai-consumed-by:
@@ -983,6 +1021,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LeaveRequest'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /labour-cost:
     get:
       operationId: getLabourCost
@@ -1039,6 +1079,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/LabourCostRow'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /workforce-compliance:
     get:
       operationId: validateWorkforceCompliance
@@ -1083,6 +1125,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkforceComplianceFinding'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /shift-marketplace:
     get:
       operationId: listOpenShifts
@@ -1115,6 +1159,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/OpenShift'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: claimOpenShift
       x-ticvai-consumed-by:
@@ -1153,6 +1199,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /employees:
     get:
@@ -1206,6 +1254,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/WorkforceEmployee'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /employees/{employeeId}:
     get:
       operationId: getEmployee
@@ -1245,6 +1295,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /job-titles:
     get:
       operationId: listJobTitles
@@ -1267,6 +1319,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkforceJobTitle'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setJobTitle
       x-ticvai-consumed-by:
@@ -1301,6 +1355,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkforceJobTitle'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /leave-types:
     get:
       operationId: listLeaveTypes
@@ -1327,6 +1383,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkforceLeaveType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setLeaveType
       x-ticvai-consumed-by:
@@ -1357,6 +1415,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkforceLeaveType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /leave-balances:
     get:
       operationId: listLeaveBalances
@@ -1395,6 +1455,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkforceLeaveBalance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /shift-patterns:
     get:
       operationId: listShiftPatterns
@@ -1422,6 +1484,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkforceShift'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setShiftPattern
       x-ticvai-consumed-by:
@@ -1452,6 +1516,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkforceShift'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /work-assignments:
     get:
       operationId: listWorkAssignments
@@ -1497,6 +1563,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkforceWorkAssignment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWorkAssignment
       x-ticvai-consumed-by:
@@ -1536,6 +1604,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /integration-sources:
     get:
       operationId: listIntegrationSources
@@ -1564,6 +1634,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkforceIntegrationSource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setIntegrationSource
       x-ticvai-consumed-by:
@@ -1594,6 +1666,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkforceIntegrationSource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /integration-sources/{sourceId}/field-ownership:
     get:
       operationId: getFieldOwnership
@@ -1629,6 +1703,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkforceFieldOwnership'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFieldOwnership
       x-ticvai-consumed-by:
@@ -1676,6 +1752,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkforceFieldOwnership'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /sync-runs:
     get:
       operationId: listSyncRuns
@@ -1719,6 +1797,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/WorkforceSyncRun'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: startSync
       x-ticvai-consumed-by:
@@ -1771,6 +1851,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /sync-conflicts:
     get:
       operationId: listSyncConflicts
@@ -1821,6 +1903,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/WorkforceSyncConflict'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: resolveSyncConflict
       x-ticvai-consumed-by:
@@ -1859,6 +1943,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /labour-budgets:
     get:
       operationId: listLabourBudgets
@@ -1918,6 +2004,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/LabourBudget'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setLabourBudget
       x-ticvai-consumed-by:
@@ -1970,6 +2058,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /staff-conversations:
     get:
       operationId: listStaffConversations
@@ -2019,6 +2109,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/WorkforceStaffConversationSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /staff-conversations/{conversationId}/messages:
     parameters:
     - name: conversationId
@@ -2067,6 +2159,8 @@ paths:
                         $ref: '#/components/schemas/WorkforceStaffMessage'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /staff-conversations/{conversationId}/read:
     parameters:
     - name: conversationId
@@ -2117,6 +2211,8 @@ paths:
           description: Marked read
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /staff-messages:
     post:
       operationId: sendStaffMessage
@@ -2178,6 +2274,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   securitySchemes:

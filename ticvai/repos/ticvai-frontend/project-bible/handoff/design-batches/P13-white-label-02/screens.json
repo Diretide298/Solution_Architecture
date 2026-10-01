@@ -27,17 +27,17 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-013 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-013 holds none of them. The edge carries nothing: CMS-001 needs nothing to open"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-013 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-013 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-013 holds none of them, so the edge carries nothing and CMS-003 opens cold"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-013 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
     }
    ]
   },
@@ -230,17 +230,17 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-011 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-011 holds none of them. The edge carries nothing: CMS-011 is opened from CMS-001, so this edge is the way back and CMS-001 keeps its own state"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-011 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-011 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-011 holds none of them, so the edge carries nothing and CMS-003 opens cold"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-011 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
     }
    ]
   },
@@ -360,12 +360,12 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-012 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-012 holds none of them. The edge carries nothing: CMS-001 needs nothing to open"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-012 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-012 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -507,12 +507,12 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-014 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-014 holds none of them. The edge carries nothing: CMS-001 needs nothing to open"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-014 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-014 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -735,12 +735,12 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-015 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-015 holds none of them. The edge carries nothing: CMS-015 is opened from CMS-001, so this edge is the way back and CMS-001 keeps its own state"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-015 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-015 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -959,12 +959,12 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-016 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-016 holds none of them. The edge carries nothing: CMS-016 is opened from CMS-001, so this edge is the way back and CMS-001 keeps its own state"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-016 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-016 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -977,12 +977,12 @@
     {
      "to": "CMS-017",
      "trigger": "Domain & Certificate",
-     "provenance": "derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them, so the edge carries nothing and CMS-017 opens cold"
+     "provenance": "derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them. The edge carries nothing: CMS-017 finds domainId (listCustomDomains) itself, and CMS-017 opens on its own"
     },
     {
      "to": "CMS-018",
      "trigger": "Consent & Legal",
-     "provenance": "derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds none of them, so the edge carries nothing and CMS-018 opens cold"
+     "provenance": "derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds none of them. The edge carries nothing: CMS-018 finds policyKind (listPolicies), questionId (listConsentAnswers) itself, and CMS-018 opens on its own"
     },
     {
      "to": "CMS-103",
@@ -1261,17 +1261,17 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-017 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-017 holds none of them. The edge carries nothing: CMS-001 needs nothing to open"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-017 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-017 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-017 holds none of them, so the edge carries nothing and CMS-003 opens cold"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-017 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
     }
    ]
   },
@@ -1493,12 +1493,12 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-018 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-018 holds none of them. The edge carries nothing: CMS-001 needs nothing to open"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-018 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-018 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -1907,17 +1907,17 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-019 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-019 holds none of them. The edge carries nothing: CMS-019 is opened from CMS-001, so this edge is the way back and CMS-001 keeps its own state"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-019 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-019 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-019 holds none of them, so the edge carries nothing and CMS-003 opens cold"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-019 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
     }
    ]
   },

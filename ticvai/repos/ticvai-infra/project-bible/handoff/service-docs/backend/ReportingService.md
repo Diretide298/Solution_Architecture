@@ -153,6 +153,7 @@ The self-service builder. A definition names its data source, columns, filters, 
 | 201 |  | Created |
 | 400 |  | Unknown field, invalid filter, or estimated cost beyond the limit |
 | 403 |  | Author does not hold the permission they assigned to the report |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### deleteReport
 
@@ -186,6 +187,7 @@ Retired rather than deleted where executions or paused schedules reference it �
 |---|---|---|
 | 204 |  | Retired, or removed where nothing referenced it |
 | 409 |  | Active schedules reference this report (report-scheduled), or it is a system report, which is clone-only (system-report, audit R096) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getReport
 
@@ -258,6 +260,7 @@ Retired rather than deleted where executions or paused schedules reference it �
 |---|---|---|
 | 200 |  | Definition |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listReports
 
@@ -338,6 +341,7 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 |---|---|---|
 | 200 |  | Definitions |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateReport
 
@@ -448,6 +452,7 @@ Definitions are versioned. Historic executions keep the version they ran against
 |---|---|---|
 | 200 |  | New version published |
 | 409 |  | The report is a system report, which is clone-only (audit R096). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: dashboard
@@ -534,6 +539,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | 201 |  | Created |
 | 400 |  | The tiles' refreshes per minute exceed VenueSettings.reporting.dashboardRefreshBudgetPerMinute (proposed default 24, audit R094) |
 | 409 |  | The caller is not entitled to the dashboard's module — the tenant has not licensed it, or the principal holds no permission in it. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getDashboard
 
@@ -605,6 +611,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 |---|---|---|
 | 200 |  | Dashboard with data |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordDashboardView
 
@@ -644,6 +651,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 |---|---|---|
 | 204 |  | Recorded |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateDashboard
 
@@ -726,6 +734,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | Moving a dashboard to a module the caller is not entitled to. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: execution
@@ -792,6 +801,7 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 | 202 |  | Queued. |
 | 400 |  | Required parameter missing, or the date range exceeds maxDateRangeDays (366 days when the definition sets none, audit R158) |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: naturalLanguage
@@ -801,7 +811,8 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 **`POST /reports/ask`**: Natural-language reporting query
 
 **This is an AI capability and is governed as one.** It resolves its provider through `ai.provider`, respects `ai.policy` including the masking list, and writes an `ai.activity` row with its prompt, response, model, tokens and cost — the same audit trail as the assistant (8.3.55–8.3.57).
-Distinct from `sendAiMessage`, which retrieves from documents. **This generates a query against the analytical replica and returns it**, so a finance user can check the number rather than trust it.
+Distinct from `sendAiMessage`, which retrieves from documents. **It answers through the semantic layer, never free text-to-SQL** (ADR-0054, accepted 1 October): the model writes a semantic query spec, Reporting compiles and runs it on the analytical replica with RLS and the official metric definitions, and the answer returns the query it ran, so a finance user can check the number rather than trust it. Numbers come only from that query's result, never from a document chunk (AI-D13); a mixed question takes its knowledge from the tenant's Qdrant collection and its numbers from here.
+**Block A ships the screens bound to this without the free-text box**: their saved-report and KPI views work, and the box stays behind a feature flag until the assistant lands in S7 (8 to 26 February, ADR-0059).
 AI-57, Phase 1. Queries data that already exists, so it works from day one — unlike forecasting, which needs history.
 **Returns the generated query alongside the answer.** An answer nobody can check is worse than no answer, and a finance user asked to trust an unexplained number will rightly refuse.
 Runs under the caller's resolved permissions. The generated query cannot widen scope, because scope is applied after generation, not by it.
@@ -898,6 +909,7 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | 200 |  | Answer with its query |
 | 400 |  | Question could not be interpreted. |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### saveNaturalLanguageQuery
 
@@ -979,6 +991,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Saved as a definition |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: reporting
@@ -1044,6 +1057,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### deleteDashboard
 
@@ -1077,6 +1091,7 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 |---|---|---|
 | 204 |  | Archived |
 | 409 |  | The dashboard is shared. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listAlerts
 
@@ -1113,6 +1128,7 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Alerts |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAlertRule
 
@@ -1184,6 +1200,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | 200 |  | Replaced — a rule with this id already existed |
 | 201 |  | Created — no rule with this id existed |
 | 400 |  | An outsideRange rule without both threshold and thresholdUpper, or with the upper not above the lower (audit R158) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setSemanticModel
 
@@ -1256,6 +1273,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 |---|---|---|
 | 200 |  | Published, replacing the previous model |
 | 201 |  | Published — the tenant's first model |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 

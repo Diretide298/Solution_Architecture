@@ -239,6 +239,7 @@ Created in draft. One-off, scheduled, or triggered by an event such as a booking
 |---|---|---|
 | 201 |  | Created in draft |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### launchCampaign
 
@@ -294,6 +295,7 @@ Evaluates the segment, applies consent and suppression, and queues the send. The
 | 202 |  | Queued |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | Already launched (alreadyLaunched), audience size differs beyond tolerance (audienceSizeChanged), or every recipient was excluded (noReachableRecipients). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### stopCampaign
 
@@ -399,6 +401,7 @@ Halts remaining sends immediately. Messages already dispatched cannot be recalle
 |---|---|---|
 | 200 |  | Stopped |
 | 409 |  | The campaign is not sending or paused (statusDoesNotPermit). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateCampaign
 
@@ -510,6 +513,7 @@ Content and audience are editable only in draft. A live campaign may be paused, 
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | content amended on a campaign that is no longer in draft (statusDoesNotPermit). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: case
@@ -591,6 +595,7 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Raised |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listCases
 
@@ -657,6 +662,7 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Cases |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: consent
@@ -715,6 +721,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 | 200 |  | The guest's consent state after narrowing |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The key is already claimed by another subject (already-claimed) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createConsentQuestion
 
@@ -780,6 +787,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 | 201 |  | Created, at version 1 |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getCookieConsentRuntime
 
@@ -888,6 +896,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 |---|---|---|
 | 200 |  | The runtime answer |
 | 404 |  | No published banner design for this channel (not-configured); the storefront loads nothing but strictlyNecessary |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getDeviceConsentHistory
 
@@ -950,6 +959,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 |---|---|---|
 | 200 |  | The visitor's decisions |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGuestConsents
 
@@ -995,6 +1005,7 @@ Current position per purpose and channel, with the version of the notice consent
 |---|---|---|
 | 200 |  | Consent state |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listConsentAnswers
 
@@ -1059,6 +1070,7 @@ Current position per purpose and channel, with the version of the notice consent
 |---|---|---|
 | 200 |  | Consent records |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listConsentPurposes
 
@@ -1104,6 +1116,7 @@ Current position per purpose and channel, with the version of the notice consent
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Purposes |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listConsentQuestions
 
@@ -1158,6 +1171,7 @@ Current position per purpose and channel, with the version of the notice consent
 |---|---|---|
 | 200 |  | Questions |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listPublishedTrackingTechnologies
 
@@ -1208,6 +1222,7 @@ Current position per purpose and channel, with the version of the notice consent
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Approved technologies |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordConsent
 
@@ -1268,6 +1283,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 |---|---|---|
 | 201 |  | Recorded |
 | 400 |  | Notice version unknown, or the purpose is not configured |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordConsentAnswers
 
@@ -1345,6 +1361,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | 201 |  | Recorded |
 | 409 |  | The question has changed since the cart was read (questionVersionSuperseded); the client re-reads the cart and asks the current version. |
 | 422 |  | A perPerson question answered without a person (personRequired), a question this cart does not ask (questionNotAsked), or a retired one (questionRetired). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordDeviceConsent
 
@@ -1424,6 +1441,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | 400 |  | No published banner design with this id for the channel, or a category the design does not offer |
 | 409 |  | noticeVersion is no longer the published one (notice-superseded); read getCookieConsentRuntime again and show the current banner |
 | 422 |  | strictlyNecessary declined, or savePreferences with no categories |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setConsentPurposes
 
@@ -1468,6 +1486,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Configured |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setCookieBannerDesign
 
@@ -1567,6 +1586,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | 200 |  | The new draft version |
 | 400 | BadRequest | Validation failed |
 | 422 |  | A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names ccpaCpra without a doNotSellOrShare button. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setTrackingTechnology
 
@@ -1654,6 +1674,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | 200 |  | The technology as stored |
 | 400 | BadRequest | Validation failed |
 | 422 |  | Approved with no category, or a non-essential technology marked as needing no consent. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateConsentQuestion
 
@@ -1720,6 +1741,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | 200 |  | Updated, at a new version where the question changed |
 | 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: feedback
@@ -1784,6 +1806,7 @@ Guest-facing. A low rating may open a service case automatically where the venue
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Submitted |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: guest
@@ -1850,6 +1873,7 @@ Idempotent on the variant and performance — saving twice is one entry, not two
 |---|---|---|
 | 200 |  | Saved, or already present |
 | 404 |  | Variant not found or not sellable in this venue |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGuestProfile
 
@@ -1932,6 +1956,7 @@ The single-guest view a service agent works from — profile, consent state, rec
 |---|---|---|
 | 200 |  | Profile |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getWishlist
 
@@ -1987,6 +2012,7 @@ Items whose product has been withdrawn are returned with `isAvailable: false` ra
 |---|---|---|
 | 200 |  | Wishlist |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listGuestDevices
 
@@ -2043,6 +2069,7 @@ Here rather than in tenancy. `platform.device` is staff hardware bound to a work
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Devices |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### registerGuestDevice
 
@@ -2107,6 +2134,7 @@ Called on install and again whenever the provider rotates the token — which ha
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Registered, or an existing registration refreshed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### removeFromWishlist
 
@@ -2139,6 +2167,7 @@ Called on install and again whenever the provider rotates the token — which ha
 |---|---|---|
 | 204 |  | Removed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### revokeGuestDevice
 
@@ -2174,6 +2203,7 @@ Sign-out, uninstall, or a guest removing a device they no longer have. Revoked r
 |---|---|---|
 | 204 |  | Revoked |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### searchGuests
 
@@ -2238,6 +2268,7 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 |---|---|---|
 | 200 |  | Guests |
 | 403 |  | Not permitted at the requested scope, or search passed without GUEST_VIEW_PII. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: loyalty
@@ -2331,6 +2362,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 |---|---|---|
 | 201 |  | Created |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listLoyaltyProgrammes
 
@@ -2393,6 +2425,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Programmes |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setLoyaltyRules
 
@@ -2510,6 +2543,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 |---|---|---|
 | 200 |  | Set |
 | 409 |  | A rule references a reward or product that does not exist |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: marketing
@@ -2595,6 +2629,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createForm
 
@@ -2691,6 +2726,7 @@ Published as a version. **A change creates a new version and the old one stays r
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created as a draft version |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createInvitationCampaign
 
@@ -2755,6 +2791,7 @@ BL-150 and CF-74's issuance half. **A campaign broadcasts; an invitation is addr
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createReferral
 
@@ -2817,6 +2854,7 @@ BL-034. **The reward fires on the referee's qualifying act, not on the sign-up**
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Issued |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getLoyaltyPosition
 
@@ -2864,6 +2902,7 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Position |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getMarketingSubscription
 
@@ -2889,6 +2928,7 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Every subscription this guest has — one per channel and list, since a guest may take the newsletter by email and offers by SMS. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getMyChallenges
 
@@ -2915,6 +2955,7 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Every active challenge the caller can take part in, with their progress. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getWaiverStatus
 
@@ -2957,6 +2998,7 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Status |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### handoverToAgent
 
@@ -3044,6 +3086,7 @@ Triggered by the guest asking, by the assistant refusing or failing, by sentimen
 |---|---|---|
 | 200 |  | Queued for an agent, with a position and a wait estimate |
 | 409 |  | No agent available. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### identifyGuest
 
@@ -3111,6 +3154,7 @@ Takes a token of any kind: a QR payload, an RFID or NFC serial, a membership car
 |---|---|---|
 | 200 |  | Resolved |
 | 409 |  | More than one guest matches. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listMyCases
 
@@ -3177,6 +3221,7 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Cases, newest first — by recordedAt descending, then id; the cursor is keyset on that pair |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### raiseMyCase
 
@@ -3251,6 +3296,7 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 |---|---|---|
 | 201 |  | Raised |
 | 400 |  | kind is other and detail is missing or empty (audit R222), or another field breaks the schema |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### redeemLoyaltyPoints
 
@@ -3310,6 +3356,7 @@ Holds against the balance through `authoriseStoredValue` rather than deducting d
 |---|---|---|
 | 200 |  | Redeemed |
 | 409 |  | The balance does not cover points (insufficientPoints). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### replyToMyCase
 
@@ -3392,6 +3439,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Added — the case with its guest-visible thread |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### respondToInvitation
 
@@ -3448,6 +3496,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 |---|---|---|
 | 200 |  | Recorded |
 | 409 |  | Already answered, expired or revoked — the token is single-use — or an acceptance when the campaign's quota of places is taken. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### sendConversationMessage
 
@@ -3505,6 +3554,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Sent |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAgentAvailability
 
@@ -3556,6 +3606,7 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setMarketingSubscription
 
@@ -3613,6 +3664,7 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Subscribe or unsubscribe |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setSeoMetadata
 
@@ -3684,6 +3736,7 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateGuestPreferences
 
@@ -3744,6 +3797,7 @@ Board 4G. **Table, drink, dietary needs, contact channel.** A guest who states a
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateMyProfile
 
@@ -3815,6 +3869,7 @@ CF-96 fixed this class for 28 guest screens and the underlying pattern was never
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### uploadGuestDocument
 
@@ -3875,6 +3930,7 @@ BL-133. **Deliberately not `assets`.** A guest's passport scan is not a marketin
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Stored |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: message
@@ -3942,6 +3998,7 @@ Per-language bodies with named merge fields. A template missing a version in an 
 |---|---|---|
 | 201 |  | Created |
 | 400 |  | Unknown merge field, or a required language is missing |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listMyNotifications
 
@@ -3995,6 +4052,7 @@ Per-language bodies with named merge fields. A template missing a version in an 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Notifications, newest first — by queuedAt descending, then id; the cursor is keyset on that pair |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### markMyNotificationsRead
 
@@ -4039,6 +4097,7 @@ Marks the given notifications, or all of them when `all` is true, as opened. Onl
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Marked. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: segment
@@ -4107,6 +4166,7 @@ Marks the given notifications, or all of them when `all` is true, as opened. Onl
 |---|---|---|
 | 201 |  | Created |
 | 400 |  | Criteria are contradictory or reference unknown attributes |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 

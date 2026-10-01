@@ -49,7 +49,7 @@ steps:
   operations:
   - listProductVariants
   - getAvailability
-  outcome: Sees live availability, never cached
+  outcome: Sees availability from a one-second cache (ADR-0065); the hold decides
 - step: 5
   screen: KSK-005
   action: Chooses a session

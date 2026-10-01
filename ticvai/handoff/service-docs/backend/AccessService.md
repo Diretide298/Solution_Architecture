@@ -131,6 +131,7 @@
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Manual Override & Supervisor Approval |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### bindCredentialDevice
 
@@ -202,6 +203,7 @@ The venue's device binding policy (`setDeviceBindingPolicy`) decides the rest: p
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | device-limit or device-change-needs-approval under the venue's device binding policy. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### deleteAccessPointGroup
 
@@ -238,6 +240,7 @@ Deletes a group. **Refused `409 group-in-use`** while another group is nested un
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | group-in-use: a nested group or a gate mode policy still names this group. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### enrolFacePass
 
@@ -313,6 +316,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | 403 |  | A guest enrolling a subject who is neither themselves nor a child linked to them by a familyMember or primaryHolder delegation (audit R205). |
 | 422 |  | Capture quality too low to enrol. |
 | 202 |  | A re-enrolment held for review: the new capture differs significantly from the enrolled face, so the old template stays until reviewFaceReenrolment decides |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### enrolFaceTag
 
@@ -381,6 +385,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | 201 |  | Tagged |
 | 409 |  | Biometrics are not enabled at this venue, this ticket type's biometricPolicy is disabled, or consent.method is not the one the venue's Face Tag profile requires (consentCapture). |
 | 422 |  | Capture quality too low to match against later in the visit. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getEntitlement
 
@@ -447,6 +452,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 |---|---|---|
 | 200 |  | The entitlement |
 | 404 |  | Not found and not permitted return the same response. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getEntitlementCredential
 
@@ -496,6 +502,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Credential |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getEntitlementHistory
 
@@ -529,6 +536,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | History, most recent first |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getFacePassEnrolment
 
@@ -580,6 +588,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 |---|---|---|
 | 200 |  | Enrolment |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listEntitlements
 
@@ -651,6 +660,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Newest first: id descending. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listMyEntitlements
 
@@ -724,6 +734,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Entitlements |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listParkingFacilities
 
@@ -782,6 +793,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 |---|---|---|
 | 200 |  | Facilities |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### revokeFacePass
 
@@ -815,6 +827,7 @@ Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Destroyed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### rollbackAccessPolicy
 
@@ -870,6 +883,7 @@ The restored version takes the same approval route as any policy change (`evalua
 | 200 |  | Restored as a new version |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | targetVersion is the current version, or does not exist for this policy |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAccessAttributeCatalog
 
@@ -927,6 +941,7 @@ The restored version takes the same approval route as any policy change (`evalua
 | 200 |  | Saved |
 | 409 |  | Changing the data type of, or disabling, an attribute a published policy tests |
 | 422 |  | dataType enum with no allowedValues |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAccessPointGroup
 
@@ -994,6 +1009,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | group-cycle: the parent named would make the group its own ancestor. |
 | 422 |  | A member access point is not in the group's venue. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setBiometricVerificationProfile
 
@@ -1061,6 +1077,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Biometric Verification Profile Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setBleBeaconGeofence
 
@@ -1083,8 +1100,8 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `access.access_device`, `access.access_point`, `cache:idempotency` |
-| Writes | `access.access_device`, `access.access_point`, `access.configuration_change`, `cache:idempotency` |
+| Reads | `access.device_placement`, `access.access_point`, `cache:idempotency` |
+| Writes | `access.device_placement`, `access.access_point`, `access.configuration_change`, `cache:idempotency` |
 | Called by | BO-168 |
 
 **Parameters**
@@ -1134,6 +1151,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | BLE Beacon & Geofence Configuration |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setContextTimeEvent
 
@@ -1170,7 +1188,20 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes |  |
-| conditionExpression | string | yes | e.g. |
+| conditionRule | AdmissionRule | yes | One rule format that runs on both sides (ADR-0068, accepted 1 October). |
+| conditionRule.formatVersion | enum (1) |  | The rule format's version. (default 1) |
+| conditionRule.match | enum (all, any) | yes |  |
+| conditionRule.conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
+| conditionRule.conditions[].subject | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) | yes | What the condition tests, from the policyType enum. |
+| conditionRule.conditions[].context | enum (date, day, time, season, event, performance, specialEvent, holiday, …) |  | For a timeEvent or occupancy subject, which context value is tested, from the contextType enum. (nullable) |
+| conditionRule.conditions[].attributeKey | string | yes | An access.access_attribute key (for example accreditationLevel, zone), or the context's own value where context is set. (max length 100) |
+| conditionRule.conditions[].comparator | enum (equals, notEquals, in, notIn, between, lessThan, lessOrEqual, greaterThan, …) | yes |  |
+| conditionRule.conditions[].values | array of string |  | Operands as strings, read as the attribute's type (a number, an ISO 8601 date or time, true or false). (max items 100) |
+| conditionRule.conditions[].negate | boolean |  | (default False) |
+| conditionRule.groups | array of object |  | (max items 10) |
+| conditionRule.groups[].match | enum (all, any) | yes |  |
+| conditionRule.groups[].negate | boolean |  | (default False) |
+| conditionRule.groups[].conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
 | name | string | yes |  |
 | policyId | string | yes |  |
 | contextType | enum (date, day, time, season, event, performance, specialEvent, holiday, …) | yes | Kind of venue condition the policy reacts to |
@@ -1185,7 +1216,20 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes |  |
-| conditionExpression | string | yes | e.g. |
+| conditionRule | AdmissionRule | yes | One rule format that runs on both sides (ADR-0068, accepted 1 October). |
+| conditionRule.formatVersion | enum (1) |  | The rule format's version. (default 1) |
+| conditionRule.match | enum (all, any) | yes |  |
+| conditionRule.conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
+| conditionRule.conditions[].subject | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) | yes | What the condition tests, from the policyType enum. |
+| conditionRule.conditions[].context | enum (date, day, time, season, event, performance, specialEvent, holiday, …) |  | For a timeEvent or occupancy subject, which context value is tested, from the contextType enum. (nullable) |
+| conditionRule.conditions[].attributeKey | string | yes | An access.access_attribute key (for example accreditationLevel, zone), or the context's own value where context is set. (max length 100) |
+| conditionRule.conditions[].comparator | enum (equals, notEquals, in, notIn, between, lessThan, lessOrEqual, greaterThan, …) | yes |  |
+| conditionRule.conditions[].values | array of string |  | Operands as strings, read as the attribute's type (a number, an ISO 8601 date or time, true or false). (max items 100) |
+| conditionRule.conditions[].negate | boolean |  | (default False) |
+| conditionRule.groups | array of object |  | (max items 10) |
+| conditionRule.groups[].match | enum (all, any) | yes |  |
+| conditionRule.groups[].negate | boolean |  | (default False) |
+| conditionRule.groups[].conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
 | name | string | yes |  |
 | policyId | string | yes |  |
 | contextType | enum (date, day, time, season, event, performance, specialEvent, holiday, …) | yes | Kind of venue condition the policy reacts to |
@@ -1197,6 +1241,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Context, Time, Event & Capacity Policy Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setCredentialActivationDisplay
 
@@ -1255,6 +1300,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | 200 |  | Saved |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | No activation trigger, or a display option that contradicts another (hideQr with blurQr) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setDeviceBindingPolicy
 
@@ -1337,6 +1383,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | 200 |  | The policy |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFaceMatchingVerification
 
@@ -1410,6 +1457,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | 200 |  | Saved |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | reviewRangeMin is not below highConfidenceMin |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFacePassEnrollment
 
@@ -1477,6 +1525,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Face Pass Enrollment Configuration |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFaceTagTemporaryEnrollment
 
@@ -1542,6 +1591,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | 200 |  | Saved |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | operationalRetentionThreshold chosen with no retentionThresholdHours |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setGateModePolicy
 
@@ -1614,6 +1664,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setParkingFacility
 
@@ -1689,6 +1740,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 | 201 |  | A new facility, created |
 | 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setVirtualTicketIdentity
 
@@ -1754,6 +1806,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Virtual Ticket Identity & Master Record Configuration |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setVisualAccessRule
 
@@ -1820,6 +1873,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Visual Access Rule Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setVisualDynamicPolicy
 
@@ -1858,7 +1912,20 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| conditionExpression | string | yes | Condition tree over catalogue attributes using AND, OR, NOT, IN and BETWEEN, e.g. |
+| conditionRule | AdmissionRule | yes | One rule format that runs on both sides (ADR-0068, accepted 1 October). |
+| conditionRule.formatVersion | enum (1) |  | The rule format's version. (default 1) |
+| conditionRule.match | enum (all, any) | yes |  |
+| conditionRule.conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
+| conditionRule.conditions[].subject | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) | yes | What the condition tests, from the policyType enum. |
+| conditionRule.conditions[].context | enum (date, day, time, season, event, performance, specialEvent, holiday, …) |  | For a timeEvent or occupancy subject, which context value is tested, from the contextType enum. (nullable) |
+| conditionRule.conditions[].attributeKey | string | yes | An access.access_attribute key (for example accreditationLevel, zone), or the context's own value where context is set. (max length 100) |
+| conditionRule.conditions[].comparator | enum (equals, notEquals, in, notIn, between, lessThan, lessOrEqual, greaterThan, …) | yes |  |
+| conditionRule.conditions[].values | array of string |  | Operands as strings, read as the attribute's type (a number, an ISO 8601 date or time, true or false). (max items 100) |
+| conditionRule.conditions[].negate | boolean |  | (default False) |
+| conditionRule.groups | array of object |  | (max items 10) |
+| conditionRule.groups[].match | enum (all, any) | yes |  |
+| conditionRule.groups[].negate | boolean |  | (default False) |
+| conditionRule.groups[].conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
 | name | string | yes | e.g. |
 | policyId | string | yes |  |
 | result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes | Decision the policy returns when its condition holds |
@@ -1871,7 +1938,20 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| conditionExpression | string | yes | Condition tree over catalogue attributes using AND, OR, NOT, IN and BETWEEN, e.g. |
+| conditionRule | AdmissionRule | yes | One rule format that runs on both sides (ADR-0068, accepted 1 October). |
+| conditionRule.formatVersion | enum (1) |  | The rule format's version. (default 1) |
+| conditionRule.match | enum (all, any) | yes |  |
+| conditionRule.conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
+| conditionRule.conditions[].subject | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) | yes | What the condition tests, from the policyType enum. |
+| conditionRule.conditions[].context | enum (date, day, time, season, event, performance, specialEvent, holiday, …) |  | For a timeEvent or occupancy subject, which context value is tested, from the contextType enum. (nullable) |
+| conditionRule.conditions[].attributeKey | string | yes | An access.access_attribute key (for example accreditationLevel, zone), or the context's own value where context is set. (max length 100) |
+| conditionRule.conditions[].comparator | enum (equals, notEquals, in, notIn, between, lessThan, lessOrEqual, greaterThan, …) | yes |  |
+| conditionRule.conditions[].values | array of string |  | Operands as strings, read as the attribute's type (a number, an ISO 8601 date or time, true or false). (max items 100) |
+| conditionRule.conditions[].negate | boolean |  | (default False) |
+| conditionRule.groups | array of object |  | (max items 10) |
+| conditionRule.groups[].match | enum (all, any) | yes |  |
+| conditionRule.groups[].negate | boolean |  | (default False) |
+| conditionRule.groups[].conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
 | name | string | yes | e.g. |
 | policyId | string | yes |  |
 | result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes | Decision the policy returns when its condition holds |
@@ -1882,6 +1962,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Visual Dynamic Policy Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateParkingEntitlement
 
@@ -1942,6 +2023,7 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 |---|---|---|
 | 200 |  | Updated, and re-pushed |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: accessPoint
@@ -1999,6 +2081,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 |---|---|---|
 | 201 |  | Added |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createAccessPoint
 
@@ -2067,6 +2150,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 |---|---|---|
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createAdmissionRules
 
@@ -2190,6 +2274,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAccessPointGeofence
 
@@ -2262,6 +2347,7 @@ Enforcement is configurable — `off`, `warn` or `deny` — because GPS accuracy
 | 200 |  | Set |
 | 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setTurnstileMode
 
@@ -2338,6 +2424,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 202 |  | Scheduled: a future effectiveAt was sent and the change is held pending |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateAccessPoint
 
@@ -2406,6 +2493,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 |---|---|---|
 | 200 |  | Updated |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateAdmissionRules
 
@@ -2536,6 +2624,7 @@ Changes take effect at terminals after the next offline package refresh, not imm
 | 200 |  | Updated |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | A count missing for an n* entry mode, days missing for a relative validity anchor, or validity.to before validity.from |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: sync
@@ -2582,7 +2671,8 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | validTo | string (date-time) | yes |  |
 | accessPointId | string (uuid) | yes |  |
 | entitlementsVersion | integer |  | The highest access.entitlement change included (SD-052, 29 September). |
-| dynamicPolicies | array of AccessDynamicPolicy |  | The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one. |
+| policySetVersion | string |  | The active admission policy version the package carries (ADR-0068, 1 October): a fingerprint of the (id, currentVersion) of every policy in dynamicPolicies, computed the same way by validateAccess on… |
+| dynamicPolicies | array of AccessDynamicPolicy |  | The active guest-admission dynamic policies for this access point's zones (SD-052), each at its active version with its conditionRule (ADR-0068), so an offline gate applies the same rules as an onlin… |
 | dynamicPolicies[].id | string (uuid) | yes | The policyId |
 | dynamicPolicies[].venueId | string (uuid) |  | (nullable) |
 | dynamicPolicies[].scopePath | string | yes | ltree of the owning scope node; where it applies further is access.policy_scope_assignment |
@@ -2590,7 +2680,11 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | dynamicPolicies[].policyType | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) | yes |  |
 | dynamicPolicies[].contextType | enum (date, day, time, season, event, performance, specialEvent, holiday, …) |  | Context/time/event policies (setContextTimeEvent) (nullable) |
 | dynamicPolicies[].identityType | enum (guest, member, annualPassHolder, employee, contractor, vendor, performer, media, …) |  | Identity-based policies (listIdentityMembershipAccreditation) (nullable) |
-| dynamicPolicies[].conditionExpression | string | yes | Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN |
+| dynamicPolicies[].conditionRule | AdmissionRule | yes | One rule format that runs on both sides (ADR-0068, accepted 1 October). |
+| dynamicPolicies[].conditionRule.formatVersion | enum (1) |  | The rule format's version. (default 1) |
+| dynamicPolicies[].conditionRule.match | enum (all, any) | yes |  |
+| dynamicPolicies[].conditionRule.conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
+| dynamicPolicies[].conditionRule.groups | array of object |  | (max items 10) |
 | dynamicPolicies[].result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes |  |
 | dynamicPolicies[].priority | integer |  | (nullable) |
 | dynamicPolicies[].allowedZoneIds | array of string (uuid) |  |  |
@@ -2652,6 +2746,7 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | 200 |  | Package |
 | 304 |  | Unchanged since the supplied ETag |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 
@@ -2669,41 +2764,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | data_type | text | yes |  |
 | allowed_values | text[] | no | Required when dataType is enum |
 | is_enabled | boolean | yes |  |
-| created_at | timestamptz | no |  |
-| updated_at | timestamptz | no |  |
-
-### `access.access_device`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| venue_id | uuid | yes |  |
-| hardware_model_id | uuid | no | Model from the hardware library (access.hardware_model) |
-| hardware_type | text | yes | Specific hardware type, as in the hardware library |
-| name | text | no | Device or beacon name, e.g. |
-| serial_number | text | no |  |
-| access_area_id | uuid | no | Most specific park, zone or attraction the device sits in (access.access_area) |
-| access_point_id | uuid | no | Access point (gate) the device serves |
-| gate_lane_id | uuid | no | Lane the device is mounted on (access.gate_lane) |
-| device_group_id | text | no | Device group the device belongs to, as targeted by hardware deployments and device configurations |
-| ip_network_reference | text | no |  |
-| controller_reference | text | no |  |
-| installation_date | date | no |  |
-| provisioning_stage | text | yes |  |
-| lifecycle_status | text | no | Certification stage; no device enters production until validated |
-| capabilities | text[] | no | Capabilities this device supports, from the compatibility matrix |
-| proximity_threshold_meters | integer | no | Beacons only: activation distance in metres |
-| is_active | boolean | yes | Active/inactive as configured (beacons: activeInactive) |
-| status | text | no | Health as reported by the device or vendor; TICVAI does not detect it |
-| connectivity | text | no | Reported connectivity |
-| scanner_health | text | no |  |
-| controller_health | text | no |  |
-| camera_health | text | no | Where the device has a camera |
-| configuration_version | text | no | Configuration version the device reports running |
-| local_rule_version | text | no |  |
-| credential_security_package_version | text | no |  |
-| last_heartbeat_at | timestamptz | no | Last heartbeat or, for a beacon, last detected |
-| scope_path | text | yes | ltree of the owning scope node (ADR-0005) |
 | created_at | timestamptz | no |  |
 | updated_at | timestamptz | no |  |
 
@@ -2955,6 +3015,29 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | yes | ltree of the owning scope node |
 | updated_at | timestamptz | no |  |
 
+### `access.device_placement`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| venue_id | uuid | yes |  |
+| device_id | uuid | yes | The registered device placed here (platform.device, tenancy registerDevice). |
+| access_area_id | uuid | no | Most specific park, zone or attraction the device sits in (access.access_area) |
+| access_point_id | uuid | no | Access point (gate) the device serves |
+| gate_lane_id | uuid | no | Lane the device is mounted on (access.gate_lane) |
+| role | text | yes | What the device does at this place. |
+| name | text | no | Label at this place, e.g. |
+| device_group_id | text | no | Device group the placement belongs to, as targeted by hardware deployments and device configurations |
+| controller_reference | text | no |  |
+| proximity_threshold_meters | integer | no | Beacons only: activation distance in metres |
+| installation_date | date | no |  |
+| provisioning_checklist | jsonb | no | Access's provisioning stages, as a checklist on the placement (ADR-0067). |
+| is_active | boolean | yes | Whether this placement is in use (beacons: activeInactive). |
+| scope_path | text | yes | ltree of the owning scope node (ADR-0005) |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+| hardware_model_id | uuid | no | Points at access.hardware_model. |
+
 ### `access.dynamic_policy`
 
 | Column | Type | Required | Notes |
@@ -2966,7 +3049,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | policy_type | text | yes |  |
 | context_type | text | no | Context/time/event policies (setContextTimeEvent) |
 | identity_type | text | no | Identity-based policies (listIdentityMembershipAccreditation) |
-| condition_expression | text | yes | Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN |
+| condition_rule | jsonb | yes | The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text conditionExpression). |
 | result | text | yes |  |
 | priority | integer | no |  |
 | allowed_zone_ids | text[] | no |  |
@@ -2989,7 +3072,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | yes | ltree of the owning scope node |
 | version | integer | yes | Unique per policy |
 | status | text | yes |  |
-| definition | jsonb | yes | The policy content of this version - name, policyType, contextType, identityType, conditionExpression, result, priority, zones, thresholds and validity - as on access.dynamic_policy |
+| definition | jsonb | yes | The policy content of this version - name, policyType, contextType, identityType, conditionRule, result, priority, zones, thresholds and validity - as on access.dynamic_policy |
 | restored_from_version | integer | no | Set by rollbackAccessPolicy (its targetVersion) |
 | reason | text | no |  |
 | created_by_principal_id | uuid | no |  |
@@ -3146,6 +3229,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | dynamic_policy_result | text | no | What the policy decided, which for a step-up is not the same as the scan's outcome. |
 | quantity | integer | no | Admissions this scan counted. |
 | local_sequence | integer | no | The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1). |
+| policy_set_version | text | no | The admission policy set the scan was decided under (OfflinePackage.policySetVersion, or the same fingerprint computed online by validateAccess), beside the one policy and version that decided it (dy… |
 | package_version | text | no | The offline package (access.edge_package) the device validated against; null for an online scan (added 29 September, data-model close-out DM1). |
 | recorded_at | timestamptz | yes |  |
 | synced_at | timestamptz | no | Null while pending. |
@@ -3157,7 +3241,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Group | Operations |
 |---|---|
-| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `lockIdentity`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `registerAccessDevice`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackConfigurationVersion`, `setAccessAreaZone`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevice`, `updateSecurityAlert`, `verifyIdentity` |
+| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `lockIdentity`, `placeAccessDevice`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackConfigurationVersion`, `setAccessAreaZone`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevicePlacement`, `updateSecurityAlert`, `verifyIdentity` |
 | accessPoint | `getAccessPoint`, `listAccessPoints`, `listAdmissionRules`, `listBlacklist`, `removeBlacklistEntry` |
 | drafted | `listBiometricConsentGuardian`, `listBiometricLifecycleRetention` |
 | sync | `listScans`, `syncScans` |

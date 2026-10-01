@@ -2913,7 +2913,7 @@
     {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-010 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-010 holds none of them. The edge carries nothing: ANL-010 is opened from ANL-001, so this edge is the way back and ANL-001 keeps its own state"
     },
     {
      "to": "ANL-071",

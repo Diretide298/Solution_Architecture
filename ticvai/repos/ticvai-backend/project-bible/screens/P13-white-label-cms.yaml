@@ -120,16 +120,20 @@ screens:
       provenance: structural — pack board 4 wiring, 11 September 2026
     - to: CMS-008
       trigger: Content Blocks
-      provenance: derived — CMS-008 declares entryState.params actionId, bannerId, promoBlockId and CMS-001
-        holds none of them, so the edge carries nothing and CMS-008 opens cold
+      provenance: 'derived — CMS-008 declares entryState.params actionId, bannerId, promoBlockId and CMS-001
+        holds none of them. The edge carries nothing: CMS-008 finds bannerId (createBanner), promoBlockId
+        (createPromoBlock) itself; CMS-008 opens on listPromoBlocks, and actionId has no source on CMS-008
+        yet (a gap in CMS-008, not in this edge)'
     - to: CMS-009
       trigger: Navigation & Menus
-      provenance: derived — CMS-009 declares entryState.params menuId and CMS-001 holds none of them,
-        so the edge carries nothing and CMS-009 opens cold
+      provenance: 'derived — CMS-009 declares entryState.params menuId and CMS-001 holds none of them.
+        The edge carries nothing: menuId only pre-selects (deep link or optional), and CMS-009 opens on
+        its own'
     - to: CMS-010
       trigger: Media Library
-      provenance: derived — CMS-010 declares entryState.params mediaCode, mediaId, uploadId and CMS-001
-        holds none of them, so the edge carries nothing and CMS-010 opens cold
+      provenance: 'derived — CMS-010 declares entryState.params mediaCode, mediaId, uploadId and CMS-001
+        holds none of them. The edge carries nothing: mediaCode, mediaId, uploadId only pre-select (deep
+        link or optional), and CMS-010 opens on its own'
     - to: CMS-011
       trigger: Translations
       provenance: structural — CMS-001 is P13's home screen and its exits are its launcher
@@ -397,16 +401,17 @@ screens:
       provenance: flow F22 step 1→2
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-002 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-002 holds none of them. The edge
+        carries nothing: CMS-001 needs nothing to open'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-002 holds none of them, so the edge carries nothing and CMS-003 opens cold
+      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
+        and CMS-002 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and CMS-003 opens on its own'
     - to: CMS-004
       trigger: Logo & Assets
-      provenance: derived — CMS-004 declares entryState.params  and CMS-002 holds none of them, so the
-        edge carries nothing and CMS-004 opens cold
+      provenance: 'derived — CMS-004 declares entryState.params  and CMS-002 holds none of them. The edge
+        carries nothing: CMS-004 needs nothing to open'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -572,16 +577,17 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-003 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-003 holds none of them. The edge
+        carries nothing: CMS-001 needs nothing to open'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-003 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-003 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-004
       trigger: Logo & Assets
-      provenance: derived — CMS-004 declares entryState.params  and CMS-003 holds none of them, so the
-        edge carries nothing and CMS-004 opens cold
+      provenance: 'derived — CMS-004 declares entryState.params  and CMS-003 holds none of them. The edge
+        carries nothing: CMS-004 needs nothing to open'
     - to: CMS-006
       trigger: Component Preview
       provenance: flow F102 step 2→3
@@ -757,16 +763,18 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-004 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-004 holds none of them. The edge
+        carries nothing: CMS-001 needs nothing to open'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-004 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-004 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-004 holds none of them, so the edge carries nothing and CMS-003 opens cold
+      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
+        and CMS-004 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and CMS-003 opens on its own'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -928,20 +936,23 @@ screens:
       provenance: flow F22 step 2→3
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-005 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-005 holds none of them. The edge
+        carries nothing: CMS-001 needs nothing to open'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-005 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-005 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-005 holds none of them, so the edge carries nothing and CMS-003 opens cold
+      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
+        and CMS-005 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and CMS-003 opens on its own'
     - to: CMS-006
       trigger: Component Preview
-      provenance: derived — CMS-006 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-005 holds none of them, so the edge carries nothing and CMS-006 opens cold
+      provenance: 'derived — CMS-006 declares entryState.params bannerId, pageId, policyKind, version
+        and CMS-005 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and CMS-006 opens on its own'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -1074,12 +1085,13 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-006 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-006 holds none of them. The edge
+        carries nothing: CMS-001 needs nothing to open'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-006 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-006 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
       carries:
@@ -1301,12 +1313,13 @@ screens:
       provenance: flow F22 step 3→4
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-007 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-007 holds none of them. The edge
+        carries nothing: CMS-001 needs nothing to open'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-007 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-007 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
       carries:
@@ -1586,12 +1599,14 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-008 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-008 holds none of them. The edge
+        carries nothing: CMS-008 is opened from CMS-001, so this edge is the way back and CMS-001 keeps
+        its own state'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-008 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-008 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
       carries:
@@ -1901,16 +1916,19 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-009 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-009 holds none of them. The edge
+        carries nothing: CMS-009 is opened from CMS-001, so this edge is the way back and CMS-001 keeps
+        its own state'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-009 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-009 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-009 holds none of them, so the edge carries nothing and CMS-003 opens cold
+      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
+        and CMS-009 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and CMS-003 opens on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -2156,8 +2174,9 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-010 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-010 holds none of them. The edge
+        carries nothing: CMS-010 is opened from CMS-001, so this edge is the way back and CMS-001 keeps
+        its own state'
     - to: CMS-002
       trigger: Brand Kit
       carries:
@@ -2166,8 +2185,9 @@ screens:
         an edge into it carries them
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-010 holds none of them, so the edge carries nothing and CMS-003 opens cold
+      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
+        and CMS-010 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and CMS-003 opens on its own'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -2644,16 +2664,18 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-013 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-013 holds none of them. The edge
+        carries nothing: CMS-001 needs nothing to open'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-013 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-013 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-013 holds none of them, so the edge carries nothing and CMS-003 opens cold
+      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
+        and CMS-013 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and CMS-003 opens on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -2778,16 +2800,19 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-011 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-011 holds none of them. The edge
+        carries nothing: CMS-011 is opened from CMS-001, so this edge is the way back and CMS-001 keeps
+        its own state'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-011 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-011 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-011 holds none of them, so the edge carries nothing and CMS-003 opens cold
+      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
+        and CMS-011 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and CMS-003 opens on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -2864,12 +2889,13 @@ screens:
       provenance: flow F22 step 4→5
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-012 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-012 holds none of them. The edge
+        carries nothing: CMS-001 needs nothing to open'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-012 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-012 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
       carries:
@@ -2967,12 +2993,13 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-014 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-014 holds none of them. The edge
+        carries nothing: CMS-001 needs nothing to open'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-014 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-014 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
       carries:
@@ -3133,12 +3160,14 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-015 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-015 holds none of them. The edge
+        carries nothing: CMS-015 is opened from CMS-001, so this edge is the way back and CMS-001 keeps
+        its own state'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-015 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-015 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
       carries:
@@ -3313,12 +3342,14 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-016 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-016 holds none of them. The edge
+        carries nothing: CMS-016 is opened from CMS-001, so this edge is the way back and CMS-001 keeps
+        its own state'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-016 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-016 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
       carries:
@@ -3327,12 +3358,14 @@ screens:
         CMS-016 holds version, so an edge into it carries them
     - to: CMS-017
       trigger: Domain & Certificate
-      provenance: derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them,
-        so the edge carries nothing and CMS-017 opens cold
+      provenance: 'derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them.
+        The edge carries nothing: CMS-017 finds domainId (listCustomDomains) itself, and CMS-017 opens
+        on its own'
     - to: CMS-018
       trigger: Consent & Legal
-      provenance: derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds
-        none of them, so the edge carries nothing and CMS-018 opens cold
+      provenance: 'derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds
+        none of them. The edge carries nothing: CMS-018 finds policyKind (listPolicies), questionId (listConsentAnswers)
+        itself, and CMS-018 opens on its own'
     - to: CMS-103
       trigger: Booking flows
       provenance: authored 29 September, W12 (flow-level settings and step order moved to CMS-103)
@@ -3567,16 +3600,18 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-017 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-017 holds none of them. The edge
+        carries nothing: CMS-001 needs nothing to open'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-017 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-017 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-017 holds none of them, so the edge carries nothing and CMS-003 opens cold
+      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
+        and CMS-017 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and CMS-003 opens on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -3730,12 +3765,13 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-018 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-018 holds none of them. The edge
+        carries nothing: CMS-001 needs nothing to open'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-018 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-018 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
       carries:
@@ -4055,16 +4091,19 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-019 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-019 holds none of them. The edge
+        carries nothing: CMS-019 is opened from CMS-001, so this edge is the way back and CMS-001 keeps
+        its own state'
     - to: CMS-002
       trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-019 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
+      provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-019 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
+        on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-019 holds none of them, so the edge carries nothing and CMS-003 opens cold
+      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
+        and CMS-019 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and CMS-003 opens on its own'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -4206,8 +4245,9 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-021 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-021 holds none of them. The edge
+        carries nothing: CMS-021 is opened from CMS-001, so this edge is the way back and CMS-001 keeps
+        its own state'
     - to: CMS-022
       trigger: Works in Data Processing Purpose & Lawful Basis Registry
       provenance: flow F150 step 1→2
@@ -5634,8 +5674,9 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-031 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-031 holds none of them. The edge
+        carries nothing: CMS-031 is opened from CMS-001, so this edge is the way back and CMS-001 keeps
+        its own state'
     - to: CMS-032
       trigger: Works in Customer Privacy, Consent & Preference 360°
       provenance: flow F151 step 1→2
@@ -6878,8 +6919,9 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-041 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-041 holds none of them. The edge
+        carries nothing: CMS-041 is opened from CMS-001, so this edge is the way back and CMS-001 keeps
+        its own state'
     - to: CMS-042
       trigger: Works in Waiver Template Library & Master Setup
       provenance: flow F181 step 1→2
@@ -8189,8 +8231,9 @@ screens:
     transitions:
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-051 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
+      provenance: 'derived — CMS-001 declares entryState.params  and CMS-051 holds none of them. The edge
+        carries nothing: CMS-051 is opened from CMS-001, so this edge is the way back and CMS-001 keeps
+        its own state'
     - to: CMS-052
       trigger: Works in Participant Waiver Status & Tracking
       provenance: flow F182 step 1→2
@@ -12388,19 +12431,19 @@ screens:
       components:
       - kind: dataTable
         derived: true
-        impliedBy: listAccessPolicies
+        impliedBy: listAuthorisationPolicies
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
         derived: true
-        impliedBy: createAccessPolicy
+        impliedBy: createAuthorisationPolicy
         label: Create access policy
         notes: The act the screen exists for.
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
-        impliedBy: createAccessPolicy
+        impliedBy: createAuthorisationPolicy
   states:
     loading: The role-based asset access list.
     error: Could not load. Names which read failed and leaves the role-based asset access untouched.
@@ -12411,12 +12454,12 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAccessPolicies
+  - operationId: listAuthorisationPolicies
     contract: identity
     purpose: Who may see which assets
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: createAccessPolicy
+  - operationId: createAuthorisationPolicy
     contract: identity
     purpose: Write an asset access policy
     trigger: onAction

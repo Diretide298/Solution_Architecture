@@ -99,7 +99,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-034 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-034 holds none of them. The edge carries nothing: GST-034 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },

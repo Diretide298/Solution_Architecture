@@ -117,6 +117,7 @@ Accounts may be created natively or mapped to a chart maintained externally in t
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
 | 409 |  | Code already in use within this legal entity |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateAccount
 
@@ -188,6 +189,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 | 200 |  | Updated |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | code sent for an account that already has entries, or a new code already in use within the legal entity. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: finance
@@ -261,6 +263,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 | 200 |  | What was fetched |
 | 409 |  | No provider is assigned to this purpose in this region (setFxProvider). |
 | 503 |  | The provider is unreachable, and nothing was written. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFxProvider
 
@@ -305,6 +308,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | The assignments now in force, one per purpose that has one. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: fiscal
@@ -368,6 +372,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: ledger
@@ -429,6 +434,7 @@ The consequence is that most of the questions FX usually raises do not arise. Th
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Rates |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFxRate
 
@@ -501,6 +507,7 @@ The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetc
 | 201 |  | Set |
 | 400 |  | No note was given. |
 | 409 |  | Effective window overlaps an existing bounded rate for the same pair and purpose, or does not start after the rate in force |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: reporting
@@ -563,6 +570,7 @@ Six reports, named by `report`: profit and loss, balance sheet, cash flow, reven
 |---|---|---|
 | 200 |  | Report |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: tax
@@ -627,6 +635,7 @@ Supports compound tax — a code may apply on top of another code's result rathe
 |---|---|---|
 | 201 |  | Created |
 | 400 |  | Compound reference is circular or crosses countries |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getTaxDocumentRendition
 
@@ -672,6 +681,7 @@ Supports compound tax — a code may apply on top of another code's result rathe
 |---|---|---|
 | 200 |  | Link to the PDF |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getTaxInvoice
 
@@ -803,6 +813,7 @@ Supports compound tax — a code may apply on top of another code's result rathe
 |---|---|---|
 | 200 |  | Invoice |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### issueCreditMemo
 
@@ -911,6 +922,7 @@ A credit memo has its **own series** per legal entity (`setTaxInvoiceTemplate`, 
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The invoice is already fullyCredited or superseded. |
 | 422 |  | A partial memo with no lines, a line not on the invoice, or an amount above what remains uncredited on that line. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### issueTaxInvoice
 
@@ -1069,6 +1081,7 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | An order is not paid, is already on a tax invoice of the same or a wider kind (order-already-invoiced), or the legal entity has no active template for the document kind (no-invoice-template). |
 | 422 |  | A full or consolidated invoice without a recipient name and address, a consolidated invoice whose orders span buyers, legal entities or currencies, more than one order on a simplified or full invoice… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listCreditMemos
 
@@ -1156,6 +1169,7 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Credit memos, newest first |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listTaxInvoices
 
@@ -1273,6 +1287,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Invoices, newest first |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setEInvoicingProvider
 
@@ -1339,6 +1354,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 |---|---|---|
 | 200 |  | Set |
 | 409 |  | live requested before any test transmission from this legal entity was accepted. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### transmitEInvoices
 
@@ -1405,6 +1421,7 @@ A document already `accepted` is never sent again. Nothing is sent for a legal e
 |---|---|---|
 | 202 |  | Queued; one transmission per document |
 | 409 |  | The legal entity has no provider, or its provider is disabled. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateTaxCode
 
@@ -1467,6 +1484,7 @@ Rate changes are versioned with an effective date, never applied retrospectively
 | 400 |  | rate without effectiveFrom, or effectiveFrom without rate. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | A rate change whose effectiveFrom is today or earlier, which would reprice postings already made; or a rate change addressed to a row that is no longer in force. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 

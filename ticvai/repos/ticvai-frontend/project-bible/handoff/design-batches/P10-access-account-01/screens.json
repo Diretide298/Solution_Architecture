@@ -69,7 +69,7 @@
     {
      "to": "PTR-006",
      "trigger": "Product Catalog (B2B Pricing)",
-     "provenance": "derived — PTR-006 declares entryState.params priceListId, productId and PTR-001 holds none of them, so the edge carries nothing and PTR-006 opens cold"
+     "provenance": "derived — PTR-006 declares entryState.params priceListId, productId and PTR-001 holds none of them. The edge carries nothing: priceListId, productId only pre-select (deep link or optional), and PTR-006 opens on its own"
     },
     {
      "to": "PTR-008",
@@ -82,22 +82,22 @@
     {
      "to": "PTR-009",
      "trigger": "Group / Bulk Booking",
-     "provenance": "derived — PTR-009 declares entryState.params blockId and PTR-001 holds none of them, so the edge carries nothing and PTR-009 opens cold"
+     "provenance": "derived — PTR-009 declares entryState.params blockId and PTR-001 holds none of them. The edge carries nothing: blockId only pre-selects (deep link or optional), and PTR-009 opens on its own"
     },
     {
      "to": "PTR-010",
      "trigger": "Cart & Quote",
-     "provenance": "derived — PTR-010 declares entryState.params lineId, promotionId and PTR-001 holds none of them, so the edge carries nothing and PTR-010 opens cold"
+     "provenance": "derived — PTR-010 declares entryState.params lineId, promotionId and PTR-001 holds none of them. The edge carries nothing: lineId, promotionId only pre-select (deep link or optional), and PTR-010 opens on its own"
     },
     {
      "to": "PTR-011",
      "trigger": "Quote Management",
-     "provenance": "derived — PTR-011 declares entryState.params agreementId and PTR-001 holds none of them, so the edge carries nothing and PTR-011 opens cold"
+     "provenance": "derived — PTR-011 declares entryState.params agreementId and PTR-001 holds none of them. The edge carries nothing: agreementId only pre-selects (deep link or optional), and PTR-011 opens on its own"
     },
     {
      "to": "PTR-012",
      "trigger": "Checkout / Credit Purchase",
-     "provenance": "derived — PTR-012 declares entryState.params paymentId and PTR-001 holds none of them, so the edge carries nothing and PTR-012 opens cold"
+     "provenance": "derived — PTR-012 declares entryState.params paymentId and PTR-001 holds none of them. The edge carries nothing: paymentId only pre-selects (deep link or optional), and PTR-012 opens on its own"
     },
     {
      "to": "PTR-013",
@@ -110,7 +110,7 @@
     {
      "to": "PTR-014",
      "trigger": "Settlement & Payment History",
-     "provenance": "derived — PTR-014 declares entryState.params settlementId and PTR-001 holds none of them, so the edge carries nothing and PTR-014 opens cold"
+     "provenance": "derived — PTR-014 declares entryState.params settlementId and PTR-001 holds none of them. The edge carries nothing: settlementId only pre-selects (deep link or optional), and PTR-014 opens on its own"
     },
     {
      "to": "PTR-015",
@@ -131,27 +131,27 @@
     {
      "to": "PTR-017",
      "trigger": "Commission Statement",
-     "provenance": "derived — PTR-017 declares entryState.params agreementId and PTR-001 holds none of them, so the edge carries nothing and PTR-017 opens cold"
+     "provenance": "derived — PTR-017 declares entryState.params agreementId and PTR-001 holds none of them. The edge carries nothing: agreementId only pre-selects (deep link or optional), and PTR-017 opens on its own"
     },
     {
      "to": "PTR-018",
      "trigger": "Reports & Sales Performance",
-     "provenance": "derived — PTR-018 declares entryState.params conversationId, reportId and PTR-001 holds none of them, so the edge carries nothing and PTR-018 opens cold"
+     "provenance": "derived — PTR-018 declares entryState.params conversationId, reportId and PTR-001 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or optional), and PTR-018 opens on its own"
     },
     {
      "to": "PTR-019",
      "trigger": "API Credentials & Integration",
-     "provenance": "derived — PTR-019 declares entryState.params clientId and PTR-001 holds none of them, so the edge carries nothing and PTR-019 opens cold"
+     "provenance": "derived — PTR-019 declares entryState.params clientId and PTR-001 holds none of them. The edge carries nothing: PTR-019 finds clientId (listApiClients) itself, and PTR-019 opens on its own"
     },
     {
      "to": "PTR-020",
      "trigger": "Sub-Agent Management",
-     "provenance": "derived — PTR-020 declares entryState.params delegatedAccessId and PTR-001 holds none of them, so the edge carries nothing and PTR-020 opens cold"
+     "provenance": "derived — PTR-020 declares entryState.params delegatedAccessId and PTR-001 holds none of them. The edge carries nothing: delegatedAccessId only pre-selects (deep link or optional), and PTR-020 opens on its own"
     },
     {
      "to": "PTR-021",
      "trigger": "Support & Contact",
-     "provenance": "derived — PTR-021 declares entryState.params caseId and PTR-001 holds none of them, so the edge carries nothing and PTR-021 opens cold"
+     "provenance": "derived — PTR-021 declares entryState.params caseId and PTR-001 holds none of them. The edge carries nothing: caseId only pre-selects (deep link or optional), and PTR-021 opens on its own"
     },
     {
      "to": "PTR-007",
@@ -670,12 +670,12 @@
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-003 holds none of them, so the edge carries nothing and PTR-001 opens cold"
+     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-003 holds none of them. The edge carries nothing: PTR-003 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
     },
     {
      "to": "PTR-004",
      "trigger": "Notifications",
-     "provenance": "derived — PTR-004 declares entryState.params messageId and PTR-003 holds none of them, so the edge carries nothing and PTR-004 opens cold"
+     "provenance": "derived — PTR-004 declares entryState.params messageId and PTR-003 holds none of them. The edge carries nothing: messageId only pre-selects (deep link or optional), and PTR-004 opens on its own"
     }
    ]
   },
@@ -925,12 +925,12 @@
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-004 holds none of them, so the edge carries nothing and PTR-001 opens cold"
+     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-004 holds none of them. The edge carries nothing: PTR-004 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "provenance": "derived — PTR-003 declares entryState.params  and PTR-004 holds none of them, so the edge carries nothing and PTR-003 opens cold"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-004 holds none of them. The edge carries nothing: PTR-003 needs nothing to open"
     }
    ]
   },
@@ -1087,12 +1087,12 @@
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-019 holds none of them, so the edge carries nothing and PTR-001 opens cold"
+     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-019 holds none of them. The edge carries nothing: PTR-019 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "provenance": "derived — PTR-003 declares entryState.params  and PTR-019 holds none of them, so the edge carries nothing and PTR-003 opens cold"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-019 holds none of them. The edge carries nothing: PTR-003 needs nothing to open"
     }
    ]
   },
@@ -1415,12 +1415,12 @@
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-020 holds none of them, so the edge carries nothing and PTR-001 opens cold"
+     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-020 holds none of them. The edge carries nothing: PTR-020 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "provenance": "derived — PTR-003 declares entryState.params  and PTR-020 holds none of them, so the edge carries nothing and PTR-003 opens cold"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-020 holds none of them. The edge carries nothing: PTR-003 needs nothing to open"
     }
    ]
   },

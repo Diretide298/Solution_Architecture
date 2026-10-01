@@ -254,7 +254,11 @@ def check_file(path: Path, known_schemas: set[str]) -> set[str]:
         # this generation — it was renamed on 26 August — so requiring a composite FK into it
         # would fail every table it looked at. The intent survives as an application-layer rule
         # and is recorded in `backend/tenant/930-partitioning.sql`.
-        if (is_versioned and has_venue_id and "GENERATED ALWAYS AS" not in head
+        # **Nor against a forward migration while nothing creates `platform.scope_node`** (1 October):
+        # derive-ddl.py writes `backend/<area>/V<nnnn>__*.sql` after r1, and a rule demanding a
+        # reference to a table the series never creates would fail every venue table it adds.
+        if (is_versioned and "platform.scope_node" in CREATED and has_venue_id
+                and "GENERATED ALWAYS AS" not in head
                 and table not in ALTERED and table not in EXEMPT):
             if "PARTITION OF" not in head:
                 fail(name, f"{table} has venue_id but no level-typed FK — add "

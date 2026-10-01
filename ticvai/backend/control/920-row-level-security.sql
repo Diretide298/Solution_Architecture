@@ -118,7 +118,7 @@ BEGIN
 END
 $$;
 
--- **80 tables: 28 scoped by `scope_path`, 0 by `venue_id`, 5 through the parent that owns them, 0 by subject, 0 to the tenant root only, 46 with no policy.**
+-- **81 tables: 28 scoped by `scope_path`, 0 by `venue_id`, 5 through the parent that owns them, 0 by subject, 0 to the tenant root only, 47 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -195,6 +195,7 @@ SELECT platform.apply_parent_rls('control.partner_user'::regclass, 'partner_id',
 --   control.migration_run_tenant  -- its owner control.migration_run has no policy either
 --   control.onboarding_application  -- only nullable references (venue_type_template_id -> control.venue_type_template)
 --   control.outbox_relay  -- its owner control.cell_tenant has no policy either
+--   control.outbox_republish  -- no scope column and no declared owner
 --   control.production_access_request  -- its owners control.api_client, control.integration_listing have no policy either
 --   control.release  -- no scope column and no declared owner
 --   control.release_component  -- its owner control.release has no policy either

@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS games.card (
 CREATE TABLE IF NOT EXISTS games.card_expiry_rules (
     basis                             text DEFAULT 'fromLastActivity' CONSTRAINT card_expiry_rules_basis_chk CHECK (basis IN ('fromIssue', 'fromLastActivity', 'fromLastRecharge')),
     validity_months                   integer,
-    warn_before_days                  text[],
+    warn_before_days                  integer[],
     warning_channels                  text[],
     extend_on_recharge                boolean DEFAULT true,
     on_expiry                         text DEFAULT 'holdForClaim' CONSTRAINT card_expiry_rules_on_expiry_chk CHECK (on_expiry IN ('forfeit', 'holdForClaim', 'transferToBreakage')),

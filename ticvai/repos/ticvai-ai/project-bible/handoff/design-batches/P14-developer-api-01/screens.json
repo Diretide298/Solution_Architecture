@@ -432,7 +432,7 @@
     {
      "to": "DEV-005",
      "trigger": "Webhooks",
-     "provenance": "derived — DEV-005 declares entryState.params subscriptionId and DEV-003 holds none of them, so the edge carries nothing and DEV-005 opens cold"
+     "provenance": "derived — DEV-005 declares entryState.params subscriptionId and DEV-003 holds none of them. The edge carries nothing: subscriptionId only pre-selects (deep link or optional), and DEV-005 opens on its own"
     },
     {
      "to": "DEV-004",

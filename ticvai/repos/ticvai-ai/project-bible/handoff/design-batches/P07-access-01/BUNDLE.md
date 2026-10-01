@@ -488,12 +488,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-002 holds none of them, so the edge carries nothing and SCN-001 opens cold"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-002 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
     },
     {
      "to": "SCN-003",
      "trigger": "Ready to scan",
-     "provenance": "derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-002 holds none of them, so the edge carries nothing and SCN-003 opens cold"
+     "provenance": "derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-002 holds none of them. The edge carries nothing: mediaCode, rightId only pre-select (deep link or optional), and SCN-003 opens on its own"
     },
     {
      "to": "SCN-016",
@@ -802,7 +802,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-003 holds none of them, so the edge carries nothing and SCN-001 opens cold"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-003 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -1287,7 +1287,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-007 holds none of them, so the edge carries nothing and SCN-001 opens cold"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-007 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -1683,7 +1683,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-008 holds none of them, so the edge carries nothing and SCN-001 opens cold"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-008 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -2075,7 +2075,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-009 holds none of them, so the edge carries nothing and SCN-001 opens cold"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-009 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -2466,12 +2466,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-011 holds none of them, so the edge carries nothing and SCN-001 opens cold"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-011 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
      "trigger": "Access point & direction",
-     "provenance": "derived — SCN-002 declares entryState.params accessPointId and SCN-011 holds none of them, so the edge carries nothing and SCN-002 opens cold"
+     "provenance": "derived — SCN-002 declares entryState.params accessPointId and SCN-011 holds none of them. The edge carries nothing: accessPointId only pre-selects (deep link or optional), and SCN-002 opens on its own"
     },
     {
      "to": "SCN-003",
@@ -2651,7 +2651,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-013 holds none of them, so the edge carries nothing and SCN-001 opens cold"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-013 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -3044,7 +3044,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-014 holds none of them, so the edge carries nothing and SCN-001 opens cold"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-014 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -3483,7 +3483,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-015 holds none of them, so the edge carries nothing and SCN-001 opens cold"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-015 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -4520,13 +4520,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "AccessDynamicPolicy": {
   "type": "object",
   "x-ticvai-persistence": "access.dynamic_policy",
-  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.",
+  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.authorisation_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Guest admission lives here and nowhere else** (ADR-0068, accepted 1 October). `validateAccess` online and the gate offline evaluate the same active version: `getOfflinePackage` carries it, and every `scan_event` records the policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`) and the set it was decided under (`policySetVersion`). The condition is `conditionRule`, a closed JSON format (`AdmissionRule`), not free text. Identity's staff-permission engine was renamed `AuthorisationPolicy` on the same day, so \"access policy\" means this.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AuthorisationPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAuthorisationPolicyEffectiveness` in identity.",
   "required": [
    "id",
    "scopePath",
    "name",
    "policyType",
-   "conditionExpression",
+   "conditionRule",
    "result",
    "status",
    "currentVersion"
@@ -4599,9 +4599,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "Identity-based policies (listIdentityMembershipAccreditation)"
    },
-   "conditionExpression": {
-    "type": "string",
-    "description": "Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN"
+   "conditionRule": {
+    "$ref": "#/components/schemas/AdmissionRule",
+    "description": "The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`)."
    },
    "result": {
     "type": "string",
@@ -4723,7 +4723,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Device used (access.access_device)"
+    "x-ticvai-references": "platform.device",
+    "description": "Device used, from the one device register (platform.device, ADR-0067)"
    },
    "loginAt": {
     "type": "string",
@@ -5601,9 +5602,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
    },
+   "policySetVersion": {
+    "type": "string",
+    "description": "**The active admission policy version the package carries** (ADR-0068, 1 October): a fingerprint of the `(id, currentVersion)` of every policy in `dynamicPolicies`, computed the same way by `validateAccess` online. Every scan the gate records carries it (`ScanEvent.policySetVersion`), so a scan decided offline under a set that has since changed is visible at sync rather than assumed equal."
+   },
    "dynamicPolicies": {
     "type": "array",
-    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one.",
+    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), each at its active version with its `conditionRule` (ADR-0068), so an offline gate applies the same rules as an online one.",
     "items": {
      "$ref": "#/components/schemas/AccessDynamicPolicy"
     }
@@ -6261,6 +6266,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "policySetVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The admission policy set the scan was decided under (`OfflinePackage.policySetVersion`, or the same fingerprint computed online by `validateAccess`), beside the one policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`). ADR-0068, 1 October."
    },
    "packageVersion": {
     "type": "string",

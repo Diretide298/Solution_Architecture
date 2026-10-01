@@ -109,16 +109,19 @@ screens:
       provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
     - to: SUP-005
       trigger: Live Chat Workspace
-      provenance: derived — SUP-005 declares entryState.params caseId, conversationId and SUP-001 holds
-        none of them, so the edge carries nothing and SUP-005 opens cold
+      provenance: 'derived — SUP-005 declares entryState.params caseId, conversationId and SUP-001 holds
+        none of them. The edge carries nothing: SUP-005 finds caseId (createCase) itself; SUP-005 opens
+        on listCases, and conversationId has no source on SUP-005 yet (a gap in SUP-005, not in this edge)'
     - to: SUP-006
       trigger: Knowledge Base Search
-      provenance: derived — SUP-006 declares entryState.params bannerId, pageId, policyKind, version and
-        SUP-001 holds none of them, so the edge carries nothing and SUP-006 opens cold
+      provenance: 'derived — SUP-006 declares entryState.params bannerId, pageId, policyKind, version
+        and SUP-001 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and SUP-006 opens on its own'
     - to: SUP-008
       trigger: Agent Performance & SLA View
-      provenance: derived — SUP-008 declares entryState.params conversationId, reportId and SUP-001 holds
-        none of them, so the edge carries nothing and SUP-008 opens cold
+      provenance: 'derived — SUP-008 declares entryState.params conversationId, reportId and SUP-001 holds
+        none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or
+        optional), and SUP-008 opens on its own'
     - to: SUP-007
       trigger: Canned Response Management
       provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
@@ -427,8 +430,9 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-002 holds none of them,
-        so the edge carries nothing and SUP-001 opens cold
+      provenance: 'derived — SUP-001 declares entryState.params challengeId and SUP-002 holds none of
+        them. The edge carries nothing: SUP-002 is opened from SUP-001, so this edge is the way back and
+        SUP-001 keeps its own state'
     - to: SUP-004
       trigger: Conversation Queue
       carries:
@@ -795,8 +799,9 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-003 holds none of them,
-        so the edge carries nothing and SUP-001 opens cold
+      provenance: 'derived — SUP-001 declares entryState.params challengeId and SUP-003 holds none of
+        them. The edge carries nothing: SUP-003 is opened from SUP-001, so this edge is the way back and
+        SUP-001 keeps its own state'
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -875,8 +880,9 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-004 holds none of them,
-        so the edge carries nothing and SUP-001 opens cold
+      provenance: 'derived — SUP-001 declares entryState.params challengeId and SUP-004 holds none of
+        them. The edge carries nothing: SUP-004 is opened from SUP-001, so this edge is the way back and
+        SUP-001 keeps its own state'
     - to: SUP-002
       trigger: Agent Dashboard
       carries:
@@ -1257,8 +1263,9 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-005 holds none of them,
-        so the edge carries nothing and SUP-001 opens cold
+      provenance: 'derived — SUP-001 declares entryState.params challengeId and SUP-005 holds none of
+        them. The edge carries nothing: SUP-005 is opened from SUP-001, so this edge is the way back and
+        SUP-001 keeps its own state'
     - to: SUP-002
       trigger: Agent Dashboard
       carries:
@@ -1657,8 +1664,9 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-006 holds none of them,
-        so the edge carries nothing and SUP-001 opens cold
+      provenance: 'derived — SUP-001 declares entryState.params challengeId and SUP-006 holds none of
+        them. The edge carries nothing: SUP-006 is opened from SUP-001, so this edge is the way back and
+        SUP-001 keeps its own state'
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **41 operations removed
@@ -1799,8 +1807,9 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-007 holds none of them,
-        so the edge carries nothing and SUP-001 opens cold
+      provenance: 'derived — SUP-001 declares entryState.params challengeId and SUP-007 holds none of
+        them. The edge carries nothing: SUP-007 is opened from SUP-001, so this edge is the way back and
+        SUP-001 keeps its own state'
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -1941,8 +1950,9 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-008 holds none of them,
-        so the edge carries nothing and SUP-001 opens cold
+      provenance: 'derived — SUP-001 declares entryState.params challengeId and SUP-008 holds none of
+        them. The edge carries nothing: SUP-008 is opened from SUP-001, so this edge is the way back and
+        SUP-001 keeps its own state'
     - to: SUP-002
       trigger: Agent Dashboard
       carries:
@@ -2295,8 +2305,9 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-009 holds none of them,
-        so the edge carries nothing and SUP-001 opens cold
+      provenance: 'derived — SUP-001 declares entryState.params challengeId and SUP-009 holds none of
+        them. The edge carries nothing: SUP-009 is opened from SUP-001, so this edge is the way back and
+        SUP-001 keeps its own state'
     - to: SUP-010
       trigger: Works in Customer 360° Service Profile
       provenance: flow F134 step 1→2
@@ -3587,8 +3598,9 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-019 holds none of them,
-        so the edge carries nothing and SUP-001 opens cold
+      provenance: 'derived — SUP-001 declares entryState.params challengeId and SUP-019 holds none of
+        them. The edge carries nothing: SUP-019 is opened from SUP-001, so this edge is the way back and
+        SUP-001 keeps its own state'
     - to: SUP-020
       trigger: Works in Queue Configuration & Management
       provenance: flow F135 step 1→2

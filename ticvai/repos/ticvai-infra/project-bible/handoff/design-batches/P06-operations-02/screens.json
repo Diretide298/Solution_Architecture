@@ -27,17 +27,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-014 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-014 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-014 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-014 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-014 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-014 holds none of them. The edge carries nothing: EMP-014 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     }
    ]
   },
@@ -662,17 +662,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-015 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-015 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-015 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-015 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-015 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-015 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -1054,22 +1054,22 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-017 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-017 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-017 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-017 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-017 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-017 holds none of them. The edge carries nothing: EMP-017 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     },
     {
      "to": "EMP-018",
      "trigger": "Offline package",
-     "provenance": "derived — EMP-018 declares entryState.params version and EMP-017 holds none of them, so the edge carries nothing and EMP-018 opens cold"
+     "provenance": "derived — EMP-018 declares entryState.params version and EMP-017 holds none of them. The edge carries nothing: version only pre-selects (deep link or optional), and EMP-018 opens on its own"
     }
    ]
   },
@@ -1489,17 +1489,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-018 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-018 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-018 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-018 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-018 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-018 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -1714,17 +1714,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-019 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-019 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-019 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-019 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-019 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-019 holds none of them. The edge carries nothing: EMP-019 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     },
     {
      "to": "EMP-020",
@@ -1960,17 +1960,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-020 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-020 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-020 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-020 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-020 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-020 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     },
     {
      "to": "BO-058",
@@ -2214,17 +2214,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-021 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-021 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-021 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-021 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-021 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-021 holds none of them. The edge carries nothing: EMP-021 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     },
     {
      "to": "EMP-022",
@@ -2463,17 +2463,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-022 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-022 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-022 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-022 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-022 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-022 holds none of them. The edge carries nothing: EMP-022 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     },
     {
      "to": "EMP-023",
@@ -2748,17 +2748,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-023 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-023 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-023 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-023 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-023 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-023 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -3011,17 +3011,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-024 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-024 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-024 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-024 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-024 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-024 holds none of them. The edge carries nothing: EMP-024 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     },
     {
      "to": "EMP-025",

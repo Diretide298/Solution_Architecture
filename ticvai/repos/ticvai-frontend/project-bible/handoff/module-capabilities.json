@@ -72,7 +72,7 @@
      "operationCount": 8,
      "operations": [
       "deletePodium",
-      "registerAccessDevice",
+      "placeAccessDevice",
       "setDeviceSoftwareContent",
       "setHandheldMobileAccess",
       "setHardwareModel",
@@ -683,7 +683,7 @@
   "catalogue": {
    "title": "1 — Ticketing Catalogue",
    "capabilityCount": 12,
-   "unguardedOperations": 4,
+   "unguardedOperations": 6,
    "capabilities": [
     {
      "key": "AI_APPROVE",
@@ -768,7 +768,7 @@
      "key": "PERFORMANCE_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 7,
+     "operationCount": 8,
      "operations": [
       "cancelPerformance",
       "createPerformances",
@@ -842,7 +842,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 111,
+     "operationCount": 112,
      "operations": [
       "checkBookingEligibility",
       "getAvailability",
@@ -1369,16 +1369,16 @@
     },
     {
      "key": "PERMISSION_MANAGE",
-     "label": "author, approve and retire access policies",
+     "label": "author, approve and retire authorisation policies (ADR-0068)",
      "group": "Session and identity",
      "operationCount": 6,
      "operations": [
-      "createAccessPolicy",
       "createAccessReviewCampaign",
+      "createAuthorisationPolicy",
       "createEmergencyAccessOverride",
-      "restoreAccessPolicyVersion",
-      "setAccessPolicyState",
-      "updateAccessPolicy"
+      "restoreAuthorisationPolicyVersion",
+      "setAuthorisationPolicyState",
+      "updateAuthorisationPolicy"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1390,11 +1390,11 @@
      "operationCount": 22,
      "operations": [
       "evaluateAccess",
-      "getAccessPolicy",
-      "getAccessPolicyBundle",
+      "getAuthorisationPolicy",
+      "getAuthorisationPolicyBundle",
       "getPrincipalModuleAccess",
       "listAccessDecisions",
-      "listAccessPolicies"
+      "listAccessReviewCampaigns"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2369,9 +2369,11 @@
      "key": "PLATFORM_CELL_MANAGE",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 4,
+     "operationCount": 6,
      "operations": [
+      "cancelOutboxRepublish",
       "replayDeadLetter",
+      "republishOutbox",
       "setScalingPolicy",
       "setWafPolicy",
       "skipRolloutCell"
@@ -2383,13 +2385,14 @@
      "key": "PLATFORM_CELL_VIEW",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 5,
+     "operationCount": 7,
      "operations": [
+      "getOutboxRepublish",
       "getScalingPolicy",
       "listArchivalJobs",
       "listBackupRuns",
       "listDeadLetters",
-      "listWafRules"
+      "listOutboxRepublishes"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -4074,7 +4077,7 @@
     "cloneReaderConfiguration",
     "deletePodium",
     "deployReaderConfiguration",
-    "registerAccessDevice"
+    "placeAccessDevice"
    ],
    "DEVICE_VIEW": [
     "getDevice",
@@ -4209,7 +4212,7 @@
     "getCell",
     "getCellCapacity",
     "getCellHealth",
-    "getScalingPolicy"
+    "getOutboxRepublish"
    ],
    "PLATFORM_MIGRATION_VIEW": [
     "getMigrationRun",

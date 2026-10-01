@@ -31,7 +31,12 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "handoff" / "service-docs"
-SCREEN = re.compile(r"([A-Z]+-\d{3})$")
+# Three or four digits: the Block A setup screens of 30 September are BO-1094 to BO-1190.
+SCREEN = re.compile(r"([A-Z]+-\d{3,4})$")
+# An operations task (SVC-/VM-<service>-<group>-<n>), whose subject lists its operations after the colon.
+# Any other backend task (SETUP-HOSTS, PLATFORM-KERNEL, ...) comes from docs/active/block-a-extra-tasks.json
+# and carries its own text and Done-when; reading its subject as operations wrote "Build these 0 operations".
+OPS_TASK = re.compile(r"(?:SVC|VM)-.+-\d+")
 FE_CHECK = ["Chitrangi Mestry", "Chinmay Patkar", "Pallavi Sawant", "Sanket Keluskar", "Pradnya Yeram"]
 BE_CHECK = ["Pranay Shinde", "Tanmay Dukhande"]          # Hrushikant is never a checker
 PLATFORM = {}
@@ -302,7 +307,7 @@ def build(schedule, keys):
                 out.append(f"- Timeframe: {size}, {span} of week {wk}"
                            + (f" ({n} tasks in {assignee}'s week)" if assignee else ""))
             # No reviewer on setup or onboarding tickets, and never the person who built it (R058).
-            if r["track"] in ("Backend", "Database", "Frontend"):
+            if r["track"] in ("Backend", "Database", "Frontend") and not base.startswith("SETUP"):
                 pool = BE_CHECK if r["track"] in ("Backend", "Database") else FE_CHECK
                 first = (wk - 1) % len(pool)
                 chk = next((pool[(first + i) % len(pool)] for i in range(len(pool))
@@ -470,7 +475,7 @@ def build(schedule, keys):
             continue
         r = rows[base]
         text = []
-        if r["track"] == "Backend" and r["type"] == "Task":
+        if r["track"] == "Backend" and r["type"] == "Task" and OPS_TASK.fullmatch(base):
             op_list = [part] if part else (r["subject"].split(": ", 1)[1].split(", ") if ": " in r["subject"] else [])
             text += [("Build this endpoint to its contract." if part else
                       f"Build {'this operation' if len(op_list) == 1 else f'these {len(op_list)} operations'} "

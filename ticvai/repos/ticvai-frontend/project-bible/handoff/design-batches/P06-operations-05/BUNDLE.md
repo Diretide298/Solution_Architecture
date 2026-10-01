@@ -110,12 +110,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-048 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-048 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-048 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-048 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     }
    ]
   },
@@ -375,22 +375,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-047 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-047 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-047 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-047 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-047 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-047 holds none of them. The edge carries nothing: EMP-047 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     },
     {
      "to": "EMP-050",
      "trigger": "Post-incident restore",
-     "provenance": "derived — EMP-050 declares entryState.params incidentId and EMP-047 holds none of them, so the edge carries nothing and EMP-050 opens cold"
+     "provenance": "derived — EMP-050 declares entryState.params incidentId and EMP-047 holds none of them. The edge carries nothing: EMP-047 is opened from EMP-050, so this edge is the way back and EMP-050 keeps its own state"
     }
    ]
   },
@@ -659,12 +659,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-050 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-050 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-050 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-050 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
@@ -966,17 +966,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-045 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-045 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-045 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-045 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-045 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-045 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -1063,17 +1063,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-046 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-046 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-046 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-046 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-046 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-046 holds none of them. The edge carries nothing: EMP-046 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     }
    ]
   },
@@ -1188,17 +1188,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-049 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-049 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-049 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-049 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-049 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-049 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -2727,6 +2727,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "policySetVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The admission policy set the scan was decided under (`OfflinePackage.policySetVersion`, or the same fingerprint computed online by `validateAccess`), beside the one policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`). ADR-0068, 1 October."
    },
    "packageVersion": {
     "type": "string",

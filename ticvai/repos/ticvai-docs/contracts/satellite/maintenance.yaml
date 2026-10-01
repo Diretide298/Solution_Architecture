@@ -149,6 +149,8 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/Asset' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createAsset
@@ -184,6 +186,8 @@ paths:
               schema: { $ref: '#/components/schemas/Asset' }
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /assets/{assetId}:
     parameters:
@@ -216,6 +220,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AssetDetail' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     patch:
       operationId: updateAsset
@@ -269,6 +275,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Asset' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /assets/lookup:
     get:
@@ -304,6 +312,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AssetDetail' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /assets/{assetId}/status:
     parameters:
@@ -359,6 +369,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /assets/{assetId}/history:
     parameters:
@@ -402,6 +414,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/AssetHistoryEntry' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- work orders
   /work-orders:
@@ -473,6 +487,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/WorkOrder' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createWorkOrder
@@ -522,6 +538,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}:
     parameters:
@@ -553,6 +571,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrderDetail' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     patch:
       operationId: updateWorkOrder
@@ -600,6 +620,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/time:
     parameters:
@@ -668,6 +690,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/parts:
     parameters:
@@ -733,6 +757,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/cancel:
     parameters:
@@ -790,6 +816,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/complete:
     parameters:
@@ -851,6 +879,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/verify:
     parameters:
@@ -909,6 +939,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- planned
   /work-orders/{workOrderId}/accept:
@@ -953,6 +985,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/reject:
     parameters:
@@ -1010,6 +1044,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/start:
     parameters:
@@ -1060,6 +1096,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/pause:
     parameters:
@@ -1122,6 +1160,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/resume:
     parameters:
@@ -1154,6 +1194,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/close:
     parameters:
@@ -1210,6 +1252,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/attachments:
     parameters:
@@ -1264,6 +1308,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrderAttachment' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-order-priority-policy:
     get:
@@ -1290,6 +1336,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrderPriorityPolicy' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWorkOrderPriorityPolicy
       x-ticvai-consumed-by:
@@ -1328,6 +1376,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /work-orders/{workOrderId}/assignee-suggestions:
     parameters:
@@ -1373,6 +1423,8 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/WorkOrderAssigneeSuggestion' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /vendor-service-requests:
     get:
@@ -1414,6 +1466,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/VendorServiceRequest' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createVendorServiceRequest
       x-ticvai-consumed-by:
@@ -1453,6 +1507,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /vendor-service-requests/{vendorServiceRequestId}:
     parameters:
@@ -1507,6 +1563,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /maintenance-plans:
     get:
@@ -1538,6 +1596,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/MaintenancePlan' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createMaintenancePlan
@@ -1578,6 +1638,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /maintenance-plans/{planId}:
     parameters:
@@ -1619,6 +1681,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/MaintenancePlan' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /maintenance-plans/due:
     get:
@@ -1671,6 +1735,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/DueMaintenanceTask' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- inspections
   /inspection-templates:
@@ -1696,6 +1762,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/InspectionTemplate' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createInspectionTemplate
@@ -1728,6 +1796,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InspectionTemplate' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /inspections:
     get:
@@ -1777,6 +1847,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/Inspection' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: submitInspection
@@ -1818,6 +1890,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- incidents
   /incidents:
@@ -1865,6 +1939,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/Incident' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: reportIncident
@@ -1911,6 +1987,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Incident' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /incidents/{incidentId}:
     parameters:
@@ -1942,6 +2020,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/IncidentDetail' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     patch:
       operationId: updateIncident
@@ -2007,6 +2087,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /incidents/{incidentId}/notify-authority:
     parameters:
@@ -2072,6 +2154,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

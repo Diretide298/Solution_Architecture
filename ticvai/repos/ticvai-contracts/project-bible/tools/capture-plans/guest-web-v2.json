@@ -1,0 +1,58 @@
+{
+ "about": "P01 guest web: the screens that are views in the client's Guest Booking v2 website and its Visit Planner, from the 30 September return (WebApp_30thSep.zip, sources/designs/guest-rev3-30-september). Captured with tools/capture-prototype.mjs in viewport mode (1440 x 900, the page as the guest sees it; proof texts must be on screen). The screens chosen are the ones this return or the 29 September audit changed on the website: the booking flows of the 30 September feedback (multi-park counters WEB-005, surf session tickets WEB-006, transport WEB-049), the At the venue tabs (WEB-036, 039, 040, 041, 042, 043, 046) and the Visit Planner (WEB-050, which had no frame). Flows are chosen in the prototype's engine controls (Venue type, then the Booking flow list), then Book; the At the venue screens pick Theme park (Summit Peaks) first, because the prototype remembers the last venue between page loads.",
+ "prototype": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+ "assetRoots": ["sources/designs/guest-rev3-29-september", "sources/designs/guest-rev3-28-september"],
+ "caption": "Client prototype web rev 3 (30 Sep 2026)",
+ "imgBase": "frames/img/",
+ "viewport": {"width": 1440, "height": 900},
+ "frame": {"viewport": true},
+ "maxBytes": 250000,
+ "loadWait": 4000,
+ "stepWait": 1200,
+ "setup": [],
+ "screens": [
+  {"id": "WEB-005", "name": "Ticket Type Selection", "view": "Engine controls → Theme park → Multi-park combo → Book → Fri → 2 park ticket → three adults (the counters take the 2 park ticket's price; one cart line)",
+   "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Theme park"}, {"wait": 800}, {"select": "Multi-park combo"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "Book"}, {"wait": 2500}, {"click": "End tour"}, {"clickContains": "FRI"}, {"wait": 1500}, {"click": "Select", "nth": 1}, {"wait": 1500}, {"clickSelector": "button[aria-label='Close']:right-of(:text('Any two Yas-side parks'))", "nth": 1}, {"wait": 1000}, {"clickSelector": "button:text-is('+'):below(:text('Who is using the 2 park ticket'))"}, {"clickSelector": "button:text-is('+'):below(:text('Who is using the 2 park ticket'))"}, {"clickSelector": "button:text-is('+'):below(:text('Who is using the 2 park ticket'))"}, {"wait": 1200}, {"scrollTo": "Choose your ticket"}],
+   "expect": ["Summit Peaks", "Choose your ticket", "2 park ticket", "Selected", "2 park ticket · Adult × 3", "AED 1,425"]},
+
+  {"id": "WEB-006", "name": "Date & Performance Selection", "view": "Engine controls → Water park → Surf sessions with filters → Book → Intermediate surf 09:00 → able to swim → one surfer (the session's tickets appear once it is chosen)",
+   "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Water park"}, {"wait": 800}, {"select": "Surf sessions with filters"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "Book"}, {"wait": 2500}, {"click": "End tour"}, {"clickContains": "Intermediate surf", "nth": 0}, {"wait": 1500}, {"clickContains": "Yes, I can swim"}, {"clickContains": "Next"}, {"wait": 1500}, {"clickSelector": "button:text-is('+'):below(:text('Tickets for Intermediate surf'))"}, {"wait": 1200}, {"scrollTo": "Tickets for", "offset": 420}],
+   "expect": ["Tickets for Intermediate surf · 09:00", "Surfer", "Spectator", "Intermediate surf · Surfer × 1"]},
+
+  {"id": "WEB-049", "name": "Transport — Route & Schedule", "view": "Engine controls → Transport → Route & schedule · one-way, multi-trip, favourites → Book → Fri (stations filled in, departures without a search)",
+   "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Transport"}, {"wait": 800}, {"select": "Route & schedule · one-way, multi-trip, favourites"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "Book"}, {"wait": 2500}, {"click": "End tour"}, {"clickContains": "FRI"}, {"wait": 1500}, {"scrollTo": "Select Bus Station"}],
+   "expect": ["Select Bus Station, Route & Schedule", "One-way trip", "Favourites", "Time period", "All departures", "Arrives"]},
+
+  {"id": "WEB-050", "name": "Plan Your Visit", "prototype": "sources/designs/guest-rev3-30-september/TICVAI Visit Planner.dc.html", "view": "Visit Planner → the six questions (defaults) → Make my plan (Your plan)",
+   "steps": [{"click": "Next"}, {"click": "Next"}, {"click": "Next"}, {"click": "Next"}, {"click": "Next"}, {"click": "Make my plan"}, {"wait": 2500}],
+   "expect": ["Summit Peaks", "Your plan", "A day that fits your group", "Change answers", "Swap", "Book this plan"]},
+
+  {"id": "WEB-036", "name": "F&B – Browse & Order", "view": "Summit Peaks → header 'At the venue' → Order food (table ordering)",
+   "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Theme park"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "At the venue"}, {"wait": 2500}, {"click": "Order food"}, {"wait": 2000}, {"scrollTo": "You are at"}],
+   "expect": ["Summit Peaks", "The Crater Grill", "Table 14", "Your order", "Send to the kitchen"]},
+
+  {"id": "WEB-039", "name": "Venue Map & Wait Times", "view": "Summit Peaks → header 'At the venue' → Map & waits (3D view, with the 2D plan one tap away)",
+   "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Theme park"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "At the venue"}, {"wait": 2500}, {"click": "Map & waits"}, {"wait": 2000}, {"scrollTo": "You are at"}],
+   "expect": ["Summit Peaks", "3D view", "2D plan", "Same plan, drawn two ways", "Rides & shows"]},
+
+  {"id": "WEB-040", "name": "Virtual Queue", "view": "Summit Peaks → header 'At the venue' → Virtual queue",
+   "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Theme park"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "At the venue"}, {"wait": 2500}, {"click": "Virtual queue"}, {"wait": 2000}, {"scrollTo": "You are at"}],
+   "expect": ["Summit Peaks", "Open for virtual queueing", "Summit Coaster", "Next return window", "Join the queue"]},
+
+  {"id": "WEB-041", "name": "Parking – Reserve & Pay", "view": "Summit Peaks → header 'At the venue' → Parking",
+   "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Theme park"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "At the venue"}, {"wait": 2500}, {"click": "Parking"}, {"wait": 2000}, {"scrollTo": "You are at"}],
+   "expect": ["Summit Peaks", "Choose a car park", "Premium — by the gate", "Number plate", "Reserve and pay"]},
+
+  {"id": "WEB-042", "name": "Retail & Shop and Drop", "view": "Summit Peaks → header 'At the venue' → Shop (collect at the gate, at the car park kiosk, or delivered home)",
+   "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Theme park"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "At the venue"}, {"wait": 2500}, {"click": "Shop"}, {"wait": 2000}, {"scrollTo": "You are at"}],
+   "expect": ["Summit Peaks", "In the shop today", "Collect on the way out", "Collect at the gate", "Deliver to my home"]},
+
+  {"id": "WEB-043", "name": "Loyalty & Rewards", "view": "Summit Peaks → header 'At the venue' → Loyalty",
+   "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Theme park"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "At the venue"}, {"wait": 2500}, {"click": "Loyalty"}, {"wait": 2000}, {"scrollTo": "You are at"}],
+   "expect": ["Summit Peaks", "Platinum at 5,000", "Earned today", "Spend them here", "Redeem"]},
+
+  {"id": "WEB-046", "name": "In-Venue Notifications", "view": "Summit Peaks → header 'At the venue' → Alerts",
+   "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Theme park"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "At the venue"}, {"wait": 2500}, {"click": "Alerts"}, {"wait": 2000}, {"scrollTo": "You are at"}],
+   "expect": ["Summit Peaks", "Summit Coaster is calling your party", "FNB-4471 is being made", "Queue calls and order updates always send"]}
+ ]
+}

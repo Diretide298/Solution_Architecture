@@ -189,6 +189,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TranslationProposals'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/content-drafts:
     post:
       operationId: proposeMarketingContent
@@ -349,6 +351,9 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           description: A token ceiling was reached; same cases as `sendAiMessage` 429.
+          headers:
+            Retry-After:
+              $ref: '../shared/common.yaml#/components/headers/RetryAfter'
           content:
             application/problem+json:
               schema:
@@ -449,6 +454,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/suggestions:
     post:
       operationId: requestSuggestion
@@ -623,6 +630,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/AiMissingSettingProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/suggestions/{suggestionId}/outcome:
     parameters:
     - name: suggestionId
@@ -673,6 +682,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuggestionOutcome'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/suggestion-providers:
     put:
       operationId: setSuggestionProvider
@@ -747,6 +758,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/SuggestionProviderAssignment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/venue-map/{mapId}/propose-walkways:
     parameters:
     - name: mapId
@@ -809,6 +822,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/venue-map/{mapId}/propose-labels:
     parameters:
     - name: mapId
@@ -861,6 +876,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/VenueLabelProposal'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/seat-maps/{seatMapId}/proposals:
     parameters:
     - name: seatMapId
@@ -1045,6 +1062,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai-providers/{providerId}/credential:
     parameters:
     - name: providerId
@@ -1132,6 +1151,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai-providers/{providerId}/test:
     parameters:
     - name: providerId
@@ -1195,6 +1216,8 @@ paths:
                   verifiedAt:
                     type: string
                     format: date-time
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations:
     get:
       operationId: listAiConversations
@@ -1238,6 +1261,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/AiConversation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createAiConversation
       x-ticvai-consumed-by:
@@ -1303,6 +1328,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiConversation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/messages:
     parameters:
     - name: conversationId
@@ -1398,6 +1425,9 @@ paths:
             (`AiPolicy.ceilingBehaviour`). There is no per-principal limit.
 
             '
+          headers:
+            Retry-After:
+              $ref: '../shared/common.yaml#/components/headers/RetryAfter'
           content:
             application/problem+json:
               schema:
@@ -1491,6 +1521,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SearchResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /collections:
     get:
       operationId: listKnowledgeCollections
@@ -1521,6 +1553,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/KnowledgeCollection'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createKnowledgeCollection
       x-ticvai-audience:
@@ -1555,6 +1589,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KnowledgeCollection'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /collections/{collectionId}/documents:
     parameters:
     - name: collectionId
@@ -1614,6 +1650,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KnowledgeDocument'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /generate/configuration:
     post:
       operationId: generateConfiguration
@@ -1704,6 +1742,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GeneratedConfiguration'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /generate/venue-layout:
     post:
       operationId: generateVenueLayout
@@ -1770,6 +1810,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /interactions:
     get:
       operationId: listAiInteractions
@@ -1835,6 +1877,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/AiInteraction'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /proposed-actions:
     get:
       operationId: listProposedActions
@@ -1874,6 +1918,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProposedAction'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /proposed-actions/{actionId}/decide:
     parameters:
     - name: actionId
@@ -2000,6 +2046,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /usage:
     get:
       operationId: getAiUsage
@@ -2055,6 +2103,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiUsageReport'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /providers:
     get:
       operationId: listAiProviders
@@ -2093,6 +2143,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AiProvider'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAiProvider
       x-ticvai-consumed-by:
@@ -2190,6 +2242,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /policy:
     get:
       operationId: getAiPolicy
@@ -2240,6 +2294,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAiPolicy
       x-ticvai-consumed-by:
@@ -2308,6 +2364,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /index-sources:
     get:
       operationId: listIndexSources
@@ -2342,6 +2400,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IndexSource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setIndexSource
       x-ticvai-audience:
@@ -2392,6 +2452,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexSource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /index-sources/{sourceId}/reindex:
     parameters:
     - name: sourceId
@@ -2457,6 +2519,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /index-sources/{sourceId}/entries/{entryId}:
     parameters:
     - name: sourceId
@@ -2512,6 +2576,8 @@ paths:
           description: Removed from both stores
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /index-jobs:
     get:
       operationId: listIndexJobs
@@ -2540,6 +2606,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IndexJob'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /index-failures:
     get:
       operationId: listIndexFailures
@@ -2589,6 +2657,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IndexFailure'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/capabilities:
     get:
       operationId: listAiCapabilities
@@ -2648,6 +2718,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiCapabilityRegistration'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/capabilities/{capabilityKey}:
     parameters:
     - name: capabilityKey
@@ -2721,6 +2793,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/effective-policy:
     get:
       operationId: getEffectiveAiPolicy
@@ -2775,6 +2849,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiEffectivePolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/policy-drafts:
     post:
       operationId: createAiGovernancePolicyDraft
@@ -2856,6 +2932,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiGovernancePolicyVersion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/policy-versions/{versionId}/simulate:
     parameters:
     - name: versionId
@@ -2925,6 +3003,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/policy-versions/{versionId}/publish:
     parameters:
     - name: versionId
@@ -2978,6 +3058,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/policy-versions:
     get:
       operationId: listAiGovernancePolicyVersions
@@ -3045,6 +3127,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiGovernancePolicyVersion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/policy-exceptions:
     post:
       operationId: createAiPolicyException
@@ -3084,6 +3168,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiPolicyException'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/policy-exceptions/{exceptionId}/revoke:
     parameters:
     - name: exceptionId
@@ -3145,6 +3231,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/capabilities/{capabilityKey}/pause:
     parameters:
     - name: capabilityKey
@@ -3213,6 +3301,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/capabilities/{capabilityKey}/resume:
     parameters:
     - name: capabilityKey
@@ -3273,6 +3363,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/evaluate:
     post:
       operationId: evaluateAiGovernance
@@ -3354,6 +3446,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiGovernanceDecision'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /action-plans/{planId}:
     parameters:
     - name: planId
@@ -3419,6 +3513,8 @@ paths:
                 $ref: '#/components/schemas/AiActionPlanDetail'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /action-plans/{planId}/simulate:
     parameters:
     - name: planId
@@ -3473,6 +3569,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /action-plans/{planId}/pause:
     parameters:
     - name: planId
@@ -3536,6 +3634,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /action-plans/{planId}/resume:
     parameters:
     - name: planId
@@ -3599,6 +3699,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /action-plans/{planId}/cancel:
     parameters:
     - name: planId
@@ -3661,6 +3763,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /action-plans/{planId}/steps/{stepNumber}/retry:
     parameters:
     - name: planId
@@ -3716,6 +3820,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /action-plans/{planId}/rollback:
     parameters:
     - name: planId
@@ -3783,6 +3889,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /decision-records/{decisionRecordId}/override:
     parameters:
     - name: decisionRecordId
@@ -3841,6 +3949,8 @@ paths:
                 $ref: '#/components/schemas/AiIntervention'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tools:
     get:
       operationId: listAiTools
@@ -3892,6 +4002,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiTool'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tools/{toolKey}:
     parameters:
     - name: toolKey
@@ -3951,6 +4063,8 @@ paths:
                 $ref: '#/components/schemas/AiTool'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /configuration-sessions:
     post:
       operationId: startConfigurationSession
@@ -4021,6 +4135,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiConfigurationSession'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listConfigurationSessions
       x-ticvai-consumed-by:
@@ -4077,6 +4193,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiConfigurationSession'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /configuration-sessions/{sessionId}/answers:
     parameters:
     - name: sessionId
@@ -4154,6 +4272,9 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           description: A token ceiling was reached; same cases as `sendAiMessage` 429.
+          headers:
+            Retry-After:
+              $ref: '../shared/common.yaml#/components/headers/RetryAfter'
           content:
             application/problem+json:
               schema:
@@ -4261,6 +4382,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listConfigurationSources
       x-ticvai-consumed-by:
@@ -4300,6 +4423,8 @@ paths:
                         $ref: '#/components/schemas/AiConfigurationSource'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /configuration-sessions/{sessionId}/blueprint:
     parameters:
     - name: sessionId
@@ -4366,6 +4491,8 @@ paths:
                 $ref: '#/components/schemas/AiBlueprintView'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /configuration-sessions/{sessionId}/decisions/{decisionKey}:
     parameters:
     - name: sessionId
@@ -4452,6 +4579,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /configuration-sessions/{sessionId}/plan:
     parameters:
     - name: sessionId
@@ -4504,6 +4633,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /knowledge-gaps:
     get:
       operationId: listKnowledgeGaps
@@ -4567,6 +4698,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiKnowledgeGap'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /messages/{messageId}/feedback:
     parameters:
     - name: messageId
@@ -4640,6 +4773,8 @@ paths:
                 $ref: '#/components/schemas/AiAnswerFeedback'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /assistant-profiles/{profileKey}:
     parameters:
     - name: profileKey
@@ -4708,6 +4843,8 @@ paths:
                 $ref: '#/components/schemas/AiAssistantProfile'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /assistant-profiles:
     get:
       operationId: listAssistantProfiles
@@ -4753,6 +4890,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiAssistantProfile'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /insights:
     get:
       operationId: listAiInsights
@@ -4836,6 +4975,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiInsight'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /insights/{insightId}/decide:
     parameters:
     - name: insightId
@@ -4911,6 +5052,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /insights/explain-metric-change:
     post:
       operationId: explainMetricChange
@@ -4922,8 +5065,9 @@ paths:
       summary: Why did this metric change
       description: '**Root cause over the semantic layer** (AIP-176..180; ANL-056, ADM-506). Decomposes the change
         in a governed metric by its dimensions, computed by Reporting on the analytical replica where RLS applies.
-        **A number in the narrative can only come from a query result** (design 5.7, decision 29 September). Kept
-        as a `rootCause` insight when `keep` is true.
+        **A number in the narrative can only come from a query result** (design 5.7, decision 29 September). **The
+        decomposition by channel, product and time is plain arithmetic; the model only words the result**
+        (ADR-0054, accepted 1 October). Kept as a `rootCause` insight when `keep` is true.
 
         '
       tags:
@@ -4976,6 +5120,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiMetricChangeExplanation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /marketing-recommendations:
     get:
       operationId: listMarketingRecommendations
@@ -5052,6 +5198,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiMarketingRecommendation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /anomaly-detectors/{detectorKey}:
     parameters:
     - name: detectorKey
@@ -5121,6 +5269,8 @@ paths:
                 $ref: '#/components/schemas/AiAnomalyDetector'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /anomaly-detectors:
     get:
       operationId: listAnomalyDetectors
@@ -5161,6 +5311,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiAnomalyDetector'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecast-definitions:
     get:
       operationId: listForecastDefinitions
@@ -5225,6 +5377,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiForecastDefinition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecast-definitions/{definitionKey}:
     parameters:
     - name: definitionKey
@@ -5294,6 +5448,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecast-definitions/{definitionKey}/runs:
     parameters:
     - name: definitionKey
@@ -5345,6 +5501,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecast-versions:
     get:
       operationId: listForecastVersions
@@ -5398,6 +5556,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiForecastVersion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecasts:
     get:
       operationId: getForecast
@@ -5490,6 +5650,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiForecastPoint'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecast-versions/{versionId}/publish:
     parameters:
     - name: versionId
@@ -5552,6 +5714,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecast-versions/{versionId}/exports:
     parameters:
     - name: versionId
@@ -5642,6 +5806,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecast-scenarios:
     post:
       operationId: createForecastScenario
@@ -5684,6 +5850,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiForecastScenario'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecast-scenarios/compare:
     post:
       operationId: compareForecastScenarios
@@ -5733,6 +5901,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiScenarioComparison'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecast-accuracy:
     get:
       operationId: getForecastAccuracy
@@ -5786,6 +5956,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiForecastAccuracy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecast-signals:
     get:
       operationId: listForecastSignals
@@ -5834,6 +6006,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiSignalSource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forecast-signals/{signalKey}:
     parameters:
     - name: signalKey
@@ -5891,6 +6065,8 @@ paths:
                 $ref: '#/components/schemas/AiSignalSource'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /operational-requirements:
     get:
       operationId: listOperationalRequirements
@@ -5982,6 +6158,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiOperationalRequirement'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /operational-requirements/{requirementId}/decide:
     parameters:
     - name: requirementId
@@ -6055,6 +6233,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/transaction-scores:
     post:
       operationId: scoreTransactionRisk
@@ -6190,6 +6370,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/entities/{entityType}/{entityRef}:
     parameters:
     - name: entityType
@@ -6231,6 +6413,8 @@ paths:
                 $ref: '#/components/schemas/AiEntityRisk'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/strategy:
     put:
       operationId: configureRiskStrategy
@@ -6282,6 +6466,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/strategy/backtest:
     post:
       operationId: backtestRiskStrategy
@@ -6333,6 +6519,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiRiskBacktest'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/alerts:
     get:
       operationId: listRiskAlerts
@@ -6418,6 +6606,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiRiskAlert'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/alerts/{alertId}/decide:
     parameters:
     - name: alertId
@@ -6491,6 +6681,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/cases:
     post:
       operationId: createRiskCase
@@ -6571,6 +6763,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiRiskCase'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/cases/{caseId}:
     parameters:
     - name: caseId
@@ -6608,6 +6802,8 @@ paths:
                 $ref: '#/components/schemas/AiRiskCaseDetail'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/cases/{caseId}/evidence:
     parameters:
     - name: caseId
@@ -6662,6 +6858,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/network:
     get:
       operationId: expandRiskNetwork
@@ -6722,6 +6920,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiRiskNetwork'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/cases/{caseId}/actions:
     parameters:
     - name: caseId
@@ -6799,6 +6999,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk/cases/{caseId}/close:
     parameters:
     - name: caseId
@@ -6868,6 +7070,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{approvalRequestId}/score:
     parameters:
     - name: approvalRequestId
@@ -6951,6 +7155,8 @@ paths:
                 $ref: '#/components/schemas/AiApprovalRequestScore'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getApprovalRequestScore
       x-ticvai-consumed-by:
@@ -6985,6 +7191,8 @@ paths:
                 $ref: '#/components/schemas/AiApprovalRequestScore'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendations/decide:
     post:
       operationId: decideRecommendations
@@ -7125,6 +7333,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiRecommendationResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendations/events:
     post:
       operationId: recordRecommendationEvents
@@ -7203,6 +7413,8 @@ paths:
             X-Consistency-Token:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
           description: 'Accepted: report what happened to recommended items'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendations/decisions/{decisionId}/explanation:
     parameters:
     - name: decisionId
@@ -7258,6 +7470,8 @@ paths:
                 $ref: '#/components/schemas/AiRecommendationExplanation'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendations/customers/{subjectId}/profile:
     parameters:
     - name: subjectId
@@ -7296,6 +7510,8 @@ paths:
                 $ref: '#/components/schemas/AiCustomerRecommendationProfile'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendations/simulate:
     post:
       operationId: simulateRecommendationDecision
@@ -7371,6 +7587,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiRecommendationResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /models:
     get:
       operationId: listAiModels
@@ -7427,6 +7645,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiModel'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /models/{modelId}:
     parameters:
     - name: modelId
@@ -7486,6 +7706,8 @@ paths:
                 $ref: '#/components/schemas/AiModel'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /prompt-templates:
     get:
       operationId: listPromptTemplates
@@ -7542,6 +7764,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiPromptTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /prompt-templates/{templateKey}/versions:
     parameters:
     - name: templateKey
@@ -7613,6 +7837,8 @@ paths:
                 $ref: '#/components/schemas/AiPromptTemplate'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /evaluations:
     post:
       operationId: runAiEvaluation
@@ -7675,6 +7901,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiEvaluationRun'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listAiEvaluations
       x-ticvai-consumed-by:
@@ -7730,6 +7958,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiEvaluationRun'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases/{releaseId}/promote:
     parameters:
     - name: releaseId
@@ -7808,6 +8038,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases/{releaseId}/rollback:
     parameters:
     - name: releaseId
@@ -7870,6 +8102,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /decision-records:
     get:
       operationId: searchAiDecisions
@@ -7967,6 +8201,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiDecisionRecord'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /decision-records/{decisionRecordId}/trace:
     parameters:
     - name: decisionRecordId
@@ -8025,6 +8261,8 @@ paths:
                 $ref: '#/components/schemas/AiDecisionTrace'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /evidence-packages:
     post:
       operationId: exportAiEvidencePackage
@@ -8094,6 +8332,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiEvidencePackage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /decision-records/{decisionRecordId}/replay:
     parameters:
     - name: decisionRecordId
@@ -8148,6 +8388,8 @@ paths:
                 $ref: '#/components/schemas/AiReplayResult'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance-alerts:
     get:
       operationId: listAiGovernanceAlerts
@@ -8233,6 +8475,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiGovernanceAlert'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance-alerts/{alertId}/decide:
     parameters:
     - name: alertId
@@ -8307,6 +8551,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /incidents:
     get:
       operationId: listAiIncidents
@@ -8364,6 +8610,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiIncident'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: openAiIncident
       x-ticvai-consumed-by:
@@ -8437,6 +8685,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiIncident'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /incidents/{incidentId}/contain:
     parameters:
     - name: incidentId
@@ -8516,6 +8766,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /incidents/{incidentId}/close:
     parameters:
     - name: incidentId
@@ -8580,6 +8832,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk-register:
     get:
       operationId: listAiRiskRegister
@@ -8640,6 +8894,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiRiskRegisterEntry'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk-register/{entryId}:
     parameters:
     - name: entryId
@@ -8695,6 +8951,8 @@ paths:
                 $ref: '#/components/schemas/AiRiskRegisterEntry'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /controls:
     get:
       operationId: listAiControls
@@ -8741,6 +8999,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiControl'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /controls/{controlKey}/tests:
     parameters:
     - name: controlKey
@@ -8797,6 +9057,8 @@ paths:
                 $ref: '#/components/schemas/AiControlTest'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/{tenantId}/byok:
     parameters:
     - name: tenantId
@@ -8858,6 +9120,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getAiByokEnablement
       x-ticvai-consumed-by:
@@ -8886,6 +9150,8 @@ paths:
                 $ref: '#/components/schemas/AiByokEnablement'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /venues/{venueId}/guided-choice-suggestions:
     parameters:
     - name: venueId
@@ -8970,6 +9236,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guided-choice-suggestions/{suggestionId}:
     parameters:
     - name: suggestionId
@@ -9008,6 +9276,8 @@ paths:
                 $ref: '#/components/schemas/AiGuidedChoiceSuggestion'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /venues/{venueId}/ai-settings:
     parameters:
     - name: venueId
@@ -9049,6 +9319,8 @@ paths:
                 $ref: '#/components/schemas/AiVenueSettings'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAiVenueSettings
       x-ticvai-consumed-by:
@@ -9092,6 +9364,8 @@ paths:
                 $ref: '#/components/schemas/AiVenueSettings'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /venues/{venueId}/history-imports:
     parameters:
     - name: venueId
@@ -9197,6 +9471,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listVenueHistoryImports
       x-ticvai-consumed-by:
@@ -9232,6 +9508,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiHistoryImport'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /history-imports/{importId}:
     parameters:
     - name: importId
@@ -9268,6 +9546,8 @@ paths:
                 $ref: '#/components/schemas/AiHistoryImport'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /capability-maturity:
     get:
       operationId: listAiCapabilityMaturity
@@ -9323,6 +9603,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiCapabilityMaturity'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /training-runs:
     get:
       operationId: listAiTrainingRuns
@@ -9379,6 +9661,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiTrainingRun'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance/capability-health:
     get:
       operationId: listAiCapabilityHealth
@@ -9428,6 +9712,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AiCapabilityHealth'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   securitySchemes:

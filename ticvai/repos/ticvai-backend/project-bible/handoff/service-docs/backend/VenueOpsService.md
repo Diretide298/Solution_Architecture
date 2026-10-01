@@ -41,8 +41,8 @@
 | collection | [`listCollections`](#listcollections) | GET | `/media/collections` | core | 2 | CMS-010, CMS-062, CMS-064 |
 | departure | [`getNextTransportDeparture`](#getnexttransportdeparture) | GET | `/transport/departures/next` | core | 3 | GST-076, WEB-049 |
 | departure | [`searchTransportDepartures`](#searchtransportdepartures) | GET | `/transport/departures` | core | 3 | GST-076, WEB-049 |
-| entry | [`getWaitingGuest`](#getwaitingguest) | GET | `/waiting-guests/{entryId}` | core | 1 | GST-023, GST-046, WEB-015, WEB-040 |
-| entry | [`joinQueue`](#joinqueue) | POST | `/waiting-guests` | core | 1 | GST-023, GST-046, WEB-015, WEB-040 |
+| entry | [`getWaitingGuest`](#getwaitingguest) | GET | `/waiting-guests/{entryId}` | core | 2 | GST-023, WEB-040 |
+| entry | [`joinQueue`](#joinqueue) | POST | `/waiting-guests` | core | 2 | GST-023, WEB-040 |
 | entry | [`leaveQueue`](#leavequeue) | DELETE | `/waiting-guests/{entryId}` | core | 2 | GST-023, WEB-040 |
 | entry | [`listQueueEntries`](#listqueueentries) | GET | `/queues/{queueId}/entries` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
 | fare | [`getTransportFareTable`](#gettransportfaretable) | GET | `/transport/routes/{routeId}/fare-table` | core | 3 | BO-1185, GST-077, WEB-049 |
@@ -138,6 +138,7 @@
 |---|---|---|
 | 204 |  | Deleted |
 | 409 |  | Asset is in use. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getMediaAsset
 
@@ -233,6 +234,7 @@ Returns every generated size and every place the asset is referenced. Usage is w
 |---|---|---|
 | 200 |  | Asset |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### replaceMediaAsset
 
@@ -320,6 +322,7 @@ Derivatives regenerate. The previous version is retained for rollback.
 |---|---|---|
 | 200 |  | Replaced, with affected surfaces reported |
 | 409 |  | The upload cannot be used: it is a different kind — an image cannot replace a document (kindMismatch) — or the transfer never finished (transferIncomplete), the upload ticket expired (uploadExpired),… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### searchMedia
 
@@ -405,6 +408,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 |---|---|---|
 | 200 |  | Assets |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateMediaAsset
 
@@ -506,6 +510,7 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | Status change refused: archiving an asset that is still referenced (inUse, with every reference listed), or a transition states/media.yaml does not allow from the asset's current status (transitionNo… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: card
@@ -559,6 +564,7 @@ The reader path. Offline-capable so a machine can validate a card during a netwo
 |---|---|---|
 | 200 |  | Card |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### issueGameCard
 
@@ -621,6 +627,7 @@ Physical cards are pre-printed and activated at sale; digital cards live in the 
 |---|---|---|
 | 201 |  | Issued |
 | 409 |  | Card already active, or the code is unknown |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### transferGameCard
 
@@ -680,6 +687,7 @@ A damaged or lost card. The source moves to status `transferred`, with `transfer
 |---|---|---|
 | 200 |  | Transferred; the source card is now transferred |
 | 409 |  | Target already carries a balance, or either card is not active (blocked, expired or already transferred). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: collection
@@ -733,6 +741,7 @@ A damaged or lost card. The source moves to status `transferred`, with `transfer
 |---|---|---|
 | 201 |  | Created |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listCollections
 
@@ -758,6 +767,7 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Collections |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: departure
@@ -817,7 +827,7 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | The next departure |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | The stations are the same, or no active route serves them in this order. |
@@ -894,7 +904,7 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Departures by departure time at the boarding stop |
 | 422 |  | The stations are the same, or no active route serves them in this order. |
 
@@ -906,19 +916,20 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 **`GET /waiting-guests/{entryId}`**: Read a queue entry
 
 Position, parties ahead, estimated call time. Polled by the guest app, so it is cacheable for a few seconds — a thousand guests refreshing a countdown is its own load problem.
+**Ride queues (Q1) only** (ADR-0066): the on-sale waiting room's position is catalogue `getWaitingRoomPosition`.
 
 |  |  |
 |---|---|
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 1 |
+| Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Reads | `queue.entry` |
 | Writes | - |
-| Called by | GST-023, GST-046, WEB-015, WEB-040 |
+| Called by | GST-023, WEB-040 |
 
 **Parameters**
 
@@ -959,12 +970,14 @@ Position, parties ahead, estimated call time. Polled by the guest app, so it is 
 |---|---|---|
 | 200 |  | Entry |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### joinQueue
 
 **`POST /waiting-guests`**: Join a virtual queue
 
 Guest-facing. Returns a position, a party number and a return window.
+**Ride queues (Q1) only** (ADR-0066, 1 October). It writes a `queue.entry` row per guest, which is exactly the load an on-sale waiting room exists to keep away; the on-sale room is catalogue `enterWaitingRoom`. The waiting-room parts of WEB-015 and GST-046 move there.
 **One active entry per guest per queue**, and a configurable cap across queues — a guest holding positions in every queue at once defeats the purpose of a virtual queue for everyone else.
 **The cap is `VenueSettings.queue.crossQueueLimit`**, the number of queues a guest may be waiting in at once in this venue: a venue setting with a tenant default (decided 28 September, audit R094). **Proposed default 2, client to correct (audit R094).** The refusal carries the limit in `crossQueueLimit`.
 Where the party includes someone below the height requirement, the join is refused here rather than at the ride, which is a much better place to find out.
@@ -975,12 +988,12 @@ Where the party includes someone below the height requirement, the join is refus
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 1 |
+| Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.loyalty_position`, `promotions.promotion`, `queue.entry`, `queue.queue` |
 | Writes | `cache:idempotency`, `queue.entry` |
-| Called by | GST-023, GST-046, WEB-015, WEB-040 |
+| Called by | GST-023, WEB-040 |
 | State model | Queue entry ([states/queue-entry.yaml](../../../states/queue-entry.yaml)): created as `waiting` |
 
 **Parameters**
@@ -1035,7 +1048,7 @@ Where the party includes someone below the height requirement, the join is refus
 |---|---|---|
 | 201 |  | Joined |
 | 409 |  | Already in this queue, at the cross-queue limit, party exceeds the maximum, queue is paused or closed, or a party member does not meet the height requirement. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### leaveQueue
 
@@ -1067,6 +1080,7 @@ Where the party includes someone below the height requirement, the join is refus
 |---|---|---|
 | 204 |  | Left |
 | 409 |  | Already called or redeemed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listQueueEntries
 
@@ -1131,6 +1145,7 @@ Operator view. Position order, with no-shows and expiries visible.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Entries |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: fare
@@ -1198,7 +1213,7 @@ The passenger picker reads its types from here (adult, child, student, person of
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Fare table |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
@@ -1271,7 +1286,7 @@ Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Quote |
 | 422 |  | Stations not on the route or in the wrong order, an unknown passenger type, no passengers, or a pass type not offered on this route. |
 
@@ -1375,6 +1390,7 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 | 200 |  | Set |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | A matrix model missing a station pair the route serves, a passenger type code repeated, no passenger type with isDefault, or a multiplier outside 0 to 1. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: favourite
@@ -1406,7 +1422,7 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 204 |  | Removed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
@@ -1461,7 +1477,7 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Saved routes |
 | 401 | Unauthorized | Missing, expired or superseded session |
 
@@ -1519,7 +1535,7 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Already saved; the existing favourite |
 | 201 |  | Saved |
 | 409 |  | The guest already has the maximum number of saved routes. |
@@ -1605,6 +1621,7 @@ Enables integration for a venue and selects an adaptor. **TICVAI ships no vendor
 | 201 |  | Created — no feed had this id |
 | 409 |  | The feed with this id belongs to a different queue. |
 | 400 |  | Unknown adaptor, or credentials missing for the selected adaptor |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getQueueFeedHealth
 
@@ -1650,6 +1667,7 @@ Last reading, expected interval, and whether the feed has gone quiet. A silent f
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Health |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: inspection
@@ -1732,6 +1750,7 @@ Items may be marked safety-critical. **A failed safety-critical item blocks the 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: networkImport
@@ -1799,6 +1818,7 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 | 200 |  | Applied, with what was written |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Not previewReady, has error findings, or the network changed since validation. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### importTransportNetwork
 
@@ -1870,6 +1890,7 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 | 202 |  | Accepted; the file is being validated |
 | 400 | BadRequest | Validation failed |
 | 422 |  | The asset is not ready, not in this venue, or not a zip. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: pass
@@ -1942,6 +1963,7 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listTransportPassOffers
 
@@ -1999,7 +2021,7 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Pass offers, by sortOrder |
 | 422 |  | The stations are the same, or no active route serves them in this order. |
 
@@ -2120,6 +2142,7 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 |---|---|---|
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getQueue
 
@@ -2210,6 +2233,7 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 |---|---|---|
 | 200 |  | Queue |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listQueues
 
@@ -2295,6 +2319,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 |---|---|---|
 | 200 |  | Queues |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateQueue
 
@@ -2391,6 +2416,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: resources
@@ -2483,6 +2509,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 |---|---|---|
 | 201 |  | Created |
 | 422 |  | A cleaningPolicy with timesPerDay and no cleaningsPerDay, or whose window ends before it starts (W10, 29 September). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createResourceBlock
 
@@ -2540,6 +2567,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 |---|---|---|
 | 201 |  | Blocked |
 | 409 |  | Bookings already exist in the window. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createResourceHold
 
@@ -2616,6 +2644,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Taken for some of the window, held by someone else, not placed on the published map, or marked not bookable. |
 | 422 |  | The party is larger than the resource's capacity (party-exceeds-capacity). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createResourcePackage
 
@@ -2708,6 +2737,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### extendResourceHold
 
@@ -2764,6 +2794,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 |---|---|---|
 | 200 |  | Extended |
 | 409 |  | Already expired or converted, or the extension limit is reached. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getMapResourceAvailability
 
@@ -2833,6 +2864,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 |---|---|---|
 | 200 |  | Every placed resource with its status for the window |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getResourceAvailability
 
@@ -2883,6 +2915,7 @@ Includes maintenance windows and blackouts. **A resource under repair is unavail
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Free windows |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getResourceHold
 
@@ -2939,6 +2972,7 @@ The countdown's source of truth, as `seating.getSeatHold`.
 |---|---|---|
 | 200 |  | Hold |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listProductStartTimes
 
@@ -2991,6 +3025,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | 200 |  | Free start times, earliest first |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | The product is not sold by time window, the variant is not one of its lengths, or it has no resource requirements (product-not-time-windowed, variant-has-no-duration, no-resource-requirements). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### releaseResourceBlock
 
@@ -3020,6 +3055,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Released |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### relinquishResourceHold
 
@@ -3054,6 +3090,7 @@ The guest picked another cabana or left the map. The resource is free at once.
 |---|---|---|
 | 204 |  | Released |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setExperienceResourceRequirements
 
@@ -3102,6 +3139,7 @@ Requirements are stated as type and quantity with optional qualifications — *o
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setResourceSchedule
 
@@ -3182,6 +3220,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateResource
 
@@ -3270,6 +3309,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 |---|---|---|
 | 200 |  | Updated |
 | 422 |  | A cleaningPolicy with timesPerDay and no cleaningsPerDay, or whose window ends before it starts (W10, 29 September). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateResourcePackage
 
@@ -3363,6 +3403,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: rights
@@ -3398,6 +3439,7 @@ A stock photograph licensed for one season and still on a website two years late
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Expiring assets |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: route
@@ -3486,6 +3528,7 @@ Created as `draft`. **Creating a route creates its catalogue side** — a catalo
 | 400 | BadRequest | Validation failed |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 422 |  | Fewer than two stops, a station repeated, a station that is inactive or not in this venue, or offsets that do not start at 0 and strictly increase. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getTransportRoute
 
@@ -3549,7 +3592,7 @@ The stop list from origin to end. A guest or public caller gets 404 for a route 
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Route |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
@@ -3610,7 +3653,7 @@ The stop list from departure to arrival and the street map beside it (decided 29
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Route map |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | A station is not on this route, or the alighting stop comes before the boarding stop. |
@@ -3678,7 +3721,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Routes |
 
 ### updateTransportRoute
@@ -3761,6 +3804,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Stops changed while a published timetable covers a future date. |
 | 422 |  | Invalid stops, as on createTransportRoute. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: station
@@ -3820,6 +3864,7 @@ Venue Management transport setup (decided 29 September, rev 3 REV3-21). **A stat
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listTransportStations
 
@@ -3870,7 +3915,7 @@ The From and To station menus (decided 29 September, rev 3 REV3-21). A guest or 
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Stations |
 
 
@@ -3944,6 +3989,7 @@ Departure times from the route's origin by day of week, valid over a date range.
 | 201 |  | Created as draft |
 | 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishTransportTimetable
 
@@ -4000,6 +4046,7 @@ The route must be `active` and have a fare table.
 | 200 |  | Published, with the number of departures released |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Not a draft, the route is not active or has no fare table, or a superseded timetable has departures with sold seats on or after this validFrom. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: upload
@@ -4103,6 +4150,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 |---|---|---|
 | 201 |  | Asset created. |
 | 409 |  | The transfer never finished (transferIncomplete), the upload ticket expired (uploadExpired), or the stored file is larger than the ticket allowed (sizeExceeded). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createUpload
 
@@ -4161,6 +4209,7 @@ Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes. The
 |---|---|---|
 | 201 |  | Signed URL issued |
 | 400 |  | Content type not permitted, or size beyond the limit for that kind. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: venueMap
@@ -4251,6 +4300,7 @@ A venue may have several — **a park map and a floor plan per building are diff
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created as a draft |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getVenueMap
 
@@ -4372,6 +4422,7 @@ A venue may have several — **a park map and a floor plan per building are diff
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | The published version asked for, or the draft. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getVenueMapGraph
 
@@ -4431,6 +4482,7 @@ Returns nodes, edges, precomputed distances and **the connected components**. A 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Graph |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### importVenueGeometry
 
@@ -4527,6 +4579,7 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Accepted and parsing. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listBookableVenueMaps
 
@@ -4578,6 +4631,7 @@ A venue with no published bookable map is an empty `maps` list, not a 404.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | The venue's published bookable maps, park maps first, then by name. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishVenueMap
 
@@ -4649,6 +4703,7 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 |---|---|---|
 | 200 |  | Published |
 | 409 |  | Unresolved proposals, a broken link, or a disconnected area (audit R106 (8)). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPlacedResource
 
@@ -4727,6 +4782,7 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 | 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setVenuePoint
 
@@ -4836,6 +4892,7 @@ Unlinked points are fine and expected — a toilet is a toilet.
 |---|---|---|
 | 200 |  | Placed |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: visitPlan
@@ -4900,6 +4957,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | baseVersion is not current (plan-version-conflict), or the cart is not the caller's or is no longer open (cart-not-open). |
 | 422 |  | Nothing on the plan could be added (nothing-bookable); the problem lists each item's refusal, so the guest is told why rather than taken to an empty cart. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### generateVisitPlan
 
@@ -5029,6 +5087,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | 201 |  | The plan, version 1, one day per date asked for. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | A venue of the plan (venueId or a dayVenues venue) has no published map, or none of its points carries a planning duration (venue-not-plannable), so there is nothing to lay out; or a date is outside… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getVisitPlan
 
@@ -5133,6 +5192,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 |---|---|---|
 | 200 |  | The plan |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listVisitPlanAlternatives
 
@@ -5191,6 +5251,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 |---|---|---|
 | 200 |  | Alternatives, best first |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateVisitPlan
 
@@ -5313,6 +5374,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | baseVersion is not the current version (plan-version-conflict), or the plan is already booked (plan-booked; a booked plan is read-only, generate a new one). |
 | 422 |  | A change names an item not on the plan, a revertTo version that does not exist, or a point the party is not eligible for (item-not-eligible, with the rule that excludes); or an add or swap names a po… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: waitTime
@@ -5335,7 +5397,7 @@ A guest who waits forty minutes for a fifteen-minute estimate deserves a system 
 | Read routing | replica |
 | Reads | `queue.entry`, `queue.queue`, `queue.reading` |
 | Writes | - |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031, EMP-032, GST-003, GST-004, GST-021, GST-022, GST-023, GST-038, GST-046, GST-051, GST-053, GST-054, GST-059, WEB-002, WEB-004, WEB-015, WEB-039, WEB-040 |
+| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031, EMP-032, GST-003, GST-004, GST-021, GST-022, GST-023, GST-038, GST-051, GST-053, GST-054, GST-059, WEB-002, WEB-004, WEB-039, WEB-040 |
 
 **Parameters**
 
@@ -5349,6 +5411,7 @@ A guest who waits forty minutes for a fifteen-minute estimate deserves a system 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Wait times |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 

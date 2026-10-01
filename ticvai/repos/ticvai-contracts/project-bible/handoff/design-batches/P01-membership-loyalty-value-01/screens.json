@@ -27,7 +27,7 @@
     {
      "to": "WEB-022",
      "trigger": "Membership Plans",
-     "provenance": "derived — WEB-022 declares entryState.params productId and WEB-021 holds none of them, so the edge carries nothing and WEB-022 opens cold"
+     "provenance": "derived — WEB-022 declares entryState.params productId and WEB-021 holds none of them. The edge carries nothing: WEB-022 finds productId (listProducts) itself, and WEB-022 opens on its own"
     },
     {
      "to": "WEB-023",
@@ -40,7 +40,7 @@
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-021 holds none of them, so the edge carries nothing and WEB-024 opens cold"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist, and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)"
     }
    ]
   },
@@ -416,17 +416,17 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-022 holds none of them, so the edge carries nothing and WEB-021 opens cold"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-022 holds none of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021 finds walletId (getWallet) itself, and WEB-021 opens on its own"
     },
     {
      "to": "WEB-023",
      "trigger": "Membership Management",
-     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-022 holds none of them, so the edge carries nothing and WEB-023 opens cold"
+     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-022 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements, and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)"
     },
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-022 holds none of them, so the edge carries nothing and WEB-024 opens cold"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist, and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)"
     }
    ]
   },
@@ -682,7 +682,7 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-023 holds none of them, so the edge carries nothing and WEB-021 opens cold"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-023 holds none of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021 finds walletId (getWallet) itself, and WEB-021 opens on its own"
     },
     {
      "to": "WEB-022",
@@ -695,7 +695,7 @@
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-023 holds none of them, so the edge carries nothing and WEB-024 opens cold"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist, and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)"
     }
    ]
   },
@@ -1051,17 +1051,17 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-024 holds none of them, so the edge carries nothing and WEB-021 opens cold"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-024 holds none of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021 finds walletId (getWallet) itself, and WEB-021 opens on its own"
     },
     {
      "to": "WEB-022",
      "trigger": "Membership Plans",
-     "provenance": "derived — WEB-022 declares entryState.params productId and WEB-024 holds none of them, so the edge carries nothing and WEB-022 opens cold"
+     "provenance": "derived — WEB-022 declares entryState.params productId and WEB-024 holds none of them. The edge carries nothing: WEB-022 finds productId (listProducts) itself, and WEB-022 opens on its own"
     },
     {
      "to": "WEB-023",
      "trigger": "Membership Management",
-     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-024 holds none of them, so the edge carries nothing and WEB-023 opens cold"
+     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-024 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements, and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)"
     },
     {
      "to": "GST-037",
@@ -1865,11 +1865,11 @@
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-043",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "At the venue → 'Loyalty'",
+    "view": "Summit Peaks → header 'At the venue' → Loyalty",
     "differences": "Placed inside the in-venue section; referral code appears under Account → Groups & invitations (YAML createReferral is here)."
    }
   },

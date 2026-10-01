@@ -71,7 +71,14 @@ contract). **Uniqueness is carried where the contract marks it**: a property wit
 28 September). Uniqueness and immutability rules the contracts state only in prose are not --
 there is nothing machine-readable to derive them from.
 
-Run: `python3 tools/derive-ddl.py [--apply]`
+**Frozen once the git tag `r1` exists** (plan item 1C, C3, 1 October). From then on this does not
+rewrite a baseline `.sql` file under `backend/`: databases were built from them. It writes the
+additive part of the change (new tables, columns, indexes) as the next forward migration,
+`backend/<area>/V<nnnn>__after_r1_<yyyymmdd>.sql`, numbered from V0100, and lists everything that is
+not additive (drops, renames, type changes) for a person in `handoff/migration-review.md`
+(`tools/ddl_forward.py`). `tools/check-migration-freeze.py` fails if a baseline file changes anyway.
+
+Run: `python3 tools/derive-ddl.py [--apply] [--baseline REF]`   (--baseline: test a freeze without the tag)
 """
 from __future__ import annotations
 
@@ -85,8 +92,18 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import ddl_forward  # noqa: E402
+from release_baseline import baseline_commit, ls_tree, show  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "backend"
+REVIEW = ROOT / "handoff" / "migration-review.md"
+# **A forward migration: written after r1, never regenerated.** `V` sorts after every digit, so
+# provision-tenant.sh and the initdb pass, which apply `<area>/*.sql` in name order, run these after the
+# baseline's 930 file.
+FORWARD_FILE = re.compile(r"^V(\d+)__[\w.-]+\.sql$")
+FORWARD_FIRST = 100
 
 # **The one schema that is a database.** ADR-0039 took `control` out of the tenant template,
 # so the split is a fact this file has to hold rather than a string repeated in six branches.
@@ -984,9 +1001,87 @@ def key_of(table: str, cols: dict) -> str | None:
     return None
 
 
+def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
+    """After r1: leave every baseline `.sql` file as it is and write the difference as a forward migration.
+
+    **The baseline is read from the tag, not from disk**, so a baseline file somebody edited by hand is
+    not mistaken for the release (check-migration-freeze.py fails on that edit separately). The old side
+    of the comparison is the baseline at the tag plus every forward migration already in
+    `backend/<area>/`; the new side is what this run generated. Additive changes go into
+    `backend/<area>/V<nnnn>__after_<tag>_<yyyymmdd>.sql`, one number for the run, shared by both
+    databases (each keeps its own `platform.schema_version`). **Numbering starts at V0100** so it can
+    never meet the V0001-V0034 names handoff/service-docs/backend/MIGRATIONS.md plans for the baseline.
+
+    Everything else goes to handoff/migration-review.md for a person. Scripts (`*.sh`) are not
+    migrations and are still written."""
+    import datetime as _dt
+    stamp = _dt.date.today().strftime("%Y%m%d")
+    baseline = f"{tag} ({commit[:7]})"
+    existing = sorted(p for d in (CONTROL, "tenant") for p in (OUT / d).glob("V*.sql")
+                      if FORWARD_FILE.match(p.name))
+    version_n = max([int(FORWARD_FILE.match(p.name).group(1)) + 1 for p in existing] + [FORWARD_FIRST])
+    version = f"V{version_n:04d}"
+    safe_tag = re.sub(r"[^\w]+", "_", tag).strip("_") or "baseline"
+
+    plans, extra = [], []
+    for area_dir in (CONTROL, "tenant"):
+        old, new = ddl_forward.Model(), ddl_forward.Model()
+        for path in sorted(ls_tree(commit, f"backend/{area_dir}")):
+            name = path.rsplit("/", 1)[-1]
+            if path.endswith(".sql") and not FORWARD_FILE.match(name):
+                old.add_file((show(commit, path) or b"").decode("utf-8"))
+        for fwd in sorted((OUT / area_dir).glob("V*.sql"), key=lambda p: int(FORWARD_FILE.match(p.name).group(1))
+                          if FORWARD_FILE.match(p.name) else 0):
+            if FORWARD_FILE.match(fwd.name):
+                text = fwd.read_text(encoding="utf-8")
+                old.apply_forward(re.split(r"^-- =+\n-- ROLLBACK\b", text, maxsplit=1, flags=re.M)[0])
+        for name in sorted(n for n in files if n.startswith(area_dir + "/") and n.endswith(".sql")):
+            new.add_file(files[name])
+        plans.append(ddl_forward.diff(area_dir, old, new))
+    # **Root-level files are documentation of references that are not constraints** (990): nothing
+    # applies them, so a change is listed rather than migrated.
+    for name in sorted(n for n in files if "/" not in n and n.endswith(".sql")):
+        was = show(commit, f"backend/{name}")
+        if was is not None and was.decode("utf-8").replace("\r\n", "\n") != files[name]:
+            extra.append(("both", "file changed", name, "the generator would write it differently",
+                          "not applied anywhere: bring the application rules it documents up to date by hand"))
+
+    written = []
+    for p in plans:
+        if not p.statements:
+            continue
+        dest = OUT / p.area / f"{version}__after_{safe_tag}_{stamp}.sql"
+        written.append((dest, p))
+        if apply:
+            dest.write_text(ddl_forward.render(p, version, baseline, stamp), encoding="utf-8")
+    review = ddl_forward.render_review(plans, baseline, stamp, extra)
+    if apply:
+        for name, text in files.items():
+            if name.endswith(".sh"):
+                dest = OUT / name
+                dest.write_text(text, encoding="utf-8")
+                dest.chmod(0o755)
+        REVIEW.write_text(review, encoding="utf-8")
+
+    n_review = sum(len(p.review) for p in plans) + len(extra)
+    print(f"  FROZEN at {baseline}: the baseline files under backend/ are not rewritten")
+    for dest, p in written:
+        c = p.counts
+        print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {c['tables']} table(s), "
+              f"{c['columns']} column(s), {c['indexes']} index(es), {c['other']} other"
+              + ("" if apply else " (not written, pass --apply)"))
+    if not written:
+        print("  no additive change since the baseline and the forward migrations; nothing to write")
+    print(f"  {n_review} change(s) not generated, for a person: {REVIEW.relative_to(ROOT).as_posix()}"
+          + ("" if apply else " (not written, pass --apply)"))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true")
+    # **Frozen mode** (plan item 1C, C3): once the tag r1 exists the baseline files are never rewritten.
+    # --baseline names another commit-ish, for testing a freeze without creating the tag.
+    ap.add_argument("--baseline", default=None, help="freeze against this commit-ish (default: the tag r1)")
     a = ap.parse_args()
 
     S = json.loads((ROOT / "handoff" / "schema-reference.json").read_text(encoding="utf-8"))
@@ -1629,7 +1724,10 @@ def main() -> int:
     # usable by hand and by the control plane.
     files["initdb-provision.sh"] = INITDB_PROVISION
 
-    if a.apply:
+    frozen_at = baseline_commit(a.baseline)
+    if frozen_at:
+        frozen_mode(files, a.baseline or "r1", frozen_at, a.apply)
+    elif a.apply:
         # **The flat layout is removed, not left beside the new one.** The deploy configs mount
         # `backend/<area>` into initdb, and a stale `backend/010-orders.sql` sitting next to
         # `backend/tenant/010-orders.sql` is two answers to what a tenant database contains —
@@ -1643,6 +1741,9 @@ def main() -> int:
         # stopped generating it, and initdb would still have applied it.
         for area_dir in (CONTROL, "tenant"):
             for stale in sorted((OUT / area_dir).glob("*.sql")):
+                # A forward migration is never generated in this branch and never removed by it.
+                if FORWARD_FILE.match(stale.name):
+                    continue
                 if f"{area_dir}/{stale.name}" not in files:
                     print(f"  removed stale {area_dir}/{stale.name}")
                     stale.unlink()
@@ -1677,7 +1778,8 @@ def main() -> int:
         print(f"  {len(unkeyed)} declared reference(s) point at a table with no addressable key:")
         for u in unkeyed[:8]:
             print(f"     {u}")
-    print(f"  {len(files)} files" + ("" if a.apply else " — nothing written, pass --apply"))
+    print(f"  {len(files)} files" + (" generated; baseline frozen, see above" if frozen_at
+                                      else "" if a.apply else " — nothing written, pass --apply"))
     return 0
 
 

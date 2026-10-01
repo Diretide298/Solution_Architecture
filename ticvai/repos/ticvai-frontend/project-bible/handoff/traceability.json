@@ -9981,8 +9981,8 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createAccessPolicy",
-   "note": "re-traced 29 September: identity now has attribute-based policies: createAccessPolicy writes an AccessPolicy of AccessCondition rows (attribute, operator, value) with an effect, evaluated by evaluateAccess against an AccessContext. access also carries its own dynamic policy set (setVisualDynamicPolicy, AccessDynamicPolicy) - two policy models to reconcile.",
+   "evidence": "createAuthorisationPolicy",
+   "note": "re-traced 29 September: identity now has attribute-based policies: createAuthorisationPolicy writes an AuthorisationPolicy of AccessCondition rows (attribute, operator, value) with an effect, evaluated by evaluateAccess against an AccessContext. access also carries its own dynamic policy set (setVisualDynamicPolicy, AccessDynamicPolicy) - two policy models to reconcile.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -9995,7 +9995,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has location.scopePath and venue.id; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has location.scopePath and venue.id; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10008,7 +10008,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has time.ofDay, time.withinOperatingHours and employee.onShift; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). AccessPolicy.effectiveFrom/effectiveTo add a validity window. ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has time.ofDay, time.withinOperatingHours and employee.onShift; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). AuthorisationPolicy.effectiveFrom/effectiveTo add a validity window. ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10021,7 +10021,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has ticket.status and event.status; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has ticket.status and event.status; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10033,8 +10033,8 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createAccessPolicy",
-   "note": "re-traced 29 September: createAccessPolicy ('write a policy without writing code') takes conditions from a fixed AccessCondition vocabulary with allMustMatch/anyMayMatch combining; updateAccessPolicy edits as a new version. access setVisualDynamicPolicy is the no-code builder screen.",
+   "evidence": "createAuthorisationPolicy",
+   "note": "re-traced 29 September: createAuthorisationPolicy ('write a policy without writing code') takes conditions from a fixed AccessCondition vocabulary with allMustMatch/anyMayMatch combining; updateAuthorisationPolicy edits as a new version. access setVisualDynamicPolicy is the no-code builder screen.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10059,7 +10059,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has user.attribute (key names the attribute); policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has user.attribute (key names the attribute); policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10072,7 +10072,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has employee.attribute and employee.onShift; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has employee.attribute and employee.onShift; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10085,7 +10085,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has membership.tier and membership.status; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has membership.tier and membership.status; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10098,7 +10098,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has accreditation.type and accreditation.status; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has accreditation.type and accreditation.status; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10111,7 +10111,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has customer.segment; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has customer.segment; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10124,7 +10124,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has resource.classification; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has resource.classification; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10137,7 +10137,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has venue.attribute and venue.id; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has venue.attribute and venue.id; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10150,7 +10150,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has attraction.attribute; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). AccessContext.attractionId supplies the attraction. ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has attraction.attribute; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). AccessContext.attractionId supplies the attraction. ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10163,7 +10163,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has device.kind, device.id and device.trusted; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). AccessContext.deviceId supplies the device. ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has device.kind, device.id and device.trusted; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). AccessContext.deviceId supplies the device. ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10176,7 +10176,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has time.dayOfWeek; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has time.dayOfWeek; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10189,7 +10189,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has time.season; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has time.season; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10202,7 +10202,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has event.id and event.status; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). AccessContext.eventId supplies the event. ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has event.id and event.status; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). AccessContext.eventId supplies the event. ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10215,7 +10215,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has capacity.utilisationPercent; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has capacity.utilisationPercent; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10228,7 +10228,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has occupancy.level; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has occupancy.level; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10241,7 +10241,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "AccessCondition",
-   "note": "re-traced 29 September: identity AccessCondition.attribute has risk.score; policies are written with createAccessPolicy and decided by evaluateAccess (AccessContext carries the inputs). The score's bands are configured by access setRiskScoringConfig. ABAC now exists in identity, so the BL-110 gap is closed.",
+   "note": "re-traced 29 September: identity AccessCondition.attribute has risk.score; policies are written with createAuthorisationPolicy and decided by evaluateAccess (AccessContext carries the inputs). The score's bands are configured by access setRiskScoringConfig. ABAC now exists in identity, so the BL-110 gap is closed.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10254,7 +10254,7 @@
    "verdict": "CONTRACTED",
    "contract": "access",
    "evidence": "setVisualDynamicPolicy",
-   "note": "re-traced 29 September: access setVisualDynamicPolicy is the Visual Dynamic Policy Builder (IF/AND/OR/NOT/IN, pack p.136) writing conditionExpression, result and priority, with the attribute catalogue (listAccessAttributeCatalog) and simulation (simulatePolicyConflictImpact). It writes access AccessDynamicPolicy, not identity AccessPolicy.",
+   "note": "re-traced 29 September: access setVisualDynamicPolicy is the Visual Dynamic Policy Builder (IF/AND/OR/NOT/IN, pack p.136) writing conditionExpression, result and priority, with the attribute catalogue (listAccessAttributeCatalog) and simulation (simulatePolicyConflictImpact). It writes access AccessDynamicPolicy, not identity AuthorisationPolicy.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10266,8 +10266,8 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listAccessPolicyTemplates",
-   "note": "re-traced 29 September: identity listAccessPolicyTemplates returns reusable policy shapes; a template is an AccessPolicy with isTemplate true, written through createAccessPolicy.",
+   "evidence": "listAuthorisationPolicyTemplates",
+   "note": "re-traced 29 September: identity listAuthorisationPolicyTemplates returns reusable policy shapes; a template is an AuthorisationPolicy with isTemplate true, written through createAuthorisationPolicy.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10279,8 +10279,8 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "updateAccessPolicy",
-   "note": "re-traced 29 September: every identity updateAccessPolicy writes a new AccessPolicy.version; getAccessPolicy reads one at a version and listAccessPolicyHistory lists them (AccessPolicyVersion). access also has rollbackAccessPolicy for its dynamic policies.",
+   "evidence": "updateAuthorisationPolicy",
+   "note": "re-traced 29 September: every identity updateAuthorisationPolicy writes a new AuthorisationPolicy.version; getAuthorisationPolicy reads one at a version and listAuthorisationPolicyHistory lists them (AuthorisationPolicyVersion). access also has rollbackAccessPolicy for its dynamic policies.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10292,8 +10292,8 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "simulateAccessPolicy",
-   "note": "re-traced 29 September: identity simulateAccessPolicy decides a draft policy against an AccessContext before it is active (same shape as evaluateAccess); access simulatePolicyConflictImpact does the same for dynamic policies.",
+   "evidence": "simulateAuthorisationPolicy",
+   "note": "re-traced 29 September: identity simulateAuthorisationPolicy decides a draft policy against an AccessContext before it is active (same shape as evaluateAccess); access simulatePolicyConflictImpact does the same for dynamic policies.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10305,8 +10305,8 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "setAccessPolicyState",
-   "note": "re-traced 29 September: identity setAccessPolicyState moves a policy draft -> pendingApproval -> active (submit, approve, activate, retire); status cannot be set by create/update, so approval cannot be skipped; AccessPolicyVersion.approvedBy records the approver.",
+   "evidence": "setAuthorisationPolicyState",
+   "note": "re-traced 29 September: identity setAuthorisationPolicyState moves a policy draft -> pendingApproval -> active (submit, approve, activate, retire); status cannot be set by create/update, so approval cannot be skipped; AuthorisationPolicyVersion.approvedBy records the approver.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10341,7 +10341,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "evaluateAccess",
-   "note": "re-traced 29 September: identity evaluateAccess is the single central decision point (AccessDecision.decidedBy central), with getAccessPolicyBundle for device-side evaluation offline.",
+   "note": "re-traced 29 September: identity evaluateAccess is the single central decision point (AccessDecision.decidedBy central), with getAuthorisationPolicyBundle for device-side evaluation offline.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10408,8 +10408,8 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "AccessPolicy",
-   "note": "re-traced 29 September: AccessPolicy.delegatedAdminRoleIds names roles that may edit the policy without being platform administrators, set through createAccessPolicy/updateAccessPolicy.",
+   "evidence": "AuthorisationPolicy",
+   "note": "re-traced 29 September: AuthorisationPolicy.delegatedAdminRoleIds names roles that may edit the policy without being platform administrators, set through createAuthorisationPolicy/updateAuthorisationPolicy.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10456,8 +10456,8 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listAccessPolicyHistory",
-   "note": "re-traced 29 September: identity listAccessPolicyHistory returns every version with changedBy, changedAt, reason, approvedBy and the previous and current policy.",
+   "evidence": "listAuthorisationPolicyHistory",
+   "note": "re-traced 29 September: identity listAuthorisationPolicyHistory returns every version with changedBy, changedAt, reason, approvedBy and the previous and current policy.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10469,8 +10469,8 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "AccessPolicy",
-   "note": "re-traced 29 September: AccessPolicy.scopePath scopes a policy to a tenant (or below); tenant, venue and cross-venue policies are one mechanism by scope-path prefix.",
+   "evidence": "AuthorisationPolicy",
+   "note": "re-traced 29 September: AuthorisationPolicy.scopePath scopes a policy to a tenant (or below); tenant, venue and cross-venue policies are one mechanism by scope-path prefix.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10493,8 +10493,8 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "AccessPolicy",
-   "note": "re-traced 29 September: AccessPolicy.scopePath at a node above several venues (e.g. uae.dubai) applies to every venue beneath it by prefix inheritance; AccessCondition venue.id with operator in narrows to a chosen set.",
+   "evidence": "AuthorisationPolicy",
+   "note": "re-traced 29 September: AuthorisationPolicy.scopePath at a node above several venues (e.g. uae.dubai) applies to every venue beneath it by prefix inheritance; AccessCondition venue.id with operator in narrows to a chosen set.",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -10569,7 +10569,7 @@
    "verdict": "CONTRACTED",
    "contract": "access",
    "evidence": "listDynamicPolicyEffectiveness",
-   "note": "re-traced 29 September (build): per-policy effectiveness over a period for gate policies (listDynamicPolicyEffectiveness: triggers, allow/deny/review/step-up, supervisor overrides, override rate, never-triggered, daily trend; ScanEvent now records the deciding dynamicPolicyId/version/result) and for software-permission policies (identity listAccessPolicyEffectiveness).",
+   "note": "re-traced 29 September (build): per-policy effectiveness over a period for gate policies (listDynamicPolicyEffectiveness: triggers, allow/deny/review/step-up, supervisor overrides, override rate, never-triggered, daily trend; ScanEvent now records the deciding dynamicPolicyId/version/result) and for software-permission policies (identity listAuthorisationPolicyEffectiveness).",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -19994,7 +19994,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "evaluateAccess",
-   "note": "re-traced 29 September: attribute-based policies narrow or extend role grants: AccessPolicy.conditions on user, resource, environment and time, and evaluateAccess decides per request and says which condition failed. BL-110 is built in identity",
+   "note": "re-traced 29 September: attribute-based policies narrow or extend role grants: AuthorisationPolicy.conditions on user, resource, environment and time, and evaluateAccess decides per request and says which condition failed. BL-110 is built in identity",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -20086,8 +20086,8 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createAccessPolicy",
-   "note": "re-traced 29 September: policies are data written without code (createAccessPolicy): conditions with combining logic, approval through setAccessPolicyState routed to approvals, and reusable templates. The visual builder is the screen over this operation",
+   "evidence": "createAuthorisationPolicy",
+   "note": "re-traced 29 September: policies are data written without code (createAuthorisationPolicy): conditions with combining logic, approval through setAuthorisationPolicyState routed to approvals, and reusable templates. The visual builder is the screen over this operation",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -20099,8 +20099,8 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listAccessPolicyTemplates",
-   "note": "re-traced 29 September: reusable policy templates (listAccessPolicyTemplates, AccessPolicy.isTemplate), applied at any scope node (scopePath covers department, business unit, venue, attraction) and to roles. A sales channel is expressed as a condition",
+   "evidence": "listAuthorisationPolicyTemplates",
+   "note": "re-traced 29 September: reusable policy templates (listAuthorisationPolicyTemplates, AuthorisationPolicy.isTemplate), applied at any scope node (scopePath covers department, business unit, venue, attraction) and to roles. A sales channel is expressed as a condition",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -20112,8 +20112,8 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "restoreAccessPolicyVersion",
-   "note": "re-traced 29 September (build): versions kept with who and why (listAccessPolicyHistory, previous/current for comparison, getAccessPolicy by version) and rollback to a previously approved version through restoreAccessPolicyVersion (new pendingApproval version, never a rewind; 409 for a never-approved target).",
+   "evidence": "restoreAuthorisationPolicyVersion",
+   "note": "re-traced 29 September (build): versions kept with who and why (listAuthorisationPolicyHistory, previous/current for comparison, getAuthorisationPolicy by version) and rollback to a previously approved version through restoreAuthorisationPolicyVersion (new pendingApproval version, never a rewind; 409 for a never-approved target).",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -20126,7 +20126,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "listPermissionFindings",
-   "note": "re-traced 29 September (build): sandbox testing of draft policies (simulateAccessPolicy, resolvePermissions) plus listPermissionFindings for excessive (unused in lookback), missing (repeatedly denied, held by role peers) and conflicting (segregation) permissions, optionally as if a draft policy were active (draftPolicyId).",
+   "note": "re-traced 29 September (build): sandbox testing of draft policies (simulateAuthorisationPolicy, resolvePermissions) plus listPermissionFindings for excessive (unused in lookback), missing (repeatedly denied, held by role peers) and conflicting (segregation) permissions, optionally as if a draft policy were active (draftPolicyId).",
    "backlog": "BL-110",
    "cf": "CF-130"
   },
@@ -20205,7 +20205,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED_PARTIAL",
    "contract": "ai",
-   "note": "re-traced 29 September (AI build): getEntityRisk scores staff, account, device and credential entities from composite signals (login events with hashed device, velocity, history); rules-first producer until a model is promoted per tenant. Missing: permission sensitivity as a signal and a risk-driven step-up; identity AccessPolicy can test risk.score but only permits or denies, and step-up is only on device/location restriction (setPasswordPolicy onViolation requireStepUp).",
+   "note": "re-traced 29 September (AI build): getEntityRisk scores staff, account, device and credential entities from composite signals (login events with hashed device, velocity, history); rules-first producer until a model is promoted per tenant. Missing: permission sensitivity as a signal and a risk-driven step-up; identity AuthorisationPolicy can test risk.score but only permits or denies, and step-up is only on device/location restriction (setPasswordPolicy onViolation requireStepUp).",
    "evidence": "getEntityRisk",
    "backlog": "BL-182"
   },

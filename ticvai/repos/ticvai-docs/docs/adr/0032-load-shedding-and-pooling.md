@@ -6,7 +6,8 @@ database, and there is now one database per tenant** — *"four hundred client c
 server ones"* is a statement about one tenant. **The cap is a per-tenant limit, not a reservation,
 and the primary's connections are a shared budget** — amended again by
 [ADR-0040](0040-a-cell-may-hold-more-than-one-instance.md), which also gives the region a second
-instance when one is not enough.
+instance when one is not enough. **The deferred per-tenant rate limit is decided by
+[ADR-0064](0064-per-tenant-limits.md)** (amended 1 October 2026).
 **Date:** 31 August 2026
 **Related:** [ADR-0016](0016-read-write-separation.md) · [ADR-0028](0028-service-decomposition.md) (amended by ADR-0055: five deployables) · [ADR-0031](0031-contention-and-locking.md) · CF-161
 
@@ -162,7 +163,9 @@ costs a connection, and the queue is where an outage hides until it is total.
 
 **Global rate limit per tenant.** Deferred rather than rejected — **it protects other tenants from
 one, which is a real property of the shared cell** — but it needs a fairness model nobody has
-specified, and a wrong one throttles the tenant having the good day.
+specified, and a wrong one throttles the tenant having the good day. **Decided on 1 October 2026 by
+[ADR-0064](0064-per-tenant-limits.md):** a token bucket per tenant and audience, and a per-tenant share
+of a replica enforced only when the replica is under load.
 
 ---
 

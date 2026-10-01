@@ -129,7 +129,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-006",
      "trigger": "Parking Configuration",
-     "provenance": "derived — BO-006 declares entryState.params accessPointId and BO-001 holds none of them, so the edge carries nothing and BO-006 opens cold"
+     "provenance": "derived — BO-006 declares entryState.params accessPointId and BO-001 holds none of them. The edge carries nothing: accessPointId only pre-selects (deep link or optional), and BO-006 opens on its own"
     },
     {
      "to": "BO-002",
@@ -3184,7 +3184,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-006 holds none of them, so the edge carries nothing and BO-001 opens cold"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-006 holds none of them. The edge carries nothing: BO-006 is opened from BO-001, so this edge is the way back and BO-001 keeps its own state"
     }
    ]
   },
@@ -3932,7 +3932,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-031 holds none of them, so the edge carries nothing and BO-001 opens cold"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-031 holds none of them. The edge carries nothing: eventId, feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
     }
    ]
   },
@@ -4308,7 +4308,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-032 holds none of them, so the edge carries nothing and BO-001 opens cold"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-032 holds none of them. The edge carries nothing: eventId, feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
     }
    ]
   },
@@ -4564,7 +4564,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-033 holds none of them, so the edge carries nothing and BO-001 opens cold"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-033 holds none of them. The edge carries nothing: eventId, feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
     }
    ]
   },

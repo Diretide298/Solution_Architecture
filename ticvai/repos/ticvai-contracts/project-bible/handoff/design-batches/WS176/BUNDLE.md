@@ -941,13 +941,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listAccessPolicies",
+       "impliedBy": "listAuthorisationPolicies",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "createAccessPolicy",
+       "impliedBy": "createAuthorisationPolicy",
        "label": "Create access policy",
        "notes": "The act the screen exists for."
       },
@@ -956,7 +956,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "createAccessPolicy"
+       "impliedBy": "createAuthorisationPolicy"
       }
      ]
     }
@@ -971,44 +971,44 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
-    "operationId": "listAccessPolicies",
+    "operationId": "listAuthorisationPolicies",
     "contract": "identity",
     "purpose": "Who may see and change what",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "createAccessPolicy",
+    "operationId": "createAuthorisationPolicy",
     "contract": "identity",
     "purpose": "Write a policy",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "simulateAccessPolicy",
+    "operationId": "simulateAuthorisationPolicy",
     "contract": "identity",
     "purpose": "What this policy would decide, before it decides anything",
     "trigger": "onAction",
     "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it"
    },
    {
-    "operationId": "updateAccessPolicy",
+    "operationId": "updateAuthorisationPolicy",
     "contract": "identity",
     "purpose": "Change a data-access policy, as a new version",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listAccessPolicies"
+     "listAuthorisationPolicies"
     ]
    },
    {
-    "operationId": "setAccessPolicyState",
+    "operationId": "setAuthorisationPolicyState",
     "contract": "identity",
     "purpose": "Submit, approve, activate or retire a policy",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listAccessPolicies"
+     "listAuthorisationPolicies"
     ]
    },
    {
@@ -1018,25 +1018,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listAccessPolicies"
+     "listAuthorisationPolicies"
     ]
    },
    {
-    "operationId": "listAccessPolicyHistory",
+    "operationId": "listAuthorisationPolicyHistory",
     "contract": "identity",
     "purpose": "Versions of a policy, to compare and pick one to restore",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "restoreAccessPolicyVersion",
+    "operationId": "restoreAuthorisationPolicyVersion",
     "contract": "identity",
     "purpose": "Restore an approved version as a new version",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "listAccessPolicyEffectiveness",
+    "operationId": "listAuthorisationPolicyEffectiveness",
     "contract": "identity",
     "purpose": "How each permission policy has behaved over a period",
     "trigger": "onAction",
@@ -1664,25 +1664,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "SeatMap"
  },
- "createAccessPolicy": {
-  "method": "POST",
-  "path": "/access-policies",
-  "contract": "identity",
-  "summary": "Write a policy without writing code",
-  "permission": "PERMISSION_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AccessPolicy",
-  "responds": "AccessPolicy"
- },
  "createAccessReviewCampaign": {
   "method": "POST",
   "path": "/access-review-campaigns",
@@ -1701,6 +1682,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "IdentityAccessReviewCampaign",
   "responds": "IdentityAccessReviewCampaign"
+ },
+ "createAuthorisationPolicy": {
+  "method": "POST",
+  "path": "/authorisation-policies",
+  "contract": "identity",
+  "summary": "Write a policy without writing code",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AuthorisationPolicy",
+  "responds": "AuthorisationPolicy"
  },
  "createEmergencyAccessOverride": {
   "method": "POST",
@@ -1824,87 +1824,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
- "listAccessPolicies": {
-  "method": "GET",
-  "path": "/access-policies",
-  "contract": "identity",
-  "summary": "Attribute-based access policies",
-  "permission": "PERMISSION_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "scopePath",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AccessPolicy"
- },
- "listAccessPolicyEffectiveness": {
-  "method": "GET",
-  "path": "/access-policy-effectiveness",
-  "contract": "identity",
-  "summary": "How each software-permission policy has behaved over a period",
-  "permission": "PERMISSION_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "from",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "to",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "policyId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "scopePath",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listAccessPolicyHistory": {
-  "method": "GET",
-  "path": "/access-policies/{policyId}/history",
-  "contract": "identity",
-  "summary": "Every version, who changed it and why",
-  "permission": "PERMISSION_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "AccessPolicyVersion"
- },
  "listAccessReviewCampaigns": {
   "method": "GET",
   "path": "/access-review-campaigns",
@@ -1972,6 +1891,87 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listAuthorisationPolicies": {
+  "method": "GET",
+  "path": "/authorisation-policies",
+  "contract": "identity",
+  "summary": "Attribute-based authorisation policies",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AuthorisationPolicy"
+ },
+ "listAuthorisationPolicyEffectiveness": {
+  "method": "GET",
+  "path": "/authorisation-policy-effectiveness",
+  "contract": "identity",
+  "summary": "How each software-permission policy has behaved over a period",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "policyId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAuthorisationPolicyHistory": {
+  "method": "GET",
+  "path": "/authorisation-policies/{policyId}/history",
+  "contract": "identity",
+  "summary": "Every version, who changed it and why",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AuthorisationPolicyVersion"
  },
  "listDenominations": {
   "method": "GET",
@@ -2098,9 +2098,9 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "VenueMap"
  },
- "restoreAccessPolicyVersion": {
+ "restoreAuthorisationPolicyVersion": {
   "method": "POST",
-  "path": "/access-policies/{policyId}/restore",
+  "path": "/authorisation-policies/{policyId}/restore",
   "contract": "identity",
   "summary": "Put a previously approved policy version back, as a new version",
   "permission": "PERMISSION_MANAGE",
@@ -2115,11 +2115,11 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "AccessPolicy"
+  "responds": "AuthorisationPolicy"
  },
- "setAccessPolicyState": {
+ "setAuthorisationPolicyState": {
   "method": "POST",
-  "path": "/access-policies/{policyId}/state",
+  "path": "/authorisation-policies/{policyId}/state",
   "contract": "identity",
   "summary": "Submit, approve, activate or retire a policy",
   "permission": "PERMISSION_MANAGE",
@@ -2134,7 +2134,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "AccessPolicy"
+  "responds": "AuthorisationPolicy"
  },
  "setConfigurationProfile": {
   "method": "PUT",
@@ -2231,9 +2231,9 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "VisualWorkflowDesignerInput",
   "responds": "VisualWorkflowDesignerView"
  },
- "simulateAccessPolicy": {
+ "simulateAuthorisationPolicy": {
   "method": "POST",
-  "path": "/access-policies/simulate",
+  "path": "/authorisation-policies/simulate",
   "contract": "identity",
   "summary": "What this policy would decide, before it decides anything",
   "permission": "PERMISSION_VIEW",
@@ -2250,9 +2250,9 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "AccessDecision"
  },
- "updateAccessPolicy": {
+ "updateAuthorisationPolicy": {
   "method": "PUT",
-  "path": "/access-policies/{policyId}",
+  "path": "/authorisation-policies/{policyId}",
   "contract": "identity",
   "summary": "Change a policy, as a new version",
   "permission": "PERMISSION_MANAGE",
@@ -2266,8 +2266,8 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": "AccessPolicy",
-  "responds": "AccessPolicy"
+  "requestBody": "AuthorisationPolicy",
+  "responds": "AuthorisationPolicy"
  },
  "updateRegionSettings": {
   "method": "PUT",
@@ -2527,10 +2527,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "AccessPolicy": {
+ "AuthorisationPolicy": {
   "type": "object",
-  "x-ticvai-persistence": "identity.access_policy",
-  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here). The overlap that remains is listed in the build readiness open items rather than merged in this pass.\n",
+  "x-ticvai-persistence": "identity.authorisation_policy",
+  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n",
   "required": [
    "code",
    "name",
@@ -2541,7 +2541,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "readOnly": true,
-    "description": "Assigned by the server on `createAccessPolicy`; the path names the policy on update."
+    "description": "Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."
    },
    "code": {
     "type": "string"
@@ -2604,7 +2604,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "status": {
     "type": "string",
     "readOnly": true,
-    "description": "**Moved only by `setAccessPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n",
+    "description": "**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n",
     "enum": [
      "draft",
      "pendingApproval",
@@ -2617,7 +2617,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "default": 1,
     "readOnly": true,
-    "description": "Set by the server; every `updateAccessPolicy` writes a new version."
+    "description": "Set by the server; every `updateAuthorisationPolicy` writes a new version."
    },
    "effectiveFrom": {
     "type": "string",
@@ -2639,9 +2639,100 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "AccessPolicyVersion": {
+ "AuthorisationPolicyEffectiveness": {
   "type": "object",
-  "x-ticvai-persistence": "identity.access_policy_version",
+  "x-ticvai-persistence": "none — computed from identity.access_decision and identity.access_override over the requested period",
+  "description": "One `AuthorisationPolicy` over a period (3.3.48; decided 29 September, build pass).",
+  "required": [
+   "policyId",
+   "evaluations"
+  ],
+  "properties": {
+   "policyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "suspended",
+     "retired"
+    ]
+   },
+   "versionsInPeriod": {
+    "type": "array",
+    "items": {
+     "type": "integer"
+    },
+    "description": "The versions that decided anything in the period."
+   },
+   "evaluations": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Decisions that evaluated this policy."
+   },
+   "matched": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Evaluations in which every condition held (or one, for `anyMayMatch`)."
+   },
+   "decisivePermits": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Permits this policy decided."
+   },
+   "decisiveDenies": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Denies this policy decided, deny winning over any permit."
+   },
+   "overridesAtScope": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Emergency overrides opened in the period at or beneath the policy's scope for a permission it speaks to - the times people had to go around it."
+   },
+   "lastMatchedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "neverMatched": {
+    "type": "boolean",
+    "description": "True when the policy was evaluated and never matched in the period, the usual sign of a condition written backwards or a policy nobody needs."
+   },
+   "trend": {
+    "type": "array",
+    "description": "One point per day in the period.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "evaluations": {
+       "type": "integer"
+      },
+      "decisiveDenies": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
+ "AuthorisationPolicyVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.authorisation_policy_version",
   "description": "3.3.36 and 3.3.39. **Who changed what, from what, and why.**",
   "properties": {
    "policyId": {
@@ -2669,10 +2760,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    },
    "previous": {
-    "$ref": "#/components/schemas/AccessPolicy"
+    "$ref": "#/components/schemas/AuthorisationPolicy"
    },
    "current": {
-    "$ref": "#/components/schemas/AccessPolicy"
+    "$ref": "#/components/schemas/AuthorisationPolicy"
    },
    "scopePath": {
     "type": "string"
@@ -2875,97 +2966,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "type": "string",
      "format": "uuid"
-    }
-   }
-  }
- },
- "IdentityAccessPolicyEffectiveness": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed from identity.access_decision and identity.access_override over the requested period",
-  "description": "One `AccessPolicy` over a period (3.3.48; decided 29 September, build pass).",
-  "required": [
-   "policyId",
-   "evaluations"
-  ],
-  "properties": {
-   "policyId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "draft",
-     "pendingApproval",
-     "active",
-     "suspended",
-     "retired"
-    ]
-   },
-   "versionsInPeriod": {
-    "type": "array",
-    "items": {
-     "type": "integer"
-    },
-    "description": "The versions that decided anything in the period."
-   },
-   "evaluations": {
-    "type": "integer",
-    "minimum": 0,
-    "description": "Decisions that evaluated this policy."
-   },
-   "matched": {
-    "type": "integer",
-    "minimum": 0,
-    "description": "Evaluations in which every condition held (or one, for `anyMayMatch`)."
-   },
-   "decisivePermits": {
-    "type": "integer",
-    "minimum": 0,
-    "description": "Permits this policy decided."
-   },
-   "decisiveDenies": {
-    "type": "integer",
-    "minimum": 0,
-    "description": "Denies this policy decided, deny winning over any permit."
-   },
-   "overridesAtScope": {
-    "type": "integer",
-    "minimum": 0,
-    "description": "Emergency overrides opened in the period at or beneath the policy's scope for a permission it speaks to - the times people had to go around it."
-   },
-   "lastMatchedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "neverMatched": {
-    "type": "boolean",
-    "description": "True when the policy was evaluated and never matched in the period, the usual sign of a condition written backwards or a policy nobody needs."
-   },
-   "trend": {
-    "type": "array",
-    "description": "One point per day in the period.",
-    "items": {
-     "type": "object",
-     "properties": {
-      "date": {
-       "type": "string",
-       "format": "date"
-      },
-      "evaluations": {
-       "type": "integer"
-      },
-      "decisiveDenies": {
-       "type": "integer"
-      }
-     }
     }
    }
   }

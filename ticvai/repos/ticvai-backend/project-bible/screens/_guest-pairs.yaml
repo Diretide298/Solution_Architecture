@@ -99,9 +99,12 @@ groups:
   kind: paired
   web: [WEB-015]
   app: [GST-046]
+  note: '**The on-sale waiting room (Q2), re-pointed 1 October under ADR-0066** from the ride queue''s
+    `joinQueue`, `getWaitingGuest` and `getWaitTimes` to `enterWaitingRoom` and `getWaitingRoomPosition`.
+    The ride queue is the virtual-queue pair (WEB-040, GST-023).'
   offline: >-
-    **The offline banner shows.** The last known position stays on screen with its age. Joining,
-    leaving and being admitted all need the connection.
+    **The offline banner shows.** The last known position stays on screen with its age, and polling
+    resumes with the same entry when the connection is back. Admission needs the connection.
 
 # ── cart and checkout ───────────────────────────────────────────────────────────────────────
 - key: cart

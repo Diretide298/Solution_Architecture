@@ -1,5 +1,5 @@
 id: LLD-platform-ops
-title: platform-ops — 33 operations
+title: platform-ops — 37 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -24,6 +24,20 @@ operations:
   - cache:idempotency
   - control.migration_run
   - control.rollout_cell
+- operation: cancelOutboxRepublish
+  verb: POST
+  path: /outbox-republishes/{republishId}/cancel
+  scope: platform
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.outbox_republish
+  writes:
+  - cache:idempotency
+  - control.outbox_republish
+  - platform.audit_record
 - operation: createRelease
   verb: POST
   path: /releases
@@ -53,6 +67,17 @@ operations:
   - control.migration_run_tenant
   - control.rollout_cell
   - control.rollout_tenant
+  writes: []
+- operation: getOutboxRepublish
+  verb: GET
+  path: /outbox-republishes/{republishId}
+  scope: platform
+  permission: PLATFORM_CELL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.outbox_republish
   writes: []
 - operation: getRelease
   verb: GET
@@ -166,6 +191,17 @@ operations:
   offline: false
   reads:
   - control.migration
+  writes: []
+- operation: listOutboxRepublishes
+  verb: GET
+  path: /outbox-republishes
+  scope: platform
+  permission: PLATFORM_CELL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.outbox_republish
   writes: []
 - operation: listReleases
   verb: GET
@@ -325,6 +361,21 @@ operations:
   - cache:idempotency
   - platform.dead_letter
   - platform.outbox
+- operation: republishOutbox
+  verb: POST
+  path: /outbox-republishes
+  scope: platform
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.outbox_republish
+  - platform.outbox
+  writes:
+  - cache:idempotency
+  - control.outbox_republish
+  - platform.audit_record
 - operation: rollbackMigrationRun
   verb: POST
   path: /migrations/runs/{runId}/rollback

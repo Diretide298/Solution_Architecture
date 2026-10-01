@@ -70,10 +70,10 @@
    }
   }
  },
- "AccessPolicy": {
+ "AuthorisationPolicy": {
   "type": "object",
-  "x-ticvai-persistence": "identity.access_policy",
-  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here). The overlap that remains is listed in the build readiness open items rather than merged in this pass.\n",
+  "x-ticvai-persistence": "identity.authorisation_policy",
+  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n",
   "required": [
    "code",
    "name",
@@ -84,7 +84,7 @@
     "type": "string",
     "format": "uuid",
     "readOnly": true,
-    "description": "Assigned by the server on `createAccessPolicy`; the path names the policy on update."
+    "description": "Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."
    },
    "code": {
     "type": "string"
@@ -147,7 +147,7 @@
    "status": {
     "type": "string",
     "readOnly": true,
-    "description": "**Moved only by `setAccessPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n",
+    "description": "**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n",
     "enum": [
      "draft",
      "pendingApproval",
@@ -160,7 +160,7 @@
     "type": "integer",
     "default": 1,
     "readOnly": true,
-    "description": "Set by the server; every `updateAccessPolicy` writes a new version."
+    "description": "Set by the server; every `updateAuthorisationPolicy` writes a new version."
    },
    "effectiveFrom": {
     "type": "string",

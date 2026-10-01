@@ -99,12 +99,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-088 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-088 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional); BO-084 finds approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own"
     },
     {
      "to": "BO-085",
      "trigger": "Approval Request",
-     "provenance": "derived — BO-085 declares entryState.params requestId and BO-088 holds none of them, so the edge carries nothing and BO-085 opens cold"
+     "provenance": "derived — BO-085 declares entryState.params requestId and BO-088 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens on its own"
     }
    ]
   },
@@ -279,42 +279,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-053",
      "trigger": "Staff Directory",
-     "provenance": "derived — BO-053 declares entryState.params  and BO-106 holds none of them, so the edge carries nothing and BO-053 opens cold"
+     "provenance": "derived — BO-053 declares entryState.params  and BO-106 holds none of them. The edge carries nothing: BO-053 needs nothing to open"
     },
     {
      "to": "BO-055",
      "trigger": "Rota & Scheduling",
-     "provenance": "derived — BO-055 declares entryState.params assignmentId and BO-106 holds none of them, so the edge carries nothing and BO-055 opens cold"
+     "provenance": "derived — BO-055 declares entryState.params assignmentId and BO-106 holds none of them. The edge carries nothing: assignmentId only pre-selects (deep link or optional), and BO-055 opens on its own"
     },
     {
      "to": "BO-056",
      "trigger": "Time & Attendance",
-     "provenance": "derived — BO-056 declares entryState.params recordId and BO-106 holds none of them, so the edge carries nothing and BO-056 opens cold"
+     "provenance": "derived — BO-056 declares entryState.params recordId and BO-106 holds none of them. The edge carries nothing: recordId only pre-selects (deep link or optional), and BO-056 opens on its own"
     },
     {
      "to": "BO-066",
      "trigger": "Notification Settings",
-     "provenance": "derived — BO-066 declares entryState.params announcementId and BO-106 holds none of them, so the edge carries nothing and BO-066 opens cold"
+     "provenance": "derived — BO-066 declares entryState.params announcementId and BO-106 holds none of them. The edge carries nothing: announcementId only pre-selects (deep link or optional), and BO-066 opens on its own"
     },
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-106 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-106 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional); BO-084 finds approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own"
     },
     {
      "to": "BO-085",
      "trigger": "Approval Request",
-     "provenance": "derived — BO-085 declares entryState.params requestId and BO-106 holds none of them, so the edge carries nothing and BO-085 opens cold"
+     "provenance": "derived — BO-085 declares entryState.params requestId and BO-106 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens on its own"
     },
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-106 holds none of them, so the edge carries nothing and BO-087 opens cold"
+     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-106 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
     },
     {
      "to": "BO-054",
      "trigger": "Role Assignment",
-     "provenance": "derived — BO-054 declares entryState.params campaignId and BO-106 holds none of them, so the edge carries nothing and BO-054 opens cold"
+     "provenance": "derived — BO-054 declares entryState.params campaignId and BO-106 holds none of them. The edge carries nothing: BO-054 finds campaignId (listAccessReviewCampaigns) itself, and BO-054 opens on its own"
     }
    ]
   },

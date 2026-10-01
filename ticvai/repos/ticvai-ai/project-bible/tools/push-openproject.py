@@ -68,6 +68,33 @@ def reduce_links(edges):
     return [(k, d) for k, d in edges if not any(d in before(o) for o in after[k] if o != d)]
 
 
+def sub_tasks(r, lineage):
+    """The sub-tasks under a task row: one per operation, one per table, three per screen.
+    [(key, parent key, subject, short text)]. tools/op-release.py reads the same list."""
+    key, out = r["key"], []
+    if r["type"] != "Task":
+        return out
+    if r["track"] == "Backend" and ": " in r["subject"]:
+        for op in r["subject"].split(": ", 1)[1].split(", "):
+            ln = lineage.get(op, {})
+            out.append((f"{key}#{op}", key, f"[BE] {op}: {ln.get('verb', '')} {ln.get('path', '')}".strip(),
+                        f"Build `{op}` to its contract, with tests for success and every listed error. "
+                        f"{ln.get('summary', '')}"))
+    elif r["track"] == "Database":
+        m = re.search(r"Tables: (.+?)\. Source", r["description"])
+        for t in (m.group(1).split(", ") if m else []):
+            out.append((f"{key}#{t}", key, f"[DB] {t}", f"Create `{t}` in this migration with its keys, "
+                        "indexes and row-level security; include it in ROLLBACK."))
+    elif r["track"] == "Frontend":
+        name = r["subject"].split("] ", 1)[-1]
+        for part, text in (("build", "Build the screen with every state (loading, empty, error, offline) against the mock API."),
+                           ("wire", "Connect the screen to the real API once its backend tasks are done."),
+                           ("test", "Component tests for the states and the main flows; lint and typecheck pass.")):
+            label = {"build": "build with all states", "wire": "connect to API", "test": "tests"}[part]
+            out.append((f"{key}#{part}", key, f"[FE] {name}: {label}", text))
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--schedule", required=True)
@@ -221,26 +248,7 @@ def main() -> int:
 
     def small(r, assignee, wk):
         """The sub-tasks under a task: one per operation, one per table, three per screen."""
-        key, out = r["key"], []
-        if r["track"] == "Backend" and ": " in r["subject"]:
-            for op in r["subject"].split(": ", 1)[1].split(", "):
-                ln = lineage.get(op, {})
-                out.append((f"{key}#{op}", key, f"[BE] {op}: {ln.get('verb', '')} {ln.get('path', '')}".strip(),
-                            f"Build `{op}` to its contract, with tests for success and every listed error. "
-                            f"{ln.get('summary', '')}", assignee, r, wk))
-        elif r["track"] == "Database":
-            m = re.search(r"Tables: (.+?)\. Source", r["description"])
-            for t in (m.group(1).split(", ") if m else []):
-                out.append((f"{key}#{t}", key, f"[DB] {t}", f"Create `{t}` in this migration with its keys, "
-                            "indexes and row-level security; include it in ROLLBACK.", assignee, r, wk))
-        elif r["track"] == "Frontend":
-            name = r["subject"].split("] ", 1)[-1]
-            for part, text in (("build", "Build the screen with every state (loading, empty, error, offline) against the mock API."),
-                               ("wire", "Connect the screen to the real API once its backend tasks are done."),
-                               ("test", "Component tests for the states and the main flows; lint and typecheck pass.")):
-                label = {"build": "build with all states", "wire": "connect to API", "test": "tests"}[part]
-                out.append((f"{key}#{part}", key, f"[FE] {name}: {label}", text, assignee, r, wk))
-        return out
+        return [(k, p, s, d, assignee, r, wk) for k, p, s, d in sub_tasks(r, lineage)]
 
     # The full description for every ticket (tools/op-descriptions.py): contract, tables, screens, done-when and
     # plan. The short text built below is only the fallback for a key the builder does not know.

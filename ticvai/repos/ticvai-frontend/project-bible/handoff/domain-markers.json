@@ -122,6 +122,9 @@
  "document:docs\\active\\bl-073-cookie-consent-20-september.md": [
   "ai:names it"
  ],
+ "document:docs\\active\\broker-decision-pack.md": [
+  "ai:names it"
+ ],
  "document:docs\\active\\build-plan-20-september.md": [
   "ai:names it"
  ],
@@ -248,6 +251,15 @@
  "document:docs\\adr\\0051-ai-ships-on-a-baseline-and-learns-per-tenant.md": [
   "ai:names it"
  ],
+ "document:docs\\adr\\0052-one-recommendation-engine.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0053-risk-layer-ownership.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0054-natural-language-analytics-goes-through-the-semantic-layer.md": [
+  "ai:names it"
+ ],
  "document:docs\\adr\\0055-a-modular-monolith-deployed-as-five-units.md": [
   "ai:names it"
  ],
@@ -258,6 +270,18 @@
   "ai:names it"
  ],
  "document:docs\\adr\\0059-ai-phasing-against-the-six-month-plan.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0060-availability-targets-high-availability-and-disaster-recovery.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0061-replica-floors-per-deployable.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0063-encryption-keys-and-biometric-templates.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0064-per-tenant-limits.md": [
   "ai:names it"
  ],
  "document:docs\\architecture\\README.md": [

@@ -97,7 +97,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "provenance": "derived — PTR-003 declares entryState.params  and PTR-014 holds none of them, so the edge carries nothing and PTR-003 opens cold"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-014 holds none of them. The edge carries nothing: PTR-003 needs nothing to open"
     }
    ]
   },
@@ -379,7 +379,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "provenance": "derived — PTR-003 declares entryState.params  and PTR-017 holds none of them, so the edge carries nothing and PTR-003 opens cold"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-017 holds none of them. The edge carries nothing: PTR-003 needs nothing to open"
     }
    ]
   },
@@ -580,7 +580,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "provenance": "derived — PTR-003 declares entryState.params  and PTR-018 holds none of them, so the edge carries nothing and PTR-003 opens cold"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-018 holds none of them. The edge carries nothing: PTR-003 needs nothing to open"
     }
    ]
   },

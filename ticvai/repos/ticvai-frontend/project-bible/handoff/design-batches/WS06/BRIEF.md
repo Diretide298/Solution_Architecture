@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-194` | Device & Gate Command Center | listDetail | 5 | 1 | — |
 | `BO-195` | Device Type & Hardware Library | listDetail | 2 | 1 | — |
-| `BO-196` | Physical Device Registration & Provisioning | configEditor | 3 | 2 | — |
+| `BO-196` | Physical Device Registration & Provisioning | configEditor | 4 | 3 | — |
 | `BO-197` | Turnstile & Lane Behavior Configuration | configEditor | 1 | 0 | — |
 | `BO-198` | Validation Outcome & Guest Feedback Designer | configEditor | 1 | 0 | — |
 | `BO-199` | Reader, Scanner & Peripheral Configuration | listDetail | 1 | 0 | — |

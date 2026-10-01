@@ -119,6 +119,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SeededReport'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /suppliers/{supplierId}/performance:
     parameters:
     - name: supplierId
@@ -203,6 +205,8 @@ paths:
                       raising prices**, which no delivery record shows.
 
                       '
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /alert-rules:
     get:
       operationId: listAlertRules
@@ -225,6 +229,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AlertRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAlertRule
       x-ticvai-consumed-by:
@@ -288,6 +294,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /alerts:
     get:
       operationId: listAlerts
@@ -365,6 +373,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Alert'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /alerts/{alertId}/acknowledge:
     parameters:
     - name: alertId
@@ -421,6 +431,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Alert'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reports:
     get:
       operationId: listReports
@@ -477,6 +489,8 @@ paths:
                         $ref: '#/components/schemas/ReportDefinition'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createReport
       x-ticvai-consumed-by:
@@ -537,6 +551,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reports/{reportId}:
     parameters:
     - name: reportId
@@ -576,6 +592,8 @@ paths:
                 $ref: '#/components/schemas/ReportDefinition'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: updateReport
       x-ticvai-consumed-by:
@@ -644,6 +662,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: deleteReport
       x-ticvai-consumed-by:
@@ -692,6 +712,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /report-fields:
     get:
       operationId: listReportFields
@@ -727,6 +749,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReportField'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reports/{reportId}/run:
     parameters:
     - name: reportId
@@ -837,6 +861,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /report-executions:
     get:
       operationId: listReportExecutions
@@ -890,6 +916,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ReportExecution'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /report-executions/{executionId}:
     parameters:
     - name: executionId
@@ -928,6 +956,8 @@ paths:
                 $ref: '#/components/schemas/ReportExecution'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: cancelReportExecution
       x-ticvai-consumed-by:
@@ -955,6 +985,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /report-executions/{executionId}/result:
     parameters:
     - name: executionId
@@ -993,6 +1025,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /report-schedules:
     get:
       operationId: listReportSchedules
@@ -1028,6 +1062,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ReportSchedule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createReportSchedule
       x-ticvai-consumed-by:
@@ -1076,6 +1112,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /report-schedules/{scheduleId}:
     parameters:
     - name: scheduleId
@@ -1128,6 +1166,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportSchedule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: deleteReportSchedule
       x-ticvai-consumed-by:
@@ -1150,6 +1190,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Deleted
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /report-executions/{executionId}/export:
     parameters:
     - name: executionId
@@ -1223,6 +1265,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /report-exports/{exportId}:
     parameters:
     - name: exportId
@@ -1254,6 +1298,8 @@ paths:
                 $ref: '#/components/schemas/ReportExport'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /command-centre:
     get:
       operationId: getCommandCentre
@@ -1294,6 +1340,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CommandCentre'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dashboards:
     get:
       operationId: listDashboards
@@ -1336,6 +1384,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Dashboard'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createDashboard
       x-ticvai-consumed-by:
@@ -1398,6 +1448,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dashboards/{dashboardId}:
     parameters:
     - name: dashboardId
@@ -1452,6 +1504,8 @@ paths:
                 $ref: '#/components/schemas/DashboardData'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: updateDashboard
       x-ticvai-consumed-by:
@@ -1505,6 +1559,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: deleteDashboard
       x-ticvai-consumed-by:
@@ -1542,6 +1598,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reports/ask:
     post:
       operationId: askReportingQuestion
@@ -1570,9 +1628,17 @@ paths:
         `ai.provider`, respects `ai.policy` including the masking list, and writes an `ai.activity`
         row with its prompt, response, model, tokens and cost — the same audit trail as the assistant (8.3.55–8.3.57).
 
-        Distinct from `sendAiMessage`, which retrieves from documents. **This generates a query against
-        the analytical replica and returns it**, so a finance user can check the number rather than trust
-        it.
+        Distinct from `sendAiMessage`, which retrieves from documents. **It answers through the semantic
+        layer, never free text-to-SQL** (ADR-0054, accepted 1 October): the model writes a semantic query
+        spec, Reporting compiles and runs it on the analytical replica with RLS and the official metric
+        definitions, and the answer returns the query it ran, so a finance user can check the number
+        rather than trust it. Numbers come only from that query''s result, never from a document chunk
+        (AI-D13); a mixed question takes its knowledge from the tenant''s Qdrant collection and its numbers
+        from here.
+
+        **Block A ships the screens bound to this without the free-text box**: their saved-report and KPI
+        views work, and the box stays behind a feature flag until the assistant lands in S7 (8 to 26
+        February, ADR-0059).
 
         AI-57, Phase 1. Queries data that already exists, so it works from day one — unlike forecasting,
         which needs history.
@@ -1658,6 +1724,8 @@ paths:
                 $ref: '#/components/schemas/ReportQuestionProblem'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reports/ask/{conversationId}/save:
     parameters:
     - name: conversationId
@@ -1721,6 +1789,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportDefinition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /semantic-queries:
     post:
       operationId: runSemanticQuery
@@ -1822,6 +1892,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ReportingSemanticQueryProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kpis:
     get:
       operationId: listKpis
@@ -1855,6 +1927,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/KpiDefinition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createKpi
       x-ticvai-consumed-by:
@@ -1886,6 +1960,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KpiDefinition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kpis/{kpiId}/targets:
     parameters:
     - name: kpiId
@@ -1949,6 +2025,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/KpiTarget'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kpi-values:
     get:
       operationId: getKpiValues
@@ -2070,6 +2148,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/KpiValue'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /analytics-benchmarks:
     get:
       operationId: getAnalyticsBenchmark
@@ -2115,6 +2195,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BenchmarkRow'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /semantic-model:
     get:
       operationId: getSemanticModel
@@ -2147,6 +2229,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SemanticModel'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSemanticModel
       x-ticvai-consumed-by:
@@ -2189,6 +2273,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SemanticModel'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /analytics-pipelines:
     get:
       operationId: listAnalyticsPipelines
@@ -2221,6 +2307,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AnalyticsPipeline'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /analytics-anomalies:
     get:
       operationId: listAnalyticsAnomalies
@@ -2266,6 +2354,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AnalyticsAnomaly'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /report-subscriptions:
     get:
       operationId: listReportSubscriptions
@@ -2297,6 +2387,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReportSubscription'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createReportSubscription
       x-ticvai-consumed-by:
@@ -2327,6 +2419,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportSubscription'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /report-deliveries:
     get:
       operationId: listReportDeliveries
@@ -2369,6 +2463,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReportDelivery'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /analytics-usage:
     get:
       operationId: getAnalyticsUsage
@@ -2412,6 +2508,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AnalyticsUsageRow'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dashboards/{dashboardId}/views:
     parameters:
     - name: dashboardId
@@ -2484,6 +2582,8 @@ paths:
           description: Recorded
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /site-normalisation-bases:
     get:
       operationId: listSiteNormalisationBases
@@ -2544,6 +2644,8 @@ paths:
                         $ref: '#/components/schemas/SiteNormalisationBasis'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSiteNormalisationBasis
       x-ticvai-consumed-by:
@@ -2609,6 +2711,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

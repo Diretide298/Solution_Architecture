@@ -1,6 +1,6 @@
 # WS08 — Access Control board 8
 
-**10 screens · 22 operations · 33 schemas · 5 permissions**
+**10 screens · 22 operations · 34 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

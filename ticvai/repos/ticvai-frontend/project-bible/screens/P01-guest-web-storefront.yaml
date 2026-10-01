@@ -82,7 +82,6 @@ screens:
     - WEB-004
     - WEB-008
     - WEB-009
-    - WEB-015
     - WEB-016
     - WEB-017
     - WEB-018
@@ -162,20 +161,19 @@ screens:
       provenance: structural — WEB-001 is P01's home screen and its exits are its launcher
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them.
+        The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on
+        WEB-008 yet (a gap in WEB-008, not in this edge)'
     - to: WEB-009
       trigger: Wishlist
-      provenance: derived — WEB-009 declares entryState.params itemId and WEB-001 holds none of them,
-        so the edge carries nothing and WEB-009 opens cold
-    - to: WEB-015
-      trigger: Branded Queue / Waiting Room
-      provenance: derived — WEB-015 declares entryState.params entryId and WEB-001 holds none of them,
-        so the edge carries nothing and WEB-015 opens cold
+      provenance: 'derived — WEB-009 declares entryState.params itemId and WEB-001 holds none of them.
+        The edge carries nothing: itemId only pre-selects (deep link or optional), and WEB-009 opens on
+        its own'
     - to: WEB-017
       trigger: My Account Dashboard
-      provenance: derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-001 holds
-        none of them, so the edge carries nothing and WEB-017 opens cold
+      provenance: 'derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-001 holds
+        none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or
+        optional), and WEB-017 opens on its own'
     - to: WEB-018
       trigger: My Tickets
       carries:
@@ -185,12 +183,15 @@ screens:
         entitlementId, orderId, so an edge into it carries them
     - to: WEB-019
       trigger: Order History
-      provenance: derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-001
-        holds none of them, so the edge carries nothing and WEB-019 opens cold
+      provenance: 'derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-001
+        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
+        WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId
+        has no source on WEB-019 yet (a gap in WEB-019, not in this edge)'
     - to: WEB-021
       trigger: Wallet & Gift Cards
-      provenance: derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none
-        of them, so the edge carries nothing and WEB-021 opens cold
+      provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none
+        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
+        finds walletId (getWallet) itself, and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
       carries:
@@ -199,28 +200,36 @@ screens:
         so an edge into it carries them
     - to: WEB-023
       trigger: Membership Management
-      provenance: derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-001
-        holds none of them, so the edge carries nothing and WEB-023 opens cold
+      provenance: 'derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-001
+        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
+        WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements,
+        and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)'
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
-      provenance: derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-001 holds none of them, so the edge carries nothing and WEB-024 opens cold
+      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
+        and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
+        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
+        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
     - to: WEB-027
       trigger: Newsletter Subscription
-      provenance: derived — WEB-027 declares entryState.params deviceId, itemId and WEB-001 holds none
-        of them, so the edge carries nothing and WEB-027 opens cold
+      provenance: 'derived — WEB-027 declares entryState.params deviceId, itemId and WEB-001 holds none
+        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
+        WEB-027 opens on its own'
     - to: WEB-032
       trigger: Offers & Promotions
-      provenance: derived — WEB-032 declares entryState.params promotionId and WEB-001 holds none of them,
-        so the edge carries nothing and WEB-032 opens cold
+      provenance: 'derived — WEB-032 declares entryState.params promotionId and WEB-001 holds none of
+        them. The edge carries nothing: promotionId only pre-selects (deep link or optional), and WEB-032
+        opens on its own'
     - to: WEB-033
       trigger: Shop
-      provenance: derived — WEB-033 declares entryState.params outletId and WEB-001 holds none of them,
-        so the edge carries nothing and WEB-033 opens cold
+      provenance: 'derived — WEB-033 declares entryState.params outletId and WEB-001 holds none of them.
+        The edge carries nothing: outletId only pre-selects (deep link or optional), and WEB-033 opens
+        on its own'
     - to: WEB-034
       trigger: Lost & Found
-      provenance: derived — WEB-034 declares entryState.params caseId and WEB-001 holds none of them,
-        so the edge carries nothing and WEB-034 opens cold
+      provenance: 'derived — WEB-034 declares entryState.params caseId and WEB-001 holds none of them.
+        The edge carries nothing: caseId only pre-selects (deep link or optional), and WEB-034 opens on
+        its own'
     - to: WEB-020
       trigger: Profile & Preferences
       provenance: structural — WEB-001 is P01's home screen and its exits are its launcher
@@ -823,8 +832,9 @@ screens:
     transitions:
     - to: WEB-002
       trigger: Event & Attraction Listing
-      provenance: derived — WEB-002 declares entryState.params eventId and WEB-003 holds none of them,
-        so the edge carries nothing and WEB-002 opens cold
+      provenance: 'derived — WEB-002 declares entryState.params eventId and WEB-003 holds none of them.
+        The edge carries nothing: eventId only pre-selects (deep link or optional), and WEB-002 opens
+        on its own'
     - to: WEB-004
       trigger: Attraction Details
       carries:
@@ -1315,8 +1325,9 @@ screens:
         holds eventId, so an edge into it carries them
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them.
+        The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on
+        WEB-008 yet (a gap in WEB-008, not in this edge)'
     - to: WEB-010
       trigger: Shopping Cart
       carries:
@@ -1512,17 +1523,21 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-005
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: partial
-      view: Header 'Book' (or any card's Book) → step 1 'Tickets' of the booking stepper; e.g. Tidewater
-        Museum → 'Category → subcategory tickets'
+      view: Engine controls → Theme park → Multi-park combo → Book → Fri → 2 park ticket → three adults
+        (the counters take the 2 park ticket's price; one cart line)
       differences: 'Ticket choice is on the same step as date and time and comes last: ''Date → time →
         ticket'' (Config ''Performance reveal'', Rev 3 item 2), whereas YAML goes WEB-005 → WEB-006. Prototype
         adds category → subcategory browsing, info-only (not bookable) products, ''Help me choose'' questions,
         location switcher (''Booking at'' bar), quick tour. Promo codes are entered in the cart, not on
-        this step (YAML keeps evaluatePromotions here).'
+        this step (YAML keeps evaluatePromotions here). 30 September: the guest counters take their price
+        from the ticket chosen (2 park ticket, three adults: one line, AED 1,425), and Group / school
+        booking starts from four group tickets with a typed headcount. The same flow''s Read more panel
+        still prices guests at single-park rates (Adult AED 325, Infant AED 475): a prototype defect;
+        the counters on the page are the reference.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1601,7 +1616,20 @@ screens:
 
 
     **29 September.** W4: Help me choose filters. W8: in a product-first flow (workshop) this step comes
-    first and the date follows. W5: surf levels appear only after a time slot.'
+    first and the date follows. W5: surf levels appear only after a time slot.
+
+    **30 September (client feedback, CLIENT-RESPONSE-30SEP 1 and 2).** **Guest counters take the chosen
+    ticket''s prices:** the guest types (adult, child, senior, infant) are the chosen product''s variants
+    and are priced from it (`listProductVariants`), so *2 park ticket* with three adults is one line,
+    *2 park ticket · Adult × 3*, never a ticket line plus a separate adult line; child and senior follow
+    the chosen ticket, and an infant stays free where the ticket says so. **Group and school booking starts
+    from the group tickets** (in the client build: School, Corporate, Tour operator and Community), each
+    card with its per-person price and minimum group size, then **How many people** as a number box the
+    guest can type into (for example 45) or step with − and + (the app adds a +10 step); there is no Group
+    size dropdown. The estimate reads *<ticket> · Guests × <n>*, and the request is `requestGroupBooking`
+    with the group ticket as `packageProductId` and the headcount as `expectedSize`. Supervisors listed
+    separately and free, and a water-park group choosing a session, are not in the contract yet (questions
+    of 1 October).'
 - id: WEB-006
   name: Date & Performance Selection
   module: Booking & Selection
@@ -1623,6 +1651,7 @@ screens:
     - WEB-007
     - WEB-008
     - WEB-010
+    - WEB-015
     transitions:
     - to: WEB-005
       trigger: Picks a time; the tickets for it appear
@@ -1631,14 +1660,24 @@ screens:
       - performanceId
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them.
+        The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on
+        WEB-008 yet (a gap in WEB-008, not in this edge)'
     - to: WEB-010
       trigger: Reviews the cart and may enter a promotion code
       provenance: flow F01 step 4→5
       operation: getAvailability
       carries:
       - cartId
+    - to: WEB-015
+      trigger: Adds tickets for a performance whose on-sale waiting room is on
+      operation: addCartLine
+      precondition: '`addCartLine` refused `403 admission-required`: this performance''s room is on and
+        the page holds no admission token for it'
+      carries:
+      - performanceId
+      returnsTo: WEB-006
+      provenance: ADR-0066 (accepted 1 October 2026) and its 1 October amendment
     - to: WEB-007
       trigger: Selects seats on the map
       provenance: flow F02 step 1→2
@@ -1685,7 +1724,14 @@ screens:
     **29 September.** M17-08: the date strip shows the next seven days, with a calendar for later dates.
     W5: surf products (beginner, intermediate …) only after a time slot. W8: the date-first default no
     longer overrides product-first flows: order comes from the flow. W11: tours stay date → language →
-    time slot, unchanged.'
+    time slot, unchanged.
+
+    **30 September (client feedback, CLIENT-RESPONSE-30SEP 3 and 4).** **Choosing a session adds nothing
+    to the cart.** Once a session is chosen its tickets appear (for a surf session: Surfer at the session
+    price, Junior surfer 10–15, Spectator) and a line reaches the cart (`addCartLine`) only when a quantity
+    is set; until a session is chosen the ticket area says *Choose a session above to see its tickets
+    and prices.* **A question the flow already asks on the page is not asked again** in the consent pop-up:
+    on the water park''s swim-ability flow the *Are you able to swim?* answer given on the page stands.'
   density: compact
   pattern: statusTracker
   patternReason: '`getAvailability` reads one record and nothing reads a population — the screen is about
@@ -1843,16 +1889,18 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-006
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: partial
-      view: Book → step 1; e.g. Summit Peaks → 'Timed access — 10-minute slots', Coastal Aqua → 'Surf
-        sessions with filters'
-      differences: Merged into the ticket step (date first, time revealed after the date, tickets after
+      view: Engine controls → Water park → Surf sessions with filters → Book → Intermediate surf 09:00
+        → able to swim → one surfer (the session's tickets appear once it is chosen)
+      differences: 'Merged into the ticket step (date first, time revealed after the date, tickets after
         the time). Prototype adds morning/afternoon/evening filters, times-per-page paging, sold-out greying,
-        per-guest age/height eligibility dialog with 'Remove this guest', and the water-park 'Are you
-        able to swim?' pop-up. YAML's separate hold call (addCartLine / inventory hold) is implicit.
+        per-guest age/height eligibility dialog with ''Remove this guest'', and the water-park ''Are you
+        able to swim?'' pop-up. YAML''s separate hold call (addCartLine / inventory hold) is implicit.
+        30 September: a session''s tickets (Surfer, Junior surfer, Spectator) appear once the session
+        is chosen, and choosing it adds nothing to the cart.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1947,12 +1995,14 @@ screens:
     transitions:
     - to: WEB-005
       trigger: Ticket Type Selection
-      provenance: derived — WEB-005 declares entryState.params productId and WEB-007 holds none of them,
-        so the edge carries nothing and WEB-005 opens cold
+      provenance: 'derived — WEB-005 declares entryState.params productId and WEB-007 holds none of them.
+        The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on
+        its own'
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them.
+        The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on
+        WEB-008 yet (a gap in WEB-008, not in this edge)'
     - to: WEB-006
       trigger: Date & Performance Selection
       carries:
@@ -2231,18 +2281,14 @@ screens:
     - WEB-001
     - WEB-005
     - WEB-006
-    - WEB-007
     - WEB-010
     - WEB-016
     transitions:
     - to: WEB-005
       trigger: Ticket Type Selection
-      provenance: derived — WEB-005 declares entryState.params productId and WEB-008 holds none of them,
-        so the edge carries nothing and WEB-005 opens cold
-    - to: WEB-007
-      trigger: Interactive Seat Selection
-      provenance: derived — WEB-007 declares entryState.params eventId, holdId, performanceId and WEB-008
-        holds none of them, so the edge carries nothing and WEB-007 opens cold
+      provenance: 'derived — WEB-005 declares entryState.params productId and WEB-008 holds none of them.
+        The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on
+        its own'
     - to: WEB-006
       trigger: Date & Performance Selection
       carries:
@@ -2266,8 +2312,12 @@ screens:
       provenance: 'decided 29 September, rev 3 REV3-3: `BookingFlowConfig.signInAt` `afterAddOns` (default)
         places the gate at this exit; the basket is kept'
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-    Add-ons. **`listCatalogueBundles` removed** — Sanket noted the screen shows individual add-ons rather
-    than bundles, and it does. **Rewired on the 20 August review.**
+    Add-ons. Sanket noted on the 20 August review that the screen shows individual add-ons rather than
+    bundles, and it does. **Rewired on that review.** **Corrected 1 October (audit R269):** these notes
+    said `listCatalogueBundles` had gone from this screen then; it never left `apis`, and it is still
+    bound to the *Every bundle* table. It lists the signed catalogue snapshots terminals pull (ADR-0013),
+    not the sellable bundles `promotions.listBundles` returns, so unbinding it is still owed; GST-056,
+    in the same add-ons pair, calls it too, and the two change together.
 
 
     **Rev 3 (decided 29 September).** **Sign-in gate (REV3-3):** with `BookingFlowConfig.signInAt` `afterAddOns`
@@ -2428,9 +2478,10 @@ screens:
       differences: 'Sign-in is asked when leaving Add-ons (Config ''Ask to sign in: After add-ons'', Rev
         3 item 3), so WEB-008 → WEB-016 is a transition YAML does not have. Add-ons also appear on the
         payment step (combo) and confirmation (upsells). 28 Sep flow review: all add-ons live here only.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the operations this screen then declared (six since the rev
+    3 build of 29 September), not from a workshop pack — it has none. Columns are every field the response
+    schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes
+    this screen. The suggestion panel reads `getUpsellSuggestions`, which `apis` does not declare yet.
   overlays:
   - id: formAddCartLine
     component: modal
@@ -2471,16 +2522,12 @@ screens:
     - WEB-001
     - WEB-005
     - WEB-006
-    - WEB-007
     transitions:
     - to: WEB-005
       trigger: Ticket Type Selection
-      provenance: derived — WEB-005 declares entryState.params productId and WEB-009 holds none of them,
-        so the edge carries nothing and WEB-005 opens cold
-    - to: WEB-007
-      trigger: Interactive Seat Selection
-      provenance: derived — WEB-007 declares entryState.params eventId, holdId, performanceId and WEB-009
-        holds none of them, so the edge carries nothing and WEB-007 opens cold
+      provenance: 'derived — WEB-005 declares entryState.params productId and WEB-009 holds none of them.
+        The edge carries nothing: WEB-005 finds productId (listProducts) itself, and WEB-005 opens on
+        its own'
     - to: WEB-006
       trigger: Date & Performance Selection
       carries:
@@ -3046,7 +3093,6 @@ screens:
     - WEB-001
     - WEB-010
     - WEB-012
-    - WEB-013
     - WEB-016
     transitions:
     - to: WEB-016
@@ -3058,10 +3104,6 @@ screens:
       returnsTo: WEB-011
       provenance: ADR-0045, 18 September 2026 — the gate is the checkout page, not the cart; moved from
         WEB-010 where it was placed on 17 September
-    - to: WEB-013
-      trigger: Booking Confirmation
-      provenance: derived — WEB-013 declares entryState.params orderId and WEB-011 holds none of them,
-        so the edge carries nothing and WEB-013 opens cold
     - to: WEB-012
       trigger: Pays
       provenance: flow F01 step 6→7, F02 step 4→5
@@ -3528,8 +3570,9 @@ screens:
         and WEB-012 holds performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
-      provenance: derived — WEB-011 declares entryState.params deviceId, itemId and WEB-012 holds none
-        of them, so the edge carries nothing and WEB-011 opens cold
+      provenance: 'derived — WEB-011 declares entryState.params deviceId, itemId and WEB-012 holds none
+        of them. The edge carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back
+        and WEB-011 keeps its own state'
     - to: WEB-016
       trigger: Sign in or use a guest code (when sign-in is asked at payment)
       carries:
@@ -3816,8 +3859,9 @@ screens:
         and WEB-013 holds lineId, performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
-      provenance: derived — WEB-011 declares entryState.params deviceId, itemId and WEB-013 holds none
-        of them, so the edge carries nothing and WEB-011 opens cold
+      provenance: 'derived — WEB-011 declares entryState.params deviceId, itemId and WEB-013 holds none
+        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
+        WEB-011 opens on its own'
     - to: WEB-012
       trigger: Checkout — Payment
       carries:
@@ -3833,8 +3877,9 @@ screens:
         orderId, so an edge into it carries them
     - to: WEB-014
       trigger: Pay for a Booking
-      provenance: derived — WEB-014 declares entryState.params token and WEB-013 holds none of them, so
-        the edge carries nothing and WEB-014 opens cold
+      provenance: 'derived — WEB-014 declares entryState.params token and WEB-013 holds none of them.
+        The edge carries nothing: token only pre-selects (deep link or optional), and WEB-014 opens on
+        its own'
   notes: '**Renamed 31 August** from *Order Confirmation*. **A guest surface is one product with two renderings**
     — a screen named differently on web and app is two screens to a developer and one journey to a guest.'
   density: compact
@@ -4116,7 +4161,7 @@ screens:
 - id: WEB-015
   name: Branded Queue / Waiting Room
   module: High-Demand Access
-  requiresModule: queue
+  requiresModule: ticketing
   wave: 2
   implementation:
     app: guest-web
@@ -4125,22 +4170,34 @@ screens:
     status: notStarted
   navigation:
     entryFrom:
-    - WEB-001
-    inferred: true
+    - WEB-006
     exitTo:
     - WEB-001
-  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-    **Renamed 31 August** from *Virtual Waiting Room*. **A guest surface is one product with two renderings**
-    — a screen named differently on web and app is two screens to a developer and one journey to a guest.
-  openQuestions:
-  - CF-48 — Q2 Virtual Waiting Room. Edge infrastructure, not the Q1 queue contract. Build-or-buy decision
-    outstanding with Dinesh and Qossai.
+    - WEB-006
+    transitions:
+    - to: WEB-006
+      trigger: Continue to your tickets
+      precondition: '`getWaitingRoomPosition` answers `admitted`. The page keeps `admission.token` and
+        sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt`'
+      carries:
+      - performanceId
+      provenance: ADR-0066 (accepted 1 October 2026) and its 1 October amendment
+  notes: '**The on-sale waiting room (Q2), not the ride queue (Q1). Re-pointed 1 October under ADR-0066**
+    from `joinQueue`, `getWaitingGuest` and `getWaitTimes`, which are the ride queue and wrote a `queue.entry`
+    row per arriving guest, the load the room exists to keep away. The ride queue stays on WEB-040. Arrival
+    is `enterWaitingRoom` (a Redis counter, no database write, no sign-in, no personal data); the page
+    polls `getWaitingRoomPosition` every `pollAfterSeconds`. Admitted, it holds a short-lived signed admission
+    token that `addCartLine` needs for this performance while its room is on (online cart holds only:
+    the 1 October amendment exempts tills, kiosks and venue workstations). **Reached from the sale, not
+    the home screen:** WEB-006 lands here when `addCartLine` refuses `403 admission-required`, and admission
+    returns there. `notRequired` (the room is off) goes straight back. **Renamed 31 August** from *Virtual
+    Waiting Room*. **A guest surface is one product with two renderings** (GST-046).'
   density: compact
   pattern: statusTracker
-  patternReason: '`getWaitingGuest` reads one record and nothing reads a population — the screen is about
-    that one thing'
-  purpose: Virtual Waiting Room — the screen a person opens when they need to deal with virtual waiting
-    room.
+  patternReason: '`getWaitingRoomPosition` reads one guest''s place in one performance''s room, polled
+    — the screen is about that one thing'
+  purpose: The on-sale waiting room for one performance — the guest's place, the wait, and the way on
+    to the sale once admitted.
   layout:
     template: detail
     regions:
@@ -4148,89 +4205,61 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The waiting guest
-        bindsTo: WaitingGuest
+        label: Your place in the waiting room
+        bindsTo: WaitingRoomEntry
         columns:
-        - WaitingGuest.id
-        - WaitingGuest.queueId
-        - WaitingGuest.queueName
-        - WaitingGuest.subjectId
-        - WaitingGuest.partyNumber
-        - WaitingGuest.partySize
-        - WaitingGuest.status
-        - WaitingGuest.positionInQueue
-        - WaitingGuest.partiesAhead
-        - WaitingGuest.estimatedCallAt
-        - WaitingGuest.isFastPass
-        - WaitingGuest.entitlementId
-        - WaitingGuest.calledAt
-        - WaitingGuest.returnWindowEndsAt
-        - WaitingGuest.redeemedAt
-        - WaitingGuest.admittedCount
-        operation: getWaitingGuest
-        provenance: contract queue.yaml GET /waiting-guests/{entryId}
-      - kind: detailPanel
-        label: The wait time
-        bindsTo: WaitTime
-        columns:
-        - WaitTime.queueId
-        - WaitTime.queueName
-        - WaitTime.attractionProductId
-        - WaitTime.attractionCategoryId
-        - WaitTime.status
-        - WaitTime.waitMinutes
-        - WaitTime.source
-        - WaitTime.isStale
-        - WaitTime.heightRequirementCm
-        - WaitTime.zone
-        - WaitTime.asOf
-        operation: getWaitTimes
-        provenance: contract queue.yaml GET /queues/wait-times
+        - WaitingRoomEntry.state
+        - WaitingRoomEntry.position
+        - WaitingRoomEntry.aheadOfYou
+        - WaitingRoomEntry.estimatedWaitSeconds
+        operation: getWaitingRoomPosition
+        provenance: contract catalogue.yaml GET /performances/{performanceId}/waiting-room/entries/{waitingEntryId}
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Join queue
-        operation: joinQueue
-        provenance: contract queue.yaml POST /waiting-guests
+        label: Take my place
+        operation: enterWaitingRoom
+        notes: The one write on this screen, pressed rather than fired on load so a prefetch or a bot
+          does not take a place. Hidden once the guest has one.
+        provenance: contract catalogue.yaml POST /performances/{performanceId}/waiting-room/entries
+      - kind: primaryButton
+        label: Continue to your tickets
+        provenance: ADR-0066; live when `getWaitingRoomPosition` answers `admitted`
   states:
-    loading: Position in the queue, updating
-    error: '**Lost the queue position.** The worst failure on this screen: it re-queues rather than silently
-      admitting, and says so, because a guest who thinks they lost their place will open a second tab
-      and make it worse'
+    loading: Taking a place in the room. *Take my place* (`enterWaitingRoom`) answers with a position,
+      or `notRequired` and the guest goes straight on to the sale
+    error: '**Lost the place.** The worst failure on this screen. A retry sends the same `Idempotency-Key`
+      and gets the same entry back, so the guest is not sent to the back, and the screen says so, because
+      a guest who thinks they lost their place will open a second tab and make it worse. `expired` (the
+      admission was not used in time) offers to enter again; `closed` (the room was switched off or the
+      performance stopped selling) says so and goes back to the event'
     emptyFirstRun: —
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data). No access here
-      means one of two things, told apart by the response: not signed in, where the guest is offered sign-in
-      and brought back to this screen, or a record that is not theirs, which says so without saying whose
-      it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support
-      with the wrong question.'
-    offline: '**The offline banner shows.** The last known position stays on screen with its age. Joining,
-      leaving and being admitted all need the connection.'
+    emptyNoAccess: '**There is no access to refuse.** The room is anonymous (ADR-0066): no sign-in, no
+      personal data, and the guest may not have an account yet.'
+    offline: '**The offline banner shows.** The last known position stays on screen with its age, and
+      polling resumes with the same entry when the connection is back. Admission needs the connection.'
   apis:
-  - operationId: joinQueue
-    contract: queue
-    purpose: Join a virtual queue
+  - operationId: enterWaitingRoom
+    contract: catalogue
+    purpose: Take a place in the performance's on-sale waiting room (ADR-0066); `notRequired` when the
+      room is off
     trigger: onAction
-  - operationId: getWaitingGuest
-    contract: queue
-    purpose: The guest's place and the call to come forward, read on entry and polled while the screen
-      is open; the queue call shows here, and in the in-venue notifications feed too, which is back in
-      the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242)
+  - operationId: getWaitingRoomPosition
+    contract: catalogue
+    purpose: The guest's place, polled every `pollAfterSeconds`; admitted, it carries the admission token
+      for `addCartLine`
     trigger: onInterval
-  - operationId: getWaitTimes
-    contract: queue
-    purpose: Wait times across a venue
-    trigger: onLoad
   entryState:
     params:
-    - name: entryId
-      from: deepLink
-    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
-      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
-      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
-      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
-      Arrives with `entryId`.'
+    - name: performanceId
+      from: WEB-006
+    - name: waitingEntryId
+      from: WEB-015
+      optional: true
+    coldEntry: '**Opened with no performance, or one no longer selling, the room says so and offers the
+      event** — never a 404. The room belongs to one performance''s sale and has nothing to show without
+      one.'
   wireframe:
     status: review
     provenance: client-verified
@@ -4243,31 +4272,11 @@ screens:
       view: Only when the host tweak 'waitingRoom' is on; it is not in the Config drawer lists, so a reviewer
         cannot switch it on from the page
       differences: Drawn but unreachable from the Config drawer. The prototype holds the place by keeping
-        the page open ('refreshing puts you at the back'); YAML getWaitingGuest implies a resumable place.
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formJoinQueue
-    component: modal
-    trigger: Join queue
-    body: '**Collects what `joinQueue` sends before it is called.** Required: `id`, `queueId`, `partySize`,
-      `recordedAt`. Optional: `entitlementId`, `partyHeightsCm`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: JoinQueueRequest
-    confirm:
-      label: Join queue
-      operation: joinQueue
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - queueId
-      - partySize
-      - recordedAt
-      - entitlementId
-      - partyHeightsCm
-    provenance: client-verified
+        the page open ('refreshing puts you at the back'); the room keeps it across a refresh, because
+        `enterWaitingRoom` returns the same entry for the same `Idempotency-Key` (ADR-0066).
+  apisNote: Rebuilt 1 October 2026 on the two waiting-room operations (ADR-0066). Columns are the entry's
+    guest-facing fields; `pollAfterSeconds` and `admission` are plumbing the page acts on rather than
+    shows.
 - id: WEB-016
   name: Login / Register
   module: Account & Self-Service
@@ -4299,16 +4308,20 @@ screens:
     transitions:
     - to: WEB-017
       trigger: My Account Dashboard
-      provenance: derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-016 holds
-        none of them, so the edge carries nothing and WEB-017 opens cold
+      provenance: 'derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-016 holds
+        none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or
+        optional), and WEB-017 opens on its own'
     - to: WEB-018
       trigger: My Tickets
-      provenance: derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-016 holds
-        none of them, so the edge carries nothing and WEB-018 opens cold
+      provenance: 'derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-016 holds
+        none of them. The edge carries nothing: entitlementId, orderId only pre-select (deep link or optional),
+        and WEB-018 opens on its own'
     - to: WEB-019
       trigger: Order History
-      provenance: derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-016
-        holds none of them, so the edge carries nothing and WEB-019 opens cold
+      provenance: 'derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-016
+        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
+        WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId
+        has no source on WEB-019 yet (a gap in WEB-019, not in this edge)'
     - to: WEB-010
       trigger: Signed in and verified — back to the cart
       precondition: arrived from the cart
@@ -4318,12 +4331,14 @@ screens:
         per-site guestCheckout off by default (matrix 2.6.28)
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
-      provenance: derived — WEB-011 declares entryState.params deviceId, itemId and WEB-016 holds none
-        of them, so the edge carries nothing and WEB-011 opens cold
+      provenance: 'derived — WEB-011 declares entryState.params deviceId, itemId and WEB-016 holds none
+        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
+        WEB-011 opens on its own'
     - to: WEB-012
       trigger: Checkout — Payment
-      provenance: derived — WEB-012 declares entryState.params orderId, paymentId and WEB-016 holds none
-        of them, so the edge carries nothing and WEB-012 opens cold
+      provenance: 'derived — WEB-012 declares entryState.params orderId, paymentId and WEB-016 holds none
+        of them. The edge carries nothing: WEB-016 is opened from WEB-012, so this edge is the way back
+        and WEB-012 keeps its own state'
     - to: GST-039
       trigger: They set a profile
       provenance: flow F56 step 3→4
@@ -4745,12 +4760,15 @@ screens:
         challengeId, subjectId, so an edge into it carries them
     - to: WEB-018
       trigger: My Tickets
-      provenance: derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-017 holds
-        none of them, so the edge carries nothing and WEB-018 opens cold
+      provenance: 'derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-017 holds
+        none of them. The edge carries nothing: entitlementId, orderId only pre-select (deep link or optional),
+        and WEB-018 opens on its own'
     - to: WEB-019
       trigger: Order History
-      provenance: derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-017
-        holds none of them, so the edge carries nothing and WEB-019 opens cold
+      provenance: 'derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-017
+        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
+        WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId
+        has no source on WEB-019 yet (a gap in WEB-019, not in this edge)'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across
     five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard
@@ -5071,12 +5089,14 @@ screens:
     transitions:
     - to: WEB-016
       trigger: Login / Register
-      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-018 holds
-        none of them, so the edge carries nothing and WEB-016 opens cold
+      provenance: 'derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-018 holds
+        none of them. The edge carries nothing: WEB-016 finds challengeId (createMfaChallenge), subjectId
+        (registerGuest) itself, and WEB-016 opens on its own'
     - to: WEB-017
       trigger: My Account Dashboard
-      provenance: derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-018 holds
-        none of them, so the edge carries nothing and WEB-017 opens cold
+      provenance: 'derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-018 holds
+        none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or
+        optional), and WEB-017 opens on its own'
     - to: WEB-019
       trigger: Order History
       carries:
@@ -5375,8 +5395,9 @@ screens:
         subjectId, so an edge into it carries them
     - to: WEB-017
       trigger: My Account Dashboard
-      provenance: derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-019 holds
-        none of them, so the edge carries nothing and WEB-017 opens cold
+      provenance: 'derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-019 holds
+        none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or
+        optional), and WEB-017 opens on its own'
     - to: WEB-018
       trigger: My Tickets
       carries:
@@ -5630,12 +5651,14 @@ screens:
         subjectId, so an edge into it carries them
     - to: WEB-017
       trigger: My Account Dashboard
-      provenance: derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-020 holds
-        none of them, so the edge carries nothing and WEB-017 opens cold
+      provenance: 'derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-020 holds
+        none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or
+        optional), and WEB-017 opens on its own'
     - to: WEB-018
       trigger: My Tickets
-      provenance: derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-020 holds
-        none of them, so the edge carries nothing and WEB-018 opens cold
+      provenance: 'derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-020 holds
+        none of them. The edge carries nothing: entitlementId, orderId only pre-select (deep link or optional),
+        and WEB-018 opens on its own'
   notes: 'Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose
     derived from the screen name and its operations on 17 August, not from a requirement. Profile and
     Preferences. **Wishlist and device operations removed; profile, consent and email verification added.**
@@ -5915,8 +5938,9 @@ screens:
     transitions:
     - to: WEB-022
       trigger: Membership Plans
-      provenance: derived — WEB-022 declares entryState.params productId and WEB-021 holds none of them,
-        so the edge carries nothing and WEB-022 opens cold
+      provenance: 'derived — WEB-022 declares entryState.params productId and WEB-021 holds none of them.
+        The edge carries nothing: WEB-022 finds productId (listProducts) itself, and WEB-022 opens on
+        its own'
     - to: WEB-023
       trigger: Membership Management
       carries:
@@ -5925,8 +5949,10 @@ screens:
         holds orderId, so an edge into it carries them
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
-      provenance: derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-021 holds none of them, so the edge carries nothing and WEB-024 opens cold
+      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
+        and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
+        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
+        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -6202,16 +6228,21 @@ screens:
     transitions:
     - to: WEB-021
       trigger: Wallet & Gift Cards
-      provenance: derived — WEB-021 declares entryState.params cardCode, walletId and WEB-022 holds none
-        of them, so the edge carries nothing and WEB-021 opens cold
+      provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-022 holds none
+        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
+        finds walletId (getWallet) itself, and WEB-021 opens on its own'
     - to: WEB-023
       trigger: Membership Management
-      provenance: derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-022
-        holds none of them, so the edge carries nothing and WEB-023 opens cold
+      provenance: 'derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-022
+        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
+        WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements,
+        and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)'
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
-      provenance: derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-022 holds none of them, so the edge carries nothing and WEB-024 opens cold
+      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
+        and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
+        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
+        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and
     could not fetch what it shows** — the app had these and the browser did not, and there is no reason
@@ -6402,8 +6433,9 @@ screens:
     transitions:
     - to: WEB-021
       trigger: Wallet & Gift Cards
-      provenance: derived — WEB-021 declares entryState.params cardCode, walletId and WEB-023 holds none
-        of them, so the edge carries nothing and WEB-021 opens cold
+      provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-023 holds none
+        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
+        finds walletId (getWallet) itself, and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
       carries:
@@ -6412,8 +6444,10 @@ screens:
         so an edge into it carries them
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
-      provenance: derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-023 holds none of them, so the edge carries nothing and WEB-024 opens cold
+      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
+        and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
+        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
+        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and
     could not fetch what it shows** — the app had these and the browser did not, and there is no reason
@@ -6676,16 +6710,20 @@ screens:
     transitions:
     - to: WEB-021
       trigger: Wallet & Gift Cards
-      provenance: derived — WEB-021 declares entryState.params cardCode, walletId and WEB-024 holds none
-        of them, so the edge carries nothing and WEB-021 opens cold
+      provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-024 holds none
+        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
+        finds walletId (getWallet) itself, and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
-      provenance: derived — WEB-022 declares entryState.params productId and WEB-024 holds none of them,
-        so the edge carries nothing and WEB-022 opens cold
+      provenance: 'derived — WEB-022 declares entryState.params productId and WEB-024 holds none of them.
+        The edge carries nothing: WEB-022 finds productId (listProducts) itself, and WEB-022 opens on
+        its own'
     - to: WEB-023
       trigger: Membership Management
-      provenance: derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-024
-        holds none of them, so the edge carries nothing and WEB-023 opens cold
+      provenance: 'derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-024
+        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
+        WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements,
+        and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)'
     - to: GST-037
       trigger: Offers are shown against what they hold
       provenance: flow F53 step 2→3
@@ -7192,8 +7230,9 @@ screens:
     transitions:
     - to: WEB-027
       trigger: Newsletter Subscription
-      provenance: derived — WEB-027 declares entryState.params deviceId, itemId and WEB-025 holds none
-        of them, so the edge carries nothing and WEB-027 opens cold
+      provenance: 'derived — WEB-027 declares entryState.params deviceId, itemId and WEB-025 holds none
+        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
+        WEB-027 opens on its own'
   notes: 'Same content the AI concierge grounds on. One source, two surfaces. Purpose derived from the
     screen name and its operations on 17 August, not from a requirement.
 
@@ -7353,8 +7392,9 @@ screens:
     transitions:
     - to: WEB-027
       trigger: Newsletter Subscription
-      provenance: derived — WEB-027 declares entryState.params deviceId, itemId and WEB-026 holds none
-        of them, so the edge carries nothing and WEB-027 opens cold
+      provenance: 'derived — WEB-027 declares entryState.params deviceId, itemId and WEB-026 holds none
+        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
+        WEB-027 opens on its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: configEditor
@@ -7786,8 +7826,9 @@ screens:
     transitions:
     - to: WEB-027
       trigger: Newsletter Subscription
-      provenance: derived — WEB-027 declares entryState.params deviceId, itemId and WEB-028 holds none
-        of them, so the edge carries nothing and WEB-027 opens cold
+      provenance: 'derived — WEB-027 declares entryState.params deviceId, itemId and WEB-028 holds none
+        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
+        WEB-027 opens on its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Contact bound 28 September** to `getTenantAppStatus.contact` (decided 28 September, audit R073 (f)).
   density: compact
@@ -7990,8 +8031,11 @@ screens:
     transitions:
     - to: WEB-031
       trigger: My Reservations
-      provenance: derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId,
-        resourceId and WEB-030 holds none of them, so the edge carries nothing and WEB-031 opens cold
+      provenance: 'derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId,
+        resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId only pre-selects
+        (deep link or optional); WEB-031 finds groupBookingId (requestGroupBooking), productId (listGroupPackages)
+        itself; WEB-031 opens on listGroupPackages, and resourceId has no source on WEB-031 yet (a gap
+        in WEB-031, not in this edge)'
     - to: GST-014
       trigger: The friend claims it in the app
       provenance: flow F55 step 4→5
@@ -8379,7 +8423,12 @@ screens:
     body: '**Collects what `requestGroupBooking` sends before it is called.** Required: `kind`, `packageProductId`,
       `preferredDate`, `expectedSize`. Optional: `organisationName`, `yearGroup`, `accessAndDietaryNeeds`,
       `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`. Dismissing sends nothing; the screen
-      behind is unchanged.'
+      behind is unchanged.
+
+      **30 September (client feedback, CLIENT-RESPONSE-30SEP 1).** The group ticket is chosen first (`packageProductId`:
+      cards with the per-person price and the minimum group size), then *How many people* (`expectedSize`)
+      as a number box the guest types into or steps with − and + (+10 on the app); no Group size dropdown.
+      The estimate reads *<ticket> · Guests × <n>*.'
     bindsTo: GroupBookingRequest
     confirm:
       label: Request group booking
@@ -9108,8 +9157,9 @@ screens:
     transitions:
     - to: WEB-030
       trigger: Ticket Transfer
-      provenance: derived — WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none
-        of them, so the edge carries nothing and WEB-030 opens cold
+      provenance: 'derived — WEB-030 declares entryState.params orderId, transferId and WEB-035 holds
+        none of them. The edge carries nothing: orderId, transferId only pre-select (deep link or optional),
+        and WEB-030 opens on its own'
     - to: WEB-031
       trigger: My Reservations
       carries:
@@ -9563,12 +9613,11 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-036
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: Header 'At the venue' → 'Order food'; also Saffron Table → 'Takeaway — collect' / 'Delivery'
-        flows
+      view: Summit Peaks → header 'At the venue' → Order food (table ordering)
       differences: Prototype splits in-venue table ordering (At the venue) from takeaway/delivery ordering
         (a booking flow with a delivery-area and slot check). Table reservation and waitlist (in YAML
         apis) are booking flows at Saffron Table.
@@ -10145,12 +10194,13 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-039
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: At the venue → 'Map & waits'
-      differences: Prototype adds turn-by-turn walking directions and navigation mode.
+      view: Summit Peaks → header 'At the venue' → Map & waits (3D view, with the 2D plan one tap away)
+      differences: Prototype adds turn-by-turn walking directions and navigation mode. The map has a 3D
+        view / 2D plan switch ("Same plan, drawn two ways"); no map3dUnavailable or weakGps state is drawn.
     derivedFrom: wireframes/reference/Seat Board 3.dc.html
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -10303,11 +10353,11 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-040
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: At the venue → 'Virtual queue'
+      view: Summit Peaks → header 'At the venue' → Virtual queue
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -10531,11 +10581,11 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-041
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: partial
-      view: At the venue → 'Parking'
+      view: Summit Peaks → header 'At the venue' → Parking
       differences: Shows live free-bay counts, which the YAML says it does not have (no live availability;
         full = soldOutForDay). Pays directly with 'Reserve and pay' rather than through cart and checkout
         (R166). Also a plate field in the cabana/party flows.
@@ -10765,12 +10815,14 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-042
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: At the venue → 'Shop & drop'
-      differences: Pays in one tap on the page, not through the cart and checkout (YAML R236).
+      view: Summit Peaks → header 'At the venue' → Shop (collect at the gate, at the car park kiosk, or
+        delivered home)
+      differences: 'Pays in one tap on the page, not through the cart and checkout (YAML R236). 29 September:
+        collect at the gate, at the car park kiosk, or delivered home, with a collection code after paying.'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -10944,11 +10996,11 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-043
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: At the venue → 'Loyalty'
+      view: Summit Peaks → header 'At the venue' → Loyalty
       differences: Placed inside the in-venue section; referral code appears under Account → Groups &
         invitations (YAML createReferral is here).
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
@@ -11473,11 +11525,11 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-046
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: At the venue → 'Alerts'
+      view: Summit Peaks → header 'At the venue' → Alerts
       differences: 'Deferred in the YAML (release later, R242: no in-app feed in the first release), but
         the prototype draws it as a live section, so the client will expect it.'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
@@ -11932,7 +11984,19 @@ screens:
     routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before
     departure* is the proposed default of the venue''s modification policy, client to correct. **The real
     network (stations, fares, timetable) is an open value from the client**; the prototype''s Emirates
-    Link data is illustrative.'
+    Link data is illustrative.
+
+    **30 September (client feedback, CLIENT-RESPONSE-30SEP 5 and 6).** **A route opens with its stations
+    filled in:** entered from a route (a transport product or a route card), From and To are that route''s
+    first and last stops (for example E201: Abu Dhabi Central Bus Station to Al Ain Central Bus Station);
+    the guest can still change or swap them. **Departures show straight away** for those stations and
+    the date (`searchTransportDepartures` on load and on every change), with no need to press *Search
+    Trips*; the time-period buttons filter the departures listed, and pressing the chosen period again
+    shows them all. **Passengers appear only after a departure is chosen** (the departure first, then
+    the tickets). The client build also has a *Popular routes* card view (route cards with a from-fare
+    and *Book*, then the date, the departures and the passengers; on the app the first transport product);
+    a route list with a from-fare is not in the contract yet (a question of 1 October), so it is not specified
+    here.'
   density: compact
   pattern: listDetail
   patternReason: '`searchTransportDepartures` reads the population of departures and one is chosen for
@@ -12096,7 +12160,7 @@ screens:
   - operationId: searchTransportDepartures
     contract: transport
     purpose: Departures for the stations, date, period and party, with counts per period
-    trigger: onAction
+    trigger: onLoad
   - operationId: getNextTransportDeparture
     contract: transport
     purpose: The next departure with room for the party
@@ -12143,20 +12207,30 @@ screens:
       from: session
     - name: favouriteId
       from: navigation
+      optional: true
     - name: routeId
       from: navigation
-    coldEntry: Arrives with nothing; the venue comes from the site. A shared link with stations prefills
-      From and To if both still exist, and says which one does not.
+      optional: true
+    coldEntry: Arrives with nothing; the venue comes from the site. **Opened from a route** (a route card
+      or a transport product, client feedback 30 September), `routeId` fills From and To with that route's
+      first and last stops, and the departures show at once; the guest can still change or swap them.
+      A saved route (`favouriteId`) prefills the same way. A shared link with stations prefills From and
+      To if both still exist, and says which one does not.
   wireframe:
-    status: notStarted
+    status: review
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-049
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: Emirates Link → 'Route & schedule · one-way, multi-trip, favourites'
+      view: Engine controls → Transport → Route & schedule · one-way, multi-trip, favourites → Book →
+        Fri (stations filled in, departures without a search)
+      differences: '30 September: the route opens with its stations filled in and the departures listed
+        without a search; the time-period buttons filter them. The engine''s other transport flow, Popular
+        routes (card view), is route cards with a from-fare and Book, then the date, the departures and
+        the passengers. The route map needs a street-map tile provider (audit R038).'
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
@@ -12404,13 +12478,15 @@ screens:
     coldEntry: Starts at the first question; a saved-plan link opens the plan, or says it has passed and
       offers to plan again. `itemId` is the plan item the guest taps Swap on, picked on this screen.
   wireframe:
-    status: notStarted
+    status: review
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-050
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Visit Planner.dc.html
-      rev: Visit Planner (29 September build)
-      verified: '2026-09-29'
+      file: sources/designs/guest-rev3-30-september/TICVAI Visit Planner.dc.html
+      rev: Visit Planner (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: 'Header *Plan your visit* (web build), or the Visit Planner file: questions, then Your plan
-        and Book this plan'
+      view: Visit Planner → the six questions (defaults) → Make my plan (Your plan)
+      differences: 'Single-park planner: no "Which park each day?" step, no shops or kiosks as plan stops
+        and no preferenceNotAtVenue (MoM 4.7, 30 September); these are pending in design: specified, and
+        built from the definition until the design shows it (handoff/design-batches/apps/1-guest-app/README.md).'

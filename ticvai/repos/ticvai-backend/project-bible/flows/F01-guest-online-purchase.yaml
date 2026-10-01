@@ -14,7 +14,7 @@ criticality: revenue
 platforms:
 - P01 Guest Web Storefront
 offlineBehaviour: 'Cannot start. The storefront is a web surface with no local bundle — availability
-  and pricing are read live, and selling from a cached catalogue to an anonymous browser would oversell
+  and pricing are read live (browse availability from a one-second cache, ADR-0065), and selling from a cached catalogue to an anonymous browser would oversell
   within minutes. This is the deliberate opposite of the POS position (ADR-0013), and the difference
   is that a POS has a known workstation, a shift and a lease; a browser has none of those.
 
@@ -53,7 +53,7 @@ steps:
   - listPerformances
   - getAvailability
   outcome: 'Holds nothing yet: capacity is held when the tickets go into the cart (step 4, `addCartLine`,
-    a 15-minute cart hold), not on a look. Availability is read live, never cached, in one call for every time of the event in the
+    a 15-minute cart hold), not on a look. Availability is read from a one-second cache (ADR-0065, decided 1 October; the hold decides, not the look), in one call for every time of the event in the
     window (`eventId`, `from`, `to`). **Date first, then time, then tickets** (decided 29 September,
     rev 3 REV3-2): the times stay hidden until a date is picked, per the product''s published booking
     flow `settings.performanceReveal` (`getPublishedBookingFlow`, W12; default `dateTimeTicket`)'
@@ -109,8 +109,8 @@ steps:
 branches:
 - at: 3
   condition: The session sells out between loading the page and selecting it
-  behaviour: 'Selection is refused with the next available session offered. Availability is read live
-    precisely so this is caught here rather than at payment.
+  behaviour: 'Selection is refused with the next available session offered. Availability comes from a
+    one-second cache (ADR-0065), and the hold is the guarded decrement, so this is caught here rather than at payment.
 
     '
   severity: recoverable

@@ -113,7 +113,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-012 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-012 holds none of them. The edge carries nothing: GST-012 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-013",
@@ -344,9 +344,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-012",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
     "view": "Tickets tab"
    }
@@ -432,7 +432,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-013 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-013 holds none of them. The edge carries nothing: GST-013 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-055",
@@ -708,7 +708,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-018 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-018 holds none of them. The edge carries nothing: GST-018 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -1057,7 +1057,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-019 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-019 holds none of them. The edge carries nothing: GST-019 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-067",
@@ -1415,7 +1415,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-020 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-020 holds none of them. The edge carries nothing: GST-020 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -1611,22 +1611,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-039 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-039 holds none of them. The edge carries nothing: GST-039 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-069",
      "trigger": "Face Pass",
-     "provenance": "derived — GST-069 declares entryState.params enrolmentId and GST-039 holds none of them, so the edge carries nothing and GST-069 opens cold"
+     "provenance": "derived — GST-069 declares entryState.params enrolmentId and GST-039 holds none of them. The edge carries nothing: enrolmentId only pre-selects (deep link or optional), and GST-069 opens on its own"
     },
     {
      "to": "GST-071",
      "trigger": "Payment Methods",
-     "provenance": "derived — GST-071 declares entryState.params cardCode, walletId and GST-039 holds none of them, so the edge carries nothing and GST-071 opens cold"
+     "provenance": "derived — GST-071 declares entryState.params cardCode, walletId and GST-039 holds none of them. The edge carries nothing: walletId only pre-selects (deep link or optional); GST-071 opens on listPaymentTokens, and cardCode has no source on GST-071 yet (a gap in GST-071, not in this edge)"
     },
     {
      "to": "GST-073",
      "trigger": "Security & Sign-in",
-     "provenance": "derived — GST-073 declares entryState.params challengeId, methodId and GST-039 holds none of them, so the edge carries nothing and GST-073 opens cold"
+     "provenance": "derived — GST-073 declares entryState.params challengeId, methodId and GST-039 holds none of them. The edge carries nothing: GST-073 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and GST-073 opens on its own"
     }
    ]
   },
@@ -1838,7 +1838,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-042 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-042 holds none of them. The edge carries nothing: GST-042 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-041",
@@ -2337,7 +2337,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-045 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-045 holds none of them. The edge carries nothing: GST-045 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -2483,7 +2483,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-055 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-055 holds none of them. The edge carries nothing: GST-055 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },

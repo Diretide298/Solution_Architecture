@@ -4828,6 +4828,12 @@
    "mentions": 1
   },
   {
+   "file": "docs\\active\\broker-decision-pack.md",
+   "title": "The event broker: RabbitMQ or Kafka",
+   "status": "",
+   "mentions": 2
+  },
+  {
    "file": "docs\\active\\build-plan-20-september.md",
    "title": "Build plan \u2014 20 September 2026",
    "status": "",
@@ -5086,6 +5092,24 @@
    "mentions": 5
   },
   {
+   "file": "docs\\adr\\0052-one-recommendation-engine.md",
+   "title": "ADR-0052: One recommendation engine; runtime in AI, configuration in Promotions",
+   "status": "Accepted \u00b7 1 October 2026 \u00b7 Chinmay Parab \u2014 records AI-D07, ",
+   "mentions": 1
+  },
+  {
+   "file": "docs\\adr\\0053-risk-layer-ownership.md",
+   "title": "ADR-0053: Owners keep their deterministic rules; AI owns cross-entity risk, alerts and cases",
+   "status": "Accepted \u00b7 1 October 2026 \u00b7 Chinmay Parab \u2014 records AI-D06, ",
+   "mentions": 2
+  },
+  {
+   "file": "docs\\adr\\0054-natural-language-analytics-goes-through-the-semantic-layer.md",
+   "title": "ADR-0054: Natural-language analytics goes through the semantic layer",
+   "status": "Accepted \u00b7 1 October 2026 \u00b7 Chinmay Parab \u2014 records AI-D13 a",
+   "mentions": 3
+  },
+  {
    "file": "docs\\adr\\0055-a-modular-monolith-deployed-as-five-units.md",
    "title": "ADR-0055: A modular monolith, deployed as five units",
    "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab",
@@ -5100,7 +5124,7 @@
   {
    "file": "docs\\adr\\0058-one-relay-per-region-and-an-inbox-per-tenant-database.md",
    "title": "ADR-0058: One relay per region reads every tenant's outbox, and every consumer has an inbox",
-   "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab",
+   "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab \u00b7 amended 1 Oct",
    "mentions": 1
   },
   {
@@ -5108,6 +5132,30 @@
    "title": "ADR-0059: AI phasing against the six-month plan",
    "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab",
    "mentions": 6
+  },
+  {
+   "file": "docs\\adr\\0060-availability-targets-high-availability-and-disaster-recovery.md",
+   "title": "ADR-0060: Availability targets per tier, and how they are met",
+   "status": "Proposed \u00b7 waiting on the client (which services the 99.99% ",
+   "mentions": 1
+  },
+  {
+   "file": "docs\\adr\\0061-replica-floors-per-deployable.md",
+   "title": "ADR-0061: Replica floors are set per deployable and per zone",
+   "status": "Accepted \u00b7 1 October 2026 \u00b7 Chinmay Parab",
+   "mentions": 1
+  },
+  {
+   "file": "docs\\adr\\0063-encryption-keys-and-biometric-templates.md",
+   "title": "ADR-0063: Encryption and keys, and biometric templates stay with the biometric vendor",
+   "status": "Proposed \u00b7 waiting on the client's data protection officer (",
+   "mentions": 1
+  },
+  {
+   "file": "docs\\adr\\0064-per-tenant-limits.md",
+   "title": "ADR-0064: Every tenant has a request budget, and a busy tenant cannot starve the others",
+   "status": "Accepted \u00b7 1 October 2026 \u00b7 Chinmay Parab",
+   "mentions": 1
   },
   {
    "file": "docs\\architecture\\ai-credentials.md",
@@ -5319,7 +5367,7 @@
   "tables": 137,
   "screens": 195,
   "flows": 11,
-  "documents": 56,
+  "documents": 64,
   "openConflicts": 1
  }
 }

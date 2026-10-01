@@ -1,6 +1,6 @@
 # P02-high-demand-access-01 — P02 · High-Demand Access
 
-**1 screens · 3 operations · 7 schemas · 0 permissions**
+**1 screens · 2 operations · 2 schemas · 0 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -50,8 +50,8 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 0 permissions apply here:
   ``. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: getWaitTimes
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **0 of these operations work offline**
+  
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-046` | Branded Queue / Waiting Room | statusTracker | 3 | 1 | — |
+| `GST-046` | Branded Queue / Waiting Room | statusTracker | 2 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -80,7 +80,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "id": "GST-046",
   "name": "Branded Queue / Waiting Room",
   "module": "High-Demand Access",
-  "requiresModule": "queue",
+  "requiresModule": "ticketing",
   "wave": 1,
   "capability": "C98",
   "implementation": {
@@ -91,26 +91,30 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "entryFrom": [
-    "GST-001"
+    "GST-007"
    ],
-   "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002"
+    "GST-002",
+    "GST-007"
    ],
    "transitions": [
     {
-     "to": "GST-001",
-     "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-046 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "to": "GST-007",
+     "trigger": "Continue to your tickets",
+     "precondition": "`getWaitingRoomPosition` answers `admitted`. The app keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt`",
+     "carries": [
+      "performanceId"
+     ],
+     "provenance": "ADR-0066 (accepted 1 October 2026) and its 1 October amendment"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity, 31 August**: added getWaitingGuest, joinQueue. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "notes": "**The on-sale waiting room (Q2), not the ride queue (Q1). Re-pointed 1 October under ADR-0066** from `getWaitTimes`, `getWaitingGuest` and `joinQueue`, which are the ride queue and wrote a `queue.entry` row per arriving guest, the load the room exists to keep away. The ride queue stays on GST-023. Arrival is `enterWaitingRoom` (a Redis counter, no database write, no personal data); the screen polls `getWaitingRoomPosition` every `pollAfterSeconds`. Admitted, it holds a short-lived signed admission token that `addCartLine` needs for this performance while its room is on (online cart holds only: the 1 October amendment exempts tills, kiosks and venue workstations). **Reached from the sale, not the home screen:** GST-007 lands here when `addCartLine` refuses `403 admission-required`, and admission returns there. `notRequired` (the room is off) goes straight back. **A guest surface is one product with two renderings** (WEB-015): the same named screen on web and app calls the same guest-callable operations.",
   "density": "comfortable",
   "pattern": "statusTracker",
-  "patternReason": "`getWaitTimes` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Find branded queue / waiting room for this venue.",
+  "patternReason": "`getWaitingRoomPosition` reads one guest's place in one performance's room, polled — the screen is about that one thing",
+  "purpose": "The on-sale waiting room for one performance — the guest's place, the wait, and the way on to the sale once admitted.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -120,47 +124,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The wait time",
-       "bindsTo": "WaitTime",
+       "label": "Your place in the waiting room",
+       "bindsTo": "WaitingRoomEntry",
        "columns": [
-        "WaitTime.queueId",
-        "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.status",
-        "WaitTime.waitMinutes",
-        "WaitTime.source",
-        "WaitTime.isStale",
-        "WaitTime.heightRequirementCm",
-        "WaitTime.zone",
-        "WaitTime.asOf"
+        "WaitingRoomEntry.state",
+        "WaitingRoomEntry.position",
+        "WaitingRoomEntry.aheadOfYou",
+        "WaitingRoomEntry.estimatedWaitSeconds"
        ],
-       "operation": "getWaitTimes",
-       "provenance": "contract queue.yaml GET /queues/wait-times"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The waiting guest",
-       "bindsTo": "WaitingGuest",
-       "columns": [
-        "WaitingGuest.id",
-        "WaitingGuest.queueId",
-        "WaitingGuest.queueName",
-        "WaitingGuest.subjectId",
-        "WaitingGuest.partyNumber",
-        "WaitingGuest.partySize",
-        "WaitingGuest.status",
-        "WaitingGuest.positionInQueue",
-        "WaitingGuest.partiesAhead",
-        "WaitingGuest.estimatedCallAt",
-        "WaitingGuest.isFastPass",
-        "WaitingGuest.entitlementId",
-        "WaitingGuest.calledAt",
-        "WaitingGuest.returnWindowEndsAt",
-        "WaitingGuest.redeemedAt",
-        "WaitingGuest.admittedCount"
-       ],
-       "operation": "getWaitingGuest",
-       "provenance": "contract queue.yaml GET /waiting-guests/{entryId}"
+       "operation": "getWaitingRoomPosition",
+       "provenance": "contract catalogue.yaml GET /performances/{performanceId}/waiting-room/entries/{waitingEntryId}"
       }
      ]
     },
@@ -170,48 +143,53 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Join queue",
-       "operation": "joinQueue",
-       "provenance": "contract queue.yaml POST /waiting-guests"
+       "label": "Take my place",
+       "operation": "enterWaitingRoom",
+       "notes": "The one write on this screen, pressed rather than fired on load so a prefetch or a bot does not take a place. Hidden once the guest has one.",
+       "provenance": "contract catalogue.yaml POST /performances/{performanceId}/waiting-room/entries"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Continue to your tickets",
+       "provenance": "ADR-0066; live when `getWaitingRoomPosition` answers `admitted`"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The branded queue waiting, read by `getWaitTimes`.",
-   "error": "Could not load. Names which read failed and leaves the branded queue waiting untouched.",
-   "emptyFirstRun": "No branded queue waiting yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "offline": "**The offline banner shows.** The last known position stays on screen with its age. Joining, leaving and being admitted all need the connection."
+   "loading": "Taking a place in the room. *Take my place* (`enterWaitingRoom`) answers with a position, or `notRequired` and the guest goes straight on to the sale",
+   "error": "**Lost the place.** A retry sends the same `Idempotency-Key` and gets the same entry back, so the guest is not sent to the back, and the screen says so. `expired` (the admission was not used in time) offers to enter again; `closed` (the room was switched off or the performance stopped selling) says so and goes back to the event",
+   "emptyFirstRun": "—",
+   "offline": "**The offline banner shows.** The last known position stays on screen with its age, and polling resumes with the same entry when the connection is back. Admission needs the connection."
   },
   "apis": [
    {
-    "operationId": "getWaitTimes",
-    "contract": "queue",
-    "purpose": "Wait times across a venue",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getWaitingGuest",
-    "contract": "queue",
-    "purpose": "The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242)",
-    "trigger": "onInterval"
-   },
-   {
-    "operationId": "joinQueue",
-    "contract": "queue",
-    "purpose": "Join a virtual queue",
+    "operationId": "enterWaitingRoom",
+    "contract": "catalogue",
+    "purpose": "Take a place in the performance's on-sale waiting room (ADR-0066); `notRequired` when the room is off",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getWaitingRoomPosition",
+    "contract": "catalogue",
+    "purpose": "The guest's place, polled every `pollAfterSeconds`; admitted, it carries the admission token for `addCartLine`",
+    "trigger": "onInterval"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "entryId",
-     "from": "deepLink"
+     "name": "performanceId",
+     "from": "GST-007"
+    },
+    {
+     "name": "waitingEntryId",
+     "from": "GST-046",
+     "optional": true
     }
    ],
-   "coldEntry": "**Named, expired or withdrawn — never a 404** (ADR-0030). A guest holding a link that no longer resolves did nothing wrong; the screen says what happened and offers the list it came from."
+   "coldEntry": "**Named, closed or expired — never a 404** (ADR-0030). Opened with no performance, or one no longer selling, the room says so and offers the event."
   },
   "wireframe": {
    "status": "notStarted",
@@ -225,32 +203,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "view": "Account → All screens → Wave 1 → Branded queue / waiting room"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formJoinQueue",
-    "component": "modal",
-    "trigger": "Join queue",
-    "body": "**Collects what `joinQueue` sends before it is called.** Required: `id`, `queueId`, `partySize`, `recordedAt`. Optional: `entitlementId`, `partyHeightsCm`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "JoinQueueRequest",
-    "confirm": {
-     "label": "Join queue",
-     "operation": "joinQueue"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "queueId",
-      "partySize",
-      "recordedAt",
-      "entitlementId",
-      "partyHeightsCm"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ],
+  "apisNote": "Rebuilt 1 October 2026 on the two waiting-room operations (ADR-0066). Columns are the entry's guest-facing fields; `pollAfterSeconds` and `admission` are plumbing the screen acts on rather than shows.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -291,48 +244,11 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
- "getWaitTimes": {
-  "method": "GET",
-  "path": "/queues/wait-times",
-  "contract": "queue",
-  "summary": "Wait times across a venue",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "category",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "WaitTime"
- },
- "getWaitingGuest": {
-  "method": "GET",
-  "path": "/waiting-guests/{entryId}",
-  "contract": "queue",
-  "summary": "Read a queue entry",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "WaitingGuest"
- },
- "joinQueue": {
+ "enterWaitingRoom": {
   "method": "POST",
-  "path": "/waiting-guests",
-  "contract": "queue",
-  "summary": "Join a virtual queue",
+  "path": "/performances/{performanceId}/waiting-room/entries",
+  "contract": "catalogue",
+  "summary": "Join the on-sale waiting room for a performance",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -344,8 +260,21 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": "JoinQueueRequest",
-  "responds": "WaitingGuest"
+  "requestBody": null,
+  "responds": "WaitingRoomEntry"
+ },
+ "getWaitingRoomPosition": {
+  "method": "GET",
+  "path": "/performances/{performanceId}/waiting-room/entries/{waitingEntryId}",
+  "contract": "catalogue",
+  "summary": "Where a waiting guest is, and the admission token once admitted",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WaitingRoomEntry"
  }
 }
 ```
@@ -356,269 +285,95 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "JoinQueueRequest": {
-  "x-ticvai-persistence": "none — request only",
+ "WaitingRoomAdmission": {
   "type": "object",
+  "x-ticvai-persistence": "none — transient, a signed token that is checked and never stored",
+  "description": "**The admission token** (ADR-0066). Signed with a Key Vault secret; carries the tenant, the performance, the expiry and a unique id, so it cannot be moved to another performance or replayed after it expires. Sent as `X-Admission-Token` (shared parameter `AdmissionToken`).",
   "required": [
-   "id",
-   "queueId",
-   "partySize",
-   "recordedAt"
+   "token",
+   "performanceId",
+   "expiresAt"
   ],
   "properties": {
-   "id": {
+   "token": {
+    "type": "string",
+    "description": "The signed token, opaque to the client."
+   },
+   "tokenId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The token's unique id."
+   },
+   "performanceId": {
     "type": "string",
     "format": "uuid"
    },
-   "queueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "partySize": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "entitlementId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Fast Pass or priority entitlement. Owned by Product & Entitlement — this contract references it and never defines it.\n"
-   },
-   "partyHeightsCm": {
-    "type": "array",
-    "description": "Where the queue has a height requirement. Refusing here is far better than refusing at the ride, in front of a child who has already waited.\n",
-    "items": {
-     "type": "integer"
-    }
-   },
-   "accessibilityNeedDeclared": {
-    "type": "boolean",
-    "default": false,
-    "description": "The party declares an accessibility need (5.6.7; decided 29 September, build pass). Grants priority only on a lane whose `QueueFastPass.accessibilityPriority` is on, and is recorded on the entry either way.\n"
-   },
-   "promotionCode": {
-    "type": "string",
-    "maxLength": 64,
-    "nullable": true,
-    "description": "A promotion code the guest holds, checked against the lane's `QueueFastPass.promotionIds` (5.6.34). A code for a promotion the lane does not list grants nothing and is not an error.\n"
-   },
-   "recordedAt": {
+   "expiresAt": {
     "type": "string",
     "format": "date-time"
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
+ "WaitingRoomEntry": {
   "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
- "QueueEntryStatus": {
-  "type": "string",
-  "enum": [
-   "waiting",
-   "called",
-   "redeemed",
-   "expired",
-   "noShow",
-   "cancelled",
-   "released"
-  ]
- },
- "QueueStatus": {
-  "type": "string",
-  "enum": [
-   "open",
-   "paused",
-   "closed",
-   "atCapacity"
-  ]
- },
- "WaitTime": {
-  "x-ticvai-persistence": "none — computed from readings and throughput",
-  "type": "object",
+  "x-ticvai-persistence": "none — transient, held in the room's Redis counters and never in a table",
+  "description": "One guest's place in a performance's waiting room (ADR-0066). No personal data.",
   "required": [
-   "queueId",
-   "waitMinutes",
-   "source",
-   "asOf",
-   "isStale"
+   "waitingEntryId",
+   "performanceId",
+   "state"
   ],
   "properties": {
-   "queueId": {
+   "waitingEntryId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A UUIDv7 minted on arrival; what the waiting page polls with."
+   },
+   "performanceId": {
     "type": "string",
     "format": "uuid"
    },
-   "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "attractionProductId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "attractionCategoryId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. Read from catalogue, not stored here.\n"
-   },
-   "status": {
-    "$ref": "#/components/schemas/QueueStatus"
-   },
-   "waitMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "description": "Null where the queue is closed or no estimate is available."
-   },
-   "source": {
-    "$ref": "#/components/schemas/WaitTimeSource"
-   },
-   "isStale": {
-    "type": "boolean",
-    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current, and it is not hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with its `asOf` and a stale marker.\n"
-   },
-   "heightRequirementCm": {
-    "type": "integer",
-    "nullable": true
-   },
-   "zone": {
-    "type": "string",
-    "nullable": true
-   },
-   "asOf": {
-    "type": "string",
-    "format": "date-time",
-    "description": "When the figure was produced — the queue's `waitTimeAsOf`."
-   }
-  }
- },
- "WaitTimeSource": {
-  "type": "string",
-  "description": "Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed.\n",
-  "enum": [
-   "sensor",
-   "throughput",
-   "manual",
-   "unavailable"
-  ]
- },
- "WaitingGuest": {
-  "x-ticvai-persistence": "queue.entry",
-  "type": "object",
-  "required": [
-   "id",
-   "queueId",
-   "partyNumber",
-   "partySize",
-   "status",
-   "joinedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
-   },
-   "queueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "partyNumber": {
-    "type": "integer",
-    "description": "What the guest sees and what appears on signage."
-   },
-   "partySize": {
-    "type": "integer"
-   },
-   "status": {
-    "$ref": "#/components/schemas/QueueEntryStatus"
-   },
-   "positionInQueue": {
-    "type": "integer",
-    "nullable": true
-   },
-   "partiesAhead": {
-    "type": "integer",
-    "nullable": true
-   },
-   "estimatedCallAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "isFastPass": {
-    "type": "boolean"
-   },
-   "priorityBasis": {
+   "state": {
     "type": "string",
     "enum": [
-     "none",
-     "entitlement",
-     "loyaltyTier",
-     "promotion",
-     "accessibility"
+     "notRequired",
+     "waiting",
+     "admitted",
+     "expired",
+     "closed"
     ],
-    "default": "none",
-    "description": "Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first `QueueFastPass` criterion met at join, in the order entitlement, loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not `none`. Kept on the entry so a disputed priority can be explained afterwards.\n"
+    "description": "`notRequired`: the room is off, go to the sale. `waiting`: keep polling. `admitted`: `admission` is set. `expired`: the admission was not used in time; enter again. `closed`: the room was switched off or the performance stopped selling."
    },
-   "priorityTierId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`."
-   },
-   "priorityPromotionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The promotion that granted priority, where `priorityBasis` is `promotion`."
-   },
-   "accessibilityNeedDeclared": {
-    "type": "boolean",
-    "default": false,
-    "description": "What the party declared at join, shown to the operator at the front."
-   },
-   "entitlementId": {
-    "type": "string",
-    "nullable": true
-   },
-   "calledAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "returnWindowEndsAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "redeemedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "admittedCount": {
+   "position": {
     "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Place in the room; null unless `waiting`."
+   },
+   "aheadOfYou": {
+    "type": "integer",
+    "minimum": 0,
     "nullable": true
    },
-   "joinedAt": {
-    "type": "string",
-    "format": "date-time"
+   "estimatedWaitSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "At the current release rate. An estimate, and the page says so."
    },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
+   "pollAfterSeconds": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 5
+   },
+   "admission": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WaitingRoomAdmission"
+     }
+    ],
+    "nullable": true,
+    "description": "Set when `state` is `admitted`."
    }
   }
  }

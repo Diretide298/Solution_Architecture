@@ -1190,7 +1190,7 @@
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listAccessPolicies",
+       "impliedBy": "listAuthorisationPolicies",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
@@ -1206,7 +1206,7 @@
   },
   "apis": [
    {
-    "operationId": "listAccessPolicies",
+    "operationId": "listAuthorisationPolicies",
     "contract": "identity",
     "purpose": "Who may see which report",
     "trigger": "onLoad",

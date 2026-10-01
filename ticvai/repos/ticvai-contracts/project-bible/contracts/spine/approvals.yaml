@@ -179,6 +179,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ApprovalRequest'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createApprovalRequest
       x-ticvai-consumed-by:
@@ -250,6 +252,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalStateProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/submit:
     parameters:
     - name: requestId
@@ -336,6 +340,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalStateProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/evaluate:
     post:
       operationId: evaluateApprovalRequirement
@@ -396,6 +402,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalRequirement'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/decide:
     parameters:
     - name: requestId
@@ -516,6 +524,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalStateProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/withdraw:
     parameters:
     - name: requestId
@@ -574,6 +584,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalStateProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/escalate:
     parameters:
     - name: requestId
@@ -631,6 +643,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalRequest'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/resubmit:
     parameters:
     - name: requestId
@@ -685,6 +699,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalRequest'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-matrices:
     get:
       operationId: listApprovalMatrices
@@ -732,6 +748,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ApprovalMatrix'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setApprovalMatrix
       x-ticvai-consumed-by:
@@ -842,6 +860,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrixRefusedProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delegations:
     get:
       operationId: listApprovalDelegations
@@ -872,6 +892,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ApprovalDelegation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createApprovalDelegation
       x-ticvai-consumed-by:
@@ -936,6 +958,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/DelegationRefusedProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delegations/{delegationId}:
     parameters:
     - name: delegationId
@@ -972,6 +996,8 @@ paths:
           description: Revoked
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-analytics:
     get:
       operationId: getApprovalAnalytics
@@ -1031,6 +1057,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalAnalytics'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-badges:
     get:
       operationId: listAccreditationBadges
@@ -1062,6 +1090,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccreditationBadge'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: issueAccreditationBadge
       x-ticvai-audience:
@@ -1100,6 +1130,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationBadge'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rule-workflow:
     get:
       operationId: listRuleWorkflow
@@ -1153,6 +1185,8 @@ paths:
                         $ref: '#/components/schemas/RulesWorkflowCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/RulesWorkflowCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: type
         in: query
@@ -1227,6 +1261,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VisualBusinessRuleBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /condition-decision-logic:
     get:
       operationId: listConditionDecisionLogic
@@ -1269,6 +1305,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConditionsDecisionLogicDecisionTablesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's reusable decision tables, defined by hand
   /visual-workflow:
     put:
@@ -1327,6 +1365,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VisualWorkflowDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /matrix-multi-level:
     put:
       operationId: approveMatrixMultiLevel
@@ -1381,6 +1421,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrixMultiLevelApprovalConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
       x-ticvai-step-up-reason: Changes what needs approving at all, so it sits above every threshold beneath
         it.
@@ -1439,6 +1481,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RolesAuthorityDelegationApprovalLimitsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
       x-ticvai-step-up-reason: Grants authority. **The approval that creates approvers** — the one place the
         permission chain widens.
@@ -1487,6 +1531,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SlaEscalationReminderTimeoutRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a tenant's SLA policies, defined by hand
   /trigger-action-cross:
     put:
@@ -1544,6 +1590,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TriggerActionCrossModuleOrchestrationConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /workflow-testing-impact:
     put:
       operationId: simulateWorkflowTestingImpact
@@ -1598,6 +1646,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkflowTestingSimulationImpactAnalysisView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /versioning-governance:
     put:
       operationId: approveVersioningGovernance
@@ -1656,6 +1706,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VersioningGovernanceApprovalPublicationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
       x-ticvai-step-up-reason: Publishes a governed version. What everyone downstream then treats as current.
   /workflow:
@@ -1707,6 +1759,8 @@ paths:
                         $ref: '#/components/schemas/WorkflowOperationsCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/WorkflowOperationsCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: module
         in: query
@@ -1789,6 +1843,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnifiedApprovalInboxDecisionWorkspaceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
       x-ticvai-step-up-reason: Decides across modules in one act, so its blast radius is every module it touches.
   /workflow-instance-process:
@@ -1847,6 +1903,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/WorkflowInstanceMonitorProcessTimelineView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: workflowInstance
         in: query
@@ -1921,6 +1979,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/WorkflowExceptionFailureRecoveryCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: errorType
         in: query
@@ -2001,6 +2061,8 @@ paths:
                         $ref: '#/components/schemas/SlaEscalationBottleneckMonitorView'
                     summary:
                       $ref: '#/components/schemas/SlaEscalationBottleneckMonitorViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: workflow
         in: query
@@ -2080,6 +2142,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AutomationExecutionAutonomousActionMonitorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cross-module-orchestration:
     get:
       operationId: listCrossModuleOrchestration
@@ -2128,6 +2192,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CrossModuleOrchestrationMonitorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: correlationId
         in: query
@@ -2256,6 +2322,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkflowAnalyticsProcessPerformanceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /process-automation-opportunity:
     get:
       operationId: listProcessAutomationOpportunity
@@ -2302,6 +2370,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ProcessOptimizationAutomationOpportunityCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: opportunityType
         in: query
@@ -2365,6 +2435,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AiWorkflowIntelligenceAutonomousGovernanceCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a tenant's registered AI use cases, set up by hand
       parameters:
       - name: autonomyLevel
@@ -2412,6 +2484,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/StepUpPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setStepUpPolicy
       x-ticvai-consumed-by:
@@ -2489,6 +2563,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/StepUpPolicyRefusedProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-control-policies:
     get:
       operationId: listApprovalControlPolicies
@@ -2531,6 +2607,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ApprovalControlPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setApprovalControlPolicy
       x-ticvai-consumed-by:
@@ -2578,6 +2656,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalControlPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/signature:
     parameters:
     - name: requestId
@@ -2636,6 +2716,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalSignature'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/record:
     parameters:
     - name: requestId
@@ -2673,6 +2755,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalRecord'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-sla-policies:
     put:
       operationId: setApprovalSlaPolicy
@@ -2731,6 +2815,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalSlaPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-delegations/availability:
     put:
       operationId: setApproverAvailability
@@ -2783,6 +2869,8 @@ paths:
                 $ref: '#/components/schemas/ApproverAvailability'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-retention:
     put:
       operationId: setApprovalRetentionPolicy
@@ -2838,6 +2926,8 @@ paths:
                 $ref: '#/components/schemas/ApprovalRetentionPolicy'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-evidence-packages:
     post:
       operationId: createApprovalEvidencePackage
@@ -2897,6 +2987,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalEvidencePackage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approved-action-executions:
     get:
       operationId: listApprovedActionExecutions
@@ -2960,6 +3052,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ApprovedActionExecutionView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approved-action-executions/{executionId}/resolve:
     parameters:
     - name: executionId
@@ -3032,6 +3126,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /workflow-instances/{instanceId}/actions:
     parameters:
     - name: instanceId
@@ -3140,6 +3236,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /approval-external-providers:
     get:
@@ -3190,6 +3288,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ApprovalExternalProvider'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setApprovalExternalProvider
       x-ticvai-consumed-by:
@@ -3263,6 +3363,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-external-dispatches:
     get:
       operationId: listApprovalExternalDispatches
@@ -3327,6 +3429,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ApprovalExternalDispatch'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/external-decision:
     parameters:
     - name: requestId
@@ -3412,6 +3516,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   securitySchemes:
     bearerAuth:

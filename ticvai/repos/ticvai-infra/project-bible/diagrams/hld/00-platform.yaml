@@ -9,9 +9,9 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 2660
+  operations: 2668
   contracts: 33
-  tables: 1097
+  tables: 1099
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
     stores. **They own no service and should not**: a cache entry is derived from something already
     read, invalidated by an event already consumed, and losable without consequence. **Both numbers
@@ -31,7 +31,7 @@ scale:
   flows: 289
   stateModels: 206
   events: 77
-  decisions: 58
+  decisions: 70
   requirements: 3184
   buildPercent: 0
 actors:
@@ -40,7 +40,7 @@ actors:
   - P01
   - P02
   - P05
-  operations: 252
+  operations: 254
   note: Buys, arrives, is admitted, spends. **Never sees a staff surface** — `check-screens` refuses
     a guest screen declaring a staff permission.
 - actor: venue staff
@@ -51,7 +51,7 @@ actors:
   - P08
   - P15
   - P16
-  operations: 2477
+  operations: 2483
   note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
     (ADR-0002) — which is what makes a shared handheld safe.
 - actor: partner
@@ -528,10 +528,10 @@ services:
     workers: []
 stores:
 - store: postgres
-  operations: 2646
+  operations: 2654
   usedBy:
   - service: CatalogueService
-    operations: 445
+    operations: 449
   - service: OrderService
     operations: 288
   - service: VenueOpsService
@@ -541,7 +541,7 @@ stores:
   - service: AccessService
     operations: 246
   - service: PlatformService
-    operations: 212
+    operations: 216
   - service: TenancyService
     operations: 204
   - service: AiService
@@ -567,10 +567,10 @@ stores:
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 2131
+  operations: 2139
   usedBy:
   - service: CatalogueService
-    operations: 390
+    operations: 394
   - service: AccessService
     operations: 232
   - service: MarketingService
@@ -580,7 +580,7 @@ stores:
   - service: VenueOpsService
     operations: 206
   - service: PlatformService
-    operations: 165
+    operations: 169
   - service: TenancyService
     operations: 142
   - service: AiService
@@ -695,9 +695,9 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 2660 operations across 28 contracts — the join
+  holds: 2668 operations across 28 contracts — the join
 - layer: backend
-  holds: 1097 tables in 26 schemas, 910 relationships
+  holds: 1099 tables in 26 schemas, 910 relationships
 - layer: domain
   holds: 113 state models, 29 events
 - layer: decisions

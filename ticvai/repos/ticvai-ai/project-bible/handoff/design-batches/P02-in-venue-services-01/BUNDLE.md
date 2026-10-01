@@ -118,7 +118,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-021 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-021 holds none of them. The edge carries nothing: GST-021 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "BO-096",
@@ -274,7 +274,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyFirstRun": "No interactive map yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the interactive map are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect."
+   "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect.",
+   "map3dUnavailable": "**No 3D model for this map: the 2D map, same route** (ADR-0069; client meeting 30 September, MoM 4.8). The venue has not published a GLB model for this map (the default for every venue until it supplies one), the phone fails the 3D capability check, or rendering drops below 20 fps. The 2D map shows the same route from `getVenueMapGraph` and the same live position dot; the 2D/3D toggle is hidden and nothing else is said: no message, no error.",
+   "weakGps": "**Position approximate** (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or the route runs along an indoor path. The dot dims and an approximate-position ring is drawn round the last confident position, labelled *Position approximate*; the turn list and the remaining distance stay, and *I am at…* (tap a nearby location, or scan its QR sign) re-anchors. Routing does not stop, in 3D or in 2D."
   },
   "apis": [
    {
@@ -323,11 +325,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-021",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "At the venue → Map (the venue map, scrolled to the map and nearest-place filters)"
+    "view": "At the venue → Nearest food → Start (walking navigation: the 3D map follows the route, turn-by-turn above it)",
+    "differences": "The walking navigation follows the route in 3D, with turn-by-turn above the map and a live position (ADR-0069). The 2D/3D choice is a demo setting of the prototype (Config, Maps: 3D or 2D), not a switch the guest has, and neither the 3D-unavailable state (map3dUnavailable) nor the weak-GPS state (weakGps, \"Position approximate\") is drawn: both pending in design: specified, and built from the definition until the design shows it (handoff/design-batches/apps/1-guest-app/README.md)."
    },
    "derivedFrom": "wireframes/reference/Seat Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
@@ -408,12 +411,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-022 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-022 holds none of them. The edge carries nothing: GST-022 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-059",
      "trigger": "Plan My Day – In Progress",
-     "provenance": "derived — GST-059 declares entryState.params itemId, planId and GST-022 holds none of them, so the edge carries nothing and GST-059 opens cold"
+     "provenance": "derived — GST-059 declares entryState.params itemId, planId and GST-022 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 opens on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)"
     }
    ]
   },
@@ -472,9 +475,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-022",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
     "view": "At the venue → Waits"
    }
@@ -545,7 +548,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-023 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-023 holds none of them. The edge carries nothing: GST-023 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -797,7 +800,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-024 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-024 holds none of them. The edge carries nothing: GST-024 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-009",
@@ -1247,7 +1250,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-025 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-025 holds none of them. The edge carries nothing: GST-025 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-023",
@@ -1458,7 +1461,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-027 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-027 holds none of them. The edge carries nothing: GST-027 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-028",
@@ -1751,7 +1754,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-028 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-028 holds none of them. The edge carries nothing: GST-028 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-012",
@@ -1961,7 +1964,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-029 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-029 holds none of them. The edge carries nothing: GST-029 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -2198,7 +2201,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-038 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-038 holds none of them. The edge carries nothing: GST-038 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-021",
@@ -2384,7 +2387,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyFirstRun": "No digital companion mode yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the digital companion mode are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing.",
+   "map3dUnavailable": "**No 3D model for this map: the 2D map, same route** (ADR-0069; client meeting 30 September, MoM 4.8). The Map view of this screen is GST-021's map (one implementation): where the venue has not published a GLB model (the default until it supplies one), the phone fails the 3D capability check or rendering drops below 20 fps, the 2D map shows with the same route and the same live position dot; the 2D/3D toggle is hidden and nothing else is said.",
+   "weakGps": "**Position approximate** (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or indoors. The Map view dims the dot and draws an approximate-position ring round the last confident position, labelled *Position approximate*; directions keep their turn list and remaining distance, and *I am at…* (a nearby location, or its QR sign) re-anchors. Waits, shows and services are unaffected."
   },
   "apis": [
    {
@@ -2420,11 +2425,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-038",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "Home → You're at Summit Peaks (At the venue · live, Map view)"
+    "view": "Home → You're at Summit Peaks (At the venue · live, Map view)",
+    "differences": "The live Map view renders the park in 3D with the route and the position dot (2D when the prototype's Maps setting is 2D). No guest-facing 2D/3D switch, and no map3dUnavailable or weakGps state: both pending in design: specified, and built from the definition until the design shows it (handoff/design-batches/apps/1-guest-app/README.md)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -2823,6 +2829,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

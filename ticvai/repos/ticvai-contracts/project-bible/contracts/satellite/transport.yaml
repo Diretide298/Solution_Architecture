@@ -201,6 +201,8 @@ paths:
               schema: { $ref: '#/components/schemas/Station' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409': { $ref: '../shared/common.yaml#/components/responses/DuplicateCode' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/stations/{stationId}:
     parameters:
@@ -254,6 +256,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- routes
   /transport/routes:
@@ -365,6 +369,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/routes/{routeId}:
     parameters:
@@ -461,6 +467,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/routes/{routeId}/status:
     parameters:
@@ -516,6 +524,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/routes/{routeId}/map:
     parameters:
@@ -659,6 +669,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/fare-quotes:
     post:
@@ -751,6 +763,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/Timetable' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createTransportTimetable
@@ -788,6 +802,8 @@ paths:
               schema: { $ref: '#/components/schemas/Timetable' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/timetables/{timetableId}:
     parameters:
@@ -845,6 +861,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/timetables/{timetableId}/publish:
     parameters:
@@ -898,6 +916,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/timetables/{timetableId}/withdraw:
     parameters:
@@ -947,6 +967,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- departures
   /transport/departures:
@@ -1147,6 +1169,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/Departure' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/departures/{departureId}:
     parameters:
@@ -1198,6 +1222,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- passes
   /transport/pass-offers:
@@ -1288,6 +1314,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/PassType' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createTransportPassType
@@ -1329,6 +1357,8 @@ paths:
               schema: { $ref: '#/components/schemas/PassType' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409': { $ref: '../shared/common.yaml#/components/responses/DuplicateCode' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/pass-types/{passTypeId}:
     parameters:
@@ -1381,6 +1411,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/PassType' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- favourites
   /transport/favourite-routes:
@@ -1586,6 +1618,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/network-imports/{importId}:
     parameters:
@@ -1617,6 +1651,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/TransportNetworkImport' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /transport/network-imports/{importId}/apply:
     parameters:
@@ -1668,6 +1704,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

@@ -934,8 +934,8 @@ operations:
   - staff
   offline: false
   reads:
-  - access.access_device
   - access.access_point
+  - access.device_placement
   - access.hardware_deployment
   writes: []
 - operation: listDeviceTypeHardware
@@ -1313,7 +1313,7 @@ operations:
   - staff
   offline: false
   reads:
-  - access.access_device
+  - access.device_placement
   - access.hardware_deployment
   - access.hardware_model
   writes: []
@@ -1554,10 +1554,10 @@ operations:
   - staff
   offline: false
   reads:
-  - access.access_device
   - access.access_point
   - access.admission_rules
   - access.blacklist
+  - access.device_placement
   - access.edge_node
   - access.edge_package
   - access.scan_event
@@ -1609,8 +1609,8 @@ operations:
   offline: false
   reads:
   - access.access_area
-  - access.access_device
   - access.access_point
+  - access.device_placement
   - access.gate_lane
   - access.hardware_model
   writes: []
@@ -1953,6 +1953,24 @@ operations:
   writes:
   - access.scan_event
   - cache:idempotency
+- operation: placeAccessDevice
+  verb: POST
+  path: /device-placements
+  scope: venue
+  permission: DEVICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_area
+  - access.access_point
+  - access.device_placement
+  - access.hardware_model
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.device_placement
+  - cache:idempotency
 - operation: publishHardwareDeployment
   verb: POST
   path: /hardware-deployments
@@ -2012,10 +2030,10 @@ operations:
   offline: false
   reads:
   - access.access_area
-  - access.access_device
   - access.access_point
   - access.admission_rules
   - access.configuration_version
+  - access.device_placement
   - access.entry_rule_point
   - access.hardware_deployment
   - access.offline_policy
@@ -2025,24 +2043,6 @@ operations:
   - access.configuration_change
   - access.configuration_version
   - access.hardware_deployment
-  - cache:idempotency
-- operation: registerAccessDevice
-  verb: POST
-  path: /access-devices
-  scope: venue
-  permission: DEVICE_CONFIGURE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - access.access_area
-  - access.access_device
-  - access.access_point
-  - access.hardware_model
-  - cache:idempotency
-  writes:
-  - access.access_device
-  - access.configuration_change
   - cache:idempotency
 - operation: releaseCredentialDevice
   verb: POST
@@ -2357,13 +2357,13 @@ operations:
   - staff
   offline: false
   reads:
-  - access.access_device
   - access.access_point
+  - access.device_placement
   - cache:idempotency
   writes:
-  - access.access_device
   - access.access_point
   - access.configuration_change
+  - access.device_placement
   - cache:idempotency
 - operation: setBrandingLocalizationTemplate
   verb: PUT
@@ -3027,9 +3027,9 @@ operations:
   - staff
   offline: false
   reads:
-  - access.access_device
   - access.access_point
   - access.access_point_configuration
+  - access.device_placement
   - access.hardware_model
   - cache:idempotency
   writes:
@@ -3388,21 +3388,21 @@ operations:
   - access.scan_event
   - platform.outbox
   - sync.rejection
-- operation: updateAccessDevice
+- operation: updateAccessDevicePlacement
   verb: PUT
-  path: /access-devices/{deviceId}
+  path: /device-placements/{placementId}
   scope: venue
   permission: DEVICE_CONFIGURE
   audience:
   - staff
   offline: false
   reads:
-  - access.access_device
+  - access.device_placement
   - access.hardware_model
   - cache:idempotency
   writes:
-  - access.access_device
   - access.configuration_change
+  - access.device_placement
   - cache:idempotency
 - operation: updateAccessPoint
   verb: PATCH

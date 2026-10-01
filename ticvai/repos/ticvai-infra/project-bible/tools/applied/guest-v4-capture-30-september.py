@@ -63,6 +63,13 @@ def main():
     a = ap.parse_args()
     assert (ROOT / PROTO).exists(), PROTO
     man = json.loads((CAPTURE / "manifest.json").read_text(encoding="utf-8"))
+    if man["prototype"] != PROTO:
+        # Superseded on 1 October: the capture folder now holds the 30 September return, imported by
+        # tools/applied/guest-30-september-return.py. Rewriting its screens back to the 29 September
+        # build would be a regression, so there is nothing for this script to do.
+        print(f"superseded: {CAPTURE.relative_to(ROOT)} holds {man['prototype']}; "
+              "see tools/applied/guest-30-september-return.py. Nothing to do.")
+        return 0
     cap = {c["id"]: c for c in man["captured"] if c["id"] in SCREENS}
     for m in man.get("missing", []):
         print(f"  not captured: {m['id']}: {m['reason']}")

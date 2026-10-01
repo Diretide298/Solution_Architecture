@@ -126,6 +126,7 @@
 | 201 |  | Created. |
 | 400 | BadRequest | Validation failed |
 | 409 |  | Username already in use within this cell |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createRole
 
@@ -177,6 +178,7 @@
 |---|---|---|
 | 201 |  | Created |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listPrincipals
 
@@ -231,6 +233,7 @@
 |---|---|---|
 | 200 |  | Principals |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listRoles
 
@@ -281,6 +284,7 @@ A role is a grouping for permission management — code, name, description and t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Roles |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### openPlatformStaffGrant
 
@@ -341,6 +345,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 | 201 |  | Open. |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updatePrincipal
 
@@ -399,6 +404,7 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: guestAuth
@@ -441,6 +447,7 @@ Where the guest is linked across cells, the request fans out (ADR-0010).
 |---|---|---|
 | 202 |  | Erasure request raised |
 | 409 |  | Open orders or an unexpired entitlement exist. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGuestSession
 
@@ -492,6 +499,7 @@ Where the guest is linked across cells, the request fans out (ADR-0010).
 |---|---|---|
 | 200 |  | Session |
 | 401 | Unauthorized | Missing, expired or superseded session |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getMyIdentityVerification
 
@@ -537,6 +545,7 @@ Status, outcome and, where it was refused or needs resubmission, the reason the 
 | 200 |  | The latest verification |
 | 401 | Unauthorized | Missing, expired or superseded session |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### guestLogout
 
@@ -568,6 +577,7 @@ Ends this device's session. `allDevices` revokes every session for the subject, 
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Ended |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### guestPasswordLogin
 
@@ -639,7 +649,7 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 | 200 |  | Signed in |
 | 400 | BadRequest | Validation failed |
 | 401 |  | Identifier or password not accepted, or the account is locked. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### guestSocialLogin
 
@@ -707,6 +717,7 @@ Where the provider's verified email matches an existing account, the identities 
 |---|---|---|
 | 200 |  | Signed in |
 | 401 |  | Provider token invalid or expired |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### guestUaePassLogin
 
@@ -776,6 +787,7 @@ Government onboarding has lead time and should be started before it becomes the 
 |---|---|---|
 | 200 |  | Signed in with a verified identity |
 | 401 | Unauthorized | Missing, expired or superseded session |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### linkGuestCheckout
 
@@ -821,6 +833,7 @@ A guest who bought without an account, then registered. **The guest names one bo
 |---|---|---|
 | 200 |  | Attached |
 | 403 |  | Contact detail on the order does not match the verified identifier |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### registerGuest
 
@@ -893,6 +906,7 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 |---|---|---|
 | 201 |  | Created, pending verification |
 | 409 |  | Identifier already registered. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### requestGuestOtp
 
@@ -940,7 +954,7 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Sent if the identifier is deliverable |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### submitGuestIdentityDocument
 
@@ -1008,6 +1022,7 @@ Creates a `pending` verification. `409` while another is pending for this guest;
 | 401 | Unauthorized | Missing, expired or superseded session |
 | 409 |  | A verification is already pending for this guest |
 | 422 |  | The document has expired, or its kind is not accepted by the tenant's policy |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### verifyGuestOtp
 
@@ -1073,6 +1088,7 @@ Creates a `pending` verification. `409` while another is pending for this guest;
 |---|---|---|
 | 200 |  | Verified |
 | 401 |  | Code invalid or expired. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: identity
@@ -1119,6 +1135,7 @@ Held to `setPasswordPolicy` (length, breach check); a PIN is held to the length 
 | 400 | BadRequest | Validation failed |
 | 401 | Unauthorized | Missing, expired or superseded session |
 | 422 |  | The new credential fails the password policy, or matches the current one or any of the previous PasswordPolicy.reusePreventionCount credentials (5 unless the tenant sets another; decided 28 September… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### exportSubjectData
 
@@ -1167,6 +1184,7 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Export started, as a data-subject request (platform.dsar_request). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### forceLogout
 
@@ -1206,6 +1224,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 |---|---|---|
 | 204 |  | Session terminated and audited |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getCurrentSession
 
@@ -1267,6 +1286,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 |---|---|---|
 | 200 |  | Active session |
 | 401 | Unauthorized | Missing, expired or superseded session |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### grantDelegation
 
@@ -1340,6 +1360,7 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 |---|---|---|
 | 201 |  | Granted |
 | 409 |  | A cycle, or a minor granting authority over an adult. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listDelegations
 
@@ -1420,6 +1441,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Grants held and grants over |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### login
 
@@ -1516,7 +1538,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | 400 | BadRequest | Validation failed |
 | 401 | Unauthorized | Missing, expired or superseded session |
 | 409 |  | An active session already exists for this principal on another device. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### refreshToken
 
@@ -1560,6 +1582,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 |---|---|---|
 | 200 |  | Rotated |
 | 401 | Unauthorized | Missing, expired or superseded session |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### selectRole
 
@@ -1634,6 +1657,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 |---|---|---|
 | 200 |  | Role selected, session usable |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setGuestVerificationPolicy
 
@@ -1707,6 +1731,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPasswordPolicy
 
@@ -1783,6 +1808,7 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### verifyGuestEmail
 
@@ -1836,7 +1862,7 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Sent, or verified |
 | 410 |  | The token expired or was already used. |
 
@@ -1890,6 +1916,7 @@ A session that authenticated hours ago is not the same as a person present at th
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Challenge issued |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### enrolMfaMethod
 
@@ -1943,6 +1970,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | 201 |  | Enrolment started, pending verification |
 | 403 |  | A guest caller while no venue of the tenant has guest two-step verification on (rev 3 GAP-B1, per venue). |
 | 422 |  | A kind the caller may not enrol. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listMfaMethods
 
@@ -1966,6 +1994,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Methods |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### removeMfaMethod
 
@@ -1998,6 +2027,7 @@ Refused where it is the only active method and the principal holds a permission 
 |---|---|---|
 | 204 |  | Removed |
 | 409 |  | Last remaining method of a principal who holds a permission that requires MFA (audit R135) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### verifyMfaChallenge
 
@@ -2123,6 +2153,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 |---|---|---|
 | 200 |  | Active. |
 | 401 |  | Code invalid |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: session
@@ -2184,6 +2215,7 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Sessions |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 
@@ -2435,7 +2467,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Group | Operations |
 |---|---|
-| administration | `createAccessPolicy`, `createAccessReviewCampaign`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAccessPolicy`, `getAccessPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessPolicies`, `listAccessPolicyEffectiveness`, `listAccessPolicyHistory`, `listAccessPolicyTemplates`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listOwnPlatformStaffGrants`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAccessPolicyVersion`, `setAccessPolicyState`, `setCapabilityTemplate`, `setPrincipalModuleAccess`, `simulateAccessPolicy`, `suggestRoleAssignment`, `updateAccessPolicy` |
+| administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listOwnPlatformStaffGrants`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setCapabilityTemplate`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
 | identity | `decideGuestIdentityVerification`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage`, `setSegregationRules` |
 | session | `revokeAllSessions` |
 | sso | `completeSsoAuthorization`, `getSsoConfig`, `listSsoProviders`, `setSsoConfig`, `startSsoAuthorization` |

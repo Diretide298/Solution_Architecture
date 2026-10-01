@@ -1,7 +1,7 @@
 {
- "createAccessPolicy": {
+ "createAuthorisationPolicy": {
   "method": "POST",
-  "path": "/access-policies",
+  "path": "/authorisation-policies",
   "contract": "identity",
   "summary": "Write a policy without writing code",
   "permission": "PERMISSION_MANAGE",
@@ -15,8 +15,8 @@
     "required": null
    }
   ],
-  "requestBody": "AccessPolicy",
-  "responds": "AccessPolicy"
+  "requestBody": "AuthorisationPolicy",
+  "responds": "AuthorisationPolicy"
  },
  "createMediaShare": {
   "method": "POST",
@@ -98,11 +98,11 @@
   "requestBody": null,
   "responds": "MediaUsageRow"
  },
- "listAccessPolicies": {
+ "listAuthorisationPolicies": {
   "method": "GET",
-  "path": "/access-policies",
+  "path": "/authorisation-policies",
   "contract": "identity",
-  "summary": "Attribute-based access policies",
+  "summary": "Attribute-based authorisation policies",
   "permission": "PERMISSION_VIEW",
   "offlineCapable": null,
   "conflictPolicy": null,
@@ -120,7 +120,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "AccessPolicy"
+  "responds": "AuthorisationPolicy"
  },
  "listMediaAssetAudit": {
   "method": "GET",

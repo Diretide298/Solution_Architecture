@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 77 |
-| Operations | 217 |
+| Operations | 219 |
 | Contracts | 19 |
 | Modules | 17 |
 | Undrawn | 0 |
@@ -122,7 +122,7 @@
 | `GST-043` | Arabic / RTL Experience | System States | 1 | 0 | yes |
 | `GST-044` | Multi-Currency & Pricing | Ticketing | 2 | 2 | yes |
 | `GST-045` | Ticket Delivery & Sharing | Account & Self-Service | 2 | 1 | yes |
-| `GST-046` | Branded Queue / Waiting Room | High-Demand Access | 1 | 3 | yes |
+| `GST-046` | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 | yes |
 | `GST-047` | Maintenance / Upgrade Page | System States | 1 | 1 | yes |
 | `GST-048` | Upsell / Cross-Sell | Booking & Selection | 2 | 3 | yes |
 | `GST-049` | Interactive Seat Selection | Booking & Selection | 2 | 5 | yes |

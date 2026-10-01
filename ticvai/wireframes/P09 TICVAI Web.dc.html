@@ -5625,7 +5625,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccessPolicies</div>
+          <div><b>OPERATIONS</b> &middot; listAuthorisationPolicies</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-349">ADM-349</a>  &mdash; <i>Back to Approval Integration Command Center</i></div>
@@ -19815,12 +19815,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDeadLetters · replayDeadLetter</div>
+          <div><b>OPERATIONS</b> &middot; listDeadLetters · replayDeadLetter · listOutboxRepublishes · getOutboxRepublish +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; deadLetterId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; deadLetterId&larr;deepLink, republishId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRepublishOutbox &middot; <i>Republish from the outbox</i> &middot; <b>Republish</b> &middot; Cancel <span class="dis">discards tenantId · from · to · eventNames · reason</span></div><div class="ov"><b>confirmDialog</b> confirmCancelOutboxRepublish &middot; <i>Cancel republish</i> &middot; <b>Cancel republish</b></div></div>
         </div>
       </div></div><div class="grp">14 — Analytics · 20 screens</div><div class="stack">
       <div id="adm-499" class="scr" data-ws="WS119">

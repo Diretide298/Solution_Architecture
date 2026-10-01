@@ -23,25 +23,6 @@
   "requestBody": null,
   "responds": "SeatMap"
  },
- "createAccessPolicy": {
-  "method": "POST",
-  "path": "/access-policies",
-  "contract": "identity",
-  "summary": "Write a policy without writing code",
-  "permission": "PERMISSION_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AccessPolicy",
-  "responds": "AccessPolicy"
- },
  "createAccessReviewCampaign": {
   "method": "POST",
   "path": "/access-review-campaigns",
@@ -60,6 +41,25 @@
   ],
   "requestBody": "IdentityAccessReviewCampaign",
   "responds": "IdentityAccessReviewCampaign"
+ },
+ "createAuthorisationPolicy": {
+  "method": "POST",
+  "path": "/authorisation-policies",
+  "contract": "identity",
+  "summary": "Write a policy without writing code",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AuthorisationPolicy",
+  "responds": "AuthorisationPolicy"
  },
  "createEmergencyAccessOverride": {
   "method": "POST",
@@ -183,87 +183,6 @@
   "requestBody": null,
   "responds": null
  },
- "listAccessPolicies": {
-  "method": "GET",
-  "path": "/access-policies",
-  "contract": "identity",
-  "summary": "Attribute-based access policies",
-  "permission": "PERMISSION_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "scopePath",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AccessPolicy"
- },
- "listAccessPolicyEffectiveness": {
-  "method": "GET",
-  "path": "/access-policy-effectiveness",
-  "contract": "identity",
-  "summary": "How each software-permission policy has behaved over a period",
-  "permission": "PERMISSION_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "from",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "to",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "policyId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "scopePath",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listAccessPolicyHistory": {
-  "method": "GET",
-  "path": "/access-policies/{policyId}/history",
-  "contract": "identity",
-  "summary": "Every version, who changed it and why",
-  "permission": "PERMISSION_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "AccessPolicyVersion"
- },
  "listAccessReviewCampaigns": {
   "method": "GET",
   "path": "/access-review-campaigns",
@@ -331,6 +250,87 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listAuthorisationPolicies": {
+  "method": "GET",
+  "path": "/authorisation-policies",
+  "contract": "identity",
+  "summary": "Attribute-based authorisation policies",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AuthorisationPolicy"
+ },
+ "listAuthorisationPolicyEffectiveness": {
+  "method": "GET",
+  "path": "/authorisation-policy-effectiveness",
+  "contract": "identity",
+  "summary": "How each software-permission policy has behaved over a period",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "policyId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAuthorisationPolicyHistory": {
+  "method": "GET",
+  "path": "/authorisation-policies/{policyId}/history",
+  "contract": "identity",
+  "summary": "Every version, who changed it and why",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AuthorisationPolicyVersion"
  },
  "listDenominations": {
   "method": "GET",
@@ -457,9 +457,9 @@
   "requestBody": null,
   "responds": "VenueMap"
  },
- "restoreAccessPolicyVersion": {
+ "restoreAuthorisationPolicyVersion": {
   "method": "POST",
-  "path": "/access-policies/{policyId}/restore",
+  "path": "/authorisation-policies/{policyId}/restore",
   "contract": "identity",
   "summary": "Put a previously approved policy version back, as a new version",
   "permission": "PERMISSION_MANAGE",
@@ -474,11 +474,11 @@
    }
   ],
   "requestBody": null,
-  "responds": "AccessPolicy"
+  "responds": "AuthorisationPolicy"
  },
- "setAccessPolicyState": {
+ "setAuthorisationPolicyState": {
   "method": "POST",
-  "path": "/access-policies/{policyId}/state",
+  "path": "/authorisation-policies/{policyId}/state",
   "contract": "identity",
   "summary": "Submit, approve, activate or retire a policy",
   "permission": "PERMISSION_MANAGE",
@@ -493,7 +493,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "AccessPolicy"
+  "responds": "AuthorisationPolicy"
  },
  "setConfigurationProfile": {
   "method": "PUT",
@@ -590,9 +590,9 @@
   "requestBody": "VisualWorkflowDesignerInput",
   "responds": "VisualWorkflowDesignerView"
  },
- "simulateAccessPolicy": {
+ "simulateAuthorisationPolicy": {
   "method": "POST",
-  "path": "/access-policies/simulate",
+  "path": "/authorisation-policies/simulate",
   "contract": "identity",
   "summary": "What this policy would decide, before it decides anything",
   "permission": "PERMISSION_VIEW",
@@ -609,9 +609,9 @@
   "requestBody": null,
   "responds": "AccessDecision"
  },
- "updateAccessPolicy": {
+ "updateAuthorisationPolicy": {
   "method": "PUT",
-  "path": "/access-policies/{policyId}",
+  "path": "/authorisation-policies/{policyId}",
   "contract": "identity",
   "summary": "Change a policy, as a new version",
   "permission": "PERMISSION_MANAGE",
@@ -625,8 +625,8 @@
     "required": null
    }
   ],
-  "requestBody": "AccessPolicy",
-  "responds": "AccessPolicy"
+  "requestBody": "AuthorisationPolicy",
+  "responds": "AuthorisationPolicy"
  },
  "updateRegionSettings": {
   "method": "PUT",

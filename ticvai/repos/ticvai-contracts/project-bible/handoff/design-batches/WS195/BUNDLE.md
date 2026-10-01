@@ -1352,7 +1352,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
    },
    {
-    "operationId": "listAccessPolicies",
+    "operationId": "listAuthorisationPolicies",
     "contract": "identity",
     "purpose": "API access and permissions",
     "trigger": "onLoad",
@@ -2426,30 +2426,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "WalletReconciliation"
  },
- "listAccessPolicies": {
-  "method": "GET",
-  "path": "/access-policies",
-  "contract": "identity",
-  "summary": "Attribute-based access policies",
-  "permission": "PERMISSION_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "scopePath",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AccessPolicy"
- },
  "listApiClients": {
   "method": "GET",
   "path": "/api-clients",
@@ -2491,6 +2467,30 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listAuthorisationPolicies": {
+  "method": "GET",
+  "path": "/authorisation-policies",
+  "contract": "identity",
+  "summary": "Attribute-based authorisation policies",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AuthorisationPolicy"
  },
  "listProductionAccessRequests": {
   "method": "GET",
@@ -2835,118 +2835,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "type": "string"
     }
-   }
-  }
- },
- "AccessPolicy": {
-  "type": "object",
-  "x-ticvai-persistence": "identity.access_policy",
-  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here). The overlap that remains is listed in the build readiness open items rather than merged in this pass.\n",
-  "required": [
-   "code",
-   "name",
-   "effect"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "Assigned by the server on `createAccessPolicy`; the path names the policy on update."
-   },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "description": {
-    "type": "string",
-    "nullable": true
-   },
-   "isTemplate": {
-    "type": "boolean",
-    "default": false
-   },
-   "permissions": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"
-   },
-   "conditions": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AccessCondition"
-    }
-   },
-   "combining": {
-    "type": "string",
-    "enum": [
-     "allMustMatch",
-     "anyMayMatch"
-    ],
-    "default": "allMustMatch"
-   },
-   "effect": {
-    "type": "string",
-    "enum": [
-     "permit",
-     "deny"
-    ],
-    "description": "**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"
-   },
-   "priority": {
-    "type": "integer",
-    "default": 0
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"
-   },
-   "appliesToRoleIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "status": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**Moved only by `setAccessPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n",
-    "enum": [
-     "draft",
-     "pendingApproval",
-     "active",
-     "suspended",
-     "retired"
-    ]
-   },
-   "version": {
-    "type": "integer",
-    "default": 1,
-    "readOnly": true,
-    "description": "Set by the server; every `updateAccessPolicy` writes a new version."
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "effectiveTo": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "delegatedAdminRoleIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    },
-    "description": "3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"
    }
   }
  },
@@ -3455,6 +3343,118 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "expired",
    "cancelled"
   ]
+ },
+ "AuthorisationPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.authorisation_policy",
+  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n",
+  "required": [
+   "code",
+   "name",
+   "effect"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "isTemplate": {
+    "type": "boolean",
+    "default": false
+   },
+   "permissions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"
+   },
+   "conditions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AccessCondition"
+    }
+   },
+   "combining": {
+    "type": "string",
+    "enum": [
+     "allMustMatch",
+     "anyMayMatch"
+    ],
+    "default": "allMustMatch"
+   },
+   "effect": {
+    "type": "string",
+    "enum": [
+     "permit",
+     "deny"
+    ],
+    "description": "**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"
+   },
+   "priority": {
+    "type": "integer",
+    "default": 0
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"
+   },
+   "appliesToRoleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "suspended",
+     "retired"
+    ]
+   },
+   "version": {
+    "type": "integer",
+    "default": 1,
+    "readOnly": true,
+    "description": "Set by the server; every `updateAuthorisationPolicy` writes a new version."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "delegatedAdminRoleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"
+   }
+  }
  },
  "CreateApprovalRequest": {
   "type": "object",
@@ -4296,7 +4296,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "WebhookEventType": {
   "type": "string",
-  "description": "**The webhook event catalogue: every event a subscription may name** (29 September, build pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`, published through `platform.outbox` by exactly one context. A name is added here in the same change that adds its event file, and never before.\n**Added 29 September**, each closing a requirement that had the webhook mechanism and nothing to subscribe to:\n| Events | Publisher | Requirement | |---|---|---| | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 | | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 | | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 | | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 | | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 | | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) | | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) | | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |\n**Published and deliberately not offered** (29 September, build pass, group G2): `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is high-volume fraud telemetry, not a business fact a receiver acts on.\n",
+  "description": "**The webhook event catalogue: every event a subscription may name** (29 September, build pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`, published through `platform.outbox` by exactly one context. A name is added here in the same change that adds its event file, and never before.\n**Added 29 September**, each closing a requirement that had the webhook mechanism and nothing to subscribe to:\n| Events | Publisher | Requirement | |---|---|---| | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 | | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 | | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 | | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 | | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 | | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) | | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) | | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |\n**Deprecated** (1 October, ADR-0067 amendment): `device.enrolmentChanged` is still offered but nothing inside the platform consumes it any more; it is removed at the next major version of this API. Subscribers are told in the release note.\n**Published and deliberately not offered** (29 September, build pass, group G2): `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is high-volume fraud telemetry, not a business fact a receiver acts on.\n",
+  "x-ticvai-deprecated-values": [
+   "device.enrolmentChanged"
+  ],
   "enum": [
    "access.validated",
    "accreditation.applicationDecided",

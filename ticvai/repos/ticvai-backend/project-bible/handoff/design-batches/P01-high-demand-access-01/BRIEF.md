@@ -1,6 +1,6 @@
 # P01-high-demand-access-01 — P01 · High-Demand Access
 
-**1 screens · 3 operations · 7 schemas · 0 permissions**
+**1 screens · 2 operations · 2 schemas · 0 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -61,7 +61,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-015` | Branded Queue / Waiting Room | statusTracker | 3 | 1 | — |
+| `WEB-015` | Branded Queue / Waiting Room | statusTracker | 2 | 0 | — |
 
 ## Thin screens in this batch
 

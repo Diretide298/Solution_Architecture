@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `subscription`, `platform-ops`, `public-api` |
 | Schemas owned | `control`, `subscription` |
-| Operations in the slice | 18 of 212 |
+| Operations in the slice | 18 of 216 |
 | Scale | Low volume, high consequence. Tenant provisioning and licensing. |
 | If it is down | Down blocks provisioning and the developer API. Trading is unaffected. |
 
@@ -120,6 +120,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Added |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: plan
@@ -173,6 +174,25 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | billingPeriod | enum (monthly, quarterly, annual) |  |  |
 | includesBrandedApp | boolean |  | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
 | includedAiTokens | integer |  | AI tokens the package includes per billing period. (nullable) |
+| requestLimits | PlanRequestLimits |  | The limits section of a plan: every tenant has a request budget (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). (nullable) |
+| requestLimits.guest | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.guest.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.guest.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.guest.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.staff | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.staff.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.staff.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.staff.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.service | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.service.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.service.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.service.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.partner | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.partner.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.partner.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.partner.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.replicaSharePercent | integer |  | The most of one replica's request slots one tenant may hold while the share is enforced. (min 1; max 100; default 25) |
+| requestLimits.shareEnforcedAbovePercent | integer |  | The replica load, as a percent of its limit, above which the share is enforced. (min 1; max 100; default 70) |
 | packageKind | enum (standard, custom) |  | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). (default standard) |
 | offeredToTenantId | string (uuid) |  | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… (nullable) |
 
@@ -200,6 +220,25 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | billingPeriod | enum (monthly, quarterly, annual) |  |  |
 | includesBrandedApp | boolean |  | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
 | includedAiTokens | integer |  | AI tokens the package includes per billing period. (nullable) |
+| requestLimits | PlanRequestLimits |  | The limits section of a plan: every tenant has a request budget (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). (nullable) |
+| requestLimits.guest | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.guest.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.guest.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.guest.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.staff | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.staff.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.staff.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.staff.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.service | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.service.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.service.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.service.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.partner | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.partner.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.partner.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.partner.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.replicaSharePercent | integer |  | The most of one replica's request slots one tenant may hold while the share is enforced. (min 1; max 100; default 25) |
+| requestLimits.shareEnforcedAbovePercent | integer |  | The replica load, as a percent of its limit, above which the share is enforced. (min 1; max 100; default 70) |
 | packageKind | enum (standard, custom) |  | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). (default standard) |
 | offeredToTenantId | string (uuid) |  | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… (nullable) |
 | id | string (uuid) | yes |  |
@@ -214,6 +253,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 |---|---|---|
 | 201 |  | Created |
 | 422 |  | offeredToTenantId on a standard package, or a tenant that does not exist |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createPlanVersion
 
@@ -264,6 +304,25 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | billingPeriod | enum (monthly, quarterly, annual) |  |  |
 | includesBrandedApp | boolean |  | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
 | includedAiTokens | integer |  | AI tokens the package includes per billing period. (nullable) |
+| requestLimits | PlanRequestLimits |  | The limits section of a plan: every tenant has a request budget (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). (nullable) |
+| requestLimits.guest | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.guest.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.guest.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.guest.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.staff | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.staff.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.staff.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.staff.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.service | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.service.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.service.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.service.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.partner | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.partner.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.partner.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.partner.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.replicaSharePercent | integer |  | The most of one replica's request slots one tenant may hold while the share is enforced. (min 1; max 100; default 25) |
+| requestLimits.shareEnforcedAbovePercent | integer |  | The replica load, as a percent of its limit, above which the share is enforced. (min 1; max 100; default 70) |
 | packageKind | enum (standard, custom) |  | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). (default standard) |
 | offeredToTenantId | string (uuid) |  | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… (nullable) |
 
@@ -291,6 +350,25 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | billingPeriod | enum (monthly, quarterly, annual) |  |  |
 | includesBrandedApp | boolean |  | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
 | includedAiTokens | integer |  | AI tokens the package includes per billing period. (nullable) |
+| requestLimits | PlanRequestLimits |  | The limits section of a plan: every tenant has a request budget (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). (nullable) |
+| requestLimits.guest | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.guest.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.guest.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.guest.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.staff | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.staff.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.staff.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.staff.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.service | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.service.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.service.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.service.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.partner | RequestBudget |  | One audience's bucket (ADR-0064). |
+| requestLimits.partner.sustainedPerSecond | integer | yes | Requests per second the bucket refills at. (min 1) |
+| requestLimits.partner.burstMultiplier | number |  | How far above the sustained rate a burst may go (2 is twice the rate). (min 1; default 2) |
+| requestLimits.partner.burstSeconds | integer |  | How long a burst may last. (min 1; default 10) |
+| requestLimits.replicaSharePercent | integer |  | The most of one replica's request slots one tenant may hold while the share is enforced. (min 1; max 100; default 25) |
+| requestLimits.shareEnforcedAbovePercent | integer |  | The replica load, as a percent of its limit, above which the share is enforced. (min 1; max 100; default 70) |
 | packageKind | enum (standard, custom) |  | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). (default standard) |
 | offeredToTenantId | string (uuid) |  | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… (nullable) |
 | id | string (uuid) | yes |  |
@@ -305,6 +383,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 |---|---|---|
 | 201 |  | New version published |
 | 422 |  | offeredToTenantId on a standard package, or a tenant that does not exist |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: publicApi
@@ -366,6 +445,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Decided |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createApiClient
 
@@ -441,6 +521,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | 201 |  | Created. |
 | 409 |  | A production client without a current certification, or asked for by a developer rather than issued by TICVAI (certification-required, M17-06). |
 | 422 |  | A production client with an empty ipAllowList (ip-allow-list-required, M17-07), or a scope that is not in the scope catalogue (unknown-scope, M17-05). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### decideProductionAccess
 
@@ -503,6 +584,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Already decided (already-decided), or the listing's certification lapsed since the request (certification-required). |
 | 422 |  | reject without a reason. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### deprecateApiVersion
 
@@ -562,6 +644,7 @@ Notifies every client using the version, and **the notification names which oper
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Deprecated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### registerDeveloper
 
@@ -620,6 +703,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Registered, pending verification |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### rotateApiCredential
 
@@ -665,6 +749,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Rotated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setApiLicensing
 
@@ -738,6 +823,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 |---|---|---|
 | 200 |  | Set |
 | 403 |  | catalogueWriteException was sent by a principal that is not TICVAI platform staff (platform-staff-only, M17-04). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setDeveloperMembers
 
@@ -777,6 +863,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: subscription
@@ -850,6 +937,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | 200 |  | Applied |
 | 409 |  | Downgrade conflicts with current usage. |
 | 422 |  | effectiveFrom was sent and is not the date the change must take effect: today for an upgrade, the next renewal for a downgrade (effective-date-not-allowed, audit R214 (1)). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: tenant
@@ -923,6 +1011,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 |---|---|---|
 | 201 |  | Created. |
 | 409 |  | Code already in use |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listTenants
 
@@ -986,6 +1075,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 |---|---|---|
 | 200 |  | Tenants |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### reactivateTenant
 
@@ -1044,6 +1134,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 |---|---|---|
 | 200 |  | Reactivated |
 | 409 |  | Tenant is terminated, not suspended. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### suspendTenant
 
@@ -1113,6 +1204,7 @@ Graceful and reversible. Data is retained, cells stay provisioned, and the behav
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Suspended |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### terminateTenant
 
@@ -1167,6 +1259,7 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 | 202 |  | Termination scheduled |
 | 400 |  | Confirmation code does not match |
 | 409 |  | Unsettled ledger balances exist |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateTenant
 
@@ -1236,6 +1329,7 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | The tenant is terminated (tenant-terminated, audit R214 (3)). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 
@@ -1417,6 +1511,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | billing_period | text | no |  |
 | includes_branded_app | boolean | no | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
 | included_ai_tokens | integer | no | AI tokens the package includes per billing period. |
+| request_limits | jsonb | no |  |
 | package_kind | text | no | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). |
 | offered_to_tenant_id | uuid | no | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… |
 | id | uuid | yes |  |
@@ -1446,7 +1541,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-194 operations, added to this service in later releases without changing any of the above.
+198 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -1461,7 +1556,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | partner | `createPartnerQuote`, `listPartnerQuotes` |
 | plan | `getPlan`, `listPlans` |
 | platform | `getScalingPolicy`, `listArchivalJobs`, `listBackupRuns`, `listWafRules`, `setScalingPolicy`, `setWafPolicy` |
-| platform-ops | `listDeadLetters`, `replayDeadLetter`, `skipRolloutCell` |
+| platform-ops | `cancelOutboxRepublish`, `getOutboxRepublish`, `listDeadLetters`, `listOutboxRepublishes`, `replayDeadLetter`, `republishOutbox`, `skipRolloutCell` |
 | publicApi | `createSandbox`, `createWebhookSubscription`, `getApiUsage`, `issueApiToken`, `listApiAnomalies`, `listApiClients`, `listApiScopes`, `listApiVersions`, `listIntegrationListings`, `listProductionAccessRequests`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `requestProductionAccess`, `resetSandbox`, `revokeApiCredential`, `setApiAnomalyRule`, `setApiClientStatus`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |
 | release | `createRelease`, `getRelease`, `getReleaseReadiness`, `listReleases`, `promoteRelease`, `rejectRelease`, `withdrawRelease` |
 | rollout | `getRollout`, `listRollouts`, `pauseRollout`, `rollbackRollout`, `startRollout` |

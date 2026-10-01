@@ -69,11 +69,11 @@
   "requestBody": null,
   "responds": "ReportExport"
  },
- "listAccessPolicies": {
+ "listAuthorisationPolicies": {
   "method": "GET",
-  "path": "/access-policies",
+  "path": "/authorisation-policies",
   "contract": "identity",
-  "summary": "Attribute-based access policies",
+  "summary": "Attribute-based authorisation policies",
   "permission": "PERMISSION_VIEW",
   "offlineCapable": null,
   "conflictPolicy": null,
@@ -91,7 +91,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "AccessPolicy"
+  "responds": "AuthorisationPolicy"
  },
  "listDataRetentionSettings": {
   "method": "GET",

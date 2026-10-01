@@ -287,8 +287,9 @@ screens:
     transitions:
     - to: KIT-001
       trigger: Kitchen Operations Command Center
-      provenance: derived — KIT-001 declares entryState.params  and KIT-002 holds none of them, so the
-        edge carries nothing and KIT-001 opens cold
+      provenance: 'derived — KIT-001 declares entryState.params  and KIT-002 holds none of them. The edge
+        carries nothing: KIT-002 is opened from KIT-001, so this edge is the way back and KIT-001 keeps
+        its own state'
     - to: KIT-003
       trigger: Order Firing & Course Management
       provenance: flow F83 step 2→3, F88 step 2→3
@@ -655,8 +656,9 @@ screens:
     transitions:
     - to: KIT-001
       trigger: Kitchen Operations Command Center
-      provenance: derived — KIT-001 declares entryState.params  and KIT-003 holds none of them, so the
-        edge carries nothing and KIT-001 opens cold
+      provenance: 'derived — KIT-001 declares entryState.params  and KIT-003 holds none of them. The edge
+        carries nothing: KIT-003 is opened from KIT-001, so this edge is the way back and KIT-001 keeps
+        its own state'
     - to: KIT-004
       trigger: Active Order Management & Fulfilment Journey
       provenance: flow F83 step 3→4, F88 step 3→4
@@ -1108,8 +1110,9 @@ screens:
     transitions:
     - to: KIT-001
       trigger: Kitchen Operations Command Center
-      provenance: derived — KIT-001 declares entryState.params  and KIT-005 holds none of them, so the
-        edge carries nothing and KIT-001 opens cold
+      provenance: 'derived — KIT-001 declares entryState.params  and KIT-005 holds none of them. The edge
+        carries nothing: KIT-005 is opened from KIT-001, so this edge is the way back and KIT-001 keeps
+        its own state'
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3e` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
@@ -1305,8 +1308,9 @@ screens:
     transitions:
     - to: KIT-001
       trigger: Kitchen Operations Command Center
-      provenance: derived — KIT-001 declares entryState.params  and KIT-006 holds none of them, so the
-        edge carries nothing and KIT-001 opens cold
+      provenance: 'derived — KIT-001 declares entryState.params  and KIT-006 holds none of them. The edge
+        carries nothing: KIT-006 is opened from KIT-001, so this edge is the way back and KIT-001 keeps
+        its own state'
     - to: KIT-002
       trigger: Kitchen Display System (KDS)
       provenance: flow F88 step 1→2
@@ -1578,8 +1582,9 @@ screens:
     transitions:
     - to: KIT-001
       trigger: Kitchen Operations Command Center
-      provenance: derived — KIT-001 declares entryState.params  and KIT-007 holds none of them, so the
-        edge carries nothing and KIT-001 opens cold
+      provenance: 'derived — KIT-001 declares entryState.params  and KIT-007 holds none of them. The edge
+        carries nothing: KIT-007 is opened from KIT-001, so this edge is the way back and KIT-001 keeps
+        its own state'
   notes: '**Built 20 August from board 3 of the client F&B design set.** **`buzzerCode` exists and nothing
     dispatches to a physical pager.** The digital half works; the buzzer half assumes a device driver
     the package does not model. **Board repointed 24 August.** This screen pointed at `wireframes/FnB
@@ -1780,8 +1785,9 @@ screens:
     transitions:
     - to: KIT-001
       trigger: Kitchen Operations Command Center
-      provenance: derived — KIT-001 declares entryState.params  and KIT-008 holds none of them, so the
-        edge carries nothing and KIT-001 opens cold
+      provenance: 'derived — KIT-001 declares entryState.params  and KIT-008 holds none of them. The edge
+        carries nothing: KIT-008 is opened from KIT-001, so this edge is the way back and KIT-001 keeps
+        its own state'
   notes: '**Built 20 August from board 3 of the client F&B design set.** **86 is a kitchen word and a
     real state.** An item marked unavailable here stops selling at every till in the venue within seconds,
     which is the only reason to put it on a kitchen screen. **Food-safety operations wired 20 August**
@@ -2039,8 +2045,9 @@ screens:
     transitions:
     - to: KIT-001
       trigger: Kitchen Operations Command Center
-      provenance: derived — KIT-001 declares entryState.params  and KIT-009 holds none of them, so the
-        edge carries nothing and KIT-001 opens cold
+      provenance: 'derived — KIT-001 declares entryState.params  and KIT-009 holds none of them. The edge
+        carries nothing: KIT-009 is opened from KIT-001, so this edge is the way back and KIT-001 keeps
+        its own state'
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3j` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
@@ -2205,8 +2212,9 @@ screens:
     transitions:
     - to: KIT-001
       trigger: Kitchen Operations Command Center
-      provenance: derived — KIT-001 declares entryState.params  and KIT-010 holds none of them, so the
-        edge carries nothing and KIT-001 opens cold
+      provenance: 'derived — KIT-001 declares entryState.params  and KIT-010 holds none of them. The edge
+        carries nothing: KIT-010 is opened from KIT-001, so this edge is the way back and KIT-001 keeps
+        its own state'
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3k` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`

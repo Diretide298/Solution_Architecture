@@ -135,17 +135,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SUP-005",
      "trigger": "Live Chat Workspace",
-     "provenance": "derived — SUP-005 declares entryState.params caseId, conversationId and SUP-001 holds none of them, so the edge carries nothing and SUP-005 opens cold"
+     "provenance": "derived — SUP-005 declares entryState.params caseId, conversationId and SUP-001 holds none of them. The edge carries nothing: SUP-005 finds caseId (createCase) itself; SUP-005 opens on listCases, and conversationId has no source on SUP-005 yet (a gap in SUP-005, not in this edge)"
     },
     {
      "to": "SUP-006",
      "trigger": "Knowledge Base Search",
-     "provenance": "derived — SUP-006 declares entryState.params bannerId, pageId, policyKind, version and SUP-001 holds none of them, so the edge carries nothing and SUP-006 opens cold"
+     "provenance": "derived — SUP-006 declares entryState.params bannerId, pageId, policyKind, version and SUP-001 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and SUP-006 opens on its own"
     },
     {
      "to": "SUP-008",
      "trigger": "Agent Performance & SLA View",
-     "provenance": "derived — SUP-008 declares entryState.params conversationId, reportId and SUP-001 holds none of them, so the edge carries nothing and SUP-008 opens cold"
+     "provenance": "derived — SUP-008 declares entryState.params conversationId, reportId and SUP-001 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or optional), and SUP-008 opens on its own"
     },
     {
      "to": "SUP-007",
@@ -526,7 +526,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-003 holds none of them, so the edge carries nothing and SUP-001 opens cold"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-003 holds none of them. The edge carries nothing: SUP-003 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
     }
    ]
   },

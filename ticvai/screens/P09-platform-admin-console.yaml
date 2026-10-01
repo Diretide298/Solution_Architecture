@@ -76,12 +76,14 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-001 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-001 holds none of them. The edge
+        carries nothing: ADM-001 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-004
       trigger: Platform Audit Log
-      provenance: derived — ADM-004 declares entryState.params decisionRecordId and ADM-001 holds none
-        of them, so the edge carries nothing and ADM-004 opens cold
+      provenance: 'derived — ADM-004 declares entryState.params decisionRecordId and ADM-001 holds none
+        of them. The edge carries nothing: ADM-004 finds decisionRecordId (listAiInteractions) itself,
+        and ADM-004 opens on its own'
     - to: PTR-001
       trigger: A partner user signs in through the same door
       provenance: flow F104 step 3→4
@@ -741,16 +743,19 @@ screens:
         so an edge into it carries them
     - to: ADM-016
       trigger: White-Label Branding Management
-      provenance: derived — ADM-016 declares entryState.params bannerId, pageId, policyKind, version and
-        ADM-002 holds none of them, so the edge carries nothing and ADM-016 opens cold
+      provenance: 'derived — ADM-016 declares entryState.params bannerId, pageId, policyKind, version
+        and ADM-002 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and ADM-016 opens on its own'
     - to: ADM-017
       trigger: Domain & Certificate Management
-      provenance: derived — ADM-017 declares entryState.params bannerId, domainId, pageId, policyKind,
-        version and ADM-002 holds none of them, so the edge carries nothing and ADM-017 opens cold
+      provenance: 'derived — ADM-017 declares entryState.params bannerId, domainId, pageId, policyKind,
+        version and ADM-002 holds none of them. The edge carries nothing: bannerId, pageId, policyKind,
+        version, domainId only pre-select (deep link or optional), and ADM-017 opens on its own'
     - to: ADM-018
       trigger: Localisation & Language Pack
-      provenance: derived — ADM-018 declares entryState.params bannerId, pageId, policyKind, version and
-        ADM-002 holds none of them, so the edge carries nothing and ADM-018 opens cold
+      provenance: 'derived — ADM-018 declares entryState.params bannerId, pageId, policyKind, version
+        and ADM-002 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
+        only pre-select (deep link or optional), and ADM-018 opens on its own'
     - to: ADM-019
       trigger: Global Configuration & Defaults
       carries:
@@ -759,20 +764,24 @@ screens:
         edge into it carries them
     - to: ADM-022
       trigger: Release & Version Management
-      provenance: derived — ADM-022 declares entryState.params releaseId and ADM-002 holds none of them,
-        so the edge carries nothing and ADM-022 opens cold
+      provenance: 'derived — ADM-022 declares entryState.params releaseId and ADM-002 holds none of them.
+        The edge carries nothing: releaseId only pre-selects (deep link or optional), and ADM-022 opens
+        on its own'
     - to: ADM-023
       trigger: Staging Promotion & Approval
-      provenance: derived — ADM-023 declares entryState.params releaseId and ADM-002 holds none of them,
-        so the edge carries nothing and ADM-023 opens cold
+      provenance: 'derived — ADM-023 declares entryState.params releaseId and ADM-002 holds none of them.
+        The edge carries nothing: releaseId only pre-selects (deep link or optional), and ADM-023 opens
+        on its own'
     - to: ADM-026
       trigger: End-of-Support Notice Management
-      provenance: derived — ADM-026 declares entryState.params version and ADM-002 holds none of them,
-        so the edge carries nothing and ADM-026 opens cold
+      provenance: 'derived — ADM-026 declares entryState.params version and ADM-002 holds none of them.
+        The edge carries nothing: ADM-026 finds version (listSupportNotices) itself, and ADM-026 opens
+        on its own'
     - to: ADM-027
       trigger: Database Migration Console
-      provenance: derived — ADM-027 declares entryState.params runId and ADM-002 holds none of them, so
-        the edge carries nothing and ADM-027 opens cold
+      provenance: 'derived — ADM-027 declares entryState.params runId and ADM-002 holds none of them.
+        The edge carries nothing: runId only pre-selects (deep link or optional), and ADM-027 opens on
+        its own'
     - to: ADM-029
       trigger: Deployment Monitor
       carries:
@@ -787,8 +796,9 @@ screens:
         edge into it carries them
     - to: ADM-031
       trigger: Security & Compliance Dashboard
-      provenance: derived — ADM-031 declares entryState.params dashboardId and ADM-002 holds none of them,
-        so the edge carries nothing and ADM-031 opens cold
+      provenance: 'derived — ADM-031 declares entryState.params dashboardId and ADM-002 holds none of
+        them. The edge carries nothing: dashboardId only pre-selects (deep link or optional), and ADM-031
+        opens on its own'
     - to: ADM-032
       trigger: WAF & Security Policy View
       carries:
@@ -815,16 +825,18 @@ screens:
         and ADM-002 holds regionId, so an edge into it carries them
     - to: ADM-138
       trigger: Promotion Command Center Dashboard
-      provenance: derived — ADM-138 declares entryState.params promotionId and ADM-002 holds none of them,
-        so the edge carries nothing and ADM-138 opens cold
+      provenance: 'derived — ADM-138 declares entryState.params promotionId and ADM-002 holds none of
+        them. The edge carries nothing: ADM-138 finds promotionId (listPromotions) itself, and ADM-138
+        opens on its own'
     - to: ADM-158
       trigger: Coupon & Promo Code Command Center
       provenance: derived — ADM-158 declares entryState.params campaignId and ADM-002 holds none of them,
         so the edge carries nothing and ADM-158 opens cold
     - to: ADM-318
       trigger: Dead Letters
-      provenance: derived — ADM-318 declares entryState.params deadLetterId and ADM-002 holds none of
-        them, so the edge carries nothing and ADM-318 opens cold
+      provenance: 'derived — ADM-318 declares entryState.params deadLetterId and ADM-002 holds none of
+        them. The edge carries nothing: deadLetterId only pre-selects (deep link or optional), and ADM-318
+        opens on its own'
     - to: ADM-024
       trigger: Release Notification Composer
       provenance: structural — ADM-002 is P09's home screen and its exits are its launcher
@@ -1150,16 +1162,19 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-003 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-003 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-003 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-003 holds none of them. The edge
+        carries nothing: ADM-003 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-004
       trigger: Platform Audit Log
-      provenance: derived — ADM-004 declares entryState.params decisionRecordId and ADM-003 holds none
-        of them, so the edge carries nothing and ADM-004 opens cold
+      provenance: 'derived — ADM-004 declares entryState.params decisionRecordId and ADM-003 holds none
+        of them. The edge carries nothing: ADM-004 finds decisionRecordId (listAiInteractions) itself,
+        and ADM-004 opens on its own'
     - to: SCN-003
       trigger: Guest scans at the other venue
       provenance: flow F19 step 2→3
@@ -1507,16 +1522,19 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-004 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-004 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-004 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-004 holds none of them. The edge
+        carries nothing: ADM-004 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-004 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
+      provenance: 'derived — ADM-003 declares entryState.params cellId, rightId and ADM-004 holds none
+        of them. The edge carries nothing: cellId, rightId only pre-select (deep link or optional), and
+        ADM-003 opens on its own'
     - to: BO-068
       trigger: Audit Log
       provenance: flow F106 step 2→3
@@ -1657,12 +1675,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-005 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-005 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-005 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-005 holds none of them. The edge
+        carries nothing: ADM-005 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -2171,12 +2191,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-006 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-006 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-006 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-006 holds none of them. The edge
+        carries nothing: ADM-006 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -2489,12 +2511,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-007 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-007 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-007 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-007 holds none of them. The edge
+        carries nothing: ADM-007 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -2811,12 +2835,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-008 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-008 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-008 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-008 holds none of them. The edge
+        carries nothing: ADM-008 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -3381,12 +3407,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-009 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-009 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-009 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-009 holds none of them. The edge
+        carries nothing: ADM-009 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -3682,12 +3710,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-010 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-010 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-010 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-010 holds none of them. The edge
+        carries nothing: ADM-010 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -3922,12 +3952,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-011 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-011 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-011 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-011 holds none of them. The edge
+        carries nothing: ADM-011 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -4286,12 +4318,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-012 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-012 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-012 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-012 holds none of them. The edge
+        carries nothing: ADM-012 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -4576,12 +4610,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-013 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-013 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-013 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-013 holds none of them. The edge
+        carries nothing: ADM-013 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -4823,12 +4859,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-014 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-014 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-014 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-014 holds none of them. The edge
+        carries nothing: ADM-014 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -5082,12 +5120,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-015 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-015 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-015 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-015 holds none of them. The edge
+        carries nothing: ADM-015 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -5497,12 +5537,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-016 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-016 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-016 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-016 holds none of them. The edge
+        carries nothing: ADM-016 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **30 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the
     **identical 41 operations** — a Typography screen that could create banners and a Component Preview
@@ -5905,12 +5947,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-017 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-017 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-017 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-017 holds none of them. The edge
+        carries nothing: ADM-017 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-016
       trigger: White-Label Branding Management
       provenance: flow F103 step 1→2
@@ -6156,12 +6200,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-018 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-018 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-018 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-018 holds none of them. The edge
+        carries nothing: ADM-018 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **36 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the
     **identical 41 operations** — a Typography screen that could create banners and a Component Preview
@@ -6426,12 +6472,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-019 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-019 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-019 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-019 holds none of them. The edge
+        carries nothing: ADM-019 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 
 
@@ -6752,12 +6800,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-020 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-020 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-020 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-020 holds none of them. The edge
+        carries nothing: ADM-020 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -6932,12 +6982,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-021 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-021 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-021 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-021 holds none of them. The edge
+        carries nothing: ADM-021 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -7064,12 +7116,14 @@ screens:
       provenance: flow F04 step 1→2
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-022 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-022 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-022 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-022 holds none of them. The edge
+        carries nothing: ADM-022 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -7324,12 +7378,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-023 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-023 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-023 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-023 holds none of them. The edge
+        carries nothing: ADM-023 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-029
       trigger: Watches the rollout per cell
       provenance: flow F04 step 3→4
@@ -7580,12 +7636,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-024 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-024 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-024 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-024 holds none of them. The edge
+        carries nothing: ADM-024 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -7758,12 +7816,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-025 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-025 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-025 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-025 holds none of them. The edge
+        carries nothing: ADM-025 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -7890,12 +7950,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-026 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-026 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-026 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-026 holds none of them. The edge
+        carries nothing: ADM-026 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -8074,12 +8136,14 @@ screens:
       operation: planMigration
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-027 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-027 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-027 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-027 holds none of them. The edge
+        carries nothing: ADM-027 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — the unowned orchestrator
@@ -8310,12 +8374,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-028 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-028 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-028 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-028 holds none of them. The edge
+        carries nothing: ADM-028 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — not specified
@@ -8446,12 +8512,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-029 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-029 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-029 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-029 holds none of them. The edge
+        carries nothing: ADM-029 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -8812,12 +8880,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-030 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-030 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-030 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-030 holds none of them. The edge
+        carries nothing: ADM-030 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -9104,12 +9174,14 @@ screens:
       provenance: flow F106 step 1→2
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-031 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-031 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-031 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-031 holds none of them. The edge
+        carries nothing: ADM-031 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — not specified
@@ -9373,12 +9445,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-032 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-032 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-032 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-032 holds none of them. The edge
+        carries nothing: ADM-032 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -9664,12 +9738,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-033 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-033 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-033 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-033 holds none of them. The edge
+        carries nothing: ADM-033 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -9923,12 +9999,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-034 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-034 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-034 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-034 holds none of them. The edge
+        carries nothing: ADM-034 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
       carries:
@@ -10182,12 +10260,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-035 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-035 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-035 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-035 holds none of them. The edge
+        carries nothing: ADM-035 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — overlaps P12
@@ -10328,12 +10408,14 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-036 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-036 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-036 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-036 holds none of them. The edge
+        carries nothing: ADM-036 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — not specified
@@ -10534,8 +10616,9 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-037 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-037 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
     - to: BO-091
       trigger: AI Policy & Spend
       provenance: flow F100 step 1→2
@@ -10915,8 +10998,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-038 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-038 holds none of them. The edge
+        carries nothing: ADM-038 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-039
       trigger: Works in Channel & Provider Configuration
       provenance: flow F133 step 1→2
@@ -12053,8 +12137,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-048 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-048 holds none of them. The edge
+        carries nothing: ADM-048 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-049
       trigger: Works in Price List Master Configuration
       provenance: flow F143 step 1→2
@@ -13427,8 +13512,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-058 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-058 holds none of them. The edge
+        carries nothing: ADM-058 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-059
       trigger: Works in Customer Segment & Profile Pricing Rules
       provenance: flow F144 step 1→2
@@ -14573,8 +14659,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-068 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-068 holds none of them. The edge
+        carries nothing: ADM-068 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-069
       trigger: Works in Tax Profile & Jurisdiction Configuration
       provenance: flow F145 step 1→2
@@ -15983,8 +16070,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-078 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-078 holds none of them. The edge
+        carries nothing: ADM-078 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-080
       trigger: Works in Bulk Pricing Update, Import & Mass Maintenance
       provenance: flow F146 step 3→4
@@ -17218,8 +17306,9 @@ screens:
     transitions:
     - to: ADM-078
       trigger: Pricing Governance Command Center
-      provenance: derived — ADM-078 declares entryState.params changeId and ADM-087 holds none of them,
-        so the edge carries nothing and ADM-078 opens cold
+      provenance: 'derived — ADM-078 declares entryState.params changeId and ADM-087 holds none of them.
+        The edge carries nothing: ADM-087 is opened from ADM-078, so this edge is the way back and ADM-078
+        keeps its own state'
   density: compact
   purposeNote: 'Every material pricing configuration, approval, publication, override, and rollback is
     fully traceable and can be reconstructed for operational, financial, and compliance purposes. Board
@@ -17345,8 +17434,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-088 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-088 holds none of them. The edge
+        carries nothing: ADM-088 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-090
       trigger: Works in Demand, Occupancy & Availability Rule Builder
       provenance: flow F147 step 3→4
@@ -18689,8 +18779,9 @@ screens:
     transitions:
     - to: ADM-088
       trigger: Dynamic Pricing Strategy Command Center
-      provenance: derived — ADM-088 declares entryState.params strategyId and ADM-097 holds none of them,
-        so the edge carries nothing and ADM-088 opens cold
+      provenance: 'derived — ADM-088 declares entryState.params strategyId and ADM-097 holds none of them.
+        The edge carries nothing: ADM-097 is opened from ADM-088, so this edge is the way back and ADM-088
+        keeps its own state'
   density: compact
   purposeNote: 'For any configured commercial scenario, TICVAI can deterministically calculate, test,
     and explain the final dynamic price before the strategy is activated. Board 5 — Final Screen Register
@@ -18863,8 +18954,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-098 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-098 holds none of them. The edge
+        carries nothing: ADM-098 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-099
       trigger: Works in Internal Demand & Booking Signal Hub
       provenance: flow F148 step 1→2
@@ -20267,8 +20359,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-108 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-108 holds none of them. The edge
+        carries nothing: ADM-108 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-109
       trigger: Works in Pricing Simulation Studio
       provenance: flow F149 step 1→2
@@ -21679,8 +21772,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-118 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-118 holds none of them. The edge
+        carries nothing: ADM-118 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-119
       trigger: Works in Product Creation Workspace
       provenance: flow F152 step 1→2
@@ -22668,8 +22762,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-128 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-128 holds none of them. The edge
+        carries nothing: ADM-128 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-131
       trigger: Product Version Management
       carries:
@@ -24021,12 +24116,14 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-138 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-138 holds none of them. The edge
+        carries nothing: ADM-138 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-145
       trigger: Promotion Approval Inbox
-      provenance: derived — ADM-145 declares entryState.params requestId and ADM-138 holds none of them,
-        so the edge carries nothing and ADM-145 opens cold
+      provenance: 'derived — ADM-145 declares entryState.params requestId and ADM-138 holds none of them.
+        The edge carries nothing: ADM-145 finds requestId (listApprovalRequests) itself, and ADM-145 opens
+        on its own'
     - to: ADM-140
       trigger: Works in Promotion Overview
       provenance: flow F154 step 3→4
@@ -24900,8 +24997,9 @@ screens:
     transitions:
     - to: ADM-138
       trigger: Promotion Command Center Dashboard
-      provenance: derived — ADM-138 declares entryState.params promotionId and ADM-143 holds none of them,
-        so the edge carries nothing and ADM-138 opens cold
+      provenance: 'derived — ADM-138 declares entryState.params promotionId and ADM-143 holds none of
+        them. The edge carries nothing: ADM-143 is opened from ADM-138, so this edge is the way back and
+        ADM-138 keeps its own state'
   density: compact
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Show) and a per-row directory (§For
@@ -25318,8 +25416,9 @@ screens:
     transitions:
     - to: ADM-138
       trigger: Promotion Command Center Dashboard
-      provenance: derived — ADM-138 declares entryState.params promotionId and ADM-146 holds none of them,
-        so the edge carries nothing and ADM-138 opens cold
+      provenance: 'derived — ADM-138 declares entryState.params promotionId and ADM-146 holds none of
+        them. The edge carries nothing: ADM-146 is opened from ADM-138, so this edge is the way back and
+        ADM-138 keeps its own state'
   density: compact
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§KPIs; Compare) and no per-row directory
@@ -25588,8 +25687,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-148 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-148 holds none of them. The edge
+        carries nothing: ADM-148 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-149
       trigger: Works in Percentage & Fixed Discount Configurator
       provenance: flow F155 step 1→2
@@ -26559,8 +26659,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-158 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-158 holds none of them. The edge
+        carries nothing: ADM-158 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-159
       trigger: Works in Coupon & Promo Code Builder
       provenance: flow F156 step 1→2
@@ -26756,8 +26857,9 @@ screens:
     transitions:
     - to: ADM-158
       trigger: Coupon & Promo Code Command Center
-      provenance: derived — ADM-158 declares entryState.params campaignId and ADM-159 holds none of them,
-        so the edge carries nothing and ADM-158 opens cold
+      provenance: 'derived — ADM-158 declares entryState.params campaignId and ADM-159 holds none of them.
+        The edge carries nothing: ADM-159 is opened from ADM-158, so this edge is the way back and ADM-158
+        keeps its own state'
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
@@ -26849,8 +26951,9 @@ screens:
     transitions:
     - to: ADM-158
       trigger: Coupon & Promo Code Command Center
-      provenance: derived — ADM-158 declares entryState.params campaignId and ADM-160 holds none of them,
-        so the edge carries nothing and ADM-158 opens cold
+      provenance: 'derived — ADM-158 declares entryState.params campaignId and ADM-160 holds none of them.
+        The edge carries nothing: ADM-160 is opened from ADM-158, so this edge is the way back and ADM-158
+        keeps its own state'
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Users define) and no display directory
@@ -26946,8 +27049,9 @@ screens:
     transitions:
     - to: ADM-158
       trigger: Coupon & Promo Code Command Center
-      provenance: derived — ADM-158 declares entryState.params campaignId and ADM-161 holds none of them,
-        so the edge carries nothing and ADM-158 opens cold
+      provenance: 'derived — ADM-158 declares entryState.params campaignId and ADM-161 holds none of them.
+        The edge carries nothing: ADM-161 is opened from ADM-158, so this edge is the way back and ADM-158
+        keeps its own state'
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -27035,8 +27139,9 @@ screens:
     transitions:
     - to: ADM-158
       trigger: Coupon & Promo Code Command Center
-      provenance: derived — ADM-158 declares entryState.params campaignId and ADM-162 holds none of them,
-        so the edge carries nothing and ADM-158 opens cold
+      provenance: 'derived — ADM-158 declares entryState.params campaignId and ADM-162 holds none of them.
+        The edge carries nothing: ADM-162 is opened from ADM-158, so this edge is the way back and ADM-158
+        keeps its own state'
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -27125,8 +27230,9 @@ screens:
     transitions:
     - to: ADM-158
       trigger: Coupon & Promo Code Command Center
-      provenance: derived — ADM-158 declares entryState.params campaignId and ADM-163 holds none of them,
-        so the edge carries nothing and ADM-158 opens cold
+      provenance: 'derived — ADM-158 declares entryState.params campaignId and ADM-163 holds none of them.
+        The edge carries nothing: ADM-163 is opened from ADM-158, so this edge is the way back and ADM-158
+        keeps its own state'
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -27208,8 +27314,9 @@ screens:
     transitions:
     - to: ADM-158
       trigger: Coupon & Promo Code Command Center
-      provenance: derived — ADM-158 declares entryState.params campaignId and ADM-164 holds none of them,
-        so the edge carries nothing and ADM-158 opens cold
+      provenance: 'derived — ADM-158 declares entryState.params campaignId and ADM-164 holds none of them.
+        The edge carries nothing: ADM-164 is opened from ADM-158, so this edge is the way back and ADM-158
+        keeps its own state'
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -27315,8 +27422,9 @@ screens:
     transitions:
     - to: ADM-158
       trigger: Coupon & Promo Code Command Center
-      provenance: derived — ADM-158 declares entryState.params campaignId and ADM-165 holds none of them,
-        so the edge carries nothing and ADM-158 opens cold
+      provenance: 'derived — ADM-158 declares entryState.params campaignId and ADM-165 holds none of them.
+        The edge carries nothing: ADM-165 is opened from ADM-158, so this edge is the way back and ADM-158
+        keeps its own state'
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -27427,8 +27535,9 @@ screens:
     transitions:
     - to: ADM-158
       trigger: Coupon & Promo Code Command Center
-      provenance: derived — ADM-158 declares entryState.params campaignId and ADM-166 holds none of them,
-        so the edge carries nothing and ADM-158 opens cold
+      provenance: 'derived — ADM-158 declares entryState.params campaignId and ADM-166 holds none of them.
+        The edge carries nothing: ADM-166 is opened from ADM-158, so this edge is the way back and ADM-158
+        keeps its own state'
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Monitor) and no metric row
@@ -27518,8 +27627,9 @@ screens:
     transitions:
     - to: ADM-158
       trigger: Coupon & Promo Code Command Center
-      provenance: derived — ADM-158 declares entryState.params campaignId and ADM-167 holds none of them,
-        so the edge carries nothing and ADM-158 opens cold
+      provenance: 'derived — ADM-158 declares entryState.params campaignId and ADM-167 holds none of them.
+        The edge carries nothing: ADM-167 is opened from ADM-158, so this edge is the way back and ADM-158
+        keeps its own state'
   density: compact
   purposeNote: 'Board 3 shall be considered complete when: 1. Users can create common and unique promotional
     codes. 2. Coupons and promotional vouchers can be configured. 3. Large unique-code batches can be
@@ -27684,8 +27794,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-168 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-168 holds none of them. The edge
+        carries nothing: ADM-168 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-169
       trigger: Works in Buy X Get Y / BOGO Rule Builder
       provenance: flow F157 step 1→2
@@ -28674,8 +28785,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-178 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-178 holds none of them. The edge
+        carries nothing: ADM-178 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-179
       trigger: Works in Bundle Definition & Setup
       provenance: flow F158 step 1→2
@@ -29764,8 +29876,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-188 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-188 holds none of them. The edge
+        carries nothing: ADM-188 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-189
       trigger: Works in Component Inventory & Availability Matrix
       provenance: flow F159 step 1→2
@@ -30847,8 +30960,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-198 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-198 holds none of them. The edge
+        carries nothing: ADM-198 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-199
       trigger: Works in Eligibility Rule Builder
       provenance: flow F160 step 1→2
@@ -31894,8 +32008,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-208 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-208 holds none of them. The edge
+        carries nothing: ADM-208 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-209
       trigger: Works in Promotion Priority & Hierarchy Manager
       provenance: flow F161 step 1→2
@@ -32872,8 +32987,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-218 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-218 holds none of them. The edge
+        carries nothing: ADM-218 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-219
       trigger: Works in Campaign Budget & Financial Limit Setup
       provenance: flow F162 step 1→2
@@ -34082,8 +34198,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-228 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-228 holds none of them. The edge
+        carries nothing: ADM-228 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-229
       trigger: Works in Campaign & Promotion Performance Explorer
       provenance: flow F163 step 1→2
@@ -35372,8 +35489,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-238 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-238 holds none of them. The edge
+        carries nothing: ADM-238 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-239
       trigger: Works in Visual Business Rule Builder
       provenance: flow F164 step 1→2
@@ -36519,8 +36637,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-248 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-248 holds none of them. The edge
+        carries nothing: ADM-248 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-249
       trigger: Works in Unified Approval Inbox & Decision Workspace
       provenance: flow F165 step 1→2
@@ -37991,8 +38110,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-258 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-258 holds none of them. The edge
+        carries nothing: ADM-258 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-259
       trigger: Works in Channel Creation & Profile Configuration
       provenance: flow F166 step 1→2
@@ -39333,8 +39453,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-268 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-268 holds none of them. The edge
+        carries nothing: ADM-268 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-269
       trigger: Works in Channel Connection & Integration Manager
       provenance: flow F167 step 1→2
@@ -40814,8 +40935,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-278 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-278 holds none of them. The edge
+        carries nothing: ADM-278 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-279
       trigger: Works in Resale Eligibility Rule Configuration
       provenance: flow F171 step 1→2
@@ -42266,8 +42388,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-288 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-288 holds none of them. The edge
+        carries nothing: ADM-288 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-289
       trigger: Works in Buyer Purchase & Resale Order Management
       provenance: flow F172 step 1→2
@@ -43700,8 +43823,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-298 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-298 holds none of them. The edge
+        carries nothing: ADM-298 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-299
       trigger: Works in Resale Eligibility & Ticket Selection
       provenance: flow F173 step 1→2
@@ -44790,8 +44914,9 @@ screens:
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
-      provenance: derived — ADM-002 declares entryState.params  and ADM-308 holds none of them, so the
-        edge carries nothing and ADM-002 opens cold
+      provenance: 'derived — ADM-002 declares entryState.params  and ADM-308 holds none of them. The edge
+        carries nothing: ADM-308 is opened from ADM-002, so this edge is the way back and ADM-002 keeps
+        its own state'
     - to: ADM-309
       trigger: Works in Upgrade & Conversion Path Builder
       provenance: flow F174 step 1→2
@@ -45874,8 +45999,9 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-318 holds
-        none of them, so the edge carries nothing and ADM-001 opens cold
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-318 holds
+        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and ADM-001 opens on its own'
   notes: 'Added 4 September. **47 consumers declare `retryThenDeadLetter` and all 47 are marked `isCritical`,
     and until this screen existed nothing in the package read the table they land in.** Deliberately not
     DEV-005 Webhooks: `replayEvents` is partner-facing redelivery of a customer''s own integration, and
@@ -45946,9 +46072,9 @@ screens:
         provenance: contract platform-ops.yaml POST /dead-letters/{deadLetterId}/replay
     - name: republishes
       slot: collection
-      notes: '**Republish from the outbox** (ADR-0058, amended 1 October). Here until it has a screen of its
-        own: after a broker loss or a DR failover the messages the broker held are gone, and the dead letters
-        are where an operator is already looking when that happens.'
+      notes: '**Republish from the outbox** (ADR-0058, amended 1 October). Here until it has a screen
+        of its own: after a broker loss or a DR failover the messages the broker held are gone, and the
+        dead letters are where an operator is already looking when that happens.'
       components:
       - kind: selectField
         label: Republish status
@@ -45997,7 +46123,8 @@ screens:
         - OutboxRepublish.startedAt
         - OutboxRepublish.finishedAt
         operation: getOutboxRepublish
-        notes: Refetched while the republish is `queued` or `running`, so `cursorAt` and `rowsPublished` move.
+        notes: Refetched while the republish is `queued` or `running`, so `cursorAt` and `rowsPublished`
+          move.
         provenance: contract platform-ops.yaml GET /outbox-republishes/{republishId}
     - name: republishActions
       slot: rowActions
@@ -46018,13 +46145,13 @@ screens:
   - id: formRepublishOutbox
     component: modal
     trigger: Republish from the outbox
-    body: '**Collects what `republishOutbox` sends before it is called.** Required: `tenantId`, `from`, `to`
-      (`from` before `to`, `to` no later than now) and `reason` (up to 500 characters). Optional:
-      `eventNames`, catalogue names; empty means every event. **Says how to choose `from`**: when the oldest
-      message the lost broker still held was published; if unknown, the time of the loss minus one hour, or
-      the start of any consumer halt then in progress, whichever is earlier. Too early costs duplicates the
-      inboxes skip; too late loses events. A `409` names the republish the tenant already has; a `422` names
-      the oldest `from` the hot outbox still holds. Dismissing sends nothing.'
+    body: '**Collects what `republishOutbox` sends before it is called.** Required: `tenantId`, `from`,
+      `to` (`from` before `to`, `to` no later than now) and `reason` (up to 500 characters). Optional:
+      `eventNames`, catalogue names; empty means every event. **Says how to choose `from`**: when the
+      oldest message the lost broker still held was published; if unknown, the time of the loss minus
+      one hour, or the start of any consumer halt then in progress, whichever is earlier. Too early costs
+      duplicates the inboxes skip; too late loses events. A `409` names the republish the tenant already
+      has; a `422` names the oldest `from` the hot outbox still holds. Dismissing sends nothing.'
     confirm:
       label: Republish
       operation: republishOutbox
@@ -46050,9 +46177,9 @@ screens:
   states:
     loading: The dead letters list.
     error: Could not load. Names which read failed and leaves the dead letters untouched.
-    emptyFirstRun: No dead letters yet. **Offers no create action for them** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table. The republish list below it keeps
-      its own action, `republishOutbox`.
+    emptyFirstRun: No dead letters yet. **Offers no create action for them** — this screen declares no
+      operation that makes one — and says so rather than showing an empty table. The republish list below
+      it keeps its own action, `republishOutbox`.
     emptyNoResults: Nothing matches the filter on consumer, since and the dead letters are still there.
       Names the active filter and offers to clear it.
     emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires,
@@ -46094,6 +46221,8 @@ screens:
     params:
     - name: deadLetterId
       from: deepLink
+    - name: republishId
+      from: navigation
     coldEntry: '**The ordinary path is a row on this screen**, and `replayDeadLetter` takes the id from
       the row the operator chose. A deep link is how an alert reaches one directly; if that id is already
       replayed or gone the screen says so and shows the list, because a replay issued against a row nobody
@@ -46111,8 +46240,8 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen. The four outbox republish operations
-    (ADR-0058, amended 1 October) were added on 1 October 2026 and sit here until republish has a screen of
-    its own.
+    (ADR-0058, amended 1 October) were added on 1 October 2026 and sit here until republish has a screen
+    of its own.
 - id: ADM-319
   name: Approval Workflow Library
   module: Platform

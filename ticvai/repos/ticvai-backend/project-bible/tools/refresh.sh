@@ -364,8 +364,15 @@ retire-answered-questions                                          # never run: 
 retest-gap-rows                                                    # reports review candidates; a verdict is a judgement, not a rebuild
 build-provisional-review                                           # its sheets carry people's decisions; a rebuild would erase them
 bench derive-services render-screens                               # deliberate, not a rebuild
+refresh-manifest                                                   # traces this script (C13); run by refresh-safe.sh, never inside it
 build-plan-deck                                                    # the presentation plan, run by hand after a refresh
 build-mom-digest build-review-responses scan-domain-drift find-capability
+audit_guard release_baseline ddl_forward                           # imported by checkers and derive-ddl, no main (1 October)
+push-openproject op-release op-retire op-check op-assign-sync op-order-sync op-bulk-links op-created-merge op-recent op-review adam-links   # distribution: run per release (docs/active/release-runbook.md), never on a rebuild
+release-notes                                                      # per release, between two tags
+build-decisions-workbook build-hld-lld build-readiness-page build-readiness-questions build-client-readiness build-closeout-register build-audit-decisions   # hand-run documents for people; each carries dated content a rebuild must not churn
+fix-audit-contract-screens fix-audit-conventions fix-audit-derived-labels fix-audit-load-triggers fix-audit-op-descriptions fix-audit-stale-graph-refs fix-audit-stale-inventory-questions fix-audit-state-models   # one-off audit fixes, already applied
+link-reference-frames md-to-docx                                   # one-off / on request
 "
 _missing=""
 for _t in tools/*.py; do

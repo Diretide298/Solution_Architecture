@@ -59,7 +59,7 @@ servicesCalled:
 - service: CatalogueService
   operationCalls: 395
 - service: TenancyService
-  operationCalls: 364
+  operationCalls: 365
 - service: AccessService
   operationCalls: 311
 - service: OrderService
@@ -5955,7 +5955,7 @@ screens:
   - listDeviceGate
   - registerDevice
   - setTurnstileMode
-  - updateAccessDevice
+  - updateAccessDevicePlacement
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5966,6 +5966,7 @@ screens:
   entryParams:
   - accessPointId<-navigation
   - deviceId<-navigation
+  - placementId<-navigation
   goesTo:
   - BO-100
   - BO-195
@@ -6012,8 +6013,9 @@ screens:
   density: compact
   operations:
   - listPhysicalDeviceRegistration
-  - registerAccessDevice
-  - updateAccessDevice
+  - placeAccessDevice
+  - registerDevice
+  - updateAccessDevicePlacement
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6022,6 +6024,7 @@ screens:
   offlineState: false
   entryParams:
   - deviceId<-session
+  - placementId<-navigation
   goesTo:
   - BO-194
   boardFrames: null
@@ -26836,20 +26839,20 @@ screens:
   wave: 3
   density: compact
   operations:
-  - createAccessPolicy
   - createAccessReviewCampaign
+  - createAuthorisationPolicy
   - createEmergencyAccessOverride
   - decideAccessReviewItem
-  - listAccessPolicies
-  - listAccessPolicyEffectiveness
-  - listAccessPolicyHistory
   - listAccessReviewCampaigns
   - listAccessReviewItems
+  - listAuthorisationPolicies
+  - listAuthorisationPolicyEffectiveness
+  - listAuthorisationPolicyHistory
   - listPermissionFindings
-  - restoreAccessPolicyVersion
-  - setAccessPolicyState
-  - simulateAccessPolicy
-  - updateAccessPolicy
+  - restoreAuthorisationPolicyVersion
+  - setAuthorisationPolicyState
+  - simulateAuthorisationPolicy
+  - updateAuthorisationPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -29516,8 +29519,8 @@ screens:
   density: compact
   operations:
   - createApiClient
-  - listAccessPolicies
   - listApiScopes
+  - listAuthorisationPolicies
   - listProductionAccessRequests
   states:
   - emptyFirstRun

@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "handheld",
  "offlineCapable": true,
- "generated": "2026-09-30",
+ "generated": "2026-10-01",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 11,
@@ -47,11 +47,11 @@
    "operations": 2
   },
   {
-   "contract": "shift",
+   "contract": "accreditation",
    "operations": 1
   },
   {
-   "contract": "accreditation",
+   "contract": "shift",
    "operations": 1
   }
  ],
@@ -225,13 +225,13 @@
     "summary": "Decide, now, and say why"
    },
    {
-    "operation": "getAccessPolicy",
+    "operation": "getAuthorisationPolicy",
     "contract": "identity",
     "verb": "GET",
     "summary": "One policy, at a version"
    },
    {
-    "operation": "getAccessPolicyBundle",
+    "operation": "getAuthorisationPolicyBundle",
     "contract": "identity",
     "verb": "GET",
     "summary": "The policies a device needs to decide for itself"
@@ -261,7 +261,7 @@
     "summary": "What was decided, for whom, where and why"
    },
    {
-    "operation": "listAccessPolicyTemplates",
+    "operation": "listAuthorisationPolicyTemplates",
     "contract": "identity",
     "verb": "GET",
     "summary": "Reusable policy shapes"

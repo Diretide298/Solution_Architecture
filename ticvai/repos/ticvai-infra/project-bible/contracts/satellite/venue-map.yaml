@@ -147,6 +147,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/VenueMap' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createVenueMap
       x-ticvai-consumed-by:
@@ -183,6 +185,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueMap' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}:
     parameters:
@@ -249,6 +253,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueMapDetail' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}/import:
     parameters:
@@ -471,6 +477,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueMapImportJob' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}/import/{jobId}:
     parameters:
@@ -505,6 +513,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueMapImportJob' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}/proposals:
     parameters:
@@ -572,6 +582,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/VenuePoint' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}/points:
     parameters:
@@ -627,6 +639,8 @@ paths:
               schema: { $ref: '#/components/schemas/VenuePoint' }
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}/resources:
     parameters:
@@ -674,6 +688,8 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}/walkway-proposals:
     parameters:
@@ -732,6 +748,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/GraphValidation' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}/graph:
     parameters:
@@ -793,6 +811,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueMapGraph' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}/validate-graph:
     parameters:
@@ -843,6 +863,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/GraphValidation' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}/paths/{pathId}/closure:
     parameters:
@@ -932,6 +954,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/PathClosureProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}/publish:
     parameters:
@@ -1004,6 +1028,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/VenueMapPublishProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-maps/{mapId}/live:
     parameters:
@@ -1038,6 +1064,8 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bookable-venue-maps:
     get:
       operationId: listBookableVenueMaps
@@ -1099,6 +1127,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/BookableVenueMaps' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /visit-plans:
     post:
       operationId: generateVisitPlan
@@ -1198,6 +1228,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /visit-plans/{planId}:
     parameters:
@@ -1242,6 +1274,8 @@ paths:
               schema: { $ref: '#/components/schemas/VisitPlan' }
         '404':
           $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: updateVisitPlan
       x-ticvai-consumed-by:
@@ -1322,6 +1356,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /visit-plans/{planId}/items/{itemId}/alternatives:
     parameters:
@@ -1387,6 +1423,8 @@ paths:
                         items: { $ref: '#/components/schemas/VisitPlanAlternative' }
         '404':
           $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /visit-plans/{planId}/booking:
     parameters:
@@ -1488,6 +1526,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   securitySchemes:

@@ -7,11 +7,11 @@
  "audience": "guest",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-30",
+ "generated": "2026-10-01",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 50,
-  "operations": 214,
+  "operations": 216,
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
@@ -144,7 +144,7 @@
   },
   {
    "contract": "catalogue",
-   "operations": 17
+   "operations": 19
   },
   {
    "contract": "fnb",
@@ -171,11 +171,11 @@
    "operations": 8
   },
   {
-   "contract": "ai",
+   "contract": "resources",
    "operations": 7
   },
   {
-   "contract": "resources",
+   "contract": "ai",
    "operations": 7
   },
   {
@@ -191,11 +191,11 @@
    "operations": 5
   },
   {
-   "contract": "payments",
+   "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "seating",
+   "contract": "payments",
    "operations": 4
   },
   {
@@ -340,7 +340,7 @@
    "module": "High-Demand Access",
    "wave": 2,
    "route": "/high-demand-access/virtual-waiting-room",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {

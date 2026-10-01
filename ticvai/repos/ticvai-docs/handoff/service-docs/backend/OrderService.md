@@ -155,6 +155,7 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 |---|---|---|
 | 204 |  | Abandoned and leases released |
 | 409 |  | The cart is not active or expiring (cartNotOpen) — an expired cart has nothing left to release, and a checked-out cart's leases already belong to its order, so releasing them here would release the o… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### addCartLine
 
@@ -171,6 +172,7 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 **An information-only product is never added** (decided 29 September, rev 3 REV3-14). A variant whose product has `catalogue.Product.guestListing` `infoOnly` is refused 409 `productInfoOnly` (problem type `product-info-only`); the guest screens open its details instead. A `hidden` product is refused the same way here, since only a staff channel sells it.
 **Seats per guest booking are a venue setting** (decided 29 September, rev 3 REV3-7). On a guest channel the seats across the cart's lines for one performance may not exceed `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50); above it the line is refused 422 `seatLimitExceeded`, the same limit and problem type (`seat-limit-exceeded`) as `seating.createSeatHold`. Staff and POS keep 10 per sale (audit R080 (c)).
 **A transport trip or pass is a line with `attributes.transport`** (decided 29 September, rev 3 REV3-21; see `TransportLineAttributes`). The unit price is not read from the variant's price list: the order service calls `transport.quoteTransportFare` (service to service) for the route, the two stations and the passenger type, and a refused quote refuses the line 422 `transportFareUnavailable`. A one-way trip carries `variantId` = the passenger type's `catalogueVariantId` and `performanceId` = the departure's performance, and holds a seat with the inventory lease like any timed ticket (`seatIds` where the departure has a seat map). A pass carries the pass type's `openDated` product variant and no `performanceId`. A seat reserved with a pass the guest already owns (`passEntitlementId`) is a zero-priced line, refused 422 `passNotValidForTrip` unless the pass covers the two stations, has an entry left and is within its validity.
+**Behind the on-sale waiting room when it is on** (ADR-0066, accepted 1 October). For a performance whose waiting room is active (catalogue `WaitingRoomSetting`), the line needs the admission token the guest was given when admitted (`getWaitingRoomPosition`), sent as `X-Admission-Token`; missing, expired, forged or for another performance, it is refused `403 admission-required` and nothing is held. The check is a signature check in middleware with no database read, and the order service forwards the token to `catalogue.acquireInventoryHold`. A guest who skips the waiting page no longer goes straight to the sale.
 Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:00 already in the cart and karting at 13:00 being added is a prompt, not a refusal, because a party of four may legitimately split.
 
 |  |  |
@@ -192,6 +194,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 |---|---|---|---|---|
 | cartId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| X-Admission-Token | header |  | string | The on-sale waiting room's admission token (ADR-0066, accepted 1 October). |
 
 **Request body**: `AddCartLineRequest`
 
@@ -308,8 +311,9 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Added, and the cart re-priced |
+| 403 | AdmissionRequired | The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066). |
 | 409 |  | No capacity, or the product is not sellable on this channel (notSellableOnChannel). |
 | 422 |  | The booked window is missing, not allowed or the wrong length for the variant (windowRequired, windowNotAllowed, windowLengthMismatch; rev 3 REV3-13), or a table deposit line names a booking that is… |
 
@@ -437,7 +441,7 @@ Applying a code the cart already holds returns the cart unchanged.
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Applied, and the cart re-priced |
 | 410 |  | Expired (cartExpired), as for getCart. |
 | 422 |  | The code is not accepted: no such code, voided or used up (promoCodeInvalid), or a real code that nothing in this cart qualifies for (promoCodeNotApplicable). |
@@ -632,7 +636,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 201 |  | An order, pending payment |
 | 403 |  | The contact the tickets would go to is not proven — an unverified session (sessionNotVerified), or a guest checkout with no confirmed one-time code (contactNotConfirmed). |
 | 409 |  | A lease expired between the last read and checkout (leaseExpired), or a resource hold did (resourceHoldInvalid, rev 3 REV3-15). |
@@ -748,7 +752,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Claimed, and merged where the guest already had one |
 
 ### createCart
@@ -878,7 +882,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 201 |  | Started |
 
 ### extendCart
@@ -1000,7 +1004,7 @@ Offered once, typically, and the interface should say it is the last extension r
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Extended |
 | 409 |  | Extension cap reached (extensionCapReached), or a lease could not be extended because the capacity has gone (noCapacity, naming the lines in lineIds). |
 
@@ -1122,7 +1126,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | The cart |
 | 410 |  | Expired (cartExpired). |
 
@@ -1244,6 +1248,7 @@ Releases its lease immediately.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Removed, and the cart re-priced |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateCartLine
 
@@ -1371,7 +1376,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | Code | Shape | Meaning |
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Updated |
 | 409 |  | Not enough capacity to increase (noCapacity). |
 
@@ -1477,6 +1482,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | Shift is not open (problem type shift-not-open), or the lift exceeds the float counted at the last count less lifts since (lift-exceeds-float, audit R123 (2)) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listCashMovements
 
@@ -1545,6 +1551,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 |---|---|---|
 | 200 |  | Movements in sequence, one page at a time |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: dunning
@@ -1605,6 +1612,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Open cases, newest first |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### retryMyDunningPayment
 
@@ -1666,6 +1674,7 @@ Charges the case's amount again, on a different saved card if one is given. **A 
 | 200 |  | The case after the attempt |
 | 409 |  | The case is already resolved, or the decline is hard and no other card was given. |
 | 422 |  | The payment was declined again. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: order
@@ -1830,6 +1839,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | 201 |  | Appended. |
 | 409 |  | Media expired (mediaExpired), blocked (mediaBlocked), already surrendered at exit (mediaSurrendered), or the entitlement cannot share media (entitlementCannotShareMedia) — a single-entry ticket surre… |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### applyManualDiscount
 
@@ -2014,6 +2024,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 |---|---|---|
 | 200 |  | Applied |
 | 403 |  | Above the cashier's limit and no approver supplied (approverRequired), or the approver is the requester (approverIsRequester). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### claimTicketTransfer
 
@@ -2068,6 +2079,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 |---|---|---|
 | 200 |  | Claimed. |
 | 410 |  | Offer expired (offerExpired), already claimed (alreadyClaimed), or withdrawn by the sender (offerCancelled). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createOrder
 
@@ -2282,6 +2294,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | A lease covering a line has expired (leaseExpired), capacity is exhausted (capacityExhausted), or the catalogue bundle the client priced from is beyond its staleness bound (bundleStale). |
 | 422 |  | More seats for one performance than the channel allows (seatLimitExceeded, decided 29 September, rev 3 REV3-7). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### exchangeOrderLines
 
@@ -2378,6 +2391,7 @@ The replacement is held before the original is released, never the other way rou
 |---|---|---|
 | 200 |  | Exchanged |
 | 409 |  | Replacement unavailable (replacementUnavailable), outside the exchange window (outsideExchangeWindow), or the original is redeemed (lineRedeemed). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getMediaEntitlements
 
@@ -2435,6 +2449,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 |---|---|---|
 | 200 |  | What the media carries |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getOrder
 
@@ -2600,6 +2615,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 |---|---|---|
 | 200 |  | Order |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getOrderCalendarEvent
 
@@ -2635,6 +2651,7 @@ Returns an iCalendar (RFC 5545) event per dated line: the venue, the session sta
 | 200 |  | One VEVENT per dated line of the order. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The order has no dated line, so there is nothing to put in a calendar (noDatedLine). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getOrderStatement
 
@@ -2702,6 +2719,7 @@ Every payment, refund, void, modification and exchange in sequence, with the run
 |---|---|---|
 | 200 |  | Statement |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getVisitReminder
 
@@ -2747,6 +2765,7 @@ Returns the reminder, or one with `enabled` false when the guest has never set o
 |---|---|---|
 | 200 |  | The reminder |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### holdOrder
 
@@ -2925,6 +2944,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 |---|---|---|
 | 200 |  | Held |
 | 409 |  | Order is already paid (alreadyPaid) or voided (orderVoided) — only a pending order is parked — or a seated line's lease ends before holdUntil (seatLeaseExpiring, naming the lines in lineIds), because… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listOrders
 
@@ -2989,6 +3009,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 |---|---|---|
 | 200 |  | Orders, newest first — createdAt descending, id as the tiebreak. |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### modifyOrder
 
@@ -3165,6 +3186,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 |---|---|---|
 | 200 |  | Modified, with the balance to settle |
 | 409 |  | A targeted line's entitlement has been redeemed (lineRedeemed, naming it in lineIds), or the order is voided (orderVoided). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### reprintOrder
 
@@ -3218,6 +3240,7 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 |---|---|---|
 | 200 |  | Reissued |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### rescheduleOrder
 
@@ -3288,6 +3311,7 @@ Where the new performance is priced differently, the balance settles as for an e
 |---|---|---|
 | 200 |  | Rescheduled |
 | 409 |  | Target performance is unavailable (targetUnavailable) or outside the reschedule window (outsideRescheduleWindow). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### resumeOrder
 
@@ -3429,6 +3453,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 |---|---|---|
 | 200 |  | Resumed, with any change since the hold reported |
 | 409 |  | Held order expired (holdExpired), or already resumed at another till (alreadyResumed). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setVisitReminder
 
@@ -3490,6 +3515,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | 200 |  | Saved |
 | 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### transferOrderTickets
 
@@ -3551,6 +3577,7 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 |---|---|---|
 | 202 |  | Transfer offered, pending claim |
 | 409 |  | Ticket already redeemed (alreadyRedeemed), already offered (alreadyOffered), or the product forbids transfer (transferNotAllowed). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### voidOrder
 
@@ -3730,6 +3757,7 @@ Only before settlement and only within the same shift. After that it is a refund
 |---|---|---|
 | 200 |  | Voided |
 | 409 |  | Settled — a payment on the order has been captured, so the money has moved (alreadySettled) — or taken in a shift that is now closed (shiftClosed). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: orders
@@ -3803,6 +3831,7 @@ Refuses where the entitlement is partly consumed, name-bound, or past its resale
 |---|---|---|
 | 201 |  | Listed |
 | 409 |  | Not resellable, and the reason says which — partly consumed (partlyConsumed), name-bound (nameBound), or outside the resale window (outsideResaleWindow) are three different conversations with the sel… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createTicketTemplate
 
@@ -3869,6 +3898,7 @@ Check the artwork with `printTicketProof` before activating.
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | Another active template has the same priority for the same product kind, channel and media type (duplicateSelectionPriority). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getBillingStatement
 
@@ -3949,6 +3979,7 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Statement |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGroupBooking
 
@@ -4009,6 +4040,7 @@ BL-028. **`orders.group_booking` had ten columns and nothing read it** — a tab
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | The group |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getPaymentLink
 
@@ -4115,6 +4147,7 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 |---|---|---|
 | 200 |  | What is owed, and until when |
 | 410 |  | Expired, paid, superseded or cancelled — and it says which (linkExpired, linkPaid, linkSuperseded, linkCancelled, the four terminal states of PaymentLink.status). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### issueWalletPass
 
@@ -4169,6 +4202,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Issued |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listBillingStatements
 
@@ -4242,6 +4276,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Statements, most recent period first — periodStart descending, id as the tiebreak. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listMyOrders
 
@@ -4372,6 +4407,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Orders, newest first — createdAt descending, id as the tiebreak. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listPaymentTokens
 
@@ -4422,6 +4458,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Tokens, the default first, then by id. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### payByLink
 
@@ -4469,7 +4506,7 @@ BL-072. **Payment against the link, by somebody with no account.**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Paid, and the reservation converted |
 | 409 |  | The hold went while they were paying (linesUnavailable). |
 
@@ -4523,6 +4560,7 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 |---|---|---|
 | 201 |  | Reissued. |
 | 409 |  | The entitlement is not expired (entitlementNotExpired) — this is the reissue of an expired entitlement, and a live one is exchanged or rescheduled instead — or it has already been replaced by an earl… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### requestGroupBooking
 
@@ -4600,6 +4638,7 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 | 201 |  | The held booking |
 | 409 |  | The date is no longer available (dateUnavailable), or the package is not (packageUnavailable). |
 | 422 |  | More participants than the package allows (aboveParticipantLimit). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPaymentProvider
 
@@ -4704,6 +4743,7 @@ CF-131. **Network International and Stripe for Phase 1** — two gateways, which
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Configured |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### shareEntitlement
 
@@ -4758,6 +4798,7 @@ Governed by `EntitlementTemplate.canShareMedia`, which already exists and had no
 |---|---|---|
 | 200 |  | Shared. |
 | 409 |  | Not shareable, and the reason says which: the entitlement's template does not allow sharing (sharingNotAllowed, EntitlementTemplate.canShareMedia false), the caller holds it only through a share and… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### storePaymentToken
 
@@ -4815,6 +4856,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 |---|---|---|
 | 201 |  | Stored. |
 | 409 |  | The provider cannot hold a stored credential (tokenisationNotSupported, PaymentProvider.supportsTokenisation false), or the guest has not consented to the purpose named in consentPurposeId (consentNo… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateTicketTemplate
 
@@ -4883,6 +4925,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Another active template has the same priority for the same product kind, channel and media type (duplicateSelectionPriority). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: payment
@@ -4967,6 +5010,7 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 |---|---|---|
 | 200 |  | Recorded |
 | 409 |  | Payment not settled — not yet captured (notCaptured) — or a tip is already recorded against it (tipAlreadyRecorded). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### capturePayment
 
@@ -5046,6 +5090,7 @@ Captures an authorised payment. **Writes one `payments.payment_attempt` row for 
 | 200 |  | Captured |
 | 402 |  | Capture refused by the issuer (providerDeclined); the payment moves to declined (states/payment.yaml). |
 | 409 |  | Only an authorised payment is captured (notAuthorised). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createPayment
 
@@ -5139,7 +5184,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 201 |  | Recorded |
 | 402 |  | Declined by the provider (providerDeclined). |
 | 409 |  | Tender unavailable offline (tenderUnavailableOffline), amount exceeds the balance due (exceedsBalanceDue), or a guest channel sent a tender other than card or wallet (tenderNotAllowedOnChannel, audit… |
@@ -5215,6 +5260,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | 200 |  | Reconciled against the provider |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 503 |  | Provider unreachable (providerUnreachable). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: payments
@@ -5294,6 +5340,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | 201 |  | Plan created; the first instalment charged |
 | 409 |  | The order already has a plan, or is already paid in full. |
 | 422 |  | The order or product does not qualify under the instalment policy, or the count or frequency is outside it, or the first instalment was declined. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createPaymentProviderConnection
 
@@ -5373,6 +5420,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Connected |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listInstalmentPlans
 
@@ -5440,6 +5488,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Plans |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setInstalmentPolicy
 
@@ -5514,6 +5563,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
 | 422 |  | A share due at purchase outside 0-100, or more instalments than the frequency allows within the product's term. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: policy
@@ -5606,6 +5656,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
 | 422 |  | The thresholds do not ascend: selfAuthoriseLimit above requiresSecondUserAbove, or either above requiresApprovalAbove (refund-thresholds-not-ascending, audit R123 (6)). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: refund
@@ -5695,6 +5746,7 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | Second authorisation required and absent (secondAuthorisationRequired), refund window closed (refundWindowClosed), or the amount exceeds what remains refundable (exceedsRefundable). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createRefundRequest
 
@@ -5742,6 +5794,7 @@ Raised from the guest app. Enters the operations approval queue rather than refu
 |---|---|---|
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 202 |  | Submitted to the approval queue |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listOrderRefunds
 
@@ -5808,6 +5861,7 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 |---|---|---|
 | 200 |  | Refunds, newest first — createdAt descending, id as the tiebreak. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: reservation
@@ -5845,6 +5899,7 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 |---|---|---|
 | 204 |  | Cancelled |
 | 409 |  | Already converted (alreadyConverted), or no longer held — expired or already cancelled (reservationNotHeld). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getReservation
 
@@ -5915,6 +5970,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 |---|---|---|
 | 200 |  | Reservation |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listReservations
 
@@ -5979,6 +6035,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Reservations, soonest expiresAt first, id as the tiebreak. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: shift
@@ -6086,6 +6143,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | 200 |  | Accepted and finalised |
 | 403 |  | The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (problem type approver-is-cashier) — a cashier signing off their own shortfall is not a control (states/variance-r… |
 | 409 |  | Shift is not pendingVariance (problem type shift-not-pending-variance) — within tolerance, still open, or already accepted. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### adjustDepositBoxFloat
 
@@ -6187,6 +6245,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | The box is being counted or has been counted — closing, closed or reconciled (problem type deposit-box-not-open). |
 | 422 |  | The change would leave the float below zero (problem type float-below-zero, audit R123 (3)). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### allocateDepositBox
 
@@ -6331,6 +6390,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Allocated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### approveShiftOpen
 
@@ -6432,6 +6492,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 |---|---|---|
 | 200 |  | Approved and open |
 | 409 |  | Shift is not pendingApproval (problem type shift-not-awaiting-approval) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### closeDepositBoxes
 
@@ -6491,6 +6552,7 @@ A box closed without its holder present is flagged rather than blocked — **the
 |---|---|---|
 | 200 |  | Closed, with a variance per box |
 | 422 |  | A box being closed has no entry in counts, or its entry has neither a total nor a denomination count (problem type deposit-box-count-missing, audit R123 (4)). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### closeShift
 
@@ -6644,6 +6706,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | Shift is not open or suspended — already closing or closed (problem type shift-not-open) — or open orders remain (open-orders-remain) |
 | 422 |  | A counted line names an unknown or inactive denomination (unknown-denomination), repeats one (duplicate-denomination), or sends a total that disagrees with count times face value (count-total-mismatc… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getCurrentShift
 
@@ -6730,6 +6793,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 |---|---|---|
 | 200 |  | Current shift |
 | 404 |  | No shift open or suspended on this workstation, or the session has no workstation (problem type no-current-shift) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getShift
 
@@ -6823,6 +6887,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | 200 |  | Shift |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listDenominations
 
@@ -6856,6 +6921,7 @@ Raised by Tanmay in the 20 August review, and **the table was built and nothing 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Denominations, in counting order |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listDepositBoxes
 
@@ -6937,6 +7003,7 @@ That separation is what makes a variance attributable to a person rather than to
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Boxes, one page at a time |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listShifts
 
@@ -7037,6 +7104,7 @@ That separation is what makes a variance attributable to a person rather than to
 |---|---|---|
 | 200 |  | Shifts |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### openShift
 
@@ -7158,6 +7226,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | A shift is already open on this workstation (problem type shift-already-open), or a required device is absent (required-device-absent). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordNoSale
 
@@ -7213,6 +7282,7 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 |---|---|---|
 | 201 |  | Recorded |
 | 409 |  | Shift is not open (problem type shift-not-open) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### reopenShift
 
@@ -7321,6 +7391,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | 200 |  | Reopened |
 | 403 |  | The supervisor is the closing principal (problem type approver-is-closer), or the step-up failed: the PIN did not verify, or the principal does not hold SHIFT_REOPEN at this venue (supervisor-step-up… |
 | 409 |  | Shift is not closed (problem type shift-not-closed), or the fiscal period has closed over it (fiscal-period-closed) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### resumeShift
 
@@ -7423,6 +7494,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | 200 |  | Resumed |
 | 403 |  | Not the principal who suspended it, and the caller does not hold SHIFT_CLOSE_OTHER (problem type not-shift-holder). |
 | 409 |  | Another shift is now open on this workstation (problem type shift-already-open), or this shift is not suspended (shift-not-suspended) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setDenominations
 
@@ -7477,6 +7549,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 422 |  | A zero or negative value, or two entries with the same value and kind (problem type denomination-invalid). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### suspendShift
 
@@ -7581,6 +7654,7 @@ The break mechanism. The float and the shift stay intact; the workstation become
 | 200 |  | Suspended |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | Shift is not open (problem type shift-not-open) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### withdrawFromDepositBox
 
@@ -7689,6 +7763,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | The box is being counted or has been counted — closing, closed or reconciled (problem type deposit-box-not-open). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: sync
@@ -7793,6 +7868,7 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Batch processed; entries refused on their merits are quarantined, and only a transient failure stops it (SD-028) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 

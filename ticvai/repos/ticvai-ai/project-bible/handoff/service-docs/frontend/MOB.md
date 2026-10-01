@@ -40,7 +40,7 @@
 | [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 12 |
 | [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 13 |
 | [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 0 |
-| [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 3 |
+| [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 |
 | [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 1 |
 | [GST-051](#gst-051-plan) | Plan | Engagement & Support | 1 | 4 |
 | [GST-052](#gst-052-suggested-itineraries) | Suggested Itineraries | Engagement & Support | 1 | 3 |
@@ -190,7 +190,6 @@
 | GST-041 | Checkout Entry | productId |  |
 | GST-042 | Simple Registration & OTP | subjectId |  |
 | GST-045 | Ticket Delivery & Sharing | orderId |  |
-| GST-046 | Branded Queue / Waiting Room |  |  |
 | GST-049 | Interactive Seat Selection |  |  |
 | GST-052 | Suggested Itineraries |  |  |
 | GST-054 | AI Optimized Itinerary |  |  |
@@ -522,6 +521,7 @@
 | GST-008 | Picks a time; the tickets for it appear | performanceId |  |
 | GST-049 | Picks a time on a seated event (inline step) | performanceId |  |
 | GST-008 | Picks a date and time after choosing the workshop (product-first flow) | performanceId |  |
+| GST-046 | Adds tickets for a performance whose on-sale waiting room is on | performanceId | `addCartLine` refused `403 admission-required`: this performance's room is on and the app holds no admission token for it |
 
 ## GST-008 Tickets & Add-ons
 
@@ -967,13 +967,13 @@
 
 ## GST-046 Branded Queue / Waiting Room
 
-**Find branded queue / waiting room for this venue.**
+**The on-sale waiting room for one performance — the guest's place, the wait, and the way on to the sale once admitted.**
 
 |  |  |
 |---|---|
 | Module | High-Demand Access |
 | Wave | 1 |
-| Licensed module | queue |
+| Licensed module | ticketing |
 | Route | `/general/branded-queue-waiting-room` |
 | Component | `apps/guest-app/src/routes/general/BrandedQueueWaitingRoomDetail.tsx` |
 | Pattern | statusTracker |
@@ -982,30 +982,30 @@
 
 | Parameter | From |
 |---|---|
-| entryId | deepLink |
+| performanceId | GST-007 |
+| waitingEntryId | GST-046 |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
-| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242) | `None` |
-| `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onAction | Join a virtual queue | `None` |
+| `enterWaitingRoom` | [CatalogueService](../backend/CatalogueService.md#enterwaitingroom) | onAction | Take a place in the performance's on-sale waiting room (ADR-0066); `notRequired` when the room is off | `None` |
+| `getWaitingRoomPosition` | [CatalogueService](../backend/CatalogueService.md#getwaitingroomposition) | onInterval | The guest's place, polled every `pollAfterSeconds`; admitted, it carries the admission token for `addCartLine` | `None` |
 
 **States**
 
 | State | Behaviour |
 |---|---|
-| loading | The branded queue waiting, read by `getWaitTimes`. |
-| error | Could not load. Names which read failed and leaves the branded queue waiting untouched. |
-| emptyFirstRun | No branded queue waiting yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| offline | The offline banner shows. The last known position stays on screen with its age. Joining, leaving and being admitted all need the connection. |
+| loading | Taking a place in the room. *Take my place* (`enterWaitingRoom`) answers with a position, or `notRequired` and the guest goes straight on to the sale |
+| error | Lost the place. A retry sends the same `Idempotency-Key` and gets the same entry back, so the guest is not sent to the back, and the screen says so. `expired` (the admission was not used in time) offers to enter again; `closed` (the room was switched off or the performance stopped selling) says so and goes back to the event |
+| emptyFirstRun | — |
+| offline | The offline banner shows. The last known position stays on screen with its age, and polling resumes with the same entry when the connection is back. Admission needs the connection. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default |  |  |
+| GST-007 | Continue to your tickets | performanceId | `getWaitingRoomPosition` answers `admitted`. The app keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt` |
 
 ## GST-047 Maintenance / Upgrade Page
 
@@ -1708,6 +1708,8 @@
 | emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the interactive map are still there. Names the active filter and offers to clear it. |
 | emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect. |
+| map3dUnavailable | No 3D model for this map: the 2D map, same route (ADR-0069; client meeting 30 September, MoM 4.8). The venue has not published a GLB model for this map (the default for every venue until it supplies one), the phone fails the 3D capability check, or rendering drops below 20 fps. The 2D map shows the same route from `getVenueMapGraph` and the same live position dot; the 2D/3D toggle is hidden and nothing else is said: no message, no error. |
+| weakGps | Position approximate (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or the route runs along an indoor path. The dot dims and an approximate-position ring is drawn round the last confident position, labelled *Position approximate*; the turn list and the remaining distance stay, and *I am at…* (tap a nearby location, or scan its QR sign) re-anchors. Routing does not stop, in 3D or in 2D. |
 
 **Goes to**
 
@@ -3291,6 +3293,8 @@
 | emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the digital companion mode are still there. Names the active filter and offers to clear it. |
 | emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| map3dUnavailable | No 3D model for this map: the 2D map, same route (ADR-0069; client meeting 30 September, MoM 4.8). The Map view of this screen is GST-021's map (one implementation): where the venue has not published a GLB model (the default until it supplies one), the phone fails the 3D capability check or rendering drops below 20 fps, the 2D map shows with the same route and the same live position dot; the 2D/3D toggle is hidden and nothing else is said. |
+| weakGps | Position approximate (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or indoors. The Map view dims the dot and draws an approximate-position ring round the last confident position, labelled *Position approximate*; directions keep their turn list and remaining distance, and *I am at…* (a nearby location, or its QR sign) re-anchors. Waits, shows and services are unaffected. |
 
 **Goes to**
 
@@ -3590,6 +3594,7 @@
 | Parameter | From |
 |---|---|
 | favouriteId | GST-079 |
+| routeId | navigation |
 
 **Operations**
 
@@ -3597,7 +3602,7 @@
 |---|---|---|---|---|
 | `listTransportStations` | [VenueOpsService](../backend/VenueOpsService.md#listtransportstations) | onLoad | The stations to pick From and To | `None` |
 | `listTransportRoutes` | [VenueOpsService](../backend/VenueOpsService.md#listtransportroutes) | onAction | The routes between two stations (the swap uses the paired route) | `None` |
-| `searchTransportDepartures` | [VenueOpsService](../backend/VenueOpsService.md#searchtransportdepartures) | onAction | Departures for the stations, date, period and party, with counts per period | `None` |
+| `searchTransportDepartures` | [VenueOpsService](../backend/VenueOpsService.md#searchtransportdepartures) | onLoad | Departures for the stations, date, period and party, with counts per period | `None` |
 | `getNextTransportDeparture` | [VenueOpsService](../backend/VenueOpsService.md#getnexttransportdeparture) | onAction | The next departure with room for the party | `None` |
 
 **States**
@@ -3670,7 +3675,7 @@
 | GST-049 | Choose seats on this departure | performanceId | the departure has a seat map |
 | GST-041 | Continue to payment | cartId |  |
 | GST-042 | Sign in to save this route |  |  |
-| GST-076 | Back to departures |  |  |
+| GST-076 | Back to departures | routeId |  |
 
 ## GST-078 Intercity Trip — Multi-trip Passes
 
@@ -3715,7 +3720,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-041 | Choose a pass | cartId |  |
-| GST-076 | One-way instead |  |  |
+| GST-076 | One-way instead | routeId |  |
 
 ## GST-079 Intercity Trip — Favourite Routes
 

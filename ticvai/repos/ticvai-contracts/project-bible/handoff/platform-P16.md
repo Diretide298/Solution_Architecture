@@ -9,12 +9,12 @@
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 122 |
+| Operations with no screen | 124 |
 | Waves | wave3 70 |
 
 ## Gaps
 
-### 122 operations with no screen here
+### 124 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -41,16 +41,18 @@
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
 | `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
+| `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
+| `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
-| `getAccessPolicy` | identity | GET | One policy, at a version |
-| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| `getAuthorisationPolicy` | identity | GET | One policy, at a version |
+| `getAuthorisationPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
 | `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
-| `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
+| `listAuthorisationPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `listCapabilityTemplates` | identity | GET | Saved tick-sets |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
@@ -58,9 +60,7 @@
 | `listPermissions` | identity | GET | Every permission key the contracts enforce |
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
-| `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
-| `actOnWaiverRequirements` | marketing-crm | POST | Send, resend or correct participant waiver requirements, one or in bulk |
-| … | | | 82 more |
+| … | | | 84 more |
 
 ## Modules
 

@@ -24,7 +24,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-123 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-123 holds none of them. The edge carries nothing: BO-123 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },
@@ -238,7 +238,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-124 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-124 holds none of them. The edge carries nothing: BO-124 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     },
     {
      "to": "BO-125",
@@ -647,7 +647,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-125 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-125 holds none of them. The edge carries nothing: BO-125 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },
@@ -995,7 +995,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-126 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-126 holds none of them. The edge carries nothing: BO-126 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     },
     {
      "to": "BO-036",
@@ -1333,7 +1333,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-142 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-142 holds none of them. The edge carries nothing: BO-142 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },
@@ -1587,7 +1587,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-143 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-143 holds none of them. The edge carries nothing: BO-143 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },

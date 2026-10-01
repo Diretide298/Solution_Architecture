@@ -103,6 +103,7 @@ The most-used operation on a shop floor. Returns price after any live promotion,
 | 200 |  | Price and stock |
 | 400 |  | Neither barcode nor SKU supplied, or a caller with no workstation sent no outletId (audit R215) |
 | 404 |  | No active item with that barcode or SKU at the outlet. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### lookupShopAndDrop
 
@@ -137,6 +138,7 @@ Scanned at the collection point. Accepts the entitlement, the drop reference, or
 |---|---|---|
 | 200 |  | Awaiting collection |
 | 400 |  | No identifier supplied |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### reserveMerchandise
 
@@ -204,6 +206,7 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 | 400 |  | expiresAt is less than 15 minutes ahead, or later than the end of the visit day (audit R215). |
 | 201 |  | Reserved |
 | 409 |  | Insufficient stock. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: merchandise
@@ -280,6 +283,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
 | 409 |  | Barcode already in use in this venue. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listMerchandise
 
@@ -328,6 +332,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 |---|---|---|
 | 200 |  | Merchandise, one page. |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateMerchandise
 
@@ -397,6 +402,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | The new barcode is already in use in this venue. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: return
@@ -491,6 +497,7 @@ Goods returned damaged or opened are written off rather than restocked, and that
 | 201 |  | Accepted |
 | 409 |  | Refused by the return policy: outside the return window, item is non-returnable, already returned, a supervisor step-up is required, no receipt, or a serial number that does not match. |
 | 403 |  | The caller lacks ORDER_REFUND, or the supervisor step-up failed: the PIN did not verify, the principal does not hold ORDER_REFUND_APPROVE at this venue, or is the caller (supervisor-step-up-refused,… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getReturnPolicy
 
@@ -547,6 +554,7 @@ Separate from the ticket refund policy. A t-shirt and a timed admission have not
 |---|---|---|
 | 200 |  | Policy |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### lookupRetailSale
 
@@ -632,6 +640,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | 200 |  | The matching sales, newest first. |
 | 400 |  | None of the three identifiers was sent |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setReturnPolicy
 
@@ -710,6 +719,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: sale
@@ -820,6 +830,7 @@ Creates an order in the Order & Payment context and a `saleDepletion` movement i
 | 201 |  | Sold; stock depleted |
 | 400 | BadRequest | Validation failed |
 | 409 |  | Insufficient stock (insufficientStock), a serialised item has no serial number (serialNumberRequired), or the terminal is offline (terminalOffline). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getRetailSale
 
@@ -903,6 +914,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 |---|---|---|
 | 200 |  | Sale |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listRetailSales
 
@@ -982,6 +994,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Sales |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### reprintReceipt
 
@@ -1025,6 +1038,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 |---|---|---|
 | 200 |  | Sent |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 

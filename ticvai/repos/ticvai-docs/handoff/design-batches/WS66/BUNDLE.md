@@ -119,7 +119,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-012 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-012 holds none of them. The edge carries nothing: ANL-012 is opened from ANL-001, so this edge is the way back and ANL-001 keeps its own state"
     }
    ]
   },
@@ -308,7 +308,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-013 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-013 holds none of them. The edge carries nothing: ANL-013 is opened from ANL-001, so this edge is the way back and ANL-001 keeps its own state"
     }
    ]
   },
@@ -480,7 +480,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-014 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-014 holds none of them. The edge carries nothing: ANL-014 is opened from ANL-001, so this edge is the way back and ANL-001 keeps its own state"
     }
    ]
   },
@@ -667,7 +667,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-015 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-015 holds none of them. The edge carries nothing: ANL-015 is opened from ANL-001, so this edge is the way back and ANL-001 keeps its own state"
     }
    ]
   },
@@ -819,7 +819,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-016 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-016 holds none of them. The edge carries nothing: ANL-016 is opened from ANL-001, so this edge is the way back and ANL-001 keeps its own state"
     }
    ]
   },
@@ -1207,7 +1207,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-018 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-018 holds none of them. The edge carries nothing: ANL-018 is opened from ANL-001, so this edge is the way back and ANL-001 keeps its own state"
     }
    ]
   },
@@ -1371,7 +1371,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-019 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-019 holds none of them. The edge carries nothing: ANL-019 is opened from ANL-001, so this edge is the way back and ANL-001 keeps its own state"
     }
    ]
   },

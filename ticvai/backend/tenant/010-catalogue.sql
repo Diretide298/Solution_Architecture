@@ -1,4 +1,4 @@
--- catalogue — 79 tables
+-- catalogue — 80 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -1481,7 +1481,7 @@ CREATE TABLE IF NOT EXISTS catalogue.product_eligibility_rule (
     max_age_years                     integer,
     min_height_cm                     integer,
     max_height_cm                     integer,
-    height_bands_cm                   text[],
+    height_bands_cm                   integer[],
     accompanied_below_age             integer,
     guardian_signature_age_from       integer,
     guardian_signature_age_to         integer,
@@ -1789,6 +1789,21 @@ CREATE TABLE IF NOT EXISTS catalogue.variant_dimension (
     name                              text NOT NULL CONSTRAINT variant_dimension_name_chk CHECK (char_length(name) <= 200),
     id                                uuid PRIMARY KEY NOT NULL,
     product_id                        uuid NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS catalogue.waiting_room_setting (
+    id                                uuid PRIMARY KEY,
+    performance_id                    uuid NOT NULL,
+    venue_id                          uuid NOT NULL,
+    mode                              text NOT NULL DEFAULT 'off' CONSTRAINT waiting_room_setting_mode_chk CHECK (mode IN ('off', 'onSaleWindow', 'on')),
+    active_until                      timestamptz,
+    max_release_per_second            integer DEFAULT 50,
+    is_automatic_release_enabled      boolean DEFAULT true,
+    admission_ttl_seconds             integer DEFAULT 900,
+    provider                          text DEFAULT 'inHouse' CONSTRAINT waiting_room_setting_provider_chk CHECK (provider IN ('inHouse', 'vendor')),
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    updated_by_principal_id           uuid
 );
 
 -- Who asked to be told when a sold-out session frees up. Not a queue — a queue is people standing

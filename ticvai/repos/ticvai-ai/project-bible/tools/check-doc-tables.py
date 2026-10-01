@@ -46,7 +46,12 @@ EXEMPT_PARTS = ("sources", "_dump", "repos")
 EXEMPT_NAMES = ("schema-merge-decision-log.md", "schema-merge-decisions-20-september.md",
                 "schema-merge-final-report-20-september.md",
                 "schema-merge-response-20-september.md", "rename-worklist-20-september.md",
-                "schema-merge-audit-18-september.md", "change-log-validation-18-september.md")
+                "schema-merge-audit-18-september.md", "change-log-validation-18-september.md",
+                # The 1 October renames (identity.access_policy, access.access_device): the two ADRs
+                # that decided them, the review that found them, and the 29 September close-out
+                # record, which says what was declared that day.
+                "0067-one-device-register.md", "0068-guest-admission-policy-lives-in-access-only.md",
+                "system-design-review-30-september.md", "readiness-closeout.md")
 
 # `word.word` where the left side names a real schema. **A backtick is a boundary, not an
 # exclusion** - documentation wraps almost every table name in one, and excluding them found

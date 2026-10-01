@@ -200,7 +200,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ACC-008",
      "trigger": "Credential Register",
-     "provenance": "derived — ACC-008 declares entryState.params  and ACC-006 holds none of them, so the edge carries nothing and ACC-008 opens cold"
+     "provenance": "derived — ACC-008 declares entryState.params  and ACC-006 holds none of them. The edge carries nothing: ACC-008 needs nothing to open"
     }
    ]
   },
@@ -390,12 +390,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ACC-006",
      "trigger": "Reviewer Queue",
-     "provenance": "derived — ACC-006 declares entryState.params  and ACC-007 holds none of them, so the edge carries nothing and ACC-006 opens cold"
+     "provenance": "derived — ACC-006 declares entryState.params  and ACC-007 holds none of them. The edge carries nothing: ACC-007 is opened from ACC-006, so this edge is the way back and ACC-006 keeps its own state"
     },
     {
      "to": "ACC-008",
      "trigger": "Credential Register",
-     "provenance": "derived — ACC-008 declares entryState.params  and ACC-007 holds none of them, so the edge carries nothing and ACC-008 opens cold"
+     "provenance": "derived — ACC-008 declares entryState.params  and ACC-007 holds none of them. The edge carries nothing: ACC-008 needs nothing to open"
     },
     {
      "to": "ACC-005",
@@ -585,12 +585,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ACC-006",
      "trigger": "Reviewer Queue",
-     "provenance": "derived — ACC-006 declares entryState.params  and ACC-008 holds none of them, so the edge carries nothing and ACC-006 opens cold"
+     "provenance": "derived — ACC-006 declares entryState.params  and ACC-008 holds none of them. The edge carries nothing: ACC-008 is opened from ACC-006, so this edge is the way back and ACC-006 keeps its own state"
     },
     {
      "to": "ACC-007",
      "trigger": "Reviewer Application Detail",
-     "provenance": "derived — ACC-007 declares entryState.params applicationId, documentId and ACC-008 holds none of them, so the edge carries nothing and ACC-007 opens cold"
+     "provenance": "derived — ACC-007 declares entryState.params applicationId, documentId and ACC-008 holds none of them. The edge carries nothing: ACC-008 is opened from ACC-007, so this edge is the way back and ACC-007 keeps its own state"
     }
    ]
   },

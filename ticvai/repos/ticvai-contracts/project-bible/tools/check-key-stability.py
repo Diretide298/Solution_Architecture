@@ -7,20 +7,29 @@ from VM-MIG- to MIG- -- and the push made 25 second tickets for work that had on
 tools/op-retire.py). A split re-numbered SVC-WALLET-RETAIL-1, so its ticket was matched to the wrong half.
 `build-service-docs.py` now reconciles every key against pms-map.json (`reconcile_keys`); this checks it.
 
+**A pushed key is the ticket's identity and is never renamed** (council of 1 October, plan item 1C, C4):
+a move between module prefixes (VM- / SVC- / APP-SETUP- / MIG-) is metadata, and the generator keeps the
+pushed key for the moved work. **A rename is therefore a reconciliation that failed, and it blocks.**
+
 Reads handoff/service-docs/tasks.csv and pms-map.json and fails on:
 
-  duplicate   a planned key with no ticket whose work -- the screen id, an operation, a table -- is
-              already on a pushed ticket that has left the plan and is not closed. Pushing it would
-              make the second ticket.
+  renamed     a pushed key that has left the plan, is not closed and is not retired in op-retire.py, whose
+              work -- the screen id, an operation, a table -- now appears under a different planned key.
+              With a new key, pushing it would make the second ticket (the 25 duplicates of 30 September);
+              with a key that already has a ticket, the old ticket is left open carrying work that is
+              built elsewhere. Either way the planned key differs from the pushed key for the same work.
   unstable    a planned key the generator's own reconciliation would write differently: tasks.csv is
               older than the generator, or was edited by hand.
 
-and reports without failing: a new key whose work sits on a sub-task of a ticket still in the plan (the
-work moved between two live tickets, which a person moves), or on a ticket op-retire closed.
+and reports without failing: a new key whose work sits on a sub-task of a ticket still in the plan (a split:
+the new key is new work linked to its parent, and a person moves the sub-task), or on a ticket op-retire
+closed. A ticket op-retire retires (merged or deferred, with its reason) has left the plan on purpose.
 
 Then it proves the reconciliation on copies of the plan and the map, in memory: a screen moved between
 prefixes, a split that re-numbered its parts, a migration and operations moved between Block A and Venue
-Management, a genuinely new group, and a closed ticket that must not be reopened.
+Management, a genuinely new group, and a closed ticket that must not be reopened. **And it proves the
+block**: a plan written with a renamed key, and a plan that moved a ticket's work into another ticket
+without retiring it, must both fail; the same prefix move written under the pushed key must pass.
 
     python3 tools/check-key-stability.py [--tasks PATH] [--map PATH]   (defaults: the files above)
 """
@@ -65,12 +74,57 @@ def plan_work(rows):
     return work
 
 
-def check(rows, mp, closed):
+def retired_keys(mp) -> frozenset:
+    """Pushed keys tools/op-retire.py takes out of the plan with a reason: every key it names (merged or
+    deferred), and every key of a screen it defers or merges. Such a ticket left the plan on purpose."""
+    try:
+        spec = importlib.util.spec_from_file_location("op_retire", ROOT / "tools" / "op-retire.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+    except Exception:
+        return frozenset()
+    sids = list(mod.DEFERRED) + list(mod.MERGED)
+    out = set(mod.OTHER)
+    for k in mp:
+        if "#" not in k and any(re.search(rf"-{re.escape(s)}$", k) for s in sids):
+            out.add(k)
+    return frozenset(out)
+
+
+def overlap(kind, fam, work_k, p, pitems):
+    ident = gen.key_identity(p)
+    if not ident or ident[0] != kind:
+        return set()
+    if kind == "screen":
+        return {fam} if ident[1] == fam else set()
+    same = work_k & pitems[p]
+    if kind == "tables" and ident[1] == fam:
+        same = same or {f"schema {fam}"}
+    return same
+
+
+def check(rows, mp, closed, retired=frozenset()):
     """(errors, notes) for one plan and one map."""
     planned = {r["key"] for r in rows}
     work = plan_work(rows)
     pitems = gen.pushed_items(mp)
     errors, notes = [], []
+    # **A pushed ticket whose work is now under another key that already has a ticket.** The loop below
+    # only looks at new keys; this is the other half of a rename: the old ticket is left open, carrying
+    # work somebody builds under a different ticket, with nothing in the plan saying so.
+    for p in sorted(set(pitems) - planned):
+        if p in closed or p in retired or not gen.key_identity(p):
+            continue
+        for k in sorted(planned & set(pitems)):
+            if k not in work:
+                continue
+            kind, fam = gen.key_identity(k)
+            same = overlap(kind, fam, work[k], p, pitems)
+            if same:
+                what = ", ".join(sorted(same)[:4]) + (" ..." if len(same) > 4 else "")
+                errors.append(f"renamed    #{mp[p]} {p} left the plan, and its work {what} is now under {k}: "
+                              f"keep {p} for that work (moves are metadata), or retire {p} in op-retire.py "
+                              "with the reason")
     for k in sorted(planned - set(pitems)):
         if k not in work:
             continue
@@ -90,7 +144,8 @@ def check(rows, mp, closed):
             elif p in planned:
                 notes.append(f"{k}: {what} is a sub-task of #{mp[p]} {p}, still in the plan; move the sub-task")
             else:
-                errors.append(f"duplicate  {k} is new, but {what} is already on #{mp[p]} {p}, which left the plan")
+                errors.append(f"renamed    {k} is new, but {what} is already on #{mp[p]} {p}, which left the "
+                              f"plan: {p} is the key for that work (pushing {k} makes a second ticket)")
     fixed = planned - set(work)
     final, _ = gen.reconcile_keys(work, fixed, mp, closed)
     for k, v in sorted(final.items()):
@@ -100,7 +155,7 @@ def check(rows, mp, closed):
     return errors, notes
 
 
-def self_test(rows, mp):
+def self_test(rows, mp, closed=frozenset(), retired=frozenset()):
     """Each case edits copies of today's plan and map into a state the plan has been in, and asserts the key
     the reconciliation gives. Returns [(case, ok, detail)]."""
     work = plan_work(rows)
@@ -156,6 +211,62 @@ def self_test(rows, mp):
     # 6. Today's plan against today's map moves nothing.
     f = run(work, mp)
     case("today's plan keeps every key", sum(1 for k, v in f.items() if k != v), 0)
+
+    # 8-12. **The block** (C4, 1 October): these run check() itself, on a plan and a map edited in memory.
+    # Each picks its ticket from today's plan, so it does not depend on one key surviving the next plan.
+    def other_prefix(k):
+        for a, b in (("SVC-", "VM-"), ("VM-", "SVC-"), ("APP-SETUP-", "VM-")):
+            if k.startswith(a):
+                return b + k[len(a):]
+        return None
+
+    def rekey(m, old, new):
+        return {(new + k[len(old):] if k == old or k.startswith(old + "#") else k): v for k, v in m.items()}
+
+    def rows_with(rs, old, new):
+        return [dict(r, key=new) if r["key"] == old else r for r in rs]
+
+    planned = {r["key"] for r in rows}
+    pit = gen.pushed_items(mp)
+    renamed = [k for k in sorted(work) if k in pit and gen.key_identity(k)[0] in ("ops", "screen")
+               and (gen.key_identity(k)[0] == "screen" or pit[k] & work[k])
+               and other_prefix(k) and other_prefix(k) not in mp and other_prefix(k) not in planned
+               and gen.key_identity(other_prefix(k)) == gen.key_identity(k)]
+    for kind in ("ops", "screen"):
+        k = next((x for x in renamed if gen.key_identity(x)[0] == kind), None)
+        if not k:
+            continue
+        nk = other_prefix(k)
+        # 8. tasks.csv written with the work under a new prefix, the pushed key dropped: blocked.
+        errs, _ = check(rows_with(rows, k, nk), mp, closed, retired)
+        case(f"{kind} renamed {k} -> {nk} is blocked", any(e.startswith("renamed") and k in e for e in errs), True)
+        # 9. The same move, pushed under the other prefix and written under the pushed key: metadata, passes.
+        m = rekey(mp, k, nk)
+        errs, _ = check(rows_with(rows, k, nk), m, closed, retired)
+        case(f"{kind} moved {k} -> {nk} under its pushed key passes", errs, [])
+        # 10. ...because the generator gives the natural key (the new prefix) the pushed one.
+        case(f"{kind} moved: reconciliation writes {k} as pushed {nk}", run(work, m).get(k), nk)
+    # 11. A ticket's operations folded into another planned ticket, the first dropped from the plan without
+    # op-retire saying why: blocked. 12. ...and with op-retire's reason, it passes.
+    # The one moved has a single operation and the one receiving it several, so the receiving ticket keeps
+    # its key under the reconciliation and only the dropped one is at stake.
+    ops = [x for x in sorted(work) if x in pit and gen.key_identity(x)[0] == "ops"]
+    a = next((x for x in ops if len(pit[x] & work[x]) == 1), None)
+    b = next((x for x in ops if x != a and len(pit[x] & work[x]) >= 2), None)
+    if a and b:
+        moved = sorted(work[a] | work[b])
+        rs = []
+        for r in rows:
+            if r["key"] == a:
+                continue
+            if r["key"] == b:
+                r = dict(r, description=f"Operations: {', '.join(moved)}. Spec: test.")
+            rs.append(r)
+        errs, _ = check(rs, mp, closed, retired)
+        case(f"work of {a} moved into {b} without a reason is blocked",
+             any(e.startswith("renamed") and a in e for e in errs), True)
+        errs, _ = check(rs, mp, closed, retired | {a})
+        case(f"work of {a} moved into {b}, retired in op-retire, passes", errs, [])
     return out
 
 
@@ -168,7 +279,7 @@ def main() -> int:
         rows = list(csv.DictReader(fh))
     mp = json.loads(Path(a.map).read_text(encoding="utf-8"))
     closed = gen.closed_keys()
-    errors, notes = check(rows, mp, closed)
+    errors, notes = check(rows, mp, closed, retired_keys(mp))
     planned = {r["key"] for r in rows}
     pushed = set(gen.pushed_items(mp))
     print(f"plan {len(planned)} keys, {len(planned & pushed)} with a ticket, {len(planned - pushed)} new; "
@@ -177,14 +288,15 @@ def main() -> int:
         print(f"  note       {n}")
     for e in errors:
         print(f"  {e}")
-    tests = self_test(rows, mp)
+    tests = self_test(rows, mp, closed, retired_keys(mp))
     for name, ok, detail in tests:
         print(f"  test {'ok  ' if ok else 'FAIL'} {name}" + ("" if ok else f": {detail}"))
     failed = [t for t in tests if not t[1]]
     if errors or failed:
-        print(f"FAIL: {len(errors)} key(s) would duplicate or move a ticket, {len(failed)} self-test(s) failed")
+        print(f"FAIL: {len(errors)} pushed key(s) renamed or unstable (a rename blocks: keep the pushed key), "
+              f"{len(failed)} self-test(s) failed")
         return 1
-    print(f"PASS: no new key's work is already on a pushed ticket; {len(tests)} reconciliation tests pass")
+    print(f"PASS: no pushed key renamed, no new key's work already on a pushed ticket; {len(tests)} tests pass")
     return 0
 
 

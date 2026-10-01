@@ -24,10 +24,10 @@ and usually enough to predict what an ADR says.
 | [0009](0009-ai-data-residency.md) | AI data residency — architectural, not storage-location | Accepted — section 2 **amended by 0049** (Qdrant on every tier, a collection per tenant) | **CF-20** |
 | [0010](0010-cross-jurisdiction-entitlements.md) | Cross-jurisdiction entitlements — home-cell ownership with delegated redemption | Accepted | **CF-31** |
 | [0011](0011-hierarchy-is-binding.md) | The hierarchy is binding — seven levels confirmed | Accepted | **CF-34, CF-27** |
-| [0012](0012-queue-integration-adaptor-first.md) | Queue integration — adaptor-first, vendor deferred | Accepted (partial) | **CF-33** |
+| [0012](0012-queue-integration-adaptor-first.md) | Queue integration — adaptor-first, vendor deferred | Accepted in part — **Q2 amended by 0066** (the waiting room has its own endpoints and an admission token) | **CF-33** |
 | [0013](0013-local-first-point-of-sale.md) | Local-first point of sale — one read path, leases, local journal | Accepted | **CF-15** |
 | [0014](0014-cell-per-region.md) | **Cell per region** — supersedes the jurisdiction-only split | **Superseded** by 0038 | **CF-32** |
-| [0015](0015-standards-first-device-drivers.md) | Standards-first device drivers — ESC/POS, UnifiedPOS, OSDP | Accepted | — |
+| [0015](0015-standards-first-device-drivers.md) | Standards-first device drivers — ESC/POS, UnifiedPOS, OSDP | Accepted — **amended by 0067** (one device register) | — |
 | [0016](0016-read-write-separation.md) | Read and write paths are separated, routing declared per operation | Accepted | — |
 | [0017](0017-deployment-models.md) | Deployment models — shared, dedicated, additional region, on-premise | Accepted — amended by 0038 | — |
 | [0018](0018-configuration-scope.md) | Configuration scope — three levels, nearest ancestor wins, venue is the floor | Accepted | — |
@@ -44,7 +44,7 @@ and usually enough to predict what an ADR says.
 | [0029](0029-outlet-configuration-scope.md) | Outlet configuration is outlet-scoped, and the path is the evidence | Accepted | — |
 | [0030](0030-deep-link-cold-entry.md) | A deep link is a pointer, not authorisation | Accepted | — |
 | [0031](0031-contention-and-locking.md) | Contention is leased, not locked — and where a lock is unavoidable it is named | Accepted | — |
-| [0032](0032-load-shedding-and-pooling.md) | A service refuses early or fails late — pooling, backpressure and breakers | Accepted — pooling amended by 0038 | — |
+| [0032](0032-load-shedding-and-pooling.md) | A service refuses early or fails late — pooling, backpressure and breakers | Accepted — pooling amended by 0038; the per-tenant rate limit it deferred is decided by **0064** | — |
 | [0033](0033-outbox-and-dead-letters.md) | Every asynchronous handoff has an outbox and a place to fail | Accepted — **amended by 0058** (relay per region, inbox); broker per 0057 | — |
 | [0034](0034-ai-retrieval-and-cost.md) | The cheapest AI call is the one that never reaches a provider | Accepted | — |
 | [0035](0035-burst-environments.md) | A flash sale gets its own environment, and it cannot be deleted until it has been reconciled | Accepted — amended 3 September | — |
@@ -64,19 +64,34 @@ and usually enough to predict what an ADR says.
 | [0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md) | **Vectors live in Qdrant from day one, one collection per tenant, each with its own token** | Accepted 30 September | SD-060 — amends 0009, 0020, 0021 |
 | [0050](0050-one-autonomy-scale.md) | One autonomy scale; the approval tier is not an autonomy level | Accepted 30 September (records AI-D04) | SD-060 |
 | [0051](0051-ai-ships-on-a-baseline-and-learns-per-tenant.md) | Every AI function ships on a baseline and learns per tenant | Accepted 30 September | SD-060, SD-061 |
+| [0052](0052-one-recommendation-engine.md) | One recommendation engine; runtime in AI, configuration in Promotions | Accepted 1 October (records AI-D07–D09) | SD-060 |
+| [0053](0053-risk-layer-ownership.md) | Owners keep their deterministic rules; AI owns cross-entity risk, alerts and cases | Accepted 1 October (records AI-D06) | SD-060 |
+| [0054](0054-natural-language-analytics-goes-through-the-semantic-layer.md) | Natural-language analytics goes through the semantic layer | Accepted 1 October (records AI-D13, AI-D15) | SD-060 |
 | [0055](0055-a-modular-monolith-deployed-as-five-units.md) | **A modular monolith, deployed as five units** | Accepted 30 September | **SD-001**, SD-002, SD-006 — amends 0028 |
 | [0056](0056-one-id-type-and-time-partitioning-before-the-first-migration.md) | **One id type (UUIDv7), and time partitioning first** | Accepted 30 September | **SD-010**, SD-012, SD-009 — amends 0044, 0005 |
 | [0057](0057-events-travel-on-rabbitmq-or-kafka.md) | Events travel on RabbitMQ or Kafka, behind one kernel interface | **Proposed** — waiting on the client's choice between RabbitMQ and Kafka | **SD-032** — completes 0033 |
 | [0058](0058-one-relay-per-region-and-an-inbox-per-tenant-database.md) | One relay per region, and an inbox per tenant database | Accepted 30 September | SD-031, SD-030 — amends 0033 |
 | [0059](0059-ai-phasing-against-the-six-month-plan.md) | AI phasing against the six-month plan | Accepted 30 September | SD-062, CF-57, CF-14 |
+| [0060](0060-availability-targets-high-availability-and-disaster-recovery.md) | Availability targets per tier, and how they are met | **Proposed** — waiting on the client (what the 99.99% covers; SLO per tier; HA cost) and on Chinmay (one production HA mode) | **SD-045** |
+| [0061](0061-replica-floors-per-deployable.md) | Replica floors are set per deployable and per zone | Accepted 1 October | SD-044 |
+| [0062](0062-e-invoicing-through-a-provider-adapter.md) | E-invoicing goes through a provider adapter, and a rejection stops for a person | **Proposed** — waiting on the client (provider, mandate date, B2C scope, VAT 201 layout) | **SD-035**, CF-133 |
+| [0063](0063-encryption-keys-and-biometric-templates.md) | Encryption and keys; biometric templates stay with the biometric vendor | **Proposed** — waiting on the client's DPO (template location, retention floor) and the facial-reader vendor | SD-058, CF-35 |
+| [0064](0064-per-tenant-limits.md) | Every tenant has a request budget, and a busy tenant cannot starve the others | Accepted 1 October | SD-042, SD-043 — amends 0032 |
+| [0065](0065-on-sale-availability-is-read-from-a-short-cache.md) | Browse availability is read from a one-second cache; the hold decides | **Proposed** — waiting on Chinmay: it reverses F01/F07's "never cached" | **SD-038** |
+| [0066](0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md) | The on-sale waiting room sits at the edge, apart from the ride queue | Accepted 1 October | **SD-039** — amends 0012 |
+| [0067](0067-one-device-register.md) | One device register; Access keeps only where a device is placed | Accepted 1 October | SD-004 — amends 0015 |
+| [0068](0068-guest-admission-policy-lives-in-access-only.md) | Guest admission policy lives in Access only, and the offline package carries it | Accepted 1 October | SD-005, SD-052 |
 | [0069](0069-in-park-3d-navigation-is-built-natively.md) | **In-park 3D navigation is built natively**, from a venue GLB model, a pathway and location file, and GPS | Accepted 30 September (client meeting, MoM 4.8) | — builds on the venue-map contract (19.2.55–19.2.60) |
 
 > **0026 to 0037 were added on 30 September** (SD-053): they had been on disk since August and
 > missing from this table. **0049–0051 and 0055–0059 were added the same day**, from the system-design
-> review. Numbers 0052–0054 and 0060–0068 are held by review drafts that are not decided yet; they join
-> this table when they are.
-> **0069 was added the same day** from the client meeting of 30 September; it takes the next number
-> after the drafts so none of them has to be renumbered.
+> review. **0069 was added the same day** from the client meeting of 30 September; it took the next
+> number after the review drafts so none of them had to be renumbered.
+> **0052–0054 and 0060–0068 joined on 1 October** (plan item 2.5), moved from the review drafts in
+> `audit/ticvai/steps/SD/adr-drafts/` and brought in line with 0049 and 0055–0058 (the broker is RabbitMQ
+> or Kafka per 0057, never Service Bus; Redis is Azure Managed Redis). Eight are Accepted. Four are
+> Proposed with the open question and who answers in their status line: 0060, 0062 and 0063 wait on the
+> client, and 0065 on Chinmay.
 
 ## Still needed
 

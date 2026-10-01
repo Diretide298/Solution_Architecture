@@ -1,24 +1,24 @@
 # Package report
 
-**Generated 2026-09-30 by `tools/build-package-report.py`.** Every figure is read from a file another tool wrote in the same refresh.
+**Generated 2026-10-01 by `tools/build-package-report.py`.** Every figure is read from a file another tool wrote in the same refresh.
 
 ## Scale
 
 | | |
 |---|---|
 | Contracts | 33 |
-| Operations | 2660 |
+| Operations | 2668 |
 | Screens | 2445 |
 | Platforms | 16 |
 | Apps | 5 |
-| Tables | 1093 |
+| Tables | 1095 |
 | Stores | 10 |
 | Foreign Keys | 796 |
-| Indexes | 2824 |
-| Relationships | 3033 |
+| Indexes | 2825 |
+| Relationships | 3048 |
 | Flows | 97 |
 | Boards | 218 |
-| Adrs | 57 |
+| Adrs | 69 |
 | Services | 17 |
 
 ## The chain
@@ -29,39 +29,39 @@
 |---|---:|---:|---|
 | Requirements in scope | 3165 / 3184 | 99% | matrix rows, less the ones deliberately parked |
 | Requirements contracted | 3153 / 3165 | 100% | an operation or schema field demonstrably serves it |
-| Operations declaring a service | 2660 / 2660 | 100% | the operation is owned by one of the seventeen deployables |
-| Operations declaring a permission | 2513 / 2660 | 94% | the checklist a grant screen renders is built from these |
-| Operations with resolved lineage | 2653 / 2660 | 100% | names the tables it reads and writes -- the join the DDL cannot make itself |
-| Operations reaching a screen | 2430 / 2660 | 91% | sync, webhook and job operations legitimately have none |
+| Operations declaring a service | 2668 / 2668 | 100% | the operation is owned by one of the seventeen deployables |
+| Operations declaring a permission | 2519 / 2668 | 94% | the checklist a grant screen renders is built from these |
+| Operations with resolved lineage | 2659 / 2668 | 100% | names the tables it reads and writes -- the join the DDL cannot make itself |
+| Operations reaching a screen | 2436 / 2668 | 91% | sync, webhook and job operations legitimately have none |
 | Screens naming an operation | 2438 / 2445 | 100% | the rest are static, navigation shells or workshop-blocked |
-| Tables reached by an operation | 1089 / 1093 | 100% | a table nothing reaches is a missing operation or a table that should not exist |
-| Tables carrying a relationship | 1010 / 1093 | 92% | either end of a declared reference |
+| Tables reached by an operation | 1091 / 1095 | 100% | a table nothing reaches is a missing operation or a table that should not exist |
+| Tables carrying a relationship | 1012 / 1095 | 92% | either end of a declared reference |
 
 ## What crosses a service boundary
 
-**3033 declared references. 1839 stay inside one service; 1193 cross two.**
+**3048 declared references. 1840 stay inside one service; 1207 cross two.**
 
-**608 of the 1193 crossings land on three tables** -- `identity.principal`, `platform.scope`, `pii.subject`. The crossings concentrate on the foundation tier rather than spreading, which is what the tier is for.
+**611 of the 1207 crossings land on three tables** -- `identity.principal`, `platform.scope`, `pii.subject`. The crossings concentrate on the foundation tier rather than spreading, which is what the tier is for.
 
 | From | To | Edges |
 |---|---|---:|
 | MarketingService | IdentityService | 77 |
-| AccessService | TenancyService | 68 |
-| CatalogueService | TenancyService | 66 |
+| AccessService | TenancyService | 76 |
+| CatalogueService | TenancyService | 67 |
 | OrderService | IdentityService | 57 |
+| CatalogueService | IdentityService | 47 |
 | TenancyService | IdentityService | 47 |
 | AiService | IdentityService | 46 |
-| CatalogueService | IdentityService | 46 |
 | AccessService | IdentityService | 36 |
 | VenueOpsService | TenancyService | 35 |
-| PlatformService | IdentityService | 31 |
+| PlatformService | IdentityService | 32 |
 | OrderService | CatalogueService | 30 |
 | VenueOpsService | IdentityService | 28 |
 
 | Most-referenced table across a boundary | Edges |
 |---|---:|
-| `identity.principal` | 336 |
-| `platform.scope` | 180 |
+| `identity.principal` | 338 |
+| `platform.scope` | 181 |
 | `pii.subject` | 92 |
 | `platform.outbox` | 44 |
 | `orders.sales_order` | 39 |
@@ -75,16 +75,16 @@
 
 | Service | Tier | Ops | On a screen | Tables | Screens | Out | In |
 |---|---|---:|---:|---:|---:|---:|---:|
-| CatalogueService | commerce | 445 | 431 | 134 | 73 | 158 | 116 |
+| CatalogueService | commerce | 449 | 433 | 135 | 73 | 160 | 116 |
 | OrderService | commerce | 288 | 269 | 113 | 101 | 143 | 91 |
 | VenueOpsService | operations | 285 | 275 | 123 | 53 | 104 | 43 |
 | MarketingService | engagement | 264 | 211 | 130 | 40 | 153 | 16 |
-| AccessService | commerce | 246 | 240 | 76 | 29 | 131 | 19 |
-| PlatformService | platform | 212 | 191 | 103 | 42 | 83 | 36 |
-| TenancyService | foundation | 204 | 181 | 108 | 71 | 107 | 342 |
+| AccessService | commerce | 246 | 240 | 76 | 29 | 139 | 20 |
+| PlatformService | platform | 216 | 195 | 104 | 42 | 86 | 36 |
+| TenancyService | foundation | 204 | 181 | 108 | 71 | 108 | 353 |
 | AiService | engagement | 141 | 128 | 74 | 21 | 70 | 4 |
 | FnbService | operations | 120 | 109 | 48 | 57 | 57 | 6 |
-| IdentityService | foundation | 89 | 71 | 38 | 36 | 23 | 441 |
+| IdentityService | foundation | 89 | 71 | 38 | 36 | 23 | 443 |
 | WhiteLabelService | platform | 79 | 77 | 25 | 25 | 10 | 4 |
 | LedgerService | commerce | 72 | 62 | 27 | 20 | 54 | 37 |
 | WalletService | commerce | 66 | 57 | 31 | None | 17 | 6 |
@@ -102,7 +102,7 @@
 | ai | 141 | 128 | 141 | 137 |
 | approvals | 53 | 46 | 52 | 53 |
 | assets | 26 | 26 | 26 | 26 |
-| catalogue | 237 | 232 | 237 | 233 |
+| catalogue | 241 | 234 | 239 | 235 |
 | cross-region | 18 | 6 | 18 | 9 |
 | finance | 72 | 62 | 72 | 70 |
 | fnb | 120 | 109 | 120 | 109 |
@@ -113,7 +113,7 @@
 | marketing-crm | 264 | 211 | 264 | 237 |
 | orders | 219 | 202 | 218 | 203 |
 | payments | 48 | 47 | 48 | 45 |
-| platform-ops | 33 | 32 | 33 | 33 |
+| platform-ops | 37 | 36 | 37 | 37 |
 | promotions | 153 | 144 | 153 | 153 |
 | public-api | 31 | 30 | 30 | 31 |
 | queue | 22 | 16 | 22 | 14 |
@@ -135,14 +135,14 @@
 
 | Code | Platform | App | Screens | Naming an operation | Distinct operations |
 |---|---|---|---:|---:|---:|
-| P01 | Guest Web | guest-web | 50 | 50 | 214 |
-| P02 | Guest App | guest-app | 77 | 76 | 217 |
+| P01 | Guest Web | guest-web | 50 | 50 | 216 |
+| P02 | Guest App | guest-app | 77 | 76 | 219 |
 | P04 | Venue POS | venue-pos | 30 | 30 | 148 |
 | P05 | Guest Kiosk | guest-app | 17 | 15 | 23 |
 | P06 | Venue Staff App | venue-staff-app | 96 | 94 | 224 |
 | P07 | Venue Scanner | venue-scanner | 11 | 11 | 28 |
 | P08 | Venue Management | venue-management-web | 1186 | 1186 | 1460 |
-| P09 | TICVAI Web | ticvai-web | 676 | 675 | 718 |
+| P09 | TICVAI Web | ticvai-web | 676 | 675 | 722 |
 | P10 | Partner Web | partner-web | 51 | 51 | 142 |
 | P11 | Accreditation Web | accreditation-web | 8 | 7 | 16 |
 | P12 | Venue Support | venue-support-web | 28 | 28 | 62 |
@@ -161,9 +161,9 @@
 | Requirements Gap Contract | 0 |
 | Requirements Gap Decision | 0 |
 | Requirements Partial | 12 |
-| Operations No Screen | 230 |
+| Operations No Screen | 232 |
 | Screens No Operation | 7 |
-| Operations No Lineage | 7 |
+| Operations No Lineage | 9 |
 | Tables Not Reached | 4 |
 | Permissions Without Label | 70 |
 | Capability Pairs | 274 |

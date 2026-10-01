@@ -393,12 +393,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-002 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-002 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-002 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-002 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -704,17 +704,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-003 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-003 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-003 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-003 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-051",
      "trigger": "Restaurant Service Command Center",
-     "provenance": "derived — EMP-051 declares entryState.params outletId and EMP-003 holds none of them, so the edge carries nothing and EMP-051 opens cold"
+     "provenance": "derived — EMP-051 declares entryState.params outletId and EMP-003 holds none of them. The edge carries nothing: EMP-051 finds outletId (listTableReservations) itself, and EMP-051 opens on its own"
     },
     {
      "to": "EMP-052",
@@ -729,27 +729,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-054",
      "trigger": "Reservation Calendar & Timeline",
-     "provenance": "derived — EMP-054 declares entryState.params  and EMP-003 holds none of them, so the edge carries nothing and EMP-054 opens cold"
+     "provenance": "derived — EMP-054 declares entryState.params  and EMP-003 holds none of them. The edge carries nothing: EMP-054 needs nothing to open"
     },
     {
      "to": "EMP-055",
      "trigger": "Create / Edit Reservation",
-     "provenance": "derived — EMP-055 declares entryState.params  and EMP-003 holds none of them, so the edge carries nothing and EMP-055 opens cold"
+     "provenance": "derived — EMP-055 declares entryState.params  and EMP-003 holds none of them. The edge carries nothing: EMP-055 needs nothing to open"
     },
     {
      "to": "EMP-056",
      "trigger": "Walk-In & Waitlist Management",
-     "provenance": "derived — EMP-056 declares entryState.params entryId and EMP-003 holds none of them, so the edge carries nothing and EMP-056 opens cold"
+     "provenance": "derived — EMP-056 declares entryState.params entryId and EMP-003 holds none of them. The edge carries nothing: EMP-056 finds entryId (joinRestaurantWaitlist) itself, and EMP-056 opens on its own"
     },
     {
      "to": "EMP-057",
      "trigger": "Guest Profile & Dining History",
-     "provenance": "derived — EMP-057 declares entryState.params subjectId and EMP-003 holds none of them, so the edge carries nothing and EMP-057 opens cold"
+     "provenance": "derived — EMP-057 declares entryState.params subjectId and EMP-003 holds none of them. The edge carries nothing: EMP-057 finds subjectId (matchGuest) itself, and EMP-057 opens on its own"
     },
     {
      "to": "EMP-058",
      "trigger": "Live Table & Service Management",
-     "provenance": "derived — EMP-058 declares entryState.params entryId, reservationId, ticketId, visitId and EMP-003 holds none of them, so the edge carries nothing and EMP-058 opens cold"
+     "provenance": "derived — EMP-058 declares entryState.params entryId, reservationId, ticketId, visitId and EMP-003 holds none of them. The edge carries nothing: reservationId, entryId, ticketId only pre-select (deep link or optional); EMP-058 finds visitId (openTableVisit) itself, and EMP-058 opens on its own"
     },
     {
      "to": "EMP-059",
@@ -759,37 +759,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-060",
      "trigger": "Reservation & Table Performance",
-     "provenance": "derived — EMP-060 declares entryState.params outletId and EMP-003 holds none of them, so the edge carries nothing and EMP-060 opens cold"
+     "provenance": "derived — EMP-060 declares entryState.params outletId and EMP-003 holds none of them. The edge carries nothing: EMP-060 finds outletId (listTableReservations) itself, and EMP-060 opens on its own"
     },
     {
      "to": "EMP-061",
      "trigger": "Retail Inventory Command Center",
-     "provenance": "derived — EMP-061 declares entryState.params alertId, dashboardId and EMP-003 holds none of them, so the edge carries nothing and EMP-061 opens cold"
+     "provenance": "derived — EMP-061 declares entryState.params alertId, dashboardId and EMP-003 holds none of them. The edge carries nothing: EMP-061 finds alertId (listAlerts) itself; EMP-061 opens on getStockPositions, and dashboardId has no source on EMP-061 yet (a gap in EMP-061, not in this edge)"
     },
     {
      "to": "EMP-062",
      "trigger": "Store Stock & SKU Availability",
-     "provenance": "derived — EMP-062 declares entryState.params itemId and EMP-003 holds none of them, so the edge carries nothing and EMP-062 opens cold"
+     "provenance": "derived — EMP-062 declares entryState.params itemId and EMP-003 holds none of them. The edge carries nothing: EMP-062 finds itemId (getStockPositions) itself, and EMP-062 opens on its own"
     },
     {
      "to": "EMP-063",
      "trigger": "Requisition & Smart Store Replenishment",
-     "provenance": "derived — EMP-063 declares entryState.params  and EMP-003 holds none of them, so the edge carries nothing and EMP-063 opens cold"
+     "provenance": "derived — EMP-063 declares entryState.params  and EMP-003 holds none of them. The edge carries nothing: EMP-063 needs nothing to open"
     },
     {
      "to": "EMP-064",
      "trigger": "Store-to-Store & Warehouse Transfers",
-     "provenance": "derived — EMP-064 declares entryState.params  and EMP-003 holds none of them, so the edge carries nothing and EMP-064 opens cold"
+     "provenance": "derived — EMP-064 declares entryState.params  and EMP-003 holds none of them. The edge carries nothing: EMP-064 needs nothing to open"
     },
     {
      "to": "EMP-065",
      "trigger": "Receiving & Store Put-Away",
-     "provenance": "derived — EMP-065 declares entryState.params receiptId, transferId and EMP-003 holds none of them, so the edge carries nothing and EMP-065 opens cold"
+     "provenance": "derived — EMP-065 declares entryState.params receiptId, transferId and EMP-003 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional); EMP-065 finds receiptId (createGoodsReceipt) itself, and EMP-065 opens on its own"
     },
     {
      "to": "EMP-066",
      "trigger": "Stock Count & Cycle Count Management",
-     "provenance": "derived — EMP-066 declares entryState.params countId and EMP-003 holds none of them, so the edge carries nothing and EMP-066 opens cold"
+     "provenance": "derived — EMP-066 declares entryState.params countId and EMP-003 holds none of them. The edge carries nothing: EMP-066 finds countId (startStockCount) itself, and EMP-066 opens on its own"
     },
     {
      "to": "EMP-067",
@@ -799,17 +799,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-068",
      "trigger": "Reservation, Allocation & Omnichannel Inventory",
-     "provenance": "derived — EMP-068 declares entryState.params outletId and EMP-003 holds none of them, so the edge carries nothing and EMP-068 opens cold"
+     "provenance": "derived — EMP-068 declares entryState.params outletId and EMP-003 holds none of them. The edge carries nothing: EMP-068 opens on getStockPositions, and outletId has no source on EMP-068 yet (a gap in EMP-068, not in this edge)"
     },
     {
      "to": "EMP-069",
      "trigger": "Barcode, RFID, Serialized Stock & Traceability",
-     "provenance": "derived — EMP-069 declares entryState.params  and EMP-003 holds none of them, so the edge carries nothing and EMP-069 opens cold"
+     "provenance": "derived — EMP-069 declares entryState.params  and EMP-003 holds none of them. The edge carries nothing: EMP-069 needs nothing to open"
     },
     {
      "to": "EMP-070",
      "trigger": "Inventory Exceptions, AI Replenishment & Action Center",
-     "provenance": "derived — EMP-070 declares entryState.params alertId and EMP-003 holds none of them, so the edge carries nothing and EMP-070 opens cold"
+     "provenance": "derived — EMP-070 declares entryState.params alertId and EMP-003 holds none of them. The edge carries nothing: EMP-070 finds alertId (listAlerts) itself, and EMP-070 opens on its own"
     },
     {
      "to": "EMP-071",
@@ -829,37 +829,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-006",
      "trigger": "Raise a task",
-     "provenance": "derived — EMP-006 declares entryState.params workOrderId and EMP-003 holds none of them, so the edge carries nothing and EMP-006 opens cold"
+     "provenance": "derived — EMP-006 declares entryState.params workOrderId and EMP-003 holds none of them. The edge carries nothing: workOrderId only pre-selects (deep link or optional), and EMP-006 opens on its own"
     },
     {
      "to": "EMP-014",
      "trigger": "Ticket lookup",
-     "provenance": "derived — EMP-014 declares entryState.params orderId and EMP-003 holds none of them, so the edge carries nothing and EMP-014 opens cold"
+     "provenance": "derived — EMP-014 declares entryState.params orderId and EMP-003 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional), and EMP-014 opens on its own"
     },
     {
      "to": "EMP-019",
      "trigger": "AI assistant — home",
-     "provenance": "derived — EMP-019 declares entryState.params conversationId and EMP-003 holds none of them, so the edge carries nothing and EMP-019 opens cold"
+     "provenance": "derived — EMP-019 declares entryState.params conversationId and EMP-003 holds none of them. The edge carries nothing: conversationId only pre-selects (deep link or optional), and EMP-019 opens on its own"
     },
     {
      "to": "EMP-021",
      "trigger": "Roster",
-     "provenance": "derived — EMP-021 declares entryState.params assignmentId and EMP-003 holds none of them, so the edge carries nothing and EMP-021 opens cold"
+     "provenance": "derived — EMP-021 declares entryState.params assignmentId and EMP-003 holds none of them. The edge carries nothing: assignmentId only pre-selects (deep link or optional), and EMP-021 opens on its own"
     },
     {
      "to": "EMP-022",
      "trigger": "My rota",
-     "provenance": "derived — EMP-022 declares entryState.params assignmentId and EMP-003 holds none of them, so the edge carries nothing and EMP-022 opens cold"
+     "provenance": "derived — EMP-022 declares entryState.params assignmentId and EMP-003 holds none of them. The edge carries nothing: assignmentId only pre-selects (deep link or optional), and EMP-022 opens on its own"
     },
     {
      "to": "EMP-024",
      "trigger": "Clock in / out",
-     "provenance": "derived — EMP-024 declares entryState.params recordId and EMP-003 holds none of them, so the edge carries nothing and EMP-024 opens cold"
+     "provenance": "derived — EMP-024 declares entryState.params recordId and EMP-003 holds none of them. The edge carries nothing: recordId only pre-selects (deep link or optional), and EMP-024 opens on its own"
     },
     {
      "to": "EMP-025",
      "trigger": "Break management",
-     "provenance": "derived — EMP-025 declares entryState.params recordId and EMP-003 holds none of them, so the edge carries nothing and EMP-025 opens cold"
+     "provenance": "derived — EMP-025 declares entryState.params recordId and EMP-003 holds none of them. The edge carries nothing: recordId only pre-selects (deep link or optional), and EMP-025 opens on its own"
     },
     {
      "to": "EMP-026",
@@ -872,7 +872,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-028",
      "trigger": "Lost & found",
-     "provenance": "derived — EMP-028 declares entryState.params caseId and EMP-003 holds none of them, so the edge carries nothing and EMP-028 opens cold"
+     "provenance": "derived — EMP-028 declares entryState.params caseId and EMP-003 holds none of them. The edge carries nothing: caseId only pre-selects (deep link or optional), and EMP-028 opens on its own"
     },
     {
      "to": "EMP-029",
@@ -885,47 +885,47 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-030",
      "trigger": "Venue map",
-     "provenance": "derived — EMP-030 declares entryState.params mapId and EMP-003 holds none of them, so the edge carries nothing and EMP-030 opens cold"
+     "provenance": "derived — EMP-030 declares entryState.params mapId and EMP-003 holds none of them. The edge carries nothing: mapId only pre-selects (deep link or optional), and EMP-030 opens on its own"
     },
     {
      "to": "EMP-031",
      "trigger": "Queue monitor",
-     "provenance": "derived — EMP-031 declares entryState.params queueId and EMP-003 holds none of them, so the edge carries nothing and EMP-031 opens cold"
+     "provenance": "derived — EMP-031 declares entryState.params queueId and EMP-003 holds none of them. The edge carries nothing: queueId only pre-selects (deep link or optional), and EMP-031 opens on its own"
     },
     {
      "to": "EMP-033",
      "trigger": "Capacity view",
-     "provenance": "derived — EMP-033 declares entryState.params channelCapacityId and EMP-003 holds none of them, so the edge carries nothing and EMP-033 opens cold"
+     "provenance": "derived — EMP-033 declares entryState.params channelCapacityId and EMP-003 holds none of them. The edge carries nothing: channelCapacityId only pre-selects (deep link or optional), and EMP-033 opens on its own"
     },
     {
      "to": "EMP-034",
      "trigger": "Walk-up sale",
-     "provenance": "derived — EMP-034 declares entryState.params orderId, productId and EMP-003 holds none of them, so the edge carries nothing and EMP-034 opens cold"
+     "provenance": "derived — EMP-034 declares entryState.params orderId, productId and EMP-003 holds none of them. The edge carries nothing: orderId, productId only pre-select (deep link or optional), and EMP-034 opens on its own"
     },
     {
      "to": "EMP-037",
      "trigger": "Notifications",
-     "provenance": "derived — EMP-037 declares entryState.params announcementId, conversationId and EMP-003 holds none of them, so the edge carries nothing and EMP-037 opens cold"
+     "provenance": "derived — EMP-037 declares entryState.params announcementId, conversationId and EMP-003 holds none of them. The edge carries nothing: announcementId only pre-selects (deep link or optional); EMP-037 finds conversationId (listStaffConversations) itself, and EMP-037 opens on its own"
     },
     {
      "to": "EMP-038",
      "trigger": "Broadcast to team",
-     "provenance": "derived — EMP-038 declares entryState.params announcementId and EMP-003 holds none of them, so the edge carries nothing and EMP-038 opens cold"
+     "provenance": "derived — EMP-038 declares entryState.params announcementId and EMP-003 holds none of them. The edge carries nothing: announcementId only pre-selects (deep link or optional), and EMP-038 opens on its own"
     },
     {
      "to": "EMP-039",
      "trigger": "Announcements",
-     "provenance": "derived — EMP-039 declares entryState.params announcementId and EMP-003 holds none of them, so the edge carries nothing and EMP-039 opens cold"
+     "provenance": "derived — EMP-039 declares entryState.params announcementId and EMP-003 holds none of them. The edge carries nothing: announcementId only pre-selects (deep link or optional), and EMP-039 opens on its own"
     },
     {
      "to": "EMP-047",
      "trigger": "Emergency mode",
-     "provenance": "derived — EMP-047 declares entryState.params announcementId and EMP-003 holds none of them, so the edge carries nothing and EMP-047 opens cold"
+     "provenance": "derived — EMP-047 declares entryState.params announcementId and EMP-003 holds none of them. The edge carries nothing: announcementId only pre-selects (deep link or optional), and EMP-047 opens on its own"
     },
     {
      "to": "EMP-042",
      "trigger": "Profile",
-     "provenance": "derived — EMP-042 declares entryState.params methodId and EMP-003 holds none of them, so the edge carries nothing and EMP-042 opens cold"
+     "provenance": "derived — EMP-042 declares entryState.params methodId and EMP-003 holds none of them. The edge carries nothing: EMP-042 finds methodId (enrolMfaMethod) itself, and EMP-042 opens on its own"
     }
    ],
    "entryFrom": [
@@ -1637,17 +1637,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-009 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-009 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-009 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-009 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-009 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-009 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -2183,17 +2183,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-010 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-010 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-010 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-010 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-010 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-010 holds none of them. The edge carries nothing: EMP-010 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     }
    ]
   },
@@ -2572,17 +2572,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-004 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-004 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-004 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-004 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-004 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-004 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     },
     {
      "to": "EMP-005",
@@ -3209,17 +3209,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-005 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-005 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-005 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-005 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-005 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-005 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     },
     {
      "to": "BO-078",
@@ -3914,17 +3914,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-006 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-006 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-006 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-006 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-006 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-006 holds none of them. The edge carries nothing: EMP-006 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     },
     {
      "to": "EMP-004",
@@ -4595,17 +4595,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-007 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-007 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-007 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-007 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-007 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-007 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
     }
    ]
   },
@@ -4872,17 +4872,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-008 holds none of them, so the edge carries nothing and EMP-001 opens cold"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-008 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-008 holds none of them, so the edge carries nothing and EMP-002 opens cold"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-008 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-008 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-008 holds none of them. The edge carries nothing: EMP-008 is opened from EMP-003, so this edge is the way back and EMP-003 keeps its own state"
     }
    ]
   },
@@ -6446,13 +6446,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "AccessDynamicPolicy": {
   "type": "object",
   "x-ticvai-persistence": "access.dynamic_policy",
-  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.",
+  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.authorisation_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Guest admission lives here and nowhere else** (ADR-0068, accepted 1 October). `validateAccess` online and the gate offline evaluate the same active version: `getOfflinePackage` carries it, and every `scan_event` records the policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`) and the set it was decided under (`policySetVersion`). The condition is `conditionRule`, a closed JSON format (`AdmissionRule`), not free text. Identity's staff-permission engine was renamed `AuthorisationPolicy` on the same day, so \"access policy\" means this.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AuthorisationPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAuthorisationPolicyEffectiveness` in identity.",
   "required": [
    "id",
    "scopePath",
    "name",
    "policyType",
-   "conditionExpression",
+   "conditionRule",
    "result",
    "status",
    "currentVersion"
@@ -6525,9 +6525,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "Identity-based policies (listIdentityMembershipAccreditation)"
    },
-   "conditionExpression": {
-    "type": "string",
-    "description": "Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN"
+   "conditionRule": {
+    "$ref": "#/components/schemas/AdmissionRule",
+    "description": "The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`)."
    },
    "result": {
     "type": "string",
@@ -7810,9 +7810,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
    },
+   "policySetVersion": {
+    "type": "string",
+    "description": "**The active admission policy version the package carries** (ADR-0068, 1 October): a fingerprint of the `(id, currentVersion)` of every policy in `dynamicPolicies`, computed the same way by `validateAccess` online. Every scan the gate records carries it (`ScanEvent.policySetVersion`), so a scan decided offline under a set that has since changed is visible at sync rather than assumed equal."
+   },
    "dynamicPolicies": {
     "type": "array",
-    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one.",
+    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), each at its active version with its `conditionRule` (ADR-0068), so an offline gate applies the same rules as an online one.",
     "items": {
      "$ref": "#/components/schemas/AccessDynamicPolicy"
     }
@@ -8343,6 +8347,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "policySetVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The admission policy set the scan was decided under (`OfflinePackage.policySetVersion`, or the same fingerprint computed online by `validateAccess`), beside the one policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`). ADR-0068, 1 October."
    },
    "packageVersion": {
     "type": "string",

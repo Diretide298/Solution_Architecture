@@ -147,6 +147,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JournalEntry'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /write-offs:
     post:
       operationId: recordWriteOff
@@ -210,6 +212,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JournalEntry'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recognition-schedules/validate:
     post:
       operationId: validateRecognitionSchedules
@@ -261,6 +265,8 @@ paths:
                             deterministically; equal ones are a coin toss the ledger should never make.
 
                             '
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /deposits:
     post:
       operationId: recordDeposit
@@ -337,6 +343,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Deposit'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /deposits/{depositId}/settle:
     parameters:
     - name: depositId
@@ -445,6 +453,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reconciliation/unified:
     get:
       operationId: getUnifiedReconciliation
@@ -495,6 +505,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnifiedReconciliation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inter-entity-obligations/{obligationId}/settle:
     parameters:
     - name: obligationId
@@ -564,6 +576,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inter-entity-obligations/{obligationId}/dispute:
     parameters:
     - name: obligationId
@@ -632,6 +646,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inter-entity-obligations/{obligationId}/resolve:
     parameters:
     - name: obligationId
@@ -689,6 +705,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accounts:
     get:
       operationId: listAccounts
@@ -737,6 +755,8 @@ paths:
                         $ref: '#/components/schemas/Account'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createAccount
       x-ticvai-consumed-by:
@@ -783,6 +803,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accounts/{accountId}:
     parameters:
     - name: accountId
@@ -814,6 +836,8 @@ paths:
                 $ref: '#/components/schemas/Account'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateAccount
       x-ticvai-consumed-by:
@@ -898,6 +922,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /account-mappings:
     get:
       operationId: listAccountMappings
@@ -934,6 +960,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/AccountMapping'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAccountMappings
       x-ticvai-consumed-by:
@@ -996,6 +1024,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cost-centers:
     get:
       operationId: listCostCenters
@@ -1028,6 +1058,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CostCenter'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createCostCenter
       x-ticvai-consumed-by:
@@ -1075,6 +1107,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CostCenter'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-codes:
     get:
       operationId: listTaxCodes
@@ -1112,6 +1146,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/TaxCode'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createTaxCode
       x-ticvai-consumed-by:
@@ -1157,6 +1193,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-codes/{taxCodeId}:
     parameters:
     - name: taxCodeId
@@ -1251,6 +1289,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-exemptions:
     get:
       operationId: listTaxExemptions
@@ -1284,6 +1324,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/TaxExemption'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createTaxExemption
       x-ticvai-consumed-by:
@@ -1315,6 +1357,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaxExemption'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax/calculate:
     post:
       operationId: calculateTax
@@ -1352,6 +1396,8 @@ paths:
                 $ref: '#/components/schemas/TaxCalculation'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recognition-schedules:
     get:
       operationId: listRecognitionSchedules
@@ -1384,6 +1430,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/RecognitionSchedule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createRecognitionSchedule
       x-ticvai-consumed-by:
@@ -1430,6 +1478,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /deferred-revenue:
     get:
       operationId: getDeferredRevenue
@@ -1474,6 +1524,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeferredRevenueReport'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recognition/run:
     post:
       operationId: runRecognition
@@ -1534,6 +1586,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journal-entries:
     get:
       operationId: listJournalEntries
@@ -1579,6 +1633,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/JournalEntry'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createJournalEntry
       x-ticvai-consumed-by:
@@ -1635,6 +1691,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journal-entries/{entryId}:
     parameters:
     - name: entryId
@@ -1666,6 +1724,8 @@ paths:
                 $ref: '#/components/schemas/JournalEntry'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journal-entries/{entryId}/approve:
     parameters:
     - name: entryId
@@ -1736,6 +1796,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
       x-ticvai-step-up-reason: Posts to the ledger. The entry is the record; there is no undo that is
         not another entry.
@@ -1801,6 +1863,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journal-entries/{entryId}/reverse:
     parameters:
     - name: entryId
@@ -1874,6 +1938,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fx-rates:
     get:
       operationId: listFxRates
@@ -1948,6 +2014,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/FxRate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFxRate
       x-ticvai-consumed-by:
@@ -2020,6 +2088,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fx/foreign-tender:
     get:
       operationId: getForeignTenderReport
@@ -2066,6 +2136,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForeignTenderReport'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fx/inter-entity:
     get:
       operationId: listInterEntityObligations
@@ -2130,6 +2202,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/InterEntityObligation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fx/revaluation:
     post:
       operationId: runFxRevaluation
@@ -2197,6 +2271,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ledger/entries:
     get:
       operationId: listLedgerEntries
@@ -2265,6 +2341,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Posting'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ledger/trial-balance:
     get:
       operationId: getTrialBalance
@@ -2300,6 +2378,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TrialBalance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-variances:
     get:
       operationId: listPriceVariances
@@ -2368,6 +2448,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/PriceVariance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-variances/{varianceId}/review:
     parameters:
     - name: varianceId
@@ -2434,6 +2516,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /settlements:
     get:
       operationId: listSettlements
@@ -2487,6 +2571,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Settlement'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: ingestSettlementFile
       x-ticvai-consumed-by:
@@ -2589,6 +2675,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /settlements/{settlementId}:
     parameters:
     - name: settlementId
@@ -2624,6 +2712,8 @@ paths:
                 $ref: '#/components/schemas/Settlement'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /settlements/{settlementId}/exceptions:
     parameters:
     - name: settlementId
@@ -2677,6 +2767,8 @@ paths:
                         $ref: '#/components/schemas/SettlementException'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: resolveSettlementException
       x-ticvai-consumed-by:
@@ -2765,6 +2857,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /legal-entities:
     get:
       operationId: listLegalEntities
@@ -2801,6 +2895,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/LegalEntity'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createLegalEntity
       x-ticvai-consumed-by:
@@ -2834,6 +2930,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LegalEntity'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fiscal-periods:
     get:
       operationId: listFiscalPeriods
@@ -2877,6 +2975,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/FiscalPeriod'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fiscal-periods/{periodId}/begin-close:
     parameters:
     - name: periodId
@@ -2927,6 +3027,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fiscal-periods/{periodId}/abandon-close:
     parameters:
     - name: periodId
@@ -2987,6 +3089,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fiscal-periods/{periodId}/reopen:
     parameters:
     - name: periodId
@@ -3067,6 +3171,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fiscal-periods/{periodId}/close:
     parameters:
     - name: periodId
@@ -3152,6 +3258,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/PeriodCloseProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reports/financial:
     get:
       operationId: getFinancialReport
@@ -3218,6 +3326,8 @@ paths:
                 $ref: '#/components/schemas/FinancialReport'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fx-rates/ingest:
     post:
       operationId: ingestFxRates
@@ -3340,6 +3450,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fx-rates/providers:
     put:
       operationId: setFxProvider
@@ -3387,6 +3499,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FxProviderAssignment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-exemptions/{exemptionId}/verify:
     parameters:
     - name: exemptionId
@@ -3477,6 +3591,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-invoices:
     get:
       operationId: listTaxInvoices
@@ -3556,6 +3672,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/FinTaxInvoice'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: issueTaxInvoice
       x-ticvai-consumed-by:
@@ -3651,6 +3769,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-invoices/{invoiceId}:
     parameters:
     - name: invoiceId
@@ -3694,6 +3814,8 @@ paths:
                 $ref: '#/components/schemas/FinTaxInvoice'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-invoices/{invoiceId}/credit-memos:
     parameters:
     - name: invoiceId
@@ -3772,6 +3894,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credit-memos:
     get:
       operationId: listCreditMemos
@@ -3841,6 +3965,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/FinCreditMemo'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-documents/{documentId}/rendition:
     parameters:
     - name: documentId
@@ -3894,6 +4020,8 @@ paths:
                 $ref: '#/components/schemas/FinTaxDocumentRendition'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-invoice-templates:
     get:
       operationId: listTaxInvoiceTemplates
@@ -3932,6 +4060,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/FinTaxInvoiceTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTaxInvoiceTemplate
       x-ticvai-consumed-by:
@@ -3985,6 +4115,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /e-invoicing/providers:
     get:
       operationId: listEInvoicingProviders
@@ -4019,6 +4151,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/FinEInvoicingProvider'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setEInvoicingProvider
       x-ticvai-consumed-by:
@@ -4071,6 +4205,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /e-invoicing/transmissions:
     get:
       operationId: listEInvoiceTransmissions
@@ -4123,6 +4259,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/FinEInvoiceTransmission'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: transmitEInvoices
       x-ticvai-consumed-by:
@@ -4205,6 +4343,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /e-invoicing/transmissions/{transmissionId}/status:
     parameters:
     - name: transmissionId
@@ -4283,6 +4423,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax/vat-returns:
     get:
       operationId: getVatReturn
@@ -4353,6 +4495,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

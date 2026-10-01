@@ -159,17 +159,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-008",
      "trigger": "Content Blocks",
-     "provenance": "derived — CMS-008 declares entryState.params actionId, bannerId, promoBlockId and CMS-001 holds none of them, so the edge carries nothing and CMS-008 opens cold"
+     "provenance": "derived — CMS-008 declares entryState.params actionId, bannerId, promoBlockId and CMS-001 holds none of them. The edge carries nothing: CMS-008 finds bannerId (createBanner), promoBlockId (createPromoBlock) itself; CMS-008 opens on listPromoBlocks, and actionId has no source on CMS-008 yet (a gap in CMS-008, not in this edge)"
     },
     {
      "to": "CMS-009",
      "trigger": "Navigation & Menus",
-     "provenance": "derived — CMS-009 declares entryState.params menuId and CMS-001 holds none of them, so the edge carries nothing and CMS-009 opens cold"
+     "provenance": "derived — CMS-009 declares entryState.params menuId and CMS-001 holds none of them. The edge carries nothing: menuId only pre-selects (deep link or optional), and CMS-009 opens on its own"
     },
     {
      "to": "CMS-010",
      "trigger": "Media Library",
-     "provenance": "derived — CMS-010 declares entryState.params mediaCode, mediaId, uploadId and CMS-001 holds none of them, so the edge carries nothing and CMS-010 opens cold"
+     "provenance": "derived — CMS-010 declares entryState.params mediaCode, mediaId, uploadId and CMS-001 holds none of them. The edge carries nothing: mediaCode, mediaId, uploadId only pre-select (deep link or optional), and CMS-010 opens on its own"
     },
     {
      "to": "CMS-011",
@@ -517,17 +517,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-002 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-002 holds none of them. The edge carries nothing: CMS-001 needs nothing to open"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-002 holds none of them, so the edge carries nothing and CMS-003 opens cold"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-002 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
     },
     {
      "to": "CMS-004",
      "trigger": "Logo & Assets",
-     "provenance": "derived — CMS-004 declares entryState.params  and CMS-002 holds none of them, so the edge carries nothing and CMS-004 opens cold"
+     "provenance": "derived — CMS-004 declares entryState.params  and CMS-002 holds none of them. The edge carries nothing: CMS-004 needs nothing to open"
     }
    ]
   },
@@ -753,17 +753,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-003 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-003 holds none of them. The edge carries nothing: CMS-001 needs nothing to open"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-003 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-003 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-004",
      "trigger": "Logo & Assets",
-     "provenance": "derived — CMS-004 declares entryState.params  and CMS-003 holds none of them, so the edge carries nothing and CMS-004 opens cold"
+     "provenance": "derived — CMS-004 declares entryState.params  and CMS-003 holds none of them. The edge carries nothing: CMS-004 needs nothing to open"
     },
     {
      "to": "CMS-006",
@@ -1002,17 +1002,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-004 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-004 holds none of them. The edge carries nothing: CMS-001 needs nothing to open"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-004 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-004 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-004 holds none of them, so the edge carries nothing and CMS-003 opens cold"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-004 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
     }
    ]
   },
@@ -1225,22 +1225,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-005 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-005 holds none of them. The edge carries nothing: CMS-001 needs nothing to open"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-005 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-005 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-005 holds none of them, so the edge carries nothing and CMS-003 opens cold"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-005 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
     },
     {
      "to": "CMS-006",
      "trigger": "Component Preview",
-     "provenance": "derived — CMS-006 declares entryState.params bannerId, pageId, policyKind, version and CMS-005 holds none of them, so the edge carries nothing and CMS-006 opens cold"
+     "provenance": "derived — CMS-006 declares entryState.params bannerId, pageId, policyKind, version and CMS-005 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-006 opens on its own"
     }
    ]
   },
@@ -1410,12 +1410,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-006 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-006 holds none of them. The edge carries nothing: CMS-001 needs nothing to open"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-006 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-006 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -1719,12 +1719,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-007 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-007 holds none of them. The edge carries nothing: CMS-001 needs nothing to open"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-007 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-007 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -2087,12 +2087,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-008 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-008 holds none of them. The edge carries nothing: CMS-008 is opened from CMS-001, so this edge is the way back and CMS-001 keeps its own state"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-008 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-008 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -2507,17 +2507,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-009 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-009 holds none of them. The edge carries nothing: CMS-009 is opened from CMS-001, so this edge is the way back and CMS-001 keeps its own state"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-009 holds none of them, so the edge carries nothing and CMS-002 opens cold"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-009 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-009 holds none of them, so the edge carries nothing and CMS-003 opens cold"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-009 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
     }
    ]
   },
@@ -2854,7 +2854,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-010 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-010 holds none of them. The edge carries nothing: CMS-010 is opened from CMS-001, so this edge is the way back and CMS-001 keeps its own state"
     },
     {
      "to": "CMS-002",
@@ -2867,7 +2867,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-010 holds none of them, so the edge carries nothing and CMS-003 opens cold"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-010 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
     }
    ]
   },

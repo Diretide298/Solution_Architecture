@@ -4774,67 +4774,67 @@
     {
      "to": "BO-036",
      "trigger": "Device Registry",
-     "provenance": "derived — BO-036 declares entryState.params deviceId, profileId, workstationId and BO-108 holds none of them, so the edge carries nothing and BO-036 opens cold"
+     "provenance": "derived — BO-036 declares entryState.params deviceId, profileId, workstationId and BO-108 holds none of them. The edge carries nothing: workstationId, deviceId, profileId only pre-select (deep link or optional), and BO-036 opens on its own"
     },
     {
      "to": "BO-044",
      "trigger": "F&B Outlets",
-     "provenance": "derived — BO-044 declares entryState.params actionId, outletId and BO-108 holds none of them, so the edge carries nothing and BO-044 opens cold"
+     "provenance": "derived — BO-044 declares entryState.params actionId, outletId and BO-108 holds none of them. The edge carries nothing: outletId, actionId only pre-select (deep link or optional), and BO-044 opens on its own"
     },
     {
      "to": "BO-058",
      "trigger": "Reporting Home",
-     "provenance": "derived — BO-058 declares entryState.params conversationId, reportId and BO-108 holds none of them, so the edge carries nothing and BO-058 opens cold"
+     "provenance": "derived — BO-058 declares entryState.params conversationId, reportId and BO-108 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or optional), and BO-058 opens on its own"
     },
     {
      "to": "BO-060",
      "trigger": "Attendance & Footfall",
-     "provenance": "derived — BO-060 declares entryState.params conversationId, reportId and BO-108 holds none of them, so the edge carries nothing and BO-060 opens cold"
+     "provenance": "derived — BO-060 declares entryState.params conversationId, reportId and BO-108 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or optional), and BO-060 opens on its own"
     },
     {
      "to": "BO-064",
      "trigger": "Zones & Areas",
-     "provenance": "derived — BO-064 declares entryState.params accessPointId, orgUnitId and BO-108 holds none of them, so the edge carries nothing and BO-064 opens cold"
+     "provenance": "derived — BO-064 declares entryState.params accessPointId, orgUnitId and BO-108 holds none of them. The edge carries nothing: accessPointId, orgUnitId only pre-select (deep link or optional), and BO-064 opens on its own"
     },
     {
      "to": "BO-067",
      "trigger": "Integrations",
-     "provenance": "derived — BO-067 declares entryState.params subscriptionId and BO-108 holds none of them, so the edge carries nothing and BO-067 opens cold"
+     "provenance": "derived — BO-067 declares entryState.params subscriptionId and BO-108 holds none of them. The edge carries nothing: BO-067 finds subscriptionId (listWebhookSubscriptions) itself, and BO-067 opens on its own"
     },
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "provenance": "derived — BO-100 declares entryState.params  and BO-108 holds none of them, so the edge carries nothing and BO-100 opens cold"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-108 holds none of them. The edge carries nothing: BO-108 is opened from BO-100, so this edge is the way back and BO-100 keeps its own state"
     },
     {
      "to": "BO-128",
      "trigger": "Live Workstation Health Monitor",
-     "provenance": "derived — BO-128 declares entryState.params workstationId and BO-108 holds none of them, so the edge carries nothing and BO-128 opens cold"
+     "provenance": "derived — BO-128 declares entryState.params workstationId and BO-108 holds none of them. The edge carries nothing: workstationId only pre-selects (deep link or optional), and BO-128 opens on its own"
     },
     {
      "to": "BO-129",
      "trigger": "Software, Configuration & Version Management",
-     "provenance": "derived — BO-129 declares entryState.params firmwareId, profileId, rolloutId, workstationId and BO-108 holds none of them, so the edge carries nothing and BO-129 opens cold"
+     "provenance": "derived — BO-129 declares entryState.params firmwareId, profileId, rolloutId, workstationId and BO-108 holds none of them. The edge carries nothing: profileId, workstationId only pre-select (deep link or optional); BO-129 finds rolloutId (startDeviceFirmwareRollout), firmwareId (startDeviceFirmwareRollout) itself, and BO-129 opens on its own"
     },
     {
      "to": "BO-130",
      "trigger": "Offline Policy & Rules Configuration",
-     "provenance": "derived — BO-130 declares entryState.params  and BO-108 holds none of them, so the edge carries nothing and BO-130 opens cold"
+     "provenance": "derived — BO-130 declares entryState.params  and BO-108 holds none of them. The edge carries nothing: BO-130 needs nothing to open"
     },
     {
      "to": "BO-131",
      "trigger": "Connectivity & Auto-Switch Settings",
-     "provenance": "derived — BO-131 declares entryState.params  and BO-108 holds none of them, so the edge carries nothing and BO-131 opens cold"
+     "provenance": "derived — BO-131 declares entryState.params  and BO-108 holds none of them. The edge carries nothing: BO-131 needs nothing to open"
     },
     {
      "to": "BO-132",
      "trigger": "Offline Transaction Monitor & Sync Queue",
-     "provenance": "derived — BO-132 declares entryState.params  and BO-108 holds none of them, so the edge carries nothing and BO-132 opens cold"
+     "provenance": "derived — BO-132 declares entryState.params  and BO-108 holds none of them. The edge carries nothing: BO-132 needs nothing to open"
     },
     {
      "to": "BO-133",
      "trigger": "Offline Alerts, Limits & Audit",
-     "provenance": "derived — BO-133 declares entryState.params reportId, requestId and BO-108 holds none of them, so the edge carries nothing and BO-133 opens cold"
+     "provenance": "derived — BO-133 declares entryState.params reportId, requestId and BO-108 holds none of them. The edge carries nothing: reportId, requestId only pre-select (deep link or optional), and BO-133 opens on its own"
     },
     {
      "to": "BO-1184",
@@ -5159,7 +5159,7 @@
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
-     "provenance": "derived — BO-108 declares entryState.params  and BO-128 holds none of them, so the edge carries nothing and BO-108 opens cold"
+     "provenance": "derived — BO-108 declares entryState.params  and BO-128 holds none of them. The edge carries nothing: BO-128 is opened from BO-108, so this edge is the way back and BO-108 keeps its own state"
     },
     {
      "to": "BO-129",

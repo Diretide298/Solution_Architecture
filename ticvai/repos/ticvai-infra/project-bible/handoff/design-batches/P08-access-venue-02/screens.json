@@ -21,7 +21,7 @@
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-034 holds none of them, so the edge carries nothing and BO-001 opens cold"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-034 holds none of them. The edge carries nothing: eventId, feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
     }
    ]
   },
@@ -391,7 +391,7 @@
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-035 holds none of them, so the edge carries nothing and BO-001 opens cold"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-035 holds none of them. The edge carries nothing: eventId, feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
     }
    ]
   },
@@ -2357,7 +2357,7 @@
     {
      "to": "BO-094",
      "trigger": "Map Editor & Publish",
-     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-092 holds none of them, so the edge carries nothing and BO-094 opens cold"
+     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-092 holds none of them. The edge carries nothing: mapId, pathId only pre-select (deep link or optional), and BO-094 opens on its own"
     }
    ]
   },
@@ -3267,7 +3267,7 @@
     {
      "to": "BO-097",
      "trigger": "Check Out & Check In",
-     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId and BO-095 holds none of them, so the edge carries nothing and BO-097 opens cold"
+     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId and BO-095 holds none of them. The edge carries nothing: authorisationId, bookingId only pre-select (deep link or optional), and BO-097 opens on its own"
     },
     {
      "to": "BO-098",

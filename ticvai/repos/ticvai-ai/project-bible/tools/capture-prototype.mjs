@@ -23,8 +23,18 @@
  *   {"clickPage": "Text"}        exact visible text anywhere on the page (the prototype's config panel)
  *   {"clickSelector": "css"}     a visible element inside the frame
  *   {"fill": "placeholder", "text": "..."}  type into the frame's input with that placeholder
+ *   {"select": "Option label"}   choose that option in the visible <select> in the frame that offers it
  *   {"type": "..."}  {"press": "Enter"}  {"wait": ms}  {"scroll": px}  {"hash": "#view"}
+ *   {"scrollTo": "Text", "offset": 90}  scroll the page so the first visible element containing that
+ *                                text sits just under the top (a web page; "nth" picks a match)
  * "scroll" sets every scrollable element in the frame to that offset.
+ *
+ * A web prototype has no device frame: give the plan "frame": {"viewport": true}. The frame is then the
+ * page, the capture is the browser viewport, and the proof texts must be visible inside the viewport
+ * (text scrolled out of view does not count).
+ *
+ * A screen may name its own "prototype": another file in the same folder as the plan's (the web
+ * booking engine and its visit planner are two files of one build). It is served from the same roots.
  *
  * Playwright: set PLAYWRIGHT_MODULE to its index.mjs (or package folder), or install it where
  * Node can find it:  npm install playwright && npx playwright install chromium
@@ -120,13 +130,25 @@ async function main() {
                     '\ninstall one with: npx playwright install chromium');
 
   const srv = await serve(roots);
-  const url = `http://127.0.0.1:${srv.address().port}/${encodeURIComponent(path.basename(proto))}`;
+  const base = `http://127.0.0.1:${srv.address().port}/`;
+  const url = base + encodeURIComponent(path.basename(proto));
+  const urlOf = s => {
+    if (!s.prototype) return url;
+    const p = abs(s.prototype);
+    if (path.dirname(p) !== path.dirname(proto) || !fs.existsSync(p))
+      throw new Error(`screen prototype must be an existing file beside ${plan.prototype}: ${s.prototype}`);
+    return base + encodeURIComponent(path.basename(p));
+  };
   fs.mkdirSync(path.join(out, 'img'), { recursive: true });
   const page = await browser.newPage({ viewport: vp, deviceScaleFactor: 1 });
   const captured = [], missing = [];
 
   const frameSel = '[data-capture-frame]';
   async function markFrame() {
+    if (fr.viewport) {
+      await page.evaluate(() => document.body.setAttribute('data-capture-frame', '1'));
+      return;
+    }
     if (fr.selector) {
       await page.locator(fr.selector).first().evaluate(e => e.setAttribute('data-capture-frame', '1'));
       return;
@@ -141,6 +163,24 @@ async function main() {
       return !!el;
     }, { w: fr.width || 390, h: fr.height || 844, inset: fr.inset ?? 1 });
     if (!ok) throw new Error(`no ${fr.width || 390}x${fr.height || 844} device frame on the page`);
+  }
+
+  /** The text actually on screen: every text node with a box inside the viewport, in document order. */
+  async function viewportText() {
+    return page.evaluate(() => {
+      const W = innerWidth, H = innerHeight, out = [];
+      const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+        const s = n.textContent.replace(/\s+/g, ' ').trim();
+        if (!s || !n.parentElement) continue;
+        const cs = getComputedStyle(n.parentElement);
+        if (cs.visibility === 'hidden' || cs.display === 'none') continue;
+        const r = document.createRange(); r.selectNodeContents(n);
+        const b = r.getBoundingClientRect();
+        if (b.width && b.height && b.bottom > 0 && b.top < H && b.right > 0 && b.left < W) out.push(s);
+      }
+      return out.join('\n');
+    });
   }
 
   async function run(step) {
@@ -159,6 +199,15 @@ async function main() {
       const i = F.locator(`input[placeholder=${q(step.fill)}] >> visible=true`).first();
       await i.click({ timeout: 10000 });
       await page.keyboard.type(step.text || '');
+    } else if ('select' in step) {
+      const sels = F.locator('select >> visible=true');
+      const n = await sels.count();
+      let done = false;
+      for (let k = 0; k < n && !done; k++) {
+        const labels = await sels.nth(k).evaluate(e => [...e.options].map(o => o.textContent.trim()));
+        if (labels.includes(step.select)) { await sels.nth(k).selectOption({ label: step.select }); done = true; }
+      }
+      if (!done) throw new Error(`step ${JSON.stringify(step)}: no visible <select> offers that option`);
     } else if ('type' in step) await page.keyboard.type(step.type);
     else if ('press' in step) await page.keyboard.press(step.press);
     else if ('wait' in step) { await page.waitForTimeout(step.wait); return; }
@@ -167,6 +216,10 @@ async function main() {
         const o = getComputedStyle(x).overflowY;
         if ((o === 'auto' || o === 'scroll') && x.scrollHeight > x.clientHeight + 20) x.scrollTop = y;
       }), step.scroll);
+    } else if ('scrollTo' in step) {
+      const el = F.locator(`text=${step.scrollTo} >> visible=true`).nth(nth);
+      if (!(await el.count())) throw new Error(`step ${JSON.stringify(step)}: no visible match`);
+      await el.evaluate((e, off) => { e.scrollIntoView({ block: 'start' }); window.scrollBy(0, -off); }, step.offset ?? 90);
     } else if ('hash' in step) await page.evaluate(h => { location.hash = h; }, step.hash);
     else throw new Error(`unknown step ${JSON.stringify(step)}`);
     await page.waitForTimeout(step.after ?? settle);
@@ -176,12 +229,12 @@ async function main() {
     const id = s.id.toUpperCase(), low = id.toLowerCase();
     if (only && !only.has(id)) continue;
     try {
-      await page.goto(url + (s.hash || ''), { waitUntil: 'load' });
+      await page.goto(urlOf(s) + (s.hash || ''), { waitUntil: 'load' });
       await page.waitForTimeout(plan.loadWait ?? 3000);
       await markFrame();
       for (const st of [...(s.noSetup ? [] : plan.setup || []), ...(s.steps || [])]) await run(st);
       await page.waitForTimeout(s.settle ?? 800);
-      const text = (await page.locator(frameSel).innerText()).toLowerCase();
+      const text = (fr.viewport ? await viewportText() : await page.locator(frameSel).innerText()).toLowerCase();
       const gone = (s.expect || []).filter(t => !text.includes(t.toLowerCase()));
       if (gone.length) throw new Error(`proof text not visible: ${gone.map(q).join(', ')}; the view shows: ` +
                                        text.slice(0, 160).replace(/\s+/g, ' '));
@@ -189,12 +242,17 @@ async function main() {
       if (extra.length) throw new Error(`text that should not be there is: ${extra.map(q).join(', ')}`);
       if (!(s.expect || []).length) throw new Error('the plan gives no proof text for this screen');
 
-      const bb = await page.locator(frameSel).boundingBox();
-      const inset = fr.selector ? 0 : (fr.inset ?? 1);
-      const clip = { x: bb.x + inset, y: bb.y + inset, width: bb.width - 2 * inset, height: bb.height - 2 * inset };
-      let buf = await page.screenshot({ clip, type: 'png' }), ext = 'png';
+      // In viewport mode the shot is the viewport as it stands (no clip); otherwise the device frame.
+      let clip;
+      if (!fr.viewport) {
+        const bb = await page.locator(frameSel).boundingBox();
+        const inset = fr.selector ? 0 : (fr.inset ?? 1);
+        clip = { x: bb.x + inset, y: bb.y + inset, width: bb.width - 2 * inset, height: bb.height - 2 * inset };
+      }
+      const shot = o => page.screenshot(clip ? { clip, ...o } : o);
+      let buf = await shot({ type: 'png' }), ext = 'png';
       for (let qq = 85; buf.length > maxBytes && qq >= 55; qq -= 10) {
-        buf = await page.screenshot({ clip, type: 'jpeg', quality: qq }); ext = 'jpg';
+        buf = await shot({ type: 'jpeg', quality: qq }); ext = 'jpg';
       }
       for (const e of ['png', 'jpg']) fs.rmSync(path.join(out, 'img', `${low}.${e}`), { force: true });
       const file = `${low}.${ext}`;
@@ -204,7 +262,8 @@ async function main() {
         `alt="${esc(`${id} ${s.name || ''}, ${cap}`.replace(/ ,/, ','))}" style="display:block;width:100%;height:auto">` +
         `<p style="font:12px sans-serif;color:#667">${esc(cap)} · ${esc(s.view)}</p></section>\n`;
       fs.writeFileSync(path.join(out, `${low}.html`), frag, 'utf-8');
-      captured.push({ id, name: s.name || '', view: s.view, proof: s.expect, file: 'img/' + file, bytes: buf.length });
+      captured.push({ id, name: s.name || '', view: s.view, proof: s.expect, file: 'img/' + file, bytes: buf.length,
+                      ...(s.prototype ? { prototype: s.prototype } : {}) });
       console.log(`  captured  ${id}  ${s.view}`);
     } catch (e) {
       missing.push({ id, view: s.view, reason: String(e.message).split('\n')[0] });
@@ -213,6 +272,17 @@ async function main() {
   }
   await browser.close();
   srv.close();
+  // With --only, the other screens' entries of the last run stay: a re-take of one screen must not
+  // make the manifest forget the rest (the apply scripts read it as the list of what was captured).
+  const mf = path.join(out, 'manifest.json');
+  if (only && fs.existsSync(mf)) {
+    const prev = JSON.parse(fs.readFileSync(mf, 'utf-8'));
+    const order = plan.screens.map(s => s.id.toUpperCase());
+    const keep = list => (list || []).filter(e => !only.has(e.id));
+    const byPlan = (a, b) => order.indexOf(a.id) - order.indexOf(b.id);
+    captured.push(...keep(prev.captured)); captured.sort(byPlan);
+    missing.push(...keep(prev.missing)); missing.sort(byPlan);
+  }
   const manifest = { prototype: plan.prototype, plan: path.relative(ROOT, planFile).split(path.sep).join('/'),
                      captured, missing };
   fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify(manifest, null, 1) + '\n', 'utf-8');

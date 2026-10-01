@@ -4854,67 +4854,67 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-036",
      "trigger": "Device Registry",
-     "provenance": "derived — BO-036 declares entryState.params deviceId, profileId, workstationId and BO-108 holds none of them, so the edge carries nothing and BO-036 opens cold"
+     "provenance": "derived — BO-036 declares entryState.params deviceId, profileId, workstationId and BO-108 holds none of them. The edge carries nothing: workstationId, deviceId, profileId only pre-select (deep link or optional), and BO-036 opens on its own"
     },
     {
      "to": "BO-044",
      "trigger": "F&B Outlets",
-     "provenance": "derived — BO-044 declares entryState.params actionId, outletId and BO-108 holds none of them, so the edge carries nothing and BO-044 opens cold"
+     "provenance": "derived — BO-044 declares entryState.params actionId, outletId and BO-108 holds none of them. The edge carries nothing: outletId, actionId only pre-select (deep link or optional), and BO-044 opens on its own"
     },
     {
      "to": "BO-058",
      "trigger": "Reporting Home",
-     "provenance": "derived — BO-058 declares entryState.params conversationId, reportId and BO-108 holds none of them, so the edge carries nothing and BO-058 opens cold"
+     "provenance": "derived — BO-058 declares entryState.params conversationId, reportId and BO-108 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or optional), and BO-058 opens on its own"
     },
     {
      "to": "BO-060",
      "trigger": "Attendance & Footfall",
-     "provenance": "derived — BO-060 declares entryState.params conversationId, reportId and BO-108 holds none of them, so the edge carries nothing and BO-060 opens cold"
+     "provenance": "derived — BO-060 declares entryState.params conversationId, reportId and BO-108 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or optional), and BO-060 opens on its own"
     },
     {
      "to": "BO-064",
      "trigger": "Zones & Areas",
-     "provenance": "derived — BO-064 declares entryState.params accessPointId, orgUnitId and BO-108 holds none of them, so the edge carries nothing and BO-064 opens cold"
+     "provenance": "derived — BO-064 declares entryState.params accessPointId, orgUnitId and BO-108 holds none of them. The edge carries nothing: accessPointId, orgUnitId only pre-select (deep link or optional), and BO-064 opens on its own"
     },
     {
      "to": "BO-067",
      "trigger": "Integrations",
-     "provenance": "derived — BO-067 declares entryState.params subscriptionId and BO-108 holds none of them, so the edge carries nothing and BO-067 opens cold"
+     "provenance": "derived — BO-067 declares entryState.params subscriptionId and BO-108 holds none of them. The edge carries nothing: BO-067 finds subscriptionId (listWebhookSubscriptions) itself, and BO-067 opens on its own"
     },
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "provenance": "derived — BO-100 declares entryState.params  and BO-108 holds none of them, so the edge carries nothing and BO-100 opens cold"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-108 holds none of them. The edge carries nothing: BO-108 is opened from BO-100, so this edge is the way back and BO-100 keeps its own state"
     },
     {
      "to": "BO-128",
      "trigger": "Live Workstation Health Monitor",
-     "provenance": "derived — BO-128 declares entryState.params workstationId and BO-108 holds none of them, so the edge carries nothing and BO-128 opens cold"
+     "provenance": "derived — BO-128 declares entryState.params workstationId and BO-108 holds none of them. The edge carries nothing: workstationId only pre-selects (deep link or optional), and BO-128 opens on its own"
     },
     {
      "to": "BO-129",
      "trigger": "Software, Configuration & Version Management",
-     "provenance": "derived — BO-129 declares entryState.params firmwareId, profileId, rolloutId, workstationId and BO-108 holds none of them, so the edge carries nothing and BO-129 opens cold"
+     "provenance": "derived — BO-129 declares entryState.params firmwareId, profileId, rolloutId, workstationId and BO-108 holds none of them. The edge carries nothing: profileId, workstationId only pre-select (deep link or optional); BO-129 finds rolloutId (startDeviceFirmwareRollout), firmwareId (startDeviceFirmwareRollout) itself, and BO-129 opens on its own"
     },
     {
      "to": "BO-130",
      "trigger": "Offline Policy & Rules Configuration",
-     "provenance": "derived — BO-130 declares entryState.params  and BO-108 holds none of them, so the edge carries nothing and BO-130 opens cold"
+     "provenance": "derived — BO-130 declares entryState.params  and BO-108 holds none of them. The edge carries nothing: BO-130 needs nothing to open"
     },
     {
      "to": "BO-131",
      "trigger": "Connectivity & Auto-Switch Settings",
-     "provenance": "derived — BO-131 declares entryState.params  and BO-108 holds none of them, so the edge carries nothing and BO-131 opens cold"
+     "provenance": "derived — BO-131 declares entryState.params  and BO-108 holds none of them. The edge carries nothing: BO-131 needs nothing to open"
     },
     {
      "to": "BO-132",
      "trigger": "Offline Transaction Monitor & Sync Queue",
-     "provenance": "derived — BO-132 declares entryState.params  and BO-108 holds none of them, so the edge carries nothing and BO-132 opens cold"
+     "provenance": "derived — BO-132 declares entryState.params  and BO-108 holds none of them. The edge carries nothing: BO-132 needs nothing to open"
     },
     {
      "to": "BO-133",
      "trigger": "Offline Alerts, Limits & Audit",
-     "provenance": "derived — BO-133 declares entryState.params reportId, requestId and BO-108 holds none of them, so the edge carries nothing and BO-133 opens cold"
+     "provenance": "derived — BO-133 declares entryState.params reportId, requestId and BO-108 holds none of them. The edge carries nothing: reportId, requestId only pre-select (deep link or optional), and BO-133 opens on its own"
     },
     {
      "to": "BO-1184",
@@ -5239,7 +5239,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
-     "provenance": "derived — BO-108 declares entryState.params  and BO-128 holds none of them, so the edge carries nothing and BO-108 opens cold"
+     "provenance": "derived — BO-108 declares entryState.params  and BO-128 holds none of them. The edge carries nothing: BO-128 is opened from BO-108, so this edge is the way back and BO-108 keeps its own state"
     },
     {
      "to": "BO-129",
@@ -7597,13 +7597,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "AccessDynamicPolicy": {
   "type": "object",
   "x-ticvai-persistence": "access.dynamic_policy",
-  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.",
+  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.authorisation_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Guest admission lives here and nowhere else** (ADR-0068, accepted 1 October). `validateAccess` online and the gate offline evaluate the same active version: `getOfflinePackage` carries it, and every `scan_event` records the policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`) and the set it was decided under (`policySetVersion`). The condition is `conditionRule`, a closed JSON format (`AdmissionRule`), not free text. Identity's staff-permission engine was renamed `AuthorisationPolicy` on the same day, so \"access policy\" means this.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AuthorisationPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAuthorisationPolicyEffectiveness` in identity.",
   "required": [
    "id",
    "scopePath",
    "name",
    "policyType",
-   "conditionExpression",
+   "conditionRule",
    "result",
    "status",
    "currentVersion"
@@ -7676,9 +7676,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "Identity-based policies (listIdentityMembershipAccreditation)"
    },
-   "conditionExpression": {
-    "type": "string",
-    "description": "Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN"
+   "conditionRule": {
+    "$ref": "#/components/schemas/AdmissionRule",
+    "description": "The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`)."
    },
    "result": {
     "type": "string",
@@ -9219,9 +9219,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "DeviceCapability": {
   "type": "string",
-  "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n",
+  "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n**Access's capabilities merged in** (ADR-0067, 1 October): `dynamicQr`, `rfid`, `nfc`, `facePass`, `offline` and `heightCheck` were the access register's own list, from the compatibility matrix.\n",
   "enum": [
-   "genderClassification"
+   "genderClassification",
+   "dynamicQr",
+   "rfid",
+   "nfc",
+   "facePass",
+   "offline",
+   "heightCheck"
   ]
  },
  "DeviceCredential": {
@@ -9294,9 +9300,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "signaturePad",
    "scale",
    "camera",
-   "mobileHandset"
+   "mobileHandset",
+   "handheldScanner",
+   "accessPodium",
+   "bleBeacon"
   ],
-  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n"
+  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n**One kind vocabulary for every device** (ADR-0067, 1 October). `handheldScanner`, `accessPodium` and `bleBeacon` came from Access's register; the finer hardware type (a speed gate under `turnstileController`, a tablet under `handheldScanner`) is `RegisteredDevice.hardwareType` (common `DeviceHardwareType`).\n"
  },
  "Direction": {
   "type": "string",
@@ -10710,9 +10719,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
    },
+   "policySetVersion": {
+    "type": "string",
+    "description": "**The active admission policy version the package carries** (ADR-0068, 1 October): a fingerprint of the `(id, currentVersion)` of every policy in `dynamicPolicies`, computed the same way by `validateAccess` online. Every scan the gate records carries it (`ScanEvent.policySetVersion`), so a scan decided offline under a set that has since changed is visible at sync rather than assumed equal."
+   },
    "dynamicPolicies": {
     "type": "array",
-    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one.",
+    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), each at its active version with its `conditionRule` (ADR-0068), so an offline gate applies the same rules as an online one.",
     "items": {
      "$ref": "#/components/schemas/AccessDynamicPolicy"
     }
@@ -11350,7 +11363,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "RegisteredDevice": {
   "x-ticvai-persistence": "platform.device",
   "type": "object",
-  "description": "**The device register of record** (decided 29 September, build pass). Identity, enrolment, credential, firmware and push registration for every device in the estate live on this row. `access.access_device` places access-control devices in the gate topology and repeats serial, versions, health and lifecycle; the two are not merged yet, and where they disagree this row wins.\n",
+  "description": "**The only device register** (ADR-0067, accepted 1 October; the register of record since 29 September). Identity (kind, hardware type, model, serial), every version (firmware, configuration, rule package, credential package), health, heartbeat and one lifecycle (`enrolmentState`: registered, enrolled, provisioned, active, deactivated, retired) for every device in the estate live on this row. The access-control device row, which repeated serial, versions, health and lifecycle, is now `access.device_placement` and holds only where an access-control device is placed. Tenancy owns and migrates this table; Access reads it only through this contract.\n",
   "required": [
    "id",
    "kind",
@@ -11377,11 +11390,74 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September); `registerDevice` refuses either mistake with `422`.\n"
+    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September), and except an access-control device (one with a `hardwareType`), which is placed in the gate topology by access `placeAccessDevice` rather than bound to a workstation (ADR-0067); `registerDevice` refuses either mistake with `422`.\n"
    },
    "model": {
     "type": "string",
     "nullable": true
+   },
+   "hardwareType": {
+    "$ref": "../shared/common.yaml#/components/schemas/DeviceHardwareType",
+    "nullable": true,
+    "description": "**The specific hardware under `kind`** (ADR-0067, 1 October): Access's hardware types (a speed gate, a tripod turnstile, a podium) merged into the one register. Null for a device with no finer type than its kind.\n"
+   },
+   "hardwareModelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The model in the hardware library (access `setHardwareModel`; ADR-0067). Access owns the library; this names a model in it.\n"
+   },
+   "serialNumber": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 100,
+    "description": "The manufacturer's serial (ADR-0067: was on the access-control device row, now `access.device_placement`). A serial already registered in the tenant is refused `409` by `registerDevice`.\n"
+   },
+   "ipNetworkReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "Network address or reference the device is reached at (ADR-0067)."
+   },
+   "configurationVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Access configuration version the device reports running (ADR-0067)."
+   },
+   "localRuleVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Admission rule package the device reports running (ADR-0067)."
+   },
+   "credentialSecurityPackageVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Credential security package the device reports running (ADR-0067)."
+   },
+   "scannerHealth": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Component health as the device or vendor reports it on its heartbeat (ADR-0067)."
+   },
+   "controllerHealth": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "cameraHealth": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the device has a camera."
+   },
+   "connectivity": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Reported connectivity."
    },
    "pushToken": {
     "type": "string",
@@ -11436,9 +11512,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "error",
      "consumableLow",
      "needsAttention",
+     "localMode",
      "unknown"
     ],
-    "description": "What the device last said on its heartbeat; `unknown` until it has."
+    "description": "What the device last said on its heartbeat; `unknown` until it has. `localMode` is an access-control device validating from its offline package with its link down (ADR-0067).\n"
    },
    "batteryPercent": {
     "type": "integer",
@@ -12263,6 +12340,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "policySetVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The admission policy set the scan was decided under (`OfflinePackage.policySetVersion`, or the same fingerprint computed online by `validateAccess`), beside the one policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`). ADR-0068, 1 October."
    },
    "packageVersion": {
     "type": "string",
@@ -13658,7 +13740,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "WebhookEventType": {
   "type": "string",
-  "description": "**The webhook event catalogue: every event a subscription may name** (29 September, build pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`, published through `platform.outbox` by exactly one context. A name is added here in the same change that adds its event file, and never before.\n**Added 29 September**, each closing a requirement that had the webhook mechanism and nothing to subscribe to:\n| Events | Publisher | Requirement | |---|---|---| | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 | | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 | | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 | | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 | | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 | | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) | | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) | | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |\n**Published and deliberately not offered** (29 September, build pass, group G2): `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is high-volume fraud telemetry, not a business fact a receiver acts on.\n",
+  "description": "**The webhook event catalogue: every event a subscription may name** (29 September, build pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`, published through `platform.outbox` by exactly one context. A name is added here in the same change that adds its event file, and never before.\n**Added 29 September**, each closing a requirement that had the webhook mechanism and nothing to subscribe to:\n| Events | Publisher | Requirement | |---|---|---| | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 | | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 | | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 | | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 | | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 | | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) | | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) | | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |\n**Deprecated** (1 October, ADR-0067 amendment): `device.enrolmentChanged` is still offered but nothing inside the platform consumes it any more; it is removed at the next major version of this API. Subscribers are told in the release note.\n**Published and deliberately not offered** (29 September, build pass, group G2): `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is high-volume fraud telemetry, not a business fact a receiver acts on.\n",
+  "x-ticvai-deprecated-values": [
+   "device.enrolmentChanged"
+  ],
   "enum": [
    "access.validated",
    "accreditation.applicationDecided",

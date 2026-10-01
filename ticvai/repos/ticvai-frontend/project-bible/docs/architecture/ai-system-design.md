@@ -1,13 +1,13 @@
 # TICVAI AI subsystem: system design
 
-> **Status:** Draft, 28 September 2026. Decisions taken 29 September (section 8); awaiting final review before commit. **Updated 30 September** for the 29 September pass: baseline then learn (section 3.13), the visit planner in Block A, the minutes of 17, 18 and 21 September, and the staffing decision of 30 September (section 7)
+> **Status:** Decided 29 September 2026; updated 1 October 2026 (vectors in Qdrant, ADR-0049)
 > **Owner:** Chinmay
 > **Inputs:** `audit/ticvai/steps/AI/req-core.md` (AIC-001..271), `req-predict.md` (AIP-001..219), `req-personal.md` (AIR-001..211); ADR-0009, 0020, 0021, 0033, 0034, 0038, 0041, 0046; `contracts/satellite/ai.yaml` (31 operations); `ai-platform.md`, `ai-credentials.md`; `registers/ai-applications.md`; `active/ai-scope-for-confirmation.md`, `active/ai-suggestion-rules-proposal.md`.
 > **Precedence used throughout:** a decided (Accepted) ADR beats the minutes and the books unless the client overruled it in the minutes; the minutes (M18, M21) beat the books; among the books, the governance books (GOV, CORE) beat the capability books (CFG, BI, R&P, UCS) on governance questions, because CORE says its modes "should align" to governance. Where this document departs from an ADR, section 8 lists the ADR change.
 
 The client's books describe AI screen by screen. This document does not. It designs one AI platform with a small number of engines, and the ninety-odd P09 screens (ADM-469..558), the P16 analytics screens and the recommendation boards bind to the operations named in section 2.3.
 
-**The design in eight sentences.** One Python service, `ticvai-ai`, deployed in three process groups (real-time, interactive, batch), owns every AI table and every model call. Every AI capability passes one governance decision point, one gateway to models, and writes one standard decision record. Large language models never sit on a path that takes money: recommendations and fraud scoring are rules plus classical ML with hard time budgets, and checkout continues without them. Forecasting, anomaly detection, fraud and recommendations ship rules-first and statistical, and each moves to a trained model per tenant only when a shadow run proves it beats the rule. Anything that changes configuration goes plan, validate, simulate, approve (through the shared approvals service), execute through the owning module's API, with rollback. Vectors live in pgvector inside each tenant's own database, not in Qdrant. The default model provider is TICVAI-managed Azure OpenAI in UAE North, re-billed to the tenant per token, with bring-your-own-key as an override. One autonomy scale (GOV's 0 to 4) applies to every capability.
+**The design in eight sentences.** One Python service, `ticvai-ai`, deployed in three process groups (real-time, interactive, batch), owns every AI table and every model call. Every AI capability passes one governance decision point, one gateway to models, and writes one standard decision record. Large language models never sit on a path that takes money: recommendations and fraud scoring are rules plus classical ML with hard time budgets, and checkout continues without them. Forecasting, anomaly detection, fraud and recommendations ship rules-first and statistical, and each moves to a trained model per tenant only when a shadow run proves it beats the rule. Anything that changes configuration goes plan, validate, simulate, approve (through the shared approvals service), execute through the owning module's API, with rollback. Vectors live in Qdrant from day one, self-hosted in UAE North, in one collection per tenant that only that tenant's collection-scoped token can read (ADR-0049). The default model provider is TICVAI-managed Azure OpenAI in UAE North, re-billed to the tenant per token, with bring-your-own-key as an override. One autonomy scale (GOV's 0 to 4) applies to every capability.
 
 ---
 
@@ -59,7 +59,7 @@ No source agrees a number for any of these (req-predict "left to us"; AIR-203 gi
 
 1. **17 .NET services own their schemas** (ADR-0028). The AI service writes only AI stores; everything else changes through the owning module's API (ADR-0020 addendum, AIC-087).
 2. **Python/FastAPI for all AI and ML** (AIC-030), repository `ticvai-ai`.
-3. **Azure UAE North** for compute, databases, cache, blob and the default model endpoint. Cloud-agnostic application code (AIC-031): Azure is a deployment target, not an SDK dependency outside adapters.
+3. **Azure UAE North** for compute, databases, the vector store (Qdrant, hosted only on servers in the UAE: the condition of its security approval, ADR-0049), cache, blob and the default model endpoint. Cloud-agnostic application code (AIC-031): Azure is a deployment target, not an SDK dependency outside adapters.
 4. **Each tenant has its own database** inside its cell, shared or dedicated (ADR-0038). Row-level security enforces venue scope through `ticvai.scope_paths`.
 5. **Every AI operation is `x-ticvai-offline-capable: false`.** POS, scanner and kitchen are offline-first (ADR-0013); anything they need from AI must arrive in their local bundle.
 6. **Permissions:** `AI_USE`, `AI_CONFIGURE`, `AI_APPROVE`, `AI_AUDIT_VIEW`. `PLATFORM_*` permissions come only from the platform token; acting inside a tenant also needs an open platform-staff grant (`openPlatformStaffGrant`).
@@ -96,14 +96,14 @@ No source agrees a number for any of these (req-predict "left to us"; AIR-203 gi
   │  Governance decision point (PDP) · AI gateway (router, masking, budgets, caches,        │
   │  breaker, telemetry) · Retrieval client (no scope parameter) · Feature library ·        │
   │  Decision-record writer · Prompt registry client                                        │
-  └──────┬─────────────┬──────────────┬──────────────┬─────────────┬───────────────────────┘
-         ▼             ▼              ▼              ▼             ▼
-   Tenant DB       AI log DB       Redis          Blob storage   Key Vault ──► Model endpoints
-   `ai` schema:    per tenant,     features,      model files,   credentialRef   Azure OpenAI UAE North
-   config, state,  append-only,    counters,      Parquet        only            (TICVAI-managed or BYOK)
-   pgvector, RLS   partitioned     caches         snapshots,                     In-cell CPU: BGE-M3,
-   (replica for    by month                       evidence (WORM)                reranker
-   vector reads)                                                                 Customer endpoint
+  └─────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────┘
+        ▼            ▼            ▼            ▼            ▼            ▼
+   Tenant DB    Qdrant       AI log DB    Redis        Blob         Key Vault ──► Model endpoints
+   `ai` schema: collection   per tenant,  features,    model files, credentialRef Azure OpenAI UAE North
+   config,      per tenant,  append-only, counters,    Parquet      only; Qdrant  (TICVAI-managed or BYOK)
+   state, point scoped JWT,  partitioned  caches       snapshots,   API key for   In-cell CPU: BGE-M3,
+   refs, RLS    3 nodes      by month                  evidence     the issuer    reranker
+                                                       (WORM)                     Customer endpoint
 ```
 
 Three process groups share one codebase and one set of libraries. They are split because their failure and scaling profiles differ (AIC-247): real-time scales on requests per second and never calls an LLM; interactive is I/O-bound on model calls; batch is queue-driven and can starve without hurting either.
@@ -178,7 +178,7 @@ No LLM is on this path. An LLM writes case summaries later, from structured evid
 | `askReportingQuestion` | The model returns a semantic query spec; Reporting compiles it; the compiled SQL is still returned |
 | `getAiUsage` | `groupBy` adds `agent`, `model`, `task`; a month-end projection field labelled `forecast` |
 | `listAiInteractions` | Each row links its `decisionRecordId` |
-| `IndexSource.collection`, `ai.yaml` info | "Qdrant collection" becomes "embedding table"; the isolation rule text follows section 5.8 |
+| `IndexSource.collection`, `ai.yaml` info | Stays a Qdrant collection, now one per tenant per embedding model behind the alias `tenant_<id>`; the isolation rule text follows section 5.8 (applied to `ai.yaml` on 30 September, ADR-0049) |
 | `promotions.getRecommendations`, `recordRecommendationOutcome`, `explainRecommendation`, `getUpsellSuggestions`; `fnb.listFnbRecommendations`; `retail.listRetailRecommendations` | Deprecated for one release and forwarded to the engine as placements (section 5.4). `promotions.simulateRecommendationStrategy` stays and calls the engine in simulation mode |
 | `orders.addCartLine` | Optional `recommendationId` |
 | Registered tool operations in owning contracts | Accept `Prefer: validate-only`, which validates and returns what would change without writing. About 40 operations, named by the tool registry |
@@ -214,7 +214,7 @@ That is 89 new operations. The P09 blocks bind as follows: configuration assista
 | `AiGovernanceRule.environments`, `searchAiDecisions` (changed) | `sandbox` environment (M18-01); search by `venueId` and by customer as `subjectRef` (M18-03) |
 | `AiTool` registrations | The planner agent's five tools, all in `venue-map`: `generateVisitPlan`, `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives`, `bookVisitPlan`, always called as the guest |
 
-The visit plan itself lives in `venue-map` (`venuemap.visit_plan`, `venuemap.visit_plan_item`), because a plan is laid out on the map and is the guest's own, like a cart. **The planner agent never writes it directly**: it proposes changes through `requestSuggestion` kind `itinerary` or calls the plan operations as the guest, so AI still writes only `ai.*`, pgvector and `cache:*` (ADR-0020).
+The visit plan itself lives in `venue-map` (`venuemap.visit_plan`, `venuemap.visit_plan_item`), because a plan is laid out on the map and is the guest's own, like a cart. **The planner agent never writes it directly**: it proposes changes through `requestSuggestion` kind `itinerary` or calls the plan operations as the guest, so AI still writes only `ai.*`, its tenant's Qdrant collections and `cache:*` (ADR-0020, amended by ADR-0049).
 
 **The planner agent is grounded in each day's venue** (client meeting 30 September, MoM 4.7, Allam's requirement). In a multi-venue tenant each plan day is at one venue (`VisitPlanRequest.dayVenues`, `VisitPlan.days[].venueId`, `VisitPlanItem.venueId`), and the agent's candidates are only what its plan tools return for that day: the rides, dining and **retail (shops and kiosks, added alongside F&B the same day)** on that venue's published map. It never proposes a point from general knowledge or from another venue, and a wish the day's venue cannot meet is answered from `VisitPlan.unmatchedPreferences` (naming the venue that has it) rather than filled. `updateVisitPlan` refuses a point from another venue (422 `point-not-at-day-venue`) as the deterministic backstop, so grounding does not depend on the prompt alone.
 
@@ -225,7 +225,7 @@ The visit plan itself lives in `venue-map` (`venuemap.visit_plan`, `venuemap.vis
 | Data | Store | Why |
 |---|---|---|
 | Configuration and current state (policy, providers, capabilities, governance versions, plans, blueprints, cases, alerts, forecast headers, entity risk) | **Tenant database, `ai` schema**, primary | Small, hot, needs RLS and transactions (ADR-0020 §3) |
-| **Vectors**, dense and sparse | **pgvector in the tenant database**; reads on the replica | The database is the tenant boundary; RLS carries venue scope (5.8) |
+| **Vectors**, dense and sparse | **Qdrant**, self-hosted in UAE North: one collection per tenant per embedding model, behind the alias `tenant_<id>`; the tenant database keeps only the point references (`ai.chunk_embedding`) | The collection is the tenant boundary, enforced by a collection-scoped token; venue scope is a payload filter the retrieval client always adds (5.8, ADR-0049) |
 | Append-only logs (`ai.activity`, messages, decision records, recommendation decisions and events, risk assessments, forecast points) | **AI log database**: one Postgres database per tenant on a regional AI log server, monthly partitions | ADR-0020 §3 moves history off the primary; a replica cannot be written, so it needs its own server (AIC-248) |
 | Features, velocity counters, caches, snapshots | **Azure Managed Redis** (not Azure Cache for Redis, which is retiring; ADR-0032 amendment), keys prefixed `{tenant}:{scope}` | Sub-millisecond reads |
 | Offline features, training snapshots, model files | **Blob**, a container per tenant; released models immutable | Reproducible training |
@@ -254,7 +254,7 @@ All new tables are owned by the AI service. Scoped tables get `platform.apply_sc
 | | `ai.intervention` | scope | Override, pause or stop, with original and human decision (AIC-187) |
 | | `ai.proposed_action` (existing) | adds `scope_path` | Gains `planId`, `approvalRequestId`, `changeSetHash` |
 | Configuration | `ai.config_session`, `ai.blueprint`, `ai.blueprint_decision` | scope; decision via parent | Provenance on every value |
-| Knowledge | `ai.chunk_embedding` | parent (document) | `halfvec(1024)` dense and `sparsevec` from BGE-M3; one table per embedding model |
+| Knowledge | `ai.chunk_embedding` | parent (document) | The point reference, not the vector: `point_id`, `collection_alias`, `embedding_model`, source document, chunk text and hash. The BGE-M3 dense (1024) and sparse vectors live in Qdrant as named vectors (ADR-0049); erasure is checked against these rows |
 | | `ai.knowledge_gap`, `ai.answer_feedback` | scope | Unanswered questions become tasks for the content owner (AIC-061, AIC-062) |
 | | `ai.assistant_profile` | scope | Role or audience, tools, sources, model task, guest scope |
 | Forecast | `ai.forecast_definition`, `ai.forecast_version` | scope | Version header: producer, model version, data cut-off, horizon, status |
@@ -521,11 +521,11 @@ Every answer carries a "Based on" line (*your venue profile, UAE calendar, weath
 
 **Region aggregate design targets:** 1,000 recommendation decisions per second at 95th-percentile 120 ms; 250 fraud scores per second at 95th-percentile 50 ms; 150,000 LLM calls per day; about 6 GB per day of logs, kept 90 days hot (roughly 550 GB), then aggregated.
 
-**Sizing:** `ai-realtime` 4–12 pods of 2 vCPU (a decision is ~3 ms CPU and ~10 Redis reads); `ai-interactive` 3–10 pods; `ai-batch` 2–8 workers on queue depth; 2 × 4 vCPU nodes for embedding and reranking; 13 GB Redis; a 4 vCPU, 1 TB AI log server. All 30 tenants' forecasts finish in about 90 minutes on 4 workers.
+**Sizing:** `ai-realtime` 4–12 pods of 2 vCPU (a decision is ~3 ms CPU and ~10 Redis reads); `ai-interactive` 3–10 pods; `ai-batch` 2–8 workers on queue depth; 2 × 4 vCPU nodes for embedding and reranking; 13 GB Redis; a 4 vCPU, 1 TB AI log server; a 3-node Qdrant cluster (E4s v5, 256 GB disks, on the tainted data pool), about 0.2 GB per tenant, so 200 tenants at replication factor 2 stay under 100 GB (ADR-0049). All 30 tenants' forecasts finish in about 90 minutes on 4 workers.
 
 ### 4.2 Per-tenant isolation
 
-The tenant database is the vector, configuration and state boundary; RLS carries venue scope. Every log row carries scope and passes RLS. Redis keys, Blob containers, model files and caches are namespaced per tenant. Queue partitions are keyed by tenant, so one tenant's re-index cannot delay another's velocity counters. Per-tenant token budgets and rate limits sit in the gateway, and the tenant's concurrency share on `ai-interactive` is capped at 25% of the pool. **No model is trained on pooled tenant data** (AIP-149). A platform baseline for cold start is trained only on data tenants have contractually allowed, and by default uses rules, not pooled data (AIP-148).
+The tenant database is the configuration and state boundary; RLS carries venue scope. **For vectors the boundary is the tenant's own Qdrant collection**: the retrieval client for a tenant holds only that tenant's collection-scoped token, so a bug that forgets the tenant is refused by the store, and venue scope is the payload filter the client always adds (ADR-0049). Every log row carries scope and passes RLS. Redis keys, Blob containers, model files and caches are namespaced per tenant. Queue partitions are keyed by tenant, so one tenant's re-index cannot delay another's velocity counters. Per-tenant token budgets and rate limits sit in the gateway, and the tenant's concurrency share on `ai-interactive` is capped at 25% of the pool. **No model is trained on pooled tenant data** (AIP-149). A platform baseline for cold start is trained only on data tenants have contractually allowed, and by default uses rules, not pooled data (AIP-148).
 
 ### 4.3 Failover
 
@@ -533,6 +533,7 @@ The tenant database is the vector, configuration and state boundary; RLS carries
 - **Service:** `ai-realtime` runs across three availability zones. Callers own the budget, so a zone loss shows up as fallbacks, not errors.
 - **Region:** AI follows the platform's regional disaster recovery; the AI log database is geo-backed-up. AI is Engagement tier: RTO 4 h, RPO 15 min for configuration and state, 24 h for logs.
 - **Data:** a rebuildable cache is never the only copy of anything (ADR-0020's cache exemption).
+- **Vectors:** Qdrant runs 3 nodes, one per zone, replication factor 2, so a zone loss costs no collection. Each collection is snapshotted to local disk and a Kubernetes CronJob copies the snapshot to Blob in UAE North with azcopy (Qdrant cannot write to Blob itself); restore is tested per tenant. The tenant database keeps the chunk text and point references, so a lost collection can also be re-embedded (ADR-0049).
 
 ### 4.4 Monitoring and alerting
 
@@ -563,7 +564,7 @@ Illustrative token prices, to be confirmed against the Azure UAE North price she
 | Medium (3 venues, 15,000/day) | $90–150 | $200–350 | |
 | Large (6 venues, 40,000/day) | $250–400 | $600–900 | Tokens driven by guest questions; cache hit rate is the lever |
 
-Embeddings and reranking are self-hosted, so their marginal cost is CPU, not tokens: a 20,000-chunk corpus embeds in minutes. The regional AI tier (pods, embedding nodes, Redis, AI log server) is about $2,500–3,500 a month, shared by usage. **ML and rules cost almost nothing per decision**, which is part of why they, not LLMs, sit on the high-volume paths.
+Embeddings and reranking are self-hosted, so their marginal cost is CPU, not tokens: a 20,000-chunk corpus embeds in minutes. The regional AI tier (pods, embedding nodes, Redis, AI log server) is about $2,500–3,500 a month, shared by usage. The Qdrant cluster adds about $800 a month per cell (3 × E4s v5 and P15 disks, already in the cost workbook; open-source Qdrant has no licence fee). **ML and rules cost almost nothing per decision**, which is part of why they, not LLMs, sit on the high-volume paths.
 
 ---
 
@@ -621,19 +622,25 @@ The minutes win on "these capabilities exist". CH05 and the 14 August principle 
 
 **Choice: (c).** BI's AIP-170 is a must: answer from the semantic layer, and match the official dashboards. Free SQL cannot guarantee that "revenue" means the dashboard's revenue, and it needs venue scoping inside generated text. (c) inherits RLS and metric definitions, keeps the checkable SQL (CH05's intent), and is what CORE means by approved services. Questions outside the semantic model get "not available yet" plus a knowledge-gap record, not an improvised query.
 
-### 5.8 The vector store: pgvector, not Qdrant
+### 5.8 The vector store: Qdrant, one collection per tenant (ADR-0049)
 
-**Positions on record.** CH02 has Qdrant everywhere with a payload filter. ADR-0009 §2 has Qdrant for dedicated cells and pgvector for the shared tier. ADR-0020 says "a cell without Qdrant has no AI". ADR-0021 (Proposed) has Qdrant with one shard per tenant.
+**Positions on record.** CH02 has Qdrant everywhere with a payload filter. ADR-0009 §2 had Qdrant for dedicated cells and pgvector for the shared tier. ADR-0020 said "a cell without Qdrant has no AI". ADR-0021 had Qdrant with the tenant as a shard and scope as a payload filter. This design's first answer (AI-D12, 29 September) was pgvector in each tenant database "for now". **ADR-0049 reversed it on 30 September: Qdrant from day one, on every tier**, and amends ADR-0009, ADR-0020 and ADR-0021 accordingly.
 
-**Choice: pgvector in each tenant's own database, everywhere; Qdrant kept as the documented scale-out.** ADR-0038 (Accepted, after all four) gives every tenant its own database, even in a shared cell. That makes the database the strongest isolation boundary we have, and it sits exactly where ADR-0021 wanted a shard. It also brings three things Qdrant cannot give:
+**Choice: every tenant's vectors live in Qdrant, in collections of its own.** Retrieval is a first-release feature (the guest concierge is in Block A), so it runs on the store it will grow on rather than moving later.
 
-- **RLS enforces venue scope.** ADR-0021's central worry, "Qdrant enforces nothing", disappears.
-- **Erasure and offboarding follow the tenant database lifecycle**, not a second store's (AIC-266, AIC-268).
-- **One store fewer** needing DESC approval (AIC-045), costing $600–700 a month in HA, and still awaiting the 12 August compliance confirmation.
+- **One collection per tenant per embedding model**, for example `t_<tenantId>_bge-m3-v1`, provisioned at onboarding with the tenant database (ADR-0039). The retrieval client never names it; it reads the **alias `tenant_<tenantId>`**. A model change is a shadow collection, an evaluation, then an alias swap.
+- **The store enforces the tenant boundary.** Each tenant has a JWT scoped to its own collections and alias (Qdrant's granular JWT RBAC, open source since 1.9, `service.jwt_rbac: true`); the retrieval client for a tenant holds only that token, so a bug that forgets the tenant is refused by Qdrant. A shared collection with a tenant filter was rejected: payload-filter RBAC was removed in Qdrant 1.16, so no token can be limited to one tenant's points, and isolation would rest on the application never forgetting a filter (ADR-0021's own worry).
+- **The token is HS256, signed with Qdrant's admin API key**, which Key Vault holds as a secret (Key Vault keys cannot do HMAC). Only the token issuer reads it; `ticvai-ai` never does. Tenant tokens expire and are reissued on their own schedule. **Rotating the API key breaks every token at once**, so it is a planned procedure: a window with retrieval in its degraded mode, a new secret version, a rolling restart of the Qdrant pods, every token reissued, one read verified per tenant. Whether a collection-scoped token works through the alias is tested on day one; the token can name both if needed.
+- **Venue scope is a payload filter the client always adds.** Points carry `venue_id` and `scope_path`, indexed. The single retrieval client still has no scope parameter: it reads the caller's scope from the request context, so a caller cannot widen it.
+- **Hosting:** open-source Qdrant, self-hosted on the cell's own AKS in UAE North with the official Helm chart, pinned to 1.16 or later: 3 nodes, one per zone, replication factor 2, on the tainted data pool. TLS on the service. The venue-local on-premise profile (ADR-0046) runs a single node. Qdrant Hybrid Cloud was rejected (its agent sends collection metadata, which carries tenant ids, to `cloud.qdrant.io`), and Managed Cloud is ruled out until a UAE North region is shown in writing. The security approval for Qdrant was given on 30 September on one condition: it is hosted only on servers in the UAE, on every tier, backups and DR included.
+- **Backups:** each collection is snapshotted to local disk, and a Kubernetes CronJob copies the snapshot to the UAE North storage account with azcopy under workload identity (Qdrant snapshots support only local and S3 targets, not Blob). Azure Disk snapshots are a second line. Restore is tested per tenant.
+- **Erasure and offboarding** (AIC-266, AIC-268): erasure deletes points by the guest's or document's payload key. The tenant database keeps the point references in `ai.chunk_embedding` (point id, collection alias, model, source document), so the delete is checked against what existed. Offboarding deletes the tenant's collections and alias and revokes its token, with the tenant database (ADR-0047).
 
-The sizes are well inside pgvector's comfort zone: about 20,000 chunks per tenant, 1024-dimension half-precision. Hybrid retrieval uses BGE-M3's learned sparse vectors in `sparsevec` fused with dense by reciprocal rank. Learned sparse weights need no corpus IDF, which also dissolves ADR-0021's IDF-scope problem.
+The sizes are small: about 20,000 chunks per tenant, 1024 dimensions, roughly 0.2 GB per tenant with the sparse vectors and the HNSW index. Hybrid retrieval stores BGE-M3's dense and learned sparse vectors as named vectors and fuses them by reciprocal rank. Learned sparse weights need no corpus IDF, which also dissolves ADR-0021's IDF-scope problem.
 
-**What survives from ADR-0021:** one table per embedding model; the single retrieval client with no scope parameter (kept even with RLS, as defence in depth); shadow re-embed on model change; and the two-stage model evaluation. On-premise (ADR-0046) gets simpler: no fourth store to ship.
+**What survives from ADR-0021** (amended by ADR-0049): one collection per embedding model; the single retrieval client with no scope parameter; shadow re-embed on model change; and the two-stage model evaluation. What changes is that the tenant gets a collection of its own instead of a shard in a shared one.
+
+**The cost is a third store to run:** backup, restore, residency and erasure each have their own path beside the tenant database's, and nobody on the team has run Qdrant (the two AI engineers own it with DevOps). About $800 a month per cell for the cluster (section 4.5).
 
 **Revisit trigger:** section 6.
 
@@ -657,7 +664,8 @@ ADR-0034's substance survives: the tenant bears token cost, per-tenant keys give
 
 | Trigger | Revisit |
 |---|---|
-| A tenant passes ~2 million chunks, or retrieval 95th-percentile exceeds 150 ms at the replica | Move that tenant's vectors to Qdrant with a shard per tenant (ADR-0021's design) behind the same retrieval client |
+| A tenant passes ~2 million chunks, or retrieval 95th-percentile exceeds 150 ms | Shard that tenant's collection, behind the same alias and retrieval client (ADR-0049) |
+| About 500 tenants in one region (the cluster's default cap is 1,000 collections) | Custom sharding, or a second Qdrant cluster in the region (ADR-0049) |
 | More than 3 people building ML | A managed feature store and experiment tracking instead of features-as-code |
 | More than 60 tenants in a region, or LLM calls above 500,000 a day | Split `ai-interactive` into assistant and configuration deployments; dedicated Azure OpenAI capacity (provisioned throughput) |
 | Fraud labels above ~5,000 confirmed cases in a tenant | Graph neural or sequence models on the relationship graph; a streaming engine instead of Redis counters |
@@ -679,7 +687,7 @@ Effort is in developer-weeks at the AI-assisted pace assumed in the six-month pl
 | Gateway: routing, catalogue, masking, budgets, breaker, caches, telemetry | C1, C13 | 4 |
 | Governance decision point, capability registry, autonomy, policy versions | C2 | 4 |
 | Action pipeline, executor, Approvals integration, tool registry, `validate-only` on the first 15 tools | C3 | 5 |
-| pgvector migration, BGE-M3 and reranker in-cell, hybrid retrieval | C4 | 3 |
+| Qdrant tenancy (a collection, alias and scoped token per tenant, the venue filter, erasure, snapshots), BGE-M3 and reranker in-cell, hybrid retrieval | C4 | 3 |
 | Assistant profiles: staff, guest concierge, support | C5 | 3 |
 | Configuration assistant: discovery, blueprint, plan (seating and ticketing first, then general; the ai-scope paper's Reading B) | C7 | 5 |
 | Analytics assistant via semantic spec | C6 | 3 |
@@ -718,7 +726,7 @@ Effort is in developer-weeks at the AI-assisted pace assumed in the six-month pl
 | AI dashboard and report generation (AIP-186, AIP-187) | 3 |
 | Partner and external product cross-sell; in-venue location triggers | 4 |
 | On-premise local-model packaging | 3 |
-| Qdrant scale-out, only if triggered | 3 |
+| Qdrant scale-out (a sharded tenant collection, or a second cluster in a region), only if triggered | 3 |
 
 **Staffing, decided (AI-D11, and the plan decision of 30 September).** Staffing is ours to decide, not the client's (AI-D11). **The second AI engineer starts Monday 5 October with Block A, and there is no third.** The two AI engineers carry the engine work: models, pipelines, backtests and the baseline-then-learn layer. The AI endpoints and screens are built by the developers like any other module (six-month plan, decision 11).
 
@@ -730,7 +738,7 @@ Effort is in developer-weeks at the AI-assisted pace assumed in the six-month pl
 
 ## 8. Decisions taken on 29 September, and what remains
 
-> **30 September 2026:** ADR-0049 decided vectors go to Qdrant from day one, one collection per tenant with a collection-scoped token, reversing AI-D12's pgvector; the pgvector sections below are superseded on that point.
+> **30 September 2026:** ADR-0049 decided vectors go to Qdrant from day one, one collection per tenant with a collection-scoped token, reversing AI-D12's pgvector. **1 October 2026:** every vector-store passage in this document (sections 1.3, 2, 3.1, 4, 5.8, 6, 7, 8 and 9) now follows ADR-0049 and its hosting amendment of 30 September.
 
 Chinmay answered every question in this section on 29 September, following the readiness rule of the same day: the questions are ours to answer, and only make-or-break questions go to the client. None of these is make-or-break, so **nothing in this design now waits on the client.** Each answer and what it changed:
 
@@ -767,17 +775,17 @@ Chinmay answered every question in this section on 29 September, following the r
 
 | ADR | Change |
 |---|---|
-| **ADR-0020** Proposed → **Accepted, with corrections** | §1: vectors in the tenant database (pgvector), not "Qdrant per cell". §3: "the analytical store" is the writable per-tenant AI log database, not the reporting replica. Consequences: "a cell without Qdrant has no AI" becomes "a tenant without the AI entitlement has no AI"; cost is per tenant, not per cell. The lineage rule is extended to the new AI-owned tables. The CF-61 table is unchanged |
-| **ADR-0021** Proposed → **Superseded in part** | By the new ADR-0049. The retrieval client rule, one table per model, shadow re-embed and the two-stage evaluation survive. The shard design becomes the scale-out path |
-| **ADR-0009** (Accepted) **amended** | §2: pgvector is the default on every tier. Qdrant only past the section 6 trigger |
+| **ADR-0020** Proposed → **Accepted, amended by ADR-0049** | §1: vectors in Qdrant, a collection and a scoped token per tenant, not a Qdrant shared per cell. §3: "the analytical store" is the writable per-tenant AI log database, not the reporting replica. Consequences: "a cell without Qdrant has no AI" becomes "a tenant without the AI entitlement has no AI"; cost is per tenant, not per cell. The lineage rule is extended to the new AI-owned tables. The CF-61 table is unchanged |
+| **ADR-0021** Proposed → **Accepted in part, amended by ADR-0049** | A collection per tenant replaces the tenant-as-shard with a scope filter. The retrieval client rule, one collection per model, shadow re-embed and the two-stage evaluation survive |
+| **ADR-0009** (Accepted) **amended by ADR-0049** | §2: Qdrant on every tier, one collection per tenant with a collection-scoped token; the shared tier no longer uses pgvector |
 | **ADR-0034** (Accepted) **amended** | BYOK is an override, not the default (M21). `ceilingBehaviour` per capability. Semantic cache barred from live-number answers. Cache keys carry the policy version |
-| **ADR-0046** | No change. On-premise needs no vector service |
-| New **ADR-0049** | Vectors live in the tenant database |
+| **ADR-0046** | No change to the ADR. The venue-local on-premise profile runs a single Qdrant node (ADR-0049) |
+| New **ADR-0049** | Vectors live in Qdrant from day one, one collection per tenant, each with its own token (accepted 30 September; hosting amendment the same day) |
 | New **ADR-0050** | One autonomy scale; the approval tier is not an autonomy level |
 | New **ADR-0051** | Capabilities now, models on evidence (rules-first promotion gates) |
-| New **ADR-0052** | One recommendation engine; runtime in AI, configuration in Promotions |
-| New **ADR-0053** | Risk layer ownership: owners keep deterministic rules, AI owns cross-entity risk, alerts and cases |
-| New **ADR-0054** | Natural-language analytics goes through the semantic layer |
+| New **ADR-0052** | One recommendation engine; runtime in AI, configuration in Promotions (accepted 1 October) |
+| New **ADR-0053** | Risk layer ownership: owners keep deterministic rules, AI owns cross-entity risk, alerts and cases (accepted 1 October) |
+| New **ADR-0054** | Natural-language analytics goes through the semantic layer (accepted 1 October) |
 
 ---
 
@@ -819,8 +827,8 @@ Chinmay answered every question in this section on 29 September, following the r
 | Id | Treatment | Reason |
 |---|---|---|
 | AIC-046 (external enterprise sources) | Deferred | SharePoint and Drive connectors raise residency questions no source answers |
-| AIC-063, AIC-064 (Qdrant shard, Qdrant retrieval client) | Met differently | Database-per-tenant plus RLS (5.8); the client rule is kept |
-| AIC-045 (DESC for Qdrant) | Moot for Qdrant | pgvector sits in the already-approved Postgres; DESC still applies to Redis and Blob |
+| AIC-063, AIC-064 (Qdrant shard, Qdrant retrieval client) | Met differently | A Qdrant collection per tenant with a collection-scoped token instead of a shard per tenant (5.8, ADR-0049); the single retrieval client with no scope parameter is kept |
+| AIC-045 (DESC for Qdrant) | Met, with a condition | The security approval for Qdrant was given on 30 September on condition that it is hosted only on servers in the UAE, on every tier (ADR-0049); DESC applies to Qdrant as to Redis and Blob |
 | AIC-091 (autonomous agents per function) | Partial | Agents are assistant profiles with tool allow-lists; no autonomous multi-agent planning in the first release |
 | AIC-012 (model fitness check) | Partial | A warning on feature mismatch now; scored fitness later |
 | AIP-071, AIR-091, AIR-090 level 3 (AI-initiated operational changes, auto-optimisation) | Deferred | L4 stays off until six months of L3 evidence (5.5) |

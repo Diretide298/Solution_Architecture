@@ -123,7 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "provenance": "derived — CMS-001 declares entryState.params  and CMS-021 holds none of them, so the edge carries nothing and CMS-001 opens cold"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-021 holds none of them. The edge carries nothing: CMS-021 is opened from CMS-001, so this edge is the way back and CMS-001 keeps its own state"
     },
     {
      "to": "CMS-022",

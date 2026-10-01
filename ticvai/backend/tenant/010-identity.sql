@@ -32,42 +32,6 @@ CREATE TABLE IF NOT EXISTS identity.access_override (
     alerted_to                        text[]
 );
 
--- Holds 16 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS identity.access_policy (
-    id                                uuid PRIMARY KEY,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
-    description                       text,
-    is_template                       boolean DEFAULT false,
-    permissions                       text[],
-    combining                         text DEFAULT 'allMustMatch' CONSTRAINT access_policy_combining_chk CHECK (combining IN ('allMustMatch', 'anyMayMatch')),
-    effect                            text NOT NULL CONSTRAINT access_policy_effect_chk CHECK (effect IN ('permit', 'deny')),
-    priority                          integer DEFAULT 0,
-    scope_path                        ltree NOT NULL,
-    applies_to_role_ids               text[],
-    status                            text CONSTRAINT access_policy_status_chk CHECK (status IN ('draft', 'pendingApproval', 'active', 'suspended', 'retired')),
-    version                           integer DEFAULT 1,
-    effective_from                    timestamptz,
-    effective_to                      timestamptz,
-    delegated_admin_role_ids          text[]
-);
-
--- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS identity.access_policy_version (
-    policy_id                         uuid,
-    version                           integer,
-    changed_by                        uuid,
-    changed_at                        timestamptz,
-    reason                            text,
-    approved_by                       uuid,
-    previous_id                       uuid,
-    current_id                        uuid,
-    scope_path                        ltree NOT NULL,
-    id                                uuid PRIMARY KEY NOT NULL
-);
-
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.access_review_campaign (
@@ -107,6 +71,42 @@ CREATE TABLE IF NOT EXISTS identity.access_review_item (
     decided_by_principal_id           uuid,
     decided_at                        timestamptz,
     reason                            text CONSTRAINT access_review_item_reason_chk CHECK (char_length(reason) <= 1000)
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS identity.authorisation_policy (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    is_template                       boolean DEFAULT false,
+    permissions                       text[],
+    combining                         text DEFAULT 'allMustMatch' CONSTRAINT authorisation_policy_combining_chk CHECK (combining IN ('allMustMatch', 'anyMayMatch')),
+    effect                            text NOT NULL CONSTRAINT authorisation_policy_effect_chk CHECK (effect IN ('permit', 'deny')),
+    priority                          integer DEFAULT 0,
+    scope_path                        ltree NOT NULL,
+    applies_to_role_ids               text[],
+    status                            text CONSTRAINT authorisation_policy_status_chk CHECK (status IN ('draft', 'pendingApproval', 'active', 'suspended', 'retired')),
+    version                           integer DEFAULT 1,
+    effective_from                    timestamptz,
+    effective_to                      timestamptz,
+    delegated_admin_role_ids          text[]
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS identity.authorisation_policy_version (
+    policy_id                         uuid,
+    version                           integer,
+    changed_by                        uuid,
+    changed_at                        timestamptz,
+    reason                            text,
+    approved_by                       uuid,
+    previous_id                       uuid,
+    current_id                        uuid,
+    scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Written by the authorisation layer on every call, not by an operation Hangs off: reaches

@@ -609,12 +609,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-042",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "At the venue → 'Shop & drop'",
-    "differences": "Pays in one tap on the page, not through the cart and checkout (YAML R236)."
+    "view": "Summit Peaks → header 'At the venue' → Shop (collect at the gate, at the car park kiosk, or delivered home)",
+    "differences": "Pays in one tap on the page, not through the cart and checkout (YAML R236). 29 September: collect at the gate, at the car park kiosk, or delivered home, with a collection code after paying."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -693,6 +693,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

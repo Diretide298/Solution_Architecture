@@ -108,7 +108,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-040 holds none of them, so the edge carries nothing and BO-008 opens cold"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-040 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
     }
    ]
   },
@@ -647,7 +647,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-041 holds none of them, so the edge carries nothing and BO-008 opens cold"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-041 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
     }
    ]
   },
@@ -938,7 +938,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-042 holds none of them, so the edge carries nothing and BO-008 opens cold"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-042 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
     }
    ]
   },
@@ -1220,7 +1220,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-043 holds none of them, so the edge carries nothing and BO-008 opens cold"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-043 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
     },
     {
      "to": "BO-074",
@@ -1554,7 +1554,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-047 holds none of them, so the edge carries nothing and BO-008 opens cold"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-047 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
     }
    ]
   },
@@ -2176,7 +2176,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-048 holds none of them, so the edge carries nothing and BO-008 opens cold"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-048 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
     },
     {
      "to": "GST-026",
@@ -2478,7 +2478,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-059 holds none of them, so the edge carries nothing and BO-008 opens cold"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-059 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
     }
    ]
   },
@@ -2908,7 +2908,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-061 holds none of them, so the edge carries nothing and BO-008 opens cold"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-061 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
     },
     {
      "to": "BO-060",
@@ -3173,7 +3173,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-062 holds none of them, so the edge carries nothing and BO-008 opens cold"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-062 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
     }
    ]
   },
@@ -3436,7 +3436,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-065 holds none of them, so the edge carries nothing and BO-008 opens cold"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-065 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
     }
    ]
   },

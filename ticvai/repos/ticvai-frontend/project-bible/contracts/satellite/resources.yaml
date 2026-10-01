@@ -108,6 +108,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Resource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createResource
       x-ticvai-consumed-by:
@@ -149,6 +151,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/availability:
     parameters:
     - name: resourceId
@@ -217,6 +221,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceAvailability'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-bookings:
     get:
       operationId: listResourceBookings
@@ -264,6 +270,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceBooking'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: bookResource
       x-ticvai-consumed-by:
@@ -407,6 +415,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ResourceConflictProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-bookings/{bookingId}/check-out:
     parameters:
     - name: bookingId
@@ -501,6 +511,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceBooking'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-bookings/{bookingId}/check-in:
     parameters:
     - name: bookingId
@@ -586,6 +598,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceBooking'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/qualifications:
     parameters:
     - name: resourceId
@@ -622,6 +636,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Qualification'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setResourceQualifications
       x-ticvai-consumed-by:
@@ -674,6 +690,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Qualification'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /performances/{performanceId}/manifest:
     parameters:
     - name: performanceId
@@ -720,6 +738,8 @@ paths:
                   $ref: '#/components/schemas/PerformanceParticipant'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: reorderPerformanceManifest
       x-ticvai-consumed-by:
@@ -779,6 +799,8 @@ paths:
                   $ref: '#/components/schemas/PerformanceParticipant'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-types:
     get:
       operationId: listResourceTypes
@@ -816,6 +838,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createResourceType
       x-ticvai-consumed-by:
@@ -854,6 +878,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-types/{resourceTypeId}:
     parameters:
     - name: resourceTypeId
@@ -905,6 +931,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ResourceInUseProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-categories:
     get:
       operationId: listResourceCategories
@@ -934,6 +962,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceCategory'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createResourceCategory
       x-ticvai-consumed-by:
@@ -965,6 +995,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceCategory'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-categories/{categoryId}:
     parameters:
     - name: categoryId
@@ -1017,6 +1049,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ResourceInUseProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-attributes:
     get:
       operationId: listResourceAttributes
@@ -1047,6 +1081,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceAttributeDefinition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createResourceAttribute
       x-ticvai-consumed-by:
@@ -1078,6 +1114,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceAttributeDefinition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}:
     parameters:
     - name: resourceId
@@ -1114,6 +1152,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Resource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: updateResource
       x-ticvai-consumed-by:
@@ -1154,6 +1194,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/state:
     parameters:
     - name: resourceId
@@ -1232,6 +1274,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ResourceTransitionProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/clone:
     parameters:
     - name: resourceId
@@ -1288,6 +1332,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Resource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/hierarchy:
     parameters:
     - name: resourceId
@@ -1322,6 +1368,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceHierarchy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setResourceHierarchy
       x-ticvai-consumed-by:
@@ -1364,6 +1412,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ResourceHierarchyProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/dependencies:
     parameters:
     - name: resourceId
@@ -1395,6 +1445,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceDependency'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setResourceDependencies
       x-ticvai-consumed-by:
@@ -1443,6 +1495,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceDependency'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-packages:
     get:
       operationId: listResourcePackages
@@ -1477,6 +1531,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourcePackage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createResourcePackage
       x-ticvai-consumed-by:
@@ -1510,6 +1566,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourcePackage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-packages/{packageId}:
     parameters:
     - name: packageId
@@ -1549,6 +1607,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourcePackage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/venues:
     parameters:
     - name: resourceId
@@ -1600,6 +1660,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ResourceConflictProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/audit:
     parameters:
     - name: resourceId
@@ -1641,6 +1703,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceAuditEntry'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-calendar:
     get:
       operationId: getResourceCalendar
@@ -1714,6 +1778,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceCalendarRow'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/schedule:
     parameters:
     - name: resourceId
@@ -1745,6 +1811,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceSchedule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setResourceSchedule
       x-ticvai-consumed-by:
@@ -1792,6 +1860,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceSchedule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-bookings/{bookingId}:
     parameters:
     - name: bookingId
@@ -1865,6 +1935,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ResourceConflictProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: cancelResourceBooking
       x-ticvai-consumed-by:
@@ -1907,6 +1979,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceBooking'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-blocks:
     get:
       operationId: listResourceBlocks
@@ -1947,6 +2021,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceBlock'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createResourceBlock
       x-ticvai-consumed-by:
@@ -1996,6 +2072,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ResourceConflictProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-blocks/{blockId}:
     parameters:
     - name: blockId
@@ -2025,6 +2103,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-allocations:
     post:
       operationId: allocateResources
@@ -2148,6 +2228,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ResourceAllocationProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-allocations/{bookingId}/replace:
     parameters:
     - name: bookingId
@@ -2200,6 +2282,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceBooking'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-allocation-policy:
     get:
       operationId: getResourceAllocationPolicy
@@ -2224,6 +2308,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceAllocationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setResourceAllocationPolicy
       x-ticvai-consumed-by:
@@ -2263,6 +2349,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceAllocationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-selection-policy:
     put:
       operationId: setResourceSelectionPolicy
@@ -2315,6 +2403,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-suggestions:
     get:
       operationId: suggestResources
@@ -2375,6 +2465,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Resource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /experiences/{experienceId}/resource-requirements:
     parameters:
     - name: experienceId
@@ -2406,6 +2498,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceRequirement'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setExperienceResourceRequirements
       x-ticvai-consumed-by:
@@ -2456,6 +2550,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceRequirement'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-utilisation:
     get:
       operationId: getResourceUtilisation
@@ -2515,6 +2611,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceUtilisation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-availability:
     get:
       operationId: getMapResourceAvailability
@@ -2588,6 +2686,8 @@ paths:
                 $ref: '#/components/schemas/MapResourceAvailability'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-holds:
     post:
       operationId: createResourceHold
@@ -2675,6 +2775,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-holds/{holdId}:
     parameters:
     - name: holdId
@@ -2715,6 +2817,8 @@ paths:
                 $ref: '#/components/schemas/ResourceHold'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: relinquishResourceHold
       x-ticvai-consumed-by:
@@ -2745,6 +2849,8 @@ paths:
           description: Released
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-holds/{holdId}/extend:
     parameters:
     - name: holdId
@@ -2797,6 +2903,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ResourceHoldExtendProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-start-times:
     get:
       operationId: listProductStartTimes
@@ -2901,6 +3009,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-bookings/{bookingId}/progress:
     parameters:
     - name: bookingId
@@ -2968,6 +3078,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-requests:
     post:
       operationId: raiseResourceRequest
@@ -3020,6 +3132,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-cost-analytics:
     get:
       operationId: getResourceCostAnalytics
@@ -3080,6 +3194,8 @@ paths:
                   $ref: '#/components/schemas/ResourceCostAnalytics'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-costs:
     get:
       operationId: listResourceCosts
@@ -3147,6 +3263,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ResourceCostEntry'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createResourceCost
       x-ticvai-consumed-by:
@@ -3202,6 +3320,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-costs/{costId}:
     parameters:
     - name: costId
@@ -3240,6 +3360,8 @@ paths:
           description: Removed
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   securitySchemes:

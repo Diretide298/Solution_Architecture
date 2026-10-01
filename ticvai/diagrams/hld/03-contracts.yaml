@@ -51,16 +51,16 @@ contracts:
   ref: diagrams/lld/contracts/access.yaml
 - contract: catalogue
   tier: spine
-  operations: 237
+  operations: 241
   holds: null
   service: CatalogueService
   verbs:
-    GET: 119
-    PUT: 62
-    POST: 46
+    GET: 121
+    PUT: 63
+    POST: 47
     PATCH: 8
     DELETE: 2
-  guestCallable: 20
+  guestCallable: 22
   offlineCapable: 10
   events:
   - catalogue-productPublished
@@ -427,12 +427,12 @@ contracts:
   ref: diagrams/lld/contracts/games.yaml
 - contract: platform-ops
   tier: satellite
-  operations: 33
+  operations: 37
   holds: null
   service: PlatformService
   verbs:
-    GET: 16
-    POST: 15
+    GET: 18
+    POST: 17
     PUT: 2
   guestCallable: 0
   offlineCapable: 0

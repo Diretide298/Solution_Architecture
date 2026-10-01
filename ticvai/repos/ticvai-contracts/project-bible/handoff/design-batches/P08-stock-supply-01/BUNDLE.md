@@ -117,12 +117,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-049 holds none of them, so the edge carries nothing and BO-079 opens cold"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-049 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-049 holds none of them, so the edge carries nothing and BO-080 opens cold"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-049 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
     },
     {
      "to": "EMP-065",
@@ -1429,7 +1429,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-078 holds none of them, so the edge carries nothing and BO-079 opens cold"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-078 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
     },
     {
      "to": "BO-081",
@@ -1895,12 +1895,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-078",
      "trigger": "Requisitions",
-     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-079 holds none of them, so the edge carries nothing and BO-078 opens cold"
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-079 holds none of them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078 opens on its own"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-079 holds none of them, so the edge carries nothing and BO-080 opens cold"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-079 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
     },
     {
      "to": "BO-081",
@@ -2371,12 +2371,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-078",
      "trigger": "Requisitions",
-     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-080 holds none of them, so the edge carries nothing and BO-078 opens cold"
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-080 holds none of them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078 opens on its own"
     },
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-080 holds none of them, so the edge carries nothing and BO-079 opens cold"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-080 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
     },
     {
      "to": "BO-081",
@@ -2711,12 +2711,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-081 holds none of them, so the edge carries nothing and BO-079 opens cold"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-081 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-081 holds none of them, so the edge carries nothing and BO-080 opens cold"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-081 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
     }
    ]
   },
@@ -3106,12 +3106,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-078",
      "trigger": "Requisitions",
-     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-082 holds none of them, so the edge carries nothing and BO-078 opens cold"
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-082 holds none of them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078 opens on its own"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-082 holds none of them, so the edge carries nothing and BO-080 opens cold"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-082 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
     }
    ]
   },
@@ -3428,12 +3428,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-083 holds none of them, so the edge carries nothing and BO-079 opens cold"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-083 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-083 holds none of them, so the edge carries nothing and BO-080 opens cold"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-083 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
     },
     {
      "to": "BO-007",

@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `catalogue`, `promotions`, `seating` |
 | Schemas owned | `catalogue`, `pricing`, `promotions`, `seating` |
-| Operations in the slice | 91 of 445 |
+| Operations in the slice | 93 of 449 |
 | Scale | Read-heavy, bundle-published to tills. The catalogue bundle is this service's output (ADR-0013). |
 | If it is down | A bad publish reaches every workstation. Versioned and rollback-able for that reason. |
 
@@ -78,7 +78,9 @@
 | entitlement | [`createEntitlementTemplate`](#createentitlementtemplate) | POST | `/entitlement-templates` | setup | 1 | BO-012, BO-288 |
 | evaluation | [`evaluatePromotions`](#evaluatepromotions) | POST | `/promotions/evaluate` | core | 1 | BO-010, KSK-006, POS-002, POS-021, POS-023, PTR-010 … |
 | event | [`createEvent`](#createevent) | POST | `/events` | setup | 1 | BO-001, BO-015, BO-019, BO-063 |
+| event | [`enterWaitingRoom`](#enterwaitingroom) | POST | `/performances/{performanceId}/waiting-room/entries` | core | 1 | GST-046, WEB-015 |
 | event | [`getPerformance`](#getperformance) | GET | `/performances/{performanceId}` | core | 1 | BO-002, BO-015, BO-019, BO-063, GST-006, GST-041 … |
+| event | [`getWaitingRoomPosition`](#getwaitingroomposition) | GET | `/performances/{performanceId}/waiting-room/entries/{waitingEntryId}` | core | 1 | GST-046, WEB-015 |
 | event | [`listEvents`](#listevents) | GET | `/events` | core | 2 | BO-001, BO-015, BO-019, BO-063, BO-694, CMS-101 |
 | event | [`listPerformances`](#listperformances) | GET | `/events/{eventId}/performances` | core | 1 | BO-001, BO-015, BO-019, BO-063, GST-003, GST-004 … |
 | event | [`updateEvent`](#updateevent) | PATCH | `/events/{eventId}` | setup | 1 | BO-001, BO-015, BO-019, BO-063 |
@@ -198,6 +200,7 @@ Every seat with its current state — available, held, sold, blocked or buffered
 |---|---|---|
 | 200 |  | Availability |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: bundle
@@ -358,6 +361,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | 201 |  | Created |
 | 422 |  | A fnbMenuItem component with no menuItemId, or whose menu item does not sell the component's variantId (MOB-4, 29 September). |
 | 400 |  | Allocation does not sum to 100 per cent, or fixed amounts do not sum to the bundle price. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getBundle
 
@@ -454,6 +458,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 |---|---|---|
 | 200 |  | Bundle |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getLatestBundle
 
@@ -504,6 +509,7 @@ Use `since` to request a delta instead of a full bundle — a terminal on a slow
 | 200 |  | Full bundle or delta |
 | 304 |  | Unchanged |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listCatalogueBundles
 
@@ -530,6 +536,7 @@ Use `since` to request a delta instead of a full bundle — a terminal on a slow
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Bundles, newest first |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishBundle
 
@@ -587,6 +594,7 @@ Publishing is the act that makes a configuration change visible at point of sale
 | 201 |  | Published |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | A publish is already in progress for this venue |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateBundle
 
@@ -698,6 +706,7 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 |---|---|---|
 | 200 |  | Updated |
 | 400 |  | The bundle's allocation is fixedAmount and the new price no longer equals the sum of the fixed amounts. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: capacity
@@ -761,6 +770,7 @@ Display only. A terminal shows this to a guest but does not decide a sale on it 
 |---|---|---|
 | 200 |  | Availability, one row per channel capacity, by performance start |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: catalogue
@@ -823,6 +833,7 @@ Repricing every adult admission before a season is routine and currently means o
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Impact, or the applied result |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### cloneProduct
 
@@ -924,6 +935,7 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Cloned as a draft |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### commitCatalogueImport
 
@@ -992,6 +1004,7 @@ Refuses a job whose `outcome` is `nothingFound` or `unreadable`. **A commit that
 |---|---|---|
 | 200 |  | Applied |
 | 409 |  | The job found nothing, or was already committed. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getMyMemberships
 
@@ -1026,6 +1039,7 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Memberships |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### joinWaitlist
 
@@ -1092,6 +1106,7 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 |---|---|---|
 | 201 |  | Joined |
 | 409 |  | The performance is not sold out (sold, held and leased units are below capacity, audit R101). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### leaveWaitlist
 
@@ -1122,6 +1137,7 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Left |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listGuestMemberships
 
@@ -1184,6 +1200,7 @@ Lapsed terms are included — **a guest who let a pass expire is the guest most 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Memberships, current first |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listProductCategories
 
@@ -1211,6 +1228,7 @@ Retail Board 2. **`listSeatCategories` existed and a product category did not** 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | The tree. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### searchCatalogue
 
@@ -1250,6 +1268,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 |---|---|---|
 | 200 |  | Results |
 | 400 |  | A guidedAnswerIds entry that is not an answer of the venue's published guided choice (W4, 29 September). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setCurrencyRoundingRule
 
@@ -1323,6 +1342,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 |---|---|---|
 | 200 |  | Saved |
 | 422 |  | precisionBelowDecimals. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setDynamicPriceRule
 
@@ -1436,6 +1456,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Replace a rule, its conditions and its actions |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setDynamicPricingGuardrailPolicy
 
@@ -1572,6 +1593,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 |---|---|---|
 | 200 |  | Saved (an automation raise is pending its approval) |
 | 422 |  | invalidRange or scopeIdRequired. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPriceCategoryRateType
 
@@ -1648,6 +1670,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | 200 |  | Saved |
 | 409 |  | inUse. |
 | 422 |  | invalidParent. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setProductCategories
 
@@ -1702,6 +1725,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | 400 |  | The body contains a cycle — a category that is its own ancestor — or a parentId that names no category in the body. |
 | 409 |  | The body leaves out a category that products name (send it with isActive false rather than deleting it), or a category code is already used in this tenant, in the body or by another venue's category… |
 | 422 |  | A category bookingFlowId that is not a booking flow of the venue (W12, 29 September). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: category
@@ -1787,6 +1811,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 |---|---|---|
 | 200 |  | Validate-only: the would-be result, nothing written |
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: coupon
@@ -1944,6 +1969,7 @@ Creates the coupon campaign (`promotions.coupon_campaign`). **Writes `promotions
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### generateCouponCodes
 
@@ -1996,6 +2022,7 @@ Up to fifty thousand at a time. Generation is asynchronous and the batch is expo
 |---|---|---|
 | 400 |  | More guests in assignToSubjectIds than quantity codes (audit R101) |
 | 202 |  | Generation queued |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getCouponCode
 
@@ -2069,6 +2096,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 |---|---|---|
 | 200 |  | Code state |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: drafted
@@ -2149,6 +2177,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Bulk Product Creation & Catalogue Import |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setBookingVelocityTime
 
@@ -2250,6 +2279,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Booking Velocity & Time-to-Event Rule Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setBundleComponent
 
@@ -2309,6 +2339,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Bundle Component Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setBundleDefinition
 
@@ -2385,6 +2416,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Bundle Definition & Setup |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setBuyGetBogo
 
@@ -2478,6 +2510,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Buy X Get Y / BOGO Rule Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setCampaignBudgetFinancial
 
@@ -2590,6 +2623,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Campaign Budget & Financial Limit Setup |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setCodeDistributionManager
 
@@ -2654,6 +2688,7 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Code Distribution & Assignment Manager |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setCouponPromoCode
 
@@ -2725,6 +2760,7 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Coupon & Promo Code Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setCrossCategoryPromotion
 
@@ -2790,6 +2826,7 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Cross-Category Promotion Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setDemandOccupancyAvailability
 
@@ -2871,6 +2908,7 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Demand, Occupancy & Availability Rule Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setEligibilityRule
 
@@ -2957,6 +2995,7 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Eligibility Rule Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFixedPriceOffer
 
@@ -3026,6 +3065,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Fixed-Price & “N for X” Offer Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setGiftFreeProduct
 
@@ -3101,6 +3141,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Gift, Free Product & Added-Value Offer Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setGuestChoiceBuild
 
@@ -3168,6 +3209,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Guest Choice & Build-Your-Own Bundle Designer |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPriceHierarchyInheritance
 
@@ -3238,6 +3280,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Price Hierarchy & Inheritance Configuration |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPriceListMaster
 
@@ -3330,6 +3373,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Price List Master Configuration |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPromotionRule
 
@@ -3428,6 +3472,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Promotion Rule Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setRateStructure
 
@@ -3512,6 +3557,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Rate Structure Builder |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setRulePriorityConflict
 
@@ -3646,6 +3692,7 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 | 200 |  | Validated, tested or saved |
 | 409 |  | save while a critical conflict is open (criticalConflictOpen); the conflicts are named in the problem. |
 | 422 |  | test without a testScenario (testScenarioRequired), or orderedRuleIds naming a rule that does not exist or is archived (unknownRule). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: entitlement
@@ -3788,6 +3835,7 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: evaluation
@@ -3885,6 +3933,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 |---|---|---|
 | 200 |  | Evaluation |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: event
@@ -3939,6 +3988,61 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 |---|---|---|
 | 201 |  | Created |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### enterWaitingRoom
+
+**`POST /performances/{performanceId}/waiting-room/entries`**: Join the on-sale waiting room for a performance
+
+**Arrival costs a Redis increment and nothing else** (ADR-0066, accepted 1 October). The guest gets a position from the performance's counter in Azure Managed Redis (ADR-0032's product amendment) and an entry id to poll with. **No database write, no session, no personal data**: the guest may not be signed in yet, and the waiting page is static and branded, served from Front Door's cache.
+
+When the performance's room is off, the answer is `state: notRequired` and the guest goes straight to the sale. A second call with the same `Idempotency-Key` returns the same entry, so a refresh does not send the guest to the back.
+
+**Not `queue.joinQueue`.** That is the ride queue (Q1) and writes `queue.entry` per guest; the waiting parts of WEB-015 and GST-046 move here (ADR-0066).
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | - |
+| Writes | - |
+| Called by | GST-046, WEB-015 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| performanceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Response**: `WaitingRoomEntry`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| waitingEntryId | string (uuid) | yes | A UUIDv7 minted on arrival; what the waiting page polls with. |
+| performanceId | string (uuid) | yes |  |
+| state | enum (notRequired, waiting, admitted, expired, closed) | yes | notRequired: the room is off, go to the sale. |
+| position | integer |  | Place in the room; null unless waiting. (min 1; nullable) |
+| aheadOfYou | integer |  | (min 0; nullable) |
+| estimatedWaitSeconds | integer |  | At the current release rate. (min 0; nullable) |
+| pollAfterSeconds | integer |  | (min 1; default 5) |
+| admission | object |  | Set when state is admitted. (nullable) |
+| admission.token | string | yes | The signed token, opaque to the client. |
+| admission.tokenId | string (uuid) |  | The token's unique id. |
+| admission.performanceId | string (uuid) | yes |  |
+| admission.expiresAt | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | In the room, with a position; or notRequired when the room is off |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getPerformance
 
@@ -3986,6 +4090,59 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 |---|---|---|
 | 200 |  | Performance |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getWaitingRoomPosition
+
+**`GET /performances/{performanceId}/waiting-room/entries/{waitingEntryId}`**: Where a waiting guest is, and the admission token once admitted
+
+**Polled by the waiting page, answered from the edge's cache** for a few seconds at a time (`pollAfterSeconds` says when to ask again). Reads the Redis counters only.
+
+**Admitted, it carries the admission token** (`WaitingRoomAdmission`): short-lived and signed, naming the tenant, the performance, its expiry and a unique id; the signing key is a Key Vault secret. The client sends it as `X-Admission-Token` on `orders.addCartLine`, which forwards it to `acquireInventoryHold`; both refuse a missing or invalid token `403 admission-required` for a performance whose room is on. The admitted answer is never cached at the edge.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | - |
+| Writes | - |
+| Called by | GST-046, WEB-015 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| performanceId | path | yes | string (uuid) |  |
+| waitingEntryId | path | yes | string (uuid) |  |
+
+**Response**: `WaitingRoomEntry`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| waitingEntryId | string (uuid) | yes | A UUIDv7 minted on arrival; what the waiting page polls with. |
+| performanceId | string (uuid) | yes |  |
+| state | enum (notRequired, waiting, admitted, expired, closed) | yes | notRequired: the room is off, go to the sale. |
+| position | integer |  | Place in the room; null unless waiting. (min 1; nullable) |
+| aheadOfYou | integer |  | (min 0; nullable) |
+| estimatedWaitSeconds | integer |  | At the current release rate. (min 0; nullable) |
+| pollAfterSeconds | integer |  | (min 1; default 5) |
+| admission | object |  | Set when state is admitted. (nullable) |
+| admission.token | string | yes | The signed token, opaque to the client. |
+| admission.tokenId | string (uuid) |  | The token's unique id. |
+| admission.performanceId | string (uuid) | yes |  |
+| admission.expiresAt | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The position, or the admission |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listEvents
 
@@ -4032,6 +4189,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Events |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listPerformances
 
@@ -4087,6 +4245,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Performances, by startsAt ascending with id as the tiebreak — the order a date-and-performance picker shows them in, and the key the cursor pages on. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateEvent
 
@@ -4137,6 +4296,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updatePerformance
 
@@ -4197,6 +4357,7 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | A timing change on a performance with sold tickets, or a status move the state model does not allow. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: events
@@ -4244,6 +4405,7 @@ Event board 1.3. **Most events are last year's event**, and the question is neve
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Cloned as a draft |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setEventLifecycleState
 
@@ -4284,6 +4446,7 @@ A change request above a configured impact routes through `approvals` — moving
 |---|---|---|
 | 200 |  | Moved |
 | 409 |  | Preconditions for the transition are not met; they are listed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: hold
@@ -4354,6 +4517,7 @@ Where seating rules apply, holding a seat may implicitly buffer its neighbours �
 | 201 |  | Held |
 | 409 |  | One or more seats are no longer available, or the selection breaks a seating rule. |
 | 422 |  | More seats than one booking may take: above VenueSettings.seating.maxSeatsPerGuestOrder on a guest channel (decided 29 September, rev 3 REV3-7), or above 10 per sale on a staff channel (audit R080 (c… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### extendSeatHold
 
@@ -4406,6 +4570,7 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 |---|---|---|
 | 200 |  | Extended |
 | 409 |  | Already expired, or VenueSettings.seating.seatHoldMaxExtensions is reached (proposed default 2, audit R094). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getSeatHold
 
@@ -4455,6 +4620,7 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 |---|---|---|
 | 200 |  | Hold |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### relinquishSeatHold
 
@@ -4492,6 +4658,7 @@ Releases buffered neighbours alongside the held seats.
 | 204 |  | Released |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The hold is no longer active (holdNotActive) - converted to an order, already released or expired. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: lease
@@ -4525,6 +4692,7 @@ A `venueEdge` workstation acquires through its edge node, which holds the venue 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| X-Admission-Token | header |  | string | The on-sale waiting room's admission token (ADR-0066, accepted 1 October). |
 
 **Request body**: `AcquireLeaseRequest`
 
@@ -4566,8 +4734,9 @@ A `venueEdge` workstation acquires through its edge node, which holds the venue 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Granted, wholly or partially. |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 403 |  | Not permitted at the requested scope (forbidden), or a cart hold for a performance whose waiting room is on without a valid admission token (admission-required, ADR-0066). |
 | 409 |  | No units remain, or the envelope is seated — seated inventory cannot be leased because a seat map is not a count. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listInventoryHolds
 
@@ -4629,6 +4798,7 @@ Back-office monitoring. Surfaces stranded leases — capacity held by a terminal
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Inventory holds |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### relinquishInventoryHold
 
@@ -4694,6 +4864,7 @@ Consumed units are reported and retained; the remainder returns to the pool imme
 | 400 |  | consumedUnits is more than grantedUnits, or less than the consumption already reported on this hold — units reported sold stay sold. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The hold is not active: it was already released, force-released or has expired, and its units are already back in the pool. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### renewInventoryHold
 
@@ -4758,6 +4929,7 @@ Reports consumption so far and extends the hold. A holder renews while the link 
 | 200 |  | Renewed |
 | 400 |  | consumedUnits is more than grantedUnits, or less than the consumption already reported on this hold. |
 | 409 |  | The hold is not active — it expired, or was released or force-released. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: pricing
@@ -4840,6 +5012,7 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Copied |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createPriceList
 
@@ -4920,6 +5093,7 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 | 200 |  | Validate-only: the would-be result, nothing written |
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPrices
 
@@ -4972,6 +5146,7 @@ Currency must match the region's currency and scale. A price in a currency the r
 |---|---|---|
 | 200 |  | Applied |
 | 400 |  | Currency or scale mismatch against the region |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updatePriceList
 
@@ -5048,6 +5223,7 @@ Currency must match the region's currency and scale. A price in a currency the r
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: product
@@ -5105,6 +5281,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Per-guest result |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGroupPackageDefinition
 
@@ -5152,6 +5329,7 @@ Checks a party's declared ages and heights against every product in the booking 
 |---|---|---|
 | 200 |  | The current setting |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getProduct
 
@@ -5242,6 +5420,7 @@ Checks a party's declared ages and heights against every product in the booking 
 |---|---|---|
 | 200 |  | Product |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getProductEligibilityRule
 
@@ -5296,6 +5475,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | 200 |  | The current setting |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listAlternativeCodes
 
@@ -5327,6 +5507,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Codes |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listGroupPackages
 
@@ -5378,6 +5559,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Packages |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listProductVariants
 
@@ -5427,6 +5609,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Variants |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listProducts
 
@@ -5533,6 +5716,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | 200 |  | Products |
 | 400 |  | A categoryId that names no category of the venue, or a guidedAnswerIds entry that is not an answer of the venue's published guided choice (W4, 29 September). |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### resolveProductByCode
 
@@ -5580,6 +5764,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 |---|---|---|
 | 200 |  | Resolved |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAlternativeCodes
 
@@ -5624,6 +5809,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | 200 |  | Set |
 | 400 |  | A variantId is not a variant of this product, or the body sends one code twice for the same partner. |
 | 409 |  | Code already mapped to a different product for that partner |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setGroupPackageDefinition
 
@@ -5691,6 +5877,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setProductEligibilityRule
 
@@ -5768,6 +5955,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateProduct
 
@@ -5893,6 +6081,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 422 |  | A media asset that is not ready or whose kind does not match, a consentQuestionIds entry that names no active consent question of the tenant, or requiresTimeWindow on a product whose variants carry n… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: promotion
@@ -5942,6 +6131,7 @@ Run before publishing. Reports promotions that overlap on product and period, an
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Analysis |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createCommercialCampaign
 
@@ -6019,6 +6209,7 @@ Creates the campaign header (`promotions.campaign`) without budget lines, so a p
 | 201 |  | Created, with an empty budgets array |
 | 400 |  | validTo at or before validFrom. |
 | 409 |  | code is already used by another campaign at the venue. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createPromotion
 
@@ -6202,6 +6393,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 |---|---|---|
 | 201 |  | Created in draft |
 | 400 |  | Conditions are unsatisfiable, or the discount exceeds the configured cap. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getPromotion
 
@@ -6233,6 +6425,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 |---|---|---|
 | 200 |  | Promotion. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getPromotionUsage
 
@@ -6292,6 +6485,7 @@ Also the enforcement surface for budget caps — a promotion may be configured t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Usage |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listPromotions
 
@@ -6335,6 +6529,7 @@ Also the enforcement surface for budget caps — a promotion may be configured t
 |---|---|---|
 | 200 |  | Promotions. |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishPromotion
 
@@ -6450,6 +6645,7 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 |---|---|---|
 | 200 |  | Published |
 | 409 |  | Conflict analysis failed. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateCommercialCampaign
 
@@ -6529,6 +6725,7 @@ Amends the campaign header (`promotions.campaign`): name, code, description, own
 | 400 |  | validTo at or before validFrom. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The new code is already used at the venue, or the new dates would leave a scheduled or live promotion, coupon campaign or active bundle of the campaign outside them. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updatePromotion
 
@@ -6698,6 +6895,7 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | Conditions or discount amended on a live promotion |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: promotions
@@ -6758,6 +6956,7 @@ BL-114. **Split by a stable hash of the subject, not at random per request** —
 |---|---|---|
 | 200 |  | Set. |
 | 400 |  | The variants' trafficPercent values do not sum to 100 (audit R101) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: recommendation
@@ -6824,6 +7023,7 @@ Returns contiguous groups where the party requires them — a family of four spl
 |---|---|---|
 | 200 |  | Recommendations, best first |
 | 404 |  | No selection satisfies the constraints |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 
@@ -7346,7 +7546,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | max_age_years | integer | no |  |
 | min_height_cm | integer | no |  |
 | max_height_cm | integer | no |  |
-| height_bands_cm | text[] | no | Band edges the guest chooses between, e.g. |
+| height_bands_cm | integer[] | no | Band edges the guest chooses between, e.g. |
 | accompanied_below_age | integer | no | Under this age an adult must be present, e.g. |
 | guardian_signature_age_from | integer | no |  |
 | guardian_signature_age_to | integer | no | Ages needing a guardian's signature, e.g. |
@@ -7850,7 +8050,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-354 operations, added to this service in later releases without changing any of the above.
+356 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -7863,7 +8063,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | coupon | `assignCoupon`, `getCouponCodeBatch`, `listCouponCampaigns`, `listCouponCodes`, `voidCouponCode` |
 | drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `createChannelProfile`, `createLiveDynamicPrice`, `decidePricingChangeRequest`, `decidePricingRecommendation`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listScheduledLifecycleActions`, `listSeasonalCalendarDay`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishChannelAvailability`, `publishChannelReadinessValidation`, `publishPricingEffectiveDate`, `setCatalogueReview`, `setChannelFeePayment`, `setChannelPricingCommercial`, `setDynamicPricingStrategy`, `setFeeApplicabilityCharging`, `setLifecycleStatuWorkflow`, `setPricing`, `setPricingChangeRequest`, `setPricingExperiment`, `setProductCatalogue`, `setProductContextOwnership`, `setProductServicePrice`, `setPromotionStackingRule`, `setRuleTestRecommendation`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation`, `submitPricingChangeRequest`, `testPricingRule` |
 | entitlement | `listEntitlementTemplates`, `suspendEntitlement` |
-| event | `cancelPerformance`, `createPerformances`, `getEvent` |
+| event | `cancelPerformance`, `createPerformances`, `getEvent`, `getWaitingRoomStatus`, `setWaitingRoomSetting` |
 | events | `assignPerformanceMedia`, `estimateEventResourceCost`, `getEventResourcePlan`, `listEventTypes`, `listPerformanceTemplates`, `listSpaces`, `rescheduleEvent`, `setEventCapacityProfile`, `setEventRegistration`, `setEventResourcePlan`, `setEventSchedule`, `setEventType`, `setPerformanceTemplate`, `setPrepaidMinutePackage`, `setSpace` |
 | import | `commitImportJob`, `getImportJob`, `importSeatGeometry`, `importSeatManifest` |
 | lease | `convertInventoryHold`, `forceReleaseInventoryHold` |

@@ -60,12 +60,12 @@
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-105 holds none of them, so the edge carries nothing and BO-079 opens cold"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-105 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-105 holds none of them, so the edge carries nothing and BO-080 opens cold"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-105 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
     },
     {
      "to": "BO-081",
@@ -86,17 +86,17 @@
     {
      "to": "BO-137",
      "trigger": "Recipe Consumption & Theoretical Inventory",
-     "provenance": "derived — BO-137 declares entryState.params countId, runId and BO-105 holds none of them, so the edge carries nothing and BO-137 opens cold"
+     "provenance": "derived — BO-137 declares entryState.params countId, runId and BO-105 holds none of them. The edge carries nothing: countId, runId only pre-select (deep link or optional), and BO-137 opens on its own"
     },
     {
      "to": "BO-138",
      "trigger": "Production Execution & Batch Management",
-     "provenance": "derived — BO-138 declares entryState.params runId and BO-105 holds none of them, so the edge carries nothing and BO-138 opens cold"
+     "provenance": "derived — BO-138 declares entryState.params runId and BO-105 holds none of them. The edge carries nothing: runId only pre-selects (deep link or optional), and BO-138 opens on its own"
     },
     {
      "to": "BO-139",
      "trigger": "Wastage, Spoilage, Returns & Write-Off",
-     "provenance": "derived — BO-139 declares entryState.params outletId and BO-105 holds none of them, so the edge carries nothing and BO-139 opens cold"
+     "provenance": "derived — BO-139 declares entryState.params outletId and BO-105 holds none of them. The edge carries nothing: outletId only pre-selects (deep link or optional), and BO-139 opens on its own"
     },
     {
      "to": "BO-140",
@@ -109,7 +109,7 @@
     {
      "to": "BO-141",
      "trigger": "Operational Alerts, AI Replenishment & Action Center",
-     "provenance": "derived — BO-141 declares entryState.params alertId and BO-105 holds none of them, so the edge carries nothing and BO-141 opens cold"
+     "provenance": "derived — BO-141 declares entryState.params alertId and BO-105 holds none of them. The edge carries nothing: alertId only pre-selects (deep link or optional), and BO-141 opens on its own"
     },
     {
      "to": "BO-051",
@@ -453,7 +453,7 @@
     {
      "to": "BO-105",
      "trigger": "Stock & Supply",
-     "provenance": "derived — BO-105 declares entryState.params  and BO-137 holds none of them, so the edge carries nothing and BO-105 opens cold"
+     "provenance": "derived — BO-105 declares entryState.params  and BO-137 holds none of them. The edge carries nothing: BO-137 is opened from BO-105, so this edge is the way back and BO-105 keeps its own state"
     }
    ]
   },
@@ -692,7 +692,7 @@
     {
      "to": "BO-105",
      "trigger": "Stock & Supply",
-     "provenance": "derived — BO-105 declares entryState.params  and BO-138 holds none of them, so the edge carries nothing and BO-105 opens cold"
+     "provenance": "derived — BO-105 declares entryState.params  and BO-138 holds none of them. The edge carries nothing: BO-138 is opened from BO-105, so this edge is the way back and BO-105 keeps its own state"
     }
    ]
   },
@@ -948,7 +948,7 @@
     {
      "to": "BO-105",
      "trigger": "Stock & Supply",
-     "provenance": "derived — BO-105 declares entryState.params  and BO-139 holds none of them, so the edge carries nothing and BO-105 opens cold"
+     "provenance": "derived — BO-105 declares entryState.params  and BO-139 holds none of them. The edge carries nothing: BO-139 is opened from BO-105, so this edge is the way back and BO-105 keeps its own state"
     }
    ]
   },
@@ -1111,7 +1111,7 @@
     {
      "to": "BO-105",
      "trigger": "Stock & Supply",
-     "provenance": "derived — BO-105 declares entryState.params  and BO-140 holds none of them, so the edge carries nothing and BO-105 opens cold"
+     "provenance": "derived — BO-105 declares entryState.params  and BO-140 holds none of them. The edge carries nothing: BO-140 is opened from BO-105, so this edge is the way back and BO-105 keeps its own state"
     }
    ]
   },
@@ -1328,7 +1328,7 @@
     {
      "to": "BO-105",
      "trigger": "Stock & Supply",
-     "provenance": "derived — BO-105 declares entryState.params  and BO-141 holds none of them, so the edge carries nothing and BO-105 opens cold"
+     "provenance": "derived — BO-105 declares entryState.params  and BO-141 holds none of them. The edge carries nothing: BO-141 is opened from BO-105, so this edge is the way back and BO-105 keeps its own state"
     },
     {
      "to": "BO-464",

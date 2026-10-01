@@ -146,6 +146,8 @@ paths:
                 $ref: '#/components/schemas/TenantDomain'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTenantDomainMapping
       security:
@@ -194,6 +196,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /org-units:
     get:
       operationId: listOrgUnits
@@ -238,6 +242,8 @@ paths:
                         items: { $ref: '#/components/schemas/OrgUnit' }
         '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createOrgUnit
@@ -271,6 +277,8 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409': { $ref: '../shared/common.yaml#/components/responses/Conflict' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /audit-records:
     get:
@@ -362,6 +370,8 @@ paths:
                         items: { $ref: '#/components/schemas/AuditRecord' }
         '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /roles/{roleId}/permissions:
     parameters:
@@ -439,6 +449,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /workstations/{workstationId}/health:
     parameters:
@@ -493,6 +505,8 @@ paths:
                         detail: { type: string }
                         weight: { type: integer }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /configuration-profiles:
     get:
@@ -534,6 +548,8 @@ paths:
                         items: { $ref: '#/components/schemas/ConfigurationProfile' }
         '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     put:
       operationId: setConfigurationProfile
@@ -596,6 +612,8 @@ paths:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /configuration-profiles/{profileId}:
     parameters:
@@ -629,6 +647,8 @@ paths:
               schema: { $ref: '#/components/schemas/ConfigurationProfile' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /profile-deployments:
     get:
@@ -669,6 +689,8 @@ paths:
                         items: { $ref: '#/components/schemas/ProfileDeployment' }
         '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /configuration-profiles/{profileId}/deploy:
     parameters:
@@ -733,6 +755,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /offline-policy:
     get:
@@ -768,6 +792,8 @@ paths:
               schema: { $ref: '#/components/schemas/OfflinePolicy' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     put:
       operationId: setOfflinePolicy
@@ -831,6 +857,8 @@ paths:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /connectivity-policy:
     get:
@@ -861,6 +889,8 @@ paths:
               schema: { $ref: '#/components/schemas/ConnectivityPolicy' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     put:
       operationId: setConnectivityThresholds
@@ -916,6 +946,8 @@ paths:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venues/{venueId}/settings:
     parameters:
@@ -976,6 +1008,8 @@ paths:
               schema: { $ref: '#/components/schemas/VenueSettings' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setVenueSettings
       x-ticvai-consumed-by:
@@ -1045,6 +1079,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /venue-settings-defaults:
     get:
@@ -1074,6 +1110,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/VenueSettings' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setVenueSettingsDefaults
       x-ticvai-consumed-by:
@@ -1111,6 +1149,8 @@ paths:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /org-units/{orgUnitId}:
     parameters:
@@ -1139,6 +1179,8 @@ paths:
               schema: { $ref: '#/components/schemas/OrgUnit' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateOrgUnit
       x-ticvai-consumed-by:
@@ -1182,6 +1224,8 @@ paths:
           # `createOrgUnit` does. `platform.scope` has no row version, so the conflict here is
           # the idempotency one only: a reused key with a different body.
           $ref: '../shared/common.yaml#/components/responses/Conflict'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /regions/{regionId}/settings:
     parameters:
@@ -1213,6 +1257,8 @@ paths:
               schema: { $ref: '#/components/schemas/RegionSettings' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: updateRegionSettings
       x-ticvai-consumed-by:
@@ -1261,6 +1307,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /workstations:
     get:
@@ -1305,6 +1353,8 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/Workstation' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /workstations/{workstationId}:
     parameters:
@@ -1344,6 +1394,8 @@ paths:
               schema: { $ref: '#/components/schemas/Workstation' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: configureWorkstation
       x-ticvai-consumed-by:
@@ -1393,6 +1445,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /outlets:
     get:
@@ -1435,6 +1489,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/Outlet' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createOutlet
@@ -1469,6 +1525,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /outlets/{outletId}:
     parameters:
@@ -1498,6 +1556,8 @@ paths:
               schema: { $ref: '#/components/schemas/Outlet' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateOutlet
       x-ticvai-consumed-by:
@@ -1539,6 +1599,8 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /sale-boards:
     get:
@@ -1579,6 +1641,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/SaleBoard' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createSaleBoard
@@ -1617,6 +1681,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /sale-boards/{saleBoardId}:
     parameters:
@@ -1672,6 +1738,8 @@ paths:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /devices:
     get:
@@ -1692,13 +1760,12 @@ paths:
         bound to no workstation. Distinct from Device Management, which covers the full estate
         lifecycle — this is the binding a workstation needs at boot.
 
-        **`platform.device` is the device register of record** (decided 29 September, build pass).
-        Every device's identity, enrolment, credential, firmware and push registration lives here,
-        whatever else refers to it. `access.access_device` (access `registerAccessDevice`) is the
-        access topology's placement of an access-control device — gate, lane, hardware model,
-        network references — and holds a second copy of serial, versions, health and lifecycle.
-        That duplication is known and recorded, not merged yet; where the two disagree, this
-        register wins.
+        **`platform.device` is the only device register** (ADR-0067, accepted 1 October). Every
+        device's identity (kind, hardware type, model, serial), every version (firmware,
+        configuration, rule package, credential package), health, heartbeat and its one lifecycle
+        live here, whatever else refers to it, POS printers and turnstiles alike. Access keeps only
+        where an access-control device is placed (`access.device_placement`, access
+        `placeAccessDevice`), and reads the device through this contract, never with its own SQL.
 
         **`pushToken` is never in a row** (pull audit R164). It is `writeOnly`: a push token is a
         credential, and a list at venue level is not where a credential is read back.
@@ -1729,6 +1796,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/RegisteredDevice' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: registerDevice
@@ -1736,6 +1805,7 @@ paths:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P08 BO-194 Device & Gate Command Center"
+        - "P08 BO-196 Physical Device Registration & Provisioning"
         - "P08 BO-405 Reader Directory"
       x-ticvai-audience: [staff]
       summary: Register a device
@@ -1777,7 +1847,9 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
-          description: Identifier already bound to another workstation
+          description: >
+            Identifier already bound to another workstation, or `serialNumber` already registered in
+            the tenant (`duplicate-serial`, moved here from access with the register, ADR-0067).
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1788,6 +1860,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /devices/{deviceId}:
     parameters:
@@ -1817,6 +1891,8 @@ paths:
               schema: { $ref: '#/components/schemas/RegisteredDevice' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /devices/{deviceId}/heartbeat:
     parameters:
@@ -1862,9 +1938,19 @@ paths:
               properties:
                 status:
                   type: string
-                  enum: [online, offline, error, consumableLow, needsAttention]
+                  enum: [online, offline, error, consumableLow, needsAttention, localMode]
+                  description: >
+                    `localMode`: an access-control device validating from its offline package with its
+                    link to the platform down (ADR-0067; was access's device status).
                 detail: { type: string, maxLength: 500 }
                 firmwareVersion: { type: string }
+                configurationVersion: { type: string, description: 'Access configuration the device runs (ADR-0067).' }
+                localRuleVersion: { type: string, description: 'Admission rule package the device runs (ADR-0067).' }
+                credentialSecurityPackageVersion: { type: string, description: 'Credential security package the device runs (ADR-0067).' }
+                scannerHealth: { type: string, maxLength: 100 }
+                controllerHealth: { type: string, maxLength: 100 }
+                cameraHealth: { type: string, maxLength: 100 }
+                connectivity: { type: string, maxLength: 100 }
                 recordedAt: { type: string, format: date-time }
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -1874,6 +1960,8 @@ paths:
           headers:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /devices/{deviceId}/enrolment:
     parameters:
     - name: deviceId
@@ -1934,6 +2022,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /devices/{deviceId}/assignment:
     parameters:
     - name: deviceId
@@ -1991,6 +2081,8 @@ paths:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /devices/{deviceId}/telemetry:
     parameters:
     - name: deviceId
@@ -2048,6 +2140,8 @@ paths:
                   $ref: '#/components/schemas/DeviceTelemetryPoint'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /device-firmware:
     get:
       operationId: listDeviceFirmware
@@ -2085,6 +2179,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceFirmware'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createDeviceFirmware
       x-ticvai-consumed-by:
@@ -2143,6 +2239,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /device-firmware/{firmwareId}:
     parameters:
     - name: firmwareId
@@ -2181,6 +2279,8 @@ paths:
                 $ref: '#/components/schemas/DeviceFirmware'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /device-firmware/{firmwareId}/status:
     parameters:
     - name: firmwareId
@@ -2261,6 +2361,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /device-firmware/rollouts:
     post:
       operationId: startDeviceFirmwareRollout
@@ -2314,6 +2416,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /device-firmware/rollouts/{rolloutId}/rollback:
     parameters:
     - name: rolloutId
@@ -2382,6 +2486,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /devices/{deviceId}/credentials:
     parameters:
     - name: deviceId
@@ -2438,6 +2544,8 @@ paths:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: revokeDeviceCredential
       x-ticvai-consumed-by:
@@ -2465,6 +2573,8 @@ paths:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /devices/{deviceId}/audit:
     parameters:
     - name: deviceId
@@ -2519,6 +2629,8 @@ paths:
                   $ref: '#/components/schemas/DeviceAuditRecord'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /device-tamper-events:
     get:
       operationId: listDeviceTamperEvents
@@ -2551,6 +2663,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceTamperEvent'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: recordDeviceTamperEvent
       x-ticvai-conflict-policy: append
@@ -2580,6 +2694,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /data-retention-settings:
     get:
@@ -2635,6 +2751,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/TenantDataRetentionSetting'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /data-retention-settings/{dataClass}:
     parameters:
     - name: dataClass
@@ -2721,6 +2839,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cells/{cellId}/endpoints:
     get:
       operationId: listCellEndpoints
@@ -2755,6 +2875,8 @@ paths:
                   $ref: '#/components/schemas/PlatformCellEndpoint'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   # **Server-owned fields are `readOnly`, secrets are `writeOnly`** (pull audit R079, R164).
   # createOutlet, createSaleBoard, updateSaleBoard, registerDevice, deployConfigurationProfile,
@@ -3845,11 +3967,14 @@ components:
       x-ticvai-persistence: "platform.device"
       type: object
       description: >
-        **The device register of record** (decided 29 September, build pass). Identity, enrolment,
-        credential, firmware and push registration for every device in the estate live on this row.
-        `access.access_device` places access-control devices in the gate topology and repeats
-        serial, versions, health and lifecycle; the two are not merged yet, and where they disagree
-        this row wins.
+        **The only device register** (ADR-0067, accepted 1 October; the register of record since
+        29 September). Identity (kind, hardware type, model, serial), every version (firmware,
+        configuration, rule package, credential package), health, heartbeat and one lifecycle
+        (`enrolmentState`: registered, enrolled, provisioned, active, deactivated, retired) for every
+        device in the estate live on this row. The access-control device row, which repeated serial,
+        versions, health and lifecycle, is now `access.device_placement` and holds only where an
+        access-control device is placed. Tenancy owns and migrates this table; Access reads it only
+        through this contract.
       required: [id, kind, driver]
       properties:
         id: { type: string, format: uuid, readOnly: true }
@@ -3866,8 +3991,69 @@ components:
           nullable: true
           description: >
             Required for every kind except `mobileHandset`, which is bound to no workstation
-            (18.1.5, 29 September); `registerDevice` refuses either mistake with `422`.
+            (18.1.5, 29 September), and except an access-control device (one with a `hardwareType`),
+            which is placed in the gate topology by access `placeAccessDevice` rather than bound to a
+            workstation (ADR-0067); `registerDevice` refuses either mistake with `422`.
         model: { type: string, nullable: true }
+        hardwareType:
+          $ref: '../shared/common.yaml#/components/schemas/DeviceHardwareType'
+          nullable: true
+          description: >
+            **The specific hardware under `kind`** (ADR-0067, 1 October): Access's hardware types (a
+            speed gate, a tripod turnstile, a podium) merged into the one register. Null for a device
+            with no finer type than its kind.
+        hardwareModelId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The model in the hardware library (access `setHardwareModel`; ADR-0067). Access owns the
+            library; this names a model in it.
+        serialNumber:
+          type: string
+          nullable: true
+          maxLength: 100
+          description: >
+            The manufacturer's serial (ADR-0067: was on the access-control device row, now `access.device_placement`). A serial already
+            registered in the tenant is refused `409` by `registerDevice`.
+        ipNetworkReference:
+          type: string
+          nullable: true
+          description: Network address or reference the device is reached at (ADR-0067).
+        configurationVersion:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Access configuration version the device reports running (ADR-0067).
+        localRuleVersion:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Admission rule package the device reports running (ADR-0067).
+        credentialSecurityPackageVersion:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Credential security package the device reports running (ADR-0067).
+        scannerHealth:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Component health as the device or vendor reports it on its heartbeat (ADR-0067).
+        controllerHealth:
+          type: string
+          nullable: true
+          readOnly: true
+        cameraHealth:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Where the device has a camera.
+        connectivity:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Reported connectivity.
         pushToken:
           type: string
           format: password
@@ -3915,8 +4101,10 @@ components:
         status:
           type: string
           readOnly: true
-          enum: [online, offline, error, consumableLow, needsAttention, unknown]
-          description: What the device last said on its heartbeat; `unknown` until it has.
+          enum: [online, offline, error, consumableLow, needsAttention, localMode, unknown]
+          description: >
+            What the device last said on its heartbeat; `unknown` until it has. `localMode` is an
+            access-control device validating from its offline package with its link down (ADR-0067).
         batteryPercent:
           type: integer
           nullable: true
@@ -4054,8 +4242,18 @@ components:
         venue chooses to use it, the result is **advisory to the steward and never decisive at
         the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package
         deviates deliberately and CF-130 records why.
+
+        **Access's capabilities merged in** (ADR-0067, 1 October): `dynamicQr`, `rfid`, `nfc`,
+        `facePass`, `offline` and `heightCheck` were the access register's own list, from the
+        compatibility matrix.
       enum:
       - genderClassification
+      - dynamicQr
+      - rfid
+      - nfc
+      - facePass
+      - offline
+      - heightCheck
 
     ScopeLevel:
       type: string
@@ -4797,9 +4995,17 @@ components:
         - scale
         - camera
         - mobileHandset
+        - handheldScanner
+        - accessPodium
+        - bleBeacon
       description: >
         `mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app,
         registered for push and bound to no workstation.
+
+        **One kind vocabulary for every device** (ADR-0067, 1 October). `handheldScanner`,
+        `accessPodium` and `bleBeacon` came from Access's register; the finer hardware type
+        (a speed gate under `turnstileController`, a tablet under `handheldScanner`) is
+        `RegisteredDevice.hardwareType` (common `DeviceHardwareType`).
 
     DeviceBinding:
       x-ticvai-persistence: "platform.device"

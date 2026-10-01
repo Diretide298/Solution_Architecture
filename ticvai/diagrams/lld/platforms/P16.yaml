@@ -1274,7 +1274,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listAccessPolicies
+  - listAuthorisationPolicies
   states:
   - emptyFirstRun
   - emptyNoAccess

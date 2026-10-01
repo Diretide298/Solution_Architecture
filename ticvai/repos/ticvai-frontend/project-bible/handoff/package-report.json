@@ -1,20 +1,20 @@
 {
- "generated": "2026-09-30",
+ "generated": "2026-10-01",
  "note": "The package measured in one pass. Derived by tools/build-package-report.py from the files the refresh writes -- never from prose.",
  "counts": {
-  "operations": 2660,
+  "operations": 2668,
   "contracts": 33,
-  "tables": 1093,
+  "tables": 1095,
   "stores": 10,
   "foreignKeys": 796,
-  "indexes": 2824,
-  "tablesWritten": 1091,
-  "relationships": 3033,
+  "indexes": 2825,
+  "tablesWritten": 1093,
+  "relationships": 3048,
   "states": 206,
   "events": 77,
   "flows": 97,
   "flowsDerived": 192,
-  "adrs": 57,
+  "adrs": 69,
   "screens": 2445,
   "platforms": 16,
   "frontends": 13,
@@ -38,29 +38,29 @@
   },
   {
    "link": "Operations declaring a service",
-   "done": 2660,
-   "total": 2660,
+   "done": 2668,
+   "total": 2668,
    "percent": 100,
    "note": "the operation is owned by one of the seventeen deployables"
   },
   {
    "link": "Operations declaring a permission",
-   "done": 2513,
-   "total": 2660,
+   "done": 2519,
+   "total": 2668,
    "percent": 94,
    "note": "the checklist a grant screen renders is built from these"
   },
   {
    "link": "Operations with resolved lineage",
-   "done": 2653,
-   "total": 2660,
+   "done": 2659,
+   "total": 2668,
    "percent": 100,
    "note": "names the tables it reads and writes -- the join the DDL cannot make itself"
   },
   {
    "link": "Operations reaching a screen",
-   "done": 2430,
-   "total": 2660,
+   "done": 2436,
+   "total": 2668,
    "percent": 91,
    "note": "sync, webhook and job operations legitimately have none"
   },
@@ -73,23 +73,23 @@
   },
   {
    "link": "Tables reached by an operation",
-   "done": 1089,
-   "total": 1093,
+   "done": 1091,
+   "total": 1095,
    "percent": 100,
    "note": "a table nothing reaches is a missing operation or a table that should not exist"
   },
   {
    "link": "Tables carrying a relationship",
-   "done": 1010,
-   "total": 1093,
+   "done": 1012,
+   "total": 1095,
    "percent": 92,
    "note": "either end of a declared reference"
   }
  ],
  "boundaries": {
-  "edgesTotal": 3033,
-  "insideOneService": 1839,
-  "crossingTwoServices": 1193,
+  "edgesTotal": 3048,
+  "insideOneService": 1840,
+  "crossingTwoServices": 1207,
   "endpointNotOwned": 1,
   "note": "A reference inside one service is a foreign key the database enforces. A reference across two is a distributed read somebody has to design.",
   "heaviest": [
@@ -101,17 +101,22 @@
    {
     "from": "AccessService",
     "to": "TenancyService",
-    "edges": 68
+    "edges": 76
    },
    {
     "from": "CatalogueService",
     "to": "TenancyService",
-    "edges": 66
+    "edges": 67
    },
    {
     "from": "OrderService",
     "to": "IdentityService",
     "edges": 57
+   },
+   {
+    "from": "CatalogueService",
+    "to": "IdentityService",
+    "edges": 47
    },
    {
     "from": "TenancyService",
@@ -120,11 +125,6 @@
    },
    {
     "from": "AiService",
-    "to": "IdentityService",
-    "edges": 46
-   },
-   {
-    "from": "CatalogueService",
     "to": "IdentityService",
     "edges": 46
    },
@@ -141,7 +141,7 @@
    {
     "from": "PlatformService",
     "to": "IdentityService",
-    "edges": 31
+    "edges": 32
    },
    {
     "from": "OrderService",
@@ -157,11 +157,11 @@
   "topTargets": [
    {
     "table": "identity.principal",
-    "edges": 336
+    "edges": 338
    },
    {
     "table": "platform.scope",
-    "edges": 180
+    "edges": 181
    },
    {
     "table": "pii.subject",
@@ -196,7 +196,7 @@
     "edges": 17
    }
   ],
-  "inTopThreeTargets": 608
+  "inTopThreeTargets": 611
  },
  "services": [
   {
@@ -204,11 +204,11 @@
    "tier": "commerce",
    "contracts": 3,
    "schemas": 4,
-   "operations": 445,
-   "tables": 134,
+   "operations": 449,
+   "tables": 135,
    "screens": 73,
-   "operationsOnAScreen": 431,
-   "edgesOut": 158,
+   "operationsOnAScreen": 433,
+   "edgesOut": 160,
    "edgesIn": 116
   },
   {
@@ -256,19 +256,19 @@
    "tables": 76,
    "screens": 29,
    "operationsOnAScreen": 240,
-   "edgesOut": 131,
-   "edgesIn": 19
+   "edgesOut": 139,
+   "edgesIn": 20
   },
   {
    "service": "PlatformService",
    "tier": "platform",
    "contracts": 3,
    "schemas": 2,
-   "operations": 212,
-   "tables": 103,
+   "operations": 216,
+   "tables": 104,
    "screens": 42,
-   "operationsOnAScreen": 191,
-   "edgesOut": 83,
+   "operationsOnAScreen": 195,
+   "edgesOut": 86,
    "edgesIn": 36
   },
   {
@@ -280,8 +280,8 @@
    "tables": 108,
    "screens": 71,
    "operationsOnAScreen": 181,
-   "edgesOut": 107,
-   "edgesIn": 342
+   "edgesOut": 108,
+   "edgesIn": 353
   },
   {
    "service": "AiService",
@@ -317,7 +317,7 @@
    "screens": 36,
    "operationsOnAScreen": 71,
    "edgesOut": 23,
-   "edgesIn": 441
+   "edgesIn": 443
   },
   {
    "service": "WhiteLabelService",
@@ -447,11 +447,11 @@
   },
   {
    "contract": "catalogue",
-   "operations": 237,
-   "onAScreen": 232,
-   "withLineage": 237,
-   "withPermission": 233,
-   "percentOnAScreen": 98
+   "operations": 241,
+   "onAScreen": 234,
+   "withLineage": 239,
+   "withPermission": 235,
+   "percentOnAScreen": 97
   },
   {
    "contract": "cross-region",
@@ -535,10 +535,10 @@
   },
   {
    "contract": "platform-ops",
-   "operations": 33,
-   "onAScreen": 32,
-   "withLineage": 33,
-   "withPermission": 33,
+   "operations": 37,
+   "onAScreen": 36,
+   "withLineage": 37,
+   "withPermission": 37,
    "percentOnAScreen": 97
   },
   {
@@ -679,7 +679,7 @@
    "operator": "guest",
    "screens": 50,
    "screensWithOperations": 50,
-   "distinctOperations": 214,
+   "distinctOperations": 216,
    "percentWithOperations": 100
   },
   {
@@ -690,7 +690,7 @@
    "operator": "guest",
    "screens": 77,
    "screensWithOperations": 76,
-   "distinctOperations": 217,
+   "distinctOperations": 219,
    "percentWithOperations": 99
   },
   {
@@ -756,7 +756,7 @@
    "operator": "ticvai",
    "screens": 676,
    "screensWithOperations": 675,
-   "distinctOperations": 718,
+   "distinctOperations": 722,
    "percentWithOperations": 100
   },
   {
@@ -854,9 +854,9 @@
   "requirementsGapContract": 0,
   "requirementsGapDecision": 0,
   "requirementsPartial": 12,
-  "operationsNoScreen": 230,
+  "operationsNoScreen": 232,
   "screensNoOperation": 7,
-  "operationsNoLineage": 7,
+  "operationsNoLineage": 9,
   "tablesNotReached": 4,
   "permissionsWithoutLabel": 70,
   "capabilityPairs": 274,

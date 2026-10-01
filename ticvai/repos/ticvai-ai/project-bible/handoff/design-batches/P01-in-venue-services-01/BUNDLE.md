@@ -456,11 +456,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-036",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "Header 'At the venue' → 'Order food'; also Saffron Table → 'Takeaway — collect' / 'Delivery' flows",
+    "view": "Summit Peaks → header 'At the venue' → Order food (table ordering)",
     "differences": "Prototype splits in-venue table ordering (At the venue) from takeaway/delivery ordering (a booking flow with a delivery-area and slot check). Table reservation and waitlist (in YAML apis) are booking flows at Saffron Table."
    }
   },
@@ -1245,12 +1245,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-039",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "At the venue → 'Map & waits'",
-    "differences": "Prototype adds turn-by-turn walking directions and navigation mode."
+    "view": "Summit Peaks → header 'At the venue' → Map & waits (3D view, with the 2D plan one tap away)",
+    "differences": "Prototype adds turn-by-turn walking directions and navigation mode. The map has a 3D view / 2D plan switch (\"Same plan, drawn two ways\"); no map3dUnavailable or weakGps state is drawn."
    },
    "derivedFrom": "wireframes/reference/Seat Board 3.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
@@ -1468,11 +1468,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-040",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "At the venue → 'Virtual queue'"
+    "view": "Summit Peaks → header 'At the venue' → Virtual queue"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -1766,11 +1766,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-041",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build)",
+    "verified": "2026-10-01",
     "match": "partial",
-    "view": "At the venue → 'Parking'",
+    "view": "Summit Peaks → header 'At the venue' → Parking",
     "differences": "Shows live free-bay counts, which the YAML says it does not have (no live availability; full = soldOutForDay). Pays directly with 'Reserve and pay' rather than through cart and checkout (R166). Also a plate field in the cabana/party flows."
    }
   },
@@ -1867,6 +1867,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

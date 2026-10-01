@@ -113,12 +113,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-022 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-022 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-022 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-022 holds none of them. The edge carries nothing: ADM-022 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },
@@ -462,12 +462,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-023 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-023 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-023 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-023 holds none of them. The edge carries nothing: ADM-023 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     },
     {
      "to": "ADM-029",
@@ -811,12 +811,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-024 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-024 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-024 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-024 holds none of them. The edge carries nothing: ADM-024 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },
@@ -1051,12 +1051,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-025 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-025 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-025 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-025 holds none of them. The edge carries nothing: ADM-025 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },
@@ -1241,12 +1241,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-026 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-026 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-026 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-026 holds none of them. The edge carries nothing: ADM-026 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },
@@ -1496,12 +1496,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-027 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-027 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-027 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-027 holds none of them. The edge carries nothing: ADM-027 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },
@@ -1821,12 +1821,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-028 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-028 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-028 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-028 holds none of them. The edge carries nothing: ADM-028 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },

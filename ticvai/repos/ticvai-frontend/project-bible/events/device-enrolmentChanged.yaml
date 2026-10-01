@@ -32,13 +32,13 @@ consumers:
   idempotencyKey: deviceId + changedAt
   onFailure: retryThenDeadLetter
   isCritical: false
-- context: access
-  purpose: Keep access.access_device's lifecycle in step with the register of record (platform.device), so a retired
-    device is refused at the gate whatever its topology row says
-  idempotencyKey: deviceId + changedAt
-  onFailure: retryThenDeadLetter
-  isCritical: true
 retention: 1 year after publication
-notes: '**Added 29 September (build pass, group RD).** No state model emits this yet: `enrolmentState` has no state model (check-states warns on
+notes: '**The access consumer is gone** (ADR-0067, accepted 1 October): there is one device register, so there is
+  nothing to keep in step, and Access reads a device''s lifecycle from tenancy when it places it or admits through
+  it. The event stays for the webhook subscribers (16.9.56); ADR-0067''s action item says to drop it, and that is a
+  person''s call while the public API offers it.
+
+
+  **Added 29 September (build pass, group RD).** No state model emits this yet: `enrolmentState` has no state model (check-states warns on
   `tenancy.DeviceEnrolment.state`), so the emit sits on `enrolDevice`. The access consumer is the interim answer to the
   duplicated device register listed in RD.json `open`.'

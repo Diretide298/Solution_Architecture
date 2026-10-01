@@ -25,7 +25,7 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-061 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-061 holds none of them. The edge carries nothing: GST-061 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     }
    ]
   },
@@ -241,12 +241,12 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-062 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-062 holds none of them. The edge carries nothing: GST-062 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-061",
      "trigger": "Menu Item Detail",
-     "provenance": "derived — GST-061 declares entryState.params outletId and GST-062 holds none of them, so the edge carries nothing and GST-061 opens cold"
+     "provenance": "derived — GST-061 declares entryState.params outletId and GST-062 holds none of them. The edge carries nothing: outletId only pre-selects (deep link or optional), and GST-061 opens on its own"
     },
     {
      "to": "KSK-017",

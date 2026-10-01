@@ -1,267 +1,93 @@
 {
- "JoinQueueRequest": {
-  "x-ticvai-persistence": "none — request only",
+ "WaitingRoomAdmission": {
   "type": "object",
+  "x-ticvai-persistence": "none — transient, a signed token that is checked and never stored",
+  "description": "**The admission token** (ADR-0066). Signed with a Key Vault secret; carries the tenant, the performance, the expiry and a unique id, so it cannot be moved to another performance or replayed after it expires. Sent as `X-Admission-Token` (shared parameter `AdmissionToken`).",
   "required": [
-   "id",
-   "queueId",
-   "partySize",
-   "recordedAt"
+   "token",
+   "performanceId",
+   "expiresAt"
   ],
   "properties": {
-   "id": {
+   "token": {
+    "type": "string",
+    "description": "The signed token, opaque to the client."
+   },
+   "tokenId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The token's unique id."
+   },
+   "performanceId": {
     "type": "string",
     "format": "uuid"
    },
-   "queueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "partySize": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "entitlementId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Fast Pass or priority entitlement. Owned by Product & Entitlement — this contract references it and never defines it.\n"
-   },
-   "partyHeightsCm": {
-    "type": "array",
-    "description": "Where the queue has a height requirement. Refusing here is far better than refusing at the ride, in front of a child who has already waited.\n",
-    "items": {
-     "type": "integer"
-    }
-   },
-   "accessibilityNeedDeclared": {
-    "type": "boolean",
-    "default": false,
-    "description": "The party declares an accessibility need (5.6.7; decided 29 September, build pass). Grants priority only on a lane whose `QueueFastPass.accessibilityPriority` is on, and is recorded on the entry either way.\n"
-   },
-   "promotionCode": {
-    "type": "string",
-    "maxLength": 64,
-    "nullable": true,
-    "description": "A promotion code the guest holds, checked against the lane's `QueueFastPass.promotionIds` (5.6.34). A code for a promotion the lane does not list grants nothing and is not an error.\n"
-   },
-   "recordedAt": {
+   "expiresAt": {
     "type": "string",
     "format": "date-time"
    }
   }
  },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
+ "WaitingRoomEntry": {
   "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
- "QueueEntryStatus": {
-  "type": "string",
-  "enum": [
-   "waiting",
-   "called",
-   "redeemed",
-   "expired",
-   "noShow",
-   "cancelled",
-   "released"
-  ]
- },
- "QueueStatus": {
-  "type": "string",
-  "enum": [
-   "open",
-   "paused",
-   "closed",
-   "atCapacity"
-  ]
- },
- "WaitTime": {
-  "x-ticvai-persistence": "none — computed from readings and throughput",
-  "type": "object",
+  "x-ticvai-persistence": "none — transient, held in the room's Redis counters and never in a table",
+  "description": "One guest's place in a performance's waiting room (ADR-0066). No personal data.",
   "required": [
-   "queueId",
-   "waitMinutes",
-   "source",
-   "asOf",
-   "isStale"
+   "waitingEntryId",
+   "performanceId",
+   "state"
   ],
   "properties": {
-   "queueId": {
+   "waitingEntryId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A UUIDv7 minted on arrival; what the waiting page polls with."
+   },
+   "performanceId": {
     "type": "string",
     "format": "uuid"
    },
-   "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "attractionProductId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "attractionCategoryId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. Read from catalogue, not stored here.\n"
-   },
-   "status": {
-    "$ref": "#/components/schemas/QueueStatus"
-   },
-   "waitMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "description": "Null where the queue is closed or no estimate is available."
-   },
-   "source": {
-    "$ref": "#/components/schemas/WaitTimeSource"
-   },
-   "isStale": {
-    "type": "boolean",
-    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current, and it is not hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with its `asOf` and a stale marker.\n"
-   },
-   "heightRequirementCm": {
-    "type": "integer",
-    "nullable": true
-   },
-   "zone": {
-    "type": "string",
-    "nullable": true
-   },
-   "asOf": {
-    "type": "string",
-    "format": "date-time",
-    "description": "When the figure was produced — the queue's `waitTimeAsOf`."
-   }
-  }
- },
- "WaitTimeSource": {
-  "type": "string",
-  "description": "Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed.\n",
-  "enum": [
-   "sensor",
-   "throughput",
-   "manual",
-   "unavailable"
-  ]
- },
- "WaitingGuest": {
-  "x-ticvai-persistence": "queue.entry",
-  "type": "object",
-  "required": [
-   "id",
-   "queueId",
-   "partyNumber",
-   "partySize",
-   "status",
-   "joinedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
-   },
-   "queueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "partyNumber": {
-    "type": "integer",
-    "description": "What the guest sees and what appears on signage."
-   },
-   "partySize": {
-    "type": "integer"
-   },
-   "status": {
-    "$ref": "#/components/schemas/QueueEntryStatus"
-   },
-   "positionInQueue": {
-    "type": "integer",
-    "nullable": true
-   },
-   "partiesAhead": {
-    "type": "integer",
-    "nullable": true
-   },
-   "estimatedCallAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "isFastPass": {
-    "type": "boolean"
-   },
-   "priorityBasis": {
+   "state": {
     "type": "string",
     "enum": [
-     "none",
-     "entitlement",
-     "loyaltyTier",
-     "promotion",
-     "accessibility"
+     "notRequired",
+     "waiting",
+     "admitted",
+     "expired",
+     "closed"
     ],
-    "default": "none",
-    "description": "Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first `QueueFastPass` criterion met at join, in the order entitlement, loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not `none`. Kept on the entry so a disputed priority can be explained afterwards.\n"
+    "description": "`notRequired`: the room is off, go to the sale. `waiting`: keep polling. `admitted`: `admission` is set. `expired`: the admission was not used in time; enter again. `closed`: the room was switched off or the performance stopped selling."
    },
-   "priorityTierId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`."
-   },
-   "priorityPromotionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The promotion that granted priority, where `priorityBasis` is `promotion`."
-   },
-   "accessibilityNeedDeclared": {
-    "type": "boolean",
-    "default": false,
-    "description": "What the party declared at join, shown to the operator at the front."
-   },
-   "entitlementId": {
-    "type": "string",
-    "nullable": true
-   },
-   "calledAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "returnWindowEndsAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "redeemedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "admittedCount": {
+   "position": {
     "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Place in the room; null unless `waiting`."
+   },
+   "aheadOfYou": {
+    "type": "integer",
+    "minimum": 0,
     "nullable": true
    },
-   "joinedAt": {
-    "type": "string",
-    "format": "date-time"
+   "estimatedWaitSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "At the current release rate. An estimate, and the page says so."
    },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
+   "pollAfterSeconds": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 5
+   },
+   "admission": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WaitingRoomAdmission"
+     }
+    ],
+    "nullable": true,
+    "description": "Set when `state` is `admitted`."
    }
   }
  }

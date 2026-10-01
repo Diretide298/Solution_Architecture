@@ -50,7 +50,7 @@ decision below keeps both as separate deployables.
 | `access` | Access | 15.3% | Gate hot path, flat high rate, offline package. The same module code builds the venue edge node |
 | `operations` | F&B, Retail, Inventory, VenueOps, Marketing, WhiteLabel, Reporting, Platform (subscription, platform-ops, public-api), CrossRegion | 34.6% | Back office and engagement. Nothing that takes money waits on it |
 | `ticvai-ai` | AI (Python) | 1.1% | ADR-0020. Unchanged, three process groups |
-| `workers` | Outbox relay (ADR-0058), event consumers for every module, scheduled jobs | — | Background work scales on queue depth, not on requests |
+| `workers` | Outbox relay (ADR-0058, amended 1 October), event consumers for every module, scheduled jobs | — | Background work scales on queue depth, not on requests |
 
 **The ownership rule is rewritten so that it is true and testable.**
 
@@ -90,7 +90,7 @@ diverges from its host. Marketing is the first candidate, as ADR-0028 already sa
 | Dimension | Assessment |
 |---|---|
 | Complexity | Medium. One solution, five hosts, boundaries kept by tests |
-| Cost | About 12 replicas at the floor instead of 34 (ADR-0061, still a proposed draft) |
+| Cost | About 12 replicas at the floor instead of 34 (ADR-0061, accepted 1 October) |
 | Scalability | Per deployable. Access and AI still scale apart. A module can be split out later |
 | Team familiarity | High. It is what the starter repository already is |
 | Time to Block A | Fastest. Order, payment and ledger in one transaction. Five rollouts |
@@ -134,7 +134,7 @@ load). It should not share a process with Marketing sends.
 
 - Checkout commits order, payment and ledger in one transaction (SD-026 becomes smaller).
 - Five rollouts per sprint, not 17. One CI pipeline, five images.
-- The floor drops from 34 replicas to about 12 (ADR-0061, still a proposed draft, sets the exact floors).
+- The floor drops from 34 replicas to about 12 (ADR-0061, accepted 1 October, sets the exact floors).
 - The shared kernel (tenant resolution, scope, idempotency, outbox) is built once.
 
 **Harder**

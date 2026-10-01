@@ -9,12 +9,12 @@
 | Contracts | 32 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 186 |
+| Operations with no screen | 188 |
 | Waves | wave1 60 · wave2 86 · wave3 1040 |
 
 ## Gaps
 
-### 186 operations with no screen here
+### 188 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -42,8 +42,10 @@
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
 | `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
+| `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
+| `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
@@ -58,9 +60,7 @@
 | `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
 | `listIngredientSubstitutes` | fnb | GET | Approved substitutions for a recipe's ingredients |
 | `listMenuSchedules` | fnb | GET | What is scheduled to go live, and when |
-| `listMenuVersions` | fnb | GET | Every published version of a menu |
-| `listTemperatureCheckpoints` | fnb | GET | The units that get read, and the range each must hold |
-| … | | | 146 more |
+| … | | | 148 more |
 
 ### 8 modules split across waves
 
@@ -483,7 +483,7 @@
 | `BO-193` | Biometric Simulation, Audit & Publication | Access & Venue | 3 | 2 | yes |
 | `BO-194` | Device & Gate Command Center | Access & Venue | 3 | 5 | yes |
 | `BO-195` | Device Type & Hardware Library | Access & Venue | 3 | 2 | yes |
-| `BO-196` | Physical Device Registration & Provisioning | Access & Venue | 3 | 3 | yes |
+| `BO-196` | Physical Device Registration & Provisioning | Access & Venue | 3 | 4 | yes |
 | `BO-197` | Turnstile & Lane Behavior Configuration | Access & Venue | 3 | 1 | yes |
 | `BO-198` | Validation Outcome & Guest Feedback Designer | Access & Venue | 3 | 1 | yes |
 | `BO-199` | Reader, Scanner & Peripheral Configuration | Access & Venue | 3 | 1 | yes |

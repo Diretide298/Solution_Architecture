@@ -44469,6 +44469,8 @@ screens:
       trigger: Works in Physical Device Registration & Provisioning
       provenance: flow F116 step 3→4
       operation: listDeviceGate
+      carries:
+      - placementId
     - to: BO-197
       trigger: Works in Turnstile & Lane Behavior Configuration
       provenance: flow F116 step 5→6
@@ -44619,9 +44621,9 @@ screens:
         label: Save access device
         operation: updateAccessDevicePlacement
         permission: DEVICE_CONFIGURE
-        notes: 'Changes where a placed device sits: area, access point, lane, role, label, group label, controller
-          reference, proximity threshold and `isActive` (ADR-0067). What the device is (model, serial, versions) is
-          the register''s, tenancy `platform.device`.'
+        notes: 'Changes where a placed device sits: area, access point, lane, role, label, group label,
+          controller reference, proximity threshold and `isActive` (ADR-0067). What the device is (model,
+          serial, versions) is the register''s, tenancy `platform.device`.'
         provenance: contract access.yaml PUT /device-placements/{placementId}
   states:
     loading: The device gate list.
@@ -44690,11 +44692,11 @@ screens:
   - id: formUpdateAccessDevice
     component: modal
     trigger: Save access device
-    body: '**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `id`, `venueId`,
-      `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`,
-      `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The
-      device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy
-      `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `id`,
+      `venueId`, `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`,
+      `gateLaneId`, `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`.
+      The device itself (serial, hardware model, versions) is registered in `platform.device` first, with
+      tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: AccessDevicePlacement
     confirm:
       label: Save access device
@@ -44879,6 +44881,7 @@ screens:
       carries:
       - accessPointId
       - deviceId
+      - placementId
   density: compact
   purposeNote: Every physical access-control device is uniquely registered, authenticated and assigned
     to its correct topology location.
@@ -44935,25 +44938,25 @@ screens:
         label: Register device
         operation: registerDevice
         permission: DEVICE_CONFIGURE
-        notes: '**Step one: the device into the one register** (ADR-0067, 1 October): kind, hardware type, hardware
-          model, serial and network reference, in tenancy `platform.device`. An access-control device binds to no
-          workstation; it is placed next.'
+        notes: '**Step one: the device into the one register** (ADR-0067, 1 October): kind, hardware type,
+          hardware model, serial and network reference, in tenancy `platform.device`. An access-control
+          device binds to no workstation; it is placed next.'
         provenance: ADR-0067, accepted 1 October (register in the platform, then place in Access)
       - kind: primaryButton
         label: Register access device
         operation: placeAccessDevice
         permission: DEVICE_CONFIGURE
         notes: '**Register in the platform, then place in Access** (ADR-0067, 1 October): tenancy `registerDevice`
-          records the device (a turnstile, reader, handheld, podium unit or beacon) in the one register, and
-          `placeAccessDevice` puts it in the topology.'
+          records the device (a turnstile, reader, handheld, podium unit or beacon) in the one register,
+          and `placeAccessDevice` puts it in the topology.'
         provenance: contract access.yaml POST /device-placements
       - kind: secondaryButton
         label: Save access device
         operation: updateAccessDevicePlacement
         permission: DEVICE_CONFIGURE
-        notes: 'Changes where a placed device sits: area, access point, lane, role, label, group label, controller
-          reference, proximity threshold and `isActive` (ADR-0067). What the device is (model, serial, versions) is
-          the register''s, tenancy `platform.device`.'
+        notes: 'Changes where a placed device sits: area, access point, lane, role, label, group label,
+          controller reference, proximity threshold and `isActive` (ADR-0067). What the device is (model,
+          serial, versions) is the register''s, tenancy `platform.device`.'
         provenance: contract access.yaml PUT /device-placements/{placementId}
   states:
     loading: The physical device registration configuration as saved.
@@ -45022,9 +45025,9 @@ screens:
     trigger: Register access device
     body: '**Collects what `placeAccessDevice` sends before it is called.** Required: `id`, `venueId`,
       `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`,
-      `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The
-      device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy
-      `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.'
+      `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`.
+      The device itself (serial, hardware model, versions) is registered in `platform.device` first, with
+      tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: AccessDevicePlacement
     confirm:
       label: Register access device
@@ -45050,11 +45053,11 @@ screens:
   - id: formUpdateAccessDevice
     component: modal
     trigger: Save access device
-    body: '**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `id`, `venueId`,
-      `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`,
-      `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The
-      device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy
-      `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `id`,
+      `venueId`, `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`,
+      `gateLaneId`, `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`.
+      The device itself (serial, hardware model, versions) is registered in `platform.device` first, with
+      tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: AccessDevicePlacement
     confirm:
       label: Save access device
@@ -45749,8 +45752,8 @@ screens:
       trigger: Device & Gate Command Center
       carries:
       - deviceId
-      provenance: derived — BO-194 declares entryState.params accessPointId, deviceId and BO-203 holds
-        deviceId, so an edge into it carries them
+      provenance: derived — BO-194 declares entryState.params accessPointId, deviceId, placementId and
+        BO-203 holds deviceId, so an edge into it carries them
   density: compact
   purposeNote: 'No access device enters production until its required capabilities, connectivity, security
     configuration and physical responses have been successfully validated. Board 6 — Final 10-Screen Structure

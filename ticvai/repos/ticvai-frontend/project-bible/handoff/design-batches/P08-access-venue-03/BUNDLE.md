@@ -708,7 +708,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-096",
      "trigger": "Resource Calendar",
-     "provenance": "derived — BO-096 declares entryState.params resourceId and BO-099 holds none of them, so the edge carries nothing and BO-096 opens cold"
+     "provenance": "derived — BO-096 declares entryState.params resourceId and BO-099 holds none of them. The edge carries nothing: BO-099 is opened from BO-096, so this edge is the way back and BO-096 keeps its own state"
     },
     {
      "to": "BO-015",
@@ -903,27 +903,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-103 holds none of them, so the edge carries nothing and BO-001 opens cold"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-103 holds none of them. The edge carries nothing: eventId, feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
     },
     {
      "to": "BO-002",
      "trigger": "Queue Configuration",
-     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId and BO-103 holds none of them, so the edge carries nothing and BO-002 opens cold"
+     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId and BO-103 holds none of them. The edge carries nothing: BO-002 finds queueId (createQueue) itself; BO-002 opens on getWaitTimes, and performanceId has no source on BO-002 yet (a gap in BO-002, not in this edge)"
     },
     {
      "to": "BO-003",
      "trigger": "Queue Integration Setup",
-     "provenance": "derived — BO-003 declares entryState.params feedId, orderId and BO-103 holds none of them, so the edge carries nothing and BO-003 opens cold"
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId and BO-103 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); BO-003 finds feedId (configureQueueFeed) itself, and BO-003 opens on its own"
     },
     {
      "to": "BO-004",
      "trigger": "Manual Wait Time Entry",
-     "provenance": "derived — BO-004 declares entryState.params queueId, refundId and BO-103 holds none of them, so the edge carries nothing and BO-004 opens cold"
+     "provenance": "derived — BO-004 declares entryState.params queueId, refundId and BO-103 holds none of them. The edge carries nothing: refundId only pre-selects (deep link or optional); BO-004 finds queueId (listQueues) itself, and BO-004 opens on its own"
     },
     {
      "to": "BO-005",
      "trigger": "Queue Monitor",
-     "provenance": "derived — BO-005 declares entryState.params campaignId, queueId and BO-103 holds none of them, so the edge carries nothing and BO-005 opens cold"
+     "provenance": "derived — BO-005 declares entryState.params campaignId, queueId and BO-103 holds none of them. The edge carries nothing: campaignId only pre-selects (deep link or optional); BO-005 finds queueId (getWaitTimes) itself, and BO-005 opens on its own"
     },
     {
      "to": "BO-006",
@@ -936,17 +936,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-030",
      "trigger": "Work Order Verification",
-     "provenance": "derived — BO-030 declares entryState.params workOrderId and BO-103 holds none of them, so the edge carries nothing and BO-030 opens cold"
+     "provenance": "derived — BO-030 declares entryState.params workOrderId and BO-103 holds none of them. The edge carries nothing: workOrderId only pre-selects (deep link or optional), and BO-030 opens on its own"
     },
     {
      "to": "BO-031",
      "trigger": "Asset Register",
-     "provenance": "derived — BO-031 declares entryState.params assetId and BO-103 holds none of them, so the edge carries nothing and BO-031 opens cold"
+     "provenance": "derived — BO-031 declares entryState.params assetId and BO-103 holds none of them. The edge carries nothing: assetId only pre-selects (deep link or optional), and BO-031 opens on its own"
     },
     {
      "to": "BO-032",
      "trigger": "Admission Profiles",
-     "provenance": "derived — BO-032 declares entryState.params profileId, ruleId and BO-103 holds none of them, so the edge carries nothing and BO-032 opens cold"
+     "provenance": "derived — BO-032 declares entryState.params profileId, ruleId and BO-103 holds none of them. The edge carries nothing: profileId only pre-selects (deep link or optional); BO-032 finds ruleId (listAdmissionRules) itself, and BO-032 opens on its own"
     },
     {
      "to": "BO-033",
@@ -959,52 +959,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-038",
      "trigger": "Reconciliation Queue",
-     "provenance": "derived — BO-038 declares entryState.params queueId and BO-103 holds none of them, so the edge carries nothing and BO-038 opens cold"
+     "provenance": "derived — BO-038 declares entryState.params queueId and BO-103 holds none of them. The edge carries nothing: queueId only pre-selects (deep link or optional), and BO-038 opens on its own"
     },
     {
      "to": "BO-069",
      "trigger": "Asset Register",
-     "provenance": "derived — BO-069 declares entryState.params assetId, gameId and BO-103 holds none of them, so the edge carries nothing and BO-069 opens cold"
+     "provenance": "derived — BO-069 declares entryState.params assetId, gameId and BO-103 holds none of them. The edge carries nothing: assetId, gameId only pre-select (deep link or optional), and BO-069 opens on its own"
     },
     {
      "to": "BO-071",
      "trigger": "Planned Maintenance",
-     "provenance": "derived — BO-071 declares entryState.params roleId and BO-103 holds none of them, so the edge carries nothing and BO-071 opens cold"
+     "provenance": "derived — BO-071 declares entryState.params roleId and BO-103 holds none of them. The edge carries nothing: roleId only pre-selects (deep link or optional), and BO-071 opens on its own"
     },
     {
      "to": "BO-072",
      "trigger": "Incident Log",
-     "provenance": "derived — BO-072 declares entryState.params incidentId and BO-103 holds none of them, so the edge carries nothing and BO-072 opens cold"
+     "provenance": "derived — BO-072 declares entryState.params incidentId and BO-103 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and BO-072 opens on its own"
     },
     {
      "to": "BO-093",
      "trigger": "Map Import & Labelling",
-     "provenance": "derived — BO-093 declares entryState.params jobId, mapId and BO-103 holds none of them, so the edge carries nothing and BO-093 opens cold"
+     "provenance": "derived — BO-093 declares entryState.params jobId, mapId and BO-103 holds none of them. The edge carries nothing: mapId only pre-selects (deep link or optional); BO-093 finds jobId (importVenueGeometry) itself, and BO-093 opens on its own"
     },
     {
      "to": "BO-094",
      "trigger": "Map Editor & Publish",
-     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-103 holds none of them, so the edge carries nothing and BO-094 opens cold"
+     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-103 holds none of them. The edge carries nothing: mapId, pathId only pre-select (deep link or optional), and BO-094 opens on its own"
     },
     {
      "to": "BO-096",
      "trigger": "Resource Calendar",
-     "provenance": "derived — BO-096 declares entryState.params resourceId and BO-103 holds none of them, so the edge carries nothing and BO-096 opens cold"
+     "provenance": "derived — BO-096 declares entryState.params resourceId and BO-103 holds none of them. The edge carries nothing: BO-096 finds resourceId (bookResource) itself, and BO-096 opens on its own"
     },
     {
      "to": "BO-097",
      "trigger": "Check Out & Check In",
-     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId and BO-103 holds none of them, so the edge carries nothing and BO-097 opens cold"
+     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId and BO-103 holds none of them. The edge carries nothing: authorisationId, bookingId only pre-select (deep link or optional), and BO-097 opens on its own"
     },
     {
      "to": "BO-098",
      "trigger": "Qualifications",
-     "provenance": "derived — BO-098 declares entryState.params resourceId and BO-103 holds none of them, so the edge carries nothing and BO-098 opens cold"
+     "provenance": "derived — BO-098 declares entryState.params resourceId and BO-103 holds none of them. The edge carries nothing: BO-103 is the Access & Venue hub and this is its menu entry; BO-098 has no source yet for resourceId"
     },
     {
      "to": "BO-099",
      "trigger": "Performance Manifest",
-     "provenance": "derived — BO-099 declares entryState.params performanceId and BO-103 holds none of them, so the edge carries nothing and BO-099 opens cold"
+     "provenance": "derived — BO-099 declares entryState.params performanceId and BO-103 holds none of them. The edge carries nothing: BO-103 is the Access & Venue hub and this is its menu entry; BO-099 has no source yet for performanceId"
     }
    ]
   },
@@ -2372,6 +2372,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "policySetVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The admission policy set the scan was decided under (`OfflinePackage.policySetVersion`, or the same fingerprint computed online by `validateAccess`), beside the one policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`). ADR-0068, 1 October."
    },
    "packageVersion": {
     "type": "string",

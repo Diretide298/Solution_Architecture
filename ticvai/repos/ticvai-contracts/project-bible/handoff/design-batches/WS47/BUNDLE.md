@@ -123,7 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-158 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-158 holds none of them. The edge carries nothing: ADM-158 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     },
     {
      "to": "ADM-159",
@@ -421,7 +421,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-159 holds none of them, so the edge carries nothing and ADM-158 opens cold"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-159 holds none of them. The edge carries nothing: ADM-159 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
     }
    ]
   },
@@ -572,7 +572,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-160 holds none of them, so the edge carries nothing and ADM-158 opens cold"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-160 holds none of them. The edge carries nothing: ADM-160 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
     }
    ]
   },
@@ -724,7 +724,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-161 holds none of them, so the edge carries nothing and ADM-158 opens cold"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-161 holds none of them. The edge carries nothing: ADM-161 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
     }
    ]
   },
@@ -847,7 +847,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-162 holds none of them, so the edge carries nothing and ADM-158 opens cold"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-162 holds none of them. The edge carries nothing: ADM-162 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
     }
    ]
   },
@@ -983,7 +983,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-163 holds none of them, so the edge carries nothing and ADM-158 opens cold"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-163 holds none of them. The edge carries nothing: ADM-163 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
     }
    ]
   },
@@ -1103,7 +1103,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-164 holds none of them, so the edge carries nothing and ADM-158 opens cold"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-164 holds none of them. The edge carries nothing: ADM-164 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
     }
    ]
   },
@@ -1260,7 +1260,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-165 holds none of them, so the edge carries nothing and ADM-158 opens cold"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-165 holds none of them. The edge carries nothing: ADM-165 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
     }
    ]
   },
@@ -1420,7 +1420,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-166 holds none of them, so the edge carries nothing and ADM-158 opens cold"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-166 holds none of them. The edge carries nothing: ADM-166 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
     }
    ]
   },
@@ -1559,7 +1559,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-167 holds none of them, so the edge carries nothing and ADM-158 opens cold"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-167 holds none of them. The edge carries nothing: ADM-167 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
     }
    ]
   },

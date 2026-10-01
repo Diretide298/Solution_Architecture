@@ -13,8 +13,9 @@
   polling loop and a lease per tenant database (ADR-0058).
 - **The inbox.** Every consumer records the events it has handled in `kernel.inbox` (or `ai.inbox`) in the
   same transaction as its effect. At-least-once delivery is made safe by that row, not by Redis.
-- **The broker.** "To the broker" is RabbitMQ or Kafka, behind the kernel's `IEventPublisher` and
-  `IEventSubscriber`; the cloud choice is the client's (ADR-0057, proposed). Local development and the
+- **The broker.** "To the broker" is RabbitMQ or Kafka, behind the kernel's `IOutbox` (modules),
+  `IBrokerPublisher` (the relay) and `IEventSubscriber` (ADR-0058, amended 1 October); the cloud
+  choice is the client's (ADR-0057, proposed). Local development and the
   venue-local profile run RabbitMQ. Dead letters from either broker drain into `platform.dead_letter`.
 - **CDC.** The rejection under "Alternatives" is of CDC on business tables. CDC on the **outbox table**
   publishes what happened, not what changed, so it is not rejected: it is ADR-0058's growth path past about

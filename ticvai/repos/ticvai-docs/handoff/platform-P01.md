@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 50 |
-| Operations | 214 |
+| Operations | 216 |
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
@@ -87,7 +87,7 @@
 | `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 6 | yes |
 | `WEB-013` | Booking Confirmation | Cart & Checkout | 1 | 3 | yes |
 | `WEB-014` | Pay for a Booking | Cart & Checkout | 1 | 2 | yes |
-| `WEB-015` | Branded Queue / Waiting Room | High-Demand Access | 2 | 3 | yes |
+| `WEB-015` | Branded Queue / Waiting Room | High-Demand Access | 2 | 2 | yes |
 | `WEB-016` | Login / Register | Account & Self-Service | 1 | 14 | yes |
 | `WEB-017` | My Account Dashboard | Account & Self-Service | 1 | 9 | yes |
 | `WEB-018` | My Tickets | Account & Self-Service | 1 | 8 | yes |

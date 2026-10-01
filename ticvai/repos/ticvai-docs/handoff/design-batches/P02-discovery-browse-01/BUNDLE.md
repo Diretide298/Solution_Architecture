@@ -143,7 +143,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "GST-043",
     "GST-044",
     "GST-045",
-    "GST-046",
     "GST-047",
     "GST-048",
     "GST-049",
@@ -189,7 +188,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-005",
      "trigger": "What's On",
-     "provenance": "derived — GST-005 declares entryState.params eventId and GST-001 holds none of them, so the edge carries nothing and GST-005 opens cold"
+     "provenance": "derived — GST-005 declares entryState.params eventId and GST-001 holds none of them. The edge carries nothing: eventId only pre-selects (deep link or optional), and GST-005 opens on its own"
     },
     {
      "to": "GST-006",
@@ -276,12 +275,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-016",
      "trigger": "My Reservations",
-     "provenance": "derived — GST-016 declares entryState.params reservationId and GST-001 holds none of them, so the edge carries nothing and GST-016 opens cold"
+     "provenance": "derived — GST-016 declares entryState.params reservationId and GST-001 holds none of them. The edge carries nothing: reservationId only pre-selects (deep link or optional), and GST-016 opens on its own"
     },
     {
      "to": "GST-017",
      "trigger": "Reservation Details",
-     "provenance": "derived — GST-017 declares entryState.params reservationId and GST-001 holds none of them, so the edge carries nothing and GST-017 opens cold"
+     "provenance": "derived — GST-017 declares entryState.params reservationId and GST-001 holds none of them. The edge carries nothing: reservationId only pre-selects (deep link or optional), and GST-017 opens on its own"
     },
     {
      "to": "GST-018",
@@ -310,12 +309,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-021",
      "trigger": "Interactive Map",
-     "provenance": "derived — GST-021 declares entryState.params mapId and GST-001 holds none of them, so the edge carries nothing and GST-021 opens cold"
+     "provenance": "derived — GST-021 declares entryState.params mapId and GST-001 holds none of them. The edge carries nothing: mapId only pre-selects (deep link or optional), and GST-021 opens on its own"
     },
     {
      "to": "GST-023",
      "trigger": "Virtual Queue",
-     "provenance": "derived — GST-023 declares entryState.params entryId and GST-001 holds none of them, so the edge carries nothing and GST-023 opens cold"
+     "provenance": "derived — GST-023 declares entryState.params entryId and GST-001 holds none of them. The edge carries nothing: entryId only pre-selects (deep link or optional), and GST-023 opens on its own"
     },
     {
      "to": "GST-024",
@@ -336,7 +335,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-026",
      "trigger": "Retail / Merchandise",
-     "provenance": "derived — GST-026 declares entryState.params cardCode and GST-001 holds none of them, so the edge carries nothing and GST-026 opens cold"
+     "provenance": "derived — GST-026 declares entryState.params cardCode and GST-001 holds none of them. The edge carries nothing: cardCode only pre-selects (deep link or optional), and GST-026 opens on its own"
     },
     {
      "to": "GST-027",
@@ -349,7 +348,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-031",
      "trigger": "AI Concierge – Home",
-     "provenance": "derived — GST-031 declares entryState.params conversationId, outletId and GST-001 holds none of them, so the edge carries nothing and GST-031 opens cold"
+     "provenance": "derived — GST-031 declares entryState.params conversationId, outletId and GST-001 holds none of them. The edge carries nothing: conversationId, outletId only pre-select (deep link or optional), and GST-031 opens on its own"
     },
     {
      "to": "GST-032",
@@ -362,7 +361,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-033",
      "trigger": "AI Concierge – Contextual Help",
-     "provenance": "derived — GST-033 declares entryState.params conversationId and GST-001 holds none of them, so the edge carries nothing and GST-033 opens cold"
+     "provenance": "derived — GST-033 declares entryState.params conversationId and GST-001 holds none of them. The edge carries nothing: conversationId only pre-selects (deep link or optional), and GST-033 opens on its own"
     },
     {
      "to": "GST-034",
@@ -375,7 +374,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-037",
      "trigger": "Offers & Promotions",
-     "provenance": "derived — GST-037 declares entryState.params code, promotionId and GST-001 holds none of them, so the edge carries nothing and GST-037 opens cold"
+     "provenance": "derived — GST-037 declares entryState.params code, promotionId and GST-001 holds none of them. The edge carries nothing: promotionId, code only pre-select (deep link or optional), and GST-037 opens on its own"
     },
     {
      "to": "GST-039",
@@ -388,7 +387,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-040",
      "trigger": "Help & Support",
-     "provenance": "derived — GST-040 declares entryState.params caseId and GST-001 holds none of them, so the edge carries nothing and GST-040 opens cold"
+     "provenance": "derived — GST-040 declares entryState.params caseId and GST-001 holds none of them. The edge carries nothing: caseId only pre-selects (deep link or optional), and GST-040 opens on its own"
     },
     {
      "to": "GST-041",
@@ -415,11 +414,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "derived — GST-045 declares entryState.params orderId and GST-001 holds orderId, so an edge into it carries them"
     },
     {
-     "to": "GST-046",
-     "trigger": "Branded Queue / Waiting Room",
-     "provenance": "derived — GST-046 declares entryState.params entryId and GST-001 holds none of them, so the edge carries nothing and GST-046 opens cold"
-    },
-    {
      "to": "GST-049",
      "trigger": "Interactive Seat Selection",
      "provenance": "derived — GST-049 declares entryState.params eventId, holdId, performanceId and GST-001 holds none of them, so the edge carries nothing and GST-049 opens cold"
@@ -427,12 +421,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-052",
      "trigger": "Suggested Itineraries",
-     "provenance": "derived — GST-052 declares entryState.params  and GST-001 holds none of them, so the edge carries nothing and GST-052 opens cold"
+     "provenance": "derived — GST-052 declares entryState.params  and GST-001 holds none of them. The edge carries nothing: GST-052 needs nothing to open"
     },
     {
      "to": "GST-054",
      "trigger": "AI Optimized Itinerary",
-     "provenance": "derived — GST-054 declares entryState.params conversationId, planId and GST-001 holds none of them, so the edge carries nothing and GST-054 opens cold"
+     "provenance": "derived — GST-054 declares entryState.params conversationId, planId and GST-001 holds none of them. The edge carries nothing: conversationId only pre-selects (deep link or optional); GST-054 finds planId (sendAiMessage) itself, and GST-054 opens on its own"
     },
     {
      "to": "GST-055",
@@ -446,22 +440,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-056",
      "trigger": "Bundle Package",
-     "provenance": "derived — GST-056 declares entryState.params bundleId and GST-001 holds none of them, so the edge carries nothing and GST-056 opens cold"
+     "provenance": "derived — GST-056 declares entryState.params bundleId and GST-001 holds none of them. The edge carries nothing: bundleId only pre-selects (deep link or optional), and GST-056 opens on its own"
     },
     {
      "to": "GST-059",
      "trigger": "Plan My Day – In Progress",
-     "provenance": "derived — GST-059 declares entryState.params itemId, planId and GST-001 holds none of them, so the edge carries nothing and GST-059 opens cold"
+     "provenance": "derived — GST-059 declares entryState.params itemId, planId and GST-001 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 opens on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)"
     },
     {
      "to": "GST-061",
      "trigger": "Menu Item Detail",
-     "provenance": "derived — GST-061 declares entryState.params outletId and GST-001 holds none of them, so the edge carries nothing and GST-061 opens cold"
+     "provenance": "derived — GST-061 declares entryState.params outletId and GST-001 holds none of them. The edge carries nothing: outletId only pre-selects (deep link or optional), and GST-061 opens on its own"
     },
     {
      "to": "GST-070",
      "trigger": "Reserve a Table",
-     "provenance": "derived — GST-070 declares entryState.params entryId, reservationId and GST-001 holds none of them, so the edge carries nothing and GST-070 opens cold"
+     "provenance": "derived — GST-070 declares entryState.params entryId, reservationId and GST-001 holds none of them. The edge carries nothing: entryId, reservationId only pre-select (deep link or optional), and GST-070 opens on its own"
     },
     {
      "to": "GST-022",
@@ -935,9 +929,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-001",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
     "view": "Home tab (Summit Peaks, after the intro)",
     "differences": "The v4 home shows no ticket strip; `listMyEntitlements` feeds the visit-day venue suggestion only."
@@ -1021,12 +1015,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-002 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-002 holds none of them. The edge carries nothing: GST-002 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-003",
      "trigger": "Event & Attraction Listing",
-     "provenance": "derived — GST-003 declares entryState.params eventId and GST-002 holds none of them, so the edge carries nothing and GST-003 opens cold"
+     "provenance": "derived — GST-003 declares entryState.params eventId and GST-002 holds none of them. The edge carries nothing: eventId only pre-selects (deep link or optional), and GST-003 opens on its own"
     },
     {
      "to": "GST-004",
@@ -1200,9 +1194,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-002",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
     "view": "Explore tab"
    }
@@ -1272,7 +1266,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-003 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-003 holds none of them. The edge carries nothing: GST-003 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-004",
@@ -1559,9 +1553,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-003",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
     "view": "Buy tickets (the centre tab)"
    }
@@ -1634,7 +1628,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-004 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-004 holds none of them. The edge carries nothing: GST-004 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-003",
@@ -1989,9 +1983,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-004",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
     "view": "Explore → Summit Coaster (Item detail)"
    }
@@ -2055,7 +2049,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-005 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-005 holds none of them. The edge carries nothing: GST-005 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-003",
@@ -2275,7 +2269,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-006 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-006 holds none of them. The edge carries nothing: GST-006 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-003",
@@ -2393,9 +2387,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-006",
    "prototype": {
-    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
-    "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-30",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
     "view": "Explore → Shows → Night of Nine → More info (Item detail, an event)"
    }
@@ -2459,12 +2453,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "provenance": "derived — GST-001 declares entryState.params  and GST-057 holds none of them, so the edge carries nothing and GST-001 opens cold"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-057 holds none of them. The edge carries nothing: GST-057 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
      "to": "GST-003",
      "trigger": "Event & Attraction Listing",
-     "provenance": "derived — GST-003 declares entryState.params eventId and GST-057 holds none of them, so the edge carries nothing and GST-003 opens cold"
+     "provenance": "derived — GST-003 declares entryState.params eventId and GST-057 holds none of them. The edge carries nothing: eventId only pre-selects (deep link or optional), and GST-003 opens on its own"
     }
    ]
   },

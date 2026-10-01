@@ -9,12 +9,12 @@
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 153 |
+| Operations with no screen | 155 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 153 operations with no screen here
+### 155 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -32,8 +32,10 @@
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
 | `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
+| `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
+| `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
@@ -54,13 +56,11 @@
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
-| `getAccessPolicy` | identity | GET | One policy, at a version |
-| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| `getAuthorisationPolicy` | identity | GET | One policy, at a version |
+| `getAuthorisationPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
 | `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
-| `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
-| `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
-| … | | | 113 more |
+| … | | | 115 more |
 
 ### 2 modules split across waves
 

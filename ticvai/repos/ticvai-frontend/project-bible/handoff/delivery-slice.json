@@ -217,9 +217,9 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 463,
+  "core": 465,
   "setup": 234,
-  "allOperations": 2660
+  "allOperations": 2668
  },
  "services": {
   "AccessService": {
@@ -233,9 +233,9 @@
    "total": 141
   },
   "CatalogueService": {
-   "core": 41,
+   "core": 43,
    "setup": 50,
-   "total": 445
+   "total": 449
   },
   "FnbService": {
    "core": 54,
@@ -270,7 +270,7 @@
   "PlatformService": {
    "core": 1,
    "setup": 17,
-   "total": 212
+   "total": 216
   },
   "ReportingService": {
    "core": 9,
@@ -3197,6 +3197,23 @@
    ],
    "enables": []
   },
+  "enterWaitingRoom": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/performances/{performanceId}/waiting-room/entries",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-046",
+    "WEB-015"
+   ],
+   "enables": []
+  },
   "escalateCorrectiveAction": {
    "part": "setup",
    "service": "FnbService",
@@ -5323,14 +5340,12 @@
     "GST-022",
     "GST-023",
     "GST-038",
-    "GST-046",
     "GST-051",
     "GST-053",
     "GST-054",
     "GST-059",
     "WEB-002",
     "WEB-004",
-    "WEB-015",
     "WEB-039",
     "WEB-040"
    ],
@@ -5349,9 +5364,24 @@
    ],
    "screens": [
     "GST-023",
-    "GST-046",
-    "WEB-015",
     "WEB-040"
+   ],
+   "enables": []
+  },
+  "getWaitingRoomPosition": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/performances/{performanceId}/waiting-room/entries/{waitingEntryId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-046",
+    "WEB-015"
    ],
    "enables": []
   },
@@ -5837,8 +5867,6 @@
    ],
    "screens": [
     "GST-023",
-    "GST-046",
-    "WEB-015",
     "WEB-040"
    ],
    "enables": []

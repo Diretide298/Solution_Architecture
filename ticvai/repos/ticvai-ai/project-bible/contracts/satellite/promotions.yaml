@@ -144,6 +144,8 @@ paths:
                       '
                   budgetBreach:
                     type: boolean
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions/{promotionId}/variants:
     parameters:
     - name: promotionId
@@ -220,17 +222,14 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendations:
     post:
       operationId: getRecommendations
       summary: What else this guest might want
-      deprecated: true
-      x-ticvai-superseded-by: 'decideRecommendations'
-      description: '**Deprecated for one release (29 September, AI system design 2.3 and 5.4).** Forwarded
-        to the AI recommendation engine as a placement: the call becomes `ai.decideRecommendations` with
-        `surface` as the placement, and the engine''s items come back in this response''s shape. Removed
-        after one release; new screens bind `ai.decideRecommendations`. The text below describes the
-        behaviour the engine now carries.
+      description: '**A channel adapter of the one recommendation engine** (ADR-0052, accepted 1 October). This operation stays as the guest browse surface, with its path, id and response shape. **Block A**: the promotions module answers it from the relationship map (rules; strategy, relationships, business priority and suppression are configured in promotions). **Block B**: it forwards to the engine in `ticvai-ai` (ai `decideRecommendations`, placement `surface`) with no contract change, under a hard 200 ms budget and failing open to the rules answer, so checkout never waits on it. New screens may bind either; the deprecation of 29 September is withdrawn.
+        The text below describes the behaviour both producers carry.
 
         BL-068. **Rule-based recommendation exists; profile-and-cart-driven does not**, and
         the difference is whether a guest who has already bought a family ticket is offered another one.
@@ -304,6 +303,8 @@ paths:
                       - ruleBased
                     confidence:
                       type: number
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /vouchers/{voucherId}/void:
     parameters:
     - name: voucherId
@@ -362,6 +363,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Voucher'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions:
     get:
       operationId: listPromotions
@@ -431,6 +434,8 @@ paths:
                         - $ref: '#/components/schemas/GuestPromotion'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPromotion
       x-ticvai-consumed-by:
@@ -494,6 +499,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions/{promotionId}:
     parameters:
     - name: promotionId
@@ -541,6 +548,8 @@ paths:
                 - $ref: '#/components/schemas/GuestPromotion'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updatePromotion
       x-ticvai-consumed-by:
@@ -605,6 +614,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions/{promotionId}/pause:
     parameters:
     - name: promotionId
@@ -660,6 +671,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions/{promotionId}/end:
     parameters:
     - name: promotionId
@@ -716,6 +729,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions/{promotionId}/unschedule:
     parameters:
     - name: promotionId
@@ -759,6 +774,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions/{promotionId}/publish:
     parameters:
     - name: promotionId
@@ -817,6 +834,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/StackingProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions/{promotionId}/conflicts:
     parameters:
     - name: promotionId
@@ -860,6 +879,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConflictAnalysis'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions/{promotionId}/usage:
     parameters:
     - name: promotionId
@@ -902,6 +923,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PromotionUsage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /coupon-campaigns:
     get:
       operationId: listCouponCampaigns
@@ -938,6 +961,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CouponCampaign'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createCouponCampaign
       x-ticvai-consumed-by:
@@ -974,6 +999,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CouponCampaign'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /coupon-campaigns/{campaignId}/codes:
     parameters:
     - name: campaignId
@@ -1024,6 +1051,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CouponCode'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: generateCouponCodes
       x-ticvai-consumed-by:
@@ -1114,6 +1143,8 @@ paths:
                     - generating
                     - complete
                     - failed
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /coupon-campaigns/{campaignId}/code-batches/{batchId}:
     parameters:
     - name: campaignId
@@ -1155,6 +1186,8 @@ paths:
                 $ref: '#/components/schemas/CouponCodeBatch'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /coupon-codes/{code}:
     parameters:
     - name: code
@@ -1191,6 +1224,8 @@ paths:
                 $ref: '#/components/schemas/CouponCode'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /coupon-codes/{code}/assign:
     parameters:
     - name: code
@@ -1244,6 +1279,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /coupon-codes/{code}/void:
     parameters:
     - name: code
@@ -1302,6 +1339,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /voucher-batches:
     get:
       operationId: listVoucherBatches
@@ -1338,6 +1377,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/VoucherBatch'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createVoucherBatch
       x-ticvai-consumed-by:
@@ -1373,6 +1414,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VoucherBatch'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /vouchers/{voucherCode}/redeem:
     parameters:
     - name: voucherCode
@@ -1427,6 +1470,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundles:
     get:
       operationId: listBundles
@@ -1461,6 +1506,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Bundle'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createBundle
       x-ticvai-consumed-by:
@@ -1530,6 +1577,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundles/{bundleId}:
     parameters:
     - name: bundleId
@@ -1570,6 +1619,8 @@ paths:
                 $ref: '#/components/schemas/Bundle'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateBundle
       x-ticvai-consumed-by:
@@ -1633,6 +1684,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /allocation-splits:
     get:
       operationId: listAllocationSplits
@@ -1672,6 +1725,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AllocationSplit'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /allocation-splits/preview:
     post:
       operationId: previewAllocationSplit
@@ -1729,6 +1784,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /upsell-rules:
     get:
       operationId: listUpsellRules
@@ -1769,6 +1826,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/UpsellRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createUpsellRule
       x-ticvai-consumed-by:
@@ -1809,6 +1868,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UpsellRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /upsell-rules/{ruleId}:
     parameters:
     - name: ruleId
@@ -1845,6 +1906,8 @@ paths:
           description: Removed
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /upsell-suggestions:
     post:
       operationId: getUpsellSuggestions
@@ -1852,13 +1915,7 @@ paths:
       - staff
       - guest
       summary: Suggestions for a cart
-      deprecated: true
-      x-ticvai-superseded-by: 'decideRecommendations'
-      description: '**Deprecated for one release (29 September, AI system design 2.3 and 5.4).** Forwarded
-        to the AI recommendation engine as a placement: the call becomes `ai.decideRecommendations` with
-        placement `cart` or `checkout` (from `placement`) and the same cart lines, and the engine''s items
-        come back in this response''s shape. Removed after one release; new screens bind
-        `ai.decideRecommendations`.
+      description: '**A channel adapter of the one recommendation engine** (ADR-0052, accepted 1 October). This operation stays as the cart and checkout surface, with its path, id and response shape. **Block A**: the promotions module answers it from the relationship map (rules; strategy, relationships, business priority and suppression are configured in promotions). **Block B**: it forwards to the engine in `ticvai-ai` (ai `decideRecommendations`, placement `cart` or `checkout` from `placement`, with the same cart lines) with no contract change, under a hard 200 ms budget and failing open to the rules answer, so checkout never waits on it. New screens may bind either; the deprecation of 29 September is withdrawn.
 
         Rule-based today. Where the recommendation engine is enabled it augments this rather
         than replacing it — a configured rule always outranks a model, because the operator who wrote
@@ -1918,6 +1975,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/UpsellSuggestion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions/evaluate:
     post:
       operationId: evaluatePromotions
@@ -1980,6 +2039,8 @@ paths:
                 $ref: '#/components/schemas/PromotionEvaluation'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-campaign:
     get:
       operationId: listPromotionCampaign
@@ -2144,6 +2205,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PromotionCampaignDirectoryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-lifecycle-statu:
     get:
       operationId: listPromotionLifecycleStatus
@@ -2190,6 +2253,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PromotionLifecycleStatusManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaign-calendar-timeline:
     get:
       operationId: listCampaignCalendarTimeline
@@ -2287,6 +2352,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CampaignCalendarTimelineView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-channel:
     get:
       operationId: listPromotionChannel
@@ -2331,6 +2398,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PromotionChannelPublicationMonitorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-alert-exception:
     get:
       operationId: listPromotionAlertException
@@ -2372,6 +2441,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PromotionAlertsExceptionCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-health-performance:
     get:
       operationId: listPromotionHealthPerformance
@@ -2414,6 +2485,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PromotionHealthPerformanceMonitorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-activity-version:
     get:
       operationId: listPromotionActivityVersion
@@ -2473,6 +2546,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PromotionAuditActivityVersionHistoryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-rule:
     put:
       operationId: setPromotionRule
@@ -2524,6 +2599,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PromotionRuleBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /percentage-fixed-discount:
     get:
       operationId: listPercentageFixedDiscount
@@ -2571,6 +2648,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PercentageFixedDiscountConfiguratorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cart-transaction-threshold:
     get:
       operationId: listCartTransactionThreshold
@@ -2612,6 +2691,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CartTransactionThresholdRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /volume-bulk-tier:
     get:
       operationId: listVolumeBulkTier
@@ -2653,6 +2734,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/VolumeBulkTierDiscountConfiguratorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /time-based-seasonal:
     get:
       operationId: listTimeBasedSeasonal
@@ -2693,6 +2776,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TimeBasedSeasonalDiscountRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-membership-segment:
     get:
       operationId: listCustomerMembershipSegment
@@ -2734,6 +2819,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CustomerMembershipSegmentDiscountRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-method-bank:
     get:
       operationId: listPaymentMethodBank
@@ -2779,6 +2866,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PaymentMethodBankPartnerDiscountRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /special-price-guest:
     get:
       operationId: listSpecialPriceGuest
@@ -2819,6 +2908,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SpecialPriceGuestOfferConfiguratorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /discount-limit-guardrail:
     get:
       operationId: listDiscountLimitGuardrail
@@ -2858,6 +2949,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DiscountLimitsGuardrailsCommercialControlsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rule-test-recommendation:
     put:
       operationId: setRuleTestRecommendation
@@ -2911,6 +3004,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RuleTestSimulationAiRecommendationWorkspaceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /coupon-promo-code:
     put:
       operationId: setCouponPromoCode
@@ -2962,6 +3057,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CouponPromoCodeBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /unique-code-generation:
     get:
       operationId: listUniqueCodeGeneration
@@ -3002,6 +3099,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UniqueCodeGenerationBatchManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /code-eligibility-restriction:
     get:
       operationId: listCodeEligibilityRestriction
@@ -3045,6 +3144,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CodeEligibilityRestrictionManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /usage-capacity-frequency:
     get:
       operationId: listUsageCapacityFrequency
@@ -3090,6 +3191,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UsageCapacityFrequencyControlView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /validity-date-time:
     get:
       operationId: listValidityDateTime
@@ -3130,6 +3233,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ValidityDateTimeControlView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /code-distribution-manager:
     put:
       operationId: setCodeDistributionManager
@@ -3185,6 +3290,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CodeDistributionAssignmentManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /redemption-code-lookup:
     get:
       operationId: listRedemptionCodeLookup
@@ -3283,6 +3390,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RedemptionMonitorCodeLookupView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /code-security-fraud:
     get:
       operationId: listCodeSecurityFraud
@@ -3329,6 +3438,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CodeSecurityFraudExceptionCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /redemption:
     get:
       operationId: listRedemption
@@ -3421,6 +3532,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RedemptionAnalyticsAuditAiOptimizationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /advanced-offer:
     get:
       operationId: listAdvancedOffer
@@ -3535,6 +3648,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AdvancedOfferCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /buy-get-bogo:
     put:
       operationId: setBuyGetBogo
@@ -3583,6 +3698,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BuyXGetYBogoRuleBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /multi-buy-quantity:
     get:
       operationId: listMultiBuyQuantity
@@ -3622,6 +3739,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MultiBuyQuantityOfferConfiguratorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cheapest-lowest-value:
     get:
       operationId: listCheapestLowestValue
@@ -3664,6 +3783,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CheapestLowestValueItemPromotionView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fixed-price-offer:
     put:
       operationId: setFixedPriceOffer
@@ -3717,6 +3838,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FixedPriceNForXOfferBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gift-free-product:
     put:
       operationId: setGiftFreeProduct
@@ -3766,6 +3889,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GiftFreeProductAddedValueOfferBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cross-category-promotion:
     put:
       operationId: setCrossCategoryPromotion
@@ -3814,6 +3939,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CrossCategoryPromotionBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reward-selection-substitution:
     get:
       operationId: listRewardSelectionSubstitution
@@ -3855,6 +3982,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RewardSelectionSubstitutionCustomerChoiceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /advanced-offer-guardrail:
     get:
       operationId: listAdvancedOfferGuardrail
@@ -3897,6 +4026,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AdvancedOfferGuardrailsConflictControlsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /offer-basket-trace:
     get:
       operationId: listOfferBasketTrace
@@ -3952,6 +4083,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/OfferSimulationBasketTraceAiOptimizationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-combo:
     get:
       operationId: listBundleCombo
@@ -4078,6 +4211,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BundleComboCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-definition:
     put:
       operationId: setBundleDefinition
@@ -4127,6 +4262,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BundleDefinitionSetupView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-component:
     put:
       operationId: setBundleComponent
@@ -4177,6 +4314,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BundleComponentBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-choice-build:
     put:
       operationId: setGuestChoiceBuild
@@ -4228,6 +4367,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestChoiceBuildYourOwnBundleDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-pricing-commercial:
     get:
       operationId: listBundlePricingCommercial
@@ -4270,6 +4411,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BundlePricingCommercialModelView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-availability-capacity:
     get:
       operationId: listBundleAvailabilityCapacity
@@ -4317,6 +4460,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BundleAvailabilityCapacityValidationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-validity-scheduling:
     get:
       operationId: listBundleValidityScheduling
@@ -4358,6 +4503,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BundleValiditySchedulingRedemptionRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /partner-external-product:
     get:
       operationId: listPartnerExternalProduct
@@ -4400,6 +4547,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PartnerExternalProductBundleManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /revenue-allocation-cost:
     get:
       operationId: listRevenueAllocationCost
@@ -4446,6 +4595,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RevenueAllocationCostSettlementRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-preview-recommendation:
     put:
       operationId: simulateBundlePreviewRecommendation
@@ -4495,6 +4646,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BundlePreviewSimulationAiRecommendationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-bundle:
     get:
       operationId: listDynamicBundle
@@ -4539,6 +4692,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DynamicBundleOperationsCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /component-inventory-availability:
     get:
       operationId: listComponentInventoryAvailability
@@ -4581,6 +4736,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ComponentInventoryAvailabilityMatrixView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-sellability-dependency:
     get:
       operationId: listBundleSellabilityDependency
@@ -4622,6 +4779,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BundleSellabilityDependencyRuleEngineView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /capacity-pool-reservation:
     get:
       operationId: listCapacityPoolReservation
@@ -4667,6 +4826,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CapacityPoolReservationManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-component-substitution:
     get:
       operationId: listDynamicComponentSubstitution
@@ -4707,6 +4868,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DynamicComponentSubstitutionEngineView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-bundle-rule:
     get:
       operationId: listDynamicBundleRule
@@ -4750,6 +4913,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DynamicBundleRuleCompositionEngineView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /real-time-availability:
     get:
       operationId: listRealTimeAvailability
@@ -4794,6 +4959,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RealTimeAvailabilityCheckoutValidationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-availability-channel:
     get:
       operationId: listBundleAvailabilityChannel
@@ -4834,6 +5001,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BundleAvailabilityByChannelVenuePartnerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-availability-forecast:
     get:
       operationId: listBundleAvailabilityForecast
@@ -4875,6 +5044,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BundleAvailabilityForecastAlertsRecoveryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-bundle-2:
     get:
       operationId: listDynamicBundle2
@@ -4916,6 +5087,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DynamicBundleSimulationAiOptimizationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /targeting-eligibility:
     get:
       operationId: listTargetingEligibility
@@ -5042,6 +5215,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TargetingEligibilityCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /eligibility-rule:
     put:
       operationId: setEligibilityRule
@@ -5093,6 +5268,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EligibilityRuleBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /crm-customer-segment:
     get:
       operationId: listCrmCustomerSegment
@@ -5136,6 +5313,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CrmCustomerSegmentManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /membership-loyalty-guest:
     get:
       operationId: listMembershipLoyaltyGuest
@@ -5179,6 +5358,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MembershipLoyaltyGuestEligibilityView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /behavioral-transaction-targeting:
     get:
       operationId: listBehavioralTransactionTargeting
@@ -5221,6 +5402,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BehavioralTransactionTargetingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /context-location-channel:
     get:
       operationId: listContextLocationChannel
@@ -5261,6 +5444,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ContextLocationChannelTimeTargetingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /partner-payment-eligibility:
     get:
       operationId: listPartnerPaymentEligibility
@@ -5300,6 +5485,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PartnerB2bPaymentEligibilityView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /audience-preview-reach:
     get:
       operationId: listAudiencePreviewReach
@@ -5342,6 +5529,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AudiencePreviewReachEligibilitySimulatorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /targeting-conflict-frequency:
     get:
       operationId: listTargetingConflictFrequency
@@ -5383,6 +5572,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TargetingConflictFrequencyExclusionControlsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /audience-discovery-targeting:
     get:
       operationId: listAudienceDiscoveryTargeting
@@ -5432,6 +5623,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AiAudienceDiscoveryTargetingOptimizationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stacking-conflict:
     get:
       operationId: listStackingConflict
@@ -5473,6 +5666,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/StackingConflictCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-priority-hierarchy:
     get:
       operationId: listPromotionPriorityHierarchy
@@ -5513,6 +5708,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PromotionPriorityHierarchyManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-stacking-rule:
     put:
       operationId: setPromotionStackingRule
@@ -5564,6 +5761,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PromotionStackingRuleBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-exclusion-compatibility:
     get:
       operationId: listPromotionExclusionCompatibility
@@ -5605,6 +5804,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PromotionExclusionCompatibilityMatrixView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /discount-calculation-application:
     get:
       operationId: listDiscountCalculationApplication
@@ -5652,6 +5853,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DiscountCalculationApplicationSequenceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /best-offer-customer:
     get:
       operationId: listBestOfferCustomer
@@ -5693,6 +5896,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BestOfferCustomerBenefitResolverView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /discount-cap-maximum:
     get:
       operationId: listDiscountCapMaximum
@@ -5734,6 +5939,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DiscountCapMaximumBenefitControllerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conflict-detection-resolution:
     get:
       operationId: listConflictDetectionResolution
@@ -5775,6 +5982,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConflictDetectionResolutionCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-decision-trace:
     get:
       operationId: listPromotionDecisionTrace
@@ -5820,6 +6029,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PromotionDecisionTraceTransactionExplainerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conflict:
     get:
       operationId: listConflict
@@ -5861,6 +6072,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConflictSimulationAiOptimizationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaign-governance-budget:
     get:
       operationId: listCampaignGovernanceBudget
@@ -5905,6 +6118,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CampaignGovernanceBudgetCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaign-budget-financial:
     put:
       operationId: setCampaignBudgetFinancial
@@ -5954,6 +6169,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CampaignBudgetFinancialLimitSetupView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /redemption-discount-exposure:
     get:
       operationId: listRedemptionDiscountExposure
@@ -5994,6 +6211,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RedemptionDiscountExposureLimitManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /budget-consumption-forecast:
     get:
       operationId: listBudgetConsumptionForecast
@@ -6036,6 +6255,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BudgetConsumptionForecastMonitorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /threshold-action-automatic:
     get:
       operationId: listThresholdActionAutomatic
@@ -6077,6 +6298,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ThresholdActionsAutomaticSuspensionView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaign-workflow:
     put:
       operationId: approveCampaignWorkflow
@@ -6125,6 +6348,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CampaignApprovalWorkflowDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /decision:
     put:
       operationId: approveDecision
@@ -6177,6 +6402,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalInboxDecisionWorkspaceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaign-financial-commercial:
     get:
       operationId: listCampaignFinancialCommercial
@@ -6218,6 +6445,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CampaignFinancialCommercialSimulatorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaign-experiment-test:
     get:
       operationId: listCampaignExperimentTest
@@ -6261,6 +6490,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CampaignExperimentABTestManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance-risk-launch:
     get:
       operationId: listGovernanceRiskLaunch
@@ -6302,6 +6533,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GovernanceAuditAiRiskLaunchReadinessView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotion-performance:
     get:
       operationId: listPromotionPerformance
@@ -6426,6 +6659,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PromotionPerformanceCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaign-promotion-performance:
     get:
       operationId: listCampaignPromotionPerformance
@@ -6471,6 +6706,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CampaignPromotionPerformanceExplorerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /redemption-conversion-funnel:
     get:
       operationId: listRedemptionConversionFunnel
@@ -6560,6 +6797,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RedemptionConversionFunnelAnalyticsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /discount-margin-profitability:
     get:
       operationId: listDiscountMarginProfitability
@@ -6603,6 +6842,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DiscountMarginProfitabilityAnalyticsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-bogo-advanced:
     get:
       operationId: listBundleBogoAdvanced
@@ -6646,6 +6887,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BundleBogoAdvancedOfferAnalyticsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /upsell-cross-sell:
     get:
       operationId: listUpsellCrossSell
@@ -6689,6 +6932,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UpsellCrossSellAttachRateAnalyticsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-segment-channel:
     get:
       operationId: listCustomerSegmentChannel
@@ -6732,6 +6977,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CustomerSegmentChannelPartnerAnalyticsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /incrementality-attribution-cannibalization:
     get:
       operationId: listIncrementalityAttributionCannibalization
@@ -6776,6 +7023,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IncrementalityAttributionCannibalizationAnalysisView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /next-best-action:
     get:
       operationId: listNextBestAction
@@ -6823,6 +7072,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AiOptimizationNextBestActionCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /executive-promotion-reporting:
     get:
       operationId: listExecutivePromotionReporting
@@ -6912,6 +7163,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ExecutivePromotionIntelligenceReportingStudioView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-strategies:
     get:
       operationId: listRecommendationStrategies
@@ -6954,6 +7207,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RecommendationStrategy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createRecommendationStrategy
       x-ticvai-consumed-by:
@@ -7004,6 +7259,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationStrategy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-strategies/{strategyId}:
     parameters:
     - name: strategyId
@@ -7071,6 +7328,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationStrategy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-relationships:
     get:
       operationId: listProductRelationships
@@ -7113,6 +7372,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProductRelationship'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductRelationships
       x-ticvai-consumed-by:
@@ -7161,6 +7422,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProductRelationship'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-affinity:
     get:
       operationId: getProductAffinity
@@ -7210,6 +7473,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProductAffinity'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendations/explain:
     post:
       operationId: explainRecommendation
@@ -7247,6 +7512,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationTrace'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendations/outcomes:
     post:
       operationId: recordRecommendationOutcome
@@ -7288,6 +7555,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-experiments:
     get:
       operationId: listRecommendationExperiments
@@ -7311,6 +7580,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RecommendationExperiment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createRecommendationExperiment
       x-ticvai-consumed-by:
@@ -7348,6 +7619,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationExperiment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-experiments/{experimentId}/conclude:
     parameters:
     - name: experimentId
@@ -7409,6 +7682,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-performance:
     get:
       operationId: getRecommendationPerformance
@@ -7467,6 +7742,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RecommendationPerformance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-suppressions:
     put:
       operationId: setRecommendationSuppression
@@ -7512,6 +7789,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationSuppression'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-simulations:
     post:
       operationId: simulateRecommendationStrategy
@@ -7572,6 +7851,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationPerformance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /commercial-campaigns:
     get:
       operationId: listCommercialCampaigns
@@ -7644,6 +7925,8 @@ paths:
                         $ref: '#/components/schemas/CommercialCampaign'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createCommercialCampaign
       x-ticvai-consumed-by:
@@ -7699,6 +7982,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /commercial-campaigns/{campaignId}:
     parameters:
     - name: campaignId
@@ -7797,6 +8082,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundles/{bundleId}/capacity-policies:
     parameters:
     - name: bundleId
@@ -7846,6 +8133,8 @@ paths:
                         $ref: '#/components/schemas/BundleCapacityPolicy'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBundleCapacityPolicy
       x-ticvai-consumed-by:
@@ -7922,6 +8211,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundles/{bundleId}/partner-products:
     parameters:
     - name: bundleId
@@ -7969,6 +8260,8 @@ paths:
                         $ref: '#/components/schemas/PartnerBundleProduct'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBundlePartnerProductMappings
       x-ticvai-consumed-by:
@@ -8046,6 +8339,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

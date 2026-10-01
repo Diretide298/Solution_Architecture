@@ -73,6 +73,36 @@ transitions:
   isReversal: true
   emits:
   - device.statusChanged
+- from: online
+  to: localMode
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: '**An access-control device validating from its offline package** with its link to the platform down
+    (ADR-0067, 1 October: the access register''s health merged into this one). Reported when the link returns,
+    so the move is recorded late and is still true'
+  emits:
+  - device.statusChanged
+- from: localMode
+  to: online
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: The link to the platform is back; the offline scans it queued sync
+  isReversal: true
+  emits:
+  - device.statusChanged
+- from: localMode
+  to: offline
+  trigger: timer
+  guard: The device stopped reporting altogether
+  emits:
+  - device.statusChanged
+- from: offline
+  to: localMode
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: The device reconnected and reports it ran in local mode while unreachable
+  emits:
+  - device.statusChanged
 - from: offline
   to: unknown
   trigger: timer
@@ -93,4 +123,11 @@ notes: '**No terminal state, which is deliberate.** A device is never finished â
   deciding what that means.
 
 
-  `consumableLow` is the state that prevents an outage rather than reporting one.'
+  `consumableLow` is the state that prevents an outage rather than reporting one.
+
+
+  **One health model for every device since ADR-0067 (1 October).** `access.access_device` carried its own
+  health (`healthy`, `active`, `degraded`, `offline`, `localMode`, `states/access-device-status.yaml`, removed
+  with it). `offline` is the same state here; `localMode` joins this model; `healthy` and `degraded` are
+  `health`, which is computed rather than reported; component readings are `scannerHealth`,
+  `controllerHealth` and `cameraHealth` on the register.'

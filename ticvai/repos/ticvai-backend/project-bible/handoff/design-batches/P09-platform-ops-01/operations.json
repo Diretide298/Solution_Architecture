@@ -1,4 +1,36 @@
 {
+ "cancelOutboxRepublish": {
+  "method": "POST",
+  "path": "/outbox-republishes/{republishId}/cancel",
+  "contract": "platform-ops",
+  "summary": "Stop a republish after its current batch",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OutboxRepublish"
+ },
+ "getOutboxRepublish": {
+  "method": "GET",
+  "path": "/outbox-republishes/{republishId}",
+  "contract": "platform-ops",
+  "summary": "One republish and its progress",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "platform",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OutboxRepublish"
+ },
  "listDeadLetters": {
   "method": "GET",
   "path": "/dead-letters",
@@ -23,6 +55,40 @@
   "requestBody": null,
   "responds": "DeadLetter"
  },
+ "listOutboxRepublishes": {
+  "method": "GET",
+  "path": "/outbox-republishes",
+  "contract": "platform-ops",
+  "summary": "Outbox republishes, newest first",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": "tenantId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "replayDeadLetter": {
   "method": "POST",
   "path": "/dead-letters/{deadLetterId}/replay",
@@ -46,5 +112,24 @@
   ],
   "requestBody": null,
   "responds": "DeadLetter"
+ },
+ "republishOutbox": {
+  "method": "POST",
+  "path": "/outbox-republishes",
+  "contract": "platform-ops",
+  "summary": "Republish one tenant database's outbox rows for a time range",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OutboxRepublishRequest",
+  "responds": null
  }
 }

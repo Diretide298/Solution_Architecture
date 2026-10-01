@@ -111,6 +111,12 @@ RENAMES = [
      "why": "moved with whitelabel.footer_config (audit R163)"},
     {"from": "control.footer_config_social_link", "to": "whitelabel.footer_config_social_link", "on": "2026-09-28",
      "why": "moved with whitelabel.footer_config (audit R163)"},
+    {"from": "identity.access_policy_version", "to": "identity.authorisation_policy_version", "on": "2026-10-01",
+     "why": "ADR-0068: moved with identity.authorisation_policy; each version of a staff-authorisation policy"},
+    {"from": "identity.access_policy", "to": "identity.authorisation_policy", "on": "2026-10-01",
+     "why": "ADR-0068: it is staff authorisation, not access. Guest admission at the gate is access.dynamic_policy, so 'access policy' now means one thing"},
+    {"from": "access.access_device", "to": "access.device_placement", "on": "2026-10-01",
+     "why": "ADR-0067: platform.device is the one device register; identity, versions, health and lifecycle moved there and this table keeps only where a device is placed in the gate topology. Not access.device_binding, which already names a guest's phone bound to an entitlement"},
 ]
 
 

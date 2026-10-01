@@ -123,7 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-078 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-078 holds none of them. The edge carries nothing: ADM-078 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     },
     {
      "to": "ADM-080",
@@ -1923,7 +1923,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-078",
      "trigger": "Pricing Governance Command Center",
-     "provenance": "derived — ADM-078 declares entryState.params changeId and ADM-087 holds none of them, so the edge carries nothing and ADM-078 opens cold"
+     "provenance": "derived — ADM-078 declares entryState.params changeId and ADM-087 holds none of them. The edge carries nothing: ADM-087 is opened from ADM-078, so this edge is the way back and ADM-078 keeps its own state"
     }
    ]
   },

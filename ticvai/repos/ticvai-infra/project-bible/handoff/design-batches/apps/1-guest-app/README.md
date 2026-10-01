@@ -16,17 +16,17 @@ Sections: P01, P02, P05
 
 ### Reference design to match
 
-- `sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html`: the website. Rev 3 with the 29 September fixes. The client approved it for development once W1 to W10 are in.
-- `sources/designs/guest-rev3-29-september/TICVAI Visit Planner.dc.html`: the visit planner. WEB-050 Plan Your Visit is this file.
+- `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`: the website. Rev 3 with the 29 September fixes and the 30 September feedback (group booking with a headcount, multi-park counters, surf session tickets, the swim-ability answer, transport stations and departures, popular route cards; `CLIENT-RESPONSE-30SEP.md` beside it). The client approved it for development once W1 to W10 are in.
+- `sources/designs/guest-rev3-30-september/TICVAI Visit Planner.dc.html`: the visit planner. WEB-050 Plan Your Visit is this file.
 
 Open the file and match it. Do not describe it in words.
 
 ### Where it stands
 
 - **50 screens.** 50 are Block A (the first 35 days of the build, from Monday 5 October).
-- **49 have a frame; 48 of those are client-verified** (a capture of the client-approved prototype).
+- **50 have a frame; 49 of those are client-verified** (a capture of the client-approved prototype).
 
-**WEB-050 Plan Your Visit is new** (the web opening of the visit planner). It has no frame yet. The other Block A screens that changed on 29 September keep their rev 3 frames until the client sees the new ones.
+**The 30 September return was captured on 1 October** (viewport 1440 x 900): **11 screens are views in it and now carry its frames**: WEB-005 (the multi-park counters), WEB-006 (a surf session's tickets), WEB-049 (transport, stations filled in and departures listed), the At the venue tabs WEB-036, WEB-039, WEB-040, WEB-041, WEB-042, WEB-043, WEB-046, and **WEB-050 Plan Your Visit, from the Visit Planner, which had no frame**. Do not draw these. The views and proof texts are in `tools/capture-plans/guest-web-v2.json`; the captures, with a manifest, in `wireframes/incoming/P01-web-v2/`. WEB-002, WEB-004 and WEB-007 keep their 29 September captures and the rest their rev 3 (28 September) captures: this return does not change those views.
 
 ### Batches, in the order to run them
 
@@ -56,7 +56,7 @@ Block A first: batches with a new or changed screen, then the rest of Block A. T
 Paste this into the Claude Design session with the batch folder and the reference file linked. Fill in the batch id.
 
 ```
-Build batch <BATCH ID> of TICVAI Guest, web shell. Read BRIEF.md in the batch folder first, then BUNDLE.md (screens, operations, schemas, permissions); BRIEF.md outranks this prompt. Match the look of `sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html` and `sources/designs/guest-rev3-29-september/TICVAI Visit Planner.dc.html`. This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. Add this batch's screens to the one working file for the whole app, handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html (create it with the first batch; every later batch extends the same file and keeps every earlier screen working, with one shared navigation, one shared seeded dataset and one look), where every screen opens from #<screen id> in its main populated state and every declared state opens from #<screen id>?state=<state>. Seed realistic UAE data from schemas.json (AED, venues, staff names), never lorem ipsum. Gate every control that needs a permission. Never show an operation id, field name, permission key or screen id as text. If a screen needs something the bundle does not have, draw it greyed with a short note and list it in return/FINDINGS.md; never invent an endpoint.
+Build batch <BATCH ID> of TICVAI Guest, web shell. Read BRIEF.md in the batch folder first, then BUNDLE.md (screens, operations, schemas, permissions); BRIEF.md outranks this prompt. Match the look of `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` and `sources/designs/guest-rev3-30-september/TICVAI Visit Planner.dc.html`. This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. Add this batch's screens to the one working file for the whole app, handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html (create it with the first batch; every later batch extends the same file and keeps every earlier screen working, with one shared navigation, one shared seeded dataset and one look), where every screen opens from #<screen id> in its main populated state and every declared state opens from #<screen id>?state=<state>. Seed realistic UAE data from schemas.json (AED, venues, staff names), never lorem ipsum. Gate every control that needs a permission. Never show an operation id, field name, permission key or screen id as text. If a screen needs something the bundle does not have, draw it greyed with a short note and list it in return/FINDINGS.md; never invent an endpoint.
 ```
 
 ### When it comes back
@@ -79,28 +79,39 @@ The standing overnight prompt and the importer's rules are in `docs/active/claud
 
 ### Reference design to match
 
-- `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`: Mobile App v4, the newest guest look (29 September). It replaces the 28 September Mobile v2 build.
-- `sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html`: the booking engine that runs inside the app. Keep both files in the same folder.
+- `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`: Mobile App v4, the newest guest look (29 September, with the 30 September feedback in the booking flows). It replaces the 28 September Mobile v2 build.
+- `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`: the booking engine that runs inside the app. Keep both files in the same folder.
 
 Open the file and match it. Do not describe it in words.
 
 ### Where it stands
 
 - **77 screens.** 77 are Block A (the first 35 days of the build, from Monday 5 October).
-- **77 have a frame; 77 of those are client-verified** (a capture of the client-approved prototype).
+- **77 have a frame; 58 of those are client-verified** (a capture of the client-approved prototype). The other 19 were drawn in the v4 look by Claude Code on 30 September and wait for the client's design reviewer (item 2 below).
 
 **The frames were captures of the 28 September build (Mobile v2).** Mobile App v4 replaced it on 29 September. So:
 
-1. **17 screens are views in v4** (GST-063, GST-012, GST-007, GST-008, GST-049, GST-041, GST-001, GST-002, GST-003, GST-004, GST-006, GST-051, GST-053, GST-054, GST-021, GST-022, GST-038). **Done: captured from v4 on 30 September** and re-imported, replacing their v2 frames. Do not draw these. The views and proof texts are in `tools/capture-plans/guest-mobile-v4.json`; the captures, with a manifest, in `wireframes/incoming/P02-mobile-v4/`. To capture again: `node tools/capture-prototype.mjs tools/capture-plans/guest-mobile-v4.json wireframes/incoming/P02-mobile-v4`, then `python tools/applied/guest-v4-capture-30-september.py --apply`.
-2. **19 changed Block A screens have no v4 view** (GST-059, GST-019, GST-039, GST-042, GST-066, GST-073, GST-048, GST-050, GST-056, GST-058, GST-074, GST-075, GST-009, GST-031, GST-032, GST-052, GST-011, GST-015, GST-036). Draw these in the v4 look, in the batches below.
-3. The other 41 screens keep their Mobile v2 frames for now. Restyle them to v4 when their batch comes round.
+1. **21 screens are views in v4** (GST-063, GST-012, GST-007, GST-008, GST-049, GST-041, GST-001, GST-002, GST-003, GST-004, GST-006, GST-051, GST-053, GST-054, GST-021, GST-022, GST-038, and the intercity transport screens GST-076, GST-077, GST-078, GST-079). **Done: captured from the 30 September return on 1 October** and re-imported (the first 17 had been captured from the 29 September build on 30 September; the transport four replace their Mobile v2 frames). **GST-021 is now the walking-navigation view**: the 3D map following the route, turn-by-turn above it. Do not draw these. The views and proof texts are in `tools/capture-plans/guest-mobile-v4.json`; the captures, with a manifest, in `wireframes/incoming/P02-mobile-v4/`.
+2. **19 changed Block A screens have no v4 view** (GST-059, GST-019, GST-039, GST-042, GST-066, GST-073, GST-048, GST-050, GST-056, GST-058, GST-074, GST-075, GST-009, GST-031, GST-032, GST-052, GST-011, GST-015, GST-036). Drawn in the v4 look by Claude Code on 30 September (`designed`, not client-verified); refine them in the batches below.
+3. The other 37 screens keep their Mobile v2 frames for now. Restyle them to v4 when their batch comes round.
+
+**To capture again** (both platforms): `node tools/capture-prototype.mjs tools/capture-plans/guest-mobile-v4.json wireframes/incoming/P02-mobile-v4` and `node tools/capture-prototype.mjs tools/capture-plans/guest-web-v2.json wireframes/incoming/P01-web-v2`, then `python tools/applied/guest-30-september-return.py --apply`.
 
 The manifest counts every P02 batch as drawn, because it counts frames on disk. It cannot see that the frames are one build old. The batches below are exported and current anyway.
 
-**Two changes from the client meeting of 30 September, over the v4 captures.** The v4 views stay the layout; these add to them, on the web twins too (WEB-050, WEB-004).
+**Three changes from the client meeting of 30 September, over the v4 captures.** The v4 views stay the layout; these add to them, on the web twins too (WEB-050, WEB-004).
 
 - **Planner, multi-venue (MoM 4.7, Allam): GST-051, GST-053, GST-054, WEB-050.** In a multi-venue tenant each day is one park (a *Which park each day?* choice after the dates), and a day holds only that park's rides, dining and **retail: shops and kiosks now sit beside meals** as plan stops. A cuisine or shop the park lacks is never filled from another park: the chip says *Not at the parks you chose* before planning, and the day shows a *Not at this park* banner naming the park that has it. Draw the `preferenceNotAtVenue` state.
 - **Ride detail video (MoM 4.8, Qossai): GST-004, WEB-004.** The info button reveals the details and plays the video in place. **No loader or loading screen in front of the video**: the poster frame shows while it buffers (`videoBuffering`), and a video that cannot play leaves the poster (`videoUnavailable`). Remove any spinner the v4 capture draws over the video.
+- **In-park navigation in 3D (MoM 4.8, ADR-0069): GST-021, GST-038.** A 2D/3D toggle on the map; 3D shows the park model with the walking route on the paths and a live position dot, with turn-by-turn guidance to a chosen point. Draw the `map3dUnavailable` state (no 3D model: the 2D map with the same route and live position, the toggle hidden) and the `weakGps` state (an approximate position ring and *Position approximate*).
+
+**Pending in design: what the 30 September return does not show yet.** These keep their specification and are built from it until a design shows them; the captures above stay the layout.
+
+- **Planner, multi-venue with retail (GST-051, GST-053, GST-054, WEB-050).** The return's planner is still single-park: no *Which park each day?* step, no shops or kiosks as plan stops, no *Any shops you'd like to visit?* choice (its lunch step offers cuisines only), and no `preferenceNotAtVenue` chip or banner.
+- **Ride video without a loader (GST-004, WEB-004).** The return's ride detail has no info button that plays a video in place, and no `videoBuffering` or `videoUnavailable` frame. Its only loader is on the app's intro video (*Loading video…* over the splash), which is not GST-004.
+- **3D navigation, partly shown (GST-021, GST-038; web WEB-039).** Shown: the app's walking navigation in 3D (route on the paths, live position, turn-by-turn, the camera following the guest), and on the web a *3D view / 2D plan* switch. Not shown: a guest-facing 2D/3D toggle on the app (3D or 2D is a demo setting there), `map3dUnavailable` and `weakGps`.
+
+**Also in the return, a prototype defect to raise with the design side:** on the multi-park flow the ticket's *Read more* panel still prices guests at single-park rates (Adult AED 325) and charges an infant AED 475, while the counters on the page are right (2 park ticket, Adult AED 475, infant free). The capture of WEB-005 shows the page, not the panel.
 
 ### Batches, in the order to run them
 
@@ -135,7 +146,7 @@ Block A first: batches with a new or changed screen, then the rest of Block A. T
 Paste this into the Claude Design session with the batch folder and the reference file linked. Fill in the batch id.
 
 ```
-Build batch <BATCH ID> of TICVAI Guest, mobile shell. Read BRIEF.md in the batch folder first, then BUNDLE.md (screens, operations, schemas, permissions); BRIEF.md outranks this prompt. Match the look of `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html` and `sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html`. This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. Add this batch's screens to the one working file for the whole app, handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html (create it with the first batch; every later batch extends the same file and keeps every earlier screen working, with one shared navigation, one shared seeded dataset and one look), where every screen opens from #<screen id> in its main populated state and every declared state opens from #<screen id>?state=<state>. Seed realistic UAE data from schemas.json (AED, venues, staff names), never lorem ipsum. Gate every control that needs a permission. Never show an operation id, field name, permission key or screen id as text. If a screen needs something the bundle does not have, draw it greyed with a short note and list it in return/FINDINGS.md; never invent an endpoint.
+Build batch <BATCH ID> of TICVAI Guest, mobile shell. Read BRIEF.md in the batch folder first, then BUNDLE.md (screens, operations, schemas, permissions); BRIEF.md outranks this prompt. Match the look of `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` and `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`. This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. Add this batch's screens to the one working file for the whole app, handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html (create it with the first batch; every later batch extends the same file and keeps every earlier screen working, with one shared navigation, one shared seeded dataset and one look), where every screen opens from #<screen id> in its main populated state and every declared state opens from #<screen id>?state=<state>. Seed realistic UAE data from schemas.json (AED, venues, staff names), never lorem ipsum. Gate every control that needs a permission. Never show an operation id, field name, permission key or screen id as text. If a screen needs something the bundle does not have, draw it greyed with a short note and list it in return/FINDINGS.md; never invent an endpoint.
 ```
 
 ### When it comes back
@@ -158,7 +169,7 @@ The standing overnight prompt and the importer's rules are in `docs/active/claud
 
 ### Reference design to match
 
-- `sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html`: the newest client-approved guest look. The kiosk is the same product, narrower.
+- `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`: the newest client-approved guest look. The kiosk is the same product, narrower.
 - `wireframes/reference/Kiosk Board 1.dc.html`: the client's kiosk board, for layout (and Kiosk Board 2).
 
 Open the file and match it. Do not describe it in words.
@@ -185,7 +196,7 @@ Block A first: batches with a new or changed screen, then the rest of Block A. T
 Paste this into the Claude Design session with the batch folder and the reference file linked. Fill in the batch id.
 
 ```
-Build batch <BATCH ID> of TICVAI Guest, kiosk shell. Read BRIEF.md in the batch folder first, then BUNDLE.md (screens, operations, schemas, permissions); BRIEF.md outranks this prompt. Match the look of `sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html` and `wireframes/reference/Kiosk Board 1.dc.html`. This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. Add this batch's screens to the one working file for the whole app, handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html (create it with the first batch; every later batch extends the same file and keeps every earlier screen working, with one shared navigation, one shared seeded dataset and one look), where every screen opens from #<screen id> in its main populated state and every declared state opens from #<screen id>?state=<state>. Seed realistic UAE data from schemas.json (AED, venues, staff names), never lorem ipsum. Gate every control that needs a permission. Never show an operation id, field name, permission key or screen id as text. If a screen needs something the bundle does not have, draw it greyed with a short note and list it in return/FINDINGS.md; never invent an endpoint.
+Build batch <BATCH ID> of TICVAI Guest, kiosk shell. Read BRIEF.md in the batch folder first, then BUNDLE.md (screens, operations, schemas, permissions); BRIEF.md outranks this prompt. Match the look of `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` and `wireframes/reference/Kiosk Board 1.dc.html`. This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. Add this batch's screens to the one working file for the whole app, handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html (create it with the first batch; every later batch extends the same file and keeps every earlier screen working, with one shared navigation, one shared seeded dataset and one look), where every screen opens from #<screen id> in its main populated state and every declared state opens from #<screen id>?state=<state>. Seed realistic UAE data from schemas.json (AED, venues, staff names), never lorem ipsum. Gate every control that needs a permission. Never show an operation id, field name, permission key or screen id as text. If a screen needs something the bundle does not have, draw it greyed with a short note and list it in return/FINDINGS.md; never invent an endpoint.
 ```
 
 ### When it comes back

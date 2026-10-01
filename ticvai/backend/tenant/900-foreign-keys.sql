@@ -240,13 +240,13 @@ ALTER TABLE games.redemption ADD CONSTRAINT redemption_issued_by_principal_id_fk
 ALTER TABLE games.redemption ADD CONSTRAINT redemption_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
 ALTER TABLE games.redemption_line ADD CONSTRAINT redemption_line_prize_id_fkey FOREIGN KEY (prize_id) REFERENCES games.prize(id);
 ALTER TABLE games.redemption_line ADD CONSTRAINT redemption_line_redemption_id_fkey FOREIGN KEY (redemption_id) REFERENCES games.redemption(id);
-ALTER TABLE identity.access_policy_version ADD CONSTRAINT access_policy_version_current_id_fkey FOREIGN KEY (current_id) REFERENCES identity.access_policy(id);
-ALTER TABLE identity.access_policy_version ADD CONSTRAINT access_policy_version_previous_id_fkey FOREIGN KEY (previous_id) REFERENCES identity.access_policy(id);
 ALTER TABLE identity.access_review_item ADD CONSTRAINT access_review_item_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES identity.access_review_campaign(id);
 ALTER TABLE identity.access_review_item ADD CONSTRAINT access_review_item_delegated_access_id_fkey FOREIGN KEY (delegated_access_id) REFERENCES identity.delegated_access(id);
 ALTER TABLE identity.access_review_item ADD CONSTRAINT access_review_item_principal_id_fkey FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.access_review_item ADD CONSTRAINT access_review_item_reviewer_principal_id_fkey FOREIGN KEY (reviewer_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.access_review_item ADD CONSTRAINT access_review_item_role_id_fkey FOREIGN KEY (role_id) REFERENCES identity.role(id);
+ALTER TABLE identity.authorisation_policy_version ADD CONSTRAINT authorisation_policy_version_current_id_fkey FOREIGN KEY (current_id) REFERENCES identity.authorisation_policy(id);
+ALTER TABLE identity.authorisation_policy_version ADD CONSTRAINT authorisation_policy_version_previous_id_fkey FOREIGN KEY (previous_id) REFERENCES identity.authorisation_policy(id);
 ALTER TABLE identity.authz_audit ADD CONSTRAINT authz_audit_actor_principal_id_fkey FOREIGN KEY (actor_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.authz_audit ADD CONSTRAINT authz_audit_subject_principal_id_fkey FOREIGN KEY (subject_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.delegated_access ADD CONSTRAINT delegated_access_created_by_principal_id_fkey FOREIGN KEY (created_by_principal_id) REFERENCES identity.principal(id);

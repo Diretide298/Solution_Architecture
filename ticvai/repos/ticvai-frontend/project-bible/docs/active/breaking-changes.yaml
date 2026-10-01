@@ -1,0 +1,38 @@
+# Breaking contract changes after r1, approved. AUTHORED: a person writes every entry; no tool does.
+#
+# From the release tag `r1` on, tools/check-contract-compat.py compares every contract with its text at
+# r1 and labels each change additive or breaking (an operation removed or moved, a field removed, a type
+# changed, a new required request field, an enum value removed, a value added to a response enum, or a
+# change to an operation's permission, conflict policy, read routing, security or emitted events).
+# **A breaking change fails the check unless an entry here approves it.**
+#
+# A ticket records the release tag it was pulled at, so the producer and the consumers of one operation
+# can be building against different tags. A breaking change is only safe when they all move to the same
+# tag, so an entry says which tag and which tickets (council of 1 October; plan item 1C).
+#
+# Every field is required except `change`; an entry missing one approves nothing and fails the check.
+#
+#   id                BC-001, BC-002, ... never reused
+#   contract          the contract's file name without .yaml (orders, marketing-crm, ...)
+#   operation         the operationId the change is reported against
+#   change            optional: text the reported change must contain (e.g. "is now required"); leave it
+#                     out to approve every breaking change to that operation
+#   reason            why the change cannot be made additive
+#   approved-by       the person who decided, and when
+#   tag               the release tag the producer and consumer tickets move to together (r2, ...)
+#   producer-tickets  the OpenProject keys of the tickets that build the operation
+#   consumer-tickets  the keys of the tickets that call it (screens, other services)
+#
+# Example:
+#
+#   - id: BC-001
+#     contract: orders
+#     operation: checkoutCart
+#     change: "request `contactId` is now required"
+#     reason: a guest order without a verified contact cannot be refunded (audit R120)
+#     approved-by: Chinmay Parab, 12 October 2026
+#     tag: r2
+#     producer-tickets: [SVC-ORDERS-CHECKOUT-1]
+#     consumer-tickets: [APP-POS-SCN-020, APP-WEB-GST-031]
+
+changes: []

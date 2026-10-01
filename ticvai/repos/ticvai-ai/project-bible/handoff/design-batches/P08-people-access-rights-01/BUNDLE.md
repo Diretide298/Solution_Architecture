@@ -1585,7 +1585,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-084 holds none of them, so the edge carries nothing and BO-087 opens cold"
+     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-084 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
     },
     {
      "to": "BO-085",
@@ -1882,7 +1882,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-085 holds none of them, so the edge carries nothing and BO-087 opens cold"
+     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-085 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
     },
     {
      "to": "POS-005",
@@ -2215,17 +2215,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-086 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-086 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional); BO-084 finds approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own"
     },
     {
      "to": "BO-085",
      "trigger": "Approval Request",
-     "provenance": "derived — BO-085 declares entryState.params requestId and BO-086 holds none of them, so the edge carries nothing and BO-085 opens cold"
+     "provenance": "derived — BO-085 declares entryState.params requestId and BO-086 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens on its own"
     },
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-086 holds none of them, so the edge carries nothing and BO-087 opens cold"
+     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-086 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
     }
    ]
   },
@@ -2418,12 +2418,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-087 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-087 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional); BO-084 finds approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own"
     },
     {
      "to": "BO-085",
      "trigger": "Approval Request",
-     "provenance": "derived — BO-085 declares entryState.params requestId and BO-087 holds none of them, so the edge carries nothing and BO-085 opens cold"
+     "provenance": "derived — BO-085 declares entryState.params requestId and BO-087 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens on its own"
     }
    ]
   },

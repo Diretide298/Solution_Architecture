@@ -121,22 +121,6 @@ stateModels:
   - retryCredentialGeneration
   guarded: 14
   ref: diagrams/lld/lifecycles/access-credential-issuance.yaml
-- entity: AccessDeviceHealth
-  contract: access
-  owner: access
-  service: null
-  states: null
-  transitions: 20
-  initial:
-  - healthy
-  - active
-  - degraded
-  - offline
-  - localMode
-  terminal: []
-  operations: []
-  guarded: 20
-  ref: diagrams/lld/lifecycles/access-device-status.yaml
 - entity: AccessDynamicPolicyVersion
   contract: access
   owner: access
@@ -1881,6 +1865,22 @@ stateModels:
   - voidOrder
   guarded: 14
   ref: diagrams/lld/lifecycles/order.yaml
+- entity: Outbox republish
+  contract: platform-ops
+  owner: platform-ops
+  service: PlatformService
+  states: null
+  transitions: 5
+  initial:
+  - queued
+  terminal:
+  - completed
+  - failed
+  - cancelled
+  operations:
+  - cancelOutboxRepublish
+  guarded: 5
+  ref: diagrams/lld/lifecycles/outbox-republish.yaml
 - entity: Parking entitlement
   contract: access
   owner: access
@@ -2421,13 +2421,13 @@ stateModels:
   owner: tenancy
   service: TenancyService
   states: null
-  transitions: 10
+  transitions: 14
   initial:
   - offline
   terminal: []
   operations:
   - recordDeviceHeartbeat
-  guarded: 10
+  guarded: 14
   ref: diagrams/lld/lifecycles/registered-device.yaml
 - entity: Release
   contract: platform-ops

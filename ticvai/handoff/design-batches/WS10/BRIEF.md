@@ -1,6 +1,6 @@
 # WS10 — Access Control board 10
 
-**10 screens · 20 operations · 31 schemas · 6 permissions**
+**10 screens · 20 operations · 32 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

@@ -129,7 +129,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
-  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope — stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a route map). **One-way:** From and To stations with a swap, the travel date (timetables are released 30 days ahead), the passengers (adult; child and student half fare; a person of determination travels free — proof is checked by the driver at boarding), a time period with its departure count, then departure cards (departs, arrives, duration, seats left, fare). **Next Available Trip** jumps to the first departure with room. A chosen departure shows a price card and the stop list with *Show full route* and a street map. **The street map needs the internet** and a third-party tile provider approved under audit R038; the stop list and schematic line need neither. Buying a trip is `addCartLine` with `attributes.transport` (route, stations, passenger type); the price comes from `quoteTransportFare`, and a departure with a seat map goes through seat selection on its `performanceId`. **Multi-trip:** 5- and 10-trip cards and weekly or monthly unlimited passes for the station pair, with the saving. **Favourites:** saved routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before departure* is the proposed default of the venue's modification policy, client to correct. **The real network (stations, fares, timetable) is an open value from the client**; the prototype's Emirates Link data is illustrative.",
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope — stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a route map). **One-way:** From and To stations with a swap, the travel date (timetables are released 30 days ahead), the passengers (adult; child and student half fare; a person of determination travels free — proof is checked by the driver at boarding), a time period with its departure count, then departure cards (departs, arrives, duration, seats left, fare). **Next Available Trip** jumps to the first departure with room. A chosen departure shows a price card and the stop list with *Show full route* and a street map. **The street map needs the internet** and a third-party tile provider approved under audit R038; the stop list and schematic line need neither. Buying a trip is `addCartLine` with `attributes.transport` (route, stations, passenger type); the price comes from `quoteTransportFare`, and a departure with a seat map goes through seat selection on its `performanceId`. **Multi-trip:** 5- and 10-trip cards and weekly or monthly unlimited passes for the station pair, with the saving. **Favourites:** saved routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before departure* is the proposed default of the venue's modification policy, client to correct. **The real network (stations, fares, timetable) is an open value from the client**; the prototype's Emirates Link data is illustrative.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 5 and 6).** **A route opens with its stations filled in:** entered from a route (a transport product or a route card), From and To are that route's first and last stops (for example E201: Abu Dhabi Central Bus Station to Al Ain Central Bus Station); the guest can still change or swap them. **Departures show straight away** for those stations and the date (`searchTransportDepartures` on load and on every change), with no need to press *Search Trips*; the time-period buttons filter the departures listed, and pressing the chosen period again shows them all. **Passengers appear only after a departure is chosen** (the departure first, then the tickets). The client build also has a *Popular routes* card view (route cards with a from-fare and *Book*, then the date, the departures and the passengers; on the app the first transport product); a route list with a from-fare is not in the contract yet (a question of 1 October), so it is not specified here.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`searchTransportDepartures` reads the population of departures and one is chosen for a price card and a route — list, select, act; the prototype draws one-way, multi-trip and favourites as tabs of one view",
@@ -338,7 +338,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "searchTransportDepartures",
     "contract": "transport",
     "purpose": "Departures for the stations, date, period and party, with counts per period",
-    "trigger": "onAction"
+    "trigger": "onLoad"
    },
    {
     "operationId": "getNextTransportDeparture",
@@ -409,25 +409,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     },
     {
      "name": "favouriteId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true
     },
     {
      "name": "routeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true
     }
    ],
-   "coldEntry": "Arrives with nothing; the venue comes from the site. A shared link with stations prefills From and To if both still exist, and says which one does not."
+   "coldEntry": "Arrives with nothing; the venue comes from the site. **Opened from a route** (a route card or a transport product, client feedback 30 September), `routeId` fills From and To with that route's first and last stops, and the departures show at once; the guest can still change or swap them. A saved route (`favouriteId`) prefills the same way. A shared link with stations prefills From and To if both still exist, and says which one does not."
   },
   "wireframe": {
-   "status": "notStarted",
+   "status": "review",
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-049",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "Emirates Link → 'Route & schedule · one-way, multi-trip, favourites'"
+    "view": "Engine controls → Transport → Route & schedule · one-way, multi-trip, favourites → Book → Fri (stations filled in, departures without a search)",
+    "differences": "30 September: the route opens with its stations filled in and the departures listed without a search; the time-period buttons filter them. The engine's other transport flow, Popular routes (card view), is route cards with a from-fare and Book, then the date, the departures and the passengers. The route map needs a street-map tile provider (audit R038)."
    }
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
@@ -498,6 +501,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

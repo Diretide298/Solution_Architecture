@@ -995,13 +995,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listAccessPolicies",
+       "impliedBy": "listAuthorisationPolicies",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "createAccessPolicy",
+       "impliedBy": "createAuthorisationPolicy",
        "label": "Create access policy",
        "notes": "The act the screen exists for."
       },
@@ -1010,7 +1010,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "createAccessPolicy"
+       "impliedBy": "createAuthorisationPolicy"
       }
      ]
     }
@@ -1025,14 +1025,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
-    "operationId": "listAccessPolicies",
+    "operationId": "listAuthorisationPolicies",
     "contract": "identity",
     "purpose": "Who may see which assets",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "createAccessPolicy",
+    "operationId": "createAuthorisationPolicy",
     "contract": "identity",
     "purpose": "Write an asset access policy",
     "trigger": "onAction",
@@ -1732,9 +1732,9 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
- "createAccessPolicy": {
+ "createAuthorisationPolicy": {
   "method": "POST",
-  "path": "/access-policies",
+  "path": "/authorisation-policies",
   "contract": "identity",
   "summary": "Write a policy without writing code",
   "permission": "PERMISSION_MANAGE",
@@ -1748,8 +1748,8 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": "AccessPolicy",
-  "responds": "AccessPolicy"
+  "requestBody": "AuthorisationPolicy",
+  "responds": "AuthorisationPolicy"
  },
  "createMediaShare": {
   "method": "POST",
@@ -1831,11 +1831,11 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "MediaUsageRow"
  },
- "listAccessPolicies": {
+ "listAuthorisationPolicies": {
   "method": "GET",
-  "path": "/access-policies",
+  "path": "/authorisation-policies",
   "contract": "identity",
-  "summary": "Attribute-based access policies",
+  "summary": "Attribute-based authorisation policies",
   "permission": "PERMISSION_VIEW",
   "offlineCapable": null,
   "conflictPolicy": null,
@@ -1853,7 +1853,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "AccessPolicy"
+  "responds": "AuthorisationPolicy"
  },
  "listMediaAssetAudit": {
   "method": "GET",
@@ -2005,10 +2005,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "AccessPolicy": {
+ "AuthorisationPolicy": {
   "type": "object",
-  "x-ticvai-persistence": "identity.access_policy",
-  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here). The overlap that remains is listed in the build readiness open items rather than merged in this pass.\n",
+  "x-ticvai-persistence": "identity.authorisation_policy",
+  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n",
   "required": [
    "code",
    "name",
@@ -2019,7 +2019,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "readOnly": true,
-    "description": "Assigned by the server on `createAccessPolicy`; the path names the policy on update."
+    "description": "Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."
    },
    "code": {
     "type": "string"
@@ -2082,7 +2082,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "status": {
     "type": "string",
     "readOnly": true,
-    "description": "**Moved only by `setAccessPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n",
+    "description": "**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n",
     "enum": [
      "draft",
      "pendingApproval",
@@ -2095,7 +2095,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "default": 1,
     "readOnly": true,
-    "description": "Set by the server; every `updateAccessPolicy` writes a new version."
+    "description": "Set by the server; every `updateAuthorisationPolicy` writes a new version."
    },
    "effectiveFrom": {
     "type": "string",

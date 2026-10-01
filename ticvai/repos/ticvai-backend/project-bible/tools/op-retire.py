@@ -129,6 +129,32 @@ def build_plan():
                     "the board; it comes back when its release is planned.")
         plan += [(x, kind, note) for x in [key] + [s_ for s_ in mp if s_.startswith(key + "#")]]
         covered.add(key)
+    # A pushed sub-task whose task is still planned but whose operation or table is no longer under it (the task
+    # was split or regrouped, 29-30 September): 128 on 1 October. Its work is either on another planned sub-task
+    # (a duplicate in effect: closed, pointing at that one) or has left the plan (on hold). Decided 1 October.
+    sys.path.insert(0, str(Path(__file__).parent))
+    push = __import__("push-openproject")
+    lineage = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+    with open(ROOT / "handoff" / "service-docs" / "tasks.csv", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    subs = {k for r in rows for k, *_ in push.sub_tasks(r, lineage)}
+    home = {}
+    for k in sorted(subs):
+        home.setdefault(k.partition("#")[2], k)
+    done = {k for k, _, _ in plan}
+    for k in sorted(mp):
+        base, _, part = k.partition("#")
+        if not part or k in subs or k in done or base not in planned or not isinstance(mp[k], int):
+            continue
+        other = home.get(part)
+        if other and other in mp:
+            plan.append((k, "merge", f"**Duplicate of #{mp[other]}** (decided 1 October): `{part}` moved to "
+                                     f"{other.partition('#')[0]} when its task was regrouped; that sub-task carries "
+                                     "it now, so this one is closed."))
+        else:
+            plan.append((k, "defer", f"**Out of the plan** (decided 1 October): `{part}` is no longer part of "
+                                     f"{base}'s work in this release. The sub-task is on hold and comes back if "
+                                     "its work is planned again."))
     unexplained = [g for g in gone if g not in covered]
     return mp, plan, unexplained
 

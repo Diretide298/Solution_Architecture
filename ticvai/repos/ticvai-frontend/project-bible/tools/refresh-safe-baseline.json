@@ -1,0 +1,28 @@
+{
+ "note": "What refresh-safe.sh accepts as a known failure. A gating checker (run-checks.py CHECKS minus REPORT_ONLY) may fail only if it is listed here AND every error line it prints (FAIL / STALE / ISSUE) matches one of its `known` patterns (Python regex, re.search). Anything else is a NEW failure and the refresh is not merged. Report-only checkers (check-bindings and the others in run-checks.py REPORT_ONLY) never gate, so they are not listed. Remove an entry when its failure is fixed; never widen a pattern to let a new failure through. Also judged: refresh.sh's closing tools/ coverage block (refresh_tools_coverage). Recorded 1 October 2026 at 278cc437.",
+ "checkers": {
+  "check-package": {
+   "why": "two errors in docs about build-readiness-21-september.md: a platform code/name mismatch and a platform code (P03) no screen file defines; the document is historical",
+   "known": [
+    "^build-readiness-21-september\\.md: writes 'P11 Accreditation is the other'",
+    "^build-readiness-21-september\\.md: names platform code P03, which no screen file defines"
+   ]
+  },
+  "check-authored-inputs": {
+   "why": "seven authored inputs written against an older contract surface; nothing in tools/ rebuilds them (docs/regenerating-authored-docs.md)",
+   "known": [
+    "^handoff/service-decomposition\\.json\\s",
+    "^handoff/contract-backlog\\.json\\s",
+    "^handoff/backlog-clusters\\.json\\s",
+    "^handoff/traceability\\.json\\s",
+    "^handoff/artefact-audit\\.md\\s",
+    "^handoff/schema-viewer-notes\\.md\\s",
+    "^handoff/rag-index-sources\\.md\\s"
+   ]
+  }
+ },
+ "refresh_tools_coverage": {
+  "why": "refresh.sh ends by failing when tools/ holds a .py it neither runs nor names in _EXCLUDED. At 278cc437 it fails on these, and nobody saw, because refresh.sh stops at run-checks (two known gate failures) before reaching it. refresh-safe.sh runs the block and fails only on a name not listed here. Deciding each one (run it, or excuse it in _EXCLUDED with the reason) is refresh.sh's owner's call. Emptied 1 October: every tool is now run or excused in _EXCLUDED.",
+  "known_unexcused": []
+ }
+}

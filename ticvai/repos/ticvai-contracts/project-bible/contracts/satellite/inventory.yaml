@@ -153,6 +153,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Supplier'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-transfers/{transferId}:
     parameters:
     - name: transferId
@@ -199,6 +201,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockTransfer'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /requisitions/{requisitionId}/lines:
     parameters:
     - name: requisitionId
@@ -292,6 +296,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-counts/daily:
     put:
       operationId: setDailyCount
@@ -375,6 +381,8 @@ paths:
                     description: Local time, e.g. 10:00
                   postsAdjustment:
                     type: boolean
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/bulk:
     post:
       operationId: bulkUpdateProducts
@@ -456,6 +464,8 @@ paths:
                           description: The validation rule the product failed, as in `Problem.errors[].code`.
                         message:
                           type: string
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /serialised-items:
     get:
       operationId: listSerialisedItems
@@ -507,6 +517,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/SerialisedItem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-batches/expiring:
     get:
       operationId: listExpiringBatches
@@ -553,6 +565,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/StockBatch'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inventory-items:
     get:
       operationId: listInventoryItems
@@ -615,6 +629,8 @@ paths:
                         $ref: '#/components/schemas/InventoryItem'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createInventoryItem
       x-ticvai-consumed-by:
@@ -659,6 +675,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inventory-items/{itemId}:
     parameters:
     - name: itemId
@@ -690,6 +708,8 @@ paths:
                 $ref: '#/components/schemas/InventoryItem'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateInventoryItem
       x-ticvai-consumed-by:
@@ -759,6 +779,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inventory-items/lookup:
     get:
       operationId: lookupInventoryItem
@@ -802,6 +824,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock:
     get:
       operationId: getStockPositions
@@ -857,6 +881,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/StockPosition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-locations:
     get:
       operationId: listStockLocations
@@ -894,6 +920,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/StockLocation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createStockLocation
       x-ticvai-consumed-by:
@@ -946,6 +974,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockLocation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock/valuation:
     get:
       operationId: getStockValuation
@@ -985,6 +1015,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockValuation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-movements:
     get:
       operationId: listStockMovements
@@ -1047,6 +1079,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/StockMovement'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createStockMovement
       x-ticvai-consumed-by:
@@ -1113,6 +1147,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-counts:
     get:
       operationId: listStockCounts
@@ -1154,6 +1190,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/StockCount'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: startStockCount
       x-ticvai-consumed-by:
@@ -1206,6 +1244,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-counts/{countId}/lines:
     parameters:
     - name: countId
@@ -1289,6 +1329,8 @@ paths:
                     type: integer
                   recounted:
                     type: integer
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-counts/{countId}/variance:
     parameters:
     - name: countId
@@ -1343,6 +1385,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-counts/{countId}/cancel:
     parameters:
     - name: countId
@@ -1398,6 +1442,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-counts/{countId}/recount:
     parameters:
     - name: countId
@@ -1472,6 +1518,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-counts/{countId}/post:
     parameters:
     - name: countId
@@ -1531,6 +1579,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-transfers:
     get:
       operationId: listStockTransfers
@@ -1572,6 +1622,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/StockTransfer'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createStockTransfer
       x-ticvai-consumed-by:
@@ -1620,6 +1672,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-transfers/{transferId}/close-short:
     parameters:
     - name: transferId
@@ -1697,6 +1751,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-transfers/{transferId}/receive:
     parameters:
     - name: transferId
@@ -1769,6 +1825,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /requisitions:
     get:
       operationId: listRequisitions
@@ -1815,6 +1873,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Requisition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createRequisition
       x-ticvai-consumed-by:
@@ -1855,6 +1915,8 @@ paths:
                 $ref: '#/components/schemas/Requisition'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /requisitions/suggested:
     get:
       operationId: getSuggestedRequisitions
@@ -1896,6 +1958,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/RequisitionSuggestion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /requisitions/{requisitionId}/reject:
     parameters:
     - name: requisitionId
@@ -1951,6 +2015,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /requisitions/{requisitionId}/return:
     parameters:
     - name: requisitionId
@@ -2006,6 +2072,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /requisitions/{requisitionId}/cancel:
     parameters:
     - name: requisitionId
@@ -2060,6 +2128,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /requisitions/{requisitionId}/approve:
     parameters:
     - name: requisitionId
@@ -2140,6 +2210,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /suppliers:
     get:
       operationId: listSuppliers
@@ -2176,6 +2248,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Supplier'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createSupplier
       x-ticvai-consumed-by:
@@ -2214,6 +2288,8 @@ paths:
                 $ref: '#/components/schemas/Supplier'
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /suppliers/{supplierId}/quotations:
     parameters:
     - name: supplierId
@@ -2267,6 +2343,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Quotation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /requisitions/{requisitionId}/quotations:
     parameters:
     - name: requisitionId
@@ -2300,6 +2378,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuotationComparison'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /purchase-orders:
     get:
       operationId: listPurchaseOrders
@@ -2343,6 +2423,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/PurchaseOrder'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPurchaseOrder
       x-ticvai-consumed-by:
@@ -2403,6 +2485,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /purchase-orders/{purchaseOrderId}:
     parameters:
     - name: purchaseOrderId
@@ -2435,6 +2519,8 @@ paths:
                 $ref: '#/components/schemas/PurchaseOrder'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /purchase-orders/{purchaseOrderId}/send:
     parameters:
     - name: purchaseOrderId
@@ -2479,6 +2565,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /purchase-orders/{purchaseOrderId}/acknowledge:
     parameters:
     - name: purchaseOrderId
@@ -2535,6 +2623,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /purchase-orders/{purchaseOrderId}/close-short:
     parameters:
     - name: purchaseOrderId
@@ -2609,6 +2699,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /purchase-orders/{purchaseOrderId}/cancel:
     parameters:
     - name: purchaseOrderId
@@ -2685,6 +2777,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /goods-receipts:
     get:
       operationId: listGoodsReceipts
@@ -2722,6 +2816,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/GoodsReceipt'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createGoodsReceipt
       x-ticvai-consumed-by:
@@ -2772,6 +2868,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /goods-receipts/{receiptId}/reject:
     parameters:
     - name: receiptId
@@ -2876,6 +2974,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-reservations:
     get:
       operationId: listStockReservations
@@ -2923,6 +3023,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/InventoryStockReservation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createStockReservation
       x-ticvai-consumed-by:
@@ -2975,6 +3077,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-reservations/{stockReservationId}/release:
     parameters:
     - name: stockReservationId
@@ -3032,6 +3136,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /supplier-contracts:
     get:
       operationId: listSupplierContracts
@@ -3089,6 +3195,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/InventorySupplierContract'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /suppliers/{supplierId}/contracts:
     parameters:
     - name: supplierId
@@ -3179,6 +3287,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /supplier-contracts/{contractId}:
     parameters:
     - name: contractId
@@ -3258,6 +3368,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inventory-items/{itemId}/kit-definition:
     parameters:
     - name: itemId
@@ -3291,6 +3403,8 @@ paths:
                 $ref: '#/components/schemas/InventoryKitDefinition'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setInventoryKitDefinition
       x-ticvai-consumed-by:
@@ -3344,6 +3458,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

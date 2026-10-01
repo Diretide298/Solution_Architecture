@@ -2414,10 +2414,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listDeviceGate · registerDevice · setTurnstileMode · listAccessPoints +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;navigation, deviceId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-195">BO-195</a>  &mdash; <i>Works in Device Type &amp; Hardware Library</i><br><a href="#bo-196">BO-196</a>  &mdash; <i>Works in Physical Device Registration &amp; Prov</i><br><a href="#bo-197">BO-197</a>  &mdash; <i>Works in Turnstile &amp; Lane Behavior Configura</i><br><a href="#bo-198">BO-198</a>  &mdash; <i>Works in Validation Outcome &amp; Guest Feedback</i><br><a href="#bo-199">BO-199</a>  &mdash; <i>Works in Reader, Scanner &amp; Peripheral Config</i><br><a href="#bo-200">BO-200</a>  &mdash; <i>Works in Handheld &amp; Mobile Access Device Con</i><br><a href="#bo-201">BO-201</a>  &mdash; <i>Works in Gate Modes, Free Spin &amp; Emergency C</i><br><a href="#bo-202">BO-202</a>  &mdash; <i>Works in Device Software, Content &amp; Remote C</i><br><a href="#bo-203">BO-203</a>  &mdash; <i>Works in Hardware Compatibility, Health, Tes</i></div>
+          <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;navigation, deviceId&larr;navigation, placementId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-195">BO-195</a>  &mdash; <i>Works in Device Type &amp; Hardware Library</i><br><a href="#bo-196">BO-196</a>  &mdash; <i>Works in Physical Device Registration &amp; Prov</i> <span class="car">placementId</span><br><a href="#bo-197">BO-197</a>  &mdash; <i>Works in Turnstile &amp; Lane Behavior Configura</i><br><a href="#bo-198">BO-198</a>  &mdash; <i>Works in Validation Outcome &amp; Guest Feedback</i><br><a href="#bo-199">BO-199</a>  &mdash; <i>Works in Reader, Scanner &amp; Peripheral Config</i><br><a href="#bo-200">BO-200</a>  &mdash; <i>Works in Handheld &amp; Mobile Access Device Con</i><br><a href="#bo-201">BO-201</a>  &mdash; <i>Works in Gate Modes, Free Spin &amp; Emergency C</i><br><a href="#bo-202">BO-202</a>  &mdash; <i>Works in Device Software, Content &amp; Remote C</i><br><a href="#bo-203">BO-203</a>  &mdash; <i>Works in Hardware Compatibility, Health, Tes</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formUpdateAccessDevice &middot; <i>Save access device</i> &middot; <b>Save access device</b> &middot; Cancel <span class="dis">discards id · venueId · hardwareType · provisioningStage · isActive · scopePath · hardwareModelId · name · serialNumber · accessAreaId · accessPointId · gateLaneId · deviceGroupId · ipNetworkReference · controllerReference · installationDate · lifecycleStatus · capabilities</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formUpdateAccessDevice &middot; <i>Save access device</i> &middot; <b>Save access device</b> &middot; Cancel <span class="dis">discards id · venueId · deviceId · role · isActive · scopePath · accessAreaId · accessPointId · gateLaneId · name · deviceGroupId · controllerReference · proximityThresholdMeters · installationDate</span></div></div>
         </div>
       </div>
       <div id="bo-195" class="scr" data-ws="WS06">
@@ -2472,12 +2472,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPhysicalDeviceRegistration · registerAccessDevice · updateAccessDevice</div>
+          <div><b>OPERATIONS</b> &middot; listPhysicalDeviceRegistration · registerDevice · placeAccessDevice · updateAccessDevicePlacement</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; deviceId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-194">BO-194</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">accessPointId · deviceId</span></div>
+          <div><b>ARRIVES WITH</b> &middot; deviceId&larr;session, placementId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-194">BO-194</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">accessPointId · deviceId · placementId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRegisterAccessDevice &middot; <i>Register access device</i> &middot; <b>Register access device</b> &middot; Cancel <span class="dis">discards id · venueId · hardwareType · provisioningStage · isActive · scopePath · hardwareModelId · name · serialNumber · accessAreaId · accessPointId · gateLaneId · deviceGroupId · ipNetworkReference · controllerReference · installationDate · lifecycleStatus · capabilities</span></div><div class="ov"><b>modal</b> formUpdateAccessDevice &middot; <i>Save access device</i> &middot; <b>Save access device</b> &middot; Cancel <span class="dis">discards id · venueId · hardwareType · provisioningStage · isActive · scopePath · hardwareModelId · name · serialNumber · accessAreaId · accessPointId · gateLaneId · deviceGroupId · ipNetworkReference · controllerReference · installationDate · lifecycleStatus · capabilities</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRegisterDevice &middot; <i>Register device</i> &middot; <b>Register device</b> &middot; Cancel <span class="dis">discards kind · driver · hardwareType · hardwareModelId · serialNumber · model · identifier · ipNetworkReference</span></div><div class="ov"><b>modal</b> formRegisterAccessDevice &middot; <i>Register access device</i> &middot; <b>Register access device</b> &middot; Cancel <span class="dis">discards id · venueId · deviceId · role · isActive · scopePath · accessAreaId · accessPointId · gateLaneId · name · deviceGroupId · controllerReference · proximityThresholdMeters · installationDate</span></div><div class="ov"><b>modal</b> formUpdateAccessDevice &middot; <i>Save access device</i> &middot; <b>Save access device</b> &middot; Cancel <span class="dis">discards id · venueId · deviceId · role · isActive · scopePath · accessAreaId · accessPointId · gateLaneId · name · deviceGroupId · controllerReference · proximityThresholdMeters · installationDate</span></div></div>
         </div>
       </div>
       <div id="bo-197" class="scr" data-ws="WS06">
@@ -11142,7 +11142,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccessPolicies · createAccessPolicy · simulateAccessPolicy · updateAccessPolicy +10</div>
+          <div><b>OPERATIONS</b> &middot; listAuthorisationPolicies · createAuthorisationPolicy · simulateAuthorisationPolicy · updateAuthorisationPolicy +10</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; policyId&larr;navigation, campaignId&larr;navigation, itemId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1061">BO-1061</a>  &mdash; <i>Back to Platform Command Center</i></div>
@@ -19425,7 +19425,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listApiScopes · listProductionAccessRequests · listAccessPolicies · createApiClient</div>
+          <div><b>OPERATIONS</b> &middot; listApiScopes · listProductionAccessRequests · listAuthorisationPolicies · createApiClient</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1173">BO-1173</a>  &mdash; <i>Back to Wallet Integration Command Center</i> <span class="car">clientId</span></div>
@@ -39228,7 +39228,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccessPolicies · createAccessPolicy</div>
+          <div><b>OPERATIONS</b> &middot; listAuthorisationPolicies · createAuthorisationPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-081">CMS-081</a>  &mdash; <i>Back to DAM Governance &amp; Rights Command Cent</i></div>
@@ -41028,7 +41028,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccessPolicies</div>
+          <div><b>OPERATIONS</b> &middot; listAuthorisationPolicies</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#anl-041">ANL-041</a>  &mdash; <i>Back to Reporting Governance Command Center</i></div>

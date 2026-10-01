@@ -47,14 +47,6 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 3
-  - operation: createAccessPolicy
-    verb: POST
-    path: /access-policies
-    scope: tenant
-    permission: PERMISSION_MANAGE
-    offline: false
-    reads: 1
-    writes: 1
   - operation: createAccessReviewCampaign
     verb: POST
     path: /access-review-campaigns
@@ -63,6 +55,14 @@ operationsByContract:
     offline: false
     reads: 9
     writes: 3
+  - operation: createAuthorisationPolicy
+    verb: POST
+    path: /authorisation-policies
+    scope: tenant
+    permission: PERMISSION_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: createDelegatedAccess
     verb: POST
     path: /delegated-access
@@ -167,17 +167,17 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-  - operation: getAccessPolicy
+  - operation: getAuthorisationPolicy
     verb: GET
-    path: /access-policies/{policyId}
+    path: /authorisation-policies/{policyId}
     scope: venue
     permission: PERMISSION_VIEW
     offline: false
     reads: 1
     writes: 0
-  - operation: getAccessPolicyBundle
+  - operation: getAuthorisationPolicyBundle
     verb: GET
-    path: /access-policies/bundle
+    path: /authorisation-policies/bundle
     scope: venue
     permission: PERMISSION_VIEW
     offline: true
@@ -311,38 +311,6 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
-  - operation: listAccessPolicies
-    verb: GET
-    path: /access-policies
-    scope: venue
-    permission: PERMISSION_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listAccessPolicyEffectiveness
-    verb: GET
-    path: /access-policy-effectiveness
-    scope: tenant
-    permission: PERMISSION_VIEW
-    offline: false
-    reads: 3
-    writes: 0
-  - operation: listAccessPolicyHistory
-    verb: GET
-    path: /access-policies/{policyId}/history
-    scope: tenant
-    permission: PERMISSION_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: listAccessPolicyTemplates
-    verb: GET
-    path: /access-policy-templates
-    scope: tenant
-    permission: PERMISSION_VIEW
-    offline: false
-    reads: 1
-    writes: 0
   - operation: listAccessReviewCampaigns
     verb: GET
     path: /access-review-campaigns
@@ -366,6 +334,38 @@ operationsByContract:
     permission: SESSION_FORCE_LOGOUT
     offline: false
     reads: 2
+    writes: 0
+  - operation: listAuthorisationPolicies
+    verb: GET
+    path: /authorisation-policies
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAuthorisationPolicyEffectiveness
+    verb: GET
+    path: /authorisation-policy-effectiveness
+    scope: tenant
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: listAuthorisationPolicyHistory
+    verb: GET
+    path: /authorisation-policies/{policyId}/history
+    scope: tenant
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listAuthorisationPolicyTemplates
+    verb: GET
+    path: /authorisation-policy-templates
+    scope: tenant
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listCapabilityTemplates
     verb: GET
@@ -583,9 +583,9 @@ operationsByContract:
     offline: false
     reads: 7
     writes: 2
-  - operation: restoreAccessPolicyVersion
+  - operation: restoreAuthorisationPolicyVersion
     verb: POST
-    path: /access-policies/{policyId}/restore
+    path: /authorisation-policies/{policyId}/restore
     scope: tenant
     permission: PERMISSION_MANAGE
     offline: false
@@ -607,9 +607,9 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 2
-  - operation: setAccessPolicyState
+  - operation: setAuthorisationPolicyState
     verb: POST
-    path: /access-policies/{policyId}/state
+    path: /authorisation-policies/{policyId}/state
     scope: tenant
     permission: PERMISSION_MANAGE
     offline: false
@@ -663,9 +663,9 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
-  - operation: simulateAccessPolicy
+  - operation: simulateAuthorisationPolicy
     verb: POST
-    path: /access-policies/simulate
+    path: /authorisation-policies/simulate
     scope: venue
     permission: PERMISSION_VIEW
     offline: false
@@ -695,9 +695,9 @@ operationsByContract:
     offline: false
     reads: 7
     writes: 0
-  - operation: updateAccessPolicy
+  - operation: updateAuthorisationPolicy
     verb: PUT
-    path: /access-policies/{policyId}
+    path: /authorisation-policies/{policyId}
     scope: tenant
     permission: PERMISSION_MANAGE
     offline: false
@@ -782,7 +782,7 @@ tables:
   - requestGuestOtp
   - resetPrincipalCredential
   - resolvePermissions
-  - restoreAccessPolicyVersion
+  - restoreAuthorisationPolicyVersion
   - revokeAllSessions
   - selectRole
   - setGuestVerificationPolicy
@@ -822,7 +822,7 @@ tables:
   - requestGuestOtp
   - resetPrincipalCredential
   - resolvePermissions
-  - restoreAccessPolicyVersion
+  - restoreAuthorisationPolicyVersion
   - revokeAllSessions
   - selectRole
   - setGuestVerificationPolicy
@@ -871,20 +871,6 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
-- table: identity.access_policy
-  columns: 16
-  store: postgres
-  parent: null
-  writtenBy:
-  - identity
-  foreignWriters: null
-- table: identity.access_policy_version
-  columns: 10
-  store: postgres
-  parent: identity.access_policy
-  writtenBy:
-  - identity
-  foreignWriters: null
 - table: identity.access_review_campaign
   columns: 17
   store: postgres
@@ -896,6 +882,20 @@ tables:
   columns: 14
   store: postgres
   parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.authorisation_policy
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.authorisation_policy_version
+  columns: 10
+  store: postgres
+  parent: identity.authorisation_policy
   writtenBy:
   - identity
   foreignWriters: null

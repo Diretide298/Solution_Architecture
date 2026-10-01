@@ -108,7 +108,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-025 holds none of them, so the edge carries nothing and WEB-027 opens cold"
+     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-025 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and WEB-027 opens on its own"
     }
    ]
   },
@@ -320,7 +320,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-026 holds none of them, so the edge carries nothing and WEB-027 opens cold"
+     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-026 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and WEB-027 opens on its own"
     }
    ]
   },
@@ -907,7 +907,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-028 holds none of them, so the edge carries nothing and WEB-027 opens cold"
+     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-028 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and WEB-027 opens on its own"
     }
    ]
   },
@@ -1484,11 +1484,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-046",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
+    "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (30 September build)",
+    "verified": "2026-10-01",
     "match": "exact",
-    "view": "At the venue → 'Alerts'",
+    "view": "Summit Peaks → header 'At the venue' → Alerts",
     "differences": "Deferred in the YAML (release later, R242: no in-app feed in the first release), but the prototype draws it as a live section, so the client will expect it."
    }
   },

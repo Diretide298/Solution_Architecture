@@ -421,17 +421,17 @@
     {
      "to": "ADM-016",
      "trigger": "White-Label Branding Management",
-     "provenance": "derived — ADM-016 declares entryState.params bannerId, pageId, policyKind, version and ADM-002 holds none of them, so the edge carries nothing and ADM-016 opens cold"
+     "provenance": "derived — ADM-016 declares entryState.params bannerId, pageId, policyKind, version and ADM-002 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and ADM-016 opens on its own"
     },
     {
      "to": "ADM-017",
      "trigger": "Domain & Certificate Management",
-     "provenance": "derived — ADM-017 declares entryState.params bannerId, domainId, pageId, policyKind, version and ADM-002 holds none of them, so the edge carries nothing and ADM-017 opens cold"
+     "provenance": "derived — ADM-017 declares entryState.params bannerId, domainId, pageId, policyKind, version and ADM-002 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version, domainId only pre-select (deep link or optional), and ADM-017 opens on its own"
     },
     {
      "to": "ADM-018",
      "trigger": "Localisation & Language Pack",
-     "provenance": "derived — ADM-018 declares entryState.params bannerId, pageId, policyKind, version and ADM-002 holds none of them, so the edge carries nothing and ADM-018 opens cold"
+     "provenance": "derived — ADM-018 declares entryState.params bannerId, pageId, policyKind, version and ADM-002 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and ADM-018 opens on its own"
     },
     {
      "to": "ADM-019",
@@ -444,22 +444,22 @@
     {
      "to": "ADM-022",
      "trigger": "Release & Version Management",
-     "provenance": "derived — ADM-022 declares entryState.params releaseId and ADM-002 holds none of them, so the edge carries nothing and ADM-022 opens cold"
+     "provenance": "derived — ADM-022 declares entryState.params releaseId and ADM-002 holds none of them. The edge carries nothing: releaseId only pre-selects (deep link or optional), and ADM-022 opens on its own"
     },
     {
      "to": "ADM-023",
      "trigger": "Staging Promotion & Approval",
-     "provenance": "derived — ADM-023 declares entryState.params releaseId and ADM-002 holds none of them, so the edge carries nothing and ADM-023 opens cold"
+     "provenance": "derived — ADM-023 declares entryState.params releaseId and ADM-002 holds none of them. The edge carries nothing: releaseId only pre-selects (deep link or optional), and ADM-023 opens on its own"
     },
     {
      "to": "ADM-026",
      "trigger": "End-of-Support Notice Management",
-     "provenance": "derived — ADM-026 declares entryState.params version and ADM-002 holds none of them, so the edge carries nothing and ADM-026 opens cold"
+     "provenance": "derived — ADM-026 declares entryState.params version and ADM-002 holds none of them. The edge carries nothing: ADM-026 finds version (listSupportNotices) itself, and ADM-026 opens on its own"
     },
     {
      "to": "ADM-027",
      "trigger": "Database Migration Console",
-     "provenance": "derived — ADM-027 declares entryState.params runId and ADM-002 holds none of them, so the edge carries nothing and ADM-027 opens cold"
+     "provenance": "derived — ADM-027 declares entryState.params runId and ADM-002 holds none of them. The edge carries nothing: runId only pre-selects (deep link or optional), and ADM-027 opens on its own"
     },
     {
      "to": "ADM-029",
@@ -480,7 +480,7 @@
     {
      "to": "ADM-031",
      "trigger": "Security & Compliance Dashboard",
-     "provenance": "derived — ADM-031 declares entryState.params dashboardId and ADM-002 holds none of them, so the edge carries nothing and ADM-031 opens cold"
+     "provenance": "derived — ADM-031 declares entryState.params dashboardId and ADM-002 holds none of them. The edge carries nothing: dashboardId only pre-selects (deep link or optional), and ADM-031 opens on its own"
     },
     {
      "to": "ADM-032",
@@ -517,7 +517,7 @@
     {
      "to": "ADM-138",
      "trigger": "Promotion Command Center Dashboard",
-     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-002 holds none of them, so the edge carries nothing and ADM-138 opens cold"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-002 holds none of them. The edge carries nothing: ADM-138 finds promotionId (listPromotions) itself, and ADM-138 opens on its own"
     },
     {
      "to": "ADM-158",
@@ -527,7 +527,7 @@
     {
      "to": "ADM-318",
      "trigger": "Dead Letters",
-     "provenance": "derived — ADM-318 declares entryState.params deadLetterId and ADM-002 holds none of them, so the edge carries nothing and ADM-318 opens cold"
+     "provenance": "derived — ADM-318 declares entryState.params deadLetterId and ADM-002 holds none of them. The edge carries nothing: deadLetterId only pre-selects (deep link or optional), and ADM-318 opens on its own"
     },
     {
      "to": "ADM-024",
@@ -981,17 +981,17 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-003 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-003 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-003 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-003 holds none of them. The edge carries nothing: ADM-003 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     },
     {
      "to": "ADM-004",
      "trigger": "Platform Audit Log",
-     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId and ADM-003 holds none of them, so the edge carries nothing and ADM-004 opens cold"
+     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId and ADM-003 holds none of them. The edge carries nothing: ADM-004 finds decisionRecordId (listAiInteractions) itself, and ADM-004 opens on its own"
     },
     {
      "to": "SCN-003",
@@ -1452,17 +1452,17 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-004 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-004 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-004 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-004 holds none of them. The edge carries nothing: ADM-004 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-004 holds none of them, so the edge carries nothing and ADM-003 opens cold"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-004 holds none of them. The edge carries nothing: cellId, rightId only pre-select (deep link or optional), and ADM-003 opens on its own"
     },
     {
      "to": "BO-068",
@@ -1662,12 +1662,12 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-013 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-013 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-013 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-013 holds none of them. The edge carries nothing: ADM-013 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     },
     {
      "to": "ADM-003",
@@ -2002,12 +2002,12 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-029 holds none of them, so the edge carries nothing and ADM-001 opens cold"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-029 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-029 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-029 holds none of them. The edge carries nothing: ADM-029 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     },
     {
      "to": "ADM-003",

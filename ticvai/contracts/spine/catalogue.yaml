@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 232
+  x-ticvai-screen-count: 234
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -14628,6 +14628,9 @@ paths:
         format: uuid
     post:
       operationId: enterWaitingRoom
+      x-ticvai-consumed-by:
+        - "P01 WEB-015 Branded Queue / Waiting Room"
+        - "P02 GST-046 Branded Queue / Waiting Room"
       x-ticvai-audience:
       - anonymous
       - guest
@@ -14685,6 +14688,9 @@ paths:
         format: uuid
     get:
       operationId: getWaitingRoomPosition
+      x-ticvai-consumed-by:
+        - "P01 WEB-015 Branded Queue / Waiting Room"
+        - "P02 GST-046 Branded Queue / Waiting Room"
       x-ticvai-audience:
       - anonymous
       - guest

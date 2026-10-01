@@ -1201,6 +1201,14 @@ operationsByContract:
     offline: true
     reads: 4
     writes: 2
+  - operation: placeAccessDevice
+    verb: POST
+    path: /device-placements
+    scope: venue
+    permission: DEVICE_CONFIGURE
+    offline: false
+    reads: 5
+    writes: 3
   - operation: publishHardwareDeployment
     verb: POST
     path: /hardware-deployments
@@ -1233,14 +1241,6 @@ operationsByContract:
     offline: false
     reads: 10
     writes: 4
-  - operation: registerAccessDevice
-    verb: POST
-    path: /access-devices
-    scope: venue
-    permission: DEVICE_CONFIGURE
-    offline: false
-    reads: 5
-    writes: 3
   - operation: releaseCredentialDevice
     verb: POST
     path: /device-bindings/{bindingId}/release
@@ -1929,9 +1929,9 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 3
-  - operation: updateAccessDevice
+  - operation: updateAccessDevicePlacement
     verb: PUT
-    path: /access-devices/{deviceId}
+    path: /device-placements/{placementId}
     scope: venue
     permission: DEVICE_CONFIGURE
     offline: false
@@ -2027,10 +2027,10 @@ tables:
   - enrolFaceTag
   - lockIdentity
   - overrideAccess
+  - placeAccessDevice
   - publishMediaCompatibilityTesting
   - publishRuleConflictCheck
   - publishTopologyValidation
-  - registerAccessDevice
   - releaseCredentialDevice
   - releaseIdentityLock
   - removeBlacklistEntry
@@ -2113,7 +2113,7 @@ tables:
   - simulateOfflineResilienceTesting
   - simulatePolicyConflictImpact
   - startPodiumShift
-  - updateAccessDevice
+  - updateAccessDevicePlacement
   - updateAccessPoint
   - updateAdmissionRules
   - updateParkingEntitlement
@@ -2143,10 +2143,10 @@ tables:
   - enrolFaceTag
   - lockIdentity
   - overrideAccess
+  - placeAccessDevice
   - publishMediaCompatibilityTesting
   - publishRuleConflictCheck
   - publishTopologyValidation
-  - registerAccessDevice
   - releaseCredentialDevice
   - releaseIdentityLock
   - removeBlacklistEntry
@@ -2229,7 +2229,7 @@ tables:
   - simulateOfflineResilienceTesting
   - simulatePolicyConflictImpact
   - startPodiumShift
-  - updateAccessDevice
+  - updateAccessDevicePlacement
   - updateAccessPoint
   - updateAdmissionRules
   - updateParkingEntitlement
@@ -2253,13 +2253,6 @@ tables:
   foreignWriters: null
 - table: access.access_change
   columns: 9
-  store: postgres
-  parent: null
-  writtenBy:
-  - access
-  foreignWriters: null
-- table: access.access_device
-  columns: 30
   store: postgres
   parent: null
   writtenBy:
@@ -2454,6 +2447,13 @@ tables:
   foreignWriters: null
 - table: access.device_configuration
   columns: 27
+  store: postgres
+  parent: null
+  writtenBy:
+  - access
+  foreignWriters: null
+- table: access.device_placement
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -2729,7 +2729,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.scan_event
-  columns: 22
+  columns: 23
   store: postgres
   parent: null
   writtenBy:

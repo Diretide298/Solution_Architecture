@@ -1,0 +1,43 @@
+# Outbox republish — state model
+# Contract: platform-ops.OutboxRepublish.status
+# Checked by tools/check-states.py.
+
+entity: Outbox republish
+contract: platform-ops
+enum: OutboxRepublish.status
+enumKind: inline
+enumSchema: OutboxRepublish
+enumProperty: status
+owner: platform-ops
+initial:
+- queued
+terminal:
+- completed
+- failed
+- cancelled
+transitions:
+- from: queued
+  to: running
+  trigger: job
+  guard: The relay loop holding the tenant database's lease picks it up (ADR-0058, amended 1 October)
+- from: running
+  to: completed
+  trigger: job
+  guard: The cursor reached `to`
+- from: running
+  to: failed
+  trigger: job
+  guard: A batch failed past the relay's retry budget; `lastError` says why and the cursor is kept
+- from: queued
+  to: cancelled
+  operation: cancelOutboxRepublish
+  trigger: operation
+  guard: Cancelled before it started
+- from: running
+  to: cancelled
+  operation: cancelOutboxRepublish
+  trigger: operation
+  guard: Stops after the batch in flight; the cursor is kept
+notes: '**Finished is final; the cursor is not.** A cancelled or failed republish is never resumed in
+  place: a new `republishOutbox` starts from its `cursorAt`, so each attempt keeps its own record and at
+  most one per tenant is `queued` or `running` at a time.'

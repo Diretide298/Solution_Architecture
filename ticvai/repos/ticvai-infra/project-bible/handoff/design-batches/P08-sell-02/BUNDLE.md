@@ -105,12 +105,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-018 holds none of them, so the edge carries nothing and BO-007 opens cold"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-018 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-018 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-018 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     }
    ]
   },
@@ -435,12 +435,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-019 holds none of them, so the edge carries nothing and BO-007 opens cold"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-019 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-019 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-019 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     }
    ]
   },
@@ -948,12 +948,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-037 holds none of them, so the edge carries nothing and BO-007 opens cold"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-037 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-037 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-037 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     },
     {
      "to": "BO-128",
@@ -1386,12 +1386,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-063 holds none of them, so the edge carries nothing and BO-007 opens cold"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-063 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-063 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-063 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     }
    ]
   },
@@ -1958,172 +1958,172 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-102 holds none of them, so the edge carries nothing and BO-007 opens cold"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-102 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-102 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-102 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
     },
     {
      "to": "BO-010",
      "trigger": "Promotions & Coupons",
-     "provenance": "derived — BO-010 declares entryState.params campaignId, code, dashboardId, promotionId, reportId, voucherId and BO-102 holds none of them, so the edge carries nothing and BO-010 opens cold"
+     "provenance": "derived — BO-010 declares entryState.params campaignId, code, dashboardId, promotionId, reportId, voucherId and BO-102 holds none of them. The edge carries nothing: campaignId, dashboardId, promotionId, reportId, code only pre-select (deep link or optional); BO-010 opens on listPromotions, and voucherId has no source on BO-010 yet (a gap in BO-010, not in this edge)"
     },
     {
      "to": "BO-011",
      "trigger": "Packages & Bundles",
-     "provenance": "derived — BO-011 declares entryState.params bundleId, comboId, productId, version and BO-102 holds none of them, so the edge carries nothing and BO-011 opens cold"
+     "provenance": "derived — BO-011 declares entryState.params bundleId, comboId, productId, version and BO-102 holds none of them. The edge carries nothing: version only pre-selects (deep link or optional); BO-011 finds productId (setPackagePricingDefinition), bundleId (createBundle), comboId (createCombo) itself, and BO-011 opens on its own"
     },
     {
      "to": "BO-012",
      "trigger": "Membership Products",
-     "provenance": "derived — BO-012 declares entryState.params productId and BO-102 holds none of them, so the edge carries nothing and BO-012 opens cold"
+     "provenance": "derived — BO-012 declares entryState.params productId and BO-102 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-012 opens on its own"
     },
     {
      "to": "BO-013",
      "trigger": "Channel & Distribution",
-     "provenance": "derived — BO-013 declares entryState.params channelCapacityId and BO-102 holds none of them, so the edge carries nothing and BO-013 opens cold"
+     "provenance": "derived — BO-013 declares entryState.params channelCapacityId and BO-102 holds none of them. The edge carries nothing: channelCapacityId only pre-selects (deep link or optional), and BO-013 opens on its own"
     },
     {
      "to": "BO-014",
      "trigger": "Catalogue Publishing",
-     "provenance": "derived — BO-014 declares entryState.params itemId, priceListId, productId and BO-102 holds none of them, so the edge carries nothing and BO-014 opens cold"
+     "provenance": "derived — BO-014 declares entryState.params itemId, priceListId, productId and BO-102 holds none of them. The edge carries nothing: itemId, priceListId, productId only pre-select (deep link or optional), and BO-014 opens on its own"
     },
     {
      "to": "BO-015",
      "trigger": "Performance Calendar",
-     "provenance": "derived — BO-015 declares entryState.params eventId, performanceId and BO-102 holds none of them, so the edge carries nothing and BO-015 opens cold"
+     "provenance": "derived — BO-015 declares entryState.params eventId, performanceId and BO-102 holds none of them. The edge carries nothing: eventId, performanceId only pre-select (deep link or optional), and BO-015 opens on its own"
     },
     {
      "to": "BO-016",
      "trigger": "Performance Template",
-     "provenance": "derived — BO-016 declares entryState.params  and BO-102 holds none of them, so the edge carries nothing and BO-016 opens cold"
+     "provenance": "derived — BO-016 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-016 needs nothing to open"
     },
     {
      "to": "BO-017",
      "trigger": "Capacity Management",
-     "provenance": "derived — BO-017 declares entryState.params channelCapacityId, entryId and BO-102 holds none of them, so the edge carries nothing and BO-017 opens cold"
+     "provenance": "derived — BO-017 declares entryState.params channelCapacityId, entryId and BO-102 holds none of them. The edge carries nothing: channelCapacityId only pre-selects (deep link or optional); BO-017 finds entryId (listWaitlistEntries) itself, and BO-017 opens on its own"
     },
     {
      "to": "BO-018",
      "trigger": "Allocation & Holds",
-     "provenance": "derived — BO-018 declares entryState.params inventoryHoldId and BO-102 holds none of them, so the edge carries nothing and BO-018 opens cold"
+     "provenance": "derived — BO-018 declares entryState.params inventoryHoldId and BO-102 holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (deep link or optional), and BO-018 opens on its own"
     },
     {
      "to": "BO-019",
      "trigger": "Closures & Blackouts",
-     "provenance": "derived — BO-019 declares entryState.params eventId, mapId, pathId, performanceId and BO-102 holds none of them, so the edge carries nothing and BO-019 opens cold"
+     "provenance": "derived — BO-019 declares entryState.params eventId, mapId, pathId, performanceId and BO-102 holds none of them. The edge carries nothing: eventId, performanceId only pre-select (deep link or optional); BO-019 opens on listEvents, and mapId, pathId have no source on BO-019 yet (a gap in BO-019, not in this edge)"
     },
     {
      "to": "BO-037",
      "trigger": "Offline Package Status",
-     "provenance": "derived — BO-037 declares entryState.params version and BO-102 holds none of them, so the edge carries nothing and BO-037 opens cold"
+     "provenance": "derived — BO-037 declares entryState.params version and BO-102 holds none of them. The edge carries nothing: version only pre-selects (deep link or optional), and BO-037 opens on its own"
     },
     {
      "to": "BO-063",
      "trigger": "Opening Hours & Calendar",
-     "provenance": "derived — BO-063 declares entryState.params eventId, outletId, performanceId and BO-102 holds none of them, so the edge carries nothing and BO-063 opens cold"
+     "provenance": "derived — BO-063 declares entryState.params eventId, outletId, performanceId and BO-102 holds none of them. The edge carries nothing: eventId, outletId, performanceId only pre-select (deep link or optional), and BO-063 opens on its own"
     },
     {
      "to": "BO-109",
      "trigger": "Menu Builder & POS Layout Designer",
-     "provenance": "derived — BO-109 declares entryState.params menuId, saleBoardId and BO-102 holds none of them, so the edge carries nothing and BO-109 opens cold"
+     "provenance": "derived — BO-109 declares entryState.params menuId, saleBoardId and BO-102 holds none of them. The edge carries nothing: menuId, saleBoardId only pre-select (deep link or optional), and BO-109 opens on its own"
     },
     {
      "to": "BO-110",
      "trigger": "Recipe & BOM Management",
-     "provenance": "derived — BO-110 declares entryState.params  and BO-102 holds none of them, so the edge carries nothing and BO-110 opens cold"
+     "provenance": "derived — BO-110 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-110 needs nothing to open"
     },
     {
      "to": "BO-111",
      "trigger": "Ingredient Substitution, Allergen & Nutrition",
-     "provenance": "derived — BO-111 declares entryState.params menuId, menuItemId, recipeId and BO-102 holds none of them, so the edge carries nothing and BO-111 opens cold"
+     "provenance": "derived — BO-111 declares entryState.params menuId, menuItemId, recipeId and BO-102 holds none of them. The edge carries nothing: menuId, menuItemId only pre-select (deep link or optional); BO-111 finds recipeId (setSubstitutionRules) itself, and BO-111 opens on its own"
     },
     {
      "to": "BO-112",
      "trigger": "Production Planning & Production Sheets",
-     "provenance": "derived — BO-112 declares entryState.params  and BO-102 holds none of them, so the edge carries nothing and BO-112 opens cold"
+     "provenance": "derived — BO-112 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-112 needs nothing to open"
     },
     {
      "to": "BO-113",
      "trigger": "Central Kitchen & Commissary Management",
-     "provenance": "derived — BO-113 declares entryState.params runId and BO-102 holds none of them, so the edge carries nothing and BO-113 opens cold"
+     "provenance": "derived — BO-113 declares entryState.params runId and BO-102 holds none of them. The edge carries nothing: runId only pre-selects (deep link or optional), and BO-113 opens on its own"
     },
     {
      "to": "BO-114",
      "trigger": "Variants, Attributes, Barcode & RFID Management",
-     "provenance": "derived — BO-114 declares entryState.params  and BO-102 holds none of them, so the edge carries nothing and BO-114 opens cold"
+     "provenance": "derived — BO-114 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-114 needs nothing to open"
     },
     {
      "to": "BO-115",
      "trigger": "Category, Brand & Merchandise Hierarchy",
-     "provenance": "derived — BO-115 declares entryState.params reportId and BO-102 holds none of them, so the edge carries nothing and BO-115 opens cold"
+     "provenance": "derived — BO-115 declares entryState.params reportId and BO-102 holds none of them. The edge carries nothing: reportId only pre-selects (deep link or optional), and BO-115 opens on its own"
     },
     {
      "to": "BO-116",
      "trigger": "Merchandising & Product Presentation",
-     "provenance": "derived — BO-116 declares entryState.params merchandiseId, roleId, saleBoardId and BO-102 holds none of them, so the edge carries nothing and BO-116 opens cold"
+     "provenance": "derived — BO-116 declares entryState.params merchandiseId, roleId, saleBoardId and BO-102 holds none of them. The edge carries nothing: merchandiseId, roleId, saleBoardId only pre-select (deep link or optional), and BO-116 opens on its own"
     },
     {
      "to": "BO-117",
      "trigger": "Product Import, Governance & AI Configuration Assistant",
-     "provenance": "derived — BO-117 declares entryState.params jobId, saleBoardId and BO-102 holds none of them, so the edge carries nothing and BO-117 opens cold"
+     "provenance": "derived — BO-117 declares entryState.params jobId, saleBoardId and BO-102 holds none of them. The edge carries nothing: saleBoardId only pre-selects (deep link or optional); BO-117 finds jobId (importProductCatalogue) itself, and BO-117 opens on its own"
     },
     {
      "to": "BO-118",
      "trigger": "Campaign & Audience Management",
-     "provenance": "derived — BO-118 declares entryState.params reportId, saleBoardId and BO-102 holds none of them, so the edge carries nothing and BO-118 opens cold"
+     "provenance": "derived — BO-118 declares entryState.params reportId, saleBoardId and BO-102 holds none of them. The edge carries nothing: reportId, saleBoardId only pre-select (deep link or optional), and BO-118 opens on its own"
     },
     {
      "to": "BO-119",
      "trigger": "Cross-Sell, Upsell & Recommendation Rules",
-     "provenance": "derived — BO-119 declares entryState.params ruleId and BO-102 holds none of them, so the edge carries nothing and BO-119 opens cold"
+     "provenance": "derived — BO-119 declares entryState.params ruleId and BO-102 holds none of them. The edge carries nothing: BO-119 finds ruleId (createUpsellRule) itself, and BO-119 opens on its own"
     },
     {
      "to": "BO-120",
      "trigger": "Omnichannel Commerce & Journey Configuration",
-     "provenance": "derived — BO-120 declares entryState.params  and BO-102 holds none of them, so the edge carries nothing and BO-120 opens cold"
+     "provenance": "derived — BO-120 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-120 needs nothing to open"
     },
     {
      "to": "BO-121",
      "trigger": "Personalized Offers & Guest Engagement",
-     "provenance": "derived — BO-121 declares entryState.params  and BO-102 holds none of them, so the edge carries nothing and BO-121 opens cold"
+     "provenance": "derived — BO-121 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-121 needs nothing to open"
     },
     {
      "to": "BO-122",
      "trigger": "POS Experience Dashboard",
-     "provenance": "derived — BO-122 declares entryState.params  and BO-102 holds none of them, so the edge carries nothing and BO-122 opens cold"
+     "provenance": "derived — BO-122 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-122 needs nothing to open"
     },
     {
      "to": "BO-123",
      "trigger": "POS Profile Management",
-     "provenance": "derived — BO-123 declares entryState.params  and BO-102 holds none of them, so the edge carries nothing and BO-123 opens cold"
+     "provenance": "derived — BO-123 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-123 needs nothing to open"
     },
     {
      "to": "BO-124",
      "trigger": "Layout & Journey Builder",
-     "provenance": "derived — BO-124 declares entryState.params deviceId, profileId, saleBoardId and BO-102 holds none of them, so the edge carries nothing and BO-124 opens cold"
+     "provenance": "derived — BO-124 declares entryState.params deviceId, profileId, saleBoardId and BO-102 holds none of them. The edge carries nothing: saleBoardId, deviceId, profileId only pre-select (deep link or optional), and BO-124 opens on its own"
     },
     {
      "to": "BO-125",
      "trigger": "Product & Category Button Configuration",
-     "provenance": "derived — BO-125 declares entryState.params deviceId, saleBoardId, workstationId and BO-102 holds none of them, so the edge carries nothing and BO-125 opens cold"
+     "provenance": "derived — BO-125 declares entryState.params deviceId, saleBoardId, workstationId and BO-102 holds none of them. The edge carries nothing: saleBoardId, deviceId, workstationId only pre-select (deep link or optional), and BO-125 opens on its own"
     },
     {
      "to": "BO-126",
      "trigger": "Deployment, Preview & Audit",
-     "provenance": "derived — BO-126 declares entryState.params profileId, reportId, rolloutId, saleBoardId and BO-102 holds none of them, so the edge carries nothing and BO-126 opens cold"
+     "provenance": "derived — BO-126 declares entryState.params profileId, reportId, rolloutId, saleBoardId and BO-102 holds none of them. The edge carries nothing: profileId, saleBoardId, reportId, rolloutId only pre-select (deep link or optional), and BO-126 opens on its own"
     },
     {
      "to": "BO-142",
      "trigger": "Store Rules, Controls & Permissions",
-     "provenance": "derived — BO-142 declares entryState.params  and BO-102 holds none of them, so the edge carries nothing and BO-142 opens cold"
+     "provenance": "derived — BO-142 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-142 needs nothing to open"
     },
     {
      "to": "BO-143",
      "trigger": "Retail Global Settings & Controls",
-     "provenance": "derived — BO-143 declares entryState.params dropId and BO-102 holds none of them, so the edge carries nothing and BO-143 opens cold"
+     "provenance": "derived — BO-143 declares entryState.params dropId and BO-102 holds none of them. The edge carries nothing: BO-143 opens on lookupShopAndDrop, and dropId has no source on BO-143 yet (a gap in BO-143, not in this edge)"
     },
     {
      "to": "BO-1190",
@@ -2357,7 +2357,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-109 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-109 holds none of them. The edge carries nothing: BO-109 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },
@@ -2611,7 +2611,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-110 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-110 holds none of them. The edge carries nothing: BO-110 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },
@@ -2811,7 +2811,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-111 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-111 holds none of them. The edge carries nothing: BO-111 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     },
     {
      "to": "BO-045",
@@ -3073,7 +3073,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-112 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-112 holds none of them. The edge carries nothing: BO-112 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },
@@ -3247,7 +3247,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-113 holds none of them, so the edge carries nothing and BO-102 opens cold"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-113 holds none of them. The edge carries nothing: BO-113 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
     }
    ]
   },
@@ -3452,6 +3452,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "workstation",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -4508,13 +4513,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "AccessDynamicPolicy": {
   "type": "object",
   "x-ticvai-persistence": "access.dynamic_policy",
-  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.",
+  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.authorisation_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Guest admission lives here and nowhere else** (ADR-0068, accepted 1 October). `validateAccess` online and the gate offline evaluate the same active version: `getOfflinePackage` carries it, and every `scan_event` records the policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`) and the set it was decided under (`policySetVersion`). The condition is `conditionRule`, a closed JSON format (`AdmissionRule`), not free text. Identity's staff-permission engine was renamed `AuthorisationPolicy` on the same day, so \"access policy\" means this.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AuthorisationPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAuthorisationPolicyEffectiveness` in identity.",
   "required": [
    "id",
    "scopePath",
    "name",
    "policyType",
-   "conditionExpression",
+   "conditionRule",
    "result",
    "status",
    "currentVersion"
@@ -4587,9 +4592,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "Identity-based policies (listIdentityMembershipAccreditation)"
    },
-   "conditionExpression": {
-    "type": "string",
-    "description": "Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN"
+   "conditionRule": {
+    "$ref": "#/components/schemas/AdmissionRule",
+    "description": "The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`)."
    },
    "result": {
     "type": "string",
@@ -5860,9 +5865,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
    },
+   "policySetVersion": {
+    "type": "string",
+    "description": "**The active admission policy version the package carries** (ADR-0068, 1 October): a fingerprint of the `(id, currentVersion)` of every policy in `dynamicPolicies`, computed the same way by `validateAccess` online. Every scan the gate records carries it (`ScanEvent.policySetVersion`), so a scan decided offline under a set that has since changed is visible at sync rather than assumed equal."
+   },
    "dynamicPolicies": {
     "type": "array",
-    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one.",
+    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), each at its active version with its `conditionRule` (ADR-0068), so an offline gate applies the same rules as an online one.",
     "items": {
      "$ref": "#/components/schemas/AccessDynamicPolicy"
     }

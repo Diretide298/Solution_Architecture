@@ -56,6 +56,53 @@ NEW_QUESTIONS = [
     ("Tax documents", "VAT return",
      "Do you confirm the VAT 201 box layout, and how sales are attributed to each emirate?", "a",
      "VAT 201 figures prepared by the platform; sales attributed by the venue's location.", "Your tax adviser"),
+    # 1 October: from the 30 September revision feedback on the guest builds (CLIENT-RESPONSE-30SEP).
+    ("Group booking", "Supervisors",
+     "Your build lists supervisors separately and free. How many supervisors come free per group (per N guests), "
+     "and is that per group ticket?", "a",
+     "Supervisors are a separate, free guest type, up to 1 per 10 guests, counted on the group request.", "Your commercial team"),
+    ("Group booking", "Group types",
+     "Your build shows School, Corporate, Tour operator and Community groups; the platform has general, school, "
+     "corporate and party. Do tour operator and community become their own types, or map to general?", "b",
+     "Tour operator and community are added as their own group types.", "Your commercial team"),
+    ("Group booking", "Minimum group size",
+     "Each group ticket card shows a minimum group size. Is the minimum set per group ticket (product), and what "
+     "are the values?", "b",
+     "Each group ticket carries its own minimum, default 10.", "Your commercial team"),
+    ("Group booking", "Water-park groups by session",
+     "Your build has a water-park group pick a session first; group requests today take a date only. Are water-park "
+     "groups booked into a session?", "b",
+     "Group requests take a date and, for session-based products, a session.", "Your operations team"),
+    ("Guest safety", "Swim ability",
+     "The swim answer now changes what is offered: all swimmers see everything, some get a 'swim vests needed' counter, "
+     "and none see a cheaper splash-and-river pass without slides. Is the vest an add-on product, and is the "
+     "splash-and-river pass a separate product only non-swimmers are offered?", "a",
+     "The answer filters products ('Help me choose'); the vest is an add-on; the splash-and-river pass is its own product.",
+     "Your operations and safety team"),
+    ("Transport", "Popular routes card",
+     "The popular routes cards need a starting fare, a featured order and an image or badge per route. Should "
+     "these be set per route in the back office?", "c",
+     "Routes carry a featured order and an image; the starting fare is computed from the lowest fare.", "Your transport team"),
+    # 1 October: from the ADRs decided that day (0060 availability, 0062 e-invoicing, 0063 encryption and keys).
+    ("Tax documents", "B2C e-invoices",
+     "Are e-invoices to consumers (B2C) outside the first phase of the UAE mandate for you, so only B2B invoices "
+     "go through the provider at launch? (ADR-0062)", "b",
+     "B2B invoices go through the provider; B2C receipts are issued by the platform and can be switched to the "
+     "provider per venue when your mandate covers them.", "Your finance team"),
+    ("Availability", "What 99.99% covers",
+     "Which services does the 99.99% availability commitment cover: the whole platform, or the guest purchase "
+     "and admission path only? And do you accept a separate target per tier (for example 99.99% for purchase and "
+     "admission, 99.9% for back office and reporting)? (ADR-0060)", "a",
+     "Purchase and admission are designed to 99.99%; back office, reporting and AI to 99.9%.", "Your IT owner"),
+    ("Availability", "Zone-redundant hosting cost",
+     "99.99% needs zone-redundant hosting in UAE North: about USD 8,050 a month against about USD 4,530 without "
+     "it. Do you accept that cost for production? (ADR-0060, the Azure cost sheet)", "a",
+     "Production is costed zone-redundant; pre-production is not.", "Your budget owner"),
+    ("Guest data", "Where face templates are stored",
+     "Where may face templates be stored: only inside the facial-reader vendor's system at the venue, or also in "
+     "the platform in UAE North (encrypted, with a key per tenant)? (ADR-0063)", "a",
+     "Templates stay with the reader vendor; the platform keeps only a reference and the guest's consent.",
+     "Your data protection officer"),
     ("Guest data", "Face capture on a notice",
      "May a guest be enrolled for Face Tag on a displayed notice alone, with no action from them, under the "
      "UAE PDPL?", "a",

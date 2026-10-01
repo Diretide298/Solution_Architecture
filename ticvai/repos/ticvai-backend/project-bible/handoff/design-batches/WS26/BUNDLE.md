@@ -123,7 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-019 holds none of them, so the edge carries nothing and SUP-001 opens cold"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-019 holds none of them. The edge carries nothing: SUP-019 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
     },
     {
      "to": "SUP-020",

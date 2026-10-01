@@ -96,6 +96,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reader-profiles:
     put:
       operationId: setReaderProfile
@@ -138,6 +140,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReaderProfile'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-cards/{cardCode}:
     parameters:
     - name: cardCode
@@ -183,6 +187,8 @@ paths:
                 $ref: '#/components/schemas/GameCard'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-cards/{cardCode}/transfer:
     parameters:
     - name: cardCode
@@ -254,6 +260,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /games:
     get:
       operationId: listGames
@@ -290,6 +298,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Game'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createGame
       x-ticvai-consumed-by:
@@ -327,6 +337,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Game'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /games/{gameId}:
     parameters:
     - name: gameId
@@ -403,6 +415,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-plays:
     post:
       operationId: recordGamePlay
@@ -466,6 +480,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-plays/sync:
     post:
       operationId: syncGamePlays
@@ -539,6 +555,8 @@ paths:
                           type: string
                         detail:
                           type: string
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /prizes:
     get:
       operationId: listPrizes
@@ -588,6 +606,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Prize'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPrize
       x-ticvai-consumed-by:
@@ -623,6 +643,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Prize'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /prize-redemptions:
     post:
       operationId: redeemPrize
@@ -703,6 +725,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/PrizeConflictProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /attraction-types:
     get:
       operationId: listAttractionTypes
@@ -731,6 +755,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AttractionType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAttractionType
       x-ticvai-consumed-by:
@@ -761,6 +787,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AttractionType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /games/{gameId}/operations:
     parameters:
     - name: gameId
@@ -808,6 +836,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameOperationalConfig'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /readers:
     get:
       operationId: listReaders
@@ -855,6 +885,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Reader'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /readers/{readerId}:
     parameters:
     - name: readerId
@@ -913,6 +945,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Reader'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /readers/{readerId}/deploy:
     parameters:
     - name: readerId
@@ -950,6 +984,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReaderDeployment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /readers/{readerId}/test:
     parameters:
     - name: readerId
@@ -985,6 +1021,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReaderTestResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-entitlements:
     get:
       operationId: listGameEntitlements
@@ -1018,6 +1056,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GameEntitlement'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createGameEntitlement
       x-ticvai-consumed-by:
@@ -1053,6 +1093,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameEntitlement'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gameplay-validation-rules:
     get:
       operationId: getGameplayValidationRules
@@ -1073,6 +1115,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameplayValidationRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGameplayValidationRules
       x-ticvai-consumed-by:
@@ -1113,6 +1157,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameplayValidationRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gameplay-authorisations:
     post:
       operationId: authoriseGameplay
@@ -1153,6 +1199,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameplayAuthorisation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gameplay-authorisations/simulate:
     post:
       operationId: simulateGameplayAuthorisation
@@ -1189,6 +1237,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameplayAuthorisation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-pricing:
     get:
       operationId: getGamePricing
@@ -1236,6 +1286,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GamePriceResolution'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGamePricing
       x-ticvai-consumed-by:
@@ -1279,6 +1331,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GamePricing'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /redemption-rules:
     put:
       operationId: setRedemptionRules
@@ -1322,6 +1376,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RedemptionRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /prizes/{prizeId}/cost:
     parameters:
     - name: prizeId
@@ -1368,6 +1424,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrizeCost'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-cards/{cardId}/lifecycle:
     parameters:
     - name: cardId
@@ -1436,6 +1494,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-card-expiry-rules:
     put:
       operationId: setGameCardExpiryRules
@@ -1476,6 +1536,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameCardExpiryRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gameplay-transactions:
     get:
       operationId: listGameplayTransactions
@@ -1529,6 +1591,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GameplayTransaction'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gameplay-sync-status:
     get:
       operationId: getGameplaySyncStatus
@@ -1560,6 +1624,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReaderSyncStatus'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-eligibility:
     get:
       operationId: getGameEligibility
@@ -1612,6 +1678,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GameEligibility'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-kiosk-config:
     put:
       operationId: setGameKioskConfiguration
@@ -1649,6 +1717,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameKioskConfig'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /games/{gameId}/clone:
     parameters:
     - name: gameId
@@ -1724,6 +1794,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-configuration-validations:
     post:
       operationId: validateGameConfiguration
@@ -1777,6 +1849,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameConfigurationHealth'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /readers/{readerId}/clone:
     parameters:
     - name: readerId
@@ -1847,6 +1921,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /prizes/lookup:
     get:
       operationId: lookupPrize
@@ -1894,6 +1970,8 @@ paths:
                 $ref: '#/components/schemas/Prize'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /readers/{readerId}/offline-queue:
     parameters:
     - name: readerId
@@ -1970,6 +2048,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

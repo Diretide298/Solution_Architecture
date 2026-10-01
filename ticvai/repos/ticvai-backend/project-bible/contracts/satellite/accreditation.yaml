@@ -84,6 +84,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccreditationProgramme'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createAccreditationProgramme
       x-ticvai-consumed-by:
@@ -117,6 +119,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationProgramme'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-requirements:
     put:
       operationId: setAccreditationRequirements
@@ -159,6 +163,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationRequirements'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-applications:
     get:
       operationId: listAccreditationApplications
@@ -200,6 +206,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccreditationApplication'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createAccreditationApplication
       x-ticvai-consumed-by:
@@ -262,6 +270,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-applications/{applicationId}/decide:
     parameters:
     - name: applicationId
@@ -344,6 +354,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-holders:
     get:
       operationId: listAccreditationHolders
@@ -392,6 +404,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccreditationHolder'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-holders/{holderId}:
     parameters:
     - name: holderId
@@ -420,6 +434,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationHolder'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: updateAccreditationHolder
       x-ticvai-consumed-by:
@@ -452,6 +468,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationHolder'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-documents:
     get:
       operationId: listAccreditationDocuments
@@ -527,6 +545,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AccreditationDocument'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: submitAccreditationDocument
       x-ticvai-consumed-by:
@@ -572,6 +592,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationDocument'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-documents/{documentId}/verify:
     parameters:
     - name: documentId
@@ -634,6 +656,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationDocument'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-identity-conflicts:
     get:
       operationId: listAccreditationIdentityConflicts
@@ -663,6 +687,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccreditationIdentityConflict'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-credentials:
     get:
       operationId: listAccreditationCredentials
@@ -696,6 +722,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccreditationCredential'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: issueAccreditationCredential
       x-ticvai-consumed-by:
@@ -741,6 +769,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationCredential'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-credentials/{credentialId}/replace:
     parameters:
     - name: credentialId
@@ -800,6 +830,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationCredential'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /badge-templates:
     get:
       operationId: listBadgeTemplates
@@ -828,6 +860,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BadgeTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBadgeTemplate
       x-ticvai-consumed-by:
@@ -860,6 +894,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadgeTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /badge-print-jobs:
     get:
       operationId: listBadgePrintJobs
@@ -887,6 +923,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BadgePrintJob'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createBadgePrintJob
       x-ticvai-consumed-by:
@@ -917,6 +955,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadgePrintJob'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-access-profiles:
     get:
       operationId: listAccessProfiles
@@ -946,6 +986,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccessProfile'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAccessProfile
       x-ticvai-consumed-by:
@@ -990,6 +1032,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessProfile'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-access-profiles/preview:
     post:
       operationId: previewAccessImpact
@@ -1027,6 +1071,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessImpact'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-holders/{holderId}/access:
     parameters:
     - name: holderId
@@ -1073,6 +1119,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HolderAccess'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-holders/{holderId}/status:
     parameters:
     - name: holderId
@@ -1147,6 +1195,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationHolder'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-validity:
     put:
       operationId: setAccreditationValidity
@@ -1188,6 +1238,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationValidity'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-notifications:
     put:
       operationId: setAccreditationNotificationRules
@@ -1226,6 +1278,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationNotificationRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-imports:
     post:
       operationId: importAccreditationHolders
@@ -1290,6 +1344,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationImportResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-access-activity:
     get:
       operationId: listAccreditationAccessActivity
@@ -1340,6 +1396,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccreditationAccessEvent'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-audit:
     get:
       operationId: listAccreditationAudit
@@ -1385,6 +1443,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccreditationAuditRecord'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-identity-conflicts/{conflictId}/resolve:
     parameters:
     - name: conflictId
@@ -1473,6 +1533,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-programmes/{programmeId}:
     parameters:
     - name: programmeId
@@ -1533,6 +1595,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-programmes/{programmeId}/clone:
     parameters:
     - name: programmeId
@@ -1634,6 +1698,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-applications/{applicationId}:
     parameters:
     - name: applicationId
@@ -1672,6 +1738,8 @@ paths:
                 $ref: '#/components/schemas/AccreditationApplication'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: updateAccreditationApplication
       x-ticvai-consumed-by:
@@ -1744,6 +1812,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-applications/{applicationId}/submit:
     parameters:
     - name: applicationId
@@ -1803,6 +1873,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-applications/{applicationId}/resubmit:
     parameters:
     - name: applicationId
@@ -1906,6 +1978,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-applications/{applicationId}/withdraw:
     parameters:
     - name: applicationId
@@ -1979,6 +2053,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /my/accreditation-applications:
     get:
       operationId: listMyAccreditationApplications
@@ -2030,6 +2106,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AccreditationApplication'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /my/accreditation-credentials:
     get:
       operationId: listMyAccreditationCredentials
@@ -2081,6 +2159,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AccreditationCredential'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /my/accreditation-credentials/{credentialId}/wallet-pass:
     parameters:
     - name: credentialId
@@ -2156,6 +2236,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-credentials/{credentialId}/deliver:
     parameters:
     - name: credentialId
@@ -2234,6 +2316,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-credentials/verify:
     get:
       operationId: verifyAccreditationCredential
@@ -2298,6 +2382,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-holders/{holderId}/renew:
     parameters:
     - name: holderId
@@ -2385,6 +2471,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-exports:
     get:
       operationId: listAccreditationExports
@@ -2427,6 +2515,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AccreditationDataExport'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: exportAccreditationData
       x-ticvai-consumed-by:
@@ -2490,6 +2580,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-exports/{exportId}:
     parameters:
     - name: exportId
@@ -2523,6 +2615,8 @@ paths:
                 $ref: '#/components/schemas/AccreditationDataExport'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   securitySchemes:

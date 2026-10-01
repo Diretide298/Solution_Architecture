@@ -1,6 +1,6 @@
 # ADR-0012: Queue Integration — Adaptor-First, Vendor Deferred
 
-**Status:** Accepted in part — vendor selection deferred (CF-48)
+**Status:** Accepted in part — vendor selection deferred (CF-48); Q2 amended by [ADR-0066](0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md), 1 October 2026: the waiting room has its own endpoints and a signed admission token checked at the cart, and never reuses Q1's `joinQueue`
 **Date:** 13 August 2026
 **Partially closes:** CF-33
 
@@ -53,6 +53,10 @@ on completion.
 **Zero matrix requirements.** It exists only in the MoM record, and it is what keeps the
 platform standing at peak concurrency during an on-sale. A matrix-driven scope would have
 missed it entirely.
+
+**Amended 1 October 2026 by ADR-0066:** Q2 sits at the edge (a Redis position, a cached page, a release
+controller) and admits a guest with a signed token that `addCartLine` and `acquireInventoryHold` check.
+It has its own operations; `joinQueue` and `getWaitingGuest` are Q1's only.
 
 ### Q3 Chat queues — CRM, Wave 3
 

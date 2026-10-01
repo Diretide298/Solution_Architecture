@@ -45,6 +45,16 @@ A destination param `from: session` is never carried: the session resolves it (v
    The flow tool rewrites its own edges each refresh without `carries`; this runs after it and
    puts them back, so a refresh ends where it started.
 
+**An edge that carries nothing says why** (1 October, plan item 2.6: the same-module links left
+for review after R251). Its provenance names the reason, read off the screens and the contract:
+the way back to the screen the source was opened from; the destination's ids only pre-select
+(deep link or `optional`); the destination finds them itself (an operation returns them, or reads
+or creates the collection `{id}` indexes); it opens on a list it can read unaided, and the id
+left over is a gap in the destination, not in the edge; or the source is a module hub and this is
+its menu entry. Only an edge with none of these still says the destination *opens cold* -- and a
+cold link between two screens of one module is redundant with the module's own menu, so
+`tools/applied/same-module-links-1-october.py` removed the three that were left.
+
 **What this does not claim.** The `trigger` on an owned edge is the destination's name, the same
 convention the launcher and board-hub labels use — not a claim to know the button. `carries` is a
 *requirement* both ends can meet, not an observation: a real source that says more is right.
@@ -97,17 +107,19 @@ class Contracts:
     def __init__(self) -> None:
         self.files: dict[pathlib.Path, dict] = {}
         self.ops: dict[str, tuple[pathlib.Path, dict, dict]] = {}
+        self.route: dict[str, tuple[str, str]] = {}
         for f in sorted((ROOT / "contracts").rglob("*.yaml")):
             doc = yaml.safe_load(open(f, encoding="utf-8")) or {}
             self.files[f.resolve()] = doc
-            for path_item in (doc.get("paths") or {}).values():
+            for path, path_item in (doc.get("paths") or {}).items():
                 if not isinstance(path_item, dict):
                     continue
                 shared = path_item.get("parameters") or []
-                for op in path_item.values():
+                for method, op in path_item.items():
                     if isinstance(op, dict) and op.get("operationId"):
                         self.ops.setdefault(op["operationId"], (f.resolve(), op,
                                                                 {"shared": shared}))
+                        self.route.setdefault(op["operationId"], (str(method).lower(), str(path)))
         self._yield: dict[str, set[str]] = {}
 
     def deref(self, node, here: pathlib.Path):
@@ -212,10 +224,155 @@ def contracts_of(screen: dict, contracts: Contracts) -> set[str]:
             if isinstance(a, dict) and a.get("operationId")} - {""}
 
 
-def provenance(src: str, dst: str, need: list[str], carries: list[str]) -> str:
+def path_params(operation_id: str, contracts: Contracts) -> set[str]:
+    _, path = contracts.route.get(operation_id, ("", ""))
+    return set(re.findall(r"\{([A-Za-z0-9_]+)\}", path))
+
+
+def reads_itself(screen: dict, name: str, contracts: Contracts) -> str | None:
+    """The operation by which a screen finds `name` on its own, or None.
+
+    Two ways, both read off the contract: an operation that returns `name` without taking it
+    (`listProducts` gives `WEB-005` its `productId`), or a read or create on the collection that
+    `{name}` indexes (`GET /pricing/dynamic-rules` gives `BO-009` its `ruleId`, because another of
+    its operations is `/pricing/dynamic-rules/{ruleId}` in the same contract). Either way the id is
+    picked on the screen, off its own list, and an edge into it has nothing to bring.
+    """
+    ops = [a["operationId"] for a in (screen.get("apis") or [])
+           if isinstance(a, dict) and a.get("operationId")]
+    for op in ops:
+        if name in contracts.yields(op) and name not in path_params(op, contracts):
+            return op
+    # Scoped to one contract, as `holds()` is: `catalogue`'s `/catalogue/bundles` (the snapshot a
+    # terminal pulls) is not the collection `promotions`' `/bundles/{bundleId}` indexes.
+    collections = set()
+    for op in ops:
+        _, path = contracts.route.get(op, ("", ""))
+        m = re.search(r"/([^/{}]+)/\{" + re.escape(name) + r"\}", path)
+        if m:
+            collections.add((contracts.file_of(op), m.group(1)))
+    for op in ops:
+        method, path = contracts.route.get(op, ("", ""))
+        if method in ("get", "post") and "{" + name + "}" not in path \
+                and (contracts.file_of(op), path.rstrip("/").rsplit("/", 1)[-1]) in collections:
+            return op
+    return None
+
+
+def returns_many(operation_id: str, contracts: Contracts) -> bool:
+    """The operation answers with a list: an array, a `Page`, or an object whose `items` is one."""
+    hit = contracts.ops.get(operation_id)
+    if not hit:
+        return False
+    f, op, _ = hit
+
+    def many(node, here, depth=0) -> bool:
+        if depth > 4 or not isinstance(node, dict):
+            return False
+        if "$ref" in node:
+            if str(node["$ref"]).endswith("/Page"):
+                return True
+            node, here, _ = contracts.deref(node, here)
+            if not isinstance(node, dict):
+                return False
+        if node.get("type") == "array":
+            return True
+        if any(many(sub, here, depth + 1) for k in ("allOf", "oneOf", "anyOf")
+               for sub in node.get(k) or []):
+            return True
+        items = (node.get("properties") or {}).get("items")
+        if isinstance(items, dict):
+            items, _, _ = contracts.deref(items, here)
+            return isinstance(items, dict) and items.get("type") == "array"
+        return False
+
+    for code, resp in (op.get("responses") or {}).items():
+        if not str(code).startswith("2"):
+            continue
+        resp, rf, _ = contracts.deref(resp, f)
+        for media in ((resp or {}).get("content") or {}).values():
+            if isinstance(media, dict) and many(media.get("schema"), rf):
+                return True
+    return False
+
+
+def opening_list(screen: dict, given: set[str], contracts: Contracts) -> str | None:
+    """A list the screen can read with nothing but `given` in hand: what it opens on."""
+    for a in (screen.get("apis") or []):
+        op = a.get("operationId") if isinstance(a, dict) else None
+        if not op or contracts.route.get(op, ("", ""))[0] != "get":
+            continue
+        if path_params(op, contracts) <= given and returns_many(op, contracts):
+            return op
+    return None
+
+
+def is_hub(sid: str, screens: dict) -> bool:
+    """A module's hub: named after its module and entered only from the platform home."""
+    s = screens[sid]
+    parents = (s.get("navigation") or {}).get("entryFrom") or []
+    return (bool(s.get("module")) and s.get("name") == s.get("module") and bool(parents)
+            and all(((screens.get(p) or {}).get("navigation") or {}).get("isEntryPoint")
+                    for p in parents))
+
+
+def why_nothing(src: str, dst: str, screens: dict, contracts: Contracts) -> tuple[str, str]:
+    """Why an edge from src to dst carries nothing: (kind, clause).
+
+    kind is `return` (the way back to the screen src was opened from), `deepLink`/`self` (dst
+    opens without being handed anything: its ids come only by deep link, are optional, or are
+    found by its own operations), `list` (dst opens on a list it can read unaided, and the ids
+    left over have no source on dst yet -- a gap in dst, not in this edge), `hub` (a module hub's
+    menu entry), or `cold` (none of these: dst cannot open on what this edge brings).
+    """
+    s, d = screens[src], screens[dst]
+    if dst in ((s.get("navigation") or {}).get("entryFrom") or []):
+        return "return", (f"{src} is opened from {dst}, so this edge is the way back and {dst} "
+                          f"keeps its own state")
+    deep, own, cold = [], [], []
+    given = {p["name"] for p in entry_params(d) if p.get("from") == SESSION}
+    for p in entry_params(d):
+        if p.get("from") == SESSION:
+            continue
+        if p.get("from") == "deepLink" or p.get("optional"):
+            deep.append(p["name"])
+            continue
+        op = reads_itself(d, p["name"], contracts)
+        if op:
+            own.append(f"{p['name']} ({op})")
+            given.add(p["name"])
+        else:
+            cold.append(p["name"])
+    parts = []
+    if deep:
+        parts.append(f"{', '.join(deep)} only pre-select{'s' if len(deep) == 1 else ''} "
+                     f"(deep link or optional)")
+    if own:
+        parts.append(f"{dst} finds {', '.join(own)} itself")
+    if not cold and not parts:
+        return "none", f"{dst} needs nothing to open"
+    if not cold:
+        return ("self" if own else "deepLink"), f"{'; '.join(parts)}, and {dst} opens on its own"
+    listed = opening_list(d, given, contracts)
+    if listed:
+        parts.append(f"{dst} opens on {listed}, and {', '.join(cold)} "
+                     f"{'has' if len(cold) == 1 else 'have'} no source on {dst} yet "
+                     f"(a gap in {dst}, not in this edge)")
+        return "list", "; ".join(parts)
+    if is_hub(src, screens):
+        return "hub", (f"{src} is the {s['module']} hub and this is its menu entry; {dst} has "
+                       f"no source yet for {', '.join(cold)}")
+    return "cold", ""
+
+
+def provenance(src: str, dst: str, need: list[str], carries: list[str],
+               why: str = "") -> str:
     if carries:
         return (f"{MINE}{dst} {MINE_MARK} {', '.join(need)} and {src} holds "
                 f"{', '.join(carries)}, so an edge into it carries them")
+    if why:
+        return (f"{MINE}{dst} {MINE_MARK} {', '.join(need)} and {src} holds none of them. "
+                f"The edge carries nothing: {why}")
     return (f"{MINE}{dst} {MINE_MARK} {', '.join(need)} and {src} holds none of them, so the "
             f"edge carries nothing and {dst} opens cold")
 
@@ -250,7 +407,8 @@ def main() -> int:
                  "trigger": (old or {}).get("trigger") or screens[dst]["name"]}
         if carries:
             entry["carries"] = carries
-        entry["provenance"] = provenance(src, dst, needed(screens[dst]), carries)
+        why = "" if carries else why_nothing(src, dst, screens, contracts)[1]
+        entry["provenance"] = provenance(src, dst, needed(screens[dst]), carries, why)
         for k, v in (old or {}).items():
             if k not in ("to", "trigger", "carries", "provenance"):
                 entry[k] = v

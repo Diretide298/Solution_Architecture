@@ -192,6 +192,7 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 |---|---|---|
 | 200 |  | Settled |
 | 409 |  | Payments do not cover the bill, or lines remain unserved (named in lineIds). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: fnb
@@ -259,6 +260,7 @@ Board 2E. **Attachment is separate from definition** because that is what makes 
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Attached. |
 | 409 |  | The group adds an allergen the item does not declare. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### buildProductionPlan
 
@@ -326,6 +328,7 @@ Board 2M. **Demand forecast through recipes to quantities per item and per stati
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Drafted |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### chaseStation
 
@@ -366,6 +369,7 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Chased |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createTableReservation
 
@@ -468,7 +472,7 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 201 |  | booked where no deposit applies (no card, no cart; REV3-8), or awaitingDeposit with deposit filled where the venue's dining deposit applies (REV3-8b). |
 | 409 |  | No cover available for that party size at that time. |
 
@@ -524,6 +528,7 @@ Raised above the person who found it — a critical reading, or one nobody actio
 |---|---|---|
 | 200 |  | Escalate a finding |
 | 409 |  | The venue has no food-safety lead named in fnb.foodSafetyLeadPrincipalId (audit R096 (9)). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### fireCourse
 
@@ -598,6 +603,7 @@ Board 3 of the client F&B pack. **`KitchenTicket.coursing` carried the policy �
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Fired |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getHaccpStatus
 
@@ -635,6 +641,7 @@ Checks due, checks missed, open corrective actions and unsigned findings. **A mi
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Status |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### holdCourse
 
@@ -710,6 +717,7 @@ Board 3. **The other half of firing, and the one that gets forgotten.** A table 
 |---|---|---|
 | 400 | BadRequest | Validation failed |
 | 200 |  | Held |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### joinRestaurantWaitlist
 
@@ -776,6 +784,7 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Added |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### leaveRestaurantWaitlist
 
@@ -835,6 +844,7 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | 200 |  | Left. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The party is already seated, walkedAway or noShow. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### list86Events
 
@@ -887,6 +897,7 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Events |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listTableReservations
 
@@ -955,6 +966,7 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Reservations |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### logColdChain
 
@@ -1015,6 +1027,7 @@ Board 5G. **A delivery arriving warm is a rejection decision made at the door**,
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Recorded |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### logKitchenException
 
@@ -1073,6 +1086,7 @@ Board 3. **Equipment down, an item run out mid-ticket, a delivery late, a statio
 |---|---|---|
 | 201 |  | Logged |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### logTemperature
 
@@ -1153,6 +1167,7 @@ Board 5J. **HACCP records are a UAE regulatory obligation and nothing in the pac
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Recorded. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### markOrderCollected
 
@@ -1265,6 +1280,7 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Collected. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### moveTableVisit
 
@@ -1385,6 +1401,7 @@ Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` ex
 | 200 |  | Moved |
 | 400 | BadRequest | Validation failed |
 | 409 |  | The target table is occupied. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### notifyServer
 
@@ -1424,6 +1441,7 @@ Board 3 and Board 4. **Food ready and nobody collecting it is the commonest reas
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Sent |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### printOrderLabel
 
@@ -1473,6 +1491,7 @@ A label that omits an allergen on a sealed bag is the failure mode this exists t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Label content |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### rebalanceStationLoad
 
@@ -1524,6 +1543,7 @@ Board 3. **A grill twenty tickets deep and a cold section idle.** The routing ru
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Rebalanced for this service |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recallKitchenTicket
 
@@ -1598,6 +1618,7 @@ Board 3. **A bumped ticket disappears from the rail**, and a bump is a single ta
 |---|---|---|
 | 200 |  | Back on the rail, with its original age |
 | 409 |  | Past the recall window (VenueSettings.fnb.recallWindowMinutes, proposed default 10, audit R094). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### refireItem
 
@@ -1673,6 +1694,7 @@ Board 3. **A refire is not a new order and it must not be.** It is the same line
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Refired |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### releaseProductionPlan
 
@@ -1725,6 +1747,7 @@ The label matters: planned quantities against the forecast are what make a model
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Released, with the runs it created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### seatTableReservation
 
@@ -1802,6 +1825,7 @@ A party seated at a different size from the booking is recorded as such. A booki
 |---|---|---|
 | 200 |  | Seated, and a table visit opened |
 | 409 |  | The booking is not in a seatable state. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setCourseRules
 
@@ -1859,6 +1883,7 @@ Board 3. **Coursing was a per-ticket field with no default**, so every table was
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setKitchenSla
 
@@ -1923,6 +1948,7 @@ Board 3. **`getKitchenSla` was drawn on the board and nothing set the target.** 
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setTableCombinations
 
@@ -1983,6 +2009,7 @@ Without it, `getTableMap` reports a full room while the venue turns away a booki
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### signCorrectiveAction
 
@@ -2042,6 +2069,7 @@ Board 5J. **The signature is the record.** *Discarded and reset* with nobody aga
 |---|---|---|
 | 200 |  | Signed |
 | 409 |  | A critical finding signed by the principal who raised it (CorrectiveAction.raisedByPrincipalId). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateTableReservation
 
@@ -2145,6 +2173,7 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: guestOrdering
@@ -2206,6 +2235,7 @@ Codes rotate. A static code photographed once lets someone order to a cabana the
 | 200 |  | Attached, joining an open visit where one exists |
 | 400 |  | Neither a location code nor a seat reference supplied |
 | 409 |  | Code expired or unknown, the location is out of service, or no outlet currently delivers to it — a cabana is useless as an address if nothing serves it. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### claimTableSession
 
@@ -2262,6 +2292,7 @@ The code is short-lived and rotates. A static table code photographed once lets 
 |---|---|---|
 | 200 |  | Attached to the table, joining an open visit where one exists |
 | 409 |  | Code expired or unknown, the outlet is closed, or the table is out of service. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createDeliveryLocation
 
@@ -2323,6 +2354,7 @@ The code is short-lived and rotates. A static table code photographed once lets 
 | 201 |  | Created |
 | 409 |  | A location with the same label already exists in the venue. |
 | 422 |  | A table location without tableId, a seat location without seatId, or a table of another venue. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createGuestFnbOrder
 
@@ -2411,7 +2443,7 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 201 |  | Placed |
 | 409 |  | An item became unavailable, the quoted total no longer matches, the location session expired, or the outlet stopped taking orders. |
 | 422 |  | The order breaks the outlet's FnbDeliveryPolicy. |
@@ -2479,6 +2511,7 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 |---|---|---|
 | 200 |  | The current setting |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGuestBill
 
@@ -2553,6 +2586,7 @@ Everything ordered at the table this sitting, whether ordered through the app or
 |---|---|---|
 | 200 |  | Bill |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGuestMenu
 
@@ -2614,6 +2648,7 @@ Allergens are always present. Omitting them is not an option a tenant gets to ch
 |---|---|---|
 | 200 |  | The menu in force |
 | 404 |  | No menu in force at that time. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGuestOrderStatus
 
@@ -2661,6 +2696,7 @@ The order's `FnbOrderStatus` — ordered, accepted, inPreparation, ready, then s
 |---|---|---|
 | 200 |  | Status |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listDeliveryLocations
 
@@ -2716,6 +2752,7 @@ They are one concept because a runner needs one instruction, and a guest needs o
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Locations |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listDiningOutlets
 
@@ -2773,6 +2810,7 @@ Ordering method is stated per outlet, because it varies within one venue: a tabl
 |---|---|---|
 | 200 |  | Dining outlets |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listFulfilmentSlots
 
@@ -2820,6 +2858,7 @@ Computed from the outlet's `FnbDeliveryPolicy` and its current load: ASAP plus f
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Open slots |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordOrderHandover
 
@@ -2880,6 +2919,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | 200 |  | Recorded |
 | 409 |  | Order is not ready, or already closed |
 | 422 |  | The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setDeliveryLocationOutletMapping
 
@@ -2924,6 +2964,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | 200 |  | Saved. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | An outlet that is not an F&B outlet of this venue, or a location of another venue. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFnbDeliveryPolicy
 
@@ -3020,6 +3061,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | 200 |  | Saved |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateDeliveryLocation
 
@@ -3080,6 +3122,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Updated |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: kitchen
@@ -3130,6 +3173,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Stations |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listKitchenTickets
 
@@ -3203,6 +3247,7 @@ The rail. Read by P15 Kitchen Display — TICVAI's own kitchen display on commod
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Tickets, in rail order (priority first) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### prioritiseKitchenTicket
 
@@ -3274,6 +3319,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Prioritised |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setKitchenStations
 
@@ -3322,6 +3368,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 400 |  | A workstation is assigned to more than one station (displayWorkstationIds, audit R277), or the body fails validation. |
 | 200 |  | Configured |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setKitchenTicketStatus
 
@@ -3398,6 +3445,7 @@ Called by P15 Kitchen Display, or the back-office and till views of the rail. St
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | The move is not one of the four above. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: menu
@@ -3484,6 +3532,7 @@ Called by P15 Kitchen Display, or the back-office and till views of the rail. St
 |---|---|---|
 | 201 |  | Created. |
 | 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getMenu
 
@@ -3553,6 +3602,7 @@ Called by P15 Kitchen Display, or the back-office and till views of the rail. St
 |---|---|---|
 | 200 |  | Menu |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listMenus
 
@@ -3615,6 +3665,7 @@ Back-office use. A terminal reads its menu from the catalogue bundle.
 |---|---|---|
 | 200 |  | Menus |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setItemAvailability
 
@@ -3683,6 +3734,7 @@ The most-used endpoint in a live kitchen. A sold-out item must disappear from ev
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 400 | BadRequest | Validation failed |
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setMenuSections
 
@@ -3782,6 +3834,7 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Applied |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateMenu
 
@@ -3866,6 +3919,7 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: modifier
@@ -3942,6 +3996,7 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 |---|---|---|
 | 201 |  | Created |
 | 400 |  | Constraints are unsatisfiable — minimum exceeds available options. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listModifierGroups
 
@@ -3993,6 +4048,7 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Groups |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: order
@@ -4123,6 +4179,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | 201 |  | Created. |
 | 400 | BadRequest | Validation failed |
 | 409 |  | An item is unavailable, modifier constraints are unmet, a tracked item was ordered offline, or a line's redeemEntitlementId cannot be redeemed here (entitlementNotRedeemable: used, another item or ou… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getFnbOrder
 
@@ -4226,6 +4283,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 |---|---|---|
 | 200 |  | Order |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listFnbOrders
 
@@ -4317,6 +4375,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Orders |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: production
@@ -4384,6 +4443,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: table
@@ -4446,6 +4506,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Cleared |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getTableMap
 
@@ -4504,6 +4565,7 @@ The floor as the server sees it — free, seated, ordered, bill requested, needs
 |---|---|---|
 | 200 |  | Table map |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### mergeTableVisits
 
@@ -4619,6 +4681,7 @@ Two tables pushed together. Orders and covers combine; the absorbed visit closes
 |---|---|---|
 | 200 |  | Merged |
 | 409 |  | Either visit is already closed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### openTableVisit
 
@@ -4739,6 +4802,7 @@ Covers is captured at seating because it drives split-by-covers at close.
 |---|---|---|
 | 201 |  | Visit opened |
 | 409 |  | Table already occupied. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setTableLayout
 
@@ -4814,6 +4878,7 @@ The outlet's whole layout in one call — the outlet is the one in the path. Eac
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Applied |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 

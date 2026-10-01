@@ -158,6 +158,7 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 |---|---|---|
 | 200 |  | The build |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getStoreAccounts
 
@@ -214,6 +215,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 |---|---|---|
 | 200 |  | Accounts and checklist |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listAppBuilds
 
@@ -269,6 +271,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 |---|---|---|
 | 200 |  | Builds, newest first |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### requestAppBuild
 
@@ -330,6 +333,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | 202 |  | Queued |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | No store account for the platform, nothing published yet, or a build for the platform already running; the problem says which |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setStoreAccounts
 
@@ -416,6 +420,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 |---|---|---|
 | 200 |  | Saved; the checklist as it now stands |
 | 400 |  | An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing text missing a tenant language |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: bookingFlows
@@ -511,6 +516,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | 201 |  | Created in the working draft |
 | 400 |  | An unknown flow type, a step the type does not have, or a step given twice |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### deleteBookingFlow
 
@@ -545,6 +551,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 | 204 |  | Removed from the draft |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | A product or category still names this flow, or it is the default for products on sale; the problem names them |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getBookingFlow
 
@@ -604,6 +611,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 |---|---|---|
 | 200 |  | The flow, disabled steps included |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getPublishedBookingFlow
 
@@ -668,6 +676,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 |---|---|---|
 | 200 |  | The published flow, enabled steps only |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listBookingFlowTypes
 
@@ -726,6 +735,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 |---|---|---|
 | 200 |  | The flow types, in catalogue order |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listBookingFlows
 
@@ -793,6 +803,7 @@ The flows this venue has picked, each with its steps in the venue's order. Draft
 |---|---|---|
 | 200 |  | The venue's flows, defaults first |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateBookingFlowDefinition
 
@@ -879,6 +890,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | 200 |  | Updated |
 | 400 |  | A step the type does not have, or a step given twice |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### validateBookingFlow
 
@@ -935,6 +947,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 |---|---|---|
 | 200 |  | The findings; valid false lists every problem |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: brand
@@ -975,6 +988,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 |---|---|---|
 | 200 |  | Icons |
 | 404 | NotConfigured | This part of the working draft has never been saved. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getBrandIdentity
 
@@ -1015,6 +1029,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 |---|---|---|
 | 200 |  | Brand identity |
 | 404 | NotConfigured | This part of the working draft has never been saved. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAppIcons
 
@@ -1067,6 +1082,7 @@ Source is a single 1024×1024 PNG without transparency; derived sizes are genera
 |---|---|---|
 | 200 |  | Set. |
 | 400 |  | Source is not 1024×1024, or contains transparency |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setBrandIdentity
 
@@ -1131,6 +1147,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 |---|---|---|
 | 200 |  | Updated |
 | 400 |  | An asset is larger than 2 MB, or is not PNG or SVG (audit R270) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: branding
@@ -1230,6 +1247,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 |---|---|---|
 | 200 |  | The working draft's setting. |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setBookingFlowConfig
 
@@ -1398,6 +1416,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | 200 |  | Saved |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: content
@@ -1478,6 +1497,7 @@ Scheduled by date window. A campaign banner set to run through a religious or na
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createContentPage
 
@@ -1545,6 +1565,7 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | 200 |  | Validate-only: the would-be result, nothing written |
 | 201 |  | Created in draft |
 | 409 |  | Slug already in use |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createGuidedChoice
 
@@ -1647,6 +1668,7 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 |---|---|---|
 | 201 |  | Created as a draft |
 | 400 |  | A target is not in this venue, a required target id is missing for its kind, or the question and answer counts are outside their bounds |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createPromoBlock
 
@@ -1725,6 +1747,7 @@ Presentation only. A block may point at a promotion, but it does not create or p
 |---|---|---|
 | 201 |  | Created |
 | 400 |  | endsAt is not after startsAt (audit R163) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### deleteBanner
 
@@ -1755,6 +1778,7 @@ Presentation only. A block may point at a promotion, but it does not create or p
 |---|---|---|
 | 204 |  | Deleted |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### deleteContentPage
 
@@ -1787,6 +1811,7 @@ Refused where the page is referenced by navigation or the homepage. Deleting a l
 |---|---|---|
 | 204 |  | Deleted |
 | 409 |  | Page is referenced by navigation or the homepage |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### deleteGuidedChoice
 
@@ -1821,6 +1846,7 @@ A `published` choice is unpublished first, or 409.
 | 204 |  | Deleted |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The choice is published |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### deletePromoBlock
 
@@ -1851,6 +1877,7 @@ A `published` choice is unpublished first, or 409.
 |---|---|---|
 | 204 |  | Deleted |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getPublishedGuidedChoice
 
@@ -1917,6 +1944,7 @@ A `published` choice is unpublished first, or 409.
 |---|---|---|
 | 200 |  | The published choice |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listBanners
 
@@ -1974,6 +2002,7 @@ A `published` choice is unpublished first, or 409.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Banners |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listContentPages
 
@@ -2029,6 +2058,7 @@ A `published` choice is unpublished first, or 409.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Pages |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listFaqs
 
@@ -2055,6 +2085,7 @@ A guest caller sees only entries whose `isPublished` is true, and needs no `TENA
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | FAQ categories with entries |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listGuidedChoices
 
@@ -2119,6 +2150,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 |---|---|---|
 | 200 |  | Help me choose set-ups, newest first |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listPolicies
 
@@ -2151,6 +2183,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Policies |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listPromoBlocks
 
@@ -2174,6 +2207,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Blocks |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### proposeGuidedChoice
 
@@ -2276,6 +2310,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 |---|---|---|
 | 201 |  | Stored as a draft suggestion |
 | 400 |  | A target is not in this venue, or the counts are outside their bounds |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishGuidedChoice
 
@@ -2347,6 +2382,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Already published |
 | 422 |  | An answer's target is not on sale or not enabled, or an answer lacks the filter or target its behaviour needs; the problem names the answer |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFaqs
 
@@ -2393,6 +2429,7 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPolicy
 
@@ -2449,6 +2486,7 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 |---|---|---|
 | 201 |  | New version published |
 | 400 |  | The English (en) or Arabic (ar) version is missing (audit R096) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### unpublishGuidedChoice
 
@@ -2518,6 +2556,7 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | 200 |  | Back to draft |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Not published |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateBanner
 
@@ -2592,6 +2631,7 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateContentPage
 
@@ -2655,6 +2695,7 @@ Replaces the page's editable fields. `status` is taken only to archive the page 
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | The page is published and the body changes more than its status to archived (audit R163). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateGuidedChoice
 
@@ -2735,6 +2776,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The choice is published; unpublish it first |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updatePromoBlock
 
@@ -2813,6 +2855,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | 400 |  | endsAt is not after startsAt (audit R163) |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The block is active or expired, and may only be withdrawn (audit R163). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: homepage
@@ -2855,6 +2898,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 |---|---|---|
 | 200 |  | Layout |
 | 404 | NotConfigured | This part of the working draft has never been saved. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setHomepageLayout
 
@@ -2920,6 +2964,7 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 |---|---|---|
 | 200 |  | Updated |
 | 400 |  | A section references a disabled module or a missing content block |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: modules
@@ -2946,6 +2991,7 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Features |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getModuleEnablement
 
@@ -2971,6 +3017,7 @@ Shows which modules the tenant has licensed and which are enabled. A module that
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Modules |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFeatureToggles
 
@@ -3011,6 +3058,7 @@ Several are build-time on native apps and are flagged accordingly. A tenant enab
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setLanguages
 
@@ -3061,6 +3109,7 @@ Enabling a language does not translate existing content. The response reports ho
 |---|---|---|
 | 200 |  | Updated, with translation gaps reported |
 | 400 |  | Default is not among the enabled languages |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setModuleEnablement
 
@@ -3101,6 +3150,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 |---|---|---|
 | 200 |  | Updated |
 | 400 |  | Module not licensed, or still referenced by navigation or homepage |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: navigation
@@ -3152,6 +3202,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 |---|---|---|
 | 200 |  | Navigation |
 | 404 | NotConfigured | This part of the working draft has never been saved. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setHeader
 
@@ -3203,6 +3254,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setNavigation
 
@@ -3285,6 +3337,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 |---|---|---|
 | 200 |  | Updated |
 | 400 |  | An item targets a disabled module, or more than five are marked visible |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: overview
@@ -3361,6 +3414,7 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Status |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getTenantConfig
 
@@ -3608,6 +3662,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | 200 |  | Configuration |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 |  | version names no published version (not-found), or the tenant has no working draft yet — for a guest, nothing has been published yet (not-configured). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listAnalyticsProviders
 
@@ -3663,6 +3718,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 |---|---|---|
 | 200 |  | Analytics providers |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordStorefrontSessionEvents
 
@@ -3720,7 +3776,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 |---|---|---|
 | 202 |  | Accepted for publication. |
 | 400 |  | A field outside the batch shape (a URL with a query, free text, an unhashed id), or more than 50 interactions. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAnalyticsProvider
 
@@ -3792,6 +3848,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 422 |  | A measurementId that does not match the provider's format, or a venueId not among the tenant's active venues |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setMaintenanceMode
 
@@ -3887,6 +3944,7 @@ Renders the branded maintenance screen with an expected-back time. Tenant-brande
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: publishing
@@ -3940,6 +3998,7 @@ A short-lived link rendering the working draft as the guest app would, for a cho
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Preview created |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### diffConfigVersion
 
@@ -3986,6 +4045,7 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Diff |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getSiteSetupProgress
 
@@ -4024,6 +4084,7 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 |---|---|---|
 | 200 |  | The progress |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listConfigVersions
 
@@ -4076,6 +4137,7 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Versions, newest first |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishTenantConfig
 
@@ -4137,6 +4199,7 @@ The response names any build-time change in the draft that will **not** reach gu
 |---|---|---|
 | 201 |  | Published |
 | 409 |  | Validation failed. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### restoreConfigVersion
 
@@ -4385,6 +4448,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 |---|---|---|
 | 200 |  | Restored into the working draft |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setSiteSetupProgress
 
@@ -4441,6 +4505,7 @@ Records the preset and which steps are done, skipped or in progress, so the buil
 | 200 |  | Saved |
 | 400 | BadRequest | Validation failed |
 | 409 |  | previewAndPublish marked done while no version has been published |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### validateTenantConfig
 
@@ -4486,6 +4551,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Findings |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: theme
@@ -4524,6 +4590,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 |---|---|---|
 | 200 |  | Fonts |
 | 404 | NotConfigured | This part of the working draft has never been saved. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getTheme
 
@@ -4584,6 +4651,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 |---|---|---|
 | 200 |  | Theme |
 | 404 | NotConfigured | This part of the working draft has never been saved. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFonts
 
@@ -4640,6 +4708,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 |---|---|---|
 | 200 |  | Updated |
 | 400 |  | ar is among the tenant's languages and primaryArabic is not set, or secondaryLatin is set without secondaryArabic (audit R163) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setTheme
 
@@ -4745,6 +4814,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 |---|---|---|
 | 200 |  | Updated |
 | 400 |  | A colour pair fails the contrast requirement. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: white-label
@@ -4809,6 +4879,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 |---|---|---|
 | 201 |  | Claimed, with the record to publish |
 | 409 |  | Already claimed. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listCustomDomains
 
@@ -4834,6 +4905,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Domains |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### relinquishCustomDomain
 
@@ -4870,6 +4942,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 |---|---|---|
 | 204 |  | Released |
 | 409 |  | The only active domain for a live app. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### verifyCustomDomain
 
@@ -4925,6 +4998,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 |---|---|---|
 | 200 |  | Verified, or the reason it is not yet |
 | 409 |  | The hostname is already routed to another tenant (hostname-taken, from tenancy setTenantDomainMapping, SD-021); nothing was verified or issued. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: whiteLabel
@@ -4994,6 +5068,7 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created as a draft |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishContentBlock
 
@@ -5051,6 +5126,7 @@ Approval is separate from authoring where the tenant requires it — **the appro
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Published or scheduled |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFooter
 
@@ -5128,6 +5204,7 @@ BL-002. **A header is chrome and a footer is a link surface**, which is why this
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
 

@@ -117,6 +117,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FnbReservationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFnbReservationPolicy
       x-ticvai-consumed-by:
@@ -157,6 +159,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FnbReservationPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /service-charge-policy:
     get:
       operationId: getFnbServiceChargePolicy
@@ -187,6 +191,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FnbServiceChargePolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFnbServiceChargePolicy
       x-ticvai-consumed-by:
@@ -231,6 +237,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FnbServiceChargePolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /substitution-rules:
     put:
       operationId: setSubstitutionRules
@@ -291,6 +299,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SubstitutionRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menu-items/{menuItemId}/verify-allergens:
     parameters:
     - name: menuItemId
@@ -341,6 +351,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AllergenVerdict'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menu-items/{menuItemId}/allergen-verification:
     parameters:
     - name: menuItemId
@@ -376,6 +388,8 @@ paths:
                 $ref: '#/components/schemas/AllergenVerdict'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /production-plans:
     post:
       operationId: buildProductionPlan
@@ -418,6 +432,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductionPlan'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /production-plans/{planId}/release:
     parameters:
     - name: planId
@@ -468,6 +484,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductionPlan'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /production-runs/{runId}:
     parameters:
     - name: runId
@@ -504,6 +522,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductionRun'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-reservations/{reservationId}/confirm:
     parameters:
     - name: reservationId
@@ -575,6 +595,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookingMessageReceipt'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-reservations/conflicts:
     get:
       operationId: resolveBookingConflict
@@ -653,6 +675,8 @@ paths:
                               a party of twelve at 8pm on a Saturday does not.
 
                               '
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tables:
     post:
       operationId: createTable
@@ -697,6 +721,8 @@ paths:
                 $ref: '#/components/schemas/TableDefinition'
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tables/{tableId}:
     parameters:
     - name: tableId
@@ -763,6 +789,8 @@ paths:
                     refusedReason:
                       enum:
                       - tableHasOpenVisit
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus/{menuId}/schedule:
     parameters:
     - name: menuId
@@ -815,6 +843,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MenuSchedule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: scheduleMenuPublish
       x-ticvai-consumed-by:
@@ -883,6 +913,8 @@ paths:
                     refusedReason:
                       enum:
                       - scheduleExistsForDate
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus/{menuId}/actions:
     parameters:
     - name: menuId
@@ -954,6 +986,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MenuActionResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-tickets/{ticketId}/label:
     parameters:
     - name: ticketId
@@ -991,6 +1025,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderLabel'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-orders/{orderId}/notify:
     parameters:
     - name: orderId
@@ -1049,6 +1085,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Sent
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /combos:
     post:
       operationId: createCombo
@@ -1089,6 +1127,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Combo'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /combos/{comboId}/slots:
     parameters:
     - name: comboId
@@ -1145,6 +1185,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Combo'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menu-items/{menuItemId}/modifier-groups:
     parameters:
     - name: menuItemId
@@ -1218,6 +1260,8 @@ paths:
                     refusedReason:
                       enum:
                       - modifierAddsUndeclaredAllergen
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-stations/{stationId}/chase:
     parameters:
     - name: stationId
@@ -1276,6 +1320,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Chased
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-stations/rebalance:
     post:
       operationId: rebalanceStationLoad
@@ -1315,6 +1361,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StationRebalance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-exceptions:
     post:
       operationId: logKitchenException
@@ -1399,6 +1447,8 @@ paths:
                 $ref: '#/components/schemas/KitchenException'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/kitchen-sla:
     parameters:
     - name: outletId
@@ -1451,6 +1501,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KitchenSla'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/86-events:
     parameters:
     - name: outletId
@@ -1504,6 +1556,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/EightySixEvent'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /orders/{orderId}/collected:
     parameters:
     - name: orderId
@@ -1568,6 +1622,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FnbOrder'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/sections:
     parameters:
     - name: outletId
@@ -1619,6 +1675,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SectionLayout'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/table-combinations:
     parameters:
     - name: outletId
@@ -1686,6 +1744,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/TableCombination'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/stage:
     parameters:
     - name: visitId
@@ -1757,6 +1817,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/notify-server:
     parameters:
     - name: visitId
@@ -1812,6 +1874,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Sent
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/transfer-items:
     parameters:
     - name: visitId
@@ -1876,6 +1940,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waitlist/{entryId}/quote:
     parameters:
     - name: entryId
@@ -1927,6 +1993,8 @@ paths:
                     - observedTurnTime
                     - historicAverage
                     - hostOverride
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waitlist/{entryId}/notify:
     parameters:
     - name: entryId
@@ -1988,6 +2056,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestaurantWaitlist'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-stock-counts/{countId}/lines:
     parameters:
     - name: countId
@@ -2076,6 +2146,8 @@ paths:
                   countedQuantity:
                     type: number
                     description: The quantity as recorded, echoed so the device can confirm it.
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-stock-counts/{countId}/recount:
     parameters:
     - name: countId
@@ -2130,6 +2202,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecountResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus/{menuId}/publish:
     parameters:
     - name: menuId
@@ -2199,6 +2273,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MenuVersion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus/{menuId}/rollback:
     parameters:
     - name: menuId
@@ -2251,6 +2327,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MenuVersion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus/{menuId}/versions:
     parameters:
     - name: menuId
@@ -2297,6 +2375,8 @@ paths:
                         $ref: '#/components/schemas/MenuVersion'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-tickets/{ticketId}/fire:
     parameters:
     - name: ticketId
@@ -2368,6 +2448,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KitchenTicket'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-tickets/{ticketId}/hold:
     parameters:
     - name: ticketId
@@ -2447,6 +2529,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KitchenTicket'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-tickets/{ticketId}/refire:
     parameters:
     - name: ticketId
@@ -2519,6 +2603,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KitchenTicket'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-tickets/{ticketId}/recall:
     parameters:
     - name: ticketId
@@ -2595,6 +2681,8 @@ paths:
                     refusedReason:
                       enum:
                       - recallWindowPassed
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/course-rules:
     parameters:
     - name: outletId
@@ -2645,6 +2733,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CourseRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/move:
     parameters:
     - name: visitId
@@ -2741,6 +2831,8 @@ paths:
                     refusedReason:
                       enum:
                       - targetTableOccupied
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/server:
     parameters:
     - name: visitId
@@ -2801,6 +2893,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/comp:
     parameters:
     - name: visitId
@@ -2889,6 +2983,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/checkpoints:
     get:
       operationId: listTemperatureCheckpoints
@@ -2930,6 +3026,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/TemperatureCheckpoint'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTemperatureCheckpoint
       x-ticvai-consumed-by:
@@ -2971,6 +3069,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TemperatureCheckpoint'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/temperature-logs:
     post:
       operationId: logTemperature
@@ -3025,6 +3125,8 @@ paths:
                     $ref: '#/components/schemas/TemperatureLog'
                   correctiveAction:
                     $ref: '#/components/schemas/CorrectiveAction'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/cold-chain:
     post:
       operationId: logColdChain
@@ -3067,6 +3169,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ColdChainEvent'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/status:
     get:
       operationId: getHaccpStatus
@@ -3115,6 +3219,8 @@ paths:
                     type: string
                     format: date-time
                     nullable: true
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/corrective-actions/{actionId}/sign:
     parameters:
     - name: actionId
@@ -3191,6 +3297,8 @@ paths:
                     refusedReason:
                       enum:
                       - criticalSelfSign
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /production-runs:
     get:
       operationId: listProductionRuns
@@ -3258,6 +3366,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ProductionRun'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: planProductionRun
       x-ticvai-consumed-by:
@@ -3302,6 +3412,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductionRun'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /production-runs/{runId}/complete:
     parameters:
     - name: runId
@@ -3377,6 +3489,8 @@ paths:
                     refusedReason:
                       enum:
                       - runNotInProgress
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/transfer:
     parameters:
     - name: visitId
@@ -3452,6 +3566,8 @@ paths:
                 $ref: '#/components/schemas/TableVisit'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waitlist:
     post:
       operationId: joinRestaurantWaitlist
@@ -3503,6 +3619,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestaurantWaitlist'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/request-bill:
     parameters:
     - name: visitId
@@ -3555,6 +3673,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-reservations:
     get:
       operationId: listTableReservations
@@ -3607,6 +3727,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/TableReservation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createTableReservation
       x-ticvai-consumed-by:
@@ -3752,6 +3874,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableReservation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-reservations/{reservationId}/seat:
     parameters:
     - name: reservationId
@@ -3831,6 +3955,8 @@ paths:
                     refusedReason:
                       enum:
                       - reservationNotSeatable
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /venues/{venueId}/dining:
     parameters:
     - name: venueId
@@ -3896,6 +4022,8 @@ paths:
                           $ref: '#/components/schemas/DiningOutlet'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/guest-menu:
     parameters:
     - name: outletId
@@ -3970,6 +4098,8 @@ paths:
                     refusedReason:
                       enum:
                       - noMenuInForce
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /venues/{venueId}/delivery-locations:
     parameters:
     - name: venueId
@@ -4035,6 +4165,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/DeliveryLocation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /location-sessions:
     post:
       operationId: claimLocationSession
@@ -4134,6 +4266,8 @@ paths:
                       - codeUnknown
                       - locationOutOfService
                       - locationNotServed
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-orders/{orderId}/delivery:
     parameters:
     - name: orderId
@@ -4246,6 +4380,8 @@ paths:
                       enum:
                       - outcomeNotForServiceMode
                       - locationNotSupplied
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-sessions:
     post:
       operationId: claimTableSession
@@ -4329,6 +4465,8 @@ paths:
                       - codeUnknown
                       - outletClosed
                       - tableOutOfService
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-delivery-policy:
     get:
       operationId: getFnbDeliveryPolicy
@@ -4370,6 +4508,8 @@ paths:
                 $ref: '#/components/schemas/FnbDeliveryPolicy'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-guest-callable: true
     put:
       operationId: setFnbDeliveryPolicy
@@ -4420,6 +4560,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/fulfilment-slots:
     get:
       operationId: listFulfilmentSlots
@@ -4455,6 +4597,8 @@ paths:
                     properties:
                       items:
                         $ref: '#/components/schemas/FulfilmentSlots'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-read-routing: replica
       parameters:
       - name: outletId
@@ -4635,6 +4779,8 @@ paths:
                 $ref: '#/components/schemas/GuestOrderStatus'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-sessions/{sessionId}/bill:
     parameters:
     - name: sessionId
@@ -4675,6 +4821,8 @@ paths:
                 $ref: '#/components/schemas/Bill'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus:
     get:
       operationId: listMenus
@@ -4732,6 +4880,8 @@ paths:
                         $ref: '#/components/schemas/Menu'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createMenu
       x-ticvai-consumed-by:
@@ -4768,6 +4918,8 @@ paths:
                 $ref: '#/components/schemas/Menu'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus/{menuId}:
     parameters:
     - name: menuId
@@ -4800,6 +4952,8 @@ paths:
                 $ref: '#/components/schemas/Menu'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateMenu
       x-ticvai-consumed-by:
@@ -4846,6 +5000,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Menu'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus/{menuId}/sections:
     parameters:
     - name: menuId
@@ -4901,6 +5057,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Menu'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menu-items/{itemId}/availability:
     parameters:
     - name: itemId
@@ -4989,6 +5147,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MenuItem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /modifier-groups:
     get:
       operationId: listModifierGroups
@@ -5029,6 +5189,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ModifierGroup'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-audience-note: '24 August: widened to include guest. A guest choosing *no onions* reads
         the same modifier group the kitchen defined. **Reading the options is not configuring them** —
         `createModifierGroup` and `attachModifierGroup` stay staff-only.'
@@ -5081,6 +5243,8 @@ paths:
                     refusedReason:
                       enum:
                       - selectionConstraintsUnsatisfiable
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-orders:
     get:
       operationId: listFnbOrders
@@ -5131,6 +5295,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/FnbOrder'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createFnbOrder
       x-ticvai-consumed-by:
@@ -5211,6 +5377,8 @@ paths:
                       - modifierConstraintUnmet
                       - trackedItemOffline
                       - entitlementNotRedeemable
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-orders/{orderId}/accept:
     parameters:
     - name: orderId
@@ -5286,6 +5454,8 @@ paths:
                       - orderAlreadyAccepted
                       - orderCancelled
                       - outletNotAcceptingOrders
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-orders/{orderId}/cancel:
     parameters:
     - name: orderId
@@ -5392,6 +5562,8 @@ paths:
                       enum:
                       - illegalStatusTransition
                       - orderAlreadyFulfilled
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-orders/{orderId}:
     parameters:
     - name: orderId
@@ -5424,6 +5596,8 @@ paths:
                 $ref: '#/components/schemas/FnbOrder'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: amendFnbOrder
       x-ticvai-consumed-by:
@@ -5490,6 +5664,8 @@ paths:
                       enum:
                       - lineInPreparation
                       - lineServed
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/tables:
     parameters:
     - name: outletId
@@ -5529,6 +5705,8 @@ paths:
                 $ref: '#/components/schemas/TableMap'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTableLayout
       x-ticvai-consumed-by:
@@ -5579,6 +5757,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableMap'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits:
     post:
       operationId: openTableVisit
@@ -5630,6 +5810,8 @@ paths:
                     refusedReason:
                       enum:
                       - tableOccupied
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}:
     parameters:
     - name: visitId
@@ -5661,6 +5843,8 @@ paths:
                 $ref: '#/components/schemas/TableVisit'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateTableVisit
       x-ticvai-consumed-by:
@@ -5728,6 +5912,8 @@ paths:
                     refusedReason:
                       enum:
                       - targetTableOccupied
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/merge:
     parameters:
     - name: visitId
@@ -5790,6 +5976,8 @@ paths:
                     refusedReason:
                       enum:
                       - visitClosed
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/bill:
     parameters:
     - name: visitId
@@ -5825,6 +6013,8 @@ paths:
                 $ref: '#/components/schemas/Bill'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/bill/split:
     parameters:
     - name: visitId
@@ -5897,6 +6087,8 @@ paths:
                     refusedReason:
                       enum:
                       - visitSettled
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/close:
     parameters:
     - name: visitId
@@ -5986,6 +6178,8 @@ paths:
                       enum:
                       - paymentsShortOfBill
                       - linesUnserved
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tables/{tableId}/clear:
     parameters:
     - name: tableId
@@ -6032,6 +6226,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableState'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen/tickets:
     get:
       operationId: listKitchenTickets
@@ -6108,6 +6304,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/KitchenTicket'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen/tickets/{ticketId}/status:
     parameters:
     - name: ticketId
@@ -6191,6 +6389,8 @@ paths:
                     refusedReason:
                       enum:
                       - illegalStatusTransition
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen/tickets/{ticketId}/prioritise:
     parameters:
     - name: ticketId
@@ -6253,6 +6453,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KitchenTicket'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen/stations:
     get:
       operationId: listKitchenStations
@@ -6295,6 +6497,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/KitchenStation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setKitchenStations
       x-ticvai-consumed-by:
@@ -6362,6 +6566,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/KitchenStation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recipes:
     get:
       operationId: listRecipes
@@ -6411,6 +6617,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Recipe'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setRecipe
       x-ticvai-consumed-by:
@@ -6451,6 +6659,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Recipe'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/waste:
     parameters:
     - name: outletId
@@ -6542,6 +6752,8 @@ paths:
                     type: string
                   totalCost:
                     $ref: ../shared/common.yaml#/components/schemas/Money
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/corrective-actions/{actionId}/action:
     parameters:
     - name: actionId
@@ -6583,6 +6795,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CorrectiveAction'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/corrective-actions/{actionId}/escalate:
     parameters:
     - name: actionId
@@ -6635,6 +6849,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/corrective-actions/{actionId}/close:
     parameters:
     - name: actionId
@@ -6675,6 +6891,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CorrectiveAction'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recipes/{recipeId}/substitutes:
     get:
       operationId: listIngredientSubstitutes
@@ -6713,6 +6931,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/FnbIngredientSubstitute'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setIngredientSubstitutes
       x-ticvai-consumed-by:
@@ -6762,18 +6982,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FnbIngredientSubstitute'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-recommendations:
     get:
       operationId: listFnbRecommendations
       summary: Upsell and pairing suggestions for F&B
-      deprecated: true
-      x-ticvai-superseded-by: 'decideRecommendations'
       description: >
-        **Deprecated for one release (29 September, AI system design 2.3 and 5.4).** Forwarded to the AI
-        recommendation engine as a placement: the call becomes `ai.decideRecommendations` with placement
-        `fnbMenu`, and the engine's items come back in this response's shape. Removed after one release; new
-        screens bind `ai.decideRecommendations`. The configured pairings below stay the engine's candidate
-        input.
+        **A channel adapter of the one recommendation engine** (ADR-0052, accepted 1 October). This operation stays as the F&B menu surface, with its path, id and response shape. **Block A**: the promotions module answers it from the relationship map (rules; strategy, relationships, business priority and suppression are configured in promotions). **Block B**: it forwards to the engine in `ticvai-ai` (ai `decideRecommendations`, placement `fnbMenu`) with no contract change, under a hard 200 ms budget and failing open to the rules answer, so checkout never waits on it. New screens may bind either; the deprecation of 29 September is withdrawn. The configured pairings below
+        stay the candidate input of both producers.
 
         **Seventeen columns and no way to read them.** Kept whole from the backend workbook when the
         ten duplicate catalogue tables were collapsed, because we have nothing like it —
@@ -6802,6 +7019,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/FnbProductRecommendation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waitlist/{entryId}/leave:
     parameters:
     - name: entryId
@@ -6882,6 +7101,8 @@ paths:
                     refusedReason:
                       enum:
                       - illegalStatusTransition
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlet-templates:
     get:
       operationId: listOutletTemplates
@@ -6933,6 +7154,8 @@ paths:
                         $ref: '#/components/schemas/OutletTemplate'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setOutletTemplate
       x-ticvai-consumed-by:
@@ -6989,6 +7212,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /venues/{venueId}/delivery-location-outlets:
     parameters:
     - name: venueId
@@ -7070,6 +7295,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delivery-locations:
     post:
       operationId: createDeliveryLocation
@@ -7152,6 +7379,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delivery-locations/{locationId}:
     parameters:
     - name: locationId
@@ -7217,6 +7446,8 @@ paths:
                 $ref: '#/components/schemas/DeliveryLocation'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

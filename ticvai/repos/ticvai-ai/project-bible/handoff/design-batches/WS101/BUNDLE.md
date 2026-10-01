@@ -1747,6 +1747,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."
    },
+   "requestLimits": {
+    "$ref": "#/components/schemas/PlanRequestLimits"
+   },
    "packageKind": {
     "type": "string",
     "enum": [
