@@ -55,6 +55,10 @@ CHECKS = [
     # 1 October: the process design notes (handoff/design-notes/*.yaml) reach every design session through
     # BUNDLE.md; every rule there must carry a source that exists. Passes while the folder is empty.
     "check-design-notes",
+    # 2 October (CHG-DOOR-001..006): every app has a sign-in door, every staff and partner door is a sign-in
+    # form with the second factor, the role prompt and (in a browser) SSO and no workstation, no form asks a
+    # person for a token, and no door lands on a read gated by a right to act.
+    "check-doors",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
