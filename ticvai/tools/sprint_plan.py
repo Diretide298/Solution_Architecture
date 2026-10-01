@@ -274,7 +274,9 @@ def sprint_settings(team):
             # a block whose end is decided (Block A: 40 working days, Sprint 4): its test sits in its target sprint
             # whatever the work at normal hours says; the overtime to get there is reported
             "fixed": {b["block"] for b in sp.get("blocks") or [] if b.get("fixed")},
-            "pace": dict(sp.get("pace") or {})}
+            "pace": dict(sp.get("pace") or {}),
+            # sprints after the last block's target: buffer (Claude Design returns, defects, change requests, AI help)
+            "bufferSprints": [int(x) for x in sp.get("bufferSprints") or []]}
 
 
 def pace_model(team, items):

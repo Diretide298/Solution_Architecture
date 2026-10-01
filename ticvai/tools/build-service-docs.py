@@ -2165,13 +2165,50 @@ def main() -> int:
         am_end[am_of[k]] = max(am_end[am_of[k]], r_["end"])
     targets = settings["targets"]
     tests = sp.test_settings(team)
-    for k, a in am_info.items():
+    def earliest_block(k):
+        # the first block whose test window starts after the app-module is done
+        return next((i for i, b in enumerate(sp.BLOCKS) if i > 0
+                     and sp.window_of(targets[b], tests["days"])[0] >= am_end.get(k, 0.0) - 1e-6), len(sp.BLOCKS) - 1)
+
+    # **Blocks are filled to their target sprints in build order** (Chinmay, 1 October: "similar sizes"): B, C and D
+    # take consecutive runs of app-modules in the order they are built, each up to where its work no longer finishes
+    # by the block's target -- not "everything that happens to finish by then", which made the blocks lopsided. An
+    # AI engine capability runs on the AI engineers' own calendar and is placed by where it finishes; it never holds
+    # its block open (it is accepted on its own module test).
+    # The measure is work, not finish dates: the developer points the first pass completes before each block's test
+    # window (whatever block they belong to) is how much that block, with the ones before it, can hold.
+    dev_pts = {t_["key"]: float(t_["points"] or 0) for t_ in leaf if t_["track"] != "AI"}
+    done_by = {}
+    for b_ in sp.BLOCKS[1:]:
+        cut = sp.window_of(targets[b_], tests["days"])[0]
+        tot = 0.0
+        for k, r_ in first_run.items():
+            pts = dev_pts.get(k, 0.0)
+            if not pts or r_["start"] >= cut:
+                continue
+            span = max(r_["end"] - r_["start"], 1e-6)
+            tot += pts * min(1.0, (cut - r_["start"]) / span)
+        done_by[b_] = tot
+    am_pts = defaultdict(float)
+    for t_ in leaf:
+        am_pts[am_of[t_["key"]]] += dev_pts.get(t_["key"], 0.0)
+    run = sum(v for k, v in am_pts.items() if am_info[k]["block"] == "A")
+    # **Comparable sizes** (Chinmay, 1 October): B, C and D each take about a third of the work after Block A, never
+    # more than the team completes by the block's target (so each still ends on it); D takes what is left.
+    rest = sum(v for k, v in am_pts.items() if am_info[k]["block"] != "A" and am_info[k]["platform"] != "AI")
+    later_b = sp.BLOCKS[1:]
+    budget = {b_: min(done_by[b_], run + rest * (i + 1) / len(later_b)) for i, b_ in enumerate(later_b)}
+    cur = 1
+    for k, a in sorted(am_info.items(), key=lambda x: x[1]["order"]):
         if a["block"] == "A":
             continue
-        fin = sp.sprint_of_index(max(am_end.get(k, 0.0) - 1e-6, 0.0))
-        # the block whose test window starts after it is done
-        a["block"] = next((b for b in sp.BLOCKS[1:]
-                           if sp.window_of(targets[b], tests["days"])[0] >= am_end.get(k, 0.0) - 1e-6), sp.BLOCKS[-1])
+        if a["platform"] == "AI":
+            a["block"] = sp.BLOCKS[earliest_block(k)]
+            continue
+        run += am_pts.get(k, 0.0)
+        while cur < len(sp.BLOCKS) - 1 and run > budget[sp.BLOCKS[cur]] + 1e-6:
+            cur += 1
+        a["block"] = sp.BLOCKS[cur]
     # **Each block is complete and testable on its own.** What an app-module's tasks wait on to be finished -- the
     # back end a screen is wired to, the migration a service writes into, the migration a key points into, a task
     # of the same service -- must be in its block or an earlier one. Shared back end and migrations are pulled into

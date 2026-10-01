@@ -109,6 +109,12 @@ def main():
                   f"{d(b['planEnd'])} about {n(sp_['hoursPerSprint'])} hours a sprint ({n(sp_['hours'])} in all) are "
                   "free for Claude Design returns, defects, change requests and helping the AI developers."
                   if sp_.get("sprints") else "")
+    bf = b.get("buffer") or {}
+    if bf.get("sprints"):
+        spare_line = (f"Sprints {bf['sprints'][0]}-{bf['sprints'][-1]} ({d(bf['from'])} to {d(bf['to'])}) are buffer: "
+                      f"about {n(bf['hoursPerSprint'])} developer hours a sprint ({n(bf['hours'])} in all) for Claude "
+                      "Design returns, defects, change requests and helping the AI developers.")
+    ot_names = ", ".join(f"{k} {v}" for k, v in opt_a["byPerson"].items())
 
     doc = Document()
     st = doc.styles["Normal"]
@@ -139,7 +145,7 @@ def main():
                 f"AI engine {n(b['aiEngineHours'])}.", "Effort:")
     bullet(doc, f" Block A (the first release and all the functionality of Guest Web, Guest App, POS and the Kitchen "
                 f"Display; 40 working days, it was 35) ends Sprint {a['targetSprint']}, {d(a['targetEndsOn'])}, with about "
-                f"{n(opt_a['overtimeHours'])} hours of overtime. {d_line} Developer overtime over the six months: about "
+                f"{n(opt_a['overtimeHours'])} hours of planned overtime ({ot_names}). {d_line} Developer overtime over the six months: about "
                 f"{n(b['overtimeHoursDevelopers'])} hours. The pace is 5 tasks a developer a day through Block A, rising "
                 f"to 2x by Sprint 11, re-measured after Sprint 2. {spare_line} The AI engine work past "
                 f"{d(b['planEnd'])} is created as tasks and left unassigned for the AI developers joining.",
@@ -200,7 +206,8 @@ def main():
         f_, t_ = last_days(s_["end"])
         test_in.setdefault(x["targetSprint"], []).append(f"Block {k}: {d(f_, False)} – {d(t_, False)}")
     table(doc, ["Sprint", "Dates", "Blocks in progress", "Capacity (h)", "Planned (h)", "Block test (decided dates)"],
-          [[s["n"], f"{d(s['start'], False)} – {d(s['end'])}", ", ".join(s["blocks"]), n(s["capacity"]),
+          [[f"{s['n']}" + (" (buffer)" if s.get("buffer") else ""), f"{d(s['start'], False)} – {d(s['end'])}",
+            ", ".join(s["blocks"]), n(s["capacity"]),
             n(s["planned"]), "; ".join(test_in.get(s["n"], []))]
            for s in sprints], widths=[1.3, 4.2, 2.8, 2.2, 2.2, 3.5])
     para(doc, "Capacity and planned hours are at normal hours; the block test dates are the decided ones (Block A in "
@@ -244,7 +251,7 @@ def main():
     doc.add_heading("7. Dates, overtime and the AI engine: decided 1 October", level=1)
     table(doc, ["Question", "Decision", "What it costs"],
           [["When Block A ends", f"Sprint {a['targetSprint']}, {d(a['targetEndsOn'])}",
-            f"About {n(opt_a['overtimeHours'])} h of overtime: " + ", ".join(f"{k} {v}" for k, v in opt_a["byPerson"].items())
+            f"{n(opt_a['overtimeHours'])} h of planned overtime: " + ot_names
             + f". Without it Block A ends {d(a.get('normalEndsOn') or a['endsOn'])}. Block A is 40 working days "
               "(decided 1 October; it was 35)."],
            ["Block D past 2 April", f"Keep its scope; finish by {d(b['planEnd'])}",
@@ -264,8 +271,9 @@ def main():
            ["Feature", "An app-module (or a part of one)", "Ticketing · POS"],
            ["Task", "One piece of build: an operation, a table, a screen, a module test", "A screen of the POS, its wire, build and test sub-tasks"],
            ["Version", "The sprint", "Sprint 1 … Sprint 13"]], widths=[3, 7, 7])
-    bullet(doc, " Blocks A and B are ticketed task by task. Blocks C and D are ticketed as app-modules until they are "
-                "planned in detail; their tasks are already planned (plan-tasks.csv) with the keys they will get.",
+    bullet(doc, " Block A in full and the next block (B) task by task in release r2; Blocks C and D are ticketed as "
+                "app-modules (features) and broken into tasks one block ahead, at each block's start, through the normal "
+                "Tuesday/Friday release. Their tasks are already planned (plan-tasks.csv) with the keys they will get.",
            "Ticketing depth:")
     bullet(doc, " OpenProject holds who, when, the state and the order. What to build is the package, served by ADAM "
                 "at the release a developer pulled.", "Who holds what:")

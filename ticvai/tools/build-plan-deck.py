@@ -416,7 +416,7 @@ def main():
                                       for b in blocks if b["endSprint"] == s["n"]],
                         "moduleTests": len(mt), "moduleTestHours": round(sum(it["hours"] for it in mt)),
                         "appModulesDone": [a["name"] for a in ams if a["sprintTo"] == s["n"]],
-                        "holidays": hol})
+                        "holidays": hol, "buffer": s["n"] in settings["bufferSprints"]})
 
     # ---------------------------------------------------------------- build phases, back end and front end
     BACK = ("Backend", "Database", "DevOps", "Setup", "AI")
@@ -452,6 +452,10 @@ def main():
     xd = next((x for x in blocks if x["block"] == "D"), None)
     block_d = ({"onTarget": xd["normalEndSprint"] <= xd["targetSprint"], "overtimeHours": xd["targetOvertimeHours"],
                 "normalEndsOn": xd["normalEndsOn"], "targetEndsOn": xd["targetEndsOn"]} if xd else {})
+    bs = [s_ for s_ in sprints if s_.get("buffer")]
+    buffer = {"sprints": [s_["n"] for s_ in bs], "from": bs[0]["start"].isoformat() if bs else None,
+              "to": bs[-1]["end"].isoformat() if bs else None, "hours": round(sum(s_["devIdle"] for s_ in bs)),
+              "hoursPerSprint": round(sum(s_["devIdle"] for s_ in bs) / len(bs)) if bs else 0}
     fin_n = sp.sprint_of_index(max(devs_finish - 1e-6, 0))
     after = [s_ for s_ in sprints if s_["inPlan"] and s_["n"] > fin_n]
     spare = {"from": sp.day(max(devs_finish - 1e-6, 0)).isoformat(), "fromSprint": fin_n + 1 if after else None,
@@ -501,7 +505,7 @@ def main():
                   "aiUnassignedHours": round(sum(it["hours"] for it in items if it["kind"] == "AI engine"
                                                  and not it["who"])),
                   "devIdleHoursToPlanEnd": round(sum(s_["devIdle"] for s_ in sprints if s_["inPlan"])),
-                  "blockD": block_d, "spare": spare},
+                  "blockD": block_d, "spare": spare, "buffer": buffer},
         "calendar": {"start": START.isoformat(), "planEnd": PLAN_END.isoformat(), "sprintDays": sp.SPRINT_DAYS,
                      "holidays": {d.isoformat(): n for d, n in HOLIDAYS.items()}},
         "blocks": blocks, "sprints": sprints, "appModules": ams, "packages": pk, "modules": mod_rows,
@@ -566,6 +570,19 @@ def d_text(b):
 def spare_value(b):
     x = b.get("spare") or {}
     return f"{_pp(x.get('hours', 0))} hours from {_d(x.get('from'))}" if x.get("sprints") else "none before 2 April"
+
+
+def buffer_text(b):
+    """Sprints 11-13 are buffer (decided 1 October): what is free in them, and what it is for."""
+    x = b.get("buffer") or {}
+    if not x.get("sprints"):
+        return spare_text(b)
+    return (f"Sprints {x['sprints'][0]}-{x['sprints'][-1]} ({_d(x['from'])} to {_d(x['to'])}) are buffer (decided 1 "
+            f"October): about {_pp(x['hoursPerSprint'])} developer hours a sprint ({_pp(x['hours'])} in all) for Claude "
+            "Design returns, defects, change requests and helping the AI developers.")
+
+
+TICKETING = "Block A in full and the next block (B) task by task in release r2; Blocks C and D are ticketed as app-modules (features) and broken into tasks one block ahead, at each block's start, through the normal Tuesday/Friday release. Their tasks are already planned (plan-tasks.csv) with the keys they will get."
 
 
 def spare_text(b):
@@ -637,14 +654,14 @@ def summary_rows(plan):
          f"{_pp(b.get('aiUnassignedHours', 0))} h past 2 April is not overtime: those tasks are "
          f"unassigned for the AI developers joining. The plan of {PREVIOUS['date']} needed about "
          f"{_pp(PREVIOUS['overtimeHours'])} h without the tests."],
-        ["Spare capacity", spare_value(b), spare_text(b)],
+        ["Buffer", f"Sprints {'-'.join(str(n) for n in ((b.get('buffer') or {}).get('sprints') or [])[::max(1, len((b.get('buffer') or {}).get('sprints') or [1]) - 1)])}, "
+                   f"{_pp((b.get('buffer') or {}).get('hours', 0))} hours", buffer_text(b)],
         ["Block A", f"{a['appModuleCount']} app-modules, ends {_d(a['targetEndsOn'])} (Sprint {a['targetSprint']})",
          f"Previously: {PREVIOUS['blockA']}. Now complete, tested and accepted as one block. Decided 1 October: "
-         f"Sprint {a['targetSprint']} with about {_pp(_opt_a(b, a)['overtimeHours'])} h of overtime ("
+         f"Sprint {a['targetSprint']} with {_pp(_opt_a(b, a)['overtimeHours'])} h of planned overtime ("
          + ", ".join(f"{n} {h}" for n, h in _opt_a(b, a)['byPerson'].items())
          + f"); at normal hours it would end {_d(a.get('normalEndsOn') or a['endsOn'])}."],
-        ["Tasks", f"{_pp(b['tasks'])} ({_pp(b['ticketedTasks'])} ticketed)",
-         "Blocks A and B task by task; C and D at app-module level in OpenProject until they are planned."],
+        ["Ticketing depth", f"{_pp(b['tasks'])} tasks planned, {_pp(b['ticketedTasks'])} ticketed", TICKETING],
         ["Pace", b.get("pace") or f"{b['pacePointsPerDeveloperDay']} points per developer per day",
          "Default: Block A's plan of record (3,018 points, 35 days, 9 developers), replaced by the measured pace; "
          "team.json sprintPlan.pace sets a scenario (tasks a developer-day, ramp)."],
@@ -675,7 +692,8 @@ def write_build_xlsx(plan, path):
            [7, 8, 8, 13, 26, 40, 9, 8, 9, 8, 9, 9, 9, 9, 9, 70])
     _sheet(wb, "Sprints", ["Sprint", "Starts", "Ends", "Working days", "Blocks in progress", "Block ending",
                            "Capacity (hours)", "Planned (hours)", "Used", "Holidays"],
-           [[s["name"] + ("" if s["inPlan"] else " (past 2 Apr)"), _d(s["start"]), _d(s["end"]), s["days"],
+           [[s["name"] + (" (buffer)" if s.get("buffer") else "") + ("" if s["inPlan"] else " (past 2 Apr)"),
+             _d(s["start"]), _d(s["end"]), s["days"],
              ", ".join(s["blocks"]), ", ".join(s["blockEnding"]), s["capacity"], s["planned"],
              f"{s['planned'] / max(s['capacity'], 1):.0%}", "; ".join(s["holidays"])] for s in plan["sprints"]],
            [16, 13, 13, 8, 12, 10, 11, 11, 8, 40])
@@ -792,7 +810,8 @@ def write_sprint_xlsx(plan, task_rows, path):
     rows = []
     for s in plan["sprints"]:
         bt = "; ".join(f"Block {x['block']} test {_d(x['from'])} to {_d(x['to'])}" for x in s["blockTest"])
-        rows.append([s["name"] + ("" if s["inPlan"] else " (past 2 Apr)"), _d(s["start"]), _d(s["end"]), s["days"],
+        rows.append([s["name"] + (" (buffer)" if s.get("buffer") else "") + ("" if s["inPlan"] else " (past 2 Apr)"),
+                     _d(s["start"]), _d(s["end"]), s["days"],
                      ", ".join(s["blocks"]), ", ".join(f"Block {b}" for b in s["blockEnding"]), bt,
                      s["capacity"], s["planned"], f"{s['planned'] / max(s['capacity'], 1):.0%}",
                      s["moduleTests"], s["moduleTestHours"], len(s["appModulesDone"]), s.get("devIdle", ""),
@@ -938,7 +957,7 @@ def write_md(plan, path):
     w("|---|---|---|---|---|---|")
     for s in plan["sprints"]:
         bt = "; ".join(f"{x['block']}: {_d(x['from'])}-{_d(x['to'])}" for x in s["blockTest"])
-        w(f"| {s['n']} | {_d(s['start'])} – {_d(s['end'])} | {', '.join(s['blocks'])} | {_pp(s['capacity'])} | {_pp(s['planned'])} | {bt} |")
+        w(f"| {s['n']}{' (buffer)' if s.get('buffer') else ''} | {_d(s['start'])} – {_d(s['end'])} | {', '.join(s['blocks'])} | {_pp(s['capacity'])} | {_pp(s['planned'])} | {bt} |")
     w("")
     w("Holidays counted: " + "; ".join(f"{_d(d)} {n}" for d, n in plan["calendar"]["holidays"].items()) + ". Eid dates are to be confirmed.")
     w("")
@@ -981,8 +1000,8 @@ def write_md(plan, path):
     w("## 8. Finishing by 2 April: overtime")
     w("")
     w(f"About **{_pp(b['overtimeHoursDevelopers'])} developer hours** past 2 April at normal hours. Decided 1 October: Block D keeps its scope; "
-      f"{d_text(b)} Block A ends Sprint {a['targetSprint']} with about {_pp(_opt_a(b, a)['overtimeHours'])} hours of overtime. "
-      f"{spare_text(b)} "
+      f"{d_text(b)} Block A ends Sprint {a['targetSprint']} with {_pp(_opt_a(b, a)['overtimeHours'])} hours of planned overtime ("
+      + ", ".join(f"{n} {h}" for n, h in _opt_a(b, a)['byPerson'].items()) + f"). {buffer_text(b)} Ticketing depth: {TICKETING} "
       f"The AI engine's {_pp(b.get('aiUnassignedHours', 0))} hours past 2 April are not overtime: those tasks are unassigned for the AI developers joining. "
       f"The plan of {PREVIOUS['date']} needed about {_pp(PREVIOUS['overtimeHours'])} hours, without the module and block tests.")
     w("")
