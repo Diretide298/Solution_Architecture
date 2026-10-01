@@ -86,6 +86,8 @@ paths:
       operationId: simulatePromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
+        - "P09 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
       summary: What this promotion would have cost on real history
       description: 'BL-114. **A promotion is priced by guessing until it runs.** Run it against a past
         period and the answer is arithmetic: how many orders would have qualified, what the discount would
@@ -158,6 +160,7 @@ paths:
       operationId: setPromotionVariants
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-226 Campaign Experiment & A/B Test Manager"
       summary: A/B test two versions against each other
       description: 'BL-114. **Split by a stable hash of the subject, not at random per request** — a guest
         who sees 10% on Monday and 15% on Tuesday has learned to wait.
@@ -376,7 +379,6 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P09 ADM-138 Promotion Command Center Dashboard"
-        - "P09 ADM-140 Promotion Overview"
         - "P09 ADM-145 Promotion Approval Inbox"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-api-scope: ticketing.read
@@ -516,6 +518,7 @@ paths:
         - "P02 GST-037 Offers & Promotions"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-140 Promotion Overview"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -627,6 +630,7 @@ paths:
       operationId: pausePromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-141 Promotion Lifecycle & Status Manager"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -684,6 +688,7 @@ paths:
       operationId: endPromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-141 Promotion Lifecycle & Status Manager"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -742,6 +747,7 @@ paths:
       operationId: unschedulePromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-141 Promotion Lifecycle & Status Manager"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -788,6 +794,7 @@ paths:
       operationId: publishPromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-141 Promotion Lifecycle & Status Manager"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -849,7 +856,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
-        - "P10 PTR-010 Cart & Quote"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -895,6 +901,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P09 ADM-138 Promotion Command Center Dashboard"
+        - "P09 ADM-140 Promotion Overview"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -930,6 +937,7 @@ paths:
       operationId: listCouponCampaigns
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-159 Coupon & Promo Code Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1014,6 +1022,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
         - "P09 ADM-158 Coupon & Promo Code Command Center"
+        - "P09 ADM-164 Code Distribution & Assignment Manager"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1057,6 +1066,7 @@ paths:
       operationId: generateCouponCodes
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-160 Unique Code Generation & Batch Manager"
       x-ticvai-audience:
       - staff
       summary: Generate codes in bulk
@@ -1161,6 +1171,8 @@ paths:
         format: uuid
     get:
       operationId: getCouponCodeBatch
+      x-ticvai-consumed-by:
+        - "P09 ADM-160 Unique Code Generation & Batch Manager"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -1593,6 +1605,9 @@ paths:
         - "P01 WEB-008 Add-ons & Upsell"
         - "P02 GST-004 Item Detail"
         - "P02 GST-056 Bundle Package"
+        - "P09 ADM-180 Bundle Component Builder"
+        - "P09 ADM-181 Guest Choice & Build-Your-Own Bundle Designer"
+        - "P09 ADM-187 Bundle Preview, Simulation & AI Recommendation"
       x-ticvai-audience:
       - staff
       - guest
@@ -1791,6 +1806,7 @@ paths:
       operationId: listUpsellRules
       x-ticvai-consumed-by:
         - "P08 BO-102 Sell"
+        - "P08 BO-119 Cross-Sell, Upsell & Recommendation Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1988,6 +2004,8 @@ paths:
         - "P04 POS-023 Sell — Merchandise"
         - "P05 KSK-006 Review"
         - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
+        - "P09 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
@@ -2954,8 +2972,6 @@ paths:
   /rule-test-recommendation:
     put:
       operationId: setRuleTestRecommendation
-      x-ticvai-consumed-by:
-        - "P09 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.32; MoM 14 Aug (phase-one AI is a configuration assistant); shape fixed (26 non-field properties removed; added appliedRules, rejectedRules, discount, finalAmount, marginImpact, aiRecommendation)'
@@ -3444,7 +3460,6 @@ paths:
     get:
       operationId: listRedemption
       x-ticvai-consumed-by:
-        - "P08 BO-444 Redemption Operations Dashboard"
         - "P09 ADM-167 Redemption Analytics, Audit & AI Optimization"
       x-ticvai-audience:
         - staff
@@ -4920,7 +4935,6 @@ paths:
       operationId: listRealTimeAvailability
       x-ticvai-consumed-by:
         - "P08 BO-518 Real-Time Availability Calendar"
-        - "P08 BO-997 Real-Time Availability & Locking"
         - "P09 ADM-194 Real-Time Availability & Checkout Validation"
         - "P09 ADM-271 Real-Time Channel Availability & Inventory Monitor"
       x-ticvai-audience:
@@ -5222,7 +5236,6 @@ paths:
       operationId: setEligibilityRule
       x-ticvai-consumed-by:
         - "P09 ADM-199 Eligibility Rule Builder"
-        - "P09 ADM-279 Resale Eligibility Rule Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.95; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (enums ruleEffect)'
@@ -6354,8 +6367,6 @@ paths:
     put:
       operationId: approveDecision
       x-ticvai-consumed-by:
-        - "P08 BO-374 Approval Decision Workspace"
-        - "P08 BO-642 Approval Decision History"
         - "P09 ADM-224 Approval Inbox & Decision Workspace"
       x-ticvai-audience:
         - staff
@@ -7171,10 +7182,32 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-639 Recommendation Command Center"
         - "P09 ADM-640 Recommendation Strategy Manager"
+        - "P09 ADM-641 Recommendation Objective & KPI Configuration"
+        - "P09 ADM-643 Recommendation Placement & Touchpoint Manager"
+        - "P09 ADM-644 Channel & Journey Strategy Manager"
+        - "P09 ADM-645 Recommendation Priority, Ranking & Suppression Manager17"
+        - "P09 ADM-646 Recommendation Guardrails & Business Controls"
         - "P09 ADM-647 Recommendation Policy, AI Control & Governance"
+        - "P09 ADM-648 Recommendation Strategy Simulator & AI Advisor"
+        - "P09 ADM-651 Upsell Eligibility & Qualification Rules"
+        - "P09 ADM-655 Pre-Purchase, Cart & Checkout Upsell Manager"
+        - "P09 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
+        - "P09 ADM-658 Upgrade Simulator, Comparison & AI Advisor"
+        - "P09 ADM-665 Basket-Aware Cross-Sell & Duplicate Prevention"
+        - "P09 ADM-666 Availability, Inventory & Capacity-Aware Cross-Sell"
+        - "P09 ADM-668 Cross-Sell Simulator & AI Opportunity Advisor"
         - "P09 ADM-670 Customer Journey Map & Touchpoint Designer"
+        - "P09 ADM-671 Real-Time Context Rule Engine"
+        - "P09 ADM-672 Pre-Purchase & Booking Journey Recommendation Manager"
+        - "P09 ADM-673 Post-Purchase & Pre-Visit Recommendation Manager"
+        - "P09 ADM-674 In-Venue & Location-Aware Recommendation Engine"
+        - "P09 ADM-675 Visit State, Itinerary & Time-Aware Recommendation"
         - "P09 ADM-676 Omnichannel Recommendation Synchronization"
+        - "P09 ADM-681 Customer Feature & Signal Configuration"
+        - "P09 ADM-684 Personalized Ranking & Decision Policy Builder"
+        - "P09 ADM-688 Personalization Simulator & Next-Best-Offer Lab"
         - "P09 ADM-695 Recommendation Governance & Deployment Control"
+        - "P09 ADM-698 AI Optimization & Recommendation Intelligence Lab"
       summary: The strategies deciding what gets offered where
       description: 'Upsell board 1. **A strategy is the unit, not an individual recommendation.** The
         board asks for objectives, placements, channels, ranking, suppression and guardrails — six things
@@ -7278,11 +7311,13 @@ paths:
         - "P09 ADM-644 Channel & Journey Strategy Manager"
         - "P09 ADM-645 Recommendation Priority, Ranking & Suppression Manager17"
         - "P09 ADM-646 Recommendation Guardrails & Business Controls"
+        - "P09 ADM-647 Recommendation Policy, AI Control & Governance"
         - "P09 ADM-651 Upsell Eligibility & Qualification Rules"
         - "P09 ADM-655 Pre-Purchase, Cart & Checkout Upsell Manager"
         - "P09 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
         - "P09 ADM-665 Basket-Aware Cross-Sell & Duplicate Prevention"
         - "P09 ADM-666 Availability, Inventory & Capacity-Aware Cross-Sell"
+        - "P09 ADM-670 Customer Journey Map & Touchpoint Designer"
         - "P09 ADM-671 Real-Time Context Rule Engine"
         - "P09 ADM-672 Pre-Purchase & Booking Journey Recommendation Manager"
         - "P09 ADM-673 Post-Purchase & Pre-Visit Recommendation Manager"
@@ -7336,6 +7371,12 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-642 Recommendation Type & Product Relationship Manager"
         - "P09 ADM-650 Upgrade Path & Product Ladder Builder"
+        - "P09 ADM-652 Upgrade Price Difference & Value Proposition Manager"
+        - "P09 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
+        - "P09 ADM-654 Membership & Pass Upgrade Engine"
+        - "P09 ADM-660 Cross-Sell Relationship Builder"
+        - "P09 ADM-663 Cross-Category Recommendation Manager"
+        - "P09 ADM-664 Multi-Attraction, Destination & Partner Cross-Sell"
       summary: Upgrade ladders, cross-sells, affinities and substitutes
       description: 'Upsell boards 2.2, 3.2 and 3.3. **One table, because they are one kind of fact.** An
         upgrade ladder is an ordered relationship between two products; a cross-sell is an unordered one;

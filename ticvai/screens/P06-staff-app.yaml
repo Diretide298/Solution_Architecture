@@ -9830,7 +9830,8 @@ screens:
     emptyNoAccess: Shown when the caller lacks `WORKFORCE_VIEW`, which `getAnnouncementReach` requires,
       and names that permission. **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question.
-    offline: Queues, and states that it has not gone yet
+    offline: 'Refused offline: a broadcast needs the network. The draft stays on the device and the screen
+      says it has not gone.'
   apis:
   - operationId: publishAnnouncement
     contract: workforce

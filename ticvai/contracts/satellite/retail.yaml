@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Retail
   version: 0.1.0
-  x-ticvai-screen-count: 18
+  x-ticvai-screen-count: 20
   x-ticvai-tier: satellite
   x-ticvai-module: "6 — Retail POS"
   x-ticvai-requirements: 78
@@ -117,6 +117,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: collectMerchandiseReservation
+      x-ticvai-consumed-by:
+        - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
       x-ticvai-audience: [staff]
       summary: The guest picked it up
       description: >
@@ -151,6 +153,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: cancelMerchandiseReservation
+      x-ticvai-consumed-by:
+        - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
       x-ticvai-audience: [staff]
       summary: Release a reservation
       description: >
@@ -233,10 +237,8 @@ paths:
         - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-026 Retail / Merchandise"
         - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P04 POS-023 Sell — Merchandise"
         - "P05 KSK-017 Shop"
         - "P08 BO-007 Product Directory"
-        - "P08 BO-044 F&B Outlets"
         - "P08 BO-048 Retail Products"
         - "P08 BO-116 Merchandising & Product Presentation"
       x-ticvai-audience: [staff, guest]
@@ -431,8 +433,8 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-023 Sell — Merchandise"
         - "P05 KSK-017 Shop"
+        - "P06 EMP-062 Store Stock & SKU Availability"
         - "P06 EMP-069 Barcode, RFID, Serialized Stock & Traceability"
-        - "P08 BO-048 Retail Products"
         - "P08 BO-114 Variants, Attributes, Barcode & RFID Management"
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary
@@ -634,6 +636,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
         - "P04 POS-011 Returns, Refunds & Exchanges"
+        - "P08 BO-021 Order Search"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Find a sale from a receipt
@@ -703,7 +706,6 @@ paths:
       operationId: reprintReceipt
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
-        - "P04 POS-007 Close Shift"
         - "P04 POS-026 Receipt & Reprint"
         - "P04 POS-030 Sales Journal"
       x-ticvai-audience: [staff]
@@ -794,7 +796,6 @@ paths:
     post:
       operationId: createRetailReturn
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-011 Returns, Refunds & Exchanges"
       x-ticvai-audience: [staff]
       summary: Accept a return
@@ -925,6 +926,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P08 BO-044 F&B Outlets"
+        - "P08 BO-143 Retail Global Settings & Controls"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read the retail return policy
@@ -950,6 +952,7 @@ paths:
       operationId: setReturnPolicy
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
+        - "P08 BO-143 Retail Global Settings & Controls"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: outlet   # CF-138: F&B and retail configure at outlet, decided 18 August
       summary: Set the retail return policy
@@ -996,7 +999,7 @@ paths:
     get:
       operationId: getOutletStock
       x-ticvai-consumed-by:
-        - "P08 BO-044 F&B Outlets"
+        - "P06 EMP-062 Store Stock & SKU Availability"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Stock across an outlet
@@ -1242,7 +1245,6 @@ paths:
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P05 KSK-017 Shop"
         - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
-        - "P08 BO-044 F&B Outlets"
       x-ticvai-audience: [staff, guest]
       summary: Reserve an item for collection
       description: >

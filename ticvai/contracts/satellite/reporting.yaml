@@ -300,13 +300,11 @@ paths:
     get:
       operationId: listAlerts
       x-ticvai-consumed-by:
-        - "P04 POS-009 Staff Roster"
         - "P04 POS-020 Shift Exceptions & Alerts"
         - "P04 POS-025 Till Home"
         - "P06 EMP-061 Retail Inventory Command Center"
         - "P06 EMP-070 Inventory Exceptions, AI Replenishment & Action Center"
         - "P08 BO-036 Device Registry"
-        - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-141 Operational Alerts, AI Replenishment & Action Center"
         - "P08 BO-886 Staffing Gap & Coverage Control Center"
@@ -771,12 +769,9 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
         - "P08 BO-1059 Heat Maps & Drill-Down"
         - "P08 BO-1082 Admissions Revenue"
-        - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P08 BO-118 Campaign & Audience Management"
-        - "P08 BO-126 Deployment, Preview & Audit"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-262 Access Reports, Scheduled Reporting & Data Export"
-        - "P08 BO-682 Accreditation Export & Data Extract Center"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-001 Executive Command Center"
@@ -1204,7 +1199,6 @@ paths:
       operationId: exportReportResult
       x-ticvai-consumed-by:
         - "P08 BO-1060 Report Builder, Export & Audit"
-        - "P08 BO-682 Accreditation Export & Data Extract Center"
         - "P16 ANL-045 Export & Download Center"
       x-ticvai-audience:
       - staff
@@ -1605,6 +1599,7 @@ paths:
       operationId: askReportingQuestion
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
+        - "P06 EMP-020 AI assistant — answer"
         - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
@@ -2050,7 +2045,6 @@ paths:
         - "P08 BO-684 Accreditation Executive Dashboard"
         - "P08 BO-685 Accreditation Status & Portfolio Reporting"
         - "P08 BO-688 Accreditation Trend & Comparative Analysis"
-        - "P08 BO-733 Service Channel Configuration"
         - "P08 BO-833 Gamification Analytics & Audit"
         - "P16 ANL-012 Live Operations Dashboard"
         - "P16 ANL-013 Revenue Pulse"
@@ -2313,9 +2307,7 @@ paths:
     get:
       operationId: listAnalyticsAnomalies
       x-ticvai-consumed-by:
-        - "P16 ANL-019 AI Management Insights"
         - "P16 ANL-051 AI Analytics Command Center"
-        - "P16 ANL-055 Anomaly Detection Center"
         - "P16 ANL-056 Root-Cause Analysis Explorer"
         - "P16 ANL-058 AI Recommendation & Next-Best-Action Center"
         - "P16 ANL-059 AI Insight History, Evidence & Explainability"

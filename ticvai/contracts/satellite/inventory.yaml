@@ -166,8 +166,8 @@ paths:
     get:
       operationId: getStockTransfer
       x-ticvai-consumed-by:
+        - "P06 EMP-064 Store-to-Store & Warehouse Transfers"
         - "P06 EMP-065 Receiving & Store Put-Away"
-        - "P08 BO-052 Goods Receipt"
         - "P08 BO-080 Stock Transfers"
       summary: One transfer, its manifest and where it is
       description: 'Retail board 4E. **`createStockTransfer`, `receiveStockTransfer` and `closeTransferShort`
@@ -214,6 +214,7 @@ paths:
     put:
       operationId: updateRequisitionLines
       x-ticvai-consumed-by:
+        - "P06 EMP-063 Requisition & Smart Store Replenishment"
         - "P08 BO-078 Requisitions"
       summary: Change what an outlet is asking for, before it is approved
       description: 'Board 5F, 24 August. **`getSuggestedRequisitions` drafts from reorder points and nothing
@@ -473,7 +474,6 @@ paths:
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P06 EMP-069 Barcode, RFID, Serialized Stock & Traceability"
         - "P08 BO-114 Variants, Attributes, Barcode & RFID Management"
-        - "P08 BO-505 Serialized Equipment Registry"
       summary: Where each individual item is
       description: 'Retail Board 4. **A lot number answers which delivery; a serial answers which one.**
 
@@ -523,8 +523,6 @@ paths:
     get:
       operationId: listExpiringBatches
       x-ticvai-consumed-by:
-        - "P08 BO-138 Production Execution & Batch Management"
-        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
         - "P16 ANL-006 Inventory & Waste Intelligence"
       summary: What is about to go out of date
       description: 'BL-122. **The report a venue acts on daily**, and it needed batches to exist before
@@ -572,8 +570,6 @@ paths:
       operationId: listInventoryItems
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
-        - "P08 BO-105 Stock & Supply"
-        - "P08 BO-504 Rental Inventory Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -835,8 +831,8 @@ paths:
         - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
         - "P08 BO-049 Stock Levels"
         - "P08 BO-050 Stock Position & Valuation"
+        - "P08 BO-451 Prize Inventory Integration"
         - "P08 BO-452 Direct-Pay / Crane & Prize Machine Configuration"
-        - "P08 BO-504 Rental Inventory Command Center"
         - "P08 BO-507 Pooled Inventory Management"
         - "P08 BO-513 Inventory Intelligence & Rebalancing"
       x-ticvai-audience:
@@ -926,7 +922,6 @@ paths:
       operationId: createStockLocation
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
-        - "P08 BO-510 Inventory Location Allocation"
       x-ticvai-audience:
       - staff
       summary: Create a stock location
@@ -1153,6 +1148,7 @@ paths:
     get:
       operationId: listStockCounts
       x-ticvai-consumed-by:
+        - "P06 EMP-066 Stock Count & Cycle Count Management"
         - "P08 BO-079 Stock Count"
       x-ticvai-audience:
       - staff
@@ -1342,7 +1338,6 @@ paths:
     get:
       operationId: getCountVariance
       x-ticvai-consumed-by:
-        - "P06 EMP-066 Stock Count & Cycle Count Management"
         - "P08 BO-079 Stock Count"
         - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
         - "P16 ANL-006 Inventory & Waste Intelligence"
@@ -1531,7 +1526,6 @@ paths:
     post:
       operationId: postStockCount
       x-ticvai-consumed-by:
-        - "P06 EMP-066 Stock Count & Cycle Count Management"
         - "P08 BO-079 Stock Count"
       x-ticvai-audience:
       - staff
@@ -1585,6 +1579,7 @@ paths:
     get:
       operationId: listStockTransfers
       x-ticvai-consumed-by:
+        - "P06 EMP-064 Store-to-Store & Warehouse Transfers"
         - "P08 BO-080 Stock Transfers"
         - "P08 BO-511 Inventory Transfer Management"
       x-ticvai-audience:
@@ -1630,7 +1625,7 @@ paths:
         - "P06 EMP-064 Store-to-Store & Warehouse Transfers"
         - "P08 BO-049 Stock Levels"
         - "P08 BO-080 Stock Transfers"
-        - "P08 BO-082 Stock Movements"
+        - "P08 BO-113 Central Kitchen & Commissary Management"
         - "P08 BO-507 Pooled Inventory Management"
         - "P08 BO-511 Inventory Transfer Management"
         - "P08 BO-513 Inventory Intelligence & Rebalancing"
@@ -1685,7 +1680,6 @@ paths:
     post:
       operationId: closeTransferShort
       x-ticvai-consumed-by:
-        - "P08 BO-052 Goods Receipt"
         - "P08 BO-080 Stock Transfers"
       x-ticvai-audience:
       - staff
@@ -1764,6 +1758,8 @@ paths:
     post:
       operationId: receiveStockTransfer
       x-ticvai-consumed-by:
+        - "P06 EMP-064 Store-to-Store & Warehouse Transfers"
+        - "P06 EMP-065 Receiving & Store Put-Away"
         - "P08 BO-080 Stock Transfers"
         - "P08 BO-511 Inventory Transfer Management"
       x-ticvai-audience:
@@ -1921,8 +1917,8 @@ paths:
     get:
       operationId: getSuggestedRequisitions
       x-ticvai-consumed-by:
+        - "P06 EMP-063 Requisition & Smart Store Replenishment"
         - "P08 BO-078 Requisitions"
-        - "P08 BO-513 Inventory Intelligence & Rebalancing"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2384,9 +2380,9 @@ paths:
     get:
       operationId: listPurchaseOrders
       x-ticvai-consumed-by:
+        - "P06 EMP-065 Receiving & Store Put-Away"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-052 Goods Receipt"
-        - "P08 BO-105 Stock & Supply"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2429,7 +2425,6 @@ paths:
       operationId: createPurchaseOrder
       x-ticvai-consumed-by:
         - "P08 BO-051 Purchase Orders"
-        - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
       summary: Raise a purchase order
@@ -2533,7 +2528,6 @@ paths:
       operationId: sendPurchaseOrder
       x-ticvai-consumed-by:
         - "P08 BO-051 Purchase Orders"
-        - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
       summary: Issue the order to the supplier
@@ -2579,7 +2573,6 @@ paths:
       operationId: acknowledgePurchaseOrder
       x-ticvai-consumed-by:
         - "P08 BO-051 Purchase Orders"
-        - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
       summary: Record the supplier acknowledgement
@@ -2637,7 +2630,6 @@ paths:
       operationId: closePurchaseOrderShort
       x-ticvai-consumed-by:
         - "P08 BO-051 Purchase Orders"
-        - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
       summary: Close an order accepting the balance will not arrive
@@ -2713,7 +2705,6 @@ paths:
       operationId: cancelPurchaseOrder
       x-ticvai-consumed-by:
         - "P08 BO-051 Purchase Orders"
-        - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
       summary: Cancel a purchase order
@@ -2823,7 +2814,6 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-065 Receiving & Store Put-Away"
         - "P08 BO-052 Goods Receipt"
-        - "P08 BO-080 Stock Transfers"
       x-ticvai-audience:
       - staff
       summary: Receive goods against a purchase order

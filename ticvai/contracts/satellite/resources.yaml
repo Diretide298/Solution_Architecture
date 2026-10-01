@@ -115,7 +115,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-095 Resources"
         - "P08 BO-857 Resource Creation & Profile"
-        - "P08 BO-863 Resource Lifecycle, Governance & Audit"
       summary: Define a bookable resource
       tags:
       - resources
@@ -611,7 +610,9 @@ paths:
     get:
       operationId: getResourceQualifications
       x-ticvai-consumed-by:
+        - "P08 BO-098 Qualifications"
         - "P08 BO-857 Resource Creation & Profile"
+        - "P08 BO-875 Skills & Competency Management"
       summary: What an instructor or staff resource is certified to do, and until when — as saved
       description: '**The read the qualifications screen loads before it edits.** `setResourceQualifications`
         replaces the whole set, so a screen that cannot load the current set can only overwrite it
@@ -644,8 +645,6 @@ paths:
         - "P08 BO-098 Qualifications"
         - "P08 BO-875 Skills & Competency Management"
         - "P08 BO-876 Certification & Expiry Management"
-        - "P08 BO-877 Qualification & Assignment Rule Engine"
-        - "P08 BO-894 Staff-to-Experience Qualification Mapping"
       summary: What a person resource is certified to do, and until when
       description: '1.2.36. **`RotaAssignment` carried `requiredRoleId` alone, and a role is not a skill.**
 
@@ -1158,7 +1157,6 @@ paths:
       operationId: updateResource
       x-ticvai-consumed-by:
         - "P08 BO-857 Resource Creation & Profile"
-        - "P08 BO-863 Resource Lifecycle, Governance & Audit"
         - "P08 BO-866 Resource Availability Schedule Configuration"
       summary: Change a resource
       tags:
@@ -1580,6 +1578,8 @@ paths:
       operationId: updateResourcePackage
       x-ticvai-consumed-by:
         - "P08 BO-861 Resource Package & Bundle Configuration"
+        - "P08 BO-895 Resource Combination Builder"
+        - "P08 BO-918 Event Resource Template Library"
       summary: Change a combination
       tags:
       - resources
@@ -2086,6 +2086,7 @@ paths:
       operationId: releaseResourceBlock
       x-ticvai-consumed-by:
         - "P08 BO-870 Operational Time & Resource Blocking"
+        - "P08 BO-910 Maintenance & Resource Blocking"
       summary: Put it back into service
       tags:
       - resources
@@ -2111,7 +2112,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-871 Multi-Event Resource Planning"
         - "P08 BO-899 Customer / Cashier Resource Assignment Experience"
-        - "P08 BO-900 Dynamic Resource Allocation Engine"
         - "P08 BO-916 Equipment & Asset Allocation"
       summary: Fill a requirement from the pool, rotating rather than repeating
       description: '**The 26 August decision is the whole of this operation.** *"resource allocation
@@ -2313,6 +2313,7 @@ paths:
     put:
       operationId: setResourceAllocationPolicy
       x-ticvai-consumed-by:
+        - "P08 BO-900 Dynamic Resource Allocation Engine"
         - "P08 BO-901 Priority, Scoring & Allocation Policy"
         - "P08 BO-948 Resource Governance & Policy Center"
       summary: Rotation, priority and scoring
@@ -2479,6 +2480,7 @@ paths:
       operationId: getExperienceResourceRequirements
       x-ticvai-consumed-by:
         - "P08 BO-893 Experience Resource Requirement Builder"
+        - "P08 BO-894 Staff-to-Experience Qualification Mapping"
       summary: What an experience needs before it can run
       tags:
       - resources
@@ -2505,6 +2507,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P08 BO-893 Experience Resource Requirement Builder"
+        - "P08 BO-894 Staff-to-Experience Qualification Mapping"
       summary: Bind resource requirements to an experience
       description: 'Board 5.01. **This is the join between the catalogue and the pool**, and it is what
         makes the 26 August rule enforceable: the guest buys a product, the product states what it needs,
@@ -3200,7 +3203,6 @@ paths:
     get:
       operationId: listResourceCosts
       x-ticvai-consumed-by:
-        - "P08 BO-903 Equipment & Asset Command Center"
         - "P08 BO-912 Asset Lifecycle, Depreciation & Retirement"
         - "P08 BO-945 Resource Cost, Revenue & Efficiency Analytics"
       x-ticvai-audience:
@@ -3268,7 +3270,6 @@ paths:
     post:
       operationId: createResourceCost
       x-ticvai-consumed-by:
-        - "P08 BO-903 Equipment & Asset Command Center"
         - "P08 BO-910 Maintenance & Resource Blocking"
         - "P08 BO-912 Asset Lifecycle, Depreciation & Retirement"
         - "P08 BO-945 Resource Cost, Revenue & Efficiency Analytics"

@@ -113,14 +113,11 @@ paths:
         - "P01 WEB-039 Venue Map & Wait Times"
         - "P02 GST-023 Virtual Queue"
         - "P06 EMP-031 Queue monitor"
-        - "P06 EMP-032 Manual wait entry"
         - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
-        - "P08 BO-038 Reconciliation Queue"
         - "P08 BO-221 Fast Pass & Attraction Access Journey"
-        - "P12 SUP-020 Queue Configuration & Management"
       x-ticvai-audience: [staff, guest]
       x-ticvai-audience-note: >
         24 August: widened to include guest. A guest needs to see which queues exist before join
@@ -167,9 +164,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
-        - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
-        - "P08 BO-038 Reconciliation Queue"
       x-ticvai-audience: [staff]
       summary: Create a queue
       description: >
@@ -210,14 +205,12 @@ paths:
     get:
       operationId: getQueue
       x-ticvai-consumed-by:
-        - "P04 POS-029 Order Queue"
         - "P06 EMP-031 Queue monitor"
         - "P06 EMP-032 Manual wait entry"
         - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
-        - "P08 BO-038 Reconciliation Queue"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a queue with live position
@@ -241,9 +234,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
-        - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
-        - "P08 BO-038 Reconciliation Queue"
         - "P08 BO-221 Fast Pass & Attraction Access Journey"
       x-ticvai-audience: [staff]
       summary: Amend queue configuration
@@ -304,9 +295,7 @@ paths:
         - "P06 EMP-031 Queue monitor"
         - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
-        - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
-        - "P08 BO-038 Reconciliation Queue"
       x-ticvai-audience: [staff]
       summary: Open, pause or close a queue
       description: >
@@ -656,7 +645,6 @@ paths:
         - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
-        - "P08 BO-038 Reconciliation Queue"
       x-ticvai-audience: [staff]
       summary: Call the next parties forward
       description: >
@@ -711,14 +699,10 @@ paths:
     get:
       operationId: listQueueEntries
       x-ticvai-consumed-by:
-        - "P04 POS-029 Order Queue"
         - "P06 EMP-031 Queue monitor"
-        - "P06 EMP-032 Manual wait entry"
         - "P08 BO-001 Queue Directory"
-        - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
-        - "P08 BO-038 Reconciliation Queue"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: List entries in a queue
@@ -775,7 +759,6 @@ paths:
         - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
-        - "P08 BO-038 Reconciliation Queue"
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: Wait times across a venue
@@ -835,7 +818,6 @@ paths:
         - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
-        - "P08 BO-038 Reconciliation Queue"
       x-ticvai-audience: [staff]
       summary: Manually set a wait time
       description: >
@@ -1088,7 +1070,6 @@ paths:
     get:
       operationId: getQueueFeedHealth
       x-ticvai-consumed-by:
-        - "P04 POS-029 Order Queue"
         - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
       x-ticvai-audience: [staff]

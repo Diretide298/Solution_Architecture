@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 71
+  x-ticvai-screen-count: 74
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -244,6 +244,8 @@ paths:
   /password-policy:
     get:
       operationId: getPasswordPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-342 Authentication & MFA Policy Manager"
       summary: Read the password and MFA policy in force
       description: 'The read `setPasswordPolicy` never had (decided 28 September, audit R135). `setPasswordPolicy`
         replaces the whole policy, so a screen that changes one field, such as `mfaRequiredForPermissions`,
@@ -276,7 +278,7 @@ paths:
       operationId: setPasswordPolicy
       x-ticvai-consumed-by:
         - "P09 ADM-342 Authentication & MFA Policy Manager"
-        - "P09 ADM-421 Venue & Operational Structure Creation"
+        - "P09 ADM-422 Administrator & Security Initialization"
       summary: Length, breach check, lockout and step-up
       description: 'BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats composition,
         and `requireBreachCheck` stops more account takeovers than every composition rule combined.
@@ -755,7 +757,6 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-015 Memberships"
         - "P02 GST-069 Face Pass"
-        - "P08 BO-385 Delegation Management"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1107,9 +1108,7 @@ paths:
       operationId: forceLogout
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
-        - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - staff
       - partner
@@ -1198,7 +1197,6 @@ paths:
     get:
       operationId: listPrincipals
       x-ticvai-consumed-by:
-        - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-053 Staff Directory"
         - "P08 BO-057 Training & Certification"
         - "P08 BO-873 Staff Resource Directory"
@@ -1258,7 +1256,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-053 Staff Directory"
         - "P09 ADM-020 Platform User Directory"
-        - "P09 ADM-421 Venue & Operational Structure Creation"
+        - "P09 ADM-422 Administrator & Security Initialization"
         - "P10 PTR-003 Profile & Company Details"
       x-ticvai-audience:
       - staff
@@ -1397,8 +1395,10 @@ paths:
       operationId: updatePrincipal
       x-ticvai-consumed-by:
         - "P08 BO-053 Staff Directory"
+        - "P08 BO-054 Role Assignment"
         - "P09 ADM-020 Platform User Directory"
         - "P10 PTR-003 Profile & Company Details"
+        - "P13 CMS-019 User Access"
       x-ticvai-audience:
       - staff
       - partner
@@ -1453,10 +1453,8 @@ paths:
     get:
       operationId: listRoles
       x-ticvai-consumed-by:
-        - "P06 EMP-002 Select venue & role"
         - "P08 BO-054 Role Assignment"
         - "P08 BO-106 People & Access Rights"
-        - "P08 BO-142 Store Rules, Controls & Permissions"
         - "P09 ADM-021 Platform Role Management"
         - "P13 CMS-019 User Access"
       x-ticvai-audience:
@@ -1697,8 +1695,7 @@ paths:
     post:
       operationId: resolvePermissions
       x-ticvai-consumed-by:
-        - "P07 SCN-001 Sign in"
-        - "P08 BO-068 Audit Log"
+        - "P08 BO-054 Role Assignment"
       x-ticvai-audience:
       - staff
       summary: Simulate a principal's effective permissions
@@ -2400,7 +2397,6 @@ paths:
       operationId: listSsoProviders
       x-ticvai-consumed-by:
         - "P06 EMP-001 Sign in"
-        - "P06 EMP-002 Select venue & role"
         - "P06 EMP-042 Profile"
         - "P07 SCN-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
@@ -2440,6 +2436,9 @@ paths:
         format: uuid
     get:
       operationId: startSsoAuthorization
+      x-ticvai-consumed-by:
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - anonymous
       x-ticvai-read-routing: replica
@@ -2491,6 +2490,9 @@ paths:
         format: uuid
     post:
       operationId: completeSsoAuthorization
+      x-ticvai-consumed-by:
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - anonymous
       summary: Exchange an SSO code for a session
@@ -2554,16 +2556,7 @@ paths:
     get:
       operationId: getSsoConfig
       x-ticvai-consumed-by:
-        - "P09 ADM-002 Platform Dashboard"
         - "P09 ADM-005 Tenant Directory"
-        - "P09 ADM-006 Tenant Hierarchy Explorer"
-        - "P09 ADM-007 Module & Feature Entitlement"
-        - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-009 Tenant Billing & Invoicing"
-        - "P09 ADM-010 Usage Metering"
-        - "P09 ADM-011 Licence & Seat Management"
-        - "P09 ADM-012 Tenant Isolation & Resource Pool"
-        - "P09 ADM-015 API Rate Limit & Quota Management"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2636,7 +2629,6 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-001 Sign in"
-        - "P06 EMP-002 Select venue & role"
         - "P06 EMP-042 Profile"
         - "P07 SCN-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
@@ -3130,9 +3122,7 @@ paths:
       operationId: listActiveSessions
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
-        - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - staff
       - partner
@@ -3193,9 +3183,7 @@ paths:
     post:
       operationId: revokeAllSessions
       x-ticvai-consumed-by:
-        - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - staff
       - partner
@@ -3908,6 +3896,9 @@ paths:
         - "P09 ADM-037 AI Provider & Credentials"
         - "P09 ADM-412 Payment Method & Settlement Setup"
         - "P09 ADM-421 Venue & Operational Structure Creation"
+        - "P09 ADM-422 Administrator & Security Initialization"
+        - "P09 ADM-424 Module Activation & Dependency Validation"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
       summary: A platform operator opens a time-boxed grant into this tenant
       description: '**How a TICVAI operator acts inside a tenant — decided 28 September, audit R098.** The
         Platform Console (P09) runs outside every cell, and its tenant screens call operations that live

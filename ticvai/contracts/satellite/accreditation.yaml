@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Accreditation
   version: 1.0.0
-  x-ticvai-screen-count: 46
+  x-ticvai-screen-count: 47
   x-ticvai-tier: satellite
   x-ticvai-module: 12 — Accreditation & Credential Management
   x-ticvai-platforms:
@@ -54,6 +54,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-619 Accreditation Category Management"
         - "P08 BO-620 Accreditation Program Setup"
+        - "P08 BO-667 Event & Venue Accreditation Assignment"
       summary: Programmes, their categories and their applicant types
       description: 'Boards 1.5, 1.6 and 1.7. **A programme is the thing an application is made
         against** — a season, a tournament, a venue''s standing contractor scheme — and it carries the
@@ -90,8 +91,6 @@ paths:
       operationId: createAccreditationProgramme
       x-ticvai-consumed-by:
         - "P08 BO-620 Accreditation Program Setup"
-        - "P08 BO-624 Registration Rules & Publication"
-        - "P08 BO-667 Event & Venue Accreditation Assignment"
       x-ticvai-conflict-policy: serverWins
       summary: Define a programme, its categories and its window
       tags:
@@ -173,7 +172,7 @@ paths:
         - "P08 BO-616 Accreditation Application Directory"
         - "P08 BO-623 Accreditation Intake Monitor"
         - "P08 BO-635 Accreditation Review Queue"
-        - "P08 BO-636 Application Review Workspace"
+        - "P08 BO-640 Rejection & Resubmission Management"
         - "P11 ACC-006 Reviewer Queue"
       summary: Applications, by state and programme
       tags:
@@ -213,7 +212,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-617 New Accreditation Application"
         - "P11 ACC-002 Registration Form"
-        - "P11 ACC-003 Application Review & Submit"
       x-ticvai-conflict-policy: serverWins
       security:
       - guestAuth: []
@@ -283,8 +281,10 @@ paths:
     post:
       operationId: decideAccreditationApplication
       x-ticvai-consumed-by:
+        - "P08 BO-635 Accreditation Review Queue"
         - "P08 BO-636 Application Review Workspace"
         - "P08 BO-640 Rejection & Resubmission Management"
+        - "P11 ACC-006 Reviewer Queue"
         - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-conflict-policy: serverWins
       summary: Approve, reject, return for more, or escalate
@@ -362,6 +362,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-615 Accreditation Command Center"
         - "P08 BO-625 Accreditation Holder Directory"
+        - "P08 BO-644 Credential Issuance Command Center"
+        - "P08 BO-650 NFC & RFID Credential Encoding"
+        - "P08 BO-660 Holder Access Assignment"
         - "P08 BO-664 Accreditation Lifecycle Command Center"
         - "P08 BO-672 Expiry Monitor & Expiration Rules"
         - "P08 BO-673 Accreditation Renewal Workspace"
@@ -418,6 +421,8 @@ paths:
       operationId: getAccreditationHolder
       x-ticvai-consumed-by:
         - "P08 BO-626 Accreditation Holder Profile"
+        - "P08 BO-627 Identity Details & Verification"
+        - "P08 BO-628 Photo Management"
         - "P08 BO-633 Profile Completeness & Compliance Monitor"
       summary: One holder — identity, documents, access and history
       tags:
@@ -474,9 +479,11 @@ paths:
     get:
       operationId: listAccreditationDocuments
       x-ticvai-consumed-by:
+        - "P08 BO-615 Accreditation Command Center"
         - "P08 BO-629 Document Repository"
         - "P08 BO-630 Document Verification Queue"
         - "P08 BO-636 Application Review Workspace"
+        - "P08 BO-672 Expiry Monitor & Expiration Rules"
         - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.18, 12.1.19); pack ACCREDITATION.pdf pages 14-15
         (BO-629, BO-630); P11 ACC-007 listAccreditationDocuments gap; shape follows listAccreditationApplications'
@@ -606,6 +613,7 @@ paths:
       operationId: verifyAccreditationDocument
       x-ticvai-consumed-by:
         - "P08 BO-630 Document Verification Queue"
+        - "P08 BO-636 Application Review Workspace"
         - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-conflict-policy: serverWins
       summary: Accept or refuse a submitted document
@@ -662,6 +670,8 @@ paths:
     get:
       operationId: listAccreditationIdentityConflicts
       x-ticvai-consumed-by:
+        - "P08 BO-615 Accreditation Command Center"
+        - "P08 BO-623 Accreditation Intake Monitor"
         - "P08 BO-631 Duplicate & Identity Conflict Detection"
       summary: People who may already be accredited under another record
       description: 'Board 2.7. **The same person accredited twice with different access is the failure
@@ -693,7 +703,13 @@ paths:
     get:
       operationId: listAccreditationCredentials
       x-ticvai-consumed-by:
+        - "P08 BO-615 Accreditation Command Center"
+        - "P08 BO-644 Credential Issuance Command Center"
         - "P08 BO-645 Credential Generation Workspace"
+        - "P08 BO-649 Digital & Mobile Credential Management"
+        - "P08 BO-650 NFC & RFID Credential Encoding"
+        - "P08 BO-651 Credential Activation & Delivery"
+        - "P08 BO-653 Credential Registry & Credential History"
         - "P11 ACC-008 Credential Register"
       summary: Badges and digital credentials issued
       tags:
@@ -727,9 +743,8 @@ paths:
     post:
       operationId: issueAccreditationCredential
       x-ticvai-consumed-by:
-        - "P08 BO-646 Credential Media Configuration"
+        - "P08 BO-645 Credential Generation Workspace"
         - "P08 BO-650 NFC & RFID Credential Encoding"
-        - "P08 BO-651 Credential Activation & Delivery"
       x-ticvai-conflict-policy: serverWins
       summary: Produce a badge, a mobile credential, or both
       description: 'Boards 4.2, 4.6 and 4.7. **The credential is not the accreditation.** Issuing a
@@ -781,6 +796,8 @@ paths:
         format: uuid
     post:
       operationId: replaceAccreditationCredential
+      x-ticvai-consumed-by:
+        - "P08 BO-650 NFC & RFID Credential Encoding"
       x-ticvai-conflict-policy: serverWins
       summary: Reissue after loss, damage or a name change
       description: 'Board 4.9. **The old credential is invalidated in the same act.** A replacement
@@ -836,7 +853,7 @@ paths:
     get:
       operationId: listBadgeTemplates
       x-ticvai-consumed-by:
-        - "P08 BO-648 Badge Printing & Print Queue"
+        - "P08 BO-647 Badge Template Designer"
       summary: Badge designs, and what prints on each
       description: 'Board 4.4. **A badge is a security artefact as much as a printed card.** Which
         zones are shown, what colour the stripe is, whether the photograph is on it and what a
@@ -866,7 +883,6 @@ paths:
       operationId: setBadgeTemplate
       x-ticvai-consumed-by:
         - "P08 BO-647 Badge Template Designer"
-        - "P08 BO-648 Badge Printing & Print Queue"
       x-ticvai-conflict-policy: serverWins
       summary: Design a badge
       tags:
@@ -900,7 +916,8 @@ paths:
     get:
       operationId: listBadgePrintJobs
       x-ticvai-consumed-by:
-        - "P08 BO-649 Digital & Mobile Credential Management"
+        - "P08 BO-644 Credential Issuance Command Center"
+        - "P08 BO-648 Badge Printing & Print Queue"
       summary: The print queue, and what failed
       description: 'Board 4.5. **Badge printing fails in the middle of a batch and the operator needs
         to know which ones landed.** Reprinting the whole run wastes stock and produces duplicates
@@ -928,7 +945,7 @@ paths:
     post:
       operationId: createBadgePrintJob
       x-ticvai-consumed-by:
-        - "P08 BO-649 Digital & Mobile Credential Management"
+        - "P08 BO-648 Badge Printing & Print Queue"
       x-ticvai-conflict-policy: serverWins
       summary: Queue badges for printing
       tags:
@@ -963,6 +980,11 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-654 Accreditation Access Command Center"
         - "P08 BO-655 Access Profile Management"
+        - "P08 BO-656 Venue & Zone Access Matrix"
+        - "P08 BO-657 Operational Area Permission Management"
+        - "P08 BO-658 Date & Time Access Rules"
+        - "P08 BO-660 Holder Access Assignment"
+        - "P08 BO-668 Multi-Venue Accreditation Management"
         - "P08 BO-708 Accreditation & Participant Category Configuration"
       summary: Named bundles of zones, dates and times
       description: 'Boards 5.2 and 5.3. **A profile is how an estate stays governable.** Fifty
@@ -1202,8 +1224,6 @@ paths:
       operationId: setAccreditationValidity
       x-ticvai-consumed-by:
         - "P08 BO-666 Validity Period Configuration"
-        - "P08 BO-669 Temporary & Seasonal Accreditation"
-        - "P08 BO-673 Accreditation Renewal Workspace"
       x-ticvai-conflict-policy: serverWins
       summary: Validity periods, renewal windows and expiry behaviour
       description: 'Boards 6.3 and 6.10. **Expiry is the control that keeps an accreditation estate
@@ -1244,7 +1264,6 @@ paths:
     put:
       operationId: setAccreditationNotificationRules
       x-ticvai-consumed-by:
-        - "P08 BO-674 Accreditation Communications Command Center"
         - "P08 BO-675 Notification Rule Management"
         - "P08 BO-676 Expiry & Renewal Notification Scheduler"
       x-ticvai-conflict-policy: serverWins
@@ -1285,7 +1304,6 @@ paths:
       operationId: importAccreditationHolders
       x-ticvai-consumed-by:
         - "P08 BO-680 Accreditation Bulk Import"
-        - "P08 BO-681 Import Validation & Processing Monitor"
       x-ticvai-conflict-policy: serverWins
       summary: Load a roster supplied by an organisation
       description: 'Boards 7.7 and 7.8. **This is how large events actually happen.** A broadcaster
@@ -1352,6 +1370,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-686 Accreditation Utilization Analytics"
         - "P08 BO-687 Accreditation Access Activity Reporting"
+        - "P11 ACC-008 Credential Register"
       summary: Where accredited people actually went
       description: 'Board 8.4. **The difference between granted access and used access is the whole of
         the annual review.** A profile granting eight zones where holders only ever enter two is a
@@ -1403,7 +1422,10 @@ paths:
       operationId: listAccreditationAudit
       x-ticvai-consumed-by:
         - "P08 BO-634 Profile History & Audit Timeline"
+        - "P08 BO-636 Application Review Workspace"
+        - "P08 BO-642 Approval Decision History"
         - "P08 BO-643 Approval Policy Validation & Publication"
+        - "P08 BO-653 Credential Registry & Credential History"
         - "P08 BO-683 Delivery, Batch & Operational History"
         - "P08 BO-689 Accreditation Audit Reporting"
         - "P08 BO-690 Immutable Accreditation Audit Log"
@@ -1547,8 +1569,10 @@ paths:
       operationId: updateAccreditationProgramme
       x-ticvai-consumed-by:
         - "P08 BO-618 Accreditation Form Builder"
+        - "P08 BO-619 Accreditation Category Management"
         - "P08 BO-620 Accreditation Program Setup"
         - "P08 BO-624 Registration Rules & Publication"
+        - "P08 BO-667 Event & Venue Accreditation Assignment"
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.2, 12.1.56); pack ACCREDITATION.pdf pages 5 and 7
         (BO-618, BO-620); a programme could be created and never amended; shape follows createAccreditationProgramme'

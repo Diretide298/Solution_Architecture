@@ -356,8 +356,12 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-559 Payment Command Center\t7"
         - "P09 ADM-560 Payment Method Catalogue\t8"
+        - "P09 ADM-561 Payment Method Configuration\t9"
+        - "P09 ADM-562 Channel & Touchpoint Payment Configuration\t10"
+        - "P09 ADM-563 Venue, Location & Business Unit Payment Assignment\t11"
         - "P09 ADM-567 Payment Policy, Governance & Approval Manager\t15"
         - "P09 ADM-590 Digital & Alternative Payment Method Manager\t71"
+        - "P09 ADM-591 Digital Wallet & Mobile Payment Configuration\t72"
       summary: The methods this tenant can offer, and where
       description: 'Board 1.2. **A method is not a provider.** *Apple Pay* is a method; the acquirer
         behind it is a routing decision, and a venue that models them as one thing cannot change
@@ -488,6 +492,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-569 Payment Orchestration Command Center\t27"
         - "P09 ADM-570 Gateway, PSP & Acquirer Directory\t28"
+        - "P09 ADM-571 Provider Connection & Adapter Configuration\t29"
         - "P09 ADM-572 Gateway Capability & Payment Method Mapping\t30"
       summary: Gateways, PSPs and acquirers, and what each can do
       description: 'Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped and then
@@ -680,6 +685,8 @@ paths:
       operationId: listPaymentRoutingRules
       x-ticvai-consumed-by:
         - "P09 ADM-573 Payment Routing Rule Builder\t31"
+        - "P09 ADM-574 Routing Strategy, Priority & Load Distribution\t33"
+        - "P09 ADM-578 Payment Routing Simulator, Decision Trace & AI Advisor\t37"
       summary: Which provider takes which transaction
       tags:
       - payments
@@ -931,6 +938,7 @@ paths:
         - "P08 BO-1141 Device, Terminal & Acceptance Point Mapping"
         - "P09 ADM-579 Terminal & Card-Present Command Center\t48"
         - "P09 ADM-580 Payment Terminal & Device Inventory\t49"
+        - "P09 ADM-583 EMV & Card-Present Processing Configuration\t53"
         - "P09 ADM-585 Card-Present Transaction Monitor & Operations\t55"
       summary: Terminals, and the payment configuration on each
       description: 'Board 3.2. **The device register is `tenancy`''s; this is the payment layer on top
@@ -1151,6 +1159,8 @@ paths:
       operationId: getMixedTenderRules
       x-ticvai-consumed-by:
         - "P09 ADM-599 Mixed Tender & Credit Command Center\t93"
+        - "P09 ADM-600 Mixed Tender Rule & Combination Builder\t93"
+        - "P09 ADM-605 Advanced Payment Eligibility, Sequence & Restriction Rules\t98"
       summary: Which tenders may be combined, and in what order
       tags:
       - payments
@@ -1342,6 +1352,7 @@ paths:
       operationId: listReconciliationSources
       x-ticvai-consumed-by:
         - "P09 ADM-619 Reconciliation & Settlement Command Center\t139"
+        - "P09 ADM-620 Reconciliation Source & Import Manager\t141"
       summary: The files and feeds reconciliation is run against
       description: 'Board 7.2. **`finance.ingestSettlementFile` could read one and nothing said where
         they come from.** Format, schedule, credentials, the field mapping and what a missing file
@@ -1621,9 +1632,11 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-559 Payment Command Center\t7"
         - "P09 ADM-589 Digital Payments Command Center\t71"
+        - "P09 ADM-598 Digital Payment Simulator, Conversion & AI Advisor\t80"
         - "P09 ADM-629 Payment Risk & Fraud Command Center\t166"
         - "P09 ADM-636 Payment Performance & Conversion Analytics\t174"
-        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175"
+        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
+        - "P09 ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor\t176"
       summary: Authorisation rate, conversion and where payments are lost
       description: 'Board 8.8. **Conversion at the payment step is the last and most expensive place a
         venue loses a sale**, because everything before it has already been paid for in marketing.
@@ -1712,7 +1725,12 @@ paths:
     get:
       operationId: getPaymentRules
       x-ticvai-consumed-by:
+        - "P09 ADM-564 Currency & Payment Currency Configuration\t12"
+        - "P09 ADM-565 Payment Eligibility & Availability Rule Builder\t13"
+        - "P09 ADM-566 Payment Fees, Surcharges & Commercial Rules\t14"
         - "P09 ADM-567 Payment Policy, Governance & Approval Manager\t15"
+        - "P09 ADM-568 Payment Configuration Simulator & Validation Center\t16"
+        - "P09 ADM-598 Digital Payment Simulator, Conversion & AI Advisor\t80"
       summary: Currency, eligibility and fee rules as one set
       description: >
         **Three tables, one decision.** Whether a guest may pay with this method, in this currency,
@@ -1782,7 +1800,9 @@ paths:
     get:
       operationId: listDepositActivity
       x-ticvai-consumed-by:
+        - "P06 EMP-099 Deposit Release, Capture & Customer Confirmation"
         - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
+        - "P08 BO-572 Deposit Release, Capture & Customer Confirmation"
       summary: Movements on a deposit
       description: >
         **Authorise, capture, release, forfeit — the history a disputed deposit is settled from.**

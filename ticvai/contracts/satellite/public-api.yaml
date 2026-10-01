@@ -169,7 +169,8 @@ paths:
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P08 BO-691 Accreditation API Management"
         - "P09 ADM-015 API Rate Limit & Quota Management"
-        - "P09 ADM-354 External Workflow System Integration"
+        - "P09 ADM-351 Approval API Management"
+        - "P09 ADM-356 Integration Security & Access Control"
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
       summary: Registered clients for this developer
@@ -193,9 +194,6 @@ paths:
     post:
       operationId: createApiClient
       x-ticvai-consumed-by:
-        - "P08 BO-067 Integrations"
-        - "P08 BO-1073 API Access & OAuth"
-        - "P08 BO-1173 Wallet Integration Command Center"
         - "P08 BO-1177 API Security, Access & Integration Permissions"
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
@@ -529,6 +527,7 @@ paths:
         - "P08 BO-1074 Webhook Configuration"
         - "P08 BO-1077 Mapping & Transformation"
         - "P08 BO-1173 Wallet Integration Command Center"
+        - "P08 BO-1176 Wallet Events, Webhooks & Notification Orchestration"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P08 BO-692 Accreditation Webhook Management"
         - "P09 ADM-353 Webhook Configuration & Subscription Manager"
@@ -810,6 +809,7 @@ paths:
       operationId: getApiUsage
       x-ticvai-consumed-by:
         - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P09 ADM-351 Approval API Management"
         - "P14 DEV-006 Usage & Limits"
       summary: Calls, errors, latency and success rate
       description: >
@@ -1003,7 +1003,6 @@ paths:
     post:
       operationId: certifyIntegration
       x-ticvai-consumed-by:
-        - "P08 BO-483 Integration Certification & Test Console"
         - "P14 DEV-008 Programme Administration"
       summary: Approve, reject or revoke a certification
       description: >
@@ -1116,8 +1115,8 @@ paths:
     post:
       operationId: setApiClientStatus
       x-ticvai-consumed-by:
-        - "P08 BO-1173 Wallet Integration Command Center"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
+        - "P09 ADM-356 Integration Security & Access Control"
       x-ticvai-agreed: >-
         29 September: VM close-out; pack 'Wallet_Configuration_Backend_Structure_v1.0.pdf' board 10
         pp.115 and 122 (Suspend Integration); shape follows revokeApiCredential and states/api-client.yaml
@@ -1237,6 +1236,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1073 API Access & OAuth"
         - "P08 BO-1177 API Security, Access & Integration Permissions"
+        - "P09 ADM-351 Approval API Management"
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-001 API Reference"
         - "P14 DEV-003 Clients & Credentials"
