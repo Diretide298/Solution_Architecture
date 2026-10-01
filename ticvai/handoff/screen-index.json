@@ -16174,7 +16174,7 @@
    "issueGameCard",
    "loadGameCredits",
    "addCartLine",
-   "getLoyaltyPosition",
+   "getGuestLoyalty",
    "identifyGuest",
    "listMyEntitlements",
    "listSaleBoards",
@@ -62063,6 +62063,15 @@
     "operation": "listDeviceGate"
    },
    {
+    "to": "BO-196",
+    "trigger": "Works in Physical Device Registration & Provisioning",
+    "provenance": "flow F116 step 3\u21924",
+    "operation": "listDeviceGate",
+    "carries": [
+     "placementId"
+    ]
+   },
+   {
     "to": "BO-197",
     "trigger": "Works in Turnstile & Lane Behavior Configuration",
     "provenance": "flow F116 step 5\u21926",
@@ -62103,15 +62112,6 @@
     "trigger": "Works in Hardware Compatibility, Health, Testing & Deployment",
     "provenance": "flow F116 step 17\u219218",
     "operation": "listDeviceGate"
-   },
-   {
-    "to": "BO-196",
-    "trigger": "Works in Physical Device Registration & Provisioning",
-    "provenance": "flow F116 step 3\u21924",
-    "operation": "listDeviceGate",
-    "carries": [
-     "placementId"
-    ]
    }
   ],
   "machine": null,
@@ -102679,7 +102679,7 @@
   "app": "venue-management-web",
   "route": "/engagement-support/progress-leaderboards-hub-bo-831",
   "operations": [
-   "getLoyaltyPosition"
+   "getGuestLoyalty"
   ],
   "services": [
    "MarketingService"
@@ -102688,7 +102688,7 @@
    "postgres"
   ],
   "reads": [
-   "marketing.loyalty_programme"
+   "marketing.loyalty_position"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -102716,7 +102716,7 @@
    "error": "Could not load. Names which read failed and leaves the progress leaderboards untouched.",
    "emptyFirstRun": "No progress leaderboards yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the progress leaderboards are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getGuestLoyalty` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "overlays": []
  },
@@ -126363,7 +126363,7 @@
    {
     "to": "ADM-318",
     "trigger": "Dead Letters",
-    "provenance": "derived \u2014 ADM-318 declares entryState.params deadLetterId, republishId and ADM-002 holds none of them. The edge carries nothing: deadLetterId only pre-selects (deep link or optional); ADM-318 finds republishId (listOutboxRepublishes) itself, and ADM-318 opens on its own"
+    "provenance": "derived \u2014 ADM-318 declares entryState.params deadLetterId and ADM-002 holds none of them. The edge carries nothing: deadLetterId only pre-selects (deep link or optional), and ADM-318 opens on its own"
    },
    {
     "to": "ADM-024",

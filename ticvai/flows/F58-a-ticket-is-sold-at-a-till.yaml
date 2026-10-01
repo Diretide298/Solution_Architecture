@@ -46,7 +46,7 @@ steps:
   - step: 3
     screen: POS-002
     action: The guest mentions they are a member. The cashier identifies them.
-    operations: [identifyGuest, getLoyaltyPosition, listMyEntitlements]
+    operations: [identifyGuest, getGuestLoyalty, listMyEntitlements]
     outcome: >
       Member pricing and any entitlement they already hold. **Identification is optional and late** —
       a queue does not wait while somebody finds their card.

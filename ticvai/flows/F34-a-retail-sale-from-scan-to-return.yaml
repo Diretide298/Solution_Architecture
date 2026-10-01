@@ -50,7 +50,7 @@ steps:
   action: The guest offers a membership card.
   operations:
   - identifyGuest
-  - getLoyaltyPosition
+  - getGuestLoyalty
   - evaluatePromotions
   outcome: 'Member pricing applies. **Stacking is resolved at evaluation, not per line** — a promotion
     applied per line and one applied per basket give different totals, and only one of them is what

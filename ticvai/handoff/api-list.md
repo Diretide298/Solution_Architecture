@@ -1760,7 +1760,7 @@ Consent gates everything. A segment is a definition, not a list.
 | GET | `/guests/{subjectId}/devices` | `listGuestDevices` | `—` | — | guest-app, guest-web |
 | POST | `/guests/{subjectId}/devices` | `registerGuestDevice` | `—` | — | guest-app, guest-web |
 | DELETE | `/guests/{subjectId}/devices/{deviceId}` | `revokeGuestDevice` | `—` | — | guest-app, guest-web |
-| GET | `/guests/{subjectId}/loyalty` | `getGuestLoyalty` | `GUEST_VIEW` | — | venue-management-web |
+| GET | `/guests/{subjectId}/loyalty` | `getGuestLoyalty` | `GUEST_VIEW` | — | venue-management-web, venue-pos |
 | POST | `/guests/{subjectId}/loyalty/adjust` | `adjustLoyaltyPoints` | `LEDGER_POST` | — | venue-management-web |
 | POST | `/guests/{subjectId}/merge` | `mergeGuestProfiles` | `GUEST_MANAGE` | — | venue-management-web |
 | POST | `/guests/{subjectId}/notes` | `addGuestNote` | `GUEST_MANAGE` | ✓ | venue-staff-app |
@@ -1793,7 +1793,7 @@ Consent gates everything. A segment is a definition, not a list.
 | GET | `/loyalty/leaderboard` | `listLeaderboard` | `—` | — | — |
 | PUT | `/loyalty/leaderboard-nickname` | `setLeaderboardNickname` | `—` | — | — |
 | GET | `/loyalty/points` | `listLoyaltyPointEntries` | `LOYALTY_ACCRUE` | — | — |
-| GET | `/loyalty/position` | `getLoyaltyPosition` | `—` | — | guest-app, guest-web, venue-management-web, venue-pos |
+| GET | `/loyalty/position` | `getLoyaltyPosition` | `—` | — | guest-app, guest-web |
 | GET | `/loyalty/programmes` | `listLoyaltyProgrammes` | `MARKETING_VIEW` | ✓ | guest-app, guest-web, venue-management-web |
 | POST | `/loyalty/programmes` | `createLoyaltyProgramme` | `MARKETING_MANAGE` | — | venue-management-web |
 | GET | `/loyalty/programmes/{programmeId}/rules` | `getLoyaltyRules` | `MARKETING_VIEW` | — | — |

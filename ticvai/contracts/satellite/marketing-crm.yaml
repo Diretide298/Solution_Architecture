@@ -3022,8 +3022,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
-        - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P08 BO-831 Progress, Leaderboards & Hub"
       x-ticvai-audience:
       - guest
       summary: A guest's points, tier and what is within reach
@@ -5712,7 +5710,9 @@ paths:
     get:
       operationId: getGuestLoyalty
       x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-735 Guest Directory"
+        - "P08 BO-831 Progress, Leaderboards & Hub"
       x-ticvai-audience:
       - staff
       - service

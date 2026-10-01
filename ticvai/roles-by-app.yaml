@@ -236,7 +236,7 @@ apps:
     - P13
     - P16
     screens: 1387
-    operations: 1644
+    operations: 1643
     permissions: 146
     tiers:
       read:
@@ -395,7 +395,6 @@ apps:
     - getGameCard
     - getGuestMenu
     - getGuestOrderStatus
-    - getLoyaltyPosition
     - getPublishedBookingFlow
     - getTenantAppStatus
     - getTransportFareTable
@@ -417,7 +416,7 @@ apps:
     - recordGamePlay
     - syncGamePlays
     - verifyMfaChallenge
-    operationsWithNoPermissionCount: 28
+    operationsWithNoPermissionCount: 27
   venue-pos:
     name: TICVAI POS
     platforms:
@@ -489,12 +488,11 @@ apps:
     - getCart
     - getCurrentSession
     - getGuestMenu
-    - getLoyaltyPosition
     - login
     - recordDeviceHeartbeat
     - selectRole
     - verifyMfaChallenge
-    operationsWithNoPermissionCount: 11
+    operationsWithNoPermissionCount: 10
   venue-staff-mobile:
     name: TICVAI Venue Staff
     platforms:

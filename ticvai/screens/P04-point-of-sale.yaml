@@ -1224,10 +1224,6 @@ screens:
       search-driven magic banner; Qossai agreed a combination might be ideal and deferred. The three here
       are the three the minute names — they are not a recommendation.'
     source: minute 2026-08-03 §UX Design Approach Discussion
-  - operation: getLoyaltyPosition
-    why: '**`getLoyaltyPosition` declares its response inline**, so the component that shows it names
-      fields but binds to no schema. The contract should name the shape.'
-    source: contract marketing-crm.yaml GET /loyalty/position
   layout:
     template: split
     regions:
@@ -1494,12 +1490,25 @@ screens:
         operation: getPromotionUsage
         provenance: contract promotions.yaml GET /promotions/{promotionId}/usage
       - kind: detailPanel
-        label: Loyalty position
-        operation: getLoyaltyPosition
-        notes: Shows `subjectId`, `programmeId`, `pointsBalance`, `pointsPending`, `tier`, `nextTier`,
-          `pointsToNextTier`, `expiringPoints`, `expiringAt` from `getLoyaltyPosition`'s inline response.
-          **The response has no named schema**, so this cannot bind until the contract names one.
-        provenance: contract marketing-crm.yaml GET /loyalty/position
+        label: Loyalty position — the guest attached to the sale
+        bindsTo: LoyaltyPosition
+        columns:
+        - LoyaltyPosition.subjectId
+        - LoyaltyPosition.programmeId
+        - LoyaltyPosition.pointsBalance
+        - LoyaltyPosition.lifetimePoints
+        - LoyaltyPosition.tierName
+        - LoyaltyPosition.pointsToNextTier
+        - LoyaltyPosition.nextExpiryPoints
+        - LoyaltyPosition.nextExpiryAt
+        operation: getGuestLoyalty
+        permission: GUEST_VIEW
+        notes: '**The guest in front of the till, not the cashier** (decided 1 October 2026): the guest
+          attached to the cart (`identifyGuest`, or Guest Lookup, POS-027) supplies `subjectId`, and the
+          programme supplies `programmeId`. `getLoyaltyPosition` was here until then, and it returns the
+          caller''s own position. **With no guest attached the panel shows no figures** and offers Identify
+          guest (formIdentifyGuest); nothing is read.'
+        provenance: contract marketing-crm.yaml GET /guests/{subjectId}/loyalty
       - kind: detailPanel
         label: The catalogue bundle
         bindsTo: CatalogueBundle
@@ -2344,10 +2353,10 @@ screens:
     trigger: onAction
     invalidates:
     - listProducts
-  - operationId: getLoyaltyPosition
+  - operationId: getGuestLoyalty
     contract: marketing-crm
-    purpose: A guest's points, tier and what is within reach
-    trigger: onLoad
+    purpose: The attached guest's points, tier and what is within reach
+    trigger: onAction
   - operationId: identifyGuest
     contract: marketing-crm
     purpose: Resolve any identifier to a guest
@@ -2417,6 +2426,9 @@ screens:
       from: deepLink
     - name: promotionId
       from: deepLink
+    - name: subjectId
+      from: session
+      optional: true
     coldEntry: '**The cart in progress at this till**, held locally. A cold arrival mid-sale resumes it
       from the journal rather than losing it. An order recalled from the held list or a receipt lookup.'
     preloaded:

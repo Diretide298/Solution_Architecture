@@ -1055,6 +1055,7 @@
   "name": "Progress, Leaderboards & Hub",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
+  "permission": "GUEST_VIEW",
   "wave": 3,
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
@@ -1105,9 +1106,9 @@
       {
        "kind": "selectField",
        "label": "Programme",
-       "operation": "getLoyaltyPosition",
+       "operation": "getGuestLoyalty",
        "notes": "Sends `?programmeId=` (required).",
-       "provenance": "contract marketing-crm.yaml GET /loyalty/position"
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/loyalty"
       }
      ]
     },
@@ -1123,16 +1124,16 @@
         "LoyaltyPosition.subjectId",
         "LoyaltyPosition.programmeId",
         "LoyaltyPosition.pointsBalance",
+        "LoyaltyPosition.lifetimePoints",
+        "LoyaltyPosition.tierName",
         "LoyaltyPosition.pointsToNextTier",
-        "tier",
-        "nextTier",
-        "pointsPending",
-        "expiringPoints",
-        "expiringAt"
+        "LoyaltyPosition.nextExpiryPoints",
+        "LoyaltyPosition.nextExpiryAt"
        ],
-       "operation": "getLoyaltyPosition",
-       "notes": "The operation's response is an inline object: `tier`, `nextTier`, `pointsPending`, `expiringPoints` and `expiringAt` are its fields, not `LoyaltyPosition`'s. It returns the caller's own position, not a chosen participant's.",
-       "provenance": "contract marketing-crm.yaml GET /loyalty/position"
+       "operation": "getGuestLoyalty",
+       "permission": "GUEST_VIEW",
+       "notes": "**The participant being viewed, not the signed-in user** (decided 1 October 2026): the participant picked on the leaderboard, or the guest the screen is opened for, supplies `subjectId`. `getLoyaltyPosition` was here until then, and it returns the caller's own position.",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/loyalty"
       }
      ]
     },
@@ -1192,17 +1193,27 @@
    "error": "Could not load. Names which read failed and leaves the progress leaderboards untouched.",
    "emptyFirstRun": "No progress leaderboards yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the progress leaderboards are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getGuestLoyalty` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "getLoyaltyPosition",
+    "operationId": "getGuestLoyalty",
     "contract": "marketing-crm",
-    "purpose": "Progress and leaderboards",
-    "trigger": "onLoad",
+    "purpose": "The viewed participant's points, tier and progress",
+    "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation",
+     "optional": true
+    }
+   ],
+   "coldEntry": "Opens on the leaderboard; a participant's progress shows once one is picked."
+  },
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-831",

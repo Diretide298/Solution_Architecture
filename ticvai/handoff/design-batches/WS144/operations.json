@@ -112,6 +112,25 @@
   "requestBody": null,
   "responds": "GuestIntelligence"
  },
+ "getGuestLoyalty": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/loyalty",
+  "contract": "marketing-crm",
+  "summary": "A guest's loyalty position",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoyaltyPosition"
+ },
  "getKpiValues": {
   "method": "GET",
   "path": "/kpi-values",
@@ -160,25 +179,6 @@
   ],
   "requestBody": null,
   "responds": "KpiValue"
- },
- "getLoyaltyPosition": {
-  "method": "GET",
-  "path": "/loyalty/position",
-  "contract": "marketing-crm",
-  "summary": "A guest's points, tier and what is within reach",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "programmeId",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  },
  "getMyChallenges": {
   "method": "GET",

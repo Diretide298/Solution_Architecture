@@ -219,7 +219,7 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 469,
+  "core": 470,
   "setup": 234,
   "allOperations": 2668
  },
@@ -260,7 +260,7 @@
    "total": 72
   },
   "MarketingService": {
-   "core": 46,
+   "core": 47,
    "setup": 14,
    "total": 264
   },
@@ -4169,6 +4169,23 @@
    ],
    "enables": []
   },
+  "getGuestLoyalty": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/guests/{subjectId}/loyalty",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-735",
+    "BO-831",
+    "POS-002"
+   ],
+   "enables": []
+  },
   "getGuestMenu": {
    "part": "core",
    "service": "FnbService",
@@ -4330,13 +4347,10 @@
    "perm": null,
    "platforms": [
     "MOB",
-    "POS",
     "WEB"
    ],
    "screens": [
-    "BO-831",
     "GST-036",
-    "POS-002",
     "WEB-043"
    ],
    "enables": []
