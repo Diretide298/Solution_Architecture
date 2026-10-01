@@ -60,12 +60,14 @@ ID_RE = re.compile(r"^DI-\d{3,4}$")
 # ---------------------------------------------------------------------------------------------
 
 _CACHE: dict = {}
+# libyaml when installed: the screen files are large, and this module is imported by every export.
+_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
 
 def load() -> list[dict]:
     """The inputs, as authored."""
     if "inputs" not in _CACHE:
-        doc = yaml.safe_load(INDEX.read_text(encoding="utf-8")) or {}
+        doc = yaml.load(INDEX.read_text(encoding="utf-8"), Loader=_LOADER) or {}
         _CACHE["inputs"] = list(doc.get("inputs") or [])
     return _CACHE["inputs"]
 
@@ -75,7 +77,7 @@ def screen_index() -> tuple[dict, dict, set]:
     if "screens" not in _CACHE:
         screens, plats, mods = {}, {}, set()
         for f in sorted((ROOT / "screens").glob("P*.yaml")):
-            doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+            doc = yaml.load(f.read_text(encoding="utf-8"), Loader=_LOADER) or {}
             p = doc.get("platform") or {}
             code = p.get("code")
             plats[code] = p.get("shortName") or p.get("name") or code
@@ -268,10 +270,13 @@ INTRO = (
     "this bundle, never appears on a screen.")
 
 
-def render_batch(screens: list[tuple[str, str, str, str]], plat_names: dict | None = None) -> str:
+def render_batch(screens: list[tuple[str, str, str, str]], plat_names: dict | None = None,
+                 screens_inline: bool = False) -> str:
     """The 'Design inputs from the client meetings' section of a BRIEF.md.
 
-    `screens` is [(screen id, platform code, module, screen name)]."""
+    `screens` is [(screen id, platform code, module, screen name)]. `screens_inline`: the
+    screen-specific inputs are already in each screen's block (BUNDLE.md's screen-by-screen
+    specification, tools/design_spec.py), so they are counted here rather than repeated."""
     sel = for_screens([(s, p, m) for s, p, m, _ in screens])
     _, plats, _ = screen_index()
     plat_names = plat_names or plats
@@ -291,7 +296,10 @@ def render_batch(screens: list[tuple[str, str, str, str]], plat_names: dict | No
     for m, xs in sorted(sel["module"].items()):
         p, mod = m.split("/", 1)
         out += [f"### In {p} · {mod}", ""] + [line(e) for e in xs] + [""]
-    if sel["screen"]:
+    if sel["screen"] and screens_inline:
+        out += [f"**{sum(map(len, sel['screen'].values()))} more name particular screens** and are in each "
+                "screen's block above (*Client meeting inputs*).", ""]
+    elif sel["screen"]:
         out += ["### Screen by screen", ""]
         for s in [x for x, _, _, _ in screens if x in sel["screen"]]:
             out += [f"**`{s}` {name.get(s, '')}**".rstrip(), ""] + [line(e) for e in sel["screen"][s]] + [""]

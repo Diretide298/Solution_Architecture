@@ -1,23 +1,4 @@
 {
- "approveMembershipProductValidation": {
-  "method": "PUT",
-  "path": "/membership-product-validation",
-  "contract": "subscription",
-  "summary": "Membership Product Validation, Approval, Publication & Versioning",
-  "permission": "PLATFORM_CELL_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "MembershipProductValidationApprovalPublicationVersioInput",
-  "responds": "MembershipProductValidationApprovalPublicationVersioView"
- },
  "createRentalCategory": {
   "method": "POST",
   "path": "/rental-categories",

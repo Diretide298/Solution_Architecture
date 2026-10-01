@@ -1,23 +1,4 @@
 {
- "addLicenceAddOn": {
-  "method": "POST",
-  "path": "/tenants/{tenantId}/licences/add-ons",
-  "contract": "subscription",
-  "summary": "License a module outside the plan",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LicenceAddOn",
-  "responds": "LicencePosition"
- },
  "createOrgUnit": {
   "method": "POST",
   "path": "/org-units",
@@ -56,117 +37,6 @@
   "requestBody": "CreatePrincipalRequest",
   "responds": "Principal"
  },
- "createTenant": {
-  "method": "POST",
-  "path": "/tenants",
-  "contract": "subscription",
-  "summary": "Create a tenant",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateTenantRequest",
-  "responds": "Tenant"
- },
- "getGoLiveReadiness": {
-  "method": "GET",
-  "path": "/go-live-readiness",
-  "contract": "subscription",
-  "summary": "Everything that must pass before a tenant can sell",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": "tenantId",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": "GoLiveReadiness"
- },
- "getTenantLicences": {
-  "method": "GET",
-  "path": "/tenants/{tenantId}/licences",
-  "contract": "subscription",
-  "summary": "What a tenant is licensed to use",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "LicencePosition"
- },
- "listModuleCatalogue": {
-  "method": "GET",
-  "path": "/module-catalogue",
-  "contract": "subscription",
-  "summary": "Modules, their dependencies and their commercial treatment",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ModuleListing"
- },
- "listTenants": {
-  "method": "GET",
-  "path": "/tenants",
-  "contract": "subscription",
-  "summary": "List tenants",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "planId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listVenueTypeTemplates": {
-  "method": "GET",
-  "path": "/venue-type-templates",
-  "contract": "subscription",
-  "summary": "Starting configurations by venue kind",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "VenueTypeTemplate"
- },
  "openPlatformStaffGrant": {
   "method": "POST",
   "path": "/platform-staff-grants",
@@ -185,25 +55,6 @@
   ],
   "requestBody": null,
   "responds": "PlatformStaffGrant"
- },
- "runGoLiveValidation": {
-  "method": "POST",
-  "path": "/go-live-readiness/run",
-  "contract": "subscription",
-  "summary": "Run the validation plan against a tenant",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  },
  "setPasswordPolicy": {
   "method": "PUT",

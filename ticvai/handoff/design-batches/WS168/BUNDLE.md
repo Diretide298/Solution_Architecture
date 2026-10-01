@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -55,21 +56,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `BO-983` | Inventory Command Center | listDetail | 1 | 0 | — |
-| `BO-984` | Real-Time Seat Map | listDetail | 1 | 0 | — |
-| `BO-985` | Status Model Configuration | listDetail | 2 | 0 | — |
-| `BO-986` | Availability Tracker | listDetail | 1 | 0 | — |
-| `BO-987` | Hold Tracker | listDetail | 2 | 0 | — |
-| `BO-988` | Reservation Tracker | listDetail | 1 | 0 | — |
-| `BO-989` | Sales & Allocation Tracker | listDetail | 2 | 0 | — |
-| `BO-990` | Maintenance & Out of Service | listDetail | 2 | 0 | — |
-| `BO-991` | Seat History | listDetail | 1 | 0 | — |
-| `BO-992` | Audit & Reconciliation | listDetail | 1 | 0 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `BO-983` | Inventory Command Center | B–D | 2 | 20 | 6 | 1 | 0 | 4 | — | notStarted (—) |
+| `BO-984` | Real-Time Seat Map | B–D | 2 | 17 | 6 | 1 | 1 | 6 | — | notStarted (—) |
+| `BO-985` | Status Model Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-986` | Availability Tracker | B–D | 0 | 0 | 6 | 8 | 1 | 0 | — | notStarted (—) |
+| `BO-987` | Hold Tracker | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-988` | Reservation Tracker | B–D | 2 | 21 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-989` | Sales & Allocation Tracker | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-990` | Maintenance & Out of Service | B–D | 0 | 0 | 6 | 20 | 0 | 2 | — | notStarted (—) |
+| `BO-991` | Seat History | B–D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
+| `BO-992` | Audit & Reconciliation | B–D | 2 | 21 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -77,3016 +84,1342 @@ convincingly. It is never a caption.
 
 ---
 
-## `screens.json`
+## Screen by screen
 
-Every field of every screen in this batch. **`machine` is what a screen is in the middle of**, `overlays` is what opens over it and what closing it does, and `navigation.transitions` is how you leave, with `carries` naming the state that travels.
+**One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-```json
-[
- {
-  "id": "BO-983",
-  "name": "Inventory Command Center",
-  "module": "Access & Venue",
-  "requiresModule": "seating",
-  "wave": 3,
-  "source": {
-   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
-   "board": "4",
-   "number": "01",
-   "page": 18
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/inventory-command-center-bo-983",
-   "component": "apps/venue-management-web/src/routes/access-venue/InventoryCommandCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-100"
-   ],
-   "exitTo": [
-    "BO-100",
-    "BO-984",
-    "BO-985",
-    "BO-986",
-    "BO-987",
-    "BO-988",
-    "BO-989",
-    "BO-990",
-    "BO-991",
-    "BO-992"
-   ],
-   "transitions": [
-    {
-     "to": "BO-100",
-     "trigger": "Back to Venue Home",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    },
-    {
-     "to": "BO-984",
-     "trigger": "Real-Time Seat Map",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
-    },
-    {
-     "to": "BO-985",
-     "trigger": "Status Model Configuration",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
-    },
-    {
-     "to": "BO-986",
-     "trigger": "Availability Tracker",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "carries": [
-      "performanceId"
-     ]
-    },
-    {
-     "to": "BO-987",
-     "trigger": "Hold Tracker",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
-    },
-    {
-     "to": "BO-988",
-     "trigger": "Reservation Tracker",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
-    },
-    {
-     "to": "BO-989",
-     "trigger": "Sales & Allocation Tracker",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
-    },
-    {
-     "to": "BO-990",
-     "trigger": "Maintenance & Out of Service",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
-    },
-    {
-     "to": "BO-991",
-     "trigger": "Seat History",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
-    },
-    {
-     "to": "BO-992",
-     "trigger": "Audit & Reconciliation",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Monitor live seat inventory health across all venues and performances. Show total, available, held, reserved, sold, blocked, out-of-service, accessible and discrepancy counts. Filter by tenant, venue, event, performance, layout, section, category, channel and time window. Surface expiring locks, hold spikes, maintenance impact, synchronization lag and oversell risk. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 18"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "filters",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Performance",
-       "operation": "getSeatInventory",
-       "notes": "Sends `?performanceId=` (required).",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      },
-      {
-       "kind": "selectField",
-       "label": "Section",
-       "operation": "getSeatInventory",
-       "notes": "Sends `?sectionId=`.",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Capacity",
-       "bindsTo": "SeatInventory.totals",
-       "columns": [
-        "SeatInventory.totals.capacity"
-       ],
-       "operation": "getSeatInventory",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Available",
-       "bindsTo": "SeatInventory.totals",
-       "columns": [
-        "SeatInventory.totals.available"
-       ],
-       "operation": "getSeatInventory",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Held / reserved",
-       "bindsTo": "SeatInventory.totals",
-       "columns": [
-        "SeatInventory.totals.held",
-        "SeatInventory.totals.reserved"
-       ],
-       "operation": "getSeatInventory",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Sold",
-       "bindsTo": "SeatInventory.totals",
-       "columns": [
-        "SeatInventory.totals.sold"
-       ],
-       "operation": "getSeatInventory",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Blocked / out of service",
-       "bindsTo": "SeatInventory.totals",
-       "columns": [
-        "SeatInventory.totals.blocked",
-        "SeatInventory.totals.outOfService"
-       ],
-       "operation": "getSeatInventory",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Discrepancies",
-       "columns": [
-        "Discrepancies"
-       ],
-       "notes": "The pack asks for discrepancies; the contract has no field for it.",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 18"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Seats by state",
-       "bindsTo": "SeatInventory.seats",
-       "columns": [
-        "SeatInventory.seats[].label",
-        "SeatInventory.seats[].state",
-        "SeatInventory.seats[].holdPoolId",
-        "SeatInventory.seats[].orderId",
-        "SeatInventory.seats[].expiresAt"
-       ],
-       "operation": "getSeatInventory",
-       "notes": "Sorted by `expiresAt` to surface expiring locks. As of `asOf`.",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected seat",
-       "bindsTo": "SeatInventory.seats",
-       "columns": [
-        "SeatInventory.seats[].seatId",
-        "SeatInventory.seats[].label",
-        "SeatInventory.seats[].state",
-        "SeatInventory.seats[].holdPoolId",
-        "SeatInventory.seats[].orderId",
-        "SeatInventory.seats[].expiresAt",
-        "SeatInventory.asOf"
-       ],
-       "operation": "getSeatInventory",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The inventory list.",
-   "error": "Could not load. Names which read failed and leaves the inventory untouched.",
-   "emptyFirstRun": "No inventory yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the inventory are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getSeatInventory",
-    "contract": "seating",
-    "purpose": "Every seat state",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-983",
-   "workshopBoard": "wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-983"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 18. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.18; contract seating.yaml GET /seat-inventory. Pack labels with no schema field yet (shown as plain labels): Filters: tenant, venue, event, layout, category, channel, time window, Discrepancies, Accessible count, Hold spikes, Synchronisation lag, Oversell risk.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-984",
-  "name": "Real-Time Seat Map",
-  "module": "Access & Venue",
-  "requiresModule": "seating",
-  "wave": 3,
-  "source": {
-   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
-   "board": "4",
-   "number": "02",
-   "page": 18
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/real-time-seat-map-bo-984",
-   "component": "apps/venue-management-web/src/routes/access-venue/RealTimeSeatMap.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-983"
-   ],
-   "exitTo": [
-    "BO-983"
-   ],
-   "transitions": [
-    {
-     "to": "BO-983",
-     "trigger": "Back to Inventory Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Display the current authoritative status of each seat and zone. Render available, locked, held, reserved, sold, blocked, out-of-service and accessible states with an interactive legend. Stream near-real-time state changes with source, transaction reference and event timestamp. Allow authorized drill-down to seat details without permitting unsafe manual state changes. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 18"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "filters",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Performance",
-       "operation": "getSeatInventory",
-       "notes": "Sends `?performanceId=` (required).",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      },
-      {
-       "kind": "selectField",
-       "label": "Section",
-       "operation": "getSeatInventory",
-       "notes": "Sends `?sectionId=`.",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "State legend",
-       "bindsTo": "SeatInventory.totals",
-       "columns": [
-        "SeatInventory.totals.available",
-        "SeatInventory.totals.held",
-        "SeatInventory.totals.reserved",
-        "SeatInventory.totals.sold",
-        "SeatInventory.totals.blocked",
-        "SeatInventory.totals.outOfService"
-       ],
-       "operation": "getSeatInventory",
-       "notes": "Interactive legend: one count per state.",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Seat states",
-       "bindsTo": "SeatInventory.seats",
-       "columns": [
-        "SeatInventory.seats[].seatId",
-        "SeatInventory.seats[].label",
-        "SeatInventory.seats[].state"
-       ],
-       "operation": "getSeatInventory",
-       "notes": "Drawn as the seat map coloured by `state`; the list is the accessible fallback. Seat geometry comes from the map, not this read.",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "Seat detail",
-       "bindsTo": "SeatInventory.seats",
-       "columns": [
-        "SeatInventory.seats[].label",
-        "SeatInventory.seats[].state",
-        "SeatInventory.seats[].holdPoolId",
-        "SeatInventory.seats[].orderId",
-        "SeatInventory.seats[].expiresAt",
-        "Source",
-        "Transaction reference",
-        "Event timestamp"
-       ],
-       "operation": "getSeatInventory",
-       "notes": "Read-only; the pack forbids unsafe manual state changes here.",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 18"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The real-time seat map list.",
-   "error": "Could not load. Names which read failed and leaves the real-time seat map untouched.",
-   "emptyFirstRun": "No real-time seat map yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the real-time seat map are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getSeatInventory",
-    "contract": "seating",
-    "purpose": "The live map",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-984",
-   "workshopBoard": "wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-984"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 18. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.18; contract seating.yaml GET /seat-inventory. Pack labels with no schema field yet (shown as plain labels): Locked state, Accessible flag, Source, Transaction reference, Event timestamp, Seat geometry for map rendering.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-985",
-  "name": "Status Model Configuration",
-  "module": "Access & Venue",
-  "requiresModule": "seating",
-  "wave": 3,
-  "source": {
-   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
-   "board": "4",
-   "number": "03",
-   "page": 18
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/status-model-configuration-bo-985",
-   "component": "apps/venue-management-web/src/routes/access-venue/StatusModelConfiguration.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-983"
-   ],
-   "exitTo": [
-    "BO-983"
-   ],
-   "transitions": [
-    {
-     "to": "BO-983",
-     "trigger": "Back to Inventory Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Define the permitted seat lifecycle and transition rules. Maintain status code, label, color, terminal flag, availability effect, channel visibility and inventory treatment. Configure allowed transitions, required reason, approval, timeout, event source and compensating action. Simulate changes and prohibit circular, orphaned or ambiguous transitions before activation. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Configuration Scope of Work | Version 1.0 18 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 18"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 18"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSeatCategories",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createSeatCategory",
-       "label": "Create seat category",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createSeatCategory"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The status model list.",
-   "error": "Could not load. Names which read failed and leaves the status model untouched.",
-   "emptyFirstRun": "No status model yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the status model are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listSeatCategories",
-    "contract": "seating",
-    "purpose": "The status and category model",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createSeatCategory",
-    "contract": "seating",
-    "purpose": "Add a category",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSeatCategories"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-985",
-   "workshopBoard": "wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-985"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 18. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-986",
-  "name": "Availability Tracker",
-  "module": "Access & Venue",
-  "requiresModule": "seating",
-  "wave": 3,
-  "source": {
-   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
-   "board": "4",
-   "number": "04",
-   "page": 19
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/availability-tracker-bo-986",
-   "component": "apps/venue-management-web/src/routes/access-venue/AvailabilityTracker.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-983"
-   ],
-   "exitTo": [
-    "BO-983"
-   ],
-   "transitions": [
-    {
-     "to": "BO-983",
-     "trigger": "Back to Inventory Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Analyze current and historical seat availability. Show available quantity by venue, performance, section, row, category, price band and sales channel. Graph availability over time and identify material changes caused by locks, holds, reservations, sales or blocks. Provide secured export and links to the exact transactions or events underlying each change. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getSeatAvailability",
-       "notes": "One record, read-only."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The availability tracker list.",
-   "error": "Could not load. Names which read failed and leaves the availability tracker untouched.",
-   "emptyFirstRun": "No availability tracker yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the availability tracker are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getSeatAvailability",
-    "contract": "seating",
-    "purpose": "What is free",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-986",
-   "workshopBoard": "wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-986"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 19. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "performanceId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-987",
-  "name": "Hold Tracker",
-  "module": "Access & Venue",
-  "requiresModule": "seating",
-  "wave": 3,
-  "source": {
-   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
-   "board": "4",
-   "number": "05",
-   "page": 19
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/hold-tracker-bo-987",
-   "component": "apps/venue-management-web/src/routes/access-venue/HoldTracker.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-983"
-   ],
-   "exitTo": [
-    "BO-983"
-   ],
-   "transitions": [
-    {
-     "to": "BO-983",
-     "trigger": "Back to Inventory Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Track active and historical held inventory regardless of hold type. List hold ID, type, owner, event, section/seat set, quantity, created time, expiry, priority and status. Filter upcoming expiry, extended, converted, released and conflicting holds and open the governing rule. Allow approved release, extend or reassign actions while preserving the original hold record. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSeatBlocks",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getSeatHold",
-       "notes": "One record, read-only."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The hold tracker list.",
-   "error": "Could not load. Names which read failed and leaves the hold tracker untouched.",
-   "emptyFirstRun": "No hold tracker yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the hold tracker are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listSeatBlocks",
-    "contract": "seating",
-    "purpose": "Holds in force",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "getSeatHold",
-    "contract": "seating",
-    "purpose": "One hold",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-987",
-   "workshopBoard": "wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-987"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 19. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "holdId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-988",
-  "name": "Reservation Tracker",
-  "module": "Access & Venue",
-  "requiresModule": "seating",
-  "wave": 3,
-  "source": {
-   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
-   "board": "4",
-   "number": "06",
-   "page": 19
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/reservation-tracker-bo-988",
-   "component": "apps/venue-management-web/src/routes/access-venue/ReservationTracker.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-983"
-   ],
-   "exitTo": [
-    "BO-983"
-   ],
-   "transitions": [
-    {
-     "to": "BO-983",
-     "trigger": "Back to Inventory Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Monitor seat reservations and temporary allocations before final sale. List reservation, guest/group, source, seat set, lock/hold reference, expiry, payment state and confirmation status. Identify abandoned, timed-out, payment-pending, orphaned and channel-mismatched reservations. Support controlled retry, release, re-link or escalation without bypassing payment or inventory authority. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "filters",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Performance",
-       "operation": "getSeatInventory",
-       "notes": "Sends `?performanceId=` (required).",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      },
-      {
-       "kind": "selectField",
-       "label": "Issue",
-       "notes": "Abandoned, timed-out, payment-pending, orphaned, channel-mismatched.",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Reserved",
-       "bindsTo": "SeatInventory.totals",
-       "columns": [
-        "SeatInventory.totals.reserved"
-       ],
-       "operation": "getSeatInventory",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Held",
-       "bindsTo": "SeatInventory.totals",
-       "columns": [
-        "SeatInventory.totals.held"
-       ],
-       "operation": "getSeatInventory",
-       "provenance": "contract seating.yaml GET /seat-inventory"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Reservations",
-       "bindsTo": "SeatInventory.seats",
-       "columns": [
-        "Reservation",
-        "Guest / group",
-        "Source",
-        "SeatInventory.seats[].label",
-        "SeatInventory.seats[].holdPoolId",
-        "SeatInventory.seats[].orderId",
-        "SeatInventory.seats[].expiresAt",
-        "Payment state",
-        "Confirmation status"
-       ],
-       "operation": "getSeatInventory",
-       "notes": "Seats whose `state` is reserved or held. Reservation, guest, source, payment and confirmation are pack labels.",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected reservation",
-       "bindsTo": "SeatInventory.seats",
-       "columns": [
-        "SeatInventory.seats[].seatId",
-        "SeatInventory.seats[].label",
-        "SeatInventory.seats[].state",
-        "SeatInventory.seats[].holdPoolId",
-        "SeatInventory.seats[].orderId",
-        "SeatInventory.seats[].expiresAt",
-        "Reservation",
-        "Guest / group",
-        "Payment state",
-        "Issue type"
-       ],
-       "operation": "getSeatInventory",
-       "notes": "Only the seat side of the reservation is bound.",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "secondaryButton",
-       "label": "Retry",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Re-link",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Release",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Escalate",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The reservation tracker list.",
-   "error": "Could not load. Names which read failed and leaves the reservation tracker untouched.",
-   "emptyFirstRun": "No reservation tracker yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reservation tracker are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getSeatInventory",
-    "contract": "seating",
-    "purpose": "Reserved against sold",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-988",
-   "workshopBoard": "wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-988"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 19. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.19; contract seating.yaml GET /seat-inventory. Pack labels with no schema field yet (shown as plain labels): Reservation ID, Guest / group, Source channel, Payment state, Confirmation status, Issue type (abandoned, timed-out, payment-pending, orphaned, channel-mismatched).",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-989",
-  "name": "Sales & Allocation Tracker",
-  "module": "Access & Venue",
-  "requiresModule": "seating",
-  "wave": 3,
-  "source": {
-   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
-   "board": "4",
-   "number": "07",
-   "page": 19
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/sales-allocation-tracker-bo-989",
-   "component": "apps/venue-management-web/src/routes/access-venue/SalesAllocationTracker.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-983"
-   ],
-   "exitTo": [
-    "BO-983"
-   ],
-   "transitions": [
-    {
-     "to": "BO-983",
-     "trigger": "Back to Inventory Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Trace sold seats and inventory allocation across channels and partners. Report seats and revenue by web, mobile, POS, call center, box office, B2B reseller and partner API. Show allocation-versus-sold performance, remaining quota, order, ticket, price, fee and fulfillment status. Detect duplicate issue, invalid allocation, reversed payment and seat/order inconsistency. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 19",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSeatHoldPools",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The sales allocation tracker list.",
-   "error": "Could not load. Names which read failed and leaves the sales allocation tracker untouched.",
-   "emptyFirstRun": "No sales allocation tracker yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the sales allocation tracker are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getSeatInventory",
-    "contract": "seating",
-    "purpose": "Sales and allocation",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listSeatHoldPools",
-    "contract": "seating",
-    "purpose": "Allocation pools",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-989",
-   "workshopBoard": "wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-989"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 19. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-990",
-  "name": "Maintenance & Out of Service",
-  "module": "Access & Venue",
-  "requiresModule": "seating",
-  "wave": 3,
-  "source": {
-   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
-   "board": "4",
-   "number": "08",
-   "page": 20
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/maintenance-out-of-service-bo-990",
-   "component": "apps/venue-management-web/src/routes/access-venue/MaintenanceOutOfService.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-983"
-   ],
-   "exitTo": [
-    "BO-983"
-   ],
-   "transitions": [
-    {
-     "to": "BO-983",
-     "trigger": "Back to Inventory Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Control seats unavailable because of defects, inspection or venue work. Create or link work orders with seat/area, issue, severity, status, owner, due date and supporting evidence. Block affected inventory, identify sold/reserved seats and trigger reseating or guest-service workflows. Return seats to available only after required repair, inspection, approval and layout validation. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 20"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 20"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createSeatBlock",
-       "label": "Create seat block",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createSeatBlock"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The maintenance out service list.",
-   "error": "Could not load. Names which read failed and leaves the maintenance out service untouched.",
-   "emptyFirstRun": "No maintenance out service yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the maintenance out service are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "createSeatBlock",
-    "contract": "seating",
-    "purpose": "Take a seat out of service",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getSeatInventory",
-     "listSeatBlocks"
-    ]
-   },
-   {
-    "operationId": "createWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Raise the repair",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-990",
-   "workshopBoard": "wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-990"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 20. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-991",
-  "name": "Seat History",
-  "module": "Access & Venue",
-  "requiresModule": "seating",
-  "wave": 3,
-  "source": {
-   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
-   "board": "4",
-   "number": "09",
-   "page": 20
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/seat-history-bo-991",
-   "component": "apps/venue-management-web/src/routes/access-venue/SeatHistory.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-983"
-   ],
-   "exitTo": [
-    "BO-983"
-   ],
-   "transitions": [
-    {
-     "to": "BO-983",
-     "trigger": "Back to Inventory Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Present the complete chronological history of one seat for one performance or physical venue position. Show locks, holds, reservations, sales, releases, refunds, exchanges, scans, blocks and maintenance events. Preserve business timestamp, processing timestamp, source, actor, correlation ID, rule/version and related object. Provide authorized links to order, ticket, guest, hold, approval and device records with field masking. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 20"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 20"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSeats",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The seat history list.",
-   "error": "Could not load. Names which read failed and leaves the seat history untouched.",
-   "emptyFirstRun": "No seat history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the seat history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listSeats",
-    "contract": "seating",
-    "purpose": "List seats in a map",
-    "trigger": "onAction"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-991",
-   "workshopBoard": "wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-991"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 20. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "seatMapId",
-     "from": "navigation"
-    }
-   ],
-   "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
-  },
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-992",
-  "name": "Audit & Reconciliation",
-  "module": "Access & Venue",
-  "requiresModule": "seating",
-  "wave": 3,
-  "source": {
-   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
-   "board": "4",
-   "number": "10",
-   "page": 20
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/audit-reconciliation-bo-992",
-   "component": "apps/venue-management-web/src/routes/access-venue/AuditReconciliation.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-983"
-   ],
-   "exitTo": [
-    "BO-983"
-   ],
-   "transitions": [
-    {
-     "to": "BO-983",
-     "trigger": "Back to Inventory Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Detect and resolve differences between authoritative inventory and connected systems. Compare state and quantity across Seat Inventory, Cart, Order, Payment, Ticket, Channel and Access systems. Queue discrepancies by severity, age, venue, performance, type and suspected source with recommended action. Require reason and approval for corrections, use compensating events and retain complete before/after evidence. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 20 Board 5 - Seat Selection & Cart Experience Figure 5. High-definition configuration board with all 10 screens. Visual reference: information architecture and configuration coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work | Version 1.0 21",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 20"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "filters",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Performance",
-       "operation": "getSeatReconciliation",
-       "notes": "Sends `?performanceId=` (required).",
-       "provenance": "contract seating.yaml GET /seat-reconciliation"
-      },
-      {
-       "kind": "selectField",
-       "label": "Discrepancy type",
-       "operation": "getSeatReconciliation",
-       "notes": "Client-side on `kind`.",
-       "provenance": "contract seating.yaml GET /seat-reconciliation"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Open discrepancies",
-       "bindsTo": "SeatDiscrepancy",
-       "columns": [
-        "SeatDiscrepancy.kind"
-       ],
-       "operation": "getSeatReconciliation",
-       "notes": "Counted by `kind`.",
-       "provenance": "contract seating.yaml GET /seat-reconciliation"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Discrepancy queue",
-       "bindsTo": "SeatDiscrepancy",
-       "columns": [
-        "SeatDiscrepancy.label",
-        "SeatDiscrepancy.kind",
-        "SeatDiscrepancy.mapState",
-        "SeatDiscrepancy.orderState",
-        "SeatDiscrepancy.orderIds",
-        "SeatDiscrepancy.detectedAt",
-        "Severity",
-        "Suspected source",
-        "Recommended action"
-       ],
-       "operation": "getSeatReconciliation",
-       "notes": "Age is computed from `detectedAt`. Severity, suspected source and recommended action are pack labels.",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 20"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected discrepancy",
-       "bindsTo": "SeatDiscrepancy",
-       "columns": [
-        "SeatDiscrepancy.seatId",
-        "SeatDiscrepancy.label",
-        "SeatDiscrepancy.kind",
-        "SeatDiscrepancy.mapState",
-        "SeatDiscrepancy.orderState",
-        "SeatDiscrepancy.orderIds",
-        "SeatDiscrepancy.detectedAt",
-        "Cart state",
-        "Payment state",
-        "Ticket state",
-        "Access state"
-       ],
-       "operation": "getSeatReconciliation",
-       "notes": "The pack compares seven systems; the contract compares map and order only.",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 20"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Correct with reason",
-       "notes": "Correction needs reason and approval through a compensating event; no write operation is bound.",
-       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 20"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The audit reconciliation list.",
-   "error": "Could not load. Names which read failed and leaves the audit reconciliation untouched.",
-   "emptyFirstRun": "No audit reconciliation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the audit reconciliation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getSeatReconciliation",
-    "contract": "seating",
-    "purpose": "The map against the orders",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-992",
-   "workshopBoard": "wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-992"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 20. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.20; contract seating.yaml GET /seat-reconciliation. Pack labels with no schema field yet (shown as plain labels): Severity, Suspected source, Recommended action, Cart / payment / ticket / channel / access state, Venue.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- }
-]
-```
+### `BO-983` Inventory Command Center
 
-## `operations.json`
+**Monitor live seat inventory health across all venues and performances. Show total, available, held, reserved, sold, blocked, out-of-service, accessible and discrepancy counts. Filter by tenant, venue, event, performance, layout, section, category, channel and time window. Surface expiring locks, hold spikes, maintenance impact, synchronization lag and oversell risk. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Access & Venue · wave 3 · needs the `seating` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `CAPACITY_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/access-venue/inventory-command-center-bo-983` |
+
+**Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Performance | select field | — | — | — | — | Sends `?performanceId=` (required). | — |
+| Section | select field | — | — | — | — | Sends `?sectionId=`. | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Performance | picker: choose a performance | — | — | `getSeatInventory` ?performanceId |
+| Section | picker: choose a section | — | — | `getSeatInventory` ?sectionId |
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Capacity** (metric tile, from `getSeatInventory`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Capacity | 1,234 | — |
+
+**Available** (metric tile, from `getSeatInventory`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Available | 1,234 | — |
+
+**Held / reserved** (metric tile, from `getSeatInventory`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Held | 1,234 | — |
+| Reserved | 1,234 | — |
+
+**Sold** (metric tile, from `getSeatInventory`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Sold | 1,234 | — |
+
+**Blocked / out of service** (metric tile, from `getSeatInventory`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Blocked | 1,234 | — |
+| Out of service | 1,234 | — |
+
+**Discrepancies** (metric tile): The pack asks for discrepancies; the contract has no field for it.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Discrepancies | text | not in the schema: `Discrepancies` |
+
+**Seats by state** (data table, from `getSeatInventory`): Sorted by `expiresAt` to surface expiring locks. As of `asOf`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| State | chip: Available, Held, Reserved, Sold, Blocked, Out of service… | — |
+| Hold pool | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+
+**The selected seat** (detail panel, from `getSeatInventory`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Seat | the name it points at, never the id | — |
+| Label | text | — |
+| State | chip: Available, Held, Reserved, Sold, Blocked, Out of service… | — |
+| Hold pool | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| As of | 1 Oct 2026, 14:30 | — |
+
+**Data it reads**: `getSeatInventory` (onLoad, Every seat state)
+
+**Where the user goes next**
+
+- → `BO-100` Venue Home: *Back to Venue Home*
+- → `BO-984` Real-Time Seat Map: *Real-Time Seat Map*
+- → `BO-985` Status Model Configuration: *Status Model Configuration*
+- → `BO-986` Availability Tracker: *Availability Tracker*; carries `performanceId`
+- → `BO-987` Hold Tracker: *Hold Tracker*
+- → `BO-988` Reservation Tracker: *Reservation Tracker*
+- → `BO-989` Sales & Allocation Tracker: *Sales & Allocation Tracker*
+- → `BO-990` Maintenance & Out of Service: *Maintenance & Out of Service*
+- → `BO-991` Seat History: *Seat History*
+- → `BO-992` Audit & Reconciliation: *Audit & Reconciliation*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The inventory list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the inventory untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No inventory yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the inventory are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getSeatInventory` → `CAPACITY_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.4.28 | Visual Seat Categorization Automatically color-code seat categories. Generate interactive seat maps. Highlight restricted-view or obstructed seats. Visualize occupancy and sales patterns. | Ticketing Catalogue | CONTRACTED | `getSeatInventory` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A72** Design a generic, configurable multi-stage approval-workflow engine (approve / reject / return / request-more-information, AI-generated summary, audit trail) applicable to procurement, pricing changes, product creation … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 18 Aug 2026 · workshop tracker · keyword 'procurement')*
+- **A87** Design the Inventory & Procurement module: an Item Master with UOM/pack-size conversions supporting both Weighted-Average and FIFO costing, a customizable warehouse/location hierarchy with batch/date-level expiry … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 18 Aug 2026 · workshop tracker · keyword 'procurement')*
+- **A101** Schedule and hold the outstanding F&B, Retail, Procurement & Inventory workshop *(Chinmay Parab / Allam · High · Done → 30 Sep: Closed, Done (as recorded earlier) · 21 Aug 2026 · workshop tracker · keyword 'procurement')*
+- **A301** Build maintenance vendor/procurement ops and analytics *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 17 Sep 2026 · workshop tracker · keyword 'procurement')*
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-983` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-983`
+- Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 4
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 1: Opens Inventory Command Center → Monitor live seat inventory health across all venues and performances. Show total, available, held, reserved, sold, blocked, out-of-service, accessible and discrepancy counts. Filter by tenant …
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 3: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 5: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 7: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 9: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 11: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 13: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 15: Returns to the board's landing screen → Ready for the next screen on this board
+- … and 1 more flow steps (`flows/`)
+- Flow F277 branch at step 1 (expected): when Nothing has been set up on Inventory Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
+- Flow F277 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-983?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `BO-100`, `BO-984`, `BO-985`, `BO-986`, `BO-987`, `BO-988`, `BO-989`, `BO-990`, `BO-991`, `BO-992`.
+- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-984` Real-Time Seat Map
+
+**Display the current authoritative status of each seat and zone. Render available, locked, held, reserved, sold, blocked, out-of-service and accessible states with an interactive legend. Stream near-real-time state changes with source, transaction reference and event timestamp. Allow authorized drill-down to seat details without permitting unsafe manual state changes. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Access & Venue · wave 3 · needs the `seating` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `CAPACITY_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/access-venue/real-time-seat-map-bo-984` |
+
+**Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Performance | select field | — | — | — | — | Sends `?performanceId=` (required). | — |
+| Section | select field | — | — | — | — | Sends `?sectionId=`. | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Performance | picker: choose a performance | — | — | `getSeatInventory` ?performanceId |
+| Section | picker: choose a section | — | — | `getSeatInventory` ?sectionId |
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**State legend** (metric tile, from `getSeatInventory`): Interactive legend: one count per state.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Available | 1,234 | — |
+| Held | 1,234 | — |
+| Reserved | 1,234 | — |
+| Sold | 1,234 | — |
+| Blocked | 1,234 | — |
+| Out of service | 1,234 | — |
+
+**Seat states** (data table, from `getSeatInventory`): Drawn as the seat map coloured by `state`; the list is the accessible fallback. Seat geometry comes from the map, not this read.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Seat | the name it points at, never the id | — |
+| Label | text | — |
+| State | chip: Available, Held, Reserved, Sold, Blocked, Out of service… | — |
+
+**Seat detail** (detail panel, from `getSeatInventory`): Read-only; the pack forbids unsafe manual state changes here.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| State | chip: Available, Held, Reserved, Sold, Blocked, Out of service… | — |
+| Hold pool | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Source | text | not in the schema: `Source` |
+| Transaction reference | text | not in the schema: `Transaction reference` |
+| Event timestamp | text | not in the schema: `Event timestamp` |
+
+**Data it reads**: `getSeatInventory` (onLoad, The live map)
+
+**Where the user goes next**
+
+- → `BO-983` Inventory Command Center: *Back to Inventory Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The real-time seat map list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the real-time seat map untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No real-time seat map yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the real-time seat map are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getSeatInventory` → `CAPACITY_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.4.28 | Visual Seat Categorization Automatically color-code seat categories. Generate interactive seat maps. Highlight restricted-view or obstructed seats. Visualize occupancy and sales patterns. | Ticketing Catalogue | CONTRACTED | `getSeatInventory` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Real-time seat inventory view shows per-event seat status (available, on hold, reserved, sold) with availability/holder trackers, sales & allocation tracking and audit/reconciliation reporting. *(client request · MoM 21 Aug 2026, 4.6 Seat Inventory Status, Holds & Automatic Release · DI-421)*
+
+Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **C18** Locate and share the AutoCAD/PDF seating drawing from the Bahrain project (also to be shared with 3D vendor "3DDV") *(Allam · Received → 30 Sep: Closed, Received · workshop tracker · keyword 'seating')*
+- **A99** Document reusable CMS page components per venue type (seat-map, park-map) and finalise landing-page component-count logic *(Allam / Aishwarya More · Medium · With client → 30 Sep: Closed, Moved to T7 (TICVAI to act) · 20 Aug 2026 · workshop tracker · keyword 'seat-map')*
+- **C31** Provide reusable CMS page-component documentation per venue type (seat-map, park-map and equivalents) *(Allam · Pending → 30 Sep: Closed, Moved to T7 · 20 Aug 2026 · workshop tracker · keyword 'seat-map')*
+- **A102** Build a single unified seat map builder screen (section type as a section-level attribute — seated / zone / standing / suite — mixed types in one map, suites sold bulk or by seat) *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 21 Aug 2026 · workshop tracker · keyword 'seat map')*
+- **A104** Make best-seat ranking configurable per map/event and implement section-wise holds rather than freeform polygon selection *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 21 Aug 2026 · workshop tracker · keyword 'best-seat')*
+- **A105** Make seating rules configurable per venue/event (consecutive-seat enforcement, social-distancing buffer, seat-kill, company/held-seat) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 21 Aug 2026 · workshop tracker · keyword 'seating')*
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-984` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-984`
+- Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 4
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 2: Works in Real-Time Seat Map → Display the current authoritative status of each seat and zone. Render available, locked, held, reserved, sold, blocked, out-of-service and accessible states with an interactive legend. Stream …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-984?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `BO-983`.
+- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-985` Status Model Configuration
+
+**Define the permitted seat lifecycle and transition rules. Maintain status code, label, color, terminal flag, availability effect, channel visibility and inventory treatment. Configure allowed transitions, required reason, approval, timeout, event source and compensating action. Simulate changes and prohibit circular, orphaned or ambiguous transitions before activation. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Configuration Scope of Work / Version 1.0 18 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Access & Venue · wave 3 · needs the `seating` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/access-venue/status-model-configuration-bo-985` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Create seat category (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listSeatCategories` (onLoad, The status and category model)
+
+**Where the user goes next**
+
+- → `BO-983` Inventory Command Center: *Back to Inventory Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The status model list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the status model untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No status model yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the status model are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listSeatCategories` → `PRODUCT_VIEW` (read) · staff
+- `createSeatCategory` → `CAPACITY_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Real-time seat inventory view shows per-event seat status (available, on hold, reserved, sold) with availability/holder trackers, sales & allocation tracking and audit/reconciliation reporting. *(client request · MoM 21 Aug 2026, 4.6 Seat Inventory Status, Holds & Automatic Release · DI-421)*
+
+Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-985` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-985`
+- Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 4
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 4: Works in Status Model Configuration → Define the permitted seat lifecycle and transition rules. Maintain status code, label, color, terminal flag, availability effect, channel visibility and inventory treatment. Configure allowed …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-985?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Create seat category, Cancel.
+- [ ] Every transition is wired: `BO-983`.
+- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-986` Availability Tracker
+
+**Analyze current and historical seat availability. Show available quantity by venue, performance, section, row, category, price band and sales channel. Graph availability over time and identify material changes caused by locks, holds, reservations, sales or blocks. Provide secured export and links to the exact transactions or events underlying each change. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Access & Venue · wave 3 · needs the `seating` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `performanceId` (navigation) |
+| Route | `/access-venue/availability-tracker-bo-986` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Detail panel** (detail panel): One record, read-only.
+
+**Where the user goes next**
+
+- → `BO-983` Inventory Command Center: *Back to Inventory Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The availability tracker list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the availability tracker untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No availability tracker yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the availability tracker are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getSeatAvailability` → `PRODUCT_VIEW` (read) · staff, guest
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.3.15 | Define seating layouts, sections, pricing tiers, and total capacity. | Ticketing Catalogue | CONTRACTED | `getSeatAvailability` |
+| 2.6.31 | Selling Event with a seat map, shared inventory with onsite sales. | Ticketing Sales | CONTRACTED | `getSeatAvailability` |
+| 21.4.1 | Seat Status Management | Seat Management & Venue Mapping | CONTRACTED | `getSeatAvailability` |
+| 21.4.2 | Seat Availability Tracking | Seat Management & Venue Mapping | CONTRACTED | `getSeatAvailability` |
+| 21.4.3 | Seat Hold Tracking | Seat Management & Venue Mapping | CONTRACTED | `getSeatAvailability` |
+| 21.4.4 | Seat Reservation Tracking | Seat Management & Venue Mapping | CONTRACTED | `getSeatAvailability` |
+| 21.4.5 | Seat Sales Tracking | Seat Management & Venue Mapping | CONTRACTED | `getSeatAvailability` |
+| 21.5.13 | Real-Time Seat Availability | Seat Management & Venue Mapping | CONTRACTED | `getSeatAvailability` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Real-time seat inventory view shows per-event seat status (available, on hold, reserved, sold) with availability/holder trackers, sales & allocation tracking and audit/reconciliation reporting. *(client request · MoM 21 Aug 2026, 4.6 Seat Inventory Status, Holds & Automatic Release · DI-421)*
+
+Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-986` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-986`
+- Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 4
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 6: Works in Availability Tracker → Analyze current and historical seat availability. Show available quantity by venue, performance, section, row, category, price band and sales channel. Graph availability over time and identify …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-986?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `BO-983`.
+- [ ] Every gated control is gated: `PRODUCT_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-987` Hold Tracker
+
+**Track active and historical held inventory regardless of hold type. List hold ID, type, owner, event, section/seat set, quantity, created time, expiry, priority and status. Filter upcoming expiry, extended, converted, released and conflicting holds and open the governing rule. Allow approved release, extend or reassign actions while preserving the original hold record. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Access & Venue · wave 3 · needs the `seating` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_VIEW` (2 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `holdId` (navigation) |
+| Route | `/access-venue/hold-tracker-bo-987` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Performance | picker: choose a performance | — | — | `listSeatBlocks` ?performanceId |
+| Reason | select | — | Production hold · House seats · Group allocation · Maintenance · Accessibility reserve · Distancing · Other | `listSeatBlocks` ?reason |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Detail panel** (detail panel): One record, read-only.
+
+**Data it reads**: `listSeatBlocks` (onLoad, Holds in force)
+
+**Where the user goes next**
+
+- → `BO-983` Inventory Command Center: *Back to Inventory Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The hold tracker list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the hold tracker untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No hold tracker yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the hold tracker are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listSeatBlocks` → `PRODUCT_VIEW` (read) · staff, partner
+- `getSeatHold` → `ORDER_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Real-time seat inventory view shows per-event seat status (available, on hold, reserved, sold) with availability/holder trackers, sales & allocation tracking and audit/reconciliation reporting. *(client request · MoM 21 Aug 2026, 4.6 Seat Inventory Status, Holds & Automatic Release · DI-421)*
+- Chinmay: reservations/holds are made section-wise (choose section → choose/hold seats within it), not by a freeform polygon selection as in the AI-generated reference mockup. *(agreed · MoM 21 Aug 2026, 4.3 Best-Seat Logic, Seating Rules & Social Distancing Configuration · DI-415)*
+
+Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-987` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-987`
+- Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 4
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 8: Works in Hold Tracker → Track active and historical held inventory regardless of hold type. List hold ID, type, owner, event, section/seat set, quantity, created time, expiry, priority and status. Filter upcoming expiry …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-987?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `BO-983`.
+- [ ] Every gated control is gated: `ORDER_VIEW`, `PRODUCT_VIEW`.
+- [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-988` Reservation Tracker
+
+**Monitor seat reservations and temporary allocations before final sale. List reservation, guest/group, source, seat set, lock/hold reference, expiry, payment state and confirmation status. Identify abandoned, timed-out, payment-pending, orphaned and channel-mismatched reservations. Support controlled retry, release, re-link or escalation without bypassing payment or inventory authority. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Access & Venue · wave 3 · needs the `seating` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `CAPACITY_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/access-venue/reservation-tracker-bo-988` |
+
+**Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Performance | select field | — | — | — | — | Sends `?performanceId=` (required). | — |
+| Issue | select field | — | — | — | — | Abandoned, timed-out, payment-pending, orphaned, channel-mismatched. | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Performance | picker: choose a performance | — | — | `getSeatInventory` ?performanceId |
+| Section | picker: choose a section | — | — | `getSeatInventory` ?sectionId |
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Reserved** (metric tile, from `getSeatInventory`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Reserved | 1,234 | — |
+
+**Held** (metric tile, from `getSeatInventory`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Held | 1,234 | — |
+
+**Reservations** (data table, from `getSeatInventory`): Seats whose `state` is reserved or held. Reservation, guest, source, payment and confirmation are pack labels.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Reservation | text | not in the schema: `Reservation` |
+| Guest / group | text | not in the schema: `Guest / group` |
+| Source | text | not in the schema: `Source` |
+| Label | text | — |
+| Hold pool | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Payment state | text | not in the schema: `Payment state` |
+| Confirmation status | text | not in the schema: `Confirmation status` |
+
+**The selected reservation** (detail panel, from `getSeatInventory`): Only the seat side of the reservation is bound.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Seat | the name it points at, never the id | — |
+| Label | text | — |
+| State | chip: Available, Held, Reserved, Sold, Blocked, Out of service… | — |
+| Hold pool | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Reservation | text | not in the schema: `Reservation` |
+| Guest / group | text | not in the schema: `Guest / group` |
+| Payment state | text | not in the schema: `Payment state` |
+| Issue type | text | not in the schema: `Issue type` |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Retry (secondary button) | navigation or local | — | — | — | — |
+| Re-link (secondary button) | navigation or local | — | — | — | — |
+| Release (destructive button) | navigation or local | — | — | — | — |
+| Escalate (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getSeatInventory` (onLoad, Reserved against sold)
+
+**Where the user goes next**
+
+- → `BO-983` Inventory Command Center: *Back to Inventory Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The reservation tracker list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the reservation tracker untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No reservation tracker yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the reservation tracker are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getSeatInventory` → `CAPACITY_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.4.28 | Visual Seat Categorization Automatically color-code seat categories. Generate interactive seat maps. Highlight restricted-view or obstructed seats. Visualize occupancy and sales patterns. | Ticketing Catalogue | CONTRACTED | `getSeatInventory` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Real-time seat inventory view shows per-event seat status (available, on hold, reserved, sold) with availability/holder trackers, sales & allocation tracking and audit/reconciliation reporting. *(client request · MoM 21 Aug 2026, 4.6 Seat Inventory Status, Holds & Automatic Release · DI-421)*
+
+Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-988` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-988`
+- Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 4
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 10: Works in Reservation Tracker → Monitor seat reservations and temporary allocations before final sale. List reservation, guest/group, source, seat set, lock/hold reference, expiry, payment state and confirmation status. Identify …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-988?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Retry, Re-link, Release, Escalate.
+- [ ] Every transition is wired: `BO-983`.
+- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-989` Sales & Allocation Tracker
+
+**Trace sold seats and inventory allocation across channels and partners. Report seats and revenue by web, mobile, POS, call center, box office, B2B reseller and partner API. Show allocation-versus-sold performance, remaining quota, order, ticket, price, fee and fulfillment status. Detect duplicate issue, invalid allocation, reversed payment and seat/order inconsistency. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work / Version 1.0 19**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Access & Venue · wave 3 · needs the `seating` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `CAPACITY_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/access-venue/sales-allocation-tracker-bo-989` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Performance | picker: choose a performance | — | — | `getSeatInventory` ?performanceId |
+| Section | picker: choose a section | — | — | `getSeatInventory` ?sectionId |
+| Performance | picker: choose a performance | — | — | `listSeatHoldPools` ?performanceId |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Data it reads**: `getSeatInventory` (onLoad, Sales and allocation); `listSeatHoldPools` (onLoad, Allocation pools)
+
+**Where the user goes next**
+
+- → `BO-983` Inventory Command Center: *Back to Inventory Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The sales allocation tracker list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the sales allocation tracker untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No sales allocation tracker yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the sales allocation tracker are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getSeatInventory` → `CAPACITY_CONFIGURE` (configure) · staff
+- `listSeatHoldPools` → `CAPACITY_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.4.28 | Visual Seat Categorization Automatically color-code seat categories. Generate interactive seat maps. Highlight restricted-view or obstructed seats. Visualize occupancy and sales patterns. | Ticketing Catalogue | CONTRACTED | `getSeatInventory` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Real-time seat inventory view shows per-event seat status (available, on hold, reserved, sold) with availability/holder trackers, sales & allocation tracking and audit/reconciliation reporting. *(client request · MoM 21 Aug 2026, 4.6 Seat Inventory Status, Holds & Automatic Release · DI-421)*
+
+Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-989` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-989`
+- Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 4
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 12: Works in Sales & Allocation Tracker → Trace sold seats and inventory allocation across channels and partners. Report seats and revenue by web, mobile, POS, call center, box office, B2B reseller and partner API. Show …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-989?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `BO-983`.
+- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-990` Maintenance & Out of Service
+
+**Control seats unavailable because of defects, inspection or venue work. Create or link work orders with seat/area, issue, severity, status, owner, due date and supporting evidence. Block affected inventory, identify sold/reserved seats and trigger reseating or guest-service workflows. Return seats to available only after required repair, inspection, approval and layout validation. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Access & Venue · wave 3 · needs the `seating` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `WORK_ORDER_MANAGE` (2 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/access-venue/maintenance-out-of-service-bo-990` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Create seat block (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `BO-983` Inventory Command Center: *Back to Inventory Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The maintenance out service list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the maintenance out service untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No maintenance out service yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the maintenance out service are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 One or more seats already sold. (SeatConflictProblem) |
+
+#### Permissions
+
+- `createSeatBlock` → `CAPACITY_CONFIGURE` (configure) · staff, partner
+- `createWorkOrder` → `WORK_ORDER_MANAGE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+20 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 21.3.5 | Temporary Seat Blocking | Seat Management & Venue Mapping | CONTRACTED | `createSeatBlock` |
+| 21.3.6 | Temporary Seat Release | Seat Management & Venue Mapping | CONTRACTED | `createSeatBlock` |
+| 21.4.6 | Seat Maintenance Status | Seat Management & Venue Mapping | CONTRACTED | `createSeatBlock` |
+| 21.6.1 | VIP Seat Holds | Seat Management & Venue Mapping | CONTRACTED | `createSeatBlock` |
+| 21.6.2 | Sponsor Seat Holds | Seat Management & Venue Mapping | CONTRACTED | `createSeatBlock` |
+| 21.6.3 | Artist Seat Holds | Seat Management & Venue Mapping | CONTRACTED | `createSeatBlock` |
+| 21.6.4 | Media Seat Holds | Seat Management & Venue Mapping | CONTRACTED | `createSeatBlock` |
+| 21.6.5 | Corporate Seat Holds | Seat Management & Venue Mapping | CONTRACTED | `createSeatBlock` |
+| 21.6.6 | Internal Seat Holds | Seat Management & Venue Mapping | CONTRACTED | `createSeatBlock` |
+| 21.6.7 | Hold Expiration Rules | Seat Management & Venue Mapping | CONTRACTED | `createSeatBlock` |
+| 21.6.8 | Automatic Hold Release | Seat Management & Venue Mapping | CONTRACTED | `createSeatBlock` |
+| 16.5.25 | Corrective Maintenance - System shall support corrective maintenance tracking. | Device Management | CONTRACTED | `createWorkOrder` |
+| … 8 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A297** Build asset registry and preventive maintenance planning *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 17 Sep 2026 · workshop tracker · keyword 'preventive maintenance')*
+- **A299** Build work orders, safety inspections and incident management *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 17 Sep 2026 · workshop tracker · keyword 'work order')*
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-990` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-990`
+- Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 4
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 14: Works in Maintenance & Out of Service → Control seats unavailable because of defects, inspection or venue work. Create or link work orders with seat/area, issue, severity, status, owner, due date and supporting evidence. Block affected …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 409).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-990?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Create seat block, Cancel.
+- [ ] Every transition is wired: `BO-983`.
+- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`, `WORK_ORDER_MANAGE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-991` Seat History
+
+**Present the complete chronological history of one seat for one performance or physical venue position. Show locks, holds, reservations, sales, releases, refunds, exchanges, scans, blocks and maintenance events. Preserve business timestamp, processing timestamp, source, actor, correlation ID, rule/version and related object. Provide authorized links to order, ticket, guest, hold, approval and device records with field masking. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Access & Venue · wave 3 · needs the `seating` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `seatMapId` (navigation) · cold entry: **Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that … |
+| Route | `/access-venue/seat-history-bo-991` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Where the user goes next**
+
+- → `BO-983` Inventory Command Center: *Back to Inventory Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The seat history list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the seat history untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No seat history yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the seat history are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listSeats` → `PRODUCT_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 21.4.7 | Seat Audit Trail | Seat Management & Venue Mapping | CONTRACTED | `listSeats` |
+| 21.4.8 | Seat History | Seat Management & Venue Mapping | CONTRACTED | `listSeats` |
+| 21.13.5 | Seat Audit Logs | Seat Management & Venue Mapping | CONTRACTED | `listSeats` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **C18** Locate and share the AutoCAD/PDF seating drawing from the Bahrain project (also to be shared with 3D vendor "3DDV") *(Allam · Received → 30 Sep: Closed, Received · workshop tracker · keyword 'seating')*
+- **A99** Document reusable CMS page components per venue type (seat-map, park-map) and finalise landing-page component-count logic *(Allam / Aishwarya More · Medium · With client → 30 Sep: Closed, Moved to T7 (TICVAI to act) · 20 Aug 2026 · workshop tracker · keyword 'seat-map')*
+- **C31** Provide reusable CMS page-component documentation per venue type (seat-map, park-map and equivalents) *(Allam · Pending → 30 Sep: Closed, Moved to T7 · 20 Aug 2026 · workshop tracker · keyword 'seat-map')*
+- **A102** Build a single unified seat map builder screen (section type as a section-level attribute — seated / zone / standing / suite — mixed types in one map, suites sold bulk or by seat) *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 21 Aug 2026 · workshop tracker · keyword 'seat map')*
+- **A104** Make best-seat ranking configurable per map/event and implement section-wise holds rather than freeform polygon selection *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 21 Aug 2026 · workshop tracker · keyword 'best-seat')*
+- **A105** Make seating rules configurable per venue/event (consecutive-seat enforcement, social-distancing buffer, seat-kill, company/held-seat) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 21 Aug 2026 · workshop tracker · keyword 'seating')*
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-991` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-991`
+- Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 4
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 16: Works in Seat History → Present the complete chronological history of one seat for one performance or physical venue position. Show locks, holds, reservations, sales, releases, refunds, exchanges, scans, blocks and …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-991?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `BO-983`.
+- [ ] Every gated control is gated: `PRODUCT_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-992` Audit & Reconciliation
+
+**Detect and resolve differences between authoritative inventory and connected systems. Compare state and quantity across Seat Inventory, Cart, Order, Payment, Ticket, Channel and Access systems. Queue discrepancies by severity, age, venue, performance, type and suspected source with recommended action. Require reason and approval for corrections, use compensating events and retain complete before/after evidence. Use atomic transitions, optimistic concurrency, idempotent events and immutable history; historical seat facts cannot be silently overwritten. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work / Version 1.0 20 Board 5 - Seat Selection & Cart Experience Figure 5. High-definition configuration board with all 10 screens. Visual reference: information architecture and configuration coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work / Version 1.0 21**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Access & Venue · wave 3 · needs the `seating` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `CAPACITY_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/access-venue/audit-reconciliation-bo-992` |
+
+**Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Performance | select field | — | — | — | — | Sends `?performanceId=` (required). | — |
+| Discrepancy type | select field | — | — | — | — | Client-side on `kind`. | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Performance | picker: choose a performance | — | — | `getSeatReconciliation` ?performanceId |
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Open discrepancies** (metric tile, from `getSeatReconciliation`): Counted by `kind`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kind | chip: Sold twice, Sold not marked, Marked not sold, Held and sold, Orphaned hold | — |
+
+**Discrepancy queue** (data table, from `getSeatReconciliation`): Age is computed from `detectedAt`. Severity, suspected source and recommended action are pack labels.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Kind | chip: Sold twice, Sold not marked, Marked not sold, Held and sold, Orphaned hold | — |
+| Map state | text | — |
+| Order state | text | — |
+| Orders | list or chips (count when long) | — |
+| Detected at | 1 Oct 2026, 14:30 | — |
+| Severity | text | not in the schema: `Severity` |
+| Suspected source | text | not in the schema: `Suspected source` |
+| Recommended action | text | not in the schema: `Recommended action` |
+
+**The selected discrepancy** (detail panel, from `getSeatReconciliation`): The pack compares seven systems; the contract compares map and order only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Seat | the name it points at, never the id | — |
+| Label | text | — |
+| Kind | chip: Sold twice, Sold not marked, Marked not sold, Held and sold, Orphaned hold | — |
+| Map state | text | — |
+| Order state | text | — |
+| Orders | list or chips (count when long) | — |
+| Detected at | 1 Oct 2026, 14:30 | — |
+| Cart state | text | not in the schema: `Cart state` |
+| Payment state | text | not in the schema: `Payment state` |
+| Ticket state | text | not in the schema: `Ticket state` |
+| Access state | text | not in the schema: `Access state` |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Correct with reason (primary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getSeatReconciliation` (onLoad, The map against the orders)
+
+**Where the user goes next**
+
+- → `BO-983` Inventory Command Center: *Back to Inventory Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The audit reconciliation list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the audit reconciliation untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No audit reconciliation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the audit reconciliation are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getSeatReconciliation` → `CAPACITY_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Real-time seat inventory view shows per-event seat status (available, on hold, reserved, sold) with availability/holder trackers, sales & allocation tracking and audit/reconciliation reporting. *(client request · MoM 21 Aug 2026, 4.6 Seat Inventory Status, Holds & Automatic Release · DI-421)*
+
+Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-992` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-992`
+- Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 4
+- Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 18: Works in Audit & Reconciliation → Detect and resolve differences between authoritative inventory and connected systems. Compare state and quantity across Seat Inventory, Cart, Order, Payment, Ticket, Channel and Access systems. Queue …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-992?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Correct with reason.
+- [ ] Every transition is wired: `BO-983`.
+- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+
+
+## Reference designs and the trackers for this platform
+
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
+
+- `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
+- `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
+
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
+
+## Design inputs from the client meetings
+
+**What the client asked for in the meetings and design reviews, for these screens.** Apply every item. They are the client's own requirements and they are later than the reference files: where a reference design or a screen's fields disagree with an item here, the item wins. Newest first; where two items disagree, the newer one wins (anything a later meeting replaced is already left out). An **Open question** is not settled: build the default it states and keep it easy to change. The text in brackets is for traceability and, like everything else in this bundle, never appears on a screen.
+
+### Everywhere, on every app
+
+- Allam (platform-wide requirement): every calendar throughout the platform, not just maintenance, must support day, week and month views, with the day view further broken down by hour from a defined start hour through the day. *(agreed · MoM 17 Sep 2026, 4.2 Preventive Maintenance Planning · DI-907)*
+- Minimise the number of separate screens an end user navigates: consolidate related information wherever it can reasonably be shown together, rather than mirroring every workshop board as its own screen. *(agreed · MoM 7 Sep 2026, 4.10 Screen consolidation / 5. Key Decisions · DI-671)*
+- Region-configurable tax on pre-discount price (e.g. Egypt: AED 100 ticket with 20% off is paid at AED 80 but taxed on AED 100). Rounding must support up to three decimal places without dropping the third decimal where the currency requires it. *(agreed · MoM 1 Sep 2026, 4.5 Taxes, Fees & Price Calculation · DI-598)*
+- "Powered by TICVAI" is shown consistently across staff and guest-facing surfaces. *(agreed · MoM 14 Aug 2026, 8. POS / Kiosk Branding · DI-297)*
+- Full multi-language support (Arabic and others such as Chinese) consistent with the agreed i18n/RTL architecture. *(agreed · MoM 10 Aug 2026, 4.7 Account Creation, Localisation & Multi-Currency · DI-210)*
+- The reference system is a functional reference only: its dated UI/UX is not to be replicated; TICVAI delivers equivalent depth with a modern, AI-friendly, easy-to-configure experience. *(agreed · MoM 7 Aug 2026, 23. Reference System Access & Documentation · DI-186)*
+- Direction: modern, minimalistic, spacious, cross-device designs that still convey a sense of place (venue or park); Softlabs proposes two to three enhanced visual concepts for TICVAI to steer. *(agreed · MoM 3 Aug 2026, 11. Design Alignment & Team Input · DI-126)*
+- Languages: English and Arabic at minimum, with Russian, Spanish and Mandarin. *(agreed · MoM 31 Jul 2026, 13. Internationalization & Localization · DI-080)*
+- Clarity first; reduce cognitive load (simple layouts, familiar patterns); consistency ("Use the system. Do not recreate."); accessibility; hierarchy (guide attention with contrast, spacing and visual weight); feedback (every action has a clear response). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Design Principles in Action · DI-051)*
+- Standard components: search bar with Cmd+K; tabs (Overview, Events, Sales, Reports); pagination; badges (New, Pending, Sold Out, Completed); toggle (Off/On); dropdown; removable chip ("VIP x"). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Example UI Components · DI-050)*
+- Spacing on an 8px base grid: 4, 8, 12, 16, 24, 32, 40, 48, 64, 80. Border radius scale 4, 8, 12, 16, 24px, consistent across the platform. Soft shadows: sm 0 1px 2px rgba(0,0,0,.05); md 0 4px 6px rgba(0,0,0,.08); lg 0 10px 15px rgba(0,0,0,.10); xl 0 20px 40px rgba(0,0,0,.14). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 6. Spacing / 7. Border Radius / 8. Shadows · DI-049)*
+- Icons: line style, outline, 2px stroke, round corners, clean and consistent. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 5. Icons · DI-048)*
+- Component principles: clarity first; consistent spacing on an 8px grid; meaningful colour (colours communicate status and guide the user); accessible by design; mobile ready (components adapt across all screen sizes). Components are consistent, flexible, accessible and composable. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Component principles · DI-045)*
+- Empty states have a title, one explanatory line and one action: "No events yet / Create your first event to get started / Create Event"; "No data available / We couldn't find anything to show here / Refresh". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Empty States · DI-044)*
+- Notification list: status icon, title, one-line detail and relative time (e.g. "Payment received ... 2m ago", "High demand detected ... 10m ago"), with "View all notifications". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Notifications · DI-042)*
+- Forms: label above field; text input, select ("Choose an option"), date picker, toggle, checkbox. Input states: Default, Focused, Filled, Disabled and Error with inline message (e.g. "This field is required"). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Forms; 08 Design System (p8) - 4. Inputs · DI-040)*
+- Card types: event card (title, date and time, venue, "From 120.00 AED"); KPI card (label, value, delta, "vs last 7 days"); onboarding checklist card ("3 of 6 completed": Create Event, Add Staff, Configure Seating, Connect Payment). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Cards · DI-038)*
+- Button hierarchy Primary, Secondary, Tertiary (text) and Icon buttons, each with Default, Hover, Pressed and Disabled states. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Buttons; 08 Design System (p8) - 3. Buttons · DI-036)*
+- Regardless of the module a user is working in, the experience should feel like one product, not a collection of separate applications. *(agreed · Design Vision Book 29 Jul 2026, 07 Modules Overview (p7) · DI-034)*
+- DO: focus on clarity and hierarchy, use clear simple interactive elements, give relevant information at a glance (card example: "Annual Membership / All Venues / 4.4 (388) / BESTSELLER"). DON'T: clutter and overload (e.g. "-10% NEW PROMO AED 450.00 !!! BOOK NOW!!!"), complex forms and flows, hard-to-read data visualisations. *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - DO / DON'T · DI-033)*
+- Eight principles on every screen: User-Centric, AI-First, Simple & Clear (clean layouts, clear hierarchy, minimal noise), Fast & Efficient (optimised for quick actions), Reliable & Secure (permissions, data protection), Data-Driven (data visual, actionable, easy to understand), Scalable, Consistent (same patterns, components and interactions across the ecosystem). *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - Our Design Principles · DI-032)*
+- Accessibility: high contrast, readable text, keyboard navigation and inclusive components throughout; WCAG AA standards minimum ("Design for everyone"). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Better Accessibility; 06 Component principles (p6); 08 Design principles in action (p8) · DI-029)*
+- AI everywhere: AI insights, recommendations and smart assistance are embedded across the platform, not hidden. AI is not an add-on: it assists, predicts, recommends and automates. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - How TICVAI improves this concept; 05 Design Principles (p5) - 2. AI-First · DI-027)*
+- Global Search: prominent, AI-powered search that finds anything, in the top bar with a Cmd+K shortcut (placeholder e.g. "Search events, customers, orders, venues or ask AI..."). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - UI inspiration reference, item 1; 08 Design System (p8) - Search Bar · DI-025)*
+- Visual direction: Purposeful (every element has a clear purpose), Consistent (one visual system across all modules and devices), Clear (easy to scan, understand and act on), Modern. Key takeaway: clean, modern, product-first layout with clear hierarchy and minimal visual noise; deep, modern, trustworthy; built for enterprise scale. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) · DI-024)*
+- The brand is presented consistently across Web Platform, Mobile App and Admin Portal (and print). Ticvai identity, colours and typography are applied consistently across all screens and devices. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand in action; 03 Visual Direction (p3) - Consistent Branding · DI-023)*
+- Copy is Professional, Friendly, Clear, Confident, Concise and Helpful. Avoid jargon, overly technical language, clutter, outdated language and complexity. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand voice · DI-022)*
+- Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
+- Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
+
+### Across P08 Venue Management
+
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
+- Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
+- **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
+- Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
+- Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
+- Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
+- Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
+- Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
+- Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
+
+### In P08 · Access & Venue
+
+- Accreditation-holder monitoring is a filtered view inside general entitlement monitoring, not a separate system. *(agreed · MoM 7 Sep 2026, Accreditation (cited in P11 resolvedQuestions) · DI-694)*
+
+**8 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+
+---
+
+## Raw data
+
+The same package data the blocks above are built from. `screens.json` is in the folder and not repeated here: every field of it is in the blocks.
+
+### `operations.json`
 
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
 {
- "createSeatBlock": {
-  "method": "POST",
-  "path": "/seat-blocks",
-  "contract": "seating",
-  "summary": "Block seats from sale",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateSeatBlockRequest",
-  "responds": "SeatBlock"
- },
- "createSeatCategory": {
-  "method": "POST",
-  "path": "/seat-categories",
-  "contract": "seating",
-  "summary": "Create a seat category",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "SeatCategory"
- },
- "createWorkOrder": {
-  "method": "POST",
-  "path": "/work-orders",
-  "contract": "maintenance",
-  "summary": "Raise a work order",
-  "permission": "WORK_ORDER_MANAGE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateWorkOrderRequest",
-  "responds": "WorkOrder"
- },
- "getSeatAvailability": {
-  "method": "GET",
-  "path": "/performances/{performanceId}/seat-availability",
-  "contract": "seating",
-  "summary": "Seat status for a performance",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "sectionCode",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "categoryId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "availableOnly",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "mode",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "SeatAvailability"
- },
- "getSeatHold": {
-  "method": "GET",
-  "path": "/seat-holds/{holdId}",
-  "contract": "seating",
-  "summary": "Read a hold",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "SeatHold"
- },
- "getSeatInventory": {
-  "method": "GET",
-  "path": "/seat-inventory",
-  "contract": "seating",
-  "summary": "Every seat's state for a performance, in one read",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "performanceId",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "sectionId",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "SeatInventory"
- },
- "getSeatReconciliation": {
-  "method": "GET",
-  "path": "/seat-reconciliation",
-  "contract": "seating",
-  "summary": "The map against the orders, seat by seat",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "performanceId",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": "SeatDiscrepancy"
- },
- "listSeatBlocks": {
-  "method": "GET",
-  "path": "/seat-blocks",
-  "contract": "seating",
-  "summary": "List seat blocks",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "performanceId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "reason",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listSeatCategories": {
-  "method": "GET",
-  "path": "/seat-categories",
-  "contract": "seating",
-  "summary": "List seat categories",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "SeatCategory"
- },
- "listSeatHoldPools": {
-  "method": "GET",
-  "path": "/seat-hold-pools",
-  "contract": "seating",
-  "summary": "Held seats, by pool, with what is left and when it releases",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "performanceId",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "SeatHoldPool"
- },
- "listSeats": {
-  "method": "GET",
-  "path": "/seat-maps/{seatMapId}/seats",
-  "contract": "seating",
-  "summary": "List seats in a map",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "sectionCode",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "rowLabel",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "categoryId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "attribute",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- }
+"createSeatBlock": {"method":"POST","path":"/seat-blocks","contract":"seating","summary":"Block seats from sale","permission":"CAPACITY_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateSeatBlockRequest","responds":"SeatBlock"},
+"createSeatCategory": {"method":"POST","path":"/seat-categories","contract":"seating","summary":"Create a seat category","permission":"CAPACITY_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SeatCategory"},
+"createWorkOrder": {"method":"POST","path":"/work-orders","contract":"maintenance","summary":"Raise a work order","permission":"WORK_ORDER_MANAGE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateWorkOrderRequest","responds":"WorkOrder"},
+"getSeatAvailability": {"method":"GET","path":"/performances/{performanceId}/seat-availability","contract":"seating","summary":"Seat status for a performance","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"sectionCode","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"availableOnly","in":"query","required":null},{"name":"mode","in":"query","required":null}],"requestBody":null,"responds":"SeatAvailability"},
+"getSeatHold": {"method":"GET","path":"/seat-holds/{holdId}","contract":"seating","summary":"Read a hold","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"SeatHold"},
+"getSeatInventory": {"method":"GET","path":"/seat-inventory","contract":"seating","summary":"Every seat's state for a performance, in one read","permission":"CAPACITY_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":true},{"name":"sectionId","in":"query","required":null}],"requestBody":null,"responds":"SeatInventory"},
+"getSeatReconciliation": {"method":"GET","path":"/seat-reconciliation","contract":"seating","summary":"The map against the orders, seat by seat","permission":"CAPACITY_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":true}],"requestBody":null,"responds":"SeatDiscrepancy"},
+"listSeatBlocks": {"method":"GET","path":"/seat-blocks","contract":"seating","summary":"List seat blocks","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":null},{"name":"reason","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listSeatCategories": {"method":"GET","path":"/seat-categories","contract":"seating","summary":"List seat categories","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null}],"requestBody":null,"responds":"SeatCategory"},
+"listSeatHoldPools": {"method":"GET","path":"/seat-hold-pools","contract":"seating","summary":"Held seats, by pool, with what is left and when it releases","permission":"CAPACITY_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":null}],"requestBody":null,"responds":"SeatHoldPool"},
+"listSeats": {"method":"GET","path":"/seat-maps/{seatMapId}/seats","contract":"seating","summary":"List seats in a map","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"sectionCode","in":"query","required":null},{"name":"rowLabel","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"attribute","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"}
 }
 ```
 
-## `schemas.json`
+### `schemas.json`
 
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
 {
- "BlockReason": {
-  "type": "string",
-  "description": "`other` is allowed only with a note (decided 28 September, audit R222). Every block already requires `note`, so an `other` block always says why; the notes are reviewed quarterly to add the real reasons they reveal.\n",
-  "enum": [
-   "productionHold",
-   "houseSeats",
-   "groupAllocation",
-   "maintenance",
-   "accessibilityReserve",
-   "distancing",
-   "other"
-  ]
- },
- "CreateSeatBlockRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "performanceId",
-   "seatIds",
-   "reason",
-   "note"
-  ],
-  "properties": {
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "seatIds": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "type": "string"
-    }
-   },
-   "reason": {
-    "$ref": "#/components/schemas/BlockReason"
-   },
-   "note": {
-    "type": "string",
-    "minLength": 3,
-    "maxLength": 500
-   },
-   "releaseAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Automatic release, for production holds freed close to performance."
-   }
-  }
- },
- "CreateWorkOrderRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "id",
-   "title",
-   "venueId",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "title": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string",
-    "maxLength": 5000
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "assetId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "locationDescription": {
-    "type": "string",
-    "maxLength": 500
-   },
-   "kind": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/WorkOrderKind"
-     }
-    ],
-    "default": "corrective"
-   },
-   "priority": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/WorkOrderPriority"
-     }
-    ],
-    "description": "**Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the fault.\n"
-   },
-   "faultAssessment": {
-    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
-   },
-   "requiredQualificationCodes": {
-    "type": "array",
-    "maxItems": 10,
-    "items": {
-     "type": "string"
-    },
-    "description": "Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13)."
-   },
-   "categoryId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "assignedToPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "dueAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "attachmentRefs": {
-    "type": "array",
-    "description": "Photo-first. Expected at creation, not added later from memory.",
-    "items": {
-     "type": "string"
-    }
-   },
-   "takeAssetOutOfService": {
-    "type": "boolean",
-    "default": false,
-    "description": "Raise and immediately suspend the asset. For a fault found on a live ride, the two are one action.\n"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
-   }
-  }
- },
- "Point": {
-  "type": "object",
-  "required": [
-   "x",
-   "y"
-  ],
-  "properties": {
-   "x": {
-    "type": "number"
-   },
-   "y": {
-    "type": "number"
-   }
-  }
- },
- "Seat": {
-  "x-ticvai-persistence": "seating.seat",
-  "type": "object",
-  "required": [
-   "id",
-   "sectionCode",
-   "rowLabel",
-   "seatNumber",
-   "attribute"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "**Stable for the life of the seat.** Section, row and number are display labels that change on a refit; this does not. A ticket sold today must still resolve after a renumbering.\n"
-   },
-   "sectionCode": {
-    "type": "string"
-   },
-   "rowLabel": {
-    "type": "string"
-   },
-   "seatNumber": {
-    "type": "string"
-   },
-   "displayLabel": {
-    "type": "string",
-    "description": "What the guest sees, e.g. `A2-7-11`."
-   },
-   "position": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/Point"
-     }
-    ],
-    "nullable": true
-   },
-   "categoryId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "attribute": {
-    "$ref": "#/components/schemas/SeatAttribute"
-   },
-   "companionSeatIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Present on accessible seats. Sold together, released together."
-   },
-   "isActive": {
-    "type": "boolean"
-   }
-  }
- },
- "SeatAttribute": {
-  "type": "string",
-  "description": "BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n",
-  "enum": [
-   "standard",
-   "accessible",
-   "companion",
-   "obstructedView",
-   "restrictedLegroom",
-   "premium",
-   "houseSeat",
-   "buffer",
-   "aisle",
-   "endOfRow",
-   "extraLegroom",
-   "powerOutlet",
-   "tableService",
-   "shaded",
-   "covered",
-   "nearExit",
-   "nearAccessibleWc",
-   "wheelchairTransfer",
-   "limitedRecline",
-   "sofa",
-   "beanbag"
-  ]
- },
- "SeatAvailability": {
-  "x-ticvai-persistence": "none — computed from seat, hold and block",
-  "type": "object",
-  "required": [
-   "performanceId",
-   "seatMapId",
-   "renderMode",
-   "totals",
-   "seats"
-  ],
-  "properties": {
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "seatMapId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "renderMode": {
-    "type": "string",
-    "enum": [
-     "graphical",
-     "list"
-    ],
-    "description": "The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"
-   },
-   "totals": {
-    "type": "object",
-    "properties": {
-     "total": {
-      "type": "integer"
-     },
-     "available": {
-      "type": "integer"
-     },
-     "held": {
-      "type": "integer"
-     },
-     "sold": {
-      "type": "integer"
-     },
-     "blocked": {
-      "type": "integer"
-     },
-     "buffered": {
-      "type": "integer"
-     }
-    }
-   },
-   "byCategory": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "categoryId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "available": {
-       "type": "integer"
-      },
-      "sold": {
-       "type": "integer"
-      },
-      "price": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      }
-     }
-    }
-   },
-   "sections": {
-    "type": "array",
-    "description": "The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise null and the client renders the view from `boundary` and the seat positions. In this response so WEB-007 and GST-049 need no second call.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "code",
-      "name"
-     ],
-     "properties": {
-      "code": {
-       "type": "string"
-      },
-      "name": {
-       "type": "string"
-      },
-      "viewAssetId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true,
-       "description": "As `Section.viewAssetId`. Null means render the view from geometry."
-      },
-      "boundary": {
-       "type": "array",
-       "nullable": true,
-       "items": {
-        "$ref": "#/components/schemas/Point"
-       },
-       "description": "As `Section.boundary`. Null when `renderMode` is `list`."
-      }
-     }
-    }
-   },
-   "seats": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "seatId",
-      "status"
-     ],
-     "properties": {
-      "seatId": {
-       "type": "string"
-      },
-      "status": {
-       "$ref": "#/components/schemas/SeatStatus"
-      },
-      "categoryId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "displayLabel": {
-       "type": "string",
-       "description": "What the guest sees, e.g. `A2-7-11`, as on `Seat`."
-      },
-      "position": {
-       "allOf": [
-        {
-         "$ref": "#/components/schemas/Point"
-        }
-       ],
-       "nullable": true,
-       "description": "The seat's coordinates on the map, as on `Seat`. Present when `renderMode` is `graphical`; null when it is `list`."
-      }
-     }
-    }
-   }
-  }
- },
- "SeatBlock": {
-  "x-ticvai-persistence": "seating.seat_block",
-  "type": "object",
-  "required": [
-   "id",
-   "performanceId",
-   "seatIds",
-   "reason",
-   "createdAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "seatIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "reason": {
-    "$ref": "#/components/schemas/BlockReason"
-   },
-   "note": {
-    "type": "string"
-   },
-   "createdByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "releaseAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "releasedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
-   }
-  }
- },
- "SeatCategory": {
-  "x-ticvai-persistence": "seating.seat_category",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name",
-   "venueId",
-   "rank"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayColour": {
-    "type": "string",
-    "nullable": true
-   },
-   "rank": {
-    "type": "integer",
-    "description": "Ordering for best-seat assignment. Lower is better."
-   },
-   "seatCount": {
-    "type": "integer"
-   },
-   "priceBands": {
-    "type": "array",
-    "description": "What a seat in this category costs, by band (decided 28 September, audit R275 (d), from the BO-1045 pack). Written by `createSeatCategory` and `updateSeatCategory`. A band may be narrowed to a sales channel or a customer segment and to a window; where several match a sale, the narrowest wins.\n",
-    "items": {
-     "$ref": "#/components/schemas/SeatPriceBand"
-    }
-   }
-  }
- },
- "SeatDiscrepancy": {
-  "type": "object",
-  "description": "Board 4.8. **A seat sold twice and a seat sold to nobody are both invisible until somebody counts.**\n",
-  "properties": {
-   "seatId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "label": {
-    "type": "string"
-   },
-   "mapState": {
-    "type": "string"
-   },
-   "orderState": {
-    "type": "string"
-   },
-   "orderIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "soldTwice",
-     "soldNotMarked",
-     "markedNotSold",
-     "heldAndSold",
-     "orphanedHold"
-    ]
-   },
-   "detectedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "SeatHold": {
-  "x-ticvai-persistence": "seating.seat_hold",
-  "type": "object",
-  "required": [
-   "id",
-   "performanceId",
-   "seatIds",
-   "status",
-   "createdAt",
-   "expiresAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "seatIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "bufferedSeatIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Neighbours implicitly held by a seating rule."
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "held",
-     "converted",
-     "released",
-     "expired"
-    ]
-   },
-   "totalPrice": {
-    "x-ticvai-column": "gross_amount",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "heldByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "extensionCount": {
-    "type": "integer"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "SeatHoldPool": {
-  "type": "object",
-  "x-ticvai-persistence": "seating.hold_pool",
-  "description": "Board 6.3. **Utilisation decides next season's allocation.**",
-  "required": [
-   "holdTypeId",
-   "performanceId"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "holdTypeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "seatIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "seatCount": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "usedCount": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "releasedCount": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "holderName": {
-    "type": "string",
-    "nullable": true
-   },
-   "reason": {
-    "type": "string",
-    "nullable": true
-   },
-   "releaseAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "partiallyReleased",
-     "released",
-     "expired"
-    ]
-   },
-   "createdBy": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string"
-   }
-  }
- },
- "SeatInventory": {
-  "type": "object",
-  "description": "Board 4. **One read, because a real-time map assembling four endpoints renders one state late.**\n",
-  "properties": {
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "asOf": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "totals": {
-    "type": "object",
-    "properties": {
-     "capacity": {
-      "type": "integer"
-     },
-     "available": {
-      "type": "integer"
-     },
-     "held": {
-      "type": "integer"
-     },
-     "reserved": {
-      "type": "integer"
-     },
-     "sold": {
-      "type": "integer"
-     },
-     "blocked": {
-      "type": "integer"
-     },
-     "outOfService": {
-      "type": "integer"
-     }
-    }
-   },
-   "seats": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "seatId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "label": {
-       "type": "string"
-      },
-      "state": {
-       "type": "string",
-       "enum": [
-        "available",
-        "held",
-        "reserved",
-        "sold",
-        "blocked",
-        "outOfService",
-        "killed"
-       ]
-      },
-      "holdPoolId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "orderId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "expiresAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      }
-     }
-    }
-   }
-  }
- },
- "SeatPriceBand": {
-  "x-ticvai-persistence": "seating.seat_price_band",
-  "type": "object",
-  "description": "One price band on a seat category (decided 28 September, audit R275 (d)). The currency is `amount.currency`, resolved from the region like every `Money` (ADR-0018), so the band carries no currency of its own.\n",
-  "required": [
-   "code",
-   "displayLabel",
-   "amount",
-   "effectiveFrom"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "seatCategoryId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "code": {
-    "type": "string",
-    "maxLength": 64,
-    "description": "Unique within the category."
-   },
-   "displayLabel": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "displayColour": {
-    "type": "string",
-    "nullable": true,
-    "pattern": "^#[0-9A-Fa-f]{6}$"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "channel": {
-    "nullable": true,
-    "description": "Null means every channel.",
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
-     }
-    ]
-   },
-   "customerSegmentId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "A `marketing-crm` customer segment; null means everyone."
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "effectiveTo": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "Null means open-ended."
-   }
-  }
- },
- "SeatStatus": {
-  "type": "string",
-  "enum": [
-   "available",
-   "held",
-   "sold",
-   "blocked",
-   "buffered",
-   "unavailable"
-  ]
- },
- "WorkOrder": {
-  "x-ticvai-persistence": "maintenance.work_order",
-  "x-ticvai-retired-columns": [
-   "is_overdue"
-  ],
-  "type": "object",
-  "required": [
-   "id",
-   "workOrderNumber",
-   "title",
-   "venueId",
-   "status",
-   "priority",
-   "kind",
-   "createdAt"
-  ],
-  "properties": {
-   "downtimeMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n**Maintained on write**: set when the asset returns to service, as the minutes from the `maintenance.asset_status_change` row that took it out carrying this work order's id to the asset's next change back to `inService`. Null while the asset is still out, and for a work order that never took it out.\n"
-   },
-   "rootCause": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "wearAndTear",
-     "operatorError",
-     "guestDamage",
-     "manufacturingDefect",
-     "environmental",
-     "softwareFault",
-     "powerFailure",
-     "deferredMaintenance",
-     "unknown"
-    ],
-    "description": "**Structured, because free text cannot be counted.** *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault caused by work that was postponed is an argument for a budget.\n"
-   },
-   "rootCauseNote": {
-    "type": "string",
-    "nullable": true
-   },
-   "escalatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "escalationLevel": {
-    "type": "integer",
-    "default": 0,
-    "description": "**Escalation is a clock, not a decision.** A work order on a ride nobody has accepted after twenty minutes escalates itself, because the alternative is somebody noticing.\n"
-   },
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "workOrderNumber": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
-   },
-   "title": {
-    "type": "string"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "assetId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "assetName": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record reads as it was raised.\n"
-   },
-   "status": {
-    "$ref": "#/components/schemas/WorkOrderStatus"
-   },
-   "priority": {
-    "$ref": "#/components/schemas/WorkOrderPriority"
-   },
-   "priorityScore": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 100,
-    "nullable": true,
-    "readOnly": true,
-    "description": "The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."
-   },
-   "prioritySource": {
-    "type": "string",
-    "enum": [
-     "scored",
-     "assetOverride",
-     "manual"
-    ],
-    "readOnly": true,
-    "description": "Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."
-   },
-   "faultAssessment": {
-    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
-   },
-   "requiredQualificationCodes": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Skills the job needs (M17-13)."
-   },
-   "kind": {
-    "$ref": "#/components/schemas/WorkOrderKind"
-   },
-   "assignedToPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "raisedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "categoryId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "As raised in `CreateWorkOrderRequest.categoryId`, amendable by `updateWorkOrder`. The category is what `completeWorkOrder` reads to decide whether completion photographs are required.\n"
-   },
-   "locationDescription": {
-    "type": "string",
-    "maxLength": 500,
-    "nullable": true,
-    "description": "Where the fault is, as raised. Needed where there is no asset — a broken tile, a leak in a corridor.\n"
-   },
-   "elapsedMinutes": {
-    "type": "integer",
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "Labour minutes accumulated up to the last pause or stop. **Maintained on write** by `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`; while `isTimerRunning` is true the interval since the last start is not yet included.\n"
-   },
-   "isTimerRunning": {
-    "type": "boolean",
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "Maintained on write by `startWorkOrder`, `resumeWorkOrder`, `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`.\n"
-   },
-   "dueAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "isOverdue": {
-    "type": "boolean",
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "x-ticvai-derived": "onRead",
-    "description": "`dueAt` is in the past and the status is still `open`, `assigned`, `inProgress`, `paused` or `awaitingParts`. **Computed on read and not stored** — it depends on the clock. `listWorkOrders?overdueOnly` applies the same test to `due_at`.\n"
-   },
-   "requiresVerification": {
-    "type": "boolean"
-   },
-   "sourcePlanId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "sourceInspectionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "sourceIncidentId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "WorkOrderFaultAssessment": {
-  "x-ticvai-persistence": "none — columns on maintenance.work_order",
-  "type": "object",
-  "description": "What the person raising a fault says about it, which the priority score reads (M17-01).",
-  "properties": {
-   "safetyRisk": {
-    "type": "boolean",
-    "default": false
-   },
-   "guestImpact": {
-    "type": "string",
-    "enum": [
-     "none",
-     "degraded",
-     "closed"
-    ],
-    "default": "none"
-   }
-  }
- },
- "WorkOrderKind": {
-  "type": "string",
-  "enum": [
-   "corrective",
-   "planned",
-   "inspectionFollowUp",
-   "incidentCorrective",
-   "improvement"
-  ]
- },
- "WorkOrderPriority": {
-  "type": "string",
-  "enum": [
-   "low",
-   "normal",
-   "high",
-   "urgent",
-   "emergency"
-  ]
- },
- "WorkOrderStatus": {
-  "type": "string",
-  "enum": [
-   "open",
-   "assigned",
-   "inProgress",
-   "paused",
-   "awaitingParts",
-   "completed",
-   "verified",
-   "closed",
-   "cancelled"
-  ]
- }
+"BlockReason": {"type":"string","description":"`other` is allowed only with a note (decided 28 September, audit R222). Every block already requires `note`, so an `other` block always says why; the notes are reviewed quarterly to add the real reasons they reveal.\n","enum":["productionHold","houseSeats","groupAllocation","maintenance","accessibilityReserve","distancing","other"]},
+"CreateSeatBlockRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["performanceId","seatIds","reason","note"],"properties":{"performanceId":{"type":"string","format":"uuid"},"seatIds":{"type":"array","minItems":1,"items":{"type":"string"}},"reason":{"$ref":"#/components/schemas/BlockReason"},"note":{"type":"string","minLength":3,"maxLength":500},"releaseAt":{"type":"string","format":"date-time","description":"Automatic release, for production holds freed close to performance."}}},
+"CreateWorkOrderRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","title","venueId","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"title":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":5000},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid"},"locationDescription":{"type":"string","maxLength":500},"kind":{"allOf":[{"$ref":"#/components/schemas/WorkOrderKind"}],"default":"corrective"},"priority":{"allOf":[{"$ref":"#/components/schemas/WorkOrderPriority"}],"description":"**Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the fault.\n"},"faultAssessment":{"$ref":"#/components/schemas/WorkOrderFaultAssessment"},"requiredQualificationCodes":{"type":"array","maxItems":10,"items":{"type":"string"},"description":"Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13)."},"categoryId":{"type":"string","format":"uuid"},"assignedToPrincipalId":{"type":"string","format":"uuid"},"dueAt":{"type":"string","format":"date-time"},"attachmentRefs":{"type":"array","description":"Photo-first. Expected at creation, not added later from memory.","items":{"type":"string"}},"takeAssetOutOfService":{"type":"boolean","default":false,"description":"Raise and immediately suspend the asset. For a fault found on a live ride, the two are one action.\n"},"recordedAt":{"type":"string","format":"date-time"}}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"Point": {"type":"object","required":["x","y"],"properties":{"x":{"type":"number"},"y":{"type":"number"}}},
+"Seat": {"x-ticvai-persistence":"seating.seat","type":"object","required":["id","sectionCode","rowLabel","seatNumber","attribute"],"properties":{"id":{"type":"string","format":"uuid","description":"**Stable for the life of the seat.** Section, row and number are display labels that change on a refit; this does not. A ticket sold today must still resolve after a renumbering.\n"},"sectionCode":{"type":"string"},"rowLabel":{"type":"string"},"seatNumber":{"type":"string"},"displayLabel":{"type":"string","description":"What the guest sees, e.g. `A2-7-11`."},"position":{"allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true},"categoryId":{"type":"string","format":"uuid","nullable":true},"attribute":{"$ref":"#/components/schemas/SeatAttribute"},"companionSeatIds":{"type":"array","items":{"type":"string"},"description":"Present on accessible seats. Sold together, released together."},"isActive":{"type":"boolean"}}},
+"SeatAttribute": {"type":"string","description":"BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n","enum":["standard","accessible","companion","obstructedView","restrictedLegroom","premium","houseSeat","buffer","aisle","endOfRow","extraLegroom","powerOutlet","tableService","shaded","covered","nearExit","nearAccessibleWc","wheelchairTransfer","limitedRecline","sofa","beanbag"]},
+"SeatAvailability": {"x-ticvai-persistence":"none — computed from seat, hold and block","type":"object","required":["performanceId","seatMapId","renderMode","totals","seats"],"properties":{"performanceId":{"type":"string","format":"uuid"},"seatMapId":{"type":"string","format":"uuid"},"renderMode":{"type":"string","enum":["graphical","list"],"description":"The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"},"totals":{"type":"object","properties":{"total":{"type":"integer"},"available":{"type":"integer"},"held":{"type":"integer"},"sold":{"type":"integer"},"blocked":{"type":"integer"},"buffered":{"type":"integer"}}},"byCategory":{"type":"array","items":{"type":"object","properties":{"categoryId":{"type":"string","format":"uuid"},"available":{"type":"integer"},"sold":{"type":"integer"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"sections":{"type":"array","description":"The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise null and the client renders the view from `boundary` and the seat positions. In this response so WEB-007 and GST-049 need no second call.\n","items":{"type":"object","required":["code","name"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"viewAssetId":{"type":"string","format":"uuid","nullable":true,"description":"As `Section.viewAssetId`. Null means render the view from geometry."},"boundary":{"type":"array","nullable":true,"items":{"$ref":"#/components/schemas/Point"},"description":"As `Section.boundary`. Null when `renderMode` is `list`."}}}},"seats":{"type":"array","items":{"type":"object","required":["seatId","status"],"properties":{"seatId":{"type":"string"},"status":{"$ref":"#/components/schemas/SeatStatus"},"categoryId":{"type":"string","format":"uuid","nullable":true},"displayLabel":{"type":"string","description":"What the guest sees, e.g. `A2-7-11`, as on `Seat`."},"position":{"allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true,"description":"The seat's coordinates on the map, as on `Seat`. Present when `renderMode` is `graphical`; null when it is `list`."}}}}}},
+"SeatBlock": {"x-ticvai-persistence":"seating.seat_block","type":"object","required":["id","performanceId","seatIds","reason","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"performanceId":{"type":"string","format":"uuid"},"seatIds":{"type":"array","items":{"type":"string"}},"reason":{"$ref":"#/components/schemas/BlockReason"},"note":{"type":"string"},"createdByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"},"releaseAt":{"type":"string","format":"date-time","nullable":true},"releasedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"SeatCategory": {"x-ticvai-persistence":"seating.seat_category","type":"object","required":["id","code","name","venueId","rank"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"displayColour":{"type":"string","nullable":true},"rank":{"type":"integer","description":"Ordering for best-seat assignment. Lower is better."},"seatCount":{"type":"integer"},"priceBands":{"type":"array","description":"What a seat in this category costs, by band (decided 28 September, audit R275 (d), from the BO-1045 pack). Written by `createSeatCategory` and `updateSeatCategory`. A band may be narrowed to a sales channel or a customer segment and to a window; where several match a sale, the narrowest wins.\n","items":{"$ref":"#/components/schemas/SeatPriceBand"}}}},
+"SeatDiscrepancy": {"type":"object","description":"Board 4.8. **A seat sold twice and a seat sold to nobody are both invisible until somebody counts.**\n","properties":{"seatId":{"type":"string","format":"uuid"},"label":{"type":"string"},"mapState":{"type":"string"},"orderState":{"type":"string"},"orderIds":{"type":"array","items":{"type":"string","format":"uuid"}},"kind":{"type":"string","enum":["soldTwice","soldNotMarked","markedNotSold","heldAndSold","orphanedHold"]},"detectedAt":{"type":"string","format":"date-time"}}},
+"SeatHold": {"x-ticvai-persistence":"seating.seat_hold","type":"object","required":["id","performanceId","seatIds","status","createdAt","expiresAt"],"properties":{"id":{"type":"string"},"performanceId":{"type":"string","format":"uuid"},"seatIds":{"type":"array","items":{"type":"string"}},"bufferedSeatIds":{"type":"array","items":{"type":"string"},"description":"Neighbours implicitly held by a seating rule."},"status":{"type":"string","enum":["held","converted","released","expired"]},"totalPrice":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"heldByPrincipalId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"extensionCount":{"type":"integer"},"createdAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time"}}},
+"SeatHoldPool": {"type":"object","x-ticvai-persistence":"seating.hold_pool","description":"Board 6.3. **Utilisation decides next season's allocation.**","required":["holdTypeId","performanceId"],"properties":{"id":{"type":"string","format":"uuid"},"holdTypeId":{"type":"string","format":"uuid"},"performanceId":{"type":"string","format":"uuid"},"seatIds":{"type":"array","items":{"type":"string","format":"uuid"}},"seatCount":{"type":"integer","readOnly":true},"usedCount":{"type":"integer","readOnly":true},"releasedCount":{"type":"integer","readOnly":true},"holderName":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"releaseAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","partiallyReleased","released","expired"]},"createdBy":{"type":"string","format":"uuid"},"scopePath":{"type":"string"}}},
+"SeatInventory": {"type":"object","description":"Board 4. **One read, because a real-time map assembling four endpoints renders one state late.**\n","properties":{"performanceId":{"type":"string","format":"uuid"},"asOf":{"type":"string","format":"date-time"},"totals":{"type":"object","properties":{"capacity":{"type":"integer"},"available":{"type":"integer"},"held":{"type":"integer"},"reserved":{"type":"integer"},"sold":{"type":"integer"},"blocked":{"type":"integer"},"outOfService":{"type":"integer"}}},"seats":{"type":"array","items":{"type":"object","properties":{"seatId":{"type":"string","format":"uuid"},"label":{"type":"string"},"state":{"type":"string","enum":["available","held","reserved","sold","blocked","outOfService","killed"]},"holdPoolId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}}}}},
+"SeatPriceBand": {"x-ticvai-persistence":"seating.seat_price_band","type":"object","description":"One price band on a seat category (decided 28 September, audit R275 (d)). The currency is `amount.currency`, resolved from the region like every `Money` (ADR-0018), so the band carries no currency of its own.\n","required":["code","displayLabel","amount","effectiveFrom"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"seatCategoryId":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":64,"description":"Unique within the category."},"displayLabel":{"type":"string","maxLength":200},"displayColour":{"type":"string","nullable":true,"pattern":"^#[0-9A-Fa-f]{6}$"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"channel":{"nullable":true,"description":"Null means every channel.","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}]},"customerSegmentId":{"type":"string","format":"uuid","nullable":true,"description":"A `marketing-crm` customer segment; null means everyone."},"effectiveFrom":{"type":"string","format":"date-time"},"effectiveTo":{"type":"string","format":"date-time","nullable":true,"description":"Null means open-ended."}}},
+"SeatStatus": {"type":"string","enum":["available","held","sold","blocked","buffered","unavailable"]},
+"WorkOrder": {"x-ticvai-persistence":"maintenance.work_order","x-ticvai-retired-columns":["is_overdue"],"type":"object","required":["id","workOrderNumber","title","venueId","status","priority","kind","createdAt"],"properties":{"downtimeMinutes":{"type":"integer","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n**Maintained on write**: set when the asset returns to service, as the minutes from the `maintenance.asset_status_change` row that took it out carrying this work order's id to the asset's next change back to `inService`. Null while the asset is still out, and for a work order that never took it out.\n"},"rootCause":{"type":"string","nullable":true,"enum":["wearAndTear","operatorError","guestDamage","manufacturingDefect","environmental","softwareFault","powerFailure","deferredMaintenance","unknown"],"description":"**Structured, because free text cannot be counted.** *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault caused by work that was postponed is an argument for a budget.\n"},"rootCauseNote":{"type":"string","nullable":true},"escalatedAt":{"type":"string","format":"date-time","nullable":true},"escalationLevel":{"type":"integer","default":0,"description":"**Escalation is a clock, not a decision.** A work order on a ride nobody has accepted after twenty minutes escalates itself, because the alternative is somebody noticing.\n"},"id":{"type":"string","format":"uuid"},"workOrderNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"},"title":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true},"assetName":{"type":"string","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record reads as it was raised.\n"},"status":{"$ref":"#/components/schemas/WorkOrderStatus"},"priority":{"$ref":"#/components/schemas/WorkOrderPriority"},"priorityScore":{"type":"integer","minimum":0,"maximum":100,"nullable":true,"readOnly":true,"description":"The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."},"prioritySource":{"type":"string","enum":["scored","assetOverride","manual"],"readOnly":true,"description":"Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."},"faultAssessment":{"$ref":"#/components/schemas/WorkOrderFaultAssessment"},"requiredQualificationCodes":{"type":"array","items":{"type":"string"},"description":"Skills the job needs (M17-13)."},"kind":{"$ref":"#/components/schemas/WorkOrderKind"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"raisedByPrincipalId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"As raised in `CreateWorkOrderRequest.categoryId`, amendable by `updateWorkOrder`. The category is what `completeWorkOrder` reads to decide whether completion photographs are required.\n"},"locationDescription":{"type":"string","maxLength":500,"nullable":true,"description":"Where the fault is, as raised. Needed where there is no asset — a broken tile, a leak in a corridor.\n"},"elapsedMinutes":{"type":"integer","readOnly":true,"x-ticvai-derived":"onWrite","description":"Labour minutes accumulated up to the last pause or stop. **Maintained on write** by `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`; while `isTimerRunning` is true the interval since the last start is not yet included.\n"},"isTimerRunning":{"type":"boolean","readOnly":true,"x-ticvai-derived":"onWrite","description":"Maintained on write by `startWorkOrder`, `resumeWorkOrder`, `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`.\n"},"dueAt":{"type":"string","format":"date-time","nullable":true},"isOverdue":{"type":"boolean","readOnly":true,"x-ticvai-persisted":false,"x-ticvai-derived":"onRead","description":"`dueAt` is in the past and the status is still `open`, `assigned`, `inProgress`, `paused` or `awaitingParts`. **Computed on read and not stored** — it depends on the clock. `listWorkOrders?overdueOnly` applies the same test to `due_at`.\n"},"requiresVerification":{"type":"boolean"},"sourcePlanId":{"type":"string","format":"uuid","nullable":true},"sourceInspectionId":{"type":"string","format":"uuid","nullable":true},"sourceIncidentId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"WorkOrderFaultAssessment": {"x-ticvai-persistence":"none — columns on maintenance.work_order","type":"object","description":"What the person raising a fault says about it, which the priority score reads (M17-01).","properties":{"safetyRisk":{"type":"boolean","default":false},"guestImpact":{"type":"string","enum":["none","degraded","closed"],"default":"none"}}},
+"WorkOrderKind": {"type":"string","enum":["corrective","planned","inspectionFollowUp","incidentCorrective","improvement"]},
+"WorkOrderPriority": {"type":"string","enum":["low","normal","high","urgent","emergency"]},
+"WorkOrderStatus": {"type":"string","enum":["open","assigned","inProgress","paused","awaitingParts","completed","verified","closed","cancelled"]}
 }
 ```

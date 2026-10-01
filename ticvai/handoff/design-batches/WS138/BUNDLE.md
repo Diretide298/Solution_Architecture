@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -55,21 +56,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `BO-764` | Campaign Command Center | listDetail | 2 | 0 | — |
-| `BO-765` | Campaign Library & Calendar | listDetail | 1 | 0 | — |
-| `BO-766` | Campaign Builder | listDetail | 3 | 0 | — |
-| `BO-767` | Audience & Offer Selection | listDetail | 2 | 0 | — |
-| `BO-768` | Multichannel Composer | listDetail | 2 | 0 | — |
-| `BO-769` | Schedule & Trigger Rules | listDetail | 2 | 0 | — |
-| `BO-770` | Campaign Approval Workflow | listDetail | 1 | 0 | — |
-| `BO-771` | Budget, Goals & Forecast | listDetail | 2 | 0 | — |
-| `BO-772` | A/B & AI Optimization | listDetail | 6 | 0 | — |
-| `BO-773` | Attribution & Audit | listDetail | 2 | 0 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `BO-764` | Campaign Command Center | B–D | 0 | 0 | 6 | 2 | 1 | 6 | — | notStarted (—) |
+| `BO-765` | Campaign Library & Calendar | B–D | 0 | 7 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-766` | Campaign Builder | A | 0 | 0 | 6 | 7 | 0 | 6 | — | notStarted (—) |
+| `BO-767` | Audience & Offer Selection | B–D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-768` | Multichannel Composer | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-769` | Schedule & Trigger Rules | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-770` | Campaign Approval Workflow | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-771` | Budget, Goals & Forecast | B–D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-772` | A/B & AI Optimization | B–D | 0 | 0 | 6 | 26 | 0 | 0 | — | notStarted (—) |
+| `BO-773` | Attribution & Audit | B–D | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -77,3680 +84,1248 @@ convincingly. It is never a caption.
 
 ---
 
-## `screens.json`
+## Screen by screen
 
-Every field of every screen in this batch. **`machine` is what a screen is in the middle of**, `overlays` is what opens over it and what closing it does, and `navigation.transitions` is how you leave, with `carries` naming the state that travels.
+**One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-```json
-[
- {
-  "id": "BO-764",
-  "name": "Campaign Command Center",
-  "module": "Engagement & Support",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
-   "board": "4",
-   "number": "01",
-   "page": 21
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/engagement-support/campaign-command-center-bo-764",
-   "component": "apps/venue-management-web/src/routes/engagement-support/CampaignCommandCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-100"
-   ],
-   "exitTo": [
-    "BO-100",
-    "BO-765",
-    "BO-766",
-    "BO-767",
-    "BO-768",
-    "BO-769",
-    "BO-770",
-    "BO-771",
-    "BO-772",
-    "BO-773"
-   ],
-   "transitions": [
-    {
-     "to": "BO-100",
-     "trigger": "Back to Venue Home",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    },
-    {
-     "to": "BO-765",
-     "trigger": "Campaign Library & Calendar",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
-    },
-    {
-     "to": "BO-766",
-     "trigger": "Campaign Builder",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
-    },
-    {
-     "to": "BO-767",
-     "trigger": "Audience & Offer Selection",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "carries": [
-      "campaignId"
-     ]
-    },
-    {
-     "to": "BO-768",
-     "trigger": "Multichannel Composer",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "carries": [
-      "campaignId"
-     ]
-    },
-    {
-     "to": "BO-769",
-     "trigger": "Schedule & Trigger Rules",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "carries": [
-      "campaignId"
-     ]
-    },
-    {
-     "to": "BO-770",
-     "trigger": "Campaign Approval Workflow",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
-    },
-    {
-     "to": "BO-771",
-     "trigger": "Budget, Goals & Forecast",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "carries": [
-      "campaignId"
-     ]
-    },
-    {
-     "to": "BO-772",
-     "trigger": "A/B & AI Optimization",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "carries": [
-      "campaignId"
-     ]
-    },
-    {
-     "to": "BO-773",
-     "trigger": "Attribution & Audit",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "carries": [
-      "campaignId"
-     ]
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide a real-time overview of campaign operations and commercial performance. Show active, scheduled, paused and completed campaigns with sends, reach, conversions, revenue, ROI and budget pacing. Compare email, SMS, WhatsApp, push, in-app, web and external-channel delivery and conversion. Display upcoming launches, approval bottlenecks, errors, capacity risks and underperforming campaigns. Provide explainable AI recommendations and drill-down to campaign, audience, channel and transaction detail. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 21"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 21"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCampaigns",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The campaign list.",
-   "error": "Could not load. Names which read failed and leaves the campaign untouched.",
-   "emptyFirstRun": "No campaign yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the campaign are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCampaigns",
-    "contract": "marketing-crm",
-    "purpose": "List campaigns",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listMarketingRecommendations",
-    "contract": "ai",
-    "purpose": "AI recommendations on this campaign or journey, with expected impact and evidence",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-764",
-   "workshopBoard": "wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-764"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 21. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-765",
-  "name": "Campaign Library & Calendar",
-  "module": "Engagement & Support",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
-   "board": "4",
-   "number": "02",
-   "page": 21
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/engagement-support/campaign-library-calendar-bo-765",
-   "component": "apps/venue-management-web/src/routes/engagement-support/CampaignLibraryCalendar.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-764"
-   ],
-   "exitTo": [
-    "BO-764"
-   ],
-   "transitions": [
-    {
-     "to": "BO-764",
-     "trigger": "Back to Campaign Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Organize campaigns, templates and execution schedules. Provide table, card and calendar views filtered by owner, brand, venue, region, objective, channel and status. Support reusable templates for ticketing, events, membership, loyalty, wallet, seasonal, retention and abandoned-cart campaigns. Allow clone, archive, compare, tag and controlled bulk actions while preserving lineage and versions. Show schedule conflicts, blackout periods, audience fatigue and related journey activity. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 21"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 21"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "calendarView",
-       "label": "Calendar",
-       "operation": "listCampaignCalendarTimeline",
-       "notes": "Campaigns placed across their run dates. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.",
-       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCampaignCalendarTimeline",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The campaign calendar list.",
-   "error": "Could not load. Names which read failed and leaves the campaign calendar untouched.",
-   "emptyFirstRun": "No campaign calendar yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the campaign calendar are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCampaignCalendarTimeline",
-    "contract": "promotions",
-    "purpose": "Campaign Calendar & Timeline",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-765",
-   "workshopBoard": "wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-765"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 21. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-766",
-  "name": "Campaign Builder",
-  "module": "Engagement & Support",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
-   "board": "4",
-   "number": "03",
-   "page": 21
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/engagement-support/campaign-builder-bo-766",
-   "component": "apps/venue-management-web/src/routes/engagement-support/CampaignBuilder.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-764"
-   ],
-   "exitTo": [
-    "BO-764"
-   ],
-   "transitions": [
-    {
-     "to": "BO-764",
-     "trigger": "Back to Campaign Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Guide authorized users through complete campaign creation. Capture campaign name, objective, brand, venue, owner, products, commercial goal and measurement model. Configuration Scope of Work | Version 1.0 21 Support ticket, event, membership, loyalty, wallet, seasonal, retention, capacity and last-minute sales use cases. Provide a staged flow for objective, audience, offer, channels, schedule, review and activation. Validate required data, consent, inventory, offer, budget, channel and approval conditions before submission. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Campaign Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 21"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 21"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCampaigns",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createInvitationCampaign",
-       "label": "Create invitation campaign",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createInvitationCampaign"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The campaign list.",
-   "error": "Could not load. Names which read failed and leaves the campaign untouched.",
-   "emptyFirstRun": "No campaign yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the campaign are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCampaigns",
-    "contract": "marketing-crm",
-    "purpose": "The library and calendar",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "createInvitationCampaign",
-    "contract": "marketing-crm",
-    "purpose": "Create a quota-bounded, addressed invitation campaign",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listCampaigns"
-    ]
-   },
-   {
-    "operationId": "proposeMarketingContent",
-    "contract": "ai",
-    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-766",
-   "workshopBoard": "wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-766"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 21. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-767",
-  "name": "Audience & Offer Selection",
-  "module": "Engagement & Support",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
-   "board": "4",
-   "number": "04",
-   "page": 22
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/engagement-support/audience-offer-selection-bo-767",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AudienceOfferSelection.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-764"
-   ],
-   "exitTo": [
-    "BO-764"
-   ],
-   "transitions": [
-    {
-     "to": "BO-764",
-     "trigger": "Back to Campaign Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Connect governed audiences with eligible commercial offers. Select one or more segments, exclusions and suppression lists and show reachable, consent-eligible count by channel. Configure discounts, vouchers, promo codes, bundles, loyalty rewards, wallet bonuses and membership benefits through the Promotion Engine. Validate eligibility, stackability, redemption limits, dates, capacity, ticket inventory and product availability. Estimate exposure, cost, revenue and margin before proceeding. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 22"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 22"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createCampaign",
-       "label": "Create campaign",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createCampaign"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The audience offer selection list.",
-   "error": "Could not load. Names which read failed and leaves the audience offer selection untouched.",
-   "emptyFirstRun": "No audience offer selection yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the audience offer selection are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "createCampaign",
-    "contract": "marketing-crm",
-    "purpose": "Build a campaign",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "updateCampaign",
-    "contract": "marketing-crm",
-    "purpose": "Change it",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-767",
-   "workshopBoard": "wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-767"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 22. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "campaignId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-768",
-  "name": "Multichannel Composer",
-  "module": "Engagement & Support",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
-   "board": "4",
-   "number": "05",
-   "page": 22
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/engagement-support/multichannel-composer-bo-768",
-   "component": "apps/venue-management-web/src/routes/engagement-support/MultichannelComposer.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-764"
-   ],
-   "exitTo": [
-    "BO-764"
-   ],
-   "transitions": [
-    {
-     "to": "BO-764",
-     "trigger": "Back to Campaign Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Create personalized content for every selected communication channel. Provide channel-specific email, SMS, WhatsApp, push, in-app and website-banner editors and previews. Insert approved personalization tokens, products, events, tickets, QR codes, vouchers, payment links and media assets. Support brand and language variants, accessibility checks, link validation and character/channel constraints. Maintain common campaign intent while allowing controlled channel variations and version history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Multichannel Composer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 22"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 22"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSegments",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateCampaign",
-       "label": "Save campaign",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateCampaign"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The multichannel composer list.",
-   "error": "Could not load. Names which read failed and leaves the multichannel composer untouched.",
-   "emptyFirstRun": "No multichannel composer yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the multichannel composer are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listSegments",
-    "contract": "marketing-crm",
-    "purpose": "Choose an audience",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "updateCampaign",
-    "contract": "marketing-crm",
-    "purpose": "Attach it",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-768",
-   "workshopBoard": "wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-768"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 22. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "campaignId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-769",
-  "name": "Schedule & Trigger Rules",
-  "module": "Engagement & Support",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
-   "board": "4",
-   "number": "06",
-   "page": 22
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/engagement-support/schedule-trigger-rules-bo-769",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ScheduleTriggerRules.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-764"
-   ],
-   "exitTo": [
-    "BO-764"
-   ],
-   "transitions": [
-    {
-     "to": "BO-764",
-     "trigger": "Back to Campaign Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure when and under what conditions a campaign executes. Support immediate, scheduled, recurring, event-triggered and API/webhook execution. Configure timezone, send windows, blackout dates, frequency caps, re-entry, expiry and audience refresh timing. Map events such as purchase, expiry, birthday, milestone, top-up, first visit and abandoned cart. Provide schedule summary, conflict detection and pre-flight audience/inventory revalidation. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 22",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 22"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 22"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMessageTemplates",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateCampaign",
-       "label": "Save campaign",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateCampaign"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The schedule trigger rules list.",
-   "error": "Could not load. Names which read failed and leaves the schedule trigger rules untouched.",
-   "emptyFirstRun": "No schedule trigger rules yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the schedule trigger rules are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listMessageTemplates",
-    "contract": "marketing-crm",
-    "purpose": "Compose across channels",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "updateCampaign",
-    "contract": "marketing-crm",
-    "purpose": "Save the content",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-769",
-   "workshopBoard": "wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-769"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 22. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "campaignId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-770",
-  "name": "Campaign Approval Workflow",
-  "module": "Engagement & Support",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
-   "board": "4",
-   "number": "07",
-   "page": 23
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/engagement-support/campaign-approval-workflow-bo-770",
-   "component": "apps/venue-management-web/src/routes/engagement-support/CampaignApprovalWorkflow.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-764"
-   ],
-   "exitTo": [
-    "BO-764"
-   ],
-   "transitions": [
-    {
-     "to": "BO-764",
-     "trigger": "Back to Campaign Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Enforce configurable review and publishing governance. Support creator, reviewer, approver and publisher stages with role, department, threshold and business-unit rules. Route content, offer, budget, legal, brand and data-privacy approvals independently where required. Capture comments, requested changes, resubmission, delegation, escalation and segregation-of- duties checks. Lock the approved version and audit every decision and subsequent change. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 23"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 23"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "approveCampaignWorkflow",
-       "label": "Approve campaign workflow",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "approveCampaignWorkflow"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The campaign approval workflow list.",
-   "error": "Could not load. Names which read failed and leaves the campaign approval workflow untouched.",
-   "emptyFirstRun": "No campaign approval workflow yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the campaign approval workflow are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "approveCampaignWorkflow",
-    "contract": "promotions",
-    "purpose": "Campaign Approval Workflow Designer",
-    "trigger": "onAction"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-770",
-   "workshopBoard": "wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-770"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-771",
-  "name": "Budget, Goals & Forecast",
-  "module": "Engagement & Support",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
-   "board": "4",
-   "number": "08",
-   "page": 23
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/engagement-support/budget-goals-forecast-bo-771",
-   "component": "apps/venue-management-web/src/routes/engagement-support/BudgetGoalsForecast.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-764"
-   ],
-   "exitTo": [
-    "BO-764"
-   ],
-   "transitions": [
-    {
-     "to": "BO-764",
-     "trigger": "Back to Campaign Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Plan campaign investment and expected commercial results. Capture total and channel budgets, expected revenue, conversion, CPA, margin, break-even and strategic goals. Estimate provider cost, offer cost, reward liability and capacity implications by channel and audience. Compare forecast, actual and committed spend and flag variance or overspend risk. Support approval thresholds, finance integration and controlled adjustment with reason and audit. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 23"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 23"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createApprovalRequest",
-       "label": "Create approval request",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getCampaign",
-       "notes": "One record, read-only."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createApprovalRequest"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The budget goals forecast list.",
-   "error": "Could not load. Names which read failed and leaves the budget goals forecast untouched.",
-   "emptyFirstRun": "No budget goals forecast yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the budget goals forecast are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "createApprovalRequest",
-    "contract": "approvals",
-    "purpose": "Send for approval",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "getCampaign",
-    "contract": "marketing-crm",
-    "purpose": "What is being approved",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-771",
-   "workshopBoard": "wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-771"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "campaignId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-772",
-  "name": "A/B & AI Optimization",
-  "module": "Engagement & Support",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
-   "board": "4",
-   "number": "09",
-   "page": 23
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/engagement-support/a-b-ai-optimization-bo-772",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ABAiOptimization.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-764"
-   ],
-   "exitTo": [
-    "BO-764"
-   ],
-   "transitions": [
-    {
-     "to": "BO-764",
-     "trigger": "Back to Campaign Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Test campaign alternatives and apply AI recommendations safely. Configure A/B or multivariate variants for subject, content, creative, offer, channel and send time. Define audience split, sample size, duration, success metric, statistical confidence and winner rule. Show AI recommendations, expected uplift, confidence, factors and constraints and require human approval. Prevent conflicting tests and preserve assignments, results, model/version and decisions for audit. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 23"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 23"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getCampaignPerformance",
-       "notes": "One record, read-only."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "proposeMarketingContent",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMarketingRecommendations",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "proposeMarketingContent"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The optimization list.",
-   "error": "Could not load. Names which read failed and leaves the optimization untouched.",
-   "emptyFirstRun": "No optimization yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the optimization are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getCampaignPerformance",
-    "contract": "marketing-crm",
-    "purpose": "Budget, goals and pacing",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "proposeMarketingContent",
-    "contract": "ai",
-    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listMarketingRecommendations",
-    "contract": "ai",
-    "purpose": "AI recommendations on this campaign or journey, with expected impact and evidence",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "decideAiInsight",
-    "contract": "ai",
-    "purpose": "Accept, reject or mark a campaign or journey recommendation actioned",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "requestSuggestion",
-    "contract": "ai",
-    "purpose": "Send-time suggestion (kind sendTime): best hour and channel per recipient",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "updateCampaign",
-    "contract": "marketing-crm",
-    "purpose": "Set up A/B variants and the test, and pick a winner by hand (winnerRule manual)",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-772",
-   "workshopBoard": "wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-772"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "campaignId",
-     "from": "navigation"
-    },
-    {
-     "name": "insightId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-773",
-  "name": "Attribution & Audit",
-  "module": "Engagement & Support",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
-   "board": "4",
-   "number": "10",
-   "page": 23
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/engagement-support/attribution-audit-bo-773",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AttributionAudit.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-764"
-   ],
-   "exitTo": [
-    "BO-764"
-   ],
-   "transitions": [
-    {
-     "to": "BO-764",
-     "trigger": "Back to Campaign Command Center",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Measure influenced outcomes and preserve a complete campaign record. Provide first, last, linear, position-based and configurable multi-touch attribution across channels. Attribute ticket, membership, loyalty, wallet, reservation and other revenue using defined windows and identity rules. Display delivery funnel, conversion, revenue, ROI, profitability, channel contribution and unattributed outcomes. Record creation, edits, approvals, execution, pauses, variants, results, exports and user/AI actions. Configuration Scope of Work | Version 1.0 23 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 24 Board 5 - Marketing Automation & Customer Journeys Figure 5. High-definition configuration board with all 10 screens. Configuration Scope of Work | Version 1.0 25",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 23"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 23"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getCampaignPerformance",
-       "notes": "One record, read-only."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "recordTouchPoint",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "recordTouchPoint"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The attribution audit list.",
-   "error": "Could not load. Names which read failed and leaves the attribution audit untouched.",
-   "emptyFirstRun": "No attribution audit yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the attribution audit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getCampaignPerformance",
-    "contract": "marketing-crm",
-    "purpose": "Attribution",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "recordTouchPoint",
-    "contract": "marketing-crm",
-    "purpose": "Record an offline marketing touch for attribution",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "getCampaignPerformance"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-773",
-   "workshopBoard": "wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-773"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "campaignId",
-     "from": "navigation"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- }
-]
-```
+### `BO-764` Campaign Command Center
 
-## `operations.json`
+**Provide a real-time overview of campaign operations and commercial performance. Show active, scheduled, paused and completed campaigns with sends, reach, conversions, revenue, ROI and budget pacing. Compare email, SMS, WhatsApp, push, in-app, web and external-channel delivery and conversion. Display upcoming launches, approval bottlenecks, errors, capacity risks and underperforming campaigns. Provide explainable AI recommendations and drill-down to campaign, audience, channel and transaction detail. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Engagement & Support · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `AI_USE`, `MARKETING_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/engagement-support/campaign-command-center-bo-764` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | select | — | Draft · Scheduled · Sending · Paused · Completed · Stopped · Failed | `listCampaigns` ?status |
+| Target kind | segmented control | — | Campaign · Journey | `listMarketingRecommendations` ?targetKind |
+| Target ref | text field | — | — | `listMarketingRecommendations` ?targetRef |
+| Status | select | — | New · Reviewed · Accepted · Rejected · Actioned · Measured | `listMarketingRecommendations` ?status |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Data it reads**: `listCampaigns` (onLoad, List campaigns); `listMarketingRecommendations` (onLoad, AI recommendations on this campaign or journey, with …)
+
+**Where the user goes next**
+
+- → `BO-100` Venue Home: *Back to Venue Home*
+- → `BO-765` Campaign Library & Calendar: *Campaign Library & Calendar*
+- → `BO-766` Campaign Builder: *Campaign Builder*
+- → `BO-767` Audience & Offer Selection: *Audience & Offer Selection*; carries `campaignId`
+- → `BO-768` Multichannel Composer: *Multichannel Composer*; carries `campaignId`
+- → `BO-769` Schedule & Trigger Rules: *Schedule & Trigger Rules*; carries `campaignId`
+- → `BO-770` Campaign Approval Workflow: *Campaign Approval Workflow*
+- → `BO-771` Budget, Goals & Forecast: *Budget, Goals & Forecast*; carries `campaignId`
+- → `BO-772` A/B & AI Optimization: *A/B & AI Optimization*; carries `campaignId`
+- → `BO-773` Attribution & Audit: *Attribution & Audit*; carries `campaignId`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The campaign list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the campaign untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No campaign yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the campaign are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listCampaigns` → `MARKETING_VIEW` (read) · staff
+- `listMarketingRecommendations` → `AI_USE` (operate) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 22.1.16 | AI Campaign Recommendations | Marketing & CRM | CONTRACTED | `listMarketingRecommendations` |
+| 22.3.17 | AI Journey Recommendations | Marketing & CRM | CONTRACTED | `listMarketingRecommendations` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Campaign tracking shows click-through, conversion and revenue attribution per campaign, with configurable success criteria (e.g. 80% conversion target). *(client request · MoM 20 Aug 2026, 4.6 Marketing Automation — Campaigns, Offers & Visual Journey Builder · DI-383)*
+
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A92** Build audience segmentation (rule-based dynamic segments, CSV/Excel list import, Google Analytics behavioural tracking into native reporting) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 20 Aug 2026 · workshop tracker · keyword 'segmentation')*
+- **A93** Hold the data-migration workshop and define customer/segment import formats and validation rules *(Allam / Chinmay Parab · High · Not started → 30 Sep: Closed, Rolled into S14 (weekly tracker) · 20 Aug 2026 · workshop tracker · keyword 'segment')*
+- **A95** Design marketing automation (campaign attribution with success criteria, Offers module, Visual Journey Builder referencing pre-configured offers only) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 20 Aug 2026 · workshop tracker · keyword 'campaign')*
+- **A139** Build donation campaigns (fixed or variable, per channel, per product or global, separate account code) and confirm VAT treatment *(Chinmay Parab · Medium · With client → 30 Sep: Closed, Moved to T2 (TICVAI to act) · 25 Aug 2026 · workshop tracker · keyword 'campaign')*
+- **A195** Build the pricing foundation (price lists per channel/segment/category, price categories and rate types, rate structure, product association, bundle pricing, multi-market and multi-currency pricing, list cloning … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 1 Sep 2026 · workshop tracker · keyword 'segment')*
+- **A196** Build the pricing rules layer (segment, membership, residency/market, channel, venue/event, tiered volume bands, time-slot pricing) with a conflict-surfacing overview *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 1 Sep 2026 · workshop tracker · keyword 'segment')*
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-764` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-764`
+- Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 4
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 1: Opens Campaign Command Center → Provide a real-time overview of campaign operations and commercial performance. Show active, scheduled, paused and completed campaigns with sends, reach, conversions, revenue, ROI and budget pacing. …
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 3: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 5: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 7: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 9: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 11: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 13: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 15: Returns to the board's landing screen → Ready for the next screen on this board
+- … and 1 more flow steps (`flows/`)
+- Flow F247 branch at step 1 (expected): when Nothing has been set up on Campaign Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
+- Flow F247 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-764?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `BO-100`, `BO-765`, `BO-766`, `BO-767`, `BO-768`, `BO-769`, `BO-770`, `BO-771`, `BO-772`, `BO-773`.
+- [ ] Every gated control is gated: `AI_USE`, `MARKETING_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-765` Campaign Library & Calendar
+
+**Organize campaigns, templates and execution schedules. Provide table, card and calendar views filtered by owner, brand, venue, region, objective, channel and status. Support reusable templates for ticketing, events, membership, loyalty, wallet, seasonal, retention and abandoned-cart campaigns. Allow clone, archive, compare, tag and controlled bulk actions while preserving lineage and versions. Show schedule conflicts, blackout periods, audience fatigue and related journey activity. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Engagement & Support · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/engagement-support/campaign-library-calendar-bo-765` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Venue | text field | — | — | `listCampaignCalendarTimeline` ?venue |
+| Product | text field | — | — | `listCampaignCalendarTimeline` ?product |
+| Attraction | text field | — | — | `listCampaignCalendarTimeline` ?attraction |
+| Channel | text field | — | — | `listCampaignCalendarTimeline` ?channel |
+| Campaign | text field | — | — | `listCampaignCalendarTimeline` ?campaign |
+| Promotion family | text field | — | — | `listCampaignCalendarTimeline` ?promotionFamily |
+| View | radio group | — | Day · Week · Month · Quarter · Campaign timeline | `listCampaignCalendarTimeline` ?view |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Calendar** (calendar view, from `listCampaignCalendarTimeline`): Campaigns placed across their run dates. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Calendar state | chip: Active, Upcoming, Ending soon, Expired, Pending approval, Conflicting… | How the calendar marks this promotion. |
+| Promotion | text | Promotion ID |
+| Promotion name | text | Promotion Name |
+| Start date | 1 Oct 2026, 14:30 | Start Date |
+| End date | 1 Oct 2026, 14:30 | End Date |
+| Venue | text | Venue |
+| Channel | text | Channel |
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Data it reads**: `listCampaignCalendarTimeline` (onLoad, Campaign Calendar & Timeline)
+
+**Where the user goes next**
+
+- → `BO-764` Campaign Command Center: *Back to Campaign Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The campaign calendar list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the campaign calendar untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No campaign calendar yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the campaign calendar are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listCampaignCalendarTimeline` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Every calendar has day, week and month (and agenda) views, and the day view is broken into hours from the venue's day start hour (calendarDayStartHour). *(agreed · MoM 17 Sep 2026, M17-03 · DI-919)*
+
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A92** Build audience segmentation (rule-based dynamic segments, CSV/Excel list import, Google Analytics behavioural tracking into native reporting) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 20 Aug 2026 · workshop tracker · keyword 'segmentation')*
+- **A93** Hold the data-migration workshop and define customer/segment import formats and validation rules *(Allam / Chinmay Parab · High · Not started → 30 Sep: Closed, Rolled into S14 (weekly tracker) · 20 Aug 2026 · workshop tracker · keyword 'segment')*
+- **A95** Design marketing automation (campaign attribution with success criteria, Offers module, Visual Journey Builder referencing pre-configured offers only) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 20 Aug 2026 · workshop tracker · keyword 'campaign')*
+- **A139** Build donation campaigns (fixed or variable, per channel, per product or global, separate account code) and confirm VAT treatment *(Chinmay Parab · Medium · With client → 30 Sep: Closed, Moved to T2 (TICVAI to act) · 25 Aug 2026 · workshop tracker · keyword 'campaign')*
+- **A195** Build the pricing foundation (price lists per channel/segment/category, price categories and rate types, rate structure, product association, bundle pricing, multi-market and multi-currency pricing, list cloning … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 1 Sep 2026 · workshop tracker · keyword 'segment')*
+- **A196** Build the pricing rules layer (segment, membership, residency/market, channel, venue/event, tiered volume bands, time-slot pricing) with a conflict-surfacing overview *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 1 Sep 2026 · workshop tracker · keyword 'segment')*
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-765` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-765`
+- Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 4
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 2: Works in Campaign Library & Calendar → Organize campaigns, templates and execution schedules. Provide table, card and calendar views filtered by owner, brand, venue, region, objective, channel and status. Support reusable templates for …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-765?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `BO-764`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-766` Campaign Builder
+
+**Guide authorized users through complete campaign creation. Capture campaign name, objective, brand, venue, owner, products, commercial goal and measurement model. Configuration Scope of Work / Version 1.0 21 Support ticket, event, membership, loyalty, wallet, seasonal, retention, capacity and last-minute sales use cases. Provide a staged flow for objective, audience, offer, channels, schedule, review and activation. Validate required data, consent, inventory, offer, budget, channel and approval conditions before submission. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Engagement & Support · wave 3 · needs the `marketing` module |
+| Block | Block A · ticket #20766 (APP-SETUP-BO-766) |
+| Who uses it | venue staff holding `AI_USE`, `MARKETING_MANAGE`, `MARKETING_VIEW` (1 operate, 1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/engagement-support/campaign-builder-bo-766` |
+
+**Known gaps.** **Campaign Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | select | — | Draft · Scheduled · Sending · Paused · Completed · Stopped · Failed | `listCampaigns` ?status |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Create invitation campaign (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listCampaigns` (onLoad, The library and calendar)
+
+**Where the user goes next**
+
+- → `BO-764` Campaign Command Center: *Back to Campaign Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The campaign list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the campaign untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No campaign yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the campaign are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and … |
+
+#### Permissions
+
+- `listCampaigns` → `MARKETING_VIEW` (read) · staff
+- `createInvitationCampaign` → `MARKETING_MANAGE` (configure) · staff
+- `proposeMarketingContent` → `AI_USE` (operate) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 22.3.18 | AI Content Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| 22.4.9 | AI Content Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| 22.4.10 | AI Subject Line Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| 22.9.17 | AI Language Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| 22.10.14 | AI Content Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| 22.10.16 | AI Website Builder | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| 22.10.17 | AI Mobile App Content Builder | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A92** Build audience segmentation (rule-based dynamic segments, CSV/Excel list import, Google Analytics behavioural tracking into native reporting) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 20 Aug 2026 · workshop tracker · keyword 'segmentation')*
+- **A93** Hold the data-migration workshop and define customer/segment import formats and validation rules *(Allam / Chinmay Parab · High · Not started → 30 Sep: Closed, Rolled into S14 (weekly tracker) · 20 Aug 2026 · workshop tracker · keyword 'segment')*
+- **A95** Design marketing automation (campaign attribution with success criteria, Offers module, Visual Journey Builder referencing pre-configured offers only) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 20 Aug 2026 · workshop tracker · keyword 'campaign')*
+- **A139** Build donation campaigns (fixed or variable, per channel, per product or global, separate account code) and confirm VAT treatment *(Chinmay Parab · Medium · With client → 30 Sep: Closed, Moved to T2 (TICVAI to act) · 25 Aug 2026 · workshop tracker · keyword 'campaign')*
+- **A195** Build the pricing foundation (price lists per channel/segment/category, price categories and rate types, rate structure, product association, bundle pricing, multi-market and multi-currency pricing, list cloning … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 1 Sep 2026 · workshop tracker · keyword 'segment')*
+- **A196** Build the pricing rules layer (segment, membership, residency/market, channel, venue/event, tiered volume bands, time-slot pricing) with a conflict-surfacing overview *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 1 Sep 2026 · workshop tracker · keyword 'segment')*
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-766` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-766`
+- Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 4
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 4: Works in Campaign Builder → Guide authorized users through complete campaign creation. Capture campaign name, objective, brand, venue, owner, products, commercial goal and measurement model. Configuration Scope of Work / …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-766?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Create invitation campaign, Cancel.
+- [ ] Every transition is wired: `BO-764`.
+- [ ] Every gated control is gated: `AI_USE`, `MARKETING_MANAGE`, `MARKETING_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-767` Audience & Offer Selection
+
+**Connect governed audiences with eligible commercial offers. Select one or more segments, exclusions and suppression lists and show reachable, consent-eligible count by channel. Configure discounts, vouchers, promo codes, bundles, loyalty rewards, wallet bonuses and membership benefits through the Promotion Engine. Validate eligibility, stackability, redemption limits, dates, capacity, ticket inventory and product availability. Estimate exposure, cost, revenue and margin before proceeding. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Engagement & Support · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `MARKETING_MANAGE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `campaignId` (navigation) |
+| Route | `/engagement-support/audience-offer-selection-bo-767` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Create campaign (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `BO-764` Campaign Command Center: *Back to Campaign Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The audience offer selection list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the audience offer selection untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No audience offer selection yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the audience offer selection are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 `content` amended on a campaign that is no longer in `draft` (`statusDoesNotPermit`). (CampaignStateProblem) |
+
+#### Permissions
+
+- `createCampaign` → `MARKETING_MANAGE` (configure) · staff
+- `updateCampaign` → `MARKETING_MANAGE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 22.1.1 | Campaign Creation | Marketing & CRM | CONTRACTED | `createCampaign` |
+| 22.1.4 | Campaign Scheduling | Marketing & CRM | CONTRACTED | `createCampaign` |
+| 22.1.12 | Ticketing Campaigns | Marketing & CRM | CONTRACTED | `createCampaign` |
+| 22.1.13 | Membership Campaigns | Marketing & CRM | CONTRACTED | `createCampaign` |
+| 22.1.14 | Loyalty Campaigns | Marketing & CRM | CONTRACTED | `createCampaign` |
+| 22.4.8 | Product & Event Integration | Marketing & CRM | CONTRACTED | `createCampaign` |
+| 22.9.14 | Marketing Notifications | Marketing & CRM | CONTRACTED | `createCampaign` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Decision: offer blocks in the Visual Journey Builder pick only from pre-configured, system-validated offers (product/ticket-type scoped, from the Offers module: coupon code, dynamic discount or auto-discount URL); ad-hoc discount values cannot be typed in the builder. *(agreed · MoM 20 Aug 2026, 4.6 Marketing Automation; 5. Key Decisions · DI-385)*
+
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-767` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-767`
+- Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 4
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 6: Works in Audience & Offer Selection → Connect governed audiences with eligible commercial offers. Select one or more segments, exclusions and suppression lists and show reachable, consent-eligible count by channel. Configure discounts …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 409).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-767?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Create campaign, Cancel.
+- [ ] Every transition is wired: `BO-764`.
+- [ ] Every gated control is gated: `MARKETING_MANAGE`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-768` Multichannel Composer
+
+**Create personalized content for every selected communication channel. Provide channel-specific email, SMS, WhatsApp, push, in-app and website-banner editors and previews. Insert approved personalization tokens, products, events, tickets, QR codes, vouchers, payment links and media assets. Support brand and language variants, accessibility checks, link validation and character/channel constraints. Maintain common campaign intent while allowing controlled channel variations and version history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Engagement & Support · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `campaignId` (navigation) |
+| Route | `/engagement-support/multichannel-composer-bo-768` |
+
+**Known gaps.** **Multichannel Composer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Search | text field | — | max length 200 | `listSegments` ?search |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save campaign (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listSegments` (onLoad, Choose an audience)
+
+**Where the user goes next**
+
+- → `BO-764` Campaign Command Center: *Back to Campaign Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The multichannel composer list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the multichannel composer untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No multichannel composer yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the multichannel composer are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 `content` amended on a campaign that is no longer in `draft` (`statusDoesNotPermit`). (CampaignStateProblem) |
+
+#### Permissions
+
+- `listSegments` → `MARKETING_VIEW` (read) · staff
+- `updateCampaign` → `MARKETING_MANAGE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 22.14.25 | Segmentation & Attribution Audit Trail | Marketing & CRM | CONTRACTED | `listSegments` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-768` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-768`
+- Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 4
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 8: Works in Multichannel Composer → Create personalized content for every selected communication channel. Provide channel-specific email, SMS, WhatsApp, push, in-app and website-banner editors and previews. Insert approved …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-768?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save campaign, Cancel.
+- [ ] Every transition is wired: `BO-764`.
+- [ ] Every gated control is gated: `MARKETING_MANAGE`, `MARKETING_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-769` Schedule & Trigger Rules
+
+**Configure when and under what conditions a campaign executes. Support immediate, scheduled, recurring, event-triggered and API/webhook execution. Configure timezone, send windows, blackout dates, frequency caps, re-entry, expiry and audience refresh timing. Map events such as purchase, expiry, birthday, milestone, top-up, first visit and abandoned cart. Provide schedule summary, conflict detection and pre-flight audience/inventory revalidation. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work / Version 1.0 22**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Engagement & Support · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `campaignId` (navigation) |
+| Route | `/engagement-support/schedule-trigger-rules-bo-769` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Channel | select | — | Email · SMS · Whatsapp · Push · In app · Post | `listMessageTemplates` ?channel |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save campaign (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listMessageTemplates` (onLoad, Compose across channels)
+
+**Where the user goes next**
+
+- → `BO-764` Campaign Command Center: *Back to Campaign Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The schedule trigger rules list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the schedule trigger rules untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No schedule trigger rules yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the schedule trigger rules are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 `content` amended on a campaign that is no longer in `draft` (`statusDoesNotPermit`). (CampaignStateProblem) |
+
+#### Permissions
+
+- `listMessageTemplates` → `MARKETING_VIEW` (read) · staff
+- `updateCampaign` → `MARKETING_MANAGE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.3 | The system should support email templates for e-ticket purchase confirmation supporting dynamic parameters. The email templates should be configurable per site, per event | Ticketing Sales | CONTRACTED | `listMessageTemplates` |
+| 2.6.26 | It is expected that confirmation email can be generated including the number of tickets, the cost, the order number. | Ticketing Sales | CONTRACTED | `listMessageTemplates` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-769` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-769`
+- Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 4
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 10: Works in Schedule & Trigger Rules → Configure when and under what conditions a campaign executes. Support immediate, scheduled, recurring, event-triggered and API/webhook execution. Configure timezone, send windows, blackout dates …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-769?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save campaign, Cancel.
+- [ ] Every transition is wired: `BO-764`.
+- [ ] Every gated control is gated: `MARKETING_MANAGE`, `MARKETING_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-770` Campaign Approval Workflow
+
+**Enforce configurable review and publishing governance. Support creator, reviewer, approver and publisher stages with role, department, threshold and business-unit rules. Route content, offer, budget, legal, brand and data-privacy approvals independently where required. Capture comments, requested changes, resubmission, delegation, escalation and segregation-of- duties checks. Lock the approved version and audit every decision and subsequent change. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Engagement & Support · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `PRICE_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/engagement-support/campaign-approval-workflow-bo-770` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Approve campaign workflow (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `BO-764` Campaign Command Center: *Back to Campaign Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The campaign approval workflow list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the campaign approval workflow untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No campaign approval workflow yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the campaign approval workflow are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `approveCampaignWorkflow` → `PRICE_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A72** Design a generic, configurable multi-stage approval-workflow engine (approve / reject / return / request-more-information, AI-generated summary, audit trail) applicable to procurement, pricing changes, product creation … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 18 Aug 2026 · workshop tracker · keyword 'multi-stage approval')*
+- **A92** Build audience segmentation (rule-based dynamic segments, CSV/Excel list import, Google Analytics behavioural tracking into native reporting) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 20 Aug 2026 · workshop tracker · keyword 'segmentation')*
+- **A93** Hold the data-migration workshop and define customer/segment import formats and validation rules *(Allam / Chinmay Parab · High · Not started → 30 Sep: Closed, Rolled into S14 (weekly tracker) · 20 Aug 2026 · workshop tracker · keyword 'segment')*
+- **A95** Design marketing automation (campaign attribution with success criteria, Offers module, Visual Journey Builder referencing pre-configured offers only) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 20 Aug 2026 · workshop tracker · keyword 'campaign')*
+- **A139** Build donation campaigns (fixed or variable, per channel, per product or global, separate account code) and confirm VAT treatment *(Chinmay Parab · Medium · With client → 30 Sep: Closed, Moved to T2 (TICVAI to act) · 25 Aug 2026 · workshop tracker · keyword 'campaign')*
+- **A195** Build the pricing foundation (price lists per channel/segment/category, price categories and rate types, rate structure, product association, bundle pricing, multi-market and multi-currency pricing, list cloning … *(Softlabs Team · High · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 1 Sep 2026 · workshop tracker · keyword 'segment')*
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-770` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-770`
+- Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 4
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 12: Works in Campaign Approval Workflow → Enforce configurable review and publishing governance. Support creator, reviewer, approver and publisher stages with role, department, threshold and business-unit rules. Route content, offer, budget …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-770?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Approve campaign workflow, Cancel.
+- [ ] Every transition is wired: `BO-764`.
+- [ ] Every gated control is gated: `PRICE_CONFIGURE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-771` Budget, Goals & Forecast
+
+**Plan campaign investment and expected commercial results. Capture total and channel budgets, expected revenue, conversion, CPA, margin, break-even and strategic goals. Estimate provider cost, offer cost, reward liability and capacity implications by channel and audience. Compare forecast, actual and committed spend and flag variance or overspend risk. Support approval thresholds, finance integration and controlled adjustment with reason and audit. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Engagement & Support · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `APPROVAL_REQUEST`, `MARKETING_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `campaignId` (navigation) |
+| Route | `/engagement-support/budget-goals-forecast-bo-771` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Detail panel** (detail panel): One record, read-only.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Create approval request (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `BO-764` Campaign Command Center: *Back to Campaign Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The budget goals forecast list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the budget goals forecast untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No budget goals forecast yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the budget goals forecast are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 An open request already exists for this subject. Two approvals for one refund is how a refund gets paid twice. (ApprovalStateProblem) |
+
+#### Permissions
+
+- `createApprovalRequest` → `APPROVAL_REQUEST` (operate) · staff
+- `getCampaign` → `MARKETING_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.1.59 | Complimentary entitlement redemption | Ticketing Catalogue | CONTRACTED | `createApprovalRequest` |
+| 1.2.64 | Employees shall submit requests from mobile app. | Ticketing Catalogue | CONTRACTED | `createApprovalRequest` |
+| 1.2.65 | Managers shall approve requests from mobile app. | Ticketing Catalogue | CONTRACTED | `createApprovalRequest` |
+| 11.1.51 | Draft Approval Requests - System shall support saving approval requests in draft status. | Approval Workflows & Governance | CONTRACTED | `createApprovalRequest` |
+| 11.1.63 | API-Based Approval Processing - System shall expose approval workflows through APIs. | Approval Workflows & Governance | CONTRACTED | `createApprovalRequest` |
+| 22.1.20 | Campaign Audit Trail | Marketing & CRM | CONTRACTED | `getCampaign` |
+| 22.4.20 | Newsletter Audit Trail | Marketing & CRM | CONTRACTED | `getCampaign` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Campaign tracking shows click-through, conversion and revenue attribution per campaign, with configurable success criteria (e.g. 80% conversion target). *(client request · MoM 20 Aug 2026, 4.6 Marketing Automation — Campaigns, Offers & Visual Journey Builder · DI-383)*
+
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-771` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-771`
+- Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 4
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 14: Works in Budget, Goals & Forecast → Plan campaign investment and expected commercial results. Capture total and channel budgets, expected revenue, conversion, CPA, margin, break-even and strategic goals. Estimate provider cost, offer …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-771?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Create approval request, Cancel.
+- [ ] Every transition is wired: `BO-764`.
+- [ ] Every gated control is gated: `APPROVAL_REQUEST`, `MARKETING_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-772` A/B & AI Optimization
+
+**Test campaign alternatives and apply AI recommendations safely. Configure A/B or multivariate variants for subject, content, creative, offer, channel and send time. Define audience split, sample size, duration, success metric, statistical confidence and winner rule. Show AI recommendations, expected uplift, confidence, factors and constraints and require human approval. Prevent conflicting tests and preserve assignments, results, model/version and decisions for audit. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Engagement & Support · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `AI_USE`, `MARKETING_MANAGE`, `MARKETING_VIEW` (1 operate, 1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `campaignId` (navigation), `insightId` (navigation) |
+| Route | `/engagement-support/a-b-ai-optimization-bo-772` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Target kind | segmented control | — | Campaign · Journey | `listMarketingRecommendations` ?targetKind |
+| Target ref | text field | — | — | `listMarketingRecommendations` ?targetRef |
+| Status | select | — | New · Reviewed · Accepted · Rejected · Actioned · Measured | `listMarketingRecommendations` ?status |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Detail panel** (detail panel): One record, read-only.
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+|  (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listMarketingRecommendations` (onLoad, AI recommendations on this campaign or journey, with …)
+
+**Where the user goes next**
+
+- → `BO-764` Campaign Command Center: *Back to Campaign Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The optimization list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the optimization untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No optimization yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the optimization are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and …; 409 The move is not allowed from the insight's state.; 409 `content` amended on a campaign that is no longer in `draft` (`statusDoesNotPermit`). (CampaignStateProblem); 422 A setting the answer cannot do without is missing (29 … |
+
+#### Permissions
+
+- `getCampaignPerformance` → `MARKETING_VIEW` (read) · staff
+- `proposeMarketingContent` → `AI_USE` (operate) · staff
+- `listMarketingRecommendations` → `AI_USE` (operate) · staff
+- `decideAiInsight` → `AI_USE` (operate) · staff
+- `requestSuggestion` → `AI_USE` (operate) · staff, guest
+- `updateCampaign` → `MARKETING_MANAGE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+26 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 22.4.15 | Open & Click Tracking | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+| 22.4.16 | Conversion Tracking | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+| 22.4.17 | Revenue Attribution | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+| 22.4.18 | Newsletter Analytics Dashboard | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+| 22.14.16 | Attribution Framework | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+| 22.14.19 | Campaign Revenue Attribution | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+| 22.3.18 | AI Content Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| 22.4.9 | AI Content Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| 22.4.10 | AI Subject Line Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| 22.9.17 | AI Language Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| 22.10.14 | AI Content Generation | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| 22.10.16 | AI Website Builder | Marketing & CRM | CONTRACTED | `proposeMarketingContent` |
+| … 14 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-772` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-772`
+- Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 4
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 16: Works in A/B & AI Optimization → Test campaign alternatives and apply AI recommendations safely. Configure A/B or multivariate variants for subject, content, creative, offer, channel and send time. Define audience split, sample …
+- ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409, 422).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-772?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every transition is wired: `BO-764`.
+- [ ] Every gated control is gated: `AI_USE`, `MARKETING_MANAGE`, `MARKETING_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-773` Attribution & Audit
+
+**Measure influenced outcomes and preserve a complete campaign record. Provide first, last, linear, position-based and configurable multi-touch attribution across channels. Attribute ticket, membership, loyalty, wallet, reservation and other revenue using defined windows and identity rules. Display delivery funnel, conversion, revenue, ROI, profitability, channel contribution and unattributed outcomes. Record creation, edits, approvals, execution, pauses, variants, results, exports and user/AI actions. Configuration Scope of Work / Version 1.0 23 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work / Version 1.0 24 Board 5 - Marketing Automation & Customer Journeys Figure 5. High-definition configuration board with all 10 screens. Configuration Scope of Work / Version 1.0 25**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Engagement & Support · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `campaignId` (navigation) |
+| Route | `/engagement-support/attribution-audit-bo-773` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Detail panel** (detail panel): One record, read-only.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+|  (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `BO-764` Campaign Command Center: *Back to Campaign Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The attribution audit list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the attribution audit untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No attribution audit yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the attribution audit are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `getCampaignPerformance` → `MARKETING_VIEW` (read) · staff
+- `recordTouchPoint` → `MARKETING_MANAGE` (configure) · service
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 22.4.15 | Open & Click Tracking | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+| 22.4.16 | Conversion Tracking | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+| 22.4.17 | Revenue Attribution | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+| 22.4.18 | Newsletter Analytics Dashboard | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+| 22.14.16 | Attribution Framework | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+| 22.14.19 | Campaign Revenue Attribution | Marketing & CRM | CONTRACTED | `getCampaignPerformance` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Campaign tracking shows click-through, conversion and revenue attribution per campaign, with configurable success criteria (e.g. 80% conversion target). *(client request · MoM 20 Aug 2026, 4.6 Marketing Automation — Campaigns, Offers & Visual Journey Builder · DI-383)*
+
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-773` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-773`
+- Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 4
+- Flow F247 *Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center*, step 18: Works in Attribution & Audit → Measure influenced outcomes and preserve a complete campaign record. Provide first, last, linear, position-based and configurable multi-touch attribution across channels. Attribute ticket …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-773?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every transition is wired: `BO-764`.
+- [ ] Every gated control is gated: `MARKETING_MANAGE`, `MARKETING_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+
+
+## Reference designs and the trackers for this platform
+
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
+
+- `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
+- `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
+
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
+
+## Design inputs from the client meetings
+
+**What the client asked for in the meetings and design reviews, for these screens.** Apply every item. They are the client's own requirements and they are later than the reference files: where a reference design or a screen's fields disagree with an item here, the item wins. Newest first; where two items disagree, the newer one wins (anything a later meeting replaced is already left out). An **Open question** is not settled: build the default it states and keep it easy to change. The text in brackets is for traceability and, like everything else in this bundle, never appears on a screen.
+
+### Everywhere, on every app
+
+- Allam (platform-wide requirement): every calendar throughout the platform, not just maintenance, must support day, week and month views, with the day view further broken down by hour from a defined start hour through the day. *(agreed · MoM 17 Sep 2026, 4.2 Preventive Maintenance Planning · DI-907)*
+- Minimise the number of separate screens an end user navigates: consolidate related information wherever it can reasonably be shown together, rather than mirroring every workshop board as its own screen. *(agreed · MoM 7 Sep 2026, 4.10 Screen consolidation / 5. Key Decisions · DI-671)*
+- Region-configurable tax on pre-discount price (e.g. Egypt: AED 100 ticket with 20% off is paid at AED 80 but taxed on AED 100). Rounding must support up to three decimal places without dropping the third decimal where the currency requires it. *(agreed · MoM 1 Sep 2026, 4.5 Taxes, Fees & Price Calculation · DI-598)*
+- "Powered by TICVAI" is shown consistently across staff and guest-facing surfaces. *(agreed · MoM 14 Aug 2026, 8. POS / Kiosk Branding · DI-297)*
+- Full multi-language support (Arabic and others such as Chinese) consistent with the agreed i18n/RTL architecture. *(agreed · MoM 10 Aug 2026, 4.7 Account Creation, Localisation & Multi-Currency · DI-210)*
+- The reference system is a functional reference only: its dated UI/UX is not to be replicated; TICVAI delivers equivalent depth with a modern, AI-friendly, easy-to-configure experience. *(agreed · MoM 7 Aug 2026, 23. Reference System Access & Documentation · DI-186)*
+- Direction: modern, minimalistic, spacious, cross-device designs that still convey a sense of place (venue or park); Softlabs proposes two to three enhanced visual concepts for TICVAI to steer. *(agreed · MoM 3 Aug 2026, 11. Design Alignment & Team Input · DI-126)*
+- Languages: English and Arabic at minimum, with Russian, Spanish and Mandarin. *(agreed · MoM 31 Jul 2026, 13. Internationalization & Localization · DI-080)*
+- Clarity first; reduce cognitive load (simple layouts, familiar patterns); consistency ("Use the system. Do not recreate."); accessibility; hierarchy (guide attention with contrast, spacing and visual weight); feedback (every action has a clear response). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Design Principles in Action · DI-051)*
+- Standard components: search bar with Cmd+K; tabs (Overview, Events, Sales, Reports); pagination; badges (New, Pending, Sold Out, Completed); toggle (Off/On); dropdown; removable chip ("VIP x"). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Example UI Components · DI-050)*
+- Spacing on an 8px base grid: 4, 8, 12, 16, 24, 32, 40, 48, 64, 80. Border radius scale 4, 8, 12, 16, 24px, consistent across the platform. Soft shadows: sm 0 1px 2px rgba(0,0,0,.05); md 0 4px 6px rgba(0,0,0,.08); lg 0 10px 15px rgba(0,0,0,.10); xl 0 20px 40px rgba(0,0,0,.14). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 6. Spacing / 7. Border Radius / 8. Shadows · DI-049)*
+- Icons: line style, outline, 2px stroke, round corners, clean and consistent. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 5. Icons · DI-048)*
+- Component principles: clarity first; consistent spacing on an 8px grid; meaningful colour (colours communicate status and guide the user); accessible by design; mobile ready (components adapt across all screen sizes). Components are consistent, flexible, accessible and composable. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Component principles · DI-045)*
+- Empty states have a title, one explanatory line and one action: "No events yet / Create your first event to get started / Create Event"; "No data available / We couldn't find anything to show here / Refresh". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Empty States · DI-044)*
+- Notification list: status icon, title, one-line detail and relative time (e.g. "Payment received ... 2m ago", "High demand detected ... 10m ago"), with "View all notifications". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Notifications · DI-042)*
+- Forms: label above field; text input, select ("Choose an option"), date picker, toggle, checkbox. Input states: Default, Focused, Filled, Disabled and Error with inline message (e.g. "This field is required"). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Forms; 08 Design System (p8) - 4. Inputs · DI-040)*
+- Card types: event card (title, date and time, venue, "From 120.00 AED"); KPI card (label, value, delta, "vs last 7 days"); onboarding checklist card ("3 of 6 completed": Create Event, Add Staff, Configure Seating, Connect Payment). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Cards · DI-038)*
+- Button hierarchy Primary, Secondary, Tertiary (text) and Icon buttons, each with Default, Hover, Pressed and Disabled states. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Buttons; 08 Design System (p8) - 3. Buttons · DI-036)*
+- Regardless of the module a user is working in, the experience should feel like one product, not a collection of separate applications. *(agreed · Design Vision Book 29 Jul 2026, 07 Modules Overview (p7) · DI-034)*
+- DO: focus on clarity and hierarchy, use clear simple interactive elements, give relevant information at a glance (card example: "Annual Membership / All Venues / 4.4 (388) / BESTSELLER"). DON'T: clutter and overload (e.g. "-10% NEW PROMO AED 450.00 !!! BOOK NOW!!!"), complex forms and flows, hard-to-read data visualisations. *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - DO / DON'T · DI-033)*
+- Eight principles on every screen: User-Centric, AI-First, Simple & Clear (clean layouts, clear hierarchy, minimal noise), Fast & Efficient (optimised for quick actions), Reliable & Secure (permissions, data protection), Data-Driven (data visual, actionable, easy to understand), Scalable, Consistent (same patterns, components and interactions across the ecosystem). *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - Our Design Principles · DI-032)*
+- Accessibility: high contrast, readable text, keyboard navigation and inclusive components throughout; WCAG AA standards minimum ("Design for everyone"). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Better Accessibility; 06 Component principles (p6); 08 Design principles in action (p8) · DI-029)*
+- AI everywhere: AI insights, recommendations and smart assistance are embedded across the platform, not hidden. AI is not an add-on: it assists, predicts, recommends and automates. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - How TICVAI improves this concept; 05 Design Principles (p5) - 2. AI-First · DI-027)*
+- Global Search: prominent, AI-powered search that finds anything, in the top bar with a Cmd+K shortcut (placeholder e.g. "Search events, customers, orders, venues or ask AI..."). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - UI inspiration reference, item 1; 08 Design System (p8) - Search Bar · DI-025)*
+- Visual direction: Purposeful (every element has a clear purpose), Consistent (one visual system across all modules and devices), Clear (easy to scan, understand and act on), Modern. Key takeaway: clean, modern, product-first layout with clear hierarchy and minimal visual noise; deep, modern, trustworthy; built for enterprise scale. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) · DI-024)*
+- The brand is presented consistently across Web Platform, Mobile App and Admin Portal (and print). Ticvai identity, colours and typography are applied consistently across all screens and devices. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand in action; 03 Visual Direction (p3) - Consistent Branding · DI-023)*
+- Copy is Professional, Friendly, Clear, Confident, Concise and Helpful. Avoid jargon, overly technical language, clutter, outdated language and complexity. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand voice · DI-022)*
+- Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
+- Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
+
+### Across P08 Venue Management
+
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
+- Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
+- **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
+- Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
+- Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
+- Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
+- Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
+- Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
+- Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
+
+**5 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+
+---
+
+## Raw data
+
+The same package data the blocks above are built from. `screens.json` is in the folder and not repeated here: every field of it is in the blocks.
+
+### `operations.json`
 
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
 {
- "approveCampaignWorkflow": {
-  "method": "PUT",
-  "path": "/campaign-workflow",
-  "contract": "promotions",
-  "summary": "Campaign Approval Workflow Designer",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CampaignApprovalWorkflowDesignerInput",
-  "responds": "CampaignApprovalWorkflowDesignerView"
- },
- "createApprovalRequest": {
-  "method": "POST",
-  "path": "/approval-requests",
-  "contract": "approvals",
-  "summary": "Raise a request",
-  "permission": "APPROVAL_REQUEST",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateApprovalRequest",
-  "responds": "ApprovalRequest"
- },
- "createCampaign": {
-  "method": "POST",
-  "path": "/campaigns",
-  "contract": "marketing-crm",
-  "summary": "Create a campaign",
-  "permission": "MARKETING_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateCampaignRequest",
-  "responds": "Campaign"
- },
- "createInvitationCampaign": {
-  "method": "POST",
-  "path": "/invitation-campaigns",
-  "contract": "marketing-crm",
-  "summary": "A quota-bounded, addressed invitation",
-  "permission": "MARKETING_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "InvitationCampaign",
-  "responds": "InvitationCampaign"
- },
- "decideAiInsight": {
-  "method": "POST",
-  "path": "/insights/{insightId}/decide",
-  "contract": "ai",
-  "summary": "Review, accept, reject or mark an insight actioned",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiInsight"
- },
- "getCampaign": {
-  "method": "GET",
-  "path": "/campaigns/{campaignId}",
-  "contract": "marketing-crm",
-  "summary": "Read a campaign with performance",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CampaignDetail"
- },
- "getCampaignPerformance": {
-  "method": "GET",
-  "path": "/campaigns/{campaignId}/performance",
-  "contract": "marketing-crm",
-  "summary": "Delivery and engagement",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CampaignPerformance"
- },
- "listCampaignCalendarTimeline": {
-  "method": "GET",
-  "path": "/campaign-calendar-timeline",
-  "contract": "promotions",
-  "summary": "Campaign Calendar & Timeline",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "product",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "attraction",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "channel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "campaign",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "promotionFamily",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "view",
-    "in": "query",
-    "required": false
-   }
-  ],
-  "requestBody": null,
-  "responds": "CampaignCalendarTimelineView"
- },
- "listCampaigns": {
-  "method": "GET",
-  "path": "/campaigns",
-  "contract": "marketing-crm",
-  "summary": "List campaigns",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listMarketingRecommendations": {
-  "method": "GET",
-  "path": "/marketing-recommendations",
-  "contract": "ai",
-  "summary": "Recommendations on marketing campaigns and journeys",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "targetKind",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "targetRef",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listMessageTemplates": {
-  "method": "GET",
-  "path": "/message-templates",
-  "contract": "marketing-crm",
-  "summary": "List message templates",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "channel",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listSegments": {
-  "method": "GET",
-  "path": "/segments",
-  "contract": "marketing-crm",
-  "summary": "List segments",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "search",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "proposeMarketingContent": {
-  "method": "POST",
-  "path": "/ai/content-drafts",
-  "contract": "ai",
-  "summary": "Draft marketing content for a person to edit and apply",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "recordTouchPoint": {
-  "method": "POST",
-  "path": "/attribution/touches",
-  "contract": "marketing-crm",
-  "summary": "Record a marketing touch",
-  "permission": "MARKETING_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "TouchPoint",
-  "responds": "TouchPoint"
- },
- "requestSuggestion": {
-  "method": "POST",
-  "path": "/ai/suggestions",
-  "contract": "ai",
-  "summary": "Ask for an answer, however it is currently produced",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Suggestion"
- },
- "updateCampaign": {
-  "method": "PATCH",
-  "path": "/campaigns/{campaignId}",
-  "contract": "marketing-crm",
-  "summary": "Amend, pause or resume a campaign",
-  "permission": "MARKETING_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Campaign"
- }
+"approveCampaignWorkflow": {"method":"PUT","path":"/campaign-workflow","contract":"promotions","summary":"Campaign Approval Workflow Designer","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CampaignApprovalWorkflowDesignerInput","responds":"CampaignApprovalWorkflowDesignerView"},
+"createApprovalRequest": {"method":"POST","path":"/approval-requests","contract":"approvals","summary":"Raise a request","permission":"APPROVAL_REQUEST","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateApprovalRequest","responds":"ApprovalRequest"},
+"createCampaign": {"method":"POST","path":"/campaigns","contract":"marketing-crm","summary":"Create a campaign","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateCampaignRequest","responds":"Campaign"},
+"createInvitationCampaign": {"method":"POST","path":"/invitation-campaigns","contract":"marketing-crm","summary":"A quota-bounded, addressed invitation","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"InvitationCampaign","responds":"InvitationCampaign"},
+"decideAiInsight": {"method":"POST","path":"/insights/{insightId}/decide","contract":"ai","summary":"Review, accept, reject or mark an insight actioned","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiInsight"},
+"getCampaign": {"method":"GET","path":"/campaigns/{campaignId}","contract":"marketing-crm","summary":"Read a campaign with performance","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CampaignDetail"},
+"getCampaignPerformance": {"method":"GET","path":"/campaigns/{campaignId}/performance","contract":"marketing-crm","summary":"Delivery and engagement","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CampaignPerformance"},
+"listCampaignCalendarTimeline": {"method":"GET","path":"/campaign-calendar-timeline","contract":"promotions","summary":"Campaign Calendar & Timeline","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venue","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"attraction","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"campaign","in":"query","required":false},{"name":"promotionFamily","in":"query","required":false},{"name":"view","in":"query","required":false}],"requestBody":null,"responds":"CampaignCalendarTimelineView"},
+"listCampaigns": {"method":"GET","path":"/campaigns","contract":"marketing-crm","summary":"List campaigns","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listMarketingRecommendations": {"method":"GET","path":"/marketing-recommendations","contract":"ai","summary":"Recommendations on marketing campaigns and journeys","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"targetKind","in":"query","required":true},{"name":"targetRef","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listMessageTemplates": {"method":"GET","path":"/message-templates","contract":"marketing-crm","summary":"List message templates","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listSegments": {"method":"GET","path":"/segments","contract":"marketing-crm","summary":"List segments","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"search","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"proposeMarketingContent": {"method":"POST","path":"/ai/content-drafts","contract":"ai","summary":"Draft marketing content for a person to edit and apply","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"recordTouchPoint": {"method":"POST","path":"/attribution/touches","contract":"marketing-crm","summary":"Record a marketing touch","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"TouchPoint","responds":"TouchPoint"},
+"requestSuggestion": {"method":"POST","path":"/ai/suggestions","contract":"ai","summary":"Ask for an answer, however it is currently produced","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Suggestion"},
+"updateCampaign": {"method":"PATCH","path":"/campaigns/{campaignId}","contract":"marketing-crm","summary":"Amend, pause or resume a campaign","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Campaign"}
 }
 ```
 
-## `schemas.json`
+### `schemas.json`
 
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
 {
- "AiEvidenceItemList": {
-  "type": "array",
-  "x-ticvai-persistence-kind": "valueObject",
-  "x-ticvai-persistence-column": "jsonb",
-  "description": "The evidence of one decision record, stored with it.",
-  "items": {
-   "$ref": "#/components/schemas/AiEvidenceItem"
-  }
- },
- "AiInsight": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.insight",
-  "description": "**An insight with a lifecycle** (AIP-181): new, reviewed, accepted or rejected, actioned, measured. Anomalies, forecast deviations, trends and opportunities land here; the narrative binds numbers to results, so a figure can only come from a query (design 8, 5.10).",
-  "required": [
-   "kind",
-   "title",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "anomaly",
-     "forecastDeviation",
-     "trend",
-     "opportunity",
-     "executiveSummary",
-     "rootCause",
-     "forecastThreshold",
-     "marketingRecommendation"
-    ]
-   },
-   "detectorId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "x-ticvai-references": "ai.anomaly_detector"
-   },
-   "metricKey": {
-    "type": "string",
-    "nullable": true
-   },
-   "subjectKind": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "campaign",
-     "journey",
-     "forecastDefinition",
-     "venue"
-    ],
-    "description": "What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for `marketingRecommendation`, a forecast definition for `forecastThreshold`."
-   },
-   "subjectRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "recommendedAction": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "For `marketingRecommendation`: `{recommendation, parameters}` as `AiMarketingRecommendation`. Applied by a person in the owning module, never here."
-   },
-   "expectedImpact": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "A range on a named metric (`metric`, `low`, `high`), never a single number (design 5.6)."
-   },
-   "title": {
-    "type": "string"
-   },
-   "narrative": {
-    "type": "string",
-    "nullable": true
-   },
-   "evidence": {
-    "$ref": "#/components/schemas/AiEvidenceItemList"
-   },
-   "magnitude": {
-    "type": "number",
-    "nullable": true
-   },
-   "priority": {
-    "type": "string",
-    "enum": [
-     "low",
-     "medium",
-     "high",
-     "critical"
-    ]
-   },
-   "correlationKey": {
-    "type": "string",
-    "nullable": true
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "new",
-     "reviewed",
-     "accepted",
-     "rejected",
-     "actioned",
-     "measured"
-    ],
-    "readOnly": true
-   },
-   "decidedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "actionRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "measuredImpact": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "readOnly": true
-   },
-   "decisionRecordId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true
-   },
-   "detectedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
- "AiMarketingRecommendation": {
-  "type": "object",
-  "x-ticvai-persistence": "none — read from ai.insight (kind marketingRecommendation)",
-  "description": "One recommendation on a campaign or journey (22.1.16, 22.3.17), decided through `decideAiInsight` and applied by a person in marketing-crm.",
-  "required": [
-   "insightId",
-   "targetKind",
-   "targetRef",
-   "recommendation",
-   "status"
-  ],
-  "properties": {
-   "insightId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The `ai.insight` row; `decideAiInsight` takes it."
-   },
-   "targetKind": {
-    "type": "string",
-    "enum": [
-     "campaign",
-     "journey"
-    ]
-   },
-   "targetRef": {
-    "type": "string"
-   },
-   "recommendation": {
-    "type": "string",
-    "enum": [
-     "changeSegment",
-     "changeChannel",
-     "changeTiming",
-     "changeOffer",
-     "changeContent",
-     "addStep",
-     "removeStep",
-     "reorderSteps",
-     "startJourneyFromTemplate"
-    ]
-   },
-   "parameters": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "What to change to, e.g. the channel, the send hour, the step to drop."
-   },
-   "expectedImpact": {
-    "type": "object",
-    "nullable": true,
-    "properties": {
-     "metric": {
-      "type": "string"
-     },
-     "low": {
-      "type": "number"
-     },
-     "high": {
-      "type": "number"
-     }
-    },
-    "description": "A range on the named metric (conversion, open rate, revenue), never a single number (design 5.6)."
-   },
-   "rationale": {
-    "type": "string"
-   },
-   "evidence": {
-    "$ref": "#/components/schemas/AiEvidenceItemList"
-   },
-   "priority": {
-    "type": "string",
-    "enum": [
-     "low",
-     "medium",
-     "high",
-     "critical"
-    ]
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "new",
-     "reviewed",
-     "accepted",
-     "rejected",
-     "actioned",
-     "measured"
-    ]
-   },
-   "decisionRecordId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "detectedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "AiMaturity": {
-  "type": "object",
-  "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
-  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
-  "required": [
-   "stage",
-   "basedOn"
-  ],
-  "properties": {
-   "stage": {
-    "type": "string",
-    "enum": [
-     "starting",
-     "learning",
-     "established",
-     "learned"
-    ],
-    "description": "`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."
-   },
-   "basedOn": {
-    "type": "string",
-    "description": "The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."
-   },
-   "sources": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "source"
-     ],
-     "properties": {
-      "source": {
-       "type": "string",
-       "enum": [
-        "venueSettings",
-        "startingPattern",
-        "calendar",
-        "weather",
-        "bookingsOnHand",
-        "ownHistory",
-        "importedHistory",
-        "configuration",
-        "trainedModel"
-       ]
-      },
-      "detail": {
-       "type": "string",
-       "nullable": true,
-       "description": "e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."
-      },
-      "observations": {
-       "type": "integer",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "ownDataShare": {
-    "type": "number",
-    "minimum": 0,
-    "maximum": 1,
-    "description": "The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."
-   },
-   "limitedHistory": {
-    "type": "boolean"
-   },
-   "nextStage": {
-    "type": "object",
-    "nullable": true,
-    "description": "What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.",
-    "properties": {
-     "stage": {
-      "type": "string",
-      "enum": [
-       "learning",
-       "established",
-       "learned"
-      ]
-     },
-     "needs": {
-      "type": "string"
-     },
-     "expectedBy": {
-      "type": "string",
-      "format": "date",
-      "nullable": true
-     }
-    }
-   }
-  }
- },
- "ApprovalDecision": {
-  "type": "object",
-  "x-ticvai-persistence": "approvals.decision",
-  "required": [
-   "level",
-   "principalId",
-   "decision",
-   "decidedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "level": {
-    "type": "integer"
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "isDelegate": {
-    "type": "boolean"
-   },
-   "delegatedFrom": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "decision": {
-    "type": "string",
-    "enum": [
-     "approve",
-     "reject"
-    ]
-   },
-   "comment": {
-    "type": "string",
-    "nullable": true
-   },
-   "reason": {
-    "type": "string",
-    "nullable": true
-   },
-   "usedMfa": {
-    "type": "boolean"
-   },
-   "signatureRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "ApprovalKind": {
-  "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
-  "enum": [
-   "refund",
-   "priceOverride",
-   "discountOverride",
-   "complimentaryTicket",
-   "membershipCancellation",
-   "accessPermissionChange",
-   "configurationChange",
-   "aiRecommendation",
-   "releasePromotion",
-   "requisition",
-   "stockWriteOff",
-   "journalEntry",
-   "periodClose",
-   "periodReopen",
-   "purchaseOrderCancel",
-   "purchaseOrderShortClose",
-   "tenantMigration",
-   "productChange",
-   "pricingChange"
-  ]
- },
- "ApprovalMode": {
-  "type": "string",
-  "description": "11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n",
-  "enum": [
-   "sequential",
-   "parallel",
-   "consensus",
-   "majority"
-  ]
- },
- "ApprovalRequest": {
-  "type": "object",
-  "x-ticvai-persistence": "approvals.request",
-  "required": [
-   "id",
-   "kind",
-   "status",
-   "requestedByPrincipalId",
-   "requestedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/ApprovalKind"
-   },
-   "rerouteOnNoApprover": {
-    "type": "boolean",
-    "default": true,
-    "description": "BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"
-   },
-   "outOfOfficeDelegateId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "allowEmailApproval": {
-    "type": "boolean",
-    "default": false,
-    "description": "**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"
-   },
-   "reopenedFrom": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"
-   },
-   "status": {
-    "$ref": "#/components/schemas/ApprovalStatus"
-   },
-   "subjectContract": {
-    "type": "string"
-   },
-   "subjectType": {
-    "type": "string"
-   },
-   "subjectId": {
-    "type": "string"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "summary": {
-    "type": "string"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "justification": {
-    "type": "string",
-    "nullable": true
-   },
-   "requestedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "matrixVersion": {
-    "type": "integer"
-   },
-   "mode": {
-    "$ref": "#/components/schemas/ApprovalMode"
-   },
-   "currentLevel": {
-    "type": "integer"
-   },
-   "totalLevels": {
-    "type": "integer"
-   },
-   "pendingApprovers": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "principalId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "displayName": {
-       "type": "string"
-      },
-      "isDelegate": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "decisions": {
-    "type": "array",
-    "description": "Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n",
-    "items": {
-     "$ref": "#/components/schemas/ApprovalDecision"
-    }
-   },
-   "escalations": {
-    "type": "array",
-    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "at": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "reason": {
-       "type": "string"
-      },
-      "fromLevel": {
-       "type": "integer"
-      },
-      "toLevel": {
-       "type": "integer"
-      },
-      "wasAutomatic": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "resubmittedFromId": {
-    "type": "string",
-    "nullable": true
-   },
-   "reopenedFromId": {
-    "type": "string",
-    "nullable": true
-   },
-   "slaDueAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "slaBreached": {
-    "type": "boolean"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "requestedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "aiAssessment": {
-    "type": "object",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
-    "properties": {
-     "riskScore": {
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 100
-     },
-     "riskBand": {
-      "type": "string",
-      "enum": [
-       "low",
-       "medium",
-       "high",
-       "critical"
-      ]
-     },
-     "priorityScore": {
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 100
-     },
-     "escalationSuggestion": {
-      "type": "object",
-      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
-      "properties": {
-       "action": {
-        "type": "string",
-        "enum": [
-         "escalate",
-         "addBackupApprover",
-         "none"
-        ]
-       },
-       "reason": {
-        "type": "string",
-        "nullable": true
-       }
-      }
-     },
-     "signals": {
-      "type": "array",
-      "maxItems": 10,
-      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
-      "items": {
-       "type": "object",
-       "properties": {
-        "code": {
-         "type": "string"
-        },
-        "contribution": {
-         "type": "number"
-        },
-        "detail": {
-         "type": "string",
-         "nullable": true
-        }
-       }
-      }
-     },
-     "scoreId": {
-      "type": "string",
-      "format": "uuid",
-      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
-     },
-     "decisionRecordId": {
-      "type": "string",
-      "description": "The ai decision record, for the audit of what the AI said and why."
-     },
-     "assessedAt": {
-      "type": "string",
-      "format": "date-time"
-     }
-    }
-   }
-  }
- },
- "ApprovalStatus": {
-  "type": "string",
-  "enum": [
-   "draft",
-   "pending",
-   "escalated",
-   "returned",
-   "informationRequested",
-   "approved",
-   "rejected",
-   "withdrawn",
-   "expired",
-   "cancelled"
-  ]
- },
- "Campaign": {
-  "x-ticvai-persistence": "marketing.campaign",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateCampaignRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "id",
-     "status",
-     "createdAt"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "budgetCap": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "budgetSpent": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "readOnly": true,
-      "description": "BL-169. **A campaign could spend without limit** — following the promotions `budgetCap` precedent. **Sending stops at the cap rather than overspending and reporting it**, because a marketing budget discovered after it was exceeded is a budget nobody set.\n"
-     },
-     "status": {
-      "$ref": "#/components/schemas/CampaignStatus"
-     },
-     "isPaused": {
-      "type": "boolean"
-     },
-     "createdByPrincipalId": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "createdAt": {
-      "type": "string",
-      "format": "date-time"
-     },
-     "launchedAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true
-     },
-     "completedAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true
-     },
-     "sentCount": {
-      "type": "integer",
-      "readOnly": true,
-      "x-ticvai-persisted": false,
-      "description": "**How many messages went out**, counted from `marketing.message_dispatch` at read time rather than kept as a counter on the campaign row, so it cannot drift from the dispatch records it summarises. Test sends are not dispatches of the campaign and are not counted.\n"
-     }
-    }
-   }
-  ]
- },
- "CampaignApprovalWorkflowDesignerInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.coupon_campaign at 6%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Campaign Approval Workflow Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "discount": {
-    "type": "number",
-    "description": "Discount %"
-   },
-   "campaignBudget": {
-    "type": "string",
-    "description": "Campaign budget"
-   },
-   "margin": {
-    "type": "number",
-    "description": "Margin"
-   },
-   "promotionType": {
-    "type": "string",
-    "description": "Promotion type"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "freeProductValue": {
-    "type": "string",
-    "description": "Free-product value"
-   },
-   "campaignDuration": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Campaign duration"
-   },
-   "financialExposure": {
-    "type": "string",
-    "description": "Financial exposure"
-   },
-   "sequentialApproval": {
-    "type": "string",
-    "description": "Sequential approval"
-   },
-   "parallelApproval": {
-    "type": "string",
-    "description": "Parallel approval"
-   },
-   "conditionalApproval": {
-    "type": "string",
-    "description": "Conditional approval"
-   },
-   "mandatoryApproval": {
-    "type": "string",
-    "description": "Mandatory approval"
-   },
-   "optionalReview": {
-    "type": "string",
-    "description": "Optional review"
-   },
-   "delegation": {
-    "type": "string",
-    "description": "Delegation"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   }
-  }
- },
- "CampaignApprovalWorkflowDesignerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Campaign Approval Workflow Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "discount": {
-    "type": "number",
-    "description": "Discount %"
-   },
-   "campaignBudget": {
-    "type": "string",
-    "description": "Campaign budget"
-   },
-   "margin": {
-    "type": "number",
-    "description": "Margin"
-   },
-   "promotionType": {
-    "type": "string",
-    "description": "Promotion type"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "freeProductValue": {
-    "type": "string",
-    "description": "Free-product value"
-   },
-   "campaignDuration": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Campaign duration"
-   },
-   "financialExposure": {
-    "type": "string",
-    "description": "Financial exposure"
-   },
-   "sequentialApproval": {
-    "type": "string",
-    "description": "Sequential approval"
-   },
-   "parallelApproval": {
-    "type": "string",
-    "description": "Parallel approval"
-   },
-   "conditionalApproval": {
-    "type": "string",
-    "description": "Conditional approval"
-   },
-   "mandatoryApproval": {
-    "type": "string",
-    "description": "Mandatory approval"
-   },
-   "optionalReview": {
-    "type": "string",
-    "description": "Optional review"
-   },
-   "delegation": {
-    "type": "string",
-    "description": "Delegation"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   }
-  }
- },
- "CampaignCalendarTimelineView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Campaign Calendar & Timeline displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "calendarState": {
-    "type": "string",
-    "enum": [
-     "active",
-     "upcoming",
-     "endingSoon",
-     "expired",
-     "pendingApproval",
-     "conflicting",
-     "suspended"
-    ],
-    "description": "How the calendar marks this promotion."
-   },
-   "promotionId": {
-    "type": "string",
-    "description": "Promotion ID"
-   },
-   "promotionName": {
-    "type": "string",
-    "description": "Promotion Name"
-   },
-   "startDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Start Date"
-   },
-   "endDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "End Date"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   }
-  }
- },
- "CampaignContent": {
-  "x-ticvai-persistence": "none — embedded in campaign",
-  "type": "object",
-  "required": [
-   "templateId"
-  ],
-  "properties": {
-   "templateId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectOverride": {
-    "type": "object",
-    "additionalProperties": {
-     "type": "string"
-    }
-   },
-   "mergeDefaults": {
-    "type": "object",
-    "description": "Fallback values for the template's `mergeFields`, by name, used where a guest has no value.",
-    "additionalProperties": {
-     "type": "string"
-    }
-   },
-   "promotionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Offer carried by the campaign. Coupon codes are issued from it."
-   }
-  }
- },
- "CampaignDetail": {
-  "x-ticvai-persistence": "marketing.campaign",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/Campaign"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "performance": {
-      "$ref": "#/components/schemas/CampaignPerformance"
-     }
-    }
-   }
-  ]
- },
- "CampaignKind": {
-  "type": "string",
-  "enum": [
-   "oneOff",
-   "scheduled",
-   "triggered",
-   "recurring"
-  ]
- },
- "CampaignPerformance": {
-  "x-ticvai-persistence": "none — aggregated from marketing.message_dispatch (isTest false)",
-  "type": "object",
-  "required": [
-   "campaignId",
-   "sent",
-   "delivered"
-  ],
-  "properties": {
-   "campaignId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "sent": {
-    "type": "integer"
-   },
-   "delivered": {
-    "type": "integer"
-   },
-   "opened": {
-    "type": "integer"
-   },
-   "clicked": {
-    "type": "integer"
-   },
-   "bounced": {
-    "type": "integer"
-   },
-   "complained": {
-    "type": "integer"
-   },
-   "unsubscribed": {
-    "type": "integer"
-   },
-   "attributedOrders": {
-    "type": "integer"
-   },
-   "attributedRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "attributionWindowDays": {
-    "type": "integer",
-    "minimum": 1,
-    "description": "The window these figures were attributed over, from `VenueSettings.marketing.attributionWindowDays` (proposed default 7, audit R094)."
-   },
-   "variants": {
-    "type": "array",
-    "description": "Per variant of an A/B campaign, from `MessageDispatch.campaignVariantId` (29 September, build pass, group G2; 22.1.17). Empty for a single-content campaign.",
-    "items": {
-     "type": "object",
-     "properties": {
-      "variantId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "label": {
-       "type": "string"
-      },
-      "sent": {
-       "type": "integer"
-      },
-      "opened": {
-       "type": "integer"
-      },
-      "clicked": {
-       "type": "integer"
-      },
-      "attributedOrders": {
-       "type": "integer"
-      },
-      "attributedRevenue": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "isWinner": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "sendTimeOptimisedCount": {
-    "type": "integer",
-    "description": "Messages sent at a per-recipient optimised hour rather than the scheduled time."
-   }
-  }
- },
- "CampaignStatus": {
-  "type": "string",
-  "enum": [
-   "draft",
-   "scheduled",
-   "sending",
-   "paused",
-   "completed",
-   "stopped",
-   "failed"
-  ]
- },
- "CampaignTrigger": {
-  "x-ticvai-persistence": "none — embedded in campaign",
-  "type": "object",
-  "properties": {
-   "event": {
-    "type": "string",
-    "enum": [
-     "bookingConfirmed",
-     "visitCompleted",
-     "membershipExpiring",
-     "birthday",
-     "abandonedCart",
-     "firstVisit",
-     "inactivity",
-     "entitlementExpiring"
-    ],
-    "description": "`entitlementExpiring` (29 September, build pass, group G2; 5.5.30) fires on `entitlement.expiringSoon`: a ticket or pass the guest still holds comes within its template's `expiryNoticeDays` of `validTo`. The notice period is set on the template, so `delayHours` shifts the send within it rather than setting it. An entitlement belonging to a membership is left to `membershipExpiring`, so a member is not told twice."
-   },
-   "delayHours": {
-    "type": "integer"
-   },
-   "conditions": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/SegmentCriterion"
-    }
-   }
-  }
- },
- "ConsentPurpose": {
-  "type": "string",
-  "enum": [
-   "marketing",
-   "personalisation",
-   "profiling",
-   "thirdPartySharing",
-   "aiProcessing",
-   "transactional"
-  ]
- },
- "CreateApprovalRequest": {
-  "type": "object",
-  "x-ticvai-persistence": "none — request only",
-  "required": [
-   "id",
-   "kind",
-   "subjectContract",
-   "subjectType",
-   "subjectId",
-   "scopePath",
-   "summary"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/ApprovalKind"
-   },
-   "subjectContract": {
-    "type": "string",
-    "description": "Which contract owns the thing being approved."
-   },
-   "subjectType": {
-    "type": "string"
-   },
-   "subjectId": {
-    "type": "string",
-    "description": "**A reference, never a copy.** A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.\n"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "summary": {
-    "type": "string",
-    "maxLength": 300,
-    "description": "What the approver sees in their queue before opening it."
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "attributes": {
-    "type": "object",
-    "additionalProperties": true
-   },
-   "justification": {
-    "type": "string",
-    "maxLength": 1000
-   },
-   "isDraft": {
-    "type": "boolean",
-    "default": false,
-    "description": "True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129).\n"
-   }
-  }
- },
- "CreateCampaignRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "name",
-   "kind",
-   "channel",
-   "segmentId",
-   "content"
-  ],
-  "properties": {
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "kind": {
-    "$ref": "#/components/schemas/CampaignKind"
-   },
-   "channel": {
-    "$ref": "#/components/schemas/MessageChannel"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "segmentId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "content": {
-    "$ref": "#/components/schemas/CampaignContent"
-   },
-   "trigger": {
-    "$ref": "#/components/schemas/CampaignTrigger"
-   },
-   "scheduledFor": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "consentPurpose": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/ConsentPurpose"
-     }
-    ],
-    "default": "marketing"
-   },
-   "sendWindow": {
-    "type": "object",
-    "description": "Hours during which sending is permitted. A promotional message at 3am is a complaint waiting to happen.\n",
-    "properties": {
-     "startTime": {
-      "type": "string"
-     },
-     "endTime": {
-      "type": "string"
-     },
-     "timeZone": {
-      "type": "string"
-     }
-    }
-   },
-   "sendTimeMode": {
-    "type": "string",
-    "enum": [
-     "fixed",
-     "optimised"
-    ],
-    "default": "fixed",
-    "description": "`optimised` sends each recipient at the hour `ai.requestSuggestion` (kind `sendTime`) gives for them, inside `sendWindow` (29 September, build pass, group G2; 22.3.19). `fixed` is the behaviour before. Falls back to `scheduledFor` per recipient where there is no suggestion or AI is off."
-   },
-   "optimiseChannel": {
-    "type": "boolean",
-    "default": false,
-    "description": "With `sendTimeMode` `optimised`, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). Off keeps `channel`."
-   },
-   "variants": {
-    "type": "array",
-    "maxItems": 5,
-    "nullable": true,
-    "description": "**A/B (or up to five-way) content and subject variants** (29 September, build pass, group G2; 22.1.17, BO-772). Each is a subject override and optionally a different template, written by a person or taken from an AI draft (`ai.proposeMarketingContent`, `source` `aiDraft`). Held as rows of `marketing.campaign_variant`. Null or empty is a single-content campaign.",
-    "items": {
-     "$ref": "#/components/schemas/MarketingCampaignVariant"
-    }
-   },
-   "abTest": {
-    "type": "object",
-    "nullable": true,
-    "description": "How the variants are tested. Required when `variants` has two or more.",
-    "properties": {
-     "testPercent": {
-      "type": "integer",
-      "minimum": 5,
-      "maximum": 100,
-      "default": 20,
-      "description": "Share of the audience the variants are tested on; 100 splits everyone and picks no winner."
-     },
-     "successMetric": {
-      "type": "string",
-      "enum": [
-       "openRate",
-       "clickRate",
-       "conversionRate",
-       "attributedRevenue"
-      ],
-      "default": "clickRate"
-     },
-     "decideAfterHours": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 168,
-      "default": 4
-     },
-     "winnerRule": {
-      "type": "string",
-      "enum": [
-       "automatic",
-       "manual"
-      ],
-      "default": "automatic"
-     },
-     "minimumSamplePerVariant": {
-      "type": "integer",
-      "minimum": 1,
-      "default": 500,
-      "description": "Below this many sends per variant no winner is declared automatically; a person picks."
-     },
-     "winningVariantId": {
-      "type": "string",
-      "format": "uuid",
-      "nullable": true,
-      "description": "Set by the automatic rule, or by a person through `updateCampaign`."
-     }
-    }
-   }
-  }
- },
- "CreateSegmentRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "name",
-   "criteria"
-  ],
-  "properties": {
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string",
-    "maxLength": 1000
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "match": {
-    "type": "string",
-    "enum": [
-     "all",
-     "any"
-    ],
-    "default": "all"
-   },
-   "criteria": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "$ref": "#/components/schemas/SegmentCriterion"
-    }
-   },
-   "excludeSegmentIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   }
-  }
- },
- "InvitationCampaign": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.invitation_campaign",
-  "description": "BL-150. **An invitation is not a campaign and not a comp**, and CF-74's issuance half needed it too.\nA campaign broadcasts; an invitation is addressed, quota-bounded and expects a response. **A press night, a sponsor allocation, a members' preview** — all three need to know who was asked, who accepted, and how many places are left.\n",
-  "required": [
-   "id",
-   "name",
-   "quota",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "readOnly": true,
-    "type": "string",
-    "format": "uuid"
-   },
-   "name": {
-    "type": "string"
-   },
-   "eventId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "productId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "quota": {
-    "type": "integer",
-    "description": "**Places held, not invitations sent.** Over-inviting against a known acceptance rate is normal and deliberate; **over-issuing against the quota is not**, and the two must not be the same number.\n"
-   },
-   "overInvitePercent": {
-    "type": "number",
-    "default": 0,
-    "description": "How many more may be invited than there are places. **A press night invites 150 for 100 seats because 60% come**, and a system that refuses the 101st invitation makes the venue do that arithmetic by hand.\n"
-   },
-   "issuedCount": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "acceptedCount": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "respondByAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "status": {
-    "readOnly": true,
-    "type": "string",
-    "enum": [
-     "draft",
-     "open",
-     "closed",
-     "cancelled"
-    ]
-   },
-   "scopePath": {
-    "readOnly": true,
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
-   }
-  }
- },
- "MarketingCampaignVariant": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.campaign_variant",
-  "description": "One content or subject variant of a campaign, for an A/B test (22.1.17; 29 September, build pass, group G2, from group G1's handoff). Written with its campaign by `createCampaign` and `updateCampaign`.",
-  "required": [
-   "label"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "campaignId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "x-ticvai-references": "marketing.campaign"
-   },
-   "label": {
-    "type": "string",
-    "maxLength": 20,
-    "description": "A, B, C..."
-   },
-   "subjectOverride": {
-    "type": "object",
-    "nullable": true,
-    "description": "Subject line by locale.",
-    "additionalProperties": {
-     "type": "string"
-    }
-   },
-   "templateId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "A different template for this variant; null uses the campaign's `content.templateId`."
-   },
-   "splitPercent": {
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 100,
-    "nullable": true,
-    "description": "Share of the test group; null splits evenly."
-   },
-   "source": {
-    "type": "string",
-    "enum": [
-     "manual",
-     "aiDraft"
-    ],
-    "default": "manual"
-   },
-   "aiDecisionRecordId": {
-    "type": "string",
-    "nullable": true,
-    "description": "The decision record of the `ai.proposeMarketingContent` draft it came from, for `aiDraft`."
-   },
-   "isWinner": {
-    "type": "boolean",
-    "default": false,
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005), the campaign's."
-   }
-  }
- },
- "MessageChannel": {
-  "type": "string",
-  "enum": [
-   "email",
-   "sms",
-   "whatsapp",
-   "push",
-   "inApp",
-   "post"
-  ]
- },
- "MessageTemplate": {
-  "x-ticvai-persistence": "marketing.message_template",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name",
-   "channel",
-   "bodies"
-  ],
-  "properties": {
-   "id": {
-    "readOnly": true,
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "channel": {
-    "$ref": "#/components/schemas/MessageChannel"
-   },
-   "subjects": {
-    "type": "object",
-    "description": "Per language. Email only.",
-    "additionalProperties": {
-     "type": "string"
-    }
-   },
-   "bodies": {
-    "type": "object",
-    "description": "Per language, keyed by ISO 639-1 code.",
-    "additionalProperties": {
-     "type": "string"
-    }
-   },
-   "mergeFields": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "missingLanguages": {
-    "type": "array",
-    "readOnly": true,
-    "description": "Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n",
-    "items": {
-     "type": "string"
-    }
-   },
-   "providerTemplateId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Required for WhatsApp, where templates are pre-approved by the provider."
-   },
-   "brandId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The brand whose identity the template carries; null for the tenant default."
-   },
-   "ownership": {
-    "type": "string",
-    "enum": [
-     "platform",
-     "crm"
-    ],
-    "default": "crm",
-    "description": "`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"
-   }
-  }
- },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
-   }
-  }
- },
- "Segment": {
-  "x-ticvai-persistence": "marketing.segment + marketing.segment_criterion",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateSegmentRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "id",
-     "createdAt"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "lastEvaluatedSize": {
-      "type": "integer",
-      "nullable": true
-     },
-     "lastEvaluatedAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true
-     },
-     "createdAt": {
-      "type": "string",
-      "format": "date-time"
-     }
-    }
-   }
-  ]
- },
- "Suggestion": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.suggestion",
-  "description": "One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n",
-  "required": [
-   "id",
-   "kind",
-   "basis",
-   "maturity",
-   "producedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/SuggestionKind"
-   },
-   "basis": {
-    "$ref": "#/components/schemas/SuggestionBasis"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "subjectRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "What it is about — a product, an outlet, an item, a party."
-   },
-   "value": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "The suggestion itself. Shape depends on `kind`."
-   },
-   "confidence": {
-    "type": "number",
-    "nullable": true,
-    "minimum": 0,
-    "maximum": 1,
-    "description": "**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"
-   },
-   "explanation": {
-    "type": "string",
-    "description": "**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"
-   },
-   "inputs": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"
-   },
-   "producerRef": {
-    "type": "string",
-    "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
-   },
-   "maturity": {
-    "$ref": "#/components/schemas/AiMaturity"
-   },
-   "producedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"
-   }
-  }
- },
- "SuggestionBasis": {
-  "type": "string",
-  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
-  "enum": [
-   "heuristic",
-   "statistical",
-   "model",
-   "hybrid",
-   "manual"
-  ]
- },
- "SuggestionKind": {
-  "type": "string",
-  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline. Every change names a point or performance of that day's venue only, rides, dining and retail alike (30 September client meeting, MoM 4.7).\n",
-  "enum": [
-   "price",
-   "replenishment",
-   "requisition",
-   "demandForecast",
-   "prepPlan",
-   "menuEngineering",
-   "staffing",
-   "slaTarget",
-   "waitTime",
-   "upsell",
-   "segmentation",
-   "anomaly",
-   "scenario",
-   "sendTime",
-   "wasteRisk",
-   "queueBalancing",
-   "itinerary"
-  ]
- },
- "TouchPoint": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.touch_point",
-  "description": "22.14.17, 22.14.18, BL-177. **`CampaignPerformance.attributedOrders` models single-touch — one campaign, one order.**\nA guest sees an email, ignores it, sees a social post, searches, and buys. **Single-touch credits whichever one the model happened to pick**, and a marketing team optimising on that optimises the wrong channel.\n**The platform records touches and does not pick a model.** Which attribution rule applies is a reporting question, and hard-coding one here would make every other one unanswerable.\n",
-  "required": [
-   "id",
-   "subjectId",
-   "channel",
-   "occurredAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "campaignId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "journeyId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "channel": {
-    "type": "string"
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "impression",
-     "open",
-     "click",
-     "visit",
-     "conversion"
-    ]
-   },
-   "occurredAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "orderId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Set on the conversion touch. **The chain before it is what makes attribution possible.**"
-   }
-  }
- }
+"AiEvidenceItemList": {"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"The evidence of one decision record, stored with it.","items":{"$ref":"#/components/schemas/AiEvidenceItem"}},
+"AiInsight": {"type":"object","x-ticvai-persistence":"ai.insight","description":"**An insight with a lifecycle** (AIP-181): new, reviewed, accepted or rejected, actioned, measured. Anomalies, forecast deviations, trends and opportunities land here; the narrative binds numbers to results, so a figure can only come from a query (design 8, 5.10).","required":["kind","title","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"type":"string","enum":["anomaly","forecastDeviation","trend","opportunity","executiveSummary","rootCause","forecastThreshold","marketingRecommendation"]},"detectorId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.anomaly_detector"},"metricKey":{"type":"string","nullable":true},"subjectKind":{"type":"string","nullable":true,"enum":["campaign","journey","forecastDefinition","venue"],"description":"What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for `marketingRecommendation`, a forecast definition for `forecastThreshold`."},"subjectRef":{"type":"string","nullable":true},"recommendedAction":{"type":"object","additionalProperties":true,"nullable":true,"description":"For `marketingRecommendation`: `{recommendation, parameters}` as `AiMarketingRecommendation`. Applied by a person in the owning module, never here."},"expectedImpact":{"type":"object","additionalProperties":true,"nullable":true,"description":"A range on a named metric (`metric`, `low`, `high`), never a single number (design 5.6)."},"title":{"type":"string"},"narrative":{"type":"string","nullable":true},"evidence":{"$ref":"#/components/schemas/AiEvidenceItemList"},"magnitude":{"type":"number","nullable":true},"priority":{"type":"string","enum":["low","medium","high","critical"]},"correlationKey":{"type":"string","nullable":true},"status":{"type":"string","enum":["new","reviewed","accepted","rejected","actioned","measured"],"readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"actionRef":{"type":"string","nullable":true},"measuredImpact":{"type":"object","additionalProperties":true,"nullable":true,"readOnly":true},"decisionRecordId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"detectedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiMarketingRecommendation": {"type":"object","x-ticvai-persistence":"none — read from ai.insight (kind marketingRecommendation)","description":"One recommendation on a campaign or journey (22.1.16, 22.3.17), decided through `decideAiInsight` and applied by a person in marketing-crm.","required":["insightId","targetKind","targetRef","recommendation","status"],"properties":{"insightId":{"type":"string","format":"uuid","description":"The `ai.insight` row; `decideAiInsight` takes it."},"targetKind":{"type":"string","enum":["campaign","journey"]},"targetRef":{"type":"string"},"recommendation":{"type":"string","enum":["changeSegment","changeChannel","changeTiming","changeOffer","changeContent","addStep","removeStep","reorderSteps","startJourneyFromTemplate"]},"parameters":{"type":"object","additionalProperties":true,"nullable":true,"description":"What to change to, e.g. the channel, the send hour, the step to drop."},"expectedImpact":{"type":"object","nullable":true,"properties":{"metric":{"type":"string"},"low":{"type":"number"},"high":{"type":"number"}},"description":"A range on the named metric (conversion, open rate, revenue), never a single number (design 5.6)."},"rationale":{"type":"string"},"evidence":{"$ref":"#/components/schemas/AiEvidenceItemList"},"priority":{"type":"string","enum":["low","medium","high","critical"]},"status":{"type":"string","enum":["new","reviewed","accepted","rejected","actioned","measured"]},"decisionRecordId":{"type":"string","format":"uuid","nullable":true},"detectedAt":{"type":"string","format":"date-time"}}},
+"AiMaturity": {"type":"object","x-ticvai-persistence":"none — embedded as jsonb on ai.suggestion and ai.forecast_version","description":"**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.","required":["stage","basedOn"],"properties":{"stage":{"type":"string","enum":["starting","learning","established","learned"],"description":"`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."},"basedOn":{"type":"string","description":"The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."},"sources":{"type":"array","items":{"type":"object","required":["source"],"properties":{"source":{"type":"string","enum":["venueSettings","startingPattern","calendar","weather","bookingsOnHand","ownHistory","importedHistory","configuration","trainedModel"]},"detail":{"type":"string","nullable":true,"description":"e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."},"observations":{"type":"integer","nullable":true}}}},"ownDataShare":{"type":"number","minimum":0,"maximum":1,"description":"The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."},"limitedHistory":{"type":"boolean"},"nextStage":{"type":"object","nullable":true,"description":"What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.","properties":{"stage":{"type":"string","enum":["learning","established","learned"]},"needs":{"type":"string"},"expectedBy":{"type":"string","format":"date","nullable":true}}}}},
+"ApprovalDecision": {"type":"object","x-ticvai-persistence":"approvals.decision","required":["level","principalId","decision","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"level":{"type":"integer"},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"},"delegatedFrom":{"type":"string","format":"uuid","nullable":true},"decision":{"type":"string","enum":["approve","reject"]},"comment":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"usedMfa":{"type":"boolean"},"signatureRef":{"type":"string","nullable":true},"decidedAt":{"type":"string","format":"date-time"}}},
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalMode": {"type":"string","description":"11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n","enum":["sequential","parallel","consensus","majority"]},
+"ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"reason":{"type":"string"},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
+"ApprovalStatus": {"type":"string","enum":["draft","pending","escalated","returned","informationRequested","approved","rejected","withdrawn","expired","cancelled"]},
+"Campaign": {"x-ticvai-persistence":"marketing.campaign","allOf":[{"$ref":"#/components/schemas/CreateCampaignRequest"},{"type":"object","required":["id","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"budgetCap":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"budgetSpent":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"description":"BL-169. **A campaign could spend without limit** — following the promotions `budgetCap` precedent. **Sending stops at the cap rather than overspending and reporting it**, because a marketing budget discovered after it was exceeded is a budget nobody set.\n"},"status":{"$ref":"#/components/schemas/CampaignStatus"},"isPaused":{"type":"boolean"},"createdByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"},"launchedAt":{"type":"string","format":"date-time","nullable":true},"completedAt":{"type":"string","format":"date-time","nullable":true},"sentCount":{"type":"integer","readOnly":true,"x-ticvai-persisted":false,"description":"**How many messages went out**, counted from `marketing.message_dispatch` at read time rather than kept as a counter on the campaign row, so it cannot drift from the dispatch records it summarises. Test sends are not dispatches of the campaign and are not counted.\n"}}}]},
+"CampaignApprovalWorkflowDesignerInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table covers these fields** — the closest is promotions.coupon_campaign at 6%, so this is not an update to anything the package stores today and no new table has been decided","description":"**What Campaign Approval Workflow Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"discount":{"type":"number","description":"Discount %"},"campaignBudget":{"type":"string","description":"Campaign budget"},"margin":{"type":"number","description":"Margin"},"promotionType":{"type":"string","description":"Promotion type"},"venue":{"type":"string","description":"Venue"},"partner":{"type":"string","description":"Partner"},"channel":{"type":"string","description":"Channel"},"freeProductValue":{"type":"string","description":"Free-product value"},"campaignDuration":{"type":"string","format":"date-time","description":"Campaign duration"},"financialExposure":{"type":"string","description":"Financial exposure"},"sequentialApproval":{"type":"string","description":"Sequential approval"},"parallelApproval":{"type":"string","description":"Parallel approval"},"conditionalApproval":{"type":"string","description":"Conditional approval"},"mandatoryApproval":{"type":"string","description":"Mandatory approval"},"optionalReview":{"type":"string","description":"Optional review"},"delegation":{"type":"string","description":"Delegation"},"escalation":{"type":"string","description":"Escalation"}}},
+"CampaignApprovalWorkflowDesignerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Campaign Approval Workflow Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"discount":{"type":"number","description":"Discount %"},"campaignBudget":{"type":"string","description":"Campaign budget"},"margin":{"type":"number","description":"Margin"},"promotionType":{"type":"string","description":"Promotion type"},"venue":{"type":"string","description":"Venue"},"partner":{"type":"string","description":"Partner"},"channel":{"type":"string","description":"Channel"},"freeProductValue":{"type":"string","description":"Free-product value"},"campaignDuration":{"type":"string","format":"date-time","description":"Campaign duration"},"financialExposure":{"type":"string","description":"Financial exposure"},"sequentialApproval":{"type":"string","description":"Sequential approval"},"parallelApproval":{"type":"string","description":"Parallel approval"},"conditionalApproval":{"type":"string","description":"Conditional approval"},"mandatoryApproval":{"type":"string","description":"Mandatory approval"},"optionalReview":{"type":"string","description":"Optional review"},"delegation":{"type":"string","description":"Delegation"},"escalation":{"type":"string","description":"Escalation"}}},
+"CampaignCalendarTimelineView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Campaign Calendar & Timeline displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"calendarState":{"type":"string","enum":["active","upcoming","endingSoon","expired","pendingApproval","conflicting","suspended"],"description":"How the calendar marks this promotion."},"promotionId":{"type":"string","description":"Promotion ID"},"promotionName":{"type":"string","description":"Promotion Name"},"startDate":{"type":"string","format":"date-time","description":"Start Date"},"endDate":{"type":"string","format":"date-time","description":"End Date"},"venue":{"type":"string","description":"Venue"},"channel":{"type":"string","description":"Channel"}}},
+"CampaignContent": {"x-ticvai-persistence":"none — embedded in campaign","type":"object","required":["templateId"],"properties":{"templateId":{"type":"string","format":"uuid"},"subjectOverride":{"type":"object","additionalProperties":{"type":"string"}},"mergeDefaults":{"type":"object","description":"Fallback values for the template's `mergeFields`, by name, used where a guest has no value.","additionalProperties":{"type":"string"}},"promotionId":{"type":"string","format":"uuid","nullable":true,"description":"Offer carried by the campaign. Coupon codes are issued from it."}}},
+"CampaignDetail": {"x-ticvai-persistence":"marketing.campaign","allOf":[{"$ref":"#/components/schemas/Campaign"},{"type":"object","properties":{"performance":{"$ref":"#/components/schemas/CampaignPerformance"}}}]},
+"CampaignKind": {"type":"string","enum":["oneOff","scheduled","triggered","recurring"]},
+"CampaignPerformance": {"x-ticvai-persistence":"none — aggregated from marketing.message_dispatch (isTest false)","type":"object","required":["campaignId","sent","delivered"],"properties":{"campaignId":{"type":"string","format":"uuid"},"sent":{"type":"integer"},"delivered":{"type":"integer"},"opened":{"type":"integer"},"clicked":{"type":"integer"},"bounced":{"type":"integer"},"complained":{"type":"integer"},"unsubscribed":{"type":"integer"},"attributedOrders":{"type":"integer"},"attributedRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"attributionWindowDays":{"type":"integer","minimum":1,"description":"The window these figures were attributed over, from `VenueSettings.marketing.attributionWindowDays` (proposed default 7, audit R094)."},"variants":{"type":"array","description":"Per variant of an A/B campaign, from `MessageDispatch.campaignVariantId` (29 September, build pass, group G2; 22.1.17). Empty for a single-content campaign.","items":{"type":"object","properties":{"variantId":{"type":"string","format":"uuid"},"label":{"type":"string"},"sent":{"type":"integer"},"opened":{"type":"integer"},"clicked":{"type":"integer"},"attributedOrders":{"type":"integer"},"attributedRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isWinner":{"type":"boolean"}}}},"sendTimeOptimisedCount":{"type":"integer","description":"Messages sent at a per-recipient optimised hour rather than the scheduled time."}}},
+"CampaignStatus": {"type":"string","enum":["draft","scheduled","sending","paused","completed","stopped","failed"]},
+"CampaignTrigger": {"x-ticvai-persistence":"none — embedded in campaign","type":"object","properties":{"event":{"type":"string","enum":["bookingConfirmed","visitCompleted","membershipExpiring","birthday","abandonedCart","firstVisit","inactivity","entitlementExpiring"],"description":"`entitlementExpiring` (29 September, build pass, group G2; 5.5.30) fires on `entitlement.expiringSoon`: a ticket or pass the guest still holds comes within its template's `expiryNoticeDays` of `validTo`. The notice period is set on the template, so `delayHours` shifts the send within it rather than setting it. An entitlement belonging to a membership is left to `membershipExpiring`, so a member is not told twice."},"delayHours":{"type":"integer"},"conditions":{"type":"array","items":{"$ref":"#/components/schemas/SegmentCriterion"}}}},
+"ConsentPurpose": {"type":"string","enum":["marketing","personalisation","profiling","thirdPartySharing","aiProcessing","transactional"]},
+"CreateApprovalRequest": {"type":"object","x-ticvai-persistence":"none — request only","required":["id","kind","subjectContract","subjectType","subjectId","scopePath","summary"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"subjectContract":{"type":"string","description":"Which contract owns the thing being approved."},"subjectType":{"type":"string"},"subjectId":{"type":"string","description":"**A reference, never a copy.** A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.\n"},"scopePath":{"type":"string"},"summary":{"type":"string","maxLength":300,"description":"What the approver sees in their queue before opening it."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"attributes":{"type":"object","additionalProperties":true},"justification":{"type":"string","maxLength":1000},"isDraft":{"type":"boolean","default":false,"description":"True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129).\n"}}},
+"CreateCampaignRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","kind","channel","segmentId","content"],"properties":{"name":{"type":"string","maxLength":200},"kind":{"$ref":"#/components/schemas/CampaignKind"},"channel":{"$ref":"#/components/schemas/MessageChannel"},"venueId":{"type":"string","format":"uuid"},"segmentId":{"type":"string","format":"uuid"},"content":{"$ref":"#/components/schemas/CampaignContent"},"trigger":{"$ref":"#/components/schemas/CampaignTrigger"},"scheduledFor":{"type":"string","format":"date-time"},"consentPurpose":{"allOf":[{"$ref":"#/components/schemas/ConsentPurpose"}],"default":"marketing"},"sendWindow":{"type":"object","description":"Hours during which sending is permitted. A promotional message at 3am is a complaint waiting to happen.\n","properties":{"startTime":{"type":"string"},"endTime":{"type":"string"},"timeZone":{"type":"string"}}},"sendTimeMode":{"type":"string","enum":["fixed","optimised"],"default":"fixed","description":"`optimised` sends each recipient at the hour `ai.requestSuggestion` (kind `sendTime`) gives for them, inside `sendWindow` (29 September, build pass, group G2; 22.3.19). `fixed` is the behaviour before. Falls back to `scheduledFor` per recipient where there is no suggestion or AI is off."},"optimiseChannel":{"type":"boolean","default":false,"description":"With `sendTimeMode` `optimised`, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). Off keeps `channel`."},"variants":{"type":"array","maxItems":5,"nullable":true,"description":"**A/B (or up to five-way) content and subject variants** (29 September, build pass, group G2; 22.1.17, BO-772). Each is a subject override and optionally a different template, written by a person or taken from an AI draft (`ai.proposeMarketingContent`, `source` `aiDraft`). Held as rows of `marketing.campaign_variant`. Null or empty is a single-content campaign.","items":{"$ref":"#/components/schemas/MarketingCampaignVariant"}},"abTest":{"type":"object","nullable":true,"description":"How the variants are tested. Required when `variants` has two or more.","properties":{"testPercent":{"type":"integer","minimum":5,"maximum":100,"default":20,"description":"Share of the audience the variants are tested on; 100 splits everyone and picks no winner."},"successMetric":{"type":"string","enum":["openRate","clickRate","conversionRate","attributedRevenue"],"default":"clickRate"},"decideAfterHours":{"type":"integer","minimum":1,"maximum":168,"default":4},"winnerRule":{"type":"string","enum":["automatic","manual"],"default":"automatic"},"minimumSamplePerVariant":{"type":"integer","minimum":1,"default":500,"description":"Below this many sends per variant no winner is declared automatically; a person picks."},"winningVariantId":{"type":"string","format":"uuid","nullable":true,"description":"Set by the automatic rule, or by a person through `updateCampaign`."}}}}},
+"CreateSegmentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","criteria"],"properties":{"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid"},"match":{"type":"string","enum":["all","any"],"default":"all"},"criteria":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/SegmentCriterion"}},"excludeSegmentIds":{"type":"array","items":{"type":"string","format":"uuid"}}}},
+"InvitationCampaign": {"type":"object","x-ticvai-persistence":"marketing.invitation_campaign","description":"BL-150. **An invitation is not a campaign and not a comp**, and CF-74's issuance half needed it too.\nA campaign broadcasts; an invitation is addressed, quota-bounded and expects a response. **A press night, a sponsor allocation, a members' preview** — all three need to know who was asked, who accepted, and how many places are left.\n","required":["id","name","quota","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"name":{"type":"string"},"eventId":{"type":"string","format":"uuid","nullable":true},"productId":{"type":"string","format":"uuid","nullable":true},"quota":{"type":"integer","description":"**Places held, not invitations sent.** Over-inviting against a known acceptance rate is normal and deliberate; **over-issuing against the quota is not**, and the two must not be the same number.\n"},"overInvitePercent":{"type":"number","default":0,"description":"How many more may be invited than there are places. **A press night invites 150 for 100 seats because 60% come**, and a system that refuses the 101st invitation makes the venue do that arithmetic by hand.\n"},"issuedCount":{"type":"integer","readOnly":true},"acceptedCount":{"type":"integer","readOnly":true},"respondByAt":{"type":"string","format":"date-time","nullable":true},"status":{"readOnly":true,"type":"string","enum":["draft","open","closed","cancelled"]},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"MarketingCampaignVariant": {"type":"object","x-ticvai-persistence":"marketing.campaign_variant","description":"One content or subject variant of a campaign, for an A/B test (22.1.17; 29 September, build pass, group G2, from group G1's handoff). Written with its campaign by `createCampaign` and `updateCampaign`.","required":["label"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"campaignId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"marketing.campaign"},"label":{"type":"string","maxLength":20,"description":"A, B, C..."},"subjectOverride":{"type":"object","nullable":true,"description":"Subject line by locale.","additionalProperties":{"type":"string"}},"templateId":{"type":"string","format":"uuid","nullable":true,"description":"A different template for this variant; null uses the campaign's `content.templateId`."},"splitPercent":{"type":"integer","minimum":1,"maximum":100,"nullable":true,"description":"Share of the test group; null splits evenly."},"source":{"type":"string","enum":["manual","aiDraft"],"default":"manual"},"aiDecisionRecordId":{"type":"string","nullable":true,"description":"The decision record of the `ai.proposeMarketingContent` draft it came from, for `aiDraft`."},"isWinner":{"type":"boolean","default":false,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005), the campaign's."}}},
+"MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
+"MessageTemplate": {"x-ticvai-persistence":"marketing.message_template","type":"object","required":["id","code","name","channel","bodies"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"channel":{"$ref":"#/components/schemas/MessageChannel"},"subjects":{"type":"object","description":"Per language. Email only.","additionalProperties":{"type":"string"}},"bodies":{"type":"object","description":"Per language, keyed by ISO 639-1 code.","additionalProperties":{"type":"string"}},"mergeFields":{"type":"array","items":{"type":"string"}},"missingLanguages":{"type":"array","readOnly":true,"description":"Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n","items":{"type":"string"}},"providerTemplateId":{"type":"string","nullable":true,"description":"Required for WhatsApp, where templates are pre-approved by the provider."},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand whose identity the template carries; null for the tenant default."},"ownership":{"type":"string","enum":["platform","crm"],"default":"crm","description":"`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"}}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"Segment": {"x-ticvai-persistence":"marketing.segment + marketing.segment_criterion","allOf":[{"$ref":"#/components/schemas/CreateSegmentRequest"},{"type":"object","required":["id","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"lastEvaluatedSize":{"type":"integer","nullable":true},"lastEvaluatedAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time"}}}]},
+"Suggestion": {"type":"object","x-ticvai-persistence":"ai.suggestion","description":"One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n","required":["id","kind","basis","maturity","producedAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/SuggestionKind"},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"scopePath":{"type":"string"},"subjectRef":{"type":"string","nullable":true,"description":"What it is about — a product, an outlet, an item, a party."},"value":{"type":"object","additionalProperties":true,"description":"The suggestion itself. Shape depends on `kind`."},"confidence":{"type":"number","nullable":true,"minimum":0,"maximum":1,"description":"**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"},"explanation":{"type":"string","description":"**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"},"inputs":{"type":"object","additionalProperties":true,"description":"What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"},"producerRef":{"type":"string","description":"The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"},"maturity":{"$ref":"#/components/schemas/AiMaturity"},"producedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true,"description":"**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"}}},
+"SuggestionBasis": {"type":"string","description":"**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n","enum":["heuristic","statistical","model","hybrid","manual"]},
+"SuggestionKind": {"type":"string","description":"What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline. Every change names a point or performance of that day's venue only, rides, dining and retail alike (30 September client meeting, MoM 4.7).\n","enum":["price","replenishment","requisition","demandForecast","prepPlan","menuEngineering","staffing","slaTarget","waitTime","upsell","segmentation","anomaly","scenario","sendTime","wasteRisk","queueBalancing","itinerary"]},
+"TouchPoint": {"type":"object","x-ticvai-persistence":"marketing.touch_point","description":"22.14.17, 22.14.18, BL-177. **`CampaignPerformance.attributedOrders` models single-touch — one campaign, one order.**\nA guest sees an email, ignores it, sees a social post, searches, and buys. **Single-touch credits whichever one the model happened to pick**, and a marketing team optimising on that optimises the wrong channel.\n**The platform records touches and does not pick a model.** Which attribution rule applies is a reporting question, and hard-coding one here would make every other one unanswerable.\n","required":["id","subjectId","channel","occurredAt"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid"},"campaignId":{"type":"string","format":"uuid","nullable":true},"journeyId":{"type":"string","format":"uuid","nullable":true},"channel":{"type":"string"},"kind":{"type":"string","enum":["impression","open","click","visit","conversion"]},"occurredAt":{"type":"string","format":"date-time"},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"Set on the conversion touch. **The chain before it is what makes attribution possible.**"}}}
 }
 ```

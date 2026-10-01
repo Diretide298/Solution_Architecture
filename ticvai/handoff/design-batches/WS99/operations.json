@@ -1,17 +1,4 @@
 {
- "listModuleCatalogue": {
-  "method": "GET",
-  "path": "/module-catalogue",
-  "contract": "subscription",
-  "summary": "Modules, their dependencies and their commercial treatment",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ModuleListing"
- },
  "listSaleChannel": {
   "method": "GET",
   "path": "/sale-channel",
@@ -60,43 +47,5 @@
   ],
   "requestBody": null,
   "responds": "Page"
- },
- "scoreVsiAssessment": {
-  "method": "POST",
-  "path": "/vsi-assessments",
-  "contract": "subscription",
-  "summary": "Score a prospect's answers into a tier and a package",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "VsiAssessment",
-  "responds": "VsiResult"
- },
- "submitOnboardingApplication": {
-  "method": "POST",
-  "path": "/onboarding-applications",
-  "contract": "subscription",
-  "summary": "A prospect signs themselves up",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "OnboardingApplication",
-  "responds": "OnboardingApplication"
  }
 }

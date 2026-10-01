@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -55,21 +56,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `ADM-158` | Coupon & Promo Code Command Center | commandCentre | 1 | 0 | — |
-| `ADM-159` | Coupon & Promo Code Builder | configEditor | 1 | 0 | — |
-| `ADM-160` | Unique Code Generation & Batch Manager | configEditor | 1 | 0 | — |
-| `ADM-161` | Code Eligibility & Restriction Manager | listDetail | 1 | 0 | — |
-| `ADM-162` | Usage, Capacity & Frequency Control | listDetail | 1 | 0 | — |
-| `ADM-163` | Validity, Date & Time Control | listDetail | 1 | 0 | — |
-| `ADM-164` | Code Distribution & Assignment Manager | listDetail | 1 | 0 | — |
-| `ADM-165` | Redemption Monitor & Code Lookup | listDetail | 1 | 0 | — |
-| `ADM-166` | Code Security, Fraud & Exception Center | listDetail | 1 | 0 | — |
-| `ADM-167` | Redemption Analytics, Audit & AI Optimization | commandCentre | 1 | 0 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `ADM-158` | Coupon & Promo Code Command Center | B–D | 0 | 16 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
+| `ADM-159` | Coupon & Promo Code Builder | A | 9 | 0 | 5 | 0 | 0 | 2 | — | notStarted (generated) |
+| `ADM-160` | Unique Code Generation & Batch Manager | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-161` | Code Eligibility & Restriction Manager | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-162` | Usage, Capacity & Frequency Control | B–D | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-163` | Validity, Date & Time Control | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-164` | Code Distribution & Assignment Manager | A | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-165` | Redemption Monitor & Code Lookup | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-166` | Code Security, Fraud & Exception Center | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-167` | Redemption Analytics, Audit & AI Optimization | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -77,2915 +84,1194 @@ convincingly. It is never a caption.
 
 ---
 
-## `screens.json`
+## Screen by screen
 
-Every field of every screen in this batch. **`machine` is what a screen is in the middle of**, `overlays` is what opens over it and what closing it does, and `navigation.transitions` is how you leave, with `carries` naming the state that travels.
+**One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-```json
-[
- {
-  "id": "ADM-158",
-  "name": "Coupon & Promo Code Command Center",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "1",
-   "page": 36
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/coupon-promo-code-command-center-adm-158",
-   "component": "apps/ticvai-web/src/routes/commercial/CouponPromoCodeCommandCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-002"
-   ],
-   "exitTo": [
-    "ADM-002",
-    "ADM-159",
-    "ADM-160",
-    "ADM-161",
-    "ADM-162",
-    "ADM-163",
-    "ADM-164",
-    "ADM-165",
-    "ADM-166",
-    "ADM-167"
-   ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
-   "transitions": [
-    {
-     "to": "ADM-002",
-     "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-158 holds none of them. The edge carries nothing: ADM-158 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
-    },
-    {
-     "to": "ADM-159",
-     "trigger": "Works in Coupon & Promo Code Builder",
-     "provenance": "flow F156 step 1→2",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-160",
-     "trigger": "Works in Unique Code Generation & Batch Manager",
-     "provenance": "flow F156 step 3→4",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-161",
-     "trigger": "Works in Code Eligibility & Restriction Manager",
-     "provenance": "flow F156 step 5→6",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-162",
-     "trigger": "Works in Usage, Capacity & Frequency Control",
-     "provenance": "flow F156 step 7→8",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-163",
-     "trigger": "Works in Validity, Date & Time Control",
-     "provenance": "flow F156 step 9→10",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-164",
-     "trigger": "Works in Code Distribution & Assignment Manager",
-     "provenance": "flow F156 step 11→12",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-165",
-     "trigger": "Works in Redemption Monitor & Code Lookup",
-     "provenance": "flow F156 step 13→14",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-166",
-     "trigger": "Works in Code Security, Fraud & Exception Center",
-     "provenance": "flow F156 step 15→16",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-167",
-     "trigger": "Works in Redemption Analytics, Audit & AI Optimization",
-     "provenance": "flow F156 step 17→18",
-     "operation": "listCouponCodes"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show) — counts over a population, then the population",
-  "purpose": "Provide the central operational dashboard for all coupon, promo-code, and promotional voucher activities.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Draft, Pending Approval, Capacity Reached. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Support"
-   }
-  ],
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Active Code Campaigns",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Coupons",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Unique Codes Issued",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Codes Redeemed",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Redemption Rate",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Unused Codes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expired Codes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Suspended Codes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Remaining Redemption Capacity",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Discount Granted",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revenue Generated",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Order Value",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Fraud/Suspicious Usage Alerts",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every coupon promo code",
-       "columns": [
-        "Top-performing codes",
-        "Redemption trend",
-        "Redemption by channel",
-        "Redemption by venue",
-        "Redemption by partner",
-        "Redemption by customer segment",
-        "Discount exposure",
-        "Campaign budget consumption"
-       ],
-       "bindsTo": "CouponCode",
-       "operation": "listCouponCodes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected coupon promo code",
-       "bindsTo": "CouponCode",
-       "columns": [
-        "Top-performing codes",
-        "Redemption trend",
-        "Redemption by channel",
-        "Redemption by venue",
-        "Redemption by partner",
-        "Redemption by customer segment",
-        "Discount exposure",
-        "Campaign budget consumption"
-       ],
-       "notes": null,
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Show"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Draft",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Pending Approval",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Capacity Reached",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Support"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The coupon promo code list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the coupon promo code untouched.",
-   "emptyFirstRun": "No coupon promo code yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the coupon promo code are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCouponCodes",
-    "contract": "promotions",
-    "purpose": "List generated codes",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "campaignId",
-     "from": "navigation"
-    }
-   ],
-   "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-158",
-   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-158"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 36. 0 of 8 labels bound to a contract property; 24 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-159",
-  "name": "Coupon & Promo Code Builder",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "2",
-   "page": 37
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/coupon-promo-code-builder-adm-159",
-   "component": "apps/ticvai-web/src/routes/commercial/CouponPromoCodeBuilder.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-159 holds none of them. The edge carries nothing: ADM-159 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
-  "purpose": "Create the commercial definition of a coupon or promo-code campaign.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Percentage discount",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Fixed-value discount",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Fixed promotional price",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Free product",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Free ticket",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Free add-on",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Upgrade",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Bundle benefit",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Added value",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setCouponPromoCode"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The coupon promo code configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the coupon promo code untouched.",
-   "emptyFirstRun": "No coupon promo code configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setCouponPromoCode",
-    "contract": "promotions",
-    "purpose": "Coupon & Promo Code Builder",
-    "trigger": "onAction"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-159",
-   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-159"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 9 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-160",
-  "name": "Unique Code Generation & Batch Manager",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "3",
-   "page": 38
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/unique-code-generation-batch-manager-adm-160",
-   "component": "apps/ticvai-web/src/routes/commercial/UniqueCodeGenerationBatchManager.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-160 holds none of them. The edge carries nothing: ADM-160 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Users define) and no display directory — it is settings, not a population",
-  "purpose": "Generate and manage large quantities of secure unique promotional codes.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Unique Code Generation & Batch Manager declares no operation that writes anything** — its only declared call is `listUniqueCodeGeneration`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Campaign",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Number of codes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Code length",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Prefix",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Suffix",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Character type",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Case sensitivity",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Expiration",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Number of uses",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Distribution owner",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The unique code generation configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the unique code generation untouched.",
-   "emptyFirstRun": "No unique code generation configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listUniqueCodeGeneration",
-    "contract": "promotions",
-    "purpose": "Unique Code Generation & Batch Manager",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-160",
-   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-160"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 38. 0 of 0 labels bound to a contract property; 10 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-161",
-  "name": "Code Eligibility & Restriction Manager",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "4",
-   "page": 39
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/code-eligibility-restriction-manager-adm-161",
-   "component": "apps/ticvai-web/src/routes/commercial/CodeEligibilityRestrictionManager.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-161 holds none of them. The edge carries nothing: ADM-161 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Determine where, when, by whom, and against what a code can be redeemed. The matrix explicitly requires promo codes to support restrictions for usage, dates, duration, capacity, frequency, location, group, partner, operating area, and sales channel.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Code Eligibility & Restriction Manager declares no operation that writes anything** — its only declared call is `listCodeEligibilityRestriction`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 39"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 39"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCodeEligibilityRestriction",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The code eligibility restriction list.",
-   "error": "Could not load. Names which read failed and leaves the code eligibility restriction untouched.",
-   "emptyFirstRun": "No code eligibility restriction yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the code eligibility restriction are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCodeEligibilityRestriction",
-    "contract": "promotions",
-    "purpose": "Code Eligibility & Restriction Manager",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "CodeEligibilityRestrictionManagerView.productScopes"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-161",
-   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-161"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-162",
-  "name": "Usage, Capacity & Frequency Control",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "5",
-   "page": 41
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/usage-capacity-frequency-control-adm-162",
-   "component": "apps/ticvai-web/src/routes/commercial/UsageCapacityFrequencyControl.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-162 holds none of them. The edge carries nothing: ADM-162 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Control exactly how frequently and how many times promotional codes may be redeemed.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every usage capacity frequency",
-       "columns": [
-        "UsageCapacityFrequencyControlView.issued",
-        "UsageCapacityFrequencyControlView.redeemed",
-        "UsageCapacityFrequencyControlView.reservedPending",
-        "UsageCapacityFrequencyControlView.remaining"
-       ],
-       "bindsTo": "UsageCapacityFrequencyControlView",
-       "operation": "listUsageCapacityFrequency",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 41 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected usage capacity frequency",
-       "bindsTo": "UsageCapacityFrequencyControlView",
-       "columns": [
-        "UsageCapacityFrequencyControlView.issued",
-        "UsageCapacityFrequencyControlView.redeemed",
-        "UsageCapacityFrequencyControlView.reservedPending",
-        "UsageCapacityFrequencyControlView.remaining"
-       ],
-       "notes": null,
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 41 §Show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The usage capacity frequency list.",
-   "error": "Could not load. Names which read failed and leaves the usage capacity frequency untouched.",
-   "emptyFirstRun": "No usage capacity frequency yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the usage capacity frequency are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listUsageCapacityFrequency",
-    "contract": "promotions",
-    "purpose": "Usage, Capacity & Frequency Control",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "UsageCapacityFrequencyControlView.issued",
-    "UsageCapacityFrequencyControlView.redeemed",
-    "UsageCapacityFrequencyControlView.reservedPending",
-    "UsageCapacityFrequencyControlView.remaining"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-162",
-   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-162"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 41. 4 of 4 labels bound to a contract property; 4 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-163",
-  "name": "Validity, Date & Time Control",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "6",
-   "page": 41
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/validity-date-time-control-adm-163",
-   "component": "apps/ticvai-web/src/routes/commercial/ValidityDateTimeControl.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-163 holds none of them. The edge carries nothing: ADM-163 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Control the temporal validity of coupons and codes.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 41"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 41"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listValidityDateTime",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The validity date time list.",
-   "error": "Could not load. Names which read failed and leaves the validity date time untouched.",
-   "emptyFirstRun": "No validity date time yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the validity date time are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listValidityDateTime",
-    "contract": "promotions",
-    "purpose": "Validity, Date & Time Control",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "ValidityDateTimeControlView.blackoutDates",
-    "ValidityDateTimeControlView.holidays",
-    "ValidityDateTimeControlView.selectedTimeslots"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-163",
-   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-163"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-164",
-  "name": "Code Distribution & Assignment Manager",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "7",
-   "page": 42
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/code-distribution-assignment-manager-adm-164",
-   "component": "apps/ticvai-web/src/routes/commercial/CodeDistributionAssignmentManager.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-164 holds none of them. The edge carries nothing: ADM-164 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Manage how promotional codes are allocated and distributed.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every code distribution",
-       "columns": [
-        "CodeDistributionAssignmentManagerView.generated",
-        "CodeDistributionAssignmentManagerView.assigned",
-        "CodeDistributionAssignmentManagerView.sent",
-        "CodeDistributionAssignmentManagerView.delivered",
-        "CodeDistributionAssignmentManagerView.viewed",
-        "CodeDistributionAssignmentManagerView.redeemed",
-        "CodeDistributionAssignmentManagerView.expired",
-        "CodeDistributionAssignmentManagerView.cancelled"
-       ],
-       "bindsTo": "CodeDistributionAssignmentManagerView",
-       "operation": "setCodeDistributionManager",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 42 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected code distribution",
-       "bindsTo": "CodeDistributionAssignmentManagerView",
-       "columns": [
-        "CodeDistributionAssignmentManagerView.generated",
-        "CodeDistributionAssignmentManagerView.assigned",
-        "CodeDistributionAssignmentManagerView.sent",
-        "CodeDistributionAssignmentManagerView.delivered",
-        "CodeDistributionAssignmentManagerView.viewed",
-        "CodeDistributionAssignmentManagerView.redeemed",
-        "CodeDistributionAssignmentManagerView.expired",
-        "CodeDistributionAssignmentManagerView.cancelled"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Distribution Channels”, “Codes may be assigned to”, “External Partner Example”.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 42 §Show"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setCodeDistributionManager"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The code distribution list.",
-   "error": "Could not load. Names which read failed and leaves the code distribution untouched.",
-   "emptyFirstRun": "No code distribution yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the code distribution are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setCodeDistributionManager",
-    "contract": "promotions",
-    "purpose": "Code Distribution & Assignment Manager",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "CodeDistributionAssignmentManagerView.generated",
-    "CodeDistributionAssignmentManagerView.assigned",
-    "CodeDistributionAssignmentManagerView.sent",
-    "CodeDistributionAssignmentManagerView.delivered",
-    "CodeDistributionAssignmentManagerView.viewed",
-    "CodeDistributionAssignmentManagerView.redeemed"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-164",
-   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-164"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 42. 8 of 8 labels bound to a contract property; 8 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-165",
-  "name": "Redemption Monitor & Code Lookup",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "8",
-   "page": 43
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/redemption-monitor-code-lookup-adm-165",
-   "component": "apps/ticvai-web/src/routes/commercial/RedemptionMonitorCodeLookup.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-165 holds none of them. The edge carries nothing: ADM-165 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Provide real-time operational visibility into coupon and promo-code redemption.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every redemption code lookup",
-       "columns": [
-        "RedemptionMonitorCodeLookupView.code",
-        "Redemption date/time",
-        "RedemptionMonitorCodeLookupView.product",
-        "RedemptionMonitorCodeLookupView.originalValue",
-        "RedemptionMonitorCodeLookupView.discount",
-        "RedemptionMonitorCodeLookupView.finalValue",
-        "RedemptionMonitorCodeLookupView.channel",
-        "RedemptionMonitorCodeLookupView.venue",
-        "RedemptionMonitorCodeLookupView.devicePos",
-        "RedemptionMonitorCodeLookupView.operator",
-        "RedemptionMonitorCodeLookupView.validationResult"
-       ],
-       "bindsTo": "RedemptionMonitorCodeLookupView",
-       "operation": "listRedemptionCodeLookup",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 43 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected redemption code lookup",
-       "bindsTo": "RedemptionMonitorCodeLookupView",
-       "columns": [
-        "RedemptionMonitorCodeLookupView.code",
-        "Redemption date/time",
-        "RedemptionMonitorCodeLookupView.product",
-        "RedemptionMonitorCodeLookupView.originalValue",
-        "RedemptionMonitorCodeLookupView.discount",
-        "RedemptionMonitorCodeLookupView.finalValue",
-        "RedemptionMonitorCodeLookupView.channel",
-        "RedemptionMonitorCodeLookupView.venue",
-        "RedemptionMonitorCodeLookupView.devicePos",
-        "RedemptionMonitorCodeLookupView.operator",
-        "RedemptionMonitorCodeLookupView.validationResult"
-       ],
-       "notes": null,
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 43 §Show"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Promo code, Coupon ID, Batch ID, Transaction, Booking, Customer, Partner, Campaign. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 43 §Authorized users can search by"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The redemption code lookup list.",
-   "error": "Could not load. Names which read failed and leaves the redemption code lookup untouched.",
-   "emptyFirstRun": "No redemption code lookup yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the redemption code lookup are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listRedemptionCodeLookup",
-    "contract": "promotions",
-    "purpose": "Redemption Monitor & Code Lookup",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "RedemptionMonitorCodeLookupView.code",
-    "Redemption date/time"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-165",
-   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-165"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 43. 14 of 15 labels bound to a contract property; 23 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-166",
-  "name": "Code Security, Fraud & Exception Center",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "9",
-   "page": 44
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/code-security-fraud-exception-center-adm-166",
-   "component": "apps/ticvai-web/src/routes/commercial/CodeSecurityFraudExceptionCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-166 holds none of them. The edge carries nothing: ADM-166 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Monitor) and no metric row",
-  "purpose": "Detect promo-code abuse, leakage, abnormal redemption, and suspicious campaign behavior.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every code security fraud",
-       "columns": [
-        "CodeSecurityFraudExceptionCenterView.signalType"
-       ],
-       "bindsTo": "CodeSecurityFraudExceptionCenterView",
-       "operation": "listCodeSecurityFraud",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 44 §Monitor"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected code security fraud",
-       "bindsTo": "CodeSecurityFraudExceptionCenterView",
-       "columns": [
-        "CodeSecurityFraudExceptionCenterView.signalType"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Risk Levels”.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 44 §Monitor"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Suspend individual code, Suspend batch, Suspend campaign, Block redemption, Reinstate code, Assign investigation, Add case note. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 44 §Authorized users can"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The code security fraud list.",
-   "error": "Could not load. Names which read failed and leaves the code security fraud untouched.",
-   "emptyFirstRun": "No code security fraud yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the code security fraud are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCodeSecurityFraud",
-    "contract": "promotions",
-    "purpose": "Code Security, Fraud & Exception Center",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "CodeSecurityFraudExceptionCenterView.signalType"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-166",
-   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-166"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 44. 9 of 9 labels bound to a contract property; 16 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-167",
-  "name": "Redemption Analytics, Audit & AI Optimization",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "10",
-   "page": 45
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/redemption-analytics-audit-ai-optimization-adm-167",
-   "component": "apps/ticvai-web/src/routes/commercial/RedemptionAnalyticsAuditAiOptimization.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-167 holds none of them. The edge carries nothing: ADM-167 is opened from ADM-158, so this edge is the way back and ADM-158 keeps its own state"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Board 3 shall be considered complete when: 1. Users can create common and unique promotional codes. 2. Coupons and promotional vouchers can be configured. 3. Large unique-code batches can be generated. 4. Codes can support single, multiple, capped, or unlimited redemption. 5. Usage can be limited per booking, customer, account, channel, venue, or campaign. 6. Date/time/relative validity rules are supported. 7. Product and ticket eligibility can be configured. 8. Customer and segment eligibility can be configured. 9. Channel, partner, and location restrictions can be configured. 10.Codes can tr",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§Performance KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Provide complete performance analytics and governance for coupon and promo-code campaigns. Board 4 shall provide TICVAI with an enterprise-grade Advanced Promotion Mechanics Engine for promotions involving relationships between products, quantities, basket composition, rewards, and qualifying purchases. While Board 2 defines standard discounts and thresholds and Board 3 manages promo codes/coupons, Board 4 answers: “When the customer buys X, what exactly should TICVAI give them, discount, replace, upgrade, or add to the transaction?” The matrix requires mechanics such as Buy X Get X, Buy X Get Y, Buy N Get X, percentage/amount discounts on another product, cheapest-item-free, fixed-price combinations, cross-category F&B/Retail rewards, added-value gifts, and automatic cart-level promotion application. Board 4 shall contain 10 backend screens.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search redemption analytics audit",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Analyze by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Campaign",
-        "Code",
-        "Batch",
-        "Product",
-        "Venue",
-        "Channel",
-        "Customer segment",
-        "Partner",
-        "Date/time",
-        "Promotion type"
-       ],
-       "notes": "The pack filters this screen by campaign, code, batch, product, venue, channel and 4 more — which are present is a decision the pack already made.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Analyze by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Codes generated",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.codesGenerated"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Codes distributed",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.codesDistributed"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Codes redeemed",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.codesRedeemed"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Redemption rate",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.redemptionRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Conversion rate",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.conversionRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revenue generated",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.revenueGenerated"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Discount granted",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.discountGranted"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Incremental revenue",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.incrementalRevenue"
-      },
-      {
-       "kind": "metricTile",
-       "label": "AOV uplift",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.aovUplift"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Cost per redemption",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.costPerRedemption"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Margin impact",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.marginImpact"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expired unused codes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.expiredUnusedCodes"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The redemption analytics audit list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the redemption analytics audit untouched.",
-   "emptyFirstRun": "No redemption analytics audit yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the redemption analytics audit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listRedemption",
-    "contract": "promotions",
-    "purpose": "Redemption Analytics, Audit & AI Optimization",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "RedemptionAnalyticsAuditAiOptimizationView.codesGenerated",
-    "RedemptionAnalyticsAuditAiOptimizationView.codesDistributed",
-    "RedemptionAnalyticsAuditAiOptimizationView.codesRedeemed",
-    "RedemptionAnalyticsAuditAiOptimizationView.redemptionRate",
-    "RedemptionAnalyticsAuditAiOptimizationView.conversionRate",
-    "RedemptionAnalyticsAuditAiOptimizationView.revenueGenerated"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-167",
-   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-167"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 45. 12 of 22 labels bound to a contract property; 22 of 144 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- }
-]
-```
+### `ADM-158` Coupon & Promo Code Command Center
 
-## `operations.json`
+**Provide the central operational dashboard for all coupon, promo-code, and promotional voucher activities.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show) — counts over a population, then the population |
+| Offline | online only |
+| Opens with | `campaignId` (navigation) · cold entry: **Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that … |
+| Route | `/commercial/coupon-promo-code-command-center-adm-158` |
+
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Draft, Pending Approval, Capacity Reached. Each needs an operation, or needs removing from the screen; this …
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Active Code Campaigns** (metric tile)
+
+**Active Coupons** (metric tile)
+
+**Unique Codes Issued** (metric tile)
+
+**Codes Redeemed** (metric tile)
+
+**Redemption Rate** (metric tile)
+
+**Unused Codes** (metric tile)
+
+**Expired Codes** (metric tile)
+
+**Suspended Codes** (metric tile)
+
+**Remaining Redemption Capacity** (metric tile)
+
+**Discount Granted** (metric tile)
+
+**Revenue Generated** (metric tile)
+
+**Average Order Value** (metric tile)
+
+**Fraud/Suspicious Usage Alerts** (metric tile)
+
+**Every coupon promo code** (data table, from `listCouponCodes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Top performing codes | text | not in the schema: `Top-performing codes` |
+| Redemption trend | text | not in the schema: `Redemption trend` |
+| Redemption by channel | text | not in the schema: `Redemption by channel` |
+| Redemption by venue | text | not in the schema: `Redemption by venue` |
+| Redemption by partner | text | not in the schema: `Redemption by partner` |
+| Redemption by customer segment | text | not in the schema: `Redemption by customer segment` |
+| Discount exposure | text | not in the schema: `Discount exposure` |
+| Campaign budget consumption | text | not in the schema: `Campaign budget consumption` |
+
+**The selected coupon promo code** (detail panel)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Top performing codes | text | not in the schema: `Top-performing codes` |
+| Redemption trend | text | not in the schema: `Redemption trend` |
+| Redemption by channel | text | not in the schema: `Redemption by channel` |
+| Redemption by venue | text | not in the schema: `Redemption by venue` |
+| Redemption by partner | text | not in the schema: `Redemption by partner` |
+| Redemption by customer segment | text | not in the schema: `Redemption by customer segment` |
+| Discount exposure | text | not in the schema: `Discount exposure` |
+| Campaign budget consumption | text | not in the schema: `Campaign budget consumption` |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Draft (primary button) | navigation or local | — | — | — | — |
+| Pending Approval (secondary button) | navigation or local | — | — | — | — |
+| Capacity Reached (secondary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `ADM-002` Platform Dashboard: *Platform Dashboard*
+- → `ADM-159` Coupon & Promo Code Builder: *Works in Coupon & Promo Code Builder*; calls `listCouponCodes`
+- → `ADM-160` Unique Code Generation & Batch Manager: *Works in Unique Code Generation & Batch Manager*; calls `listCouponCodes`
+- → `ADM-161` Code Eligibility & Restriction Manager: *Works in Code Eligibility & Restriction Manager*; calls `listCouponCodes`
+- → `ADM-162` Usage, Capacity & Frequency Control: *Works in Usage, Capacity & Frequency Control*; calls `listCouponCodes`
+- → `ADM-163` Validity, Date & Time Control: *Works in Validity, Date & Time Control*; calls `listCouponCodes`
+- → `ADM-164` Code Distribution & Assignment Manager: *Works in Code Distribution & Assignment Manager*; calls `listCouponCodes`
+- → `ADM-165` Redemption Monitor & Code Lookup: *Works in Redemption Monitor & Code Lookup*; calls `listCouponCodes`
+- → `ADM-166` Code Security, Fraud & Exception Center: *Works in Code Security, Fraud & Exception Center*; calls `listCouponCodes`
+- → `ADM-167` Redemption Analytics, Audit & AI Optimization: *Works in Redemption Analytics, Audit & AI Optimization*; calls `listCouponCodes`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The coupon promo code list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the coupon promo code untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No coupon promo code yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the coupon promo code are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listCouponCodes` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A66** Design a promotions engine: single/shared promo codes, bulk-generated unique single-use codes, and rule-based dynamic offers (e.g., buy-2-get-1-free) applied automatically without code entry *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 7 Aug 2026 · workshop tracker · keyword 'promo code')*
+- **A171** Build gift cards and vouchers in two variants (monetary vs. product-specific entitlement) with redemption channel rules, wallet-to-media linking and spend reporting by department and channel *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 27 Aug 2026 · workshop tracker · keyword 'voucher')*
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-158` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-158`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 1: Opens Coupon & Promo Code Command Center → Provide the central operational dashboard for all coupon, promo-code, and promotional voucher activities.
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 3: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 5: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 7: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 9: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 11: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 13: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 15: Returns to the board's landing screen → Ready for the next screen on this board
+- … and 1 more flow steps (`flows/`)
+- Flow F156 branch at step 1 (expected): when Nothing has been set up on Coupon & Promo Code Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
+- Flow F156 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-158?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Draft, Pending Approval, Capacity Reached.
+- [ ] Every transition is wired: `ADM-002`, `ADM-159`, `ADM-160`, `ADM-161`, `ADM-162`, `ADM-163`, `ADM-164`, `ADM-165`, `ADM-166`, `ADM-167`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-159` Coupon & Promo Code Builder
+
+**Create the commercial definition of a coupon or promo-code campaign.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | Block A · ticket #20648 (APP-SETUP-ADM-159) |
+| Who uses it | ticvai staff holding `PRICE_CONFIGURE` (1 configure); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/coupon-promo-code-builder-adm-159` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Percentage discount | select field | — | — | — | — | — | — |
+| Fixed-value discount | select field | — | — | — | — | — | — |
+| Fixed promotional price | select field | — | — | — | — | — | — |
+| Free product | select field | — | — | — | — | — | — |
+| Free ticket | select field | — | — | — | — | — | — |
+| Free add-on | select field | — | — | — | — | — | — |
+| Upgrade | select field | — | — | — | — | — | — |
+| Bundle benefit | select field | — | — | — | — | — | — |
+| Added value | select field | — | — | — | — | — | — |
+
+#### Outputs: what the screen shows and produces
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save changes (primary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `ADM-158` Coupon & Promo Code Command Center: *Coupon & Promo Code Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The coupon promo code configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the coupon promo code untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No coupon promo code configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `setCouponPromoCode` → `PRICE_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A66** Design a promotions engine: single/shared promo codes, bulk-generated unique single-use codes, and rule-based dynamic offers (e.g., buy-2-get-1-free) applied automatically without code entry *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S10 (decision log, for TICVAI's review) · 7 Aug 2026 · workshop tracker · keyword 'promo code')*
+- **A171** Build gift cards and vouchers in two variants (monetary vs. product-specific entitlement) with redemption channel rules, wallet-to-media linking and spend reporting by department and channel *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 27 Aug 2026 · workshop tracker · keyword 'voucher')*
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-159` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-159`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 2: Works in Coupon & Promo Code Builder → Create the commercial definition of a coupon or promo-code campaign.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-159?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save changes.
+- [ ] Every transition is wired: `ADM-158`.
+- [ ] Every gated control is gated: `PRICE_CONFIGURE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-160` Unique Code Generation & Batch Manager
+
+**Generate and manage large quantities of secure unique promotional codes.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Users define) and no display directory — it is settings, not a population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/unique-code-generation-batch-manager-adm-160` |
+
+**Known gaps.** **Unique Code Generation & Batch Manager declares no operation that writes anything** — its only declared call is `listUniqueCodeGeneration`, a read. The name promises authoring and the contract …
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Campaign | select field | — | — | — | — | — | — |
+| Number of codes | select field | — | — | — | — | — | — |
+| Code length | select field | — | — | — | — | — | — |
+| Prefix | select field | — | — | — | — | — | — |
+| Suffix | select field | — | — | — | — | — | — |
+| Character type | select field | — | — | — | — | — | — |
+| Case sensitivity | select field | — | — | — | — | — | — |
+| Expiration | select field | — | — | — | — | — | — |
+| Number of uses | select field | — | — | — | — | — | — |
+| Distribution owner | select field | — | — | — | — | — | — |
+
+#### Outputs: what the screen shows and produces
+
+**Data it reads**: `listUniqueCodeGeneration` (onLoad, Unique Code Generation & Batch Manager)
+
+**Where the user goes next**
+
+- → `ADM-158` Coupon & Promo Code Command Center: *Coupon & Promo Code Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The unique code generation configuration as saved. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the unique code generation untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No unique code generation configured yet. Carries the create action and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listUniqueCodeGeneration` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-160` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-160`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 4: Works in Unique Code Generation & Batch Manager → Generate and manage large quantities of secure unique promotional codes.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (10), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-160?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-158`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-161` Code Eligibility & Restriction Manager
+
+**Determine where, when, by whom, and against what a code can be redeemed. The matrix explicitly requires promo codes to support restrictions for usage, dates, duration, capacity, frequency, location, group, partner, operating area, and sales channel.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/code-eligibility-restriction-manager-adm-161` |
+
+**Known gaps.** **Code Eligibility & Restriction Manager declares no operation that writes anything** — its only declared call is `listCodeEligibilityRestriction`, a read. The name promises authoring and the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Data it reads**: `listCodeEligibilityRestriction` (onLoad, Code Eligibility & Restriction Manager)
+
+**Where the user goes next**
+
+- → `ADM-158` Coupon & Promo Code Command Center: *Coupon & Promo Code Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The code eligibility restriction list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the code eligibility restriction untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No code eligibility restriction yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the code eligibility restriction are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listCodeEligibilityRestriction` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-161` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-161`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 6: Works in Code Eligibility & Restriction Manager → Determine where, when, by whom, and against what a code can be redeemed. The matrix explicitly requires promo codes to support restrictions for usage, dates, duration, capacity, frequency, location …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-161?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-158`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-162` Usage, Capacity & Frequency Control
+
+**Control exactly how frequently and how many times promotional codes may be redeemed.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/usage-capacity-frequency-control-adm-162` |
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every usage capacity frequency** (data table, from `listUsageCapacityFrequency`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Issued | 1,234 | Codes issued |
+| Redeemed | 1,234 | Codes redeemed |
+| Reserved pending | 1,234 | Codes reserved or pending |
+| Remaining | 1,234 | Codes remaining |
+
+**The selected usage capacity frequency** (detail panel)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Issued | 1,234 | Codes issued |
+| Redeemed | 1,234 | Codes redeemed |
+| Reserved pending | 1,234 | Codes reserved or pending |
+| Remaining | 1,234 | Codes remaining |
+
+**Data it reads**: `listUsageCapacityFrequency` (onLoad, Usage, Capacity & Frequency Control)
+
+**Where the user goes next**
+
+- → `ADM-158` Coupon & Promo Code Command Center: *Coupon & Promo Code Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The usage capacity frequency list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the usage capacity frequency untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No usage capacity frequency yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the usage capacity frequency are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listUsageCapacityFrequency` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-162` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-162`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 8: Works in Usage, Capacity & Frequency Control → Control exactly how frequently and how many times promotional codes may be redeemed.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-162?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-158`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-163` Validity, Date & Time Control
+
+**Control the temporal validity of coupons and codes.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/validity-date-time-control-adm-163` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Data it reads**: `listValidityDateTime` (onLoad, Validity, Date & Time Control)
+
+**Where the user goes next**
+
+- → `ADM-158` Coupon & Promo Code Command Center: *Coupon & Promo Code Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The validity date time list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the validity date time untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No validity date time yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the validity date time are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listValidityDateTime` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-163` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-163`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 10: Works in Validity, Date & Time Control → Control the temporal validity of coupons and codes.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-163?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-158`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-164` Code Distribution & Assignment Manager
+
+**Manage how promotional codes are allocated and distributed.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | Block A · ticket #20649 (APP-SETUP-ADM-164) |
+| Who uses it | ticvai staff holding `PRICE_CONFIGURE` (1 configure); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/code-distribution-assignment-manager-adm-164` |
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every code distribution** (data table, from `setCodeDistributionManager`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Generated | text | Generated |
+| Assigned | text | Assigned |
+| Sent | text | Sent |
+| Delivered | text | Delivered |
+| Viewed | text | Viewed where available |
+| Redeemed | text | Redeemed |
+| Expired | 1,234 | Expired |
+| Cancelled | 1,234 | Cancelled |
+
+**The selected code distribution** (detail panel): The pack groups this record's detail under its own headings: “Distribution Channels”, “Codes may be assigned to”, “External Partner Example”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Generated | text | Generated |
+| Assigned | text | Assigned |
+| Sent | text | Sent |
+| Delivered | text | Delivered |
+| Viewed | text | Viewed where available |
+| Redeemed | text | Redeemed |
+| Expired | 1,234 | Expired |
+| Cancelled | 1,234 | Cancelled |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save changes (primary button) | navigation or local | — | — | — | — |
+
+**Where the user goes next**
+
+- → `ADM-158` Coupon & Promo Code Command Center: *Coupon & Promo Code Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The code distribution list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the code distribution untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No code distribution yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the code distribution are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `setCodeDistributionManager` → `PRICE_CONFIGURE` (configure) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-164` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-164`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 12: Works in Code Distribution & Assignment Manager → Manage how promotional codes are allocated and distributed.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-164?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save changes.
+- [ ] Every transition is wired: `ADM-158`.
+- [ ] Every gated control is gated: `PRICE_CONFIGURE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-165` Redemption Monitor & Code Lookup
+
+**Provide real-time operational visibility into coupon and promo-code redemption.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/redemption-monitor-code-lookup-adm-165` |
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Promo code | text field | — | — | `listRedemptionCodeLookup` ?promoCode |
+| Coupon | text field | — | — | `listRedemptionCodeLookup` ?couponId |
+| Batch | text field | — | — | `listRedemptionCodeLookup` ?batchId |
+| Transaction | text field | — | — | `listRedemptionCodeLookup` ?transaction |
+| Booking | text field | — | — | `listRedemptionCodeLookup` ?booking |
+| Customer | text field | — | — | `listRedemptionCodeLookup` ?customer |
+| Partner | text field | — | — | `listRedemptionCodeLookup` ?partner |
+| Campaign | text field | — | — | `listRedemptionCodeLookup` ?campaign |
+| Customer account reference | text field | — | — | `listRedemptionCodeLookup` ?customerAccountReference |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every redemption code lookup** (data table, from `listRedemptionCodeLookup`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | Code |
+| Redemption date/time | text | not in the schema: `Redemption date/time` |
+| Product | text | Product |
+| Original value | text | Original value |
+| Discount | AED 1,234.50 | Discount |
+| Final value | text | Final value |
+| Channel | text | Channel |
+| Venue | text | Venue |
+| Device POS | 1,234 | Device/POS |
+| Operator | text | Operator |
+| Validation result | chip: Valid, Redeemed, Expired, Not started, Usage limit reached, Invalid product… | Validation result of the redemption attempt |
+
+**The selected redemption code lookup** (detail panel)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | Code |
+| Redemption date/time | text | not in the schema: `Redemption date/time` |
+| Product | text | Product |
+| Original value | text | Original value |
+| Discount | AED 1,234.50 | Discount |
+| Final value | text | Final value |
+| Channel | text | Channel |
+| Venue | text | Venue |
+| Device POS | 1,234 | Device/POS |
+| Operator | text | Operator |
+| Validation result | chip: Valid, Redeemed, Expired, Not started, Usage limit reached, Invalid product… | Validation result of the redemption attempt |
+
+**Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Promo code, Coupon ID, Batch ID, Transaction, Booking, Customer, Partner, Campaign. Each needs attaching to the control it gates, or the screen needs the control.
+
+**Data it reads**: `listRedemptionCodeLookup` (onLoad, Redemption Monitor & Code Lookup)
+
+**Where the user goes next**
+
+- → `ADM-158` Coupon & Promo Code Command Center: *Coupon & Promo Code Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The redemption code lookup list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the redemption code lookup untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No redemption code lookup yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the redemption code lookup are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listRedemptionCodeLookup` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-165` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-165`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 14: Works in Redemption Monitor & Code Lookup → Provide real-time operational visibility into coupon and promo-code redemption.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-165?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-158`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-166` Code Security, Fraud & Exception Center
+
+**Detect promo-code abuse, leakage, abnormal redemption, and suspicious campaign behavior.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Monitor) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/code-security-fraud-exception-center-adm-166` |
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every code security fraud** (data table, from `listCodeSecurityFraud`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Signal type | chip: Excessive redemption velocity, Repeated failed attempts, Multiple customers using … | The fraud signal monitored. |
+
+**The selected code security fraud** (detail panel): The pack groups this record's detail under its own headings: “Risk Levels”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Signal type | chip: Excessive redemption velocity, Repeated failed attempts, Multiple customers using … | The fraud signal monitored. |
+
+**Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Suspend individual code, Suspend batch, Suspend campaign, Block redemption, Reinstate code, Assign investigation, Add case note. Each needs attaching to the control it gates, or the screen needs the control.
+
+**Data it reads**: `listCodeSecurityFraud` (onLoad, Code Security, Fraud & Exception Center)
+
+**Where the user goes next**
+
+- → `ADM-158` Coupon & Promo Code Command Center: *Coupon & Promo Code Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The code security fraud list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the code security fraud untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No code security fraud yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the code security fraud are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listCodeSecurityFraud` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-166` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-166`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 16: Works in Code Security, Fraud & Exception Center → Detect promo-code abuse, leakage, abnormal redemption, and suspicious campaign behavior.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-166?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-158`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-167` Redemption Analytics, Audit & AI Optimization
+
+**Provide complete performance analytics and governance for coupon and promo-code campaigns. Board 4 shall provide TICVAI with an enterprise-grade Advanced Promotion Mechanics Engine for promotions involving relationships between products, quantities, basket composition, rewards, and qualifying purchases. While Board 2 defines standard discounts and thresholds and Board 3 manages promo codes/coupons, Board 4 answers: “When the customer buys X, what exactly should TICVAI give them, discount, replace, upgrade, or add to the transaction?” The matrix requires mechanics such as Buy X Get X, Buy X Get Y, Buy N Get X, percentage/amount discounts on another product, cheapest-item-free, fixed-price combinations, cross-category F&B/Retail rewards, added-value gifts, and automatic cart-level promotion application. Board 4 shall contain 10 backend screens.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Commercial · wave 3 · needs the `marketing` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Performance KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/commercial/redemption-analytics-audit-ai-optimization-adm-167` |
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Search redemption analytics audit | search field | — | — | — | — | — | — |
+| Filter by | multi select | — | — | — | — | The pack filters this screen by campaign, code, batch, product, venue, channel and 4 more — which are present is a decision the pack already made. | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Campaign | text field | — | — | `listRedemption` ?campaign |
+| Code | text field | — | — | `listRedemption` ?code |
+| Batch | text field | — | — | `listRedemption` ?batch |
+| Product | text field | — | — | `listRedemption` ?product |
+| Venue | text field | — | — | `listRedemption` ?venue |
+| Channel | text field | — | — | `listRedemption` ?channel |
+| Customer segment | text field | — | — | `listRedemption` ?customerSegment |
+| Partner | text field | — | — | `listRedemption` ?partner |
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Codes generated** (metric tile)
+
+**Codes distributed** (metric tile)
+
+**Codes redeemed** (metric tile)
+
+**Redemption rate** (metric tile)
+
+**Conversion rate** (metric tile)
+
+**Revenue generated** (metric tile)
+
+**Discount granted** (metric tile)
+
+**Incremental revenue** (metric tile)
+
+**AOV uplift** (metric tile)
+
+**Cost per redemption** (metric tile)
+
+**Margin impact** (metric tile)
+
+**Expired unused codes** (metric tile)
+
+**Data it reads**: `listRedemption` (onLoad, Redemption Analytics, Audit & AI Optimization)
+
+**Where the user goes next**
+
+- → `ADM-158` Coupon & Promo Code Command Center: *Coupon & Promo Code Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The redemption analytics audit list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the redemption analytics audit untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No redemption analytics audit yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the redemption analytics audit are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Permissions
+
+- `listRedemption` → `PRICE_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-167` · status **notStarted** · provenance generated
+- Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-167`
+- Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
+- Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 18: Works in Redemption Analytics, Audit & AI Optimization → Provide complete performance analytics and governance for coupon and promo-code campaigns. Board 4 shall provide TICVAI with an enterprise-grade Advanced Promotion Mechanics Engine for promotions …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-167?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-158`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+
+
+## Reference designs and the trackers for this platform
+
+**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+
+- `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
+- `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
+
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+
+## Design inputs from the client meetings
+
+**What the client asked for in the meetings and design reviews, for these screens.** Apply every item. They are the client's own requirements and they are later than the reference files: where a reference design or a screen's fields disagree with an item here, the item wins. Newest first; where two items disagree, the newer one wins (anything a later meeting replaced is already left out). An **Open question** is not settled: build the default it states and keep it easy to change. The text in brackets is for traceability and, like everything else in this bundle, never appears on a screen.
+
+### Everywhere, on every app
+
+- Allam (platform-wide requirement): every calendar throughout the platform, not just maintenance, must support day, week and month views, with the day view further broken down by hour from a defined start hour through the day. *(agreed · MoM 17 Sep 2026, 4.2 Preventive Maintenance Planning · DI-907)*
+- Minimise the number of separate screens an end user navigates: consolidate related information wherever it can reasonably be shown together, rather than mirroring every workshop board as its own screen. *(agreed · MoM 7 Sep 2026, 4.10 Screen consolidation / 5. Key Decisions · DI-671)*
+- Region-configurable tax on pre-discount price (e.g. Egypt: AED 100 ticket with 20% off is paid at AED 80 but taxed on AED 100). Rounding must support up to three decimal places without dropping the third decimal where the currency requires it. *(agreed · MoM 1 Sep 2026, 4.5 Taxes, Fees & Price Calculation · DI-598)*
+- "Powered by TICVAI" is shown consistently across staff and guest-facing surfaces. *(agreed · MoM 14 Aug 2026, 8. POS / Kiosk Branding · DI-297)*
+- Full multi-language support (Arabic and others such as Chinese) consistent with the agreed i18n/RTL architecture. *(agreed · MoM 10 Aug 2026, 4.7 Account Creation, Localisation & Multi-Currency · DI-210)*
+- The reference system is a functional reference only: its dated UI/UX is not to be replicated; TICVAI delivers equivalent depth with a modern, AI-friendly, easy-to-configure experience. *(agreed · MoM 7 Aug 2026, 23. Reference System Access & Documentation · DI-186)*
+- Direction: modern, minimalistic, spacious, cross-device designs that still convey a sense of place (venue or park); Softlabs proposes two to three enhanced visual concepts for TICVAI to steer. *(agreed · MoM 3 Aug 2026, 11. Design Alignment & Team Input · DI-126)*
+- Languages: English and Arabic at minimum, with Russian, Spanish and Mandarin. *(agreed · MoM 31 Jul 2026, 13. Internationalization & Localization · DI-080)*
+- Clarity first; reduce cognitive load (simple layouts, familiar patterns); consistency ("Use the system. Do not recreate."); accessibility; hierarchy (guide attention with contrast, spacing and visual weight); feedback (every action has a clear response). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Design Principles in Action · DI-051)*
+- Standard components: search bar with Cmd+K; tabs (Overview, Events, Sales, Reports); pagination; badges (New, Pending, Sold Out, Completed); toggle (Off/On); dropdown; removable chip ("VIP x"). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Example UI Components · DI-050)*
+- Spacing on an 8px base grid: 4, 8, 12, 16, 24, 32, 40, 48, 64, 80. Border radius scale 4, 8, 12, 16, 24px, consistent across the platform. Soft shadows: sm 0 1px 2px rgba(0,0,0,.05); md 0 4px 6px rgba(0,0,0,.08); lg 0 10px 15px rgba(0,0,0,.10); xl 0 20px 40px rgba(0,0,0,.14). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 6. Spacing / 7. Border Radius / 8. Shadows · DI-049)*
+- Icons: line style, outline, 2px stroke, round corners, clean and consistent. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 5. Icons · DI-048)*
+- Component principles: clarity first; consistent spacing on an 8px grid; meaningful colour (colours communicate status and guide the user); accessible by design; mobile ready (components adapt across all screen sizes). Components are consistent, flexible, accessible and composable. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Component principles · DI-045)*
+- Empty states have a title, one explanatory line and one action: "No events yet / Create your first event to get started / Create Event"; "No data available / We couldn't find anything to show here / Refresh". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Empty States · DI-044)*
+- Notification list: status icon, title, one-line detail and relative time (e.g. "Payment received ... 2m ago", "High demand detected ... 10m ago"), with "View all notifications". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Notifications · DI-042)*
+- Forms: label above field; text input, select ("Choose an option"), date picker, toggle, checkbox. Input states: Default, Focused, Filled, Disabled and Error with inline message (e.g. "This field is required"). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Forms; 08 Design System (p8) - 4. Inputs · DI-040)*
+- Card types: event card (title, date and time, venue, "From 120.00 AED"); KPI card (label, value, delta, "vs last 7 days"); onboarding checklist card ("3 of 6 completed": Create Event, Add Staff, Configure Seating, Connect Payment). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Cards · DI-038)*
+- Button hierarchy Primary, Secondary, Tertiary (text) and Icon buttons, each with Default, Hover, Pressed and Disabled states. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Buttons; 08 Design System (p8) - 3. Buttons · DI-036)*
+- Regardless of the module a user is working in, the experience should feel like one product, not a collection of separate applications. *(agreed · Design Vision Book 29 Jul 2026, 07 Modules Overview (p7) · DI-034)*
+- DO: focus on clarity and hierarchy, use clear simple interactive elements, give relevant information at a glance (card example: "Annual Membership / All Venues / 4.4 (388) / BESTSELLER"). DON'T: clutter and overload (e.g. "-10% NEW PROMO AED 450.00 !!! BOOK NOW!!!"), complex forms and flows, hard-to-read data visualisations. *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - DO / DON'T · DI-033)*
+- Eight principles on every screen: User-Centric, AI-First, Simple & Clear (clean layouts, clear hierarchy, minimal noise), Fast & Efficient (optimised for quick actions), Reliable & Secure (permissions, data protection), Data-Driven (data visual, actionable, easy to understand), Scalable, Consistent (same patterns, components and interactions across the ecosystem). *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - Our Design Principles · DI-032)*
+- Accessibility: high contrast, readable text, keyboard navigation and inclusive components throughout; WCAG AA standards minimum ("Design for everyone"). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Better Accessibility; 06 Component principles (p6); 08 Design principles in action (p8) · DI-029)*
+- AI everywhere: AI insights, recommendations and smart assistance are embedded across the platform, not hidden. AI is not an add-on: it assists, predicts, recommends and automates. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - How TICVAI improves this concept; 05 Design Principles (p5) - 2. AI-First · DI-027)*
+- Global Search: prominent, AI-powered search that finds anything, in the top bar with a Cmd+K shortcut (placeholder e.g. "Search events, customers, orders, venues or ask AI..."). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - UI inspiration reference, item 1; 08 Design System (p8) - Search Bar · DI-025)*
+- Visual direction: Purposeful (every element has a clear purpose), Consistent (one visual system across all modules and devices), Clear (easy to scan, understand and act on), Modern. Key takeaway: clean, modern, product-first layout with clear hierarchy and minimal visual noise; deep, modern, trustworthy; built for enterprise scale. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) · DI-024)*
+- The brand is presented consistently across Web Platform, Mobile App and Admin Portal (and print). Ticvai identity, colours and typography are applied consistently across all screens and devices. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand in action; 03 Visual Direction (p3) - Consistent Branding · DI-023)*
+- Copy is Professional, Friendly, Clear, Confident, Concise and Helpful. Avoid jargon, overly technical language, clutter, outdated language and complexity. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand voice · DI-022)*
+- Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
+- Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
+
+### Across P09 TICVAI Web
+
+- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
+- Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
+- Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
+- Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+
+**1 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+
+---
+
+## Raw data
+
+The same package data the blocks above are built from. `screens.json` is in the folder and not repeated here: every field of it is in the blocks.
+
+### `operations.json`
 
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
 {
- "listCodeEligibilityRestriction": {
-  "method": "GET",
-  "path": "/code-eligibility-restriction",
-  "contract": "promotions",
-  "summary": "Code Eligibility & Restriction Manager",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CodeEligibilityRestrictionManagerView"
- },
- "listCodeSecurityFraud": {
-  "method": "GET",
-  "path": "/code-security-fraud",
-  "contract": "promotions",
-  "summary": "Code Security, Fraud & Exception Center",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "CodeSecurityFraudExceptionCenterView"
- },
- "listCouponCodes": {
-  "method": "GET",
-  "path": "/coupon-campaigns/{campaignId}/codes",
-  "contract": "promotions",
-  "summary": "List generated codes",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "batchId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listRedemption": {
-  "method": "GET",
-  "path": "/redemption",
-  "contract": "promotions",
-  "summary": "Redemption Analytics, Audit & AI Optimization",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": "campaign",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "code",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "batch",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "product",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "channel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "customerSegment",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "partner",
-    "in": "query",
-    "required": false
-   }
-  ],
-  "requestBody": null,
-  "responds": "RedemptionAnalyticsAuditAiOptimizationView"
- },
- "listRedemptionCodeLookup": {
-  "method": "GET",
-  "path": "/redemption-code-lookup",
-  "contract": "promotions",
-  "summary": "Redemption Monitor & Code Lookup",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": "promoCode",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "couponId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "batchId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "transaction",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "booking",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "customer",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "partner",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "campaign",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "customerAccountReference",
-    "in": "query",
-    "required": false
-   }
-  ],
-  "requestBody": null,
-  "responds": "RedemptionMonitorCodeLookupView"
- },
- "listUniqueCodeGeneration": {
-  "method": "GET",
-  "path": "/unique-code-generation",
-  "contract": "promotions",
-  "summary": "Unique Code Generation & Batch Manager",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "UniqueCodeGenerationBatchManagerView"
- },
- "listUsageCapacityFrequency": {
-  "method": "GET",
-  "path": "/usage-capacity-frequency",
-  "contract": "promotions",
-  "summary": "Usage, Capacity & Frequency Control",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "UsageCapacityFrequencyControlView"
- },
- "listValidityDateTime": {
-  "method": "GET",
-  "path": "/validity-date-time",
-  "contract": "promotions",
-  "summary": "Validity, Date & Time Control",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ValidityDateTimeControlView"
- },
- "setCodeDistributionManager": {
-  "method": "PUT",
-  "path": "/code-distribution-manager",
-  "contract": "promotions",
-  "summary": "Code Distribution & Assignment Manager",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CodeDistributionAssignmentManagerInput",
-  "responds": "CodeDistributionAssignmentManagerView"
- },
- "setCouponPromoCode": {
-  "method": "PUT",
-  "path": "/coupon-promo-code",
-  "contract": "promotions",
-  "summary": "Coupon & Promo Code Builder",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CouponPromoCodeBuilderInput",
-  "responds": "CouponPromoCodeBuilderView"
- }
+"listCodeEligibilityRestriction": {"method":"GET","path":"/code-eligibility-restriction","contract":"promotions","summary":"Code Eligibility & Restriction Manager","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CodeEligibilityRestrictionManagerView"},
+"listCodeSecurityFraud": {"method":"GET","path":"/code-security-fraud","contract":"promotions","summary":"Code Security, Fraud & Exception Center","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CodeSecurityFraudExceptionCenterView"},
+"listCouponCodes": {"method":"GET","path":"/coupon-campaigns/{campaignId}/codes","contract":"promotions","summary":"List generated codes","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"batchId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listRedemption": {"method":"GET","path":"/redemption","contract":"promotions","summary":"Redemption Analytics, Audit & AI Optimization","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"campaign","in":"query","required":false},{"name":"code","in":"query","required":false},{"name":"batch","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"customerSegment","in":"query","required":false},{"name":"partner","in":"query","required":false}],"requestBody":null,"responds":"RedemptionAnalyticsAuditAiOptimizationView"},
+"listRedemptionCodeLookup": {"method":"GET","path":"/redemption-code-lookup","contract":"promotions","summary":"Redemption Monitor & Code Lookup","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"promoCode","in":"query","required":false},{"name":"couponId","in":"query","required":false},{"name":"batchId","in":"query","required":false},{"name":"transaction","in":"query","required":false},{"name":"booking","in":"query","required":false},{"name":"customer","in":"query","required":false},{"name":"partner","in":"query","required":false},{"name":"campaign","in":"query","required":false},{"name":"customerAccountReference","in":"query","required":false}],"requestBody":null,"responds":"RedemptionMonitorCodeLookupView"},
+"listUniqueCodeGeneration": {"method":"GET","path":"/unique-code-generation","contract":"promotions","summary":"Unique Code Generation & Batch Manager","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"UniqueCodeGenerationBatchManagerView"},
+"listUsageCapacityFrequency": {"method":"GET","path":"/usage-capacity-frequency","contract":"promotions","summary":"Usage, Capacity & Frequency Control","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"UsageCapacityFrequencyControlView"},
+"listValidityDateTime": {"method":"GET","path":"/validity-date-time","contract":"promotions","summary":"Validity, Date & Time Control","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ValidityDateTimeControlView"},
+"setCodeDistributionManager": {"method":"PUT","path":"/code-distribution-manager","contract":"promotions","summary":"Code Distribution & Assignment Manager","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CodeDistributionAssignmentManagerInput","responds":"CodeDistributionAssignmentManagerView"},
+"setCouponPromoCode": {"method":"PUT","path":"/coupon-promo-code","contract":"promotions","summary":"Coupon & Promo Code Builder","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CouponPromoCodeBuilderInput","responds":"CouponPromoCodeBuilderView"}
 }
 ```
 
-## `schemas.json`
+### `schemas.json`
 
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
 {
- "CodeDistributionAssignmentManagerInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Code Distribution & Assignment Manager submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "channelsType": {
-    "type": "string",
-    "enum": [
-     "email",
-     "sms",
-     "whatsapp",
-     "mobileApp",
-     "crmJourney",
-     "guestPortal",
-     "b2bPortal",
-     "partnerPortal",
-     "pos",
-     "callCenter",
-     "api",
-     "exportedBatch"
-    ],
-    "description": "Vocabulary listed under Distribution Channels."
-   },
-   "assigneeType": {
-    "type": "string",
-    "enum": [
-     "individualCustomer",
-     "customerSegment",
-     "membershipAccount",
-     "b2bCompany",
-     "reseller",
-     "travelAgency",
-     "school",
-     "hotel",
-     "bank",
-     "corporatePartner",
-     "marketingCampaign"
-    ],
-    "description": "Who the codes are assigned to."
-   },
-   "batchId": {
-    "type": "string",
-    "description": "Batch ID"
-   },
-   "assigneeReference": {
-    "type": "string",
-    "description": "Customer, segment, account or partner the codes go to"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Codes to assign"
-   }
-  }
- },
- "CodeDistributionAssignmentManagerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Code Distribution & Assignment Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "channelsType": {
-    "type": "string",
-    "enum": [
-     "email",
-     "sms",
-     "whatsapp",
-     "mobileApp",
-     "crmJourney",
-     "guestPortal",
-     "b2bPortal",
-     "partnerPortal",
-     "pos",
-     "callCenter",
-     "api",
-     "exportedBatch"
-    ],
-    "description": "Vocabulary listed under Distribution Channels."
-   },
-   "generated": {
-    "type": "string",
-    "description": "Generated"
-   },
-   "assigned": {
-    "type": "string",
-    "description": "Assigned"
-   },
-   "sent": {
-    "type": "string",
-    "description": "Sent"
-   },
-   "delivered": {
-    "type": "string",
-    "description": "Delivered"
-   },
-   "redeemed": {
-    "type": "string",
-    "description": "Redeemed"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "Cancelled"
-   },
-   "viewed": {
-    "type": "string",
-    "description": "Viewed where available"
-   },
-   "assigneeType": {
-    "type": "string",
-    "enum": [
-     "individualCustomer",
-     "customerSegment",
-     "membershipAccount",
-     "b2bCompany",
-     "reseller",
-     "travelAgency",
-     "school",
-     "hotel",
-     "bank",
-     "corporatePartner",
-     "marketingCampaign"
-    ],
-    "description": "Who the codes are assigned to."
-   },
-   "batchId": {
-    "type": "string",
-    "description": "Batch ID"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner, for a partner batch"
-   }
-  }
- },
- "CodeEligibilityRestrictionManagerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Code Eligibility & Restriction Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "businessEntity": {
-    "type": "string",
-    "description": "Business entity"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "location": {
-    "type": "string",
-    "description": "Location"
-   },
-   "operatingArea": {
-    "type": "string",
-    "description": "Operating area"
-   },
-   "productScopes": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "ticket",
-      "ticketType",
-      "product",
-      "productCategory",
-      "attraction",
-      "event",
-      "bundle",
-      "membership",
-      "fB",
-      "retail",
-      "addOn"
-     ]
-    },
-    "description": "Products the code is restricted to."
-   },
-   "customerScopes": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "guestType",
-      "crmSegment",
-      "loyaltyTier",
-      "b2bAccount",
-      "corporateGroup",
-      "b2b"
-     ]
-    },
-    "description": "Customers the code is restricted to."
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "b2c",
-      "pos",
-      "mobilePos",
-      "kiosk",
-      "mobileApp",
-      "callCenter",
-      "reseller",
-      "api"
-     ]
-    },
-    "description": "Channels the code is valid on."
-   }
-  }
- },
- "CodeSecurityFraudExceptionCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Code Security, Fraud & Exception Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "levelsType": {
-    "type": "string",
-    "enum": [
-     "low",
-     "medium",
-     "high",
-     "critical"
-    ],
-    "description": "Vocabulary listed under Risk Levels."
-   },
-   "signalType": {
-    "type": "string",
-    "enum": [
-     "excessiveRedemptionVelocity",
-     "repeatedFailedAttempts",
-     "multipleCustomersUsingCustomerSpecificCode",
-     "unusualGeographicUsage",
-     "highVolumeRedemptionFromOneDevice",
-     "suspiciousPosOperatorActivity",
-     "codeEnumerationAttempts",
-     "partnerCodeLeakage",
-     "redemptionAboveExpectedCampaignPattern"
-    ],
-    "description": "The fraud signal monitored."
-   },
-   "codeId": {
-    "type": "string",
-    "description": "Code or batch ID"
-   },
-   "detectedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "When detected"
-   },
-   "details": {
-    "type": "string",
-    "description": "What was observed"
-   }
-  }
- },
- "CouponCode": {
-  "x-ticvai-persistence": "promotions.coupon_code",
-  "type": "object",
-  "required": [
-   "code",
-   "campaignId",
-   "status"
-  ],
-  "properties": {
-   "code": {
-    "type": "string"
-   },
-   "campaignId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "batchId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The `generateCouponCodes` batch that issued this code. Null where no batch did."
-   },
-   "status": {
-    "$ref": "#/components/schemas/CouponStatus"
-   },
-   "assignedSubjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "redemptionCount": {
-    "type": "integer"
-   },
-   "maxRedemptions": {
-    "type": "integer"
-   },
-   "discount": {
-    "$ref": "#/components/schemas/Discount"
-   },
-   "invalidReason": {
-    "type": "string",
-    "nullable": true,
-    "description": "Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`.\n",
-    "enum": [
-     "expired",
-     "alreadyRedeemed",
-     "voided",
-     "notYetValid",
-     "wrongVenue",
-     "conditionsNotMet",
-     "notAssignedToGuest"
-    ]
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "redeemedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "redeemedOrderId": {
-    "type": "string",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
-   }
-  }
- },
- "CouponPromoCodeBuilderInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Coupon & Promo Code Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "codeType": {
-    "type": "string",
-    "enum": [
-     "commonPromoCode",
-     "uniquePromoCode",
-     "coupon",
-     "promotionalVoucher",
-     "freeTicketCode",
-     "discountVoucher",
-     "partnerCode",
-     "employeeCode",
-     "influencerAffiliateCode",
-     "compensationServiceRecoveryCode",
-     "bulkCampaignCode"
-    ],
-    "description": "Kind of code."
-   },
-   "benefitType": {
-    "type": "string",
-    "enum": [
-     "percentageDiscount",
-     "fixedValueDiscount",
-     "fixedPromotionalPrice",
-     "freeProduct",
-     "freeTicket",
-     "freeAddOn",
-     "upgrade",
-     "bundleBenefit",
-     "addedValue"
-    ],
-    "description": "What the code grants; the discount itself is calculated by the promotion rule engine rather than duplicated here."
-   },
-   "benefitValue": {
-    "type": "number",
-    "description": "Benefit value: the percentage, or the amount in the promotion's currency"
-   },
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
-   },
-   "code": {
-    "type": "string",
-    "description": "Code text for a common code, or the batch pattern for unique codes"
-   },
-   "maximumDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum discount"
-   },
-   "eligibleProducts": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Eligible products"
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Channels the code works on"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid from"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid to"
-   }
-  }
- },
- "CouponPromoCodeBuilderView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Coupon & Promo Code Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "codeType": {
-    "type": "string",
-    "enum": [
-     "commonPromoCode",
-     "uniquePromoCode",
-     "coupon",
-     "promotionalVoucher",
-     "freeTicketCode",
-     "discountVoucher",
-     "partnerCode",
-     "employeeCode",
-     "influencerAffiliateCode",
-     "compensationServiceRecoveryCode",
-     "bulkCampaignCode"
-    ],
-    "description": "Kind of code."
-   },
-   "benefitType": {
-    "type": "string",
-    "enum": [
-     "percentageDiscount",
-     "fixedValueDiscount",
-     "fixedPromotionalPrice",
-     "freeProduct",
-     "freeTicket",
-     "freeAddOn",
-     "upgrade",
-     "bundleBenefit",
-     "addedValue"
-    ],
-    "description": "What the code grants; the discount itself is calculated by the promotion rule engine rather than duplicated here."
-   },
-   "benefitValue": {
-    "type": "number",
-    "description": "Benefit value: the percentage, or the amount in the promotion's currency"
-   },
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
-   },
-   "code": {
-    "type": "string",
-    "description": "Code text for a common code, or the batch pattern for unique codes"
-   },
-   "maximumDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum discount"
-   },
-   "eligibleProducts": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Eligible products"
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Channels the code works on"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid from"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid to"
-   }
-  }
- },
- "CouponStatus": {
-  "type": "string",
-  "enum": [
-   "issued",
-   "assigned",
-   "redeemed",
-   "expired",
-   "voided"
-  ]
- },
- "Discount": {
-  "x-ticvai-persistence": "none — embedded in promotion",
-  "type": "object",
-  "required": [
-   "kind"
-  ],
-  "properties": {
-   "kind": {
-    "$ref": "#/components/schemas/DiscountKind"
-   },
-   "percentage": {
-    "type": "number",
-    "minimum": 0,
-    "maximum": 100
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "fixedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "buyQuantity": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "getQuantity": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "getDiscountPercentage": {
-    "type": "number",
-    "minimum": 0,
-    "maximum": 100,
-    "description": "100 makes the free items actually free; lower values give a partial discount."
-   },
-   "tiers": {
-    "type": "array",
-    "description": "For `tieredPercentage` — more units, larger discount.",
-    "items": {
-     "type": "object",
-     "required": [
-      "minQuantity",
-      "percentage"
-     ],
-     "properties": {
-      "minQuantity": {
-       "type": "integer",
-       "minimum": 1
-      },
-      "percentage": {
-       "type": "number",
-       "minimum": 0,
-       "maximum": 100
-      }
-     }
-    }
-   },
-   "maxDiscountAmount": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Cap on a percentage discount. Prevents an unbounded discount on a large basket."
-   },
-   "rewardVariantIds": {
-    "type": "array",
-    "nullable": true,
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    },
-    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
-   },
-   "maxApplicationsPerBasket": {
-    "type": "integer",
-    "minimum": 1,
-    "nullable": true,
-    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
-   }
-  }
- },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
-   }
-  }
- },
- "RedemptionAnalyticsAuditAiOptimizationView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Redemption Analytics, Audit & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "codesGenerated": {
-    "type": "string",
-    "description": "Codes generated"
-   },
-   "codesDistributed": {
-    "type": "string",
-    "description": "Codes distributed"
-   },
-   "codesRedeemed": {
-    "type": "string",
-    "description": "Codes redeemed"
-   },
-   "redemptionRate": {
-    "type": "number",
-    "description": "Redemption rate"
-   },
-   "conversionRate": {
-    "type": "number",
-    "description": "Conversion rate"
-   },
-   "revenueGenerated": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue generated"
-   },
-   "discountGranted": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount granted"
-   },
-   "incrementalRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Incremental revenue"
-   },
-   "aovUplift": {
-    "type": "number",
-    "description": "AOV uplift"
-   },
-   "costPerRedemption": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cost per redemption"
-   },
-   "marginImpact": {
-    "type": "number",
-    "description": "Margin impact"
-   },
-   "expiredUnusedCodes": {
-    "type": "integer",
-    "description": "Expired unused codes"
-   },
-   "user": {
-    "type": "string",
-    "description": "User"
-   },
-   "timestamp": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Timestamp"
-   },
-   "previousValue": {
-    "type": "string",
-    "description": "Previous value"
-   },
-   "newValue": {
-    "type": "integer",
-    "description": "New value"
-   },
-   "reason": {
-    "type": "string",
-    "description": "Reason"
-   },
-   "approvalReference": {
-    "type": "string",
-    "description": "Approval reference"
-   },
-   "auditEvent": {
-    "type": "string",
-    "enum": [
-     "created",
-     "modified",
-     "assigned",
-     "suspended",
-     "reactivated",
-     "cancelled"
-    ],
-    "description": "Code audit event."
-   }
-  }
- },
- "RedemptionMonitorCodeLookupView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Redemption Monitor & Code Lookup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "promoCode": {
-    "type": "string",
-    "description": "Promo code"
-   },
-   "code": {
-    "type": "string",
-    "description": "Code"
-   },
-   "redemptionDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Redemption date"
-   },
-   "redemptionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Redemption time"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "originalValue": {
-    "type": "string",
-    "description": "Original value"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "finalValue": {
-    "type": "string",
-    "description": "Final value"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "devicePos": {
-    "type": "integer",
-    "description": "Device/POS"
-   },
-   "operator": {
-    "type": "string",
-    "description": "Operator"
-   },
-   "validationResult": {
-    "type": "string",
-    "enum": [
-     "valid",
-     "redeemed",
-     "expired",
-     "notStarted",
-     "usageLimitReached",
-     "invalidProduct",
-     "invalidChannel",
-     "invalidLocation",
-     "invalidCustomer",
-     "suspended",
-     "cancelled"
-    ],
-    "description": "Validation result of the redemption attempt"
-   }
-  }
- },
- "UniqueCodeGenerationBatchManagerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Unique Code Generation & Batch Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
-   },
-   "numberOfCodes": {
-    "type": "integer",
-    "description": "Number of codes"
-   },
-   "codeLength": {
-    "type": "string",
-    "description": "Code length"
-   },
-   "prefix": {
-    "type": "string",
-    "description": "Prefix"
-   },
-   "suffix": {
-    "type": "string",
-    "description": "Suffix"
-   },
-   "characterType": {
-    "type": "string",
-    "description": "Character type"
-   },
-   "caseSensitivity": {
-    "type": "string",
-    "description": "Case sensitivity"
-   },
-   "expiration": {
-    "type": "string",
-    "description": "Expiration"
-   },
-   "numberOfUses": {
-    "type": "integer",
-    "description": "Number of uses"
-   },
-   "distributionOwner": {
-    "type": "string",
-    "description": "Distribution owner"
-   },
-   "batchId": {
-    "type": "string",
-    "description": "Batch ID"
-   },
-   "quantityGenerated": {
-    "type": "integer",
-    "description": "Quantity generated"
-   },
-   "generatedBy": {
-    "type": "string",
-    "description": "Generated by"
-   },
-   "generationDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Generation date"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
-   },
-   "assignedPartner": {
-    "type": "string",
-    "description": "Assigned partner"
-   },
-   "distributionStatus": {
-    "type": "string",
-    "description": "Distribution status"
-   },
-   "redeemedQuantity": {
-    "type": "integer",
-    "description": "Redeemed quantity"
-   },
-   "remainingQuantity": {
-    "type": "integer",
-    "description": "Remaining quantity"
-   }
-  }
- },
- "UsageCapacityFrequencyControlView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Usage, Capacity & Frequency Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "maximumTotalRedemptions": {
-    "type": "string",
-    "description": "Maximum total redemptions"
-   },
-   "maximumPerCustomer": {
-    "type": "string",
-    "description": "Maximum per customer"
-   },
-   "maximumPerAccount": {
-    "type": "string",
-    "description": "Maximum per account"
-   },
-   "maximumPerTransaction": {
-    "type": "string",
-    "description": "Maximum per transaction"
-   },
-   "maximumPerDay": {
-    "type": "string",
-    "description": "Maximum per day"
-   },
-   "maximumPerChannel": {
-    "type": "string",
-    "description": "Maximum per channel"
-   },
-   "maximumPerVenue": {
-    "type": "string",
-    "description": "Maximum per venue"
-   },
-   "usageType": {
-    "type": "string",
-    "enum": [
-     "singleUse",
-     "multipleUse",
-     "unlimitedUse"
-    ],
-    "description": "How often one code may be used."
-   },
-   "issued": {
-    "type": "integer",
-    "description": "Codes issued"
-   },
-   "redeemed": {
-    "type": "integer",
-    "description": "Codes redeemed"
-   },
-   "reservedPending": {
-    "type": "integer",
-    "description": "Codes reserved or pending"
-   },
-   "remaining": {
-    "type": "integer",
-    "description": "Codes remaining"
-   }
-  }
- },
- "ValidityDateTimeControlView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Validity, Date & Time Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "blackoutDates": {
-    "type": "string",
-    "description": "Blackout dates"
-   },
-   "holidays": {
-    "type": "string",
-    "description": "Holidays"
-   },
-   "selectedTimeslots": {
-    "type": "string",
-    "description": "Selected timeslots"
-   },
-   "selectedEvents": {
-    "type": "string",
-    "description": "Selected events"
-   },
-   "seasonalCalendars": {
-    "type": "string",
-    "description": "Seasonal calendars"
-   },
-   "expirationGracePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiration grace period"
-   }
-  }
- }
+"CodeDistributionAssignmentManagerInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Code Distribution & Assignment Manager submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"channelsType":{"type":"string","enum":["email","sms","whatsapp","mobileApp","crmJourney","guestPortal","b2bPortal","partnerPortal","pos","callCenter","api","exportedBatch"],"description":"Vocabulary listed under Distribution Channels."},"assigneeType":{"type":"string","enum":["individualCustomer","customerSegment","membershipAccount","b2bCompany","reseller","travelAgency","school","hotel","bank","corporatePartner","marketingCampaign"],"description":"Who the codes are assigned to."},"batchId":{"type":"string","description":"Batch ID"},"assigneeReference":{"type":"string","description":"Customer, segment, account or partner the codes go to"},"quantity":{"type":"integer","description":"Codes to assign"}}},
+"CodeDistributionAssignmentManagerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Code Distribution & Assignment Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"channelsType":{"type":"string","enum":["email","sms","whatsapp","mobileApp","crmJourney","guestPortal","b2bPortal","partnerPortal","pos","callCenter","api","exportedBatch"],"description":"Vocabulary listed under Distribution Channels."},"generated":{"type":"string","description":"Generated"},"assigned":{"type":"string","description":"Assigned"},"sent":{"type":"string","description":"Sent"},"delivered":{"type":"string","description":"Delivered"},"redeemed":{"type":"string","description":"Redeemed"},"expired":{"type":"integer","description":"Expired"},"cancelled":{"type":"integer","description":"Cancelled"},"viewed":{"type":"string","description":"Viewed where available"},"assigneeType":{"type":"string","enum":["individualCustomer","customerSegment","membershipAccount","b2bCompany","reseller","travelAgency","school","hotel","bank","corporatePartner","marketingCampaign"],"description":"Who the codes are assigned to."},"batchId":{"type":"string","description":"Batch ID"},"partner":{"type":"string","description":"Partner, for a partner batch"}}},
+"CodeEligibilityRestrictionManagerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Code Eligibility & Restriction Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"partner":{"type":"string","description":"Partner"},"businessEntity":{"type":"string","description":"Business entity"},"venue":{"type":"string","description":"Venue"},"location":{"type":"string","description":"Location"},"operatingArea":{"type":"string","description":"Operating area"},"productScopes":{"type":"array","items":{"type":"string","enum":["ticket","ticketType","product","productCategory","attraction","event","bundle","membership","fB","retail","addOn"]},"description":"Products the code is restricted to."},"customerScopes":{"type":"array","items":{"type":"string","enum":["guestType","crmSegment","loyaltyTier","b2bAccount","corporateGroup","b2b"]},"description":"Customers the code is restricted to."},"channels":{"type":"array","items":{"type":"string","enum":["b2c","pos","mobilePos","kiosk","mobileApp","callCenter","reseller","api"]},"description":"Channels the code is valid on."}}},
+"CodeSecurityFraudExceptionCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Code Security, Fraud & Exception Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"levelsType":{"type":"string","enum":["low","medium","high","critical"],"description":"Vocabulary listed under Risk Levels."},"signalType":{"type":"string","enum":["excessiveRedemptionVelocity","repeatedFailedAttempts","multipleCustomersUsingCustomerSpecificCode","unusualGeographicUsage","highVolumeRedemptionFromOneDevice","suspiciousPosOperatorActivity","codeEnumerationAttempts","partnerCodeLeakage","redemptionAboveExpectedCampaignPattern"],"description":"The fraud signal monitored."},"codeId":{"type":"string","description":"Code or batch ID"},"detectedAt":{"type":"string","format":"date-time","description":"When detected"},"details":{"type":"string","description":"What was observed"}}},
+"CouponCode": {"x-ticvai-persistence":"promotions.coupon_code","type":"object","required":["code","campaignId","status"],"properties":{"code":{"type":"string"},"campaignId":{"type":"string","format":"uuid"},"batchId":{"type":"string","format":"uuid","nullable":true,"description":"The `generateCouponCodes` batch that issued this code. Null where no batch did."},"status":{"$ref":"#/components/schemas/CouponStatus"},"assignedSubjectId":{"type":"string","format":"uuid","nullable":true},"redemptionCount":{"type":"integer"},"maxRedemptions":{"type":"integer"},"discount":{"$ref":"#/components/schemas/Discount"},"invalidReason":{"type":"string","nullable":true,"description":"Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`.\n","enum":["expired","alreadyRedeemed","voided","notYetValid","wrongVenue","conditionsNotMet","notAssignedToGuest"]},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"redeemedAt":{"type":"string","format":"date-time","nullable":true},"redeemedOrderId":{"type":"string","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"CouponPromoCodeBuilderInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Coupon & Promo Code Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"codeType":{"type":"string","enum":["commonPromoCode","uniquePromoCode","coupon","promotionalVoucher","freeTicketCode","discountVoucher","partnerCode","employeeCode","influencerAffiliateCode","compensationServiceRecoveryCode","bulkCampaignCode"],"description":"Kind of code."},"benefitType":{"type":"string","enum":["percentageDiscount","fixedValueDiscount","fixedPromotionalPrice","freeProduct","freeTicket","freeAddOn","upgrade","bundleBenefit","addedValue"],"description":"What the code grants; the discount itself is calculated by the promotion rule engine rather than duplicated here."},"benefitValue":{"type":"number","description":"Benefit value: the percentage, or the amount in the promotion's currency"},"campaign":{"type":"string","description":"Campaign"},"code":{"type":"string","description":"Code text for a common code, or the batch pattern for unique codes"},"maximumDiscount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Maximum discount"},"eligibleProducts":{"type":"array","items":{"type":"string"},"description":"Eligible products"},"channels":{"type":"array","items":{"type":"string"},"description":"Channels the code works on"},"validFrom":{"type":"string","format":"date-time","description":"Valid from"},"validTo":{"type":"string","format":"date-time","description":"Valid to"}}},
+"CouponPromoCodeBuilderView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Coupon & Promo Code Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"codeType":{"type":"string","enum":["commonPromoCode","uniquePromoCode","coupon","promotionalVoucher","freeTicketCode","discountVoucher","partnerCode","employeeCode","influencerAffiliateCode","compensationServiceRecoveryCode","bulkCampaignCode"],"description":"Kind of code."},"benefitType":{"type":"string","enum":["percentageDiscount","fixedValueDiscount","fixedPromotionalPrice","freeProduct","freeTicket","freeAddOn","upgrade","bundleBenefit","addedValue"],"description":"What the code grants; the discount itself is calculated by the promotion rule engine rather than duplicated here."},"benefitValue":{"type":"number","description":"Benefit value: the percentage, or the amount in the promotion's currency"},"campaign":{"type":"string","description":"Campaign"},"code":{"type":"string","description":"Code text for a common code, or the batch pattern for unique codes"},"maximumDiscount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Maximum discount"},"eligibleProducts":{"type":"array","items":{"type":"string"},"description":"Eligible products"},"channels":{"type":"array","items":{"type":"string"},"description":"Channels the code works on"},"validFrom":{"type":"string","format":"date-time","description":"Valid from"},"validTo":{"type":"string","format":"date-time","description":"Valid to"}}},
+"CouponStatus": {"type":"string","enum":["issued","assigned","redeemed","expired","voided"]},
+"Discount": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","required":["kind"],"properties":{"kind":{"$ref":"#/components/schemas/DiscountKind"},"percentage":{"type":"number","minimum":0,"maximum":100},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fixedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"buyQuantity":{"type":"integer","minimum":1},"getQuantity":{"type":"integer","minimum":1},"getDiscountPercentage":{"type":"number","minimum":0,"maximum":100,"description":"100 makes the free items actually free; lower values give a partial discount."},"tiers":{"type":"array","description":"For `tieredPercentage` — more units, larger discount.","items":{"type":"object","required":["minQuantity","percentage"],"properties":{"minQuantity":{"type":"integer","minimum":1},"percentage":{"type":"number","minimum":0,"maximum":100}}}},"maxDiscountAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Cap on a percentage discount. Prevents an unbounded discount on a large basket."},"rewardVariantIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"},"maxApplicationsPerBasket":{"type":"integer","minimum":1,"nullable":true,"description":"How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"}}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"RedemptionAnalyticsAuditAiOptimizationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Redemption Analytics, Audit & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"codesGenerated":{"type":"string","description":"Codes generated"},"codesDistributed":{"type":"string","description":"Codes distributed"},"codesRedeemed":{"type":"string","description":"Codes redeemed"},"redemptionRate":{"type":"number","description":"Redemption rate"},"conversionRate":{"type":"number","description":"Conversion rate"},"revenueGenerated":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue generated"},"discountGranted":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Discount granted"},"incrementalRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Incremental revenue"},"aovUplift":{"type":"number","description":"AOV uplift"},"costPerRedemption":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Cost per redemption"},"marginImpact":{"type":"number","description":"Margin impact"},"expiredUnusedCodes":{"type":"integer","description":"Expired unused codes"},"user":{"type":"string","description":"User"},"timestamp":{"type":"string","format":"date-time","description":"Timestamp"},"previousValue":{"type":"string","description":"Previous value"},"newValue":{"type":"integer","description":"New value"},"reason":{"type":"string","description":"Reason"},"approvalReference":{"type":"string","description":"Approval reference"},"auditEvent":{"type":"string","enum":["created","modified","assigned","suspended","reactivated","cancelled"],"description":"Code audit event."}}},
+"RedemptionMonitorCodeLookupView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Redemption Monitor & Code Lookup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"promoCode":{"type":"string","description":"Promo code"},"code":{"type":"string","description":"Code"},"redemptionDate":{"type":"string","format":"date-time","description":"Redemption date"},"redemptionTime":{"type":"string","format":"date-time","description":"Redemption time"},"product":{"type":"string","description":"Product"},"originalValue":{"type":"string","description":"Original value"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Discount"},"finalValue":{"type":"string","description":"Final value"},"channel":{"type":"string","description":"Channel"},"venue":{"type":"string","description":"Venue"},"devicePos":{"type":"integer","description":"Device/POS"},"operator":{"type":"string","description":"Operator"},"validationResult":{"type":"string","enum":["valid","redeemed","expired","notStarted","usageLimitReached","invalidProduct","invalidChannel","invalidLocation","invalidCustomer","suspended","cancelled"],"description":"Validation result of the redemption attempt"}}},
+"UniqueCodeGenerationBatchManagerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Unique Code Generation & Batch Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"campaign":{"type":"string","description":"Campaign"},"numberOfCodes":{"type":"integer","description":"Number of codes"},"codeLength":{"type":"string","description":"Code length"},"prefix":{"type":"string","description":"Prefix"},"suffix":{"type":"string","description":"Suffix"},"characterType":{"type":"string","description":"Character type"},"caseSensitivity":{"type":"string","description":"Case sensitivity"},"expiration":{"type":"string","description":"Expiration"},"numberOfUses":{"type":"integer","description":"Number of uses"},"distributionOwner":{"type":"string","description":"Distribution owner"},"batchId":{"type":"string","description":"Batch ID"},"quantityGenerated":{"type":"integer","description":"Quantity generated"},"generatedBy":{"type":"string","description":"Generated by"},"generationDate":{"type":"string","format":"date-time","description":"Generation date"},"expiry":{"type":"string","format":"date-time","description":"Expiry"},"assignedPartner":{"type":"string","description":"Assigned partner"},"distributionStatus":{"type":"string","description":"Distribution status"},"redeemedQuantity":{"type":"integer","description":"Redeemed quantity"},"remainingQuantity":{"type":"integer","description":"Remaining quantity"}}},
+"UsageCapacityFrequencyControlView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Usage, Capacity & Frequency Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"maximumTotalRedemptions":{"type":"string","description":"Maximum total redemptions"},"maximumPerCustomer":{"type":"string","description":"Maximum per customer"},"maximumPerAccount":{"type":"string","description":"Maximum per account"},"maximumPerTransaction":{"type":"string","description":"Maximum per transaction"},"maximumPerDay":{"type":"string","description":"Maximum per day"},"maximumPerChannel":{"type":"string","description":"Maximum per channel"},"maximumPerVenue":{"type":"string","description":"Maximum per venue"},"usageType":{"type":"string","enum":["singleUse","multipleUse","unlimitedUse"],"description":"How often one code may be used."},"issued":{"type":"integer","description":"Codes issued"},"redeemed":{"type":"integer","description":"Codes redeemed"},"reservedPending":{"type":"integer","description":"Codes reserved or pending"},"remaining":{"type":"integer","description":"Codes remaining"}}},
+"ValidityDateTimeControlView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Validity, Date & Time Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"blackoutDates":{"type":"string","description":"Blackout dates"},"holidays":{"type":"string","description":"Holidays"},"selectedTimeslots":{"type":"string","description":"Selected timeslots"},"selectedEvents":{"type":"string","description":"Selected events"},"seasonalCalendars":{"type":"string","description":"Seasonal calendars"},"expirationGracePeriod":{"type":"string","format":"date-time","description":"Expiration grace period"}}}
 }
 ```

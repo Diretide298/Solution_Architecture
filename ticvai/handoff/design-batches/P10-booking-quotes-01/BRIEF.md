@@ -1,6 +1,6 @@
 # P10-booking-quotes-01 — P10 · Booking & Quotes
 
-**4 screens · 32 operations · 49 schemas · 14 permissions**
+**4 screens · 28 operations · 44 schemas · 12 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -41,29 +41,36 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 14 permissions apply here:
-  `CAPACITY_CONFIGURE, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID, PARTNER_MANAGE, PARTNER_VIEW`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 12 permissions apply here:
+  `CAPACITY_CONFIGURE, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID, PRICE_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `PTR-008` | Booking Creation | listDetail | 14 | 9 | — |
-| `PTR-009` | Group / Bulk Booking | listDetail | 4 | 3 | — |
-| `PTR-010` | Cart & Quote | listDetail | 10 | 5 | — |
-| `PTR-011` | Quote Management | listDetail | 4 | 1 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `PTR-008` | Booking Creation | B–D | 127 | 53 | 6 | 70 | 0 | 6 | — | notStarted (generated) |
+| `PTR-009` | Group / Bulk Booking | B–D | 11 | 18 | 6 | 14 | 2 | 6 | — | notStarted (generated) |
+| `PTR-010` | Cart & Quote | B–D | 45 | 51 | 6 | 33 | 0 | 6 | — | notStarted (generated) |
+| `PTR-011` | Quote Management | B–D | 2 | 46 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

@@ -697,19 +697,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listChannelListings": {
-  "method": "GET",
-  "path": "/channel-listings",
-  "contract": "subscription",
-  "summary": "What is listed on which OTA",
-  "permission": "PARTNER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ChannelListing"
- },
  "listCommercialCampaigns": {
   "method": "GET",
   "path": "/commercial-campaigns",
@@ -1442,25 +1429,6 @@
   ],
   "requestBody": null,
   "responds": "ChannelAllocationSet"
- },
- "setChannelListing": {
-  "method": "PUT",
-  "path": "/channel-listings",
-  "contract": "subscription",
-  "summary": "List a product on a channel, with its own allocation",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ChannelListing",
-  "responds": "ChannelListing"
  },
  "setComboSlots": {
   "method": "PUT",

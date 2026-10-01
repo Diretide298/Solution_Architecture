@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -56,21 +57,27 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `KIT-001` | Kitchen Operations Command Center | commandCentre | 3 | 0 | — |
-| `KIT-002` | Kitchen Display System (KDS) | listDetail | 7 | 6 | — |
-| `KIT-003` | Order Firing & Course Management | configEditor | 6 | 4 | — |
-| `KIT-004` | Active Order Management & Fulfilment Journey | listDetail | 2 | 0 | — |
-| `KIT-005` | Kitchen Station Workload & Dynamic Routing | listDetail | 4 | 1 | — |
-| `KIT-006` | Expeditor & Order Assembly | listDetail | 5 | 3 | — |
-| `KIT-007` | Guest Collection, Buzzer & Digital Notification | listDetail | 2 | 1 | — |
-| `KIT-008` | Exceptions, Re-Fire & Unavailable Items | listDetail | 6 | 3 | — |
-| `KIT-009` | SLA, Priority & Service Rules | configEditor | 3 | 1 | — |
-| `KIT-010` | Kitchen Performance, AI & Operational Optimization | statusTracker | 3 | 1 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `KIT-001` | Kitchen Operations Command Center | A | 2 | 63 | 6 | 6 | 1 | 3 | — | notStarted (generated) |
+| `KIT-002` | Kitchen Display System (KDS) | A | 19 | 27 | 6 | 6 | 2 | 3 | — | notStarted (generated) |
+| `KIT-003` | Order Firing & Course Management | A | 22 | 0 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
+| `KIT-004` | Active Order Management & Fulfilment Journey | A | 2 | 41 | 6 | 8 | 1 | 6 | — | notStarted (generated) |
+| `KIT-005` | Kitchen Station Workload & Dynamic Routing | A | 11 | 16 | 6 | 4 | 1 | 6 | — | notStarted (generated) |
+| `KIT-006` | Expeditor & Order Assembly | A | 11 | 27 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
+| `KIT-007` | Guest Collection, Buzzer & Digital Notification | A | 7 | 47 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
+| `KIT-008` | Exceptions, Re-Fire & Unavailable Items | A | 18 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `KIT-009` | SLA, Priority & Service Rules | A | 76 | 0 | 5 | 18 | 0 | 0 | — | notStarted (generated) |
+| `KIT-010` | Kitchen Performance, AI & Operational Optimization | A | 3 | 1 | 6 | 1 | 0 | 3 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 
