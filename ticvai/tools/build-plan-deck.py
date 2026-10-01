@@ -487,6 +487,12 @@ def _pp(n):
     return f"{int(round(n)):,}"
 
 
+def _opt_a(b, a):
+    """Block A's option at its target sprint (team.json sprintPlan.blocks): the overtime it takes, by person."""
+    return next((o for o in b.get("blockAOptions") or [] if o["sprint"] == a["targetSprint"]),
+                {"overtimeHours": 0, "byPerson": {}})
+
+
 def _style():
     from openpyxl.styles import Font, PatternFill
     return {"HEAD": PatternFill("solid", fgColor="1F3864"), "SUB": PatternFill("solid", fgColor="D9E1F2"),
@@ -536,17 +542,21 @@ def summary_rows(plan):
         ["Forecast finish (developers)", _d(b["forecastFinish"]),
          f"At normal hours. The plan of {PREVIOUS['date']} said {_d(PREVIOUS['finish'])}."],
         ["AI engine finish", _d(b["aiFinish"]), "Two AI engineers, no third (decided 30 September); the AI review "
-         "found 50 AI-weeks against 35 available in Block B onwards."],
+         "found 50 AI-weeks against 35 available in Block B onwards. Decided 1 October: every AI engine task is "
+         "created; those past 2 April are left unassigned for the AI developers joining."],
         ["Total effort", f"{_pp(b['totalHours'])} hours",
          f"Build {_pp(b['buildHours'])} h, testing {_pp(b['testHours'])} h (module tests {_pp(b['moduleTestHours'])}, "
          f"block tests {_pp(b['blockTestHours'])}), AI engine {_pp(b['aiEngineHours'])} h."],
-        ["Overtime to finish by 2 April", f"{_pp(b['overtimeHours'])} hours",
-         f"Developers {_pp(b['overtimeHoursDevelopers'])} h; the rest is the AI engineers. The plan of "
-         f"{PREVIOUS['date']} needed about {_pp(PREVIOUS['overtimeHours'])} h without the tests."],
-        ["Block A", f"{a['appModuleCount']} app-modules, ends {_d(a['endsOn'])}",
-         f"Previously: {PREVIOUS['blockA']}. Now complete, tested and accepted as one block. To end it sooner: "
-         + "; ".join(f"Sprint {o['sprint']} ({_d(o['endsOn'])}) needs {_pp(o['overtimeHours'])} h of overtime"
-                     for o in b.get("blockAOptions") or [] if o["overtimeHours"]) + "."],
+        ["Overtime to finish by 2 April", f"{_pp(b['overtimeHoursDevelopers'])} hours (developers)",
+         f"Decided 1 October: Block D keeps its scope and finishes by 2 April with overtime. The AI engine's "
+         f"{_pp(b['overtimeHours'] - b['overtimeHoursDevelopers'])} h past 2 April is not overtime: those tasks are "
+         f"unassigned for the AI developers joining. The plan of {PREVIOUS['date']} needed about "
+         f"{_pp(PREVIOUS['overtimeHours'])} h without the tests."],
+        ["Block A", f"{a['appModuleCount']} app-modules, ends {_d(a['targetEndsOn'])} (Sprint {a['targetSprint']})",
+         f"Previously: {PREVIOUS['blockA']}. Now complete, tested and accepted as one block. Decided 1 October: "
+         f"Sprint {a['targetSprint']} with about {_pp(_opt_a(b, a)['overtimeHours'])} h of overtime ("
+         + ", ".join(f"{n} {h}" for n, h in _opt_a(b, a)['byPerson'].items())
+         + f"); at normal hours it would end {_d(a['endsOn'])}."],
         ["Tasks", f"{_pp(b['tasks'])} ({_pp(b['ticketedTasks'])} ticketed)",
          "Blocks A and B task by task; C and D at app-module level in OpenProject until they are planned."],
         ["Pace", f"{b['pacePointsPerDeveloperDay']} points per developer per day; {b['hoursPerPoint']} h a point",
@@ -788,18 +798,20 @@ ARCH_DECISIONS = [
 ]
 
 RISKS = [
-    ("Back-end owners overloaded in Block A", "Their Block A work runs past Sprint 4 (People sheet).", "Overtime for the three owners, or Block A accepted at the end of Sprint 5 or 6; the two new developers take back-end tasks from their first day."),
+    ("Back-end owners overloaded in Block A", "Their Block A work runs past Sprint 5 (People sheet).", "Decided 1 October: Block A ends Sprint 5 with about 195 hours of overtime, most of it Hrushikant and Pranay; the two new developers take back-end tasks from their first day. If the overtime does not happen, Block A ends Sprint 6 (25 December)."),
     ("Pace below plan", "Measured pace after the first sprints under 9.6 points per developer per day.", "Rerun the plan with the measured pace; blocks B to D re-cut to their sprints."),
     ("Hiring the two developers slips", "Not confirmed by 23 October.", "Blocks C and D move out by the scheduler's figure; the PM decides scope or date."),
     ("Client inputs late", "Wireframe sign-off over 3 working days; sandbox credentials; stations and fares; cabana numbering; real photos.", "Those tickets wait in 'Waiting on client' and do not count against the team's pace."),
     ("Make-or-break answers", "Tax invoice fields, e-invoicing provider, VAT 201 layout, face capture consent, ID-verification provider.", "Defaults are built; a different answer is a change request."),
     ("Second AI engineer not in place on 5 October", "No start date confirmed this week.", "Kalpita starts the Block A AI alone; the baseline layer moves one sprint and the AI engine work needs more overtime."),
+    ("AI engine past 2 April", "About 50 AI-engineer weeks needed against 35 available.", "Decided 1 October: every AI engine task is created; those past 2 April are unassigned until the AI developers join. Each month they do not join moves the AI engine finish by about a month."),
     ("Block test finds severity 1 or 2 defects", "A block test cannot pass in its three days.", "The defects are fixed in the next sprint's first days by the people who built the module; the block's acceptance moves, the next block does not wait."),
 ]
 
 
 def write_md(plan, path):
     b = plan["basis"]
+    a = next(x for x in plan["blocks"] if x["block"] == "A")
     L = []
     w = L.append
     w("# TICVAI complete build plan: presentation source")
@@ -873,7 +885,9 @@ def write_md(plan, path):
     w("")
     w("## 8. Finishing by 2 April: overtime")
     w("")
-    w(f"About **{_pp(b['overtimeHours'])} hours** past 2 April at normal hours ({_pp(b['overtimeHoursDevelopers'])} for the developers, the rest the AI engineers). "
+    w(f"About **{_pp(b['overtimeHoursDevelopers'])} developer hours** past 2 April at normal hours. Decided 1 October: Block D keeps its scope "
+      f"and is finished by 2 April with that overtime; Block A ends Sprint {a['targetSprint']} with about {_pp(_opt_a(b, a)['overtimeHours'])} hours of it. "
+      f"The AI engine's {_pp(b['overtimeHours'] - b['overtimeHoursDevelopers'])} hours past 2 April are not overtime: those tasks are unassigned for the AI developers joining. "
       f"The plan of {PREVIOUS['date']} needed about {_pp(PREVIOUS['overtimeHours'])} hours, without the module and block tests.")
     w("")
     w("## 9. Architecture decisions the plan rests on")

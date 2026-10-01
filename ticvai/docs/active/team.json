@@ -88,7 +88,7 @@
    "Kalpita Mejari",
    "Second AI engineer"
   ],
-  "note": "Both from Monday 5 October 2026 (Chinmay, 30 September); no third AI engineer. They carry the AI engine tasks in docs/active/block-a-extra-tasks.json; the AI endpoints and screens are developers' tickets like any other module. Every AI function is built inside the six months, baseline first."
+  "note": "Both from Monday 5 October 2026 (Chinmay, 30 September); no third AI engineer. They carry the AI engine tasks in docs/active/block-a-extra-tasks.json; the AI endpoints and screens are developers' tickets like any other module. Every AI function is built inside the six months, baseline first. 1 October: the AI engine needs about 50 AI-engineer weeks against 35; its tasks past 2 April are created unassigned (Chinmay: more developers are coming)."
  },
  "pace": {
   "Surendra": 0.6
@@ -216,7 +216,7 @@
   "blocks": [
    {
     "block": "A",
-    "endSprint": 4
+    "endSprint": 5
    },
    {
     "block": "B",
@@ -240,5 +240,5 @@
    "since": "r2"
   }
  },
- "sprintPlanNote": "The replan of 1 October (PM call): two-week sprints, Sprint 1 = 5-16 October 2026 ... Sprint 13 = 22 March-2 April 2027; app-modules (a business module split by the app it lands in, e.g. Ticketing · Guest Web, with the back end it needs); blocks A-D, each a set of complete, testable app-modules ending on a sprint boundary. blocks[].endSprint is the target: Block A is the first release (fixed); B, C and D take the remaining app-modules in build order by where they finish, and the plan reports where each block actually ends. ticketBlocks: blocks ticketed task by task; the others are ticketed at feature (app-module) level until they are planned. fePointsPerAppModule: screens points at which a module-on-an-app is cut into parts, so each part finishes in one to three sprints. stableOwners.since: from this release's bundle on, a pushed ticket keeps its owner (plan item L2); --rebalance moves New ones on purpose."
+ "sprintPlanNote": "The replan of 1 October (PM call): two-week sprints, Sprint 1 = 5-16 October 2026 ... Sprint 13 = 22 March-2 April 2027; app-modules (a business module split by the app it lands in, e.g. Ticketing · Guest Web, with the back end it needs); blocks A-D, each a set of complete, testable app-modules ending on a sprint boundary. blocks[].endSprint is the target: Block A is the first release (fixed); B, C and D take the remaining app-modules in build order by where they finish, and the plan reports where each block actually ends. ticketBlocks: blocks ticketed task by task; the others are ticketed at feature (app-module) level until they are planned. fePointsPerAppModule: screens points at which a module-on-an-app is cut into parts, so each part finishes in one to three sprints. stableOwners.since: from this release's bundle on, a pushed ticket keeps its owner (plan item L2); --rebalance moves New ones on purpose. Decided by Chinmay on 1 October after the replan: Block A ends Sprint 5 (11 December) with about 195 hours of overtime; Block D keeps its scope and finishes by Sprint 13 (2 April) with overtime; the AI engine's tasks are all created, and those past what the two AI engineers finish by 2 April stay unassigned for the AI developers joining."
 }

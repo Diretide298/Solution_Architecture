@@ -374,6 +374,7 @@ build-provisional-review                                           # its sheets 
 bench derive-services render-screens                               # deliberate, not a rebuild
 refresh-manifest                                                   # traces this script (C13); run by refresh-safe.sh, never inside it
 build-plan-deck                                                    # the presentation plan, run by hand after a refresh
+build-plan-doc                                                     # the Word build plan for the PM, run by hand after build-plan-deck (1 October)
 build-mom-digest build-review-responses scan-domain-drift find-capability
 audit_guard release_baseline ddl_forward                           # imported by checkers and derive-ddl, no main (1 October)
 sprint_plan                                                        # imported by build-service-docs, derive-block-a-schedule and build-plan-deck, no main (1 October)

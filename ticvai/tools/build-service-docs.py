@@ -2345,6 +2345,16 @@ def main() -> int:
         r_ = second.get(t_["key"])
         if not t_["assignee"] and r_ and r_["who"]:
             t_["assignee"] = r_["who"]
+    # **The AI engine past 2 April** (Chinmay, 1 October): every task is created, and those the two AI engineers
+    # cannot finish by the end of the six months stay unassigned for the AI developers joining later.
+    ai_cut = sp.index_of(sp.PLAN_END) + 1
+    ai_open = [t_ for t_ in leaf if t_["area"] == "ai" and t_["key"] not in kmap
+               and (second.get(t_["key"]) or {}).get("end", 0) > ai_cut]
+    for t_ in ai_open:
+        t_["assignee"] = ""
+        t_["description"] = (t_["description"].rstrip() + " Unassigned (1 October): past what the two AI engineers "
+                             "finish by 2 April; for the AI developers joining.")
+    print(f"AI engine: {len(ai_open)} task(s) past 2 April left unassigned")
     queue_n = defaultdict(int)
     for t_ in tasks:
         if t_["type"] == "Task" and t_["assignee"]:
