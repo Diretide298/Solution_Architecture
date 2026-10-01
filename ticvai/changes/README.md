@@ -52,6 +52,8 @@ changes/
 | `prevention` | yes | `type`: `check` · `generator-rule` · `template-field` · `none`; `ref`: the path (and `::symbol`) of the check, rule or field; with `none`, a `reason` and `approved_by` (the lead) |
 | `status` | yes | `open` or `closed` |
 | `closed_by_commit` | when closed | the commit that merged the fix |
+| `proposed` | plan changes, from 5 Oct | when the plan change was proposed, `YYYY-MM-DD[THH:MM]`; the decision comes at least 24 hours later |
+| `reverses` | when it does | the id of the change this one reverses; that one must have been decided at least 48 hours before |
 | `notes` | no | anything else a reader needs |
 
 ### The closing rule
@@ -70,12 +72,22 @@ The council's stricter form (the prevention fails on the commit before the fix a
 it) is asked of the author and the reviewer: run the new check on the parent commit and say so in
 `notes`. The tool cannot replay history on every run.
 
+### The plan-change rule
+
+On 1 October the plan was reversed several times in one day (Block A 35 to 40 days, Sprint 5 to 4, the
+pace, the block cuts). So from 5 October a commit that touches a plan input (`docs/active/team.json`,
+`docs/active/block-a-extra-tasks.json`, `tools/sprint_plan.py`) names a change of kind `plan`, and that
+entry records `proposed`, is decided at least 24 hours later, names its release when closed, and may
+reverse (`reverses`) only a change decided at least 48 hours earlier. Plan changes ship only in a Tue/Fri
+release and are not announced before they are committed.
+
 ### The commit rule
 
 `python3 tools/check-changelog.py --since [REF]` (default: the latest `r*` tag) reads every
 non-merge commit in `REF..HEAD`. A commit that touches an authored input (`contracts/`,
-`screens/`, `flows/`, `docs/adr/`, `docs/registers/`, `sources/mom/`, `docs/active/team.json`,
-`handoff/design-inputs/mom-design-inputs.yaml`) must name an existing entry id in its message,
+`screens/`, `flows/`, `states/`, `events/`, `docs/adr/`, `docs/registers/`, `sources/mom/`,
+`docs/active/team.json`, `handoff/design-inputs/mom-design-inputs.yaml`, and the plan inputs
+`docs/active/block-a-extra-tasks.json` and `tools/sprint_plan.py`) must name an existing entry id in its message,
 for example `TICVAI guest storefront reads its theme without a session (CHG-GST-001)`. A release
 refresh commit by the lead may carry `CHG-exempt: <reason>` instead; every exemption is printed.
 Commits dated before 5 October 2026 are grandfathered. Without `--since` the tool validates the

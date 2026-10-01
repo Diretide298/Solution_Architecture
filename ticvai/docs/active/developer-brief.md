@@ -22,6 +22,28 @@ Nobody rewrites a ticket you've started. You see the change as a diff, and you d
 ## When you find a gap
 If an operation, field, table or screen state is missing, or wrong, **raise it from `/ticket` as a CR** (source: developer). Don't work around it silently, and don't edit the package. The lead triages it: clarification, scope or defect; now or later. It lands in a release.
 
+## When a ticket conflicts with the spec
+Sometimes what you pulled contradicts itself or the contract. For example: a guest screen calls a staff-only
+operation, a form sends a field the request schema lacks, a till reads the cashier's own record instead of
+the guest's, or a screen that loads before sign-in calls an operation that needs a session. When that
+happens:
+1. **Raise a "spec defect" CR from `/ticket`.** Name the ticket and the artefacts, and quote both sides
+   ("the ticket says X, the contract says Y").
+2. **Name the invariant it breaks**, in one line. Examples: "a guest screen never binds a staff-audience
+   operation", "every form control maps to a contract field", "a pre-sign-in load needs no session". This
+   is what lets the lead turn your report into a check, so it cannot happen again anywhere.
+3. **Carry on with the rest of the ticket.** Don't invent the missing piece. The lead triages the CR in the
+   daily slot, as a blocker, a fix-forward or a defer, and the fix reaches you as a comment plus a linked
+   delta ticket. Your ticket is never rewritten.
+
+**Known issues** are listed in three places:
+- the change log, `changes/CHANGELOG.md`; open entries are the known, unfixed changes;
+- the check reports in the last release run (`python3 tools/run-checks.py`): `check-audience-match`,
+  `check-preauth-session`, `check-subject` and `check-binding-ratchet` list issues by screen;
+- `/ticket`, where each one shows what changed since your pin.
+
+If your ticket's screen appears in one of these, it is known. Raise a CR only if you have something to add.
+
 ## Tables
 From `r1` the **baseline migrations are frozen**. A table change arrives as a **new forward migration** in a release. Never edit an applied migration.
 
