@@ -49,6 +49,20 @@ OUT = ROOT / "handoff" / "design-batches"
 PROTOTYPE = "sources/designs/TICVAI_POS_Terminal_client_approved.html"
 
 
+def _design_inputs():
+    """`tools/build-design-inputs.py`, imported: the client's design inputs from the meetings.
+
+    **The bundles never carried what the client said in the room** (found 1 October): the minutes
+    asked for a ride video with no loader, a planner per venue, a typed group size, and none of it
+    reached a design session, which builds from this folder and nothing else. The index is authored
+    (`handoff/design-inputs/mom-design-inputs.yaml`); this only selects from it, per batch."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("design_inputs", ROOT / "tools" / "build-design-inputs.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 def _sane(x):
     """PyYAML reads a `"\\uD83D\\uDD34"` escape as two lone surrogates rather than one emoji, and
     `json.dumps` then refuses to encode them -- so one stray escape in one screen file killed
@@ -151,7 +165,16 @@ def main() -> int:
     # special folders -- B2B-OPTIONS, CMS-FLOW-BUILDER, DEMO-SITE, apps/ -- are not batches), and
     # never a locked one.
     ap.add_argument("--all", action="store_true", help="re-export every batch that already has a folder")
+    # **A trial export must not overwrite what a design session is reading** (1 October). The
+    # folders under handoff/design-batches are live: Claude Design reads the current briefs. --out
+    # writes the same files somewhere else, to look at before a refresh publishes them. With --all,
+    # the batches are still the ones that have a folder under handoff/design-batches.
+    ap.add_argument("--out", metavar="DIR", help="write the batch folder(s) here instead of handoff/design-batches")
     a = ap.parse_args()
+    global OUT
+    live = OUT
+    if a.out:
+        OUT = pathlib.Path(a.out).resolve()
 
     if not MANIFEST.exists():
         print("no design-manifest.json — run tools/derive-design-manifest.py first")
@@ -175,7 +198,7 @@ def main() -> int:
     if a.all:
         ops, schemas = contracts()
         todo = [x for x in man["batches"]
-                if wanted(x) and x["status"] != "locked" and (OUT / x["id"]).is_dir()]
+                if wanted(x) and x["status"] != "locked" and (live / x["id"]).is_dir()]
         for x in todo:
             export(x, ops, schemas, quiet=True)
         print(f"  {len(todo)} batch folder(s) re-exported from the current package")
@@ -222,6 +245,7 @@ def main() -> int:
 
 
 _DOCS: list = []
+_DI = _design_inputs()
 
 
 def _screen_docs() -> list:
@@ -373,6 +397,12 @@ convincingly. It is never a caption.
                   f"declared and say what is missing — **an invented screen comes back looking "
                   f"finished**, which is worse than an honest gap.\n")
 
+    # **What the client said about these screens, in the brief and so in the bundle** (1 October).
+    # Global inputs, the platform's and the modules', then screen by screen; the latest only.
+    brief += "\n" + _DI.render_batch(
+        [(s["id"], s["_platform"].get("code"), s.get("module"), s.get("name")) for s in screens]
+    ).rstrip() + "\n"
+
     (d / "BRIEF.md").write_text(brief, encoding="utf-8")
 
     # **One file, because a design session is handed a thing rather than a folder.** Four files
@@ -425,7 +455,7 @@ convincingly. It is never a caption.
           f"{len(perms)} permissions · {len(offline)} offline-capable")
     if thin:
         print(f"  {len(thin)} thin screen(s): {', '.join(thin)}")
-    print(f"  -> {d.relative_to(ROOT)}/")
+    print(f"  -> {d.relative_to(ROOT) if d.is_relative_to(ROOT) else d}/")
     print(f"     BUNDLE.md ({len(bundle) // 1024} KB) — the single file to hand a design session")
     print("     BRIEF.md, screens.json, operations.json, schemas.json — the same content, apart")
     return 0

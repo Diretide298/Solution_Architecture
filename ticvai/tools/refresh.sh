@@ -141,6 +141,11 @@ python3 tools/index-boards.py
 # The Claude Design work list, and what each shipped app demands of a signed-in user.
 # Both are derived from the screens and both go stale the moment a screen changes.
 python3 tools/derive-design-manifest.py
+# **The client's design inputs from the meetings, checked before any batch carries them** (1 October).
+# `handoff/design-inputs/mom-design-inputs.yaml` is authored; this validates every scope against the
+# screens (a retired screen id fails here, not silently in a bundle), writes its README and fills the
+# app guides' generated blocks. export-design-batch imports the same file, so it runs first.
+python3 tools/build-design-inputs.py
 # **Every design-batch folder rebuilt from today's package** (30 September). Claude Design reads a batch
 # folder and nothing else; one exported before a contract changed hands a design session yesterday's
 # fields and data. Existing folders only, never a locked batch; the special folders are not batches.

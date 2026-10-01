@@ -62,6 +62,13 @@ produce a second product, not more of this one.
 wireframes/design-base/pos-terminal/ is the fidelity bar for operator screens.
 sources/designs/ticvai-booking-archetypes.md governs anything on the booking spine.
 
+THE CLIENT'S DESIGN INPUTS OUTRANK THE REFERENCES
+
+Every BUNDLE.md has a section "Design inputs from the client meetings": what the client
+said in the minutes, workshops and design reviews about that batch's platform, modules
+and screens. Apply every item. Where a reference design or house style disagrees, the
+input wins; an open question gets the default it states.
+
 WHERE YOU MUST BE CREATIVE, AND WHERE YOU MUST NOT
 
 1,292 of the 7,679 component labels in this package are scaffolding a generator wrote
@@ -116,6 +123,19 @@ NEVER
   - read anything under _dump/ — it is retired work
   - go looking for wireframe boards; frames are the deliverable
 ```
+
+---
+
+## The client's design inputs (1 October)
+
+**The bundles carried the screens and the contracts and nothing the client said in the room.**
+`handoff/design-inputs/mom-design-inputs.yaml` is the authored index of every design statement in
+the minutes, workshop outputs and design reviews (source, date, section, scope, status, what it
+supersedes); `handoff/design-inputs/README.md` is its readable copy and says how to add one.
+`tools/build-design-inputs.py` validates it against the screens and `export-design-batch.py` puts
+the inputs that apply into each batch's BRIEF.md and BUNDLE.md, latest only. The app guides in
+`handoff/design-batches/apps/` list the app-wide ones between `<!-- design-inputs:... -->` markers.
+**A new MoM is not in a bundle until it is in the index.**
 
 ---
 
