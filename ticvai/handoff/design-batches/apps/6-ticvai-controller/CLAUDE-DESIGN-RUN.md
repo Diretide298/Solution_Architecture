@@ -4,7 +4,7 @@
 > **Scope:** the complete TICVAI main controller, 708 screens in 78 batches: P09 web console 676 (74 batches), P17 sign-up 24 (3), P14 developer portal 8 (1). Block A batches first.
 
 ## Link in Claude Design
-Link **one folder: `D:\Chinmaydam	icvai`**. Every path in the prompt is relative to it.
+Link **one folder: `D:\Chinmay\adam\ticvai`**. Every path in the prompt is relative to it.
 
 ## The prompt (paste once)
 

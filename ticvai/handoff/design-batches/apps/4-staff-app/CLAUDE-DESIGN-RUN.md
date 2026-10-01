@@ -4,7 +4,7 @@
 > **Scope:** the complete Staff App (P06), 96 screens in 10 batches, on a handheld (Android, Chainway C66 size). Block A batches first.
 
 ## Link in Claude Design
-Link **one folder: `D:\Chinmaydam	icvai`**. Every path in the prompt is relative to it.
+Link **one folder: `D:\Chinmay\adam\ticvai`**. Every path in the prompt is relative to it.
 
 ## The prompt (paste once)
 

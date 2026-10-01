@@ -4,7 +4,7 @@
 > **Scope:** the complete Scanner app (P07), 11 screens in 2 batches, on a handheld scanner.
 
 ## Link in Claude Design
-Link **one folder: `D:\Chinmaydam	icvai`**. Every path in the prompt is relative to it.
+Link **one folder: `D:\Chinmay\adam\ticvai`**. Every path in the prompt is relative to it.
 
 ## The prompt (paste once)
 
