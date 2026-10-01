@@ -111,7 +111,8 @@ approver and an expiry no more than 14 days out. **Re-record the baseline at r2 
 
 **R11. Typed properties.** `check-audience-match`, `check-preauth-session` and `check-subject` hold every
 screen against three operation properties: its audience, whether it needs a session, and whether it acts on
-the caller or a named customer. They are report-only until the guest fixes and the POS loyalty swap land.
+the caller or a named customer. `check-audience-match` also reports an operation whose declared audience
+includes guests while its security admits no guest. They are report-only until the guest fixes and the POS loyalty swap land.
 The lead then records each baseline (`--update-baseline`) and takes the check out of `REPORT_ONLY`.
 
 **R12. Canary.** After each release, one AI session pulls **5 tickets** through ADAM at the new tag, as a
