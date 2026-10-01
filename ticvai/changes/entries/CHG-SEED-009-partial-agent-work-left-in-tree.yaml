@@ -1,0 +1,32 @@
+id: CHG-SEED-009
+date: '2026-10-01'
+source: audit
+kind: process
+summary: Agents stopped by the AI usage limit left partial work in the main working tree (the POS loyalty swap,
+  process-agent note files), days before a release refresh.
+decision:
+  what: Every agent works in its own git worktree on its own branch with checkpoint commits, never leaves partial
+    work in the main checkout, and writes only its own files when sharing a tree (ticvai/CLAUDE.md 11).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Council of 2 October: ''Partial agent work was left in the working tree when the usage limit hit'' and ''running
+  agents need isolated worktrees and checkpoint commits''.'
+keys_touched:
+  files:
+  - ticvai/CLAUDE.md
+  - docs/active/release-runbook.md
+  other:
+  - stash@{0} POS loyalty swap (partial)
+root_class: 'new: unreproducible-tree'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/refresh-safe.sh::uncommitted AUTHORED
+status: closed
+closed_by_commit: d2dd286f
+notes: refresh-safe.sh refuses to refresh over uncommitted authored changes, so partial work cannot reach a release;
+  the CLAUDE.md rule keeps it out of the main tree.

@@ -148,7 +148,7 @@ def validate(entries: list[tuple[str, dict]], schema: dict, ctx) -> tuple[list[s
     id_re = re.compile(schema["id_pattern"])
     slug_re = re.compile(schema["slug_pattern"])
     enums = schema["enums"]
-    cites = [re.compile(c) for c in schema["why_cites"]]
+    cites = [re.compile(c, re.I) for c in schema["why_cites"]]
     cr_from = _date(schema.get("adam_cr_required_from"))
     seen: dict = {}
     batches: dict = {}

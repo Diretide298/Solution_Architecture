@@ -24,7 +24,7 @@ enums:
 # the kind is process or plan).
 keys_touched_lists: [screens, operations, tables, schemas, flows, tickets, files, other]
 
-# `why` must cite where the change came from, so a reader can open it. One of these must match.
+# `why` must cite where the change came from, so a reader can open it. One of these must match (any case).
 why_cites:
   - '\bMoM\b|\bminutes\b|sources/mom/'                # a meeting
   - '\bDI-[A-Z0-9-]+'                                 # a design input (handoff/design-inputs/mom-design-inputs.yaml)

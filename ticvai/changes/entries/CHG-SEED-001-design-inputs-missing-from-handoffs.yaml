@@ -1,0 +1,35 @@
+id: CHG-SEED-001
+date: '2026-10-01'
+source: design-input
+kind: design-input
+summary: The 1,119 design inputs taken from 32+ MoMs and client design reviews had never reached the Claude Design
+  handoffs; every batch now carries the inputs scoped to its screens.
+decision:
+  what: Every Claude Design batch carries the meeting inputs scoped to its screens (handoff/design-inputs/mom-design-inputs.yaml
+    through build-design-inputs.py, the meetings section of every BUNDLE.md); where the P04 bundles are locked,
+    the POS guide and run sheet carry them.
+  by: Chinmay
+  date: '2026-10-01'
+why: 'Council of 2 October: ''MoM design inputs were missing from the design docs''. The index of 1,119 DIs existed,
+  and export-design-batch did not read it until commit a9c58a14 (then 38131e04 for the locked P04 bundles).'
+keys_touched:
+  files:
+  - handoff/design-inputs/mom-design-inputs.yaml
+  - tools/build-design-inputs.py
+  - tools/export-design-batch.py
+  - tools/design_spec.py
+  other:
+  - every design batch under handoff/design-batches/
+root_class: 'new: input-not-reaching-output'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/design_spec.py::PKG.di.for_screens
+status: closed
+closed_by_commit: a9c58a14
+notes: 'The generator rule: render_screen writes section 7 (meetings) for every screen from the DI index, so a batch
+  cannot be exported without the inputs that name its screens, module or platform.'

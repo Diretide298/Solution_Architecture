@@ -1,0 +1,41 @@
+id: CHG-SEED-005
+date: '2026-10-01'
+source: client-review
+kind: spec
+summary: 'POS v2 arrived as a client design build and needed eight decisions: POS-030 Sales Journal and POS-031
+  Reservations & Group Arrivals added, listOrders gains optional terminal, customer and tender filters, design corrections
+  on the v2 candidates, seven P04 screens unlocked for Claude Design.'
+decision:
+  what: All eight POS v2 decisions (POSV2-1..8) approved as recommended; POS-028 move/merge deferred past r2.
+  by: Chinmay
+  date: '2026-10-01'
+why: The client's POS v2 build (sources/designs/TICVAI_POS_Terminal_v2.html, imported as candidate frames in 3d9b755d)
+  differed from the approved POS. POSV2-1..8 are recorded in docs/registers/pos-v2-decisions.md (commit d5862420).
+keys_touched:
+  screens:
+  - POS-030
+  - POS-031
+  - POS-005
+  - POS-009
+  - POS-028
+  - POS-029
+  - KIT-007
+  operations:
+  - listOrders
+  files:
+  - docs/registers/pos-v2-decisions.md
+  - contracts/spine/orders.yaml
+root_class: 'new: design-return'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: none
+  reason: 'A client design return is new input, not a defect: no check can predict it. The slips its follow-ups
+    exposed are logged with their own checks (CHG-SEED-006 audience, CHG-SEED-007 screenless operations, CHG-SEED-008
+    subject).'
+status: open
+notes: 'Open only for the lead''s approval of `prevention: none`; set prevention.approved_by and close it on commit
+  d5862420.'

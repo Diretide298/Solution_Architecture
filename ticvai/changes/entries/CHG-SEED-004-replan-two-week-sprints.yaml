@@ -1,0 +1,33 @@
+id: CHG-SEED-004
+date: '2026-10-01'
+source: plan
+kind: plan
+summary: 'The replan: two-week sprints, app-modules, Blocks A-D with module and block tests, in the plan generators.'
+decision:
+  what: Plan in two-week sprints by app-module, in four blocks A-D, each closed by module tests and a block test.
+  by: Chinmay
+  date: '2026-10-01'
+why: 'Chinmay''s replan of 1 October (commit 7f818b2f, followed by the four changes in CHG-SEED-003). The risk a
+  replan carries is ticket keys moving between prefixes: the 30 September push made 25 second tickets that way (CHG-SEED-010).'
+keys_touched:
+  files:
+  - docs/active/team.json
+  - tools/sprint_plan.py
+  - tools/build-service-docs.py
+  - tools/derive-block-a-schedule.py
+  - docs/active/block-a-extra-tasks.json
+  other:
+  - every OpenProject task key formed by the plan
+root_class: 'new: plan-churn'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+status: closed
+closed_by_commit: 7f818b2f
+notes: check-key-stability blocks a plan that renames a pushed key, so the replan could not make second tickets.
+  The plan-change rule (CHG-SEED-003) now applies to any further replan.

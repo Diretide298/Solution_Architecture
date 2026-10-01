@@ -1,0 +1,35 @@
+id: CHG-SEED-008
+date: '2026-10-01'
+source: audit
+kind: spec
+summary: POS-002 (the till) and BO-831 read getLoyaltyPosition, the caller's own loyalty, so the till would show
+  the cashier's points; they should read getGuestLoyalty for the named guest.
+decision:
+  what: 'Recommended, not yet decided: swap POS-002 and BO-831 to getGuestLoyalty (staff, GUEST_VIEW, venue scope,
+    the guest named in the path); getLoyaltyPosition stays guest-only.'
+  by: 'pending: Chinmay'
+  date: '2026-10-01'
+why: 'Found by the POS v2 follow-up (commit 0d59727e): getLoyaltyPosition has no subject parameter and is guest-scoped.
+  Council of 2 October: ''a loyalty read that would have returned the cashier''s own loyalty''; typed property ''acts
+  on the caller or a named customer''.'
+keys_touched:
+  screens:
+  - POS-002
+  - BO-831
+  operations:
+  - getLoyaltyPosition
+  - getGuestLoyalty
+root_class: 'new: wrong-subject'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-subject.py
+status: open
+notes: 'A partial edit sits in `git stash` (''POS loyalty swap ... partial'', 1 October, agent stopped at the usage
+  limit); finish it in a worktree, not from main. check-subject reports POS-002 (SUB-UNDECLARED-ON-STAFF); check-audience-match
+  reports POS-002 and BO-831 (AM-STAFF-OP). Also: getLoyaltyPosition should declare x-ticvai-self-scoped: subject
+  (contracts/README.md: a null permission must say why).'
