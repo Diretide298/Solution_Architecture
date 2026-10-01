@@ -197,8 +197,9 @@ python3 tools/derive-block-a-schedule.py
 # the contracts and backend/MIGRATIONS.md -- all of them rebuilt above -- and nothing in this script rebuilt
 # it: the tool passed the coverage block below only because its name is inside fix-audit-op-descriptions.
 # So every screen or slice change failed the gate on text nobody had regenerated: on 1 October the POS v2
-# screens (POS-028/030/031) left 15 ticket-text findings and the slice's new tables two MIG-ticket table
-# lists behind MIGRATIONS.md, and on 30 September the same had been fixed by running this by hand.
+# screens (POS-028/030/031) left 15 ticket-text findings, and the slice's new tables (orders' group and
+# reservation tables, workforce.attendance) left MIG-ORDERS and MIG-WORKFORCE listing fewer tables than
+# MIGRATIONS.md. The r1 run earlier that day had failed the same way and was fixed by running this by hand.
 # Writes the local file only; tools/op-descriptions.rb applies it on the OpenProject server, per release.
 python3 tools/op-descriptions.py --schedule handoff/service-docs/block-a-schedule.json
 # How the tickets are linked: layers, services, module builds, reports (handoff/service-docs/TICKET-LINKS.md).
