@@ -2639,8 +2639,12 @@ paths:
       x-ticvai-audience:
       - guest
       - partner
+      - staff
       summary: The cart, priced and checked, right now
-      description: '2.9.2. **Re-prices and re-checks on every read**, because a cart is a claim about
+      description: '**Staff since 1 October 2026**: the till reads its own cart (`cartId` from the workstation
+        session) on POS-010; the declaration said guest and partner while P04 called it.
+
+        2.9.2. **Re-prices and re-checks on every read**, because a cart is a claim about
         the future and the future moves. Availability, promotions and lease expiry are all live.
 
         Returns the conflicts (2.9.5) and the leases with their remaining time, so the interface can say
@@ -2779,8 +2783,13 @@ paths:
       x-ticvai-audience:
       - guest
       - partner
+      - staff
       summary: Add something
-      description: '2.9.4. **Acquiring the lease is the whole reason this is a server operation.** A capacity-bound
+      description: '**Staff since 1 October 2026**: the till adds lines to its own cart (`cartId` from the
+        workstation session) on POS-002, POS-021, POS-023 and POS-030; the declaration said guest
+        and partner while P04 called it.
+
+        2.9.4. **Acquiring the lease is the whole reason this is a server operation.** A capacity-bound
         product added to a cart reserves capacity for a configured window, and a cart held in a browser
         cannot reserve anything.
 

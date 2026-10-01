@@ -6,7 +6,13 @@
   "kind": "new-screen",
   "decision": "One new P04 screen, POS-030 Sales Journal, for both. It lists the till's orders (by default this terminal, today) with reprint or email of the receipt, reprint of the order, the tax invoice, Refund or void handed to POS-011, and Reload this cart (getOrder, then addCartLine). listOrders gains optional terminal (workstationId), customer (subjectId) and payment-method (tender) query parameters, an additive change. No CSV or Excel export now: it is a later change. The v2 journal is the candidate frame, with the cart history as its variant.",
   "applied": "POS-030 (screens/P04-point-of-sale.yaml), entered from POS-025 and POS-002; listOrders in contracts/spine/orders.yaml; the candidate frame by tools/applied/pos-v2-decisions-1-october.py",
-  "screens": ["POS-030", "POS-025", "POS-002", "POS-011", "POS-026"],
+  "screens": [
+   "POS-030",
+   "POS-025",
+   "POS-002",
+   "POS-011",
+   "POS-026"
+  ],
   "decided": "2026-10-01"
  },
  {
@@ -16,7 +22,12 @@
   "kind": "new-screen",
   "decision": "One new P04 screen, POS-031 Reservations & Group Arrivals, built on the existing operations only: createReservation, listReservations, getReservation, extendReservation, convertReservation and cancelReservation, and the group operations the back office uses (getGroupBooking as on BO-026; listGroupArrivalCheck and recordGroupCheckIn as on BO-280). The contract stands: a reservation creates no entitlement, and tickets are issued when the order is paid on arrival (convert, pay at POS-005, issue), never before. The v2 'encode inactive, pay on arrival' design is corrected, and recorded on the candidate frame.",
   "applied": "POS-031 (screens/P04-point-of-sale.yaml), entered from POS-025 and the cart's Reserve on POS-002, exits to POS-005; the candidate frame and its correction by tools/applied/pos-v2-decisions-1-october.py",
-  "screens": ["POS-031", "POS-025", "POS-002", "POS-005"],
+  "screens": [
+   "POS-031",
+   "POS-025",
+   "POS-002",
+   "POS-005"
+  ],
   "decided": "2026-10-01"
  },
  {
@@ -26,7 +37,13 @@
   "kind": "conflict",
   "decision": "'Expected in drawer' is removed and the expected float is not shown while counting: the blind count stands (audit R080 (e): a supervisor accepts a variance after the count, acceptShiftVariance; the close is blind, POS-007). Clock out and breaks use recordAttendance (clockOut, breakStart, breakEnd), now on POS-009 Staff Roster, where the shift panel's clock and shift history land.",
   "applied": "Design corrections on the POS-001 and POS-025 candidate blocks; recordAttendance added to POS-009; the Claude Design run sheet for POS-009 and POS-015",
-  "screens": ["POS-001", "POS-025", "POS-007", "POS-009", "POS-015"],
+  "screens": [
+   "POS-001",
+   "POS-025",
+   "POS-007",
+   "POS-009",
+   "POS-015"
+  ],
   "decided": "2026-10-01"
  },
  {
@@ -36,7 +53,10 @@
   "kind": "conflict",
   "decision": "Audit R261 stands: send to kitchen, then charge, for every POS F&B order. Recorded as a design correction on the POS-021 and POS-022 candidates.",
   "applied": "Design corrections on the POS-021 and POS-022 candidate blocks",
-  "screens": ["POS-021", "POS-022"],
+  "screens": [
+   "POS-021",
+   "POS-022"
+  ],
   "decided": "2026-10-01"
  },
  {
@@ -46,7 +66,9 @@
   "kind": "screen",
   "decision": "Follow v2: POS-005 takes a split on any tender, with no separate Split payment button.",
   "applied": "POS-005 layout (the Split payment button replaced by Add to split and the part payments taken); its candidate block says the definition now follows v2",
-  "screens": ["POS-005"],
+  "screens": [
+   "POS-005"
+  ],
   "decided": "2026-10-01"
  },
  {
@@ -56,7 +78,9 @@
   "kind": "design-gap",
   "decision": "Keep the modify, refund, exchange and reschedule overlays in the POS-006 specification; the design must add them. Recorded as a design gap on the candidate.",
   "applied": "Design gap on the POS-006 candidate block; POS-006's overlays unchanged",
-  "screens": ["POS-006"],
+  "screens": [
+   "POS-006"
+  ],
   "decided": "2026-10-01"
  },
  {
@@ -66,7 +90,10 @@
   "kind": "screen",
   "decision": "The customer-facing order status board is owned by KIT-007 (P15); POS-029's queue mirrors it. KIT-007's design takes v2's queue guest status board as its look.",
   "applied": "KIT-007 (screens/P15-kitchen-display.yaml) and POS-029 notes and layout; the POS-029 candidate block; the Claude Design run sheet for KIT-007",
-  "screens": ["KIT-007", "POS-029"],
+  "screens": [
+   "KIT-007",
+   "POS-029"
+  ],
   "decided": "2026-10-01"
  },
  {
@@ -74,9 +101,13 @@
   "source": "POS v2 build, POS-001, POS-029 and POS-028 captures",
   "what": "'Report to facilities' on a failed device at the float count (POS-001) and 'Cancel' on each queue card (POS-029) have no operation behind them; Table service still has no move or merge of tables.",
   "kind": "design-gap",
-  "decision": "Drop 'Report to facilities' (POS-001) and 'Cancel' (POS-029) from the design. Moving and merging tables on POS-028 is deferred: not in r2.",
-  "applied": "Design corrections on the POS-001, POS-029 and POS-028 candidate blocks; POS-028 notes record the deferral",
-  "screens": ["POS-001", "POS-029", "POS-028"],
+  "decision": "Drop 'Report to facilities' (POS-001) and 'Cancel' (POS-029) from the design. Moving and merging tables on POS-028 is deferred until after r2: moveTableVisit and mergeTableVisits are taken off POS-028 (recorded as removed gaps on the screen), and stay in the fnb contract and on the staff app's EMP-058, so neither operation is deleted or left without a screen.",
+  "applied": "Design corrections on the POS-001, POS-029 and POS-028 candidate blocks; POS-028's apis, purpose, notes and gaps (move and merge taken off, deferred after r2)",
+  "screens": [
+   "POS-001",
+   "POS-029",
+   "POS-028"
+  ],
   "decided": "2026-10-01"
  }
 ]

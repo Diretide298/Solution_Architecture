@@ -1802,14 +1802,14 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         <div>
           <div class="hdr"><span class="code">POS-028</span>
             <span class="ttl">Table Service</span><span class="pill off">offline</span><span class="drawnb" title="A designer drew this frame">drawn</span></div>
-          <div class="pur">Open, move, merge and close table visits from the floor.</div>
+          <div class="pur">Seat parties and close table visits from the floor.</div>
         </div>
         <div class="frame drawn">
           <section id="pos-028" class="proto-frame"><img src="frames/img/pos-028.jpg" alt="POS-028 Table Service, POS v2 build, ours, not client-approved (1 Oct 2026)" style="display:block;width:100%;height:auto"><p style="font:12px sans-serif;color:#667">POS v2 build, ours, not client-approved (1 Oct 2026) · Left rail 'Tables' -&gt; 'Table service': halls (Main Hall, Terrace, Majlis rooms), the plan drawn to scale, status filters, the hall's table list with Seat &amp; order / Recall check / Settle bill / Seat booking</p></section>
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTableMap · listTableReservations · openTableVisit · moveTableVisit +4</div>
+          <div><b>OPERATIONS</b> &middot; getTableMap · listTableReservations · openTableVisit · closeTableVisit +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session, tableId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-025">POS-025</a>  &mdash; <i>Till Home</i><br><a href="#pos-005">POS-005</a>  &mdash; <i>Payment</i><br><a href="#pos-021">POS-021</a>  &mdash; <i>Sell — Food &amp; Drink</i></div>

@@ -21781,8 +21781,6 @@
    "getTableMap",
    "listTableReservations",
    "openTableVisit",
-   "moveTableVisit",
-   "mergeTableVisits",
    "closeTableVisit",
    "clearTable",
    "seatTableReservation"
@@ -21808,7 +21806,6 @@
   "writes": [
    "cache:idempotency",
    "fnb.dining_table",
-   "fnb.kitchen_ticket",
    "fnb.service_order",
    "fnb.table_reservation",
    "fnb.table_session",
@@ -62066,15 +62063,6 @@
     "operation": "listDeviceGate"
    },
    {
-    "to": "BO-196",
-    "trigger": "Works in Physical Device Registration & Provisioning",
-    "provenance": "flow F116 step 3\u21924",
-    "operation": "listDeviceGate",
-    "carries": [
-     "placementId"
-    ]
-   },
-   {
     "to": "BO-197",
     "trigger": "Works in Turnstile & Lane Behavior Configuration",
     "provenance": "flow F116 step 5\u21926",
@@ -62115,6 +62103,15 @@
     "trigger": "Works in Hardware Compatibility, Health, Testing & Deployment",
     "provenance": "flow F116 step 17\u219218",
     "operation": "listDeviceGate"
+   },
+   {
+    "to": "BO-196",
+    "trigger": "Works in Physical Device Registration & Provisioning",
+    "provenance": "flow F116 step 3\u21924",
+    "operation": "listDeviceGate",
+    "carries": [
+     "placementId"
+    ]
    }
   ],
   "machine": null,
@@ -126366,7 +126363,7 @@
    {
     "to": "ADM-318",
     "trigger": "Dead Letters",
-    "provenance": "derived \u2014 ADM-318 declares entryState.params deadLetterId and ADM-002 holds none of them. The edge carries nothing: deadLetterId only pre-selects (deep link or optional), and ADM-318 opens on its own"
+    "provenance": "derived \u2014 ADM-318 declares entryState.params deadLetterId, republishId and ADM-002 holds none of them. The edge carries nothing: deadLetterId only pre-selects (deep link or optional); ADM-318 finds republishId (listOutboxRepublishes) itself, and ADM-318 opens on its own"
    },
    {
     "to": "ADM-024",

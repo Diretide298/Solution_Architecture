@@ -109,7 +109,7 @@
  },
  "totals": {
   "operations": 2668,
-  "screens": 2445,
+  "screens": 2447,
   "flows": 289
  },
  "audiences": {
@@ -1793,6 +1793,7 @@
     "activateJourney",
     "addBlacklistEntry",
     "addCapacityPack",
+    "addCartLine",
     "addCaseMessage",
     "addGuestNote",
     "addLicenceAddOn",
@@ -2242,6 +2243,7 @@
     "getBundle",
     "getCampaign",
     "getCampaignPerformance",
+    "getCart",
     "getCase",
     "getCaseInvestigationResolution",
     "getCatalogueImportJob",
@@ -6408,6 +6410,8 @@
     "POS-027",
     "POS-028",
     "POS-029",
+    "POS-030",
+    "POS-031",
     "SCN-001",
     "SCN-002",
     "SCN-003",
@@ -7698,8 +7702,8 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 2478,
-    "screens": 2196,
+    "operations": 2480,
+    "screens": 2198,
     "flows": 135,
     "contracts": 33,
     "tables": 1075

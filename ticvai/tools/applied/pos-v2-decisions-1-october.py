@@ -136,7 +136,9 @@ DECIDED = {
                 "built, since nothing is encoded before payment (POSV2-2); the Shift management panel drops "
                 "'Expected in drawer', the blind count standing (POSV2-3, audit R080), and its Clock out and "
                 "breaks call recordAttendance, on POS-009 Staff Roster (POSV2-3)."),
-    "POS-028": ([], "Decided 1 October (POSV2-8): moving and merging tables is deferred, not in r2."),
+    "POS-028": ([("Still no move, merge or close / clear of a table visit.", "Still no close / clear of a table visit.")],
+                "Decided 1 October (POSV2-8): moving and merging tables is deferred until after r2 and taken off "
+                "this screen; moveTableVisit and mergeTableVisits stay in the contract and on EMP-058."),
     "POS-029": ([], "Decided 1 October: Cancel is dropped from the design, no operation is behind it "
                     "(POSV2-8); the guest status board is owned by KIT-007 (P15) and this queue mirrors it "
                     "(POSV2-7)."),

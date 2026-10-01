@@ -2746,7 +2746,6 @@ paths:
     post:
       operationId: moveTableVisit
       x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
         - "P06 EMP-058 Live Table & Service Management"
       summary: Move a party to a different table, mid-service
       description: 'Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` existed
@@ -5925,7 +5924,6 @@ paths:
     post:
       operationId: mergeTableVisits
       x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
         - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff

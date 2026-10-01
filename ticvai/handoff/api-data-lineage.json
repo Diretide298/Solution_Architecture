@@ -19043,7 +19043,8 @@
   ],
   "audience": [
    "guest",
-   "partner"
+   "partner",
+   "staff"
   ]
  },
  "abandonCart": {
@@ -19105,7 +19106,8 @@
   ],
   "audience": [
    "guest",
-   "partner"
+   "partner",
+   "staff"
   ],
   "note": "the hold is written by catalogue.acquireInventoryHold, not here"
  },

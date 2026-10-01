@@ -10250,14 +10250,15 @@ screens:
   notes: '**Nineteen table operations existed and not one was on a till screen.** The F&B pack drew table
     service on board 4 and the package put the operations in the contracts; the surface that uses them
     was never specified. A venue running table service had a kitchen display, a menu configuration screen
-    and no way to seat a party. **Moving and merging tables is deferred, not in r2** (decided 1 October
-    2026, POSV2-8): the v2 build draws neither, and `moveTableVisit` and `mergeTableVisits` stay on the
-    screen for the later release.'
+    and no way to seat a party. **Moving and merging tables is deferred until after r2** (decided 1 October
+    2026, POSV2-8; taken off this screen the same day): `moveTableVisit` and `mergeTableVisits` stay in
+    the fnb contract and on the staff app''s EMP-058, and come back to the till in a later release. The
+    v2 build draws neither.'
   density: touchLarge
   pattern: board
   patternReason: '`getTableMap` reads a floor and the visits are worked on it — a board, not a table of
     rows'
-  purpose: Open, move, merge and close table visits from the floor.
+  purpose: Seat parties and close table visits from the floor.
   layout:
     template: split
     regions:
@@ -10296,14 +10297,6 @@ screens:
     contract: fnb
     purpose: Seat a party
     trigger: onAction
-  - operationId: moveTableVisit
-    contract: fnb
-    purpose: Move a party to another table
-    trigger: onAction
-  - operationId: mergeTableVisits
-    contract: fnb
-    purpose: Join two parties onto one bill
-    trigger: onAction
   - operationId: closeTableVisit
     contract: fnb
     purpose: Close the visit and take payment
@@ -10331,6 +10324,17 @@ screens:
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: fnb
+  gaps:
+  - operation: moveTableVisit
+    removed: true
+    why: Deferred until after r2 (POS v2 decision POSV2-8, 1 October 2026). Kept in the fnb contract and
+      on EMP-058; comes back to the till in a later release.
+    source: docs/registers/pos-v2-decisions.md
+  - operation: mergeTableVisits
+    removed: true
+    why: Deferred until after r2 (POS v2 decision POSV2-8, 1 October 2026). Kept in the fnb contract and
+      on EMP-058; comes back to the till in a later release.
+    source: docs/registers/pos-v2-decisions.md
   wireframe:
     status: review
     provenance: designed
@@ -10356,9 +10360,10 @@ screens:
       differences: 'v2: three halls (Main Hall, Terrace, Majlis rooms), the floor plan drawn to scale
         with status filters (vacant, occupied, bill requested, reserved), and the hall''s table list with
         Seat & order, Recall check, Settle bill and Seat booking. Reservations takes a sitting with party
-        size, the table held for, the tables that fit and an optional holding deposit. Still no move,
-        merge or close / clear of a table visit. Decided 1 October (POSV2-8): moving and merging tables
-        is deferred, not in r2.'
+        size, the table held for, the tables that fit and an optional holding deposit. Still no close
+        / clear of a table visit. Decided 1 October (POSV2-8): moving and merging tables is deferred until
+        after r2 and taken off this screen; moveTableVisit and mergeTableVisits stay in the contract and
+        on EMP-058.'
 - id: POS-029
   name: Order Queue
   module: Sell
@@ -10652,7 +10657,8 @@ screens:
         label: Print or email the tax invoice
         operation: getTaxDocumentRendition
         permission: LEDGER_VIEW
-        notes: The issued invoice as a PDF, in English or Arabic, to print at the till or email to the guest.
+        notes: The issued invoice as a PDF, in English or Arabic, to print at the till or email to the
+          guest.
         provenance: v2 sales journal (Email tax invoice) · contract finance.yaml GET /tax-documents/{documentId}/rendition
       - kind: secondaryButton
         label: Reload this cart

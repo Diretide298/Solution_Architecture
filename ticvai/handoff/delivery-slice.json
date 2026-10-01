@@ -219,7 +219,7 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 471,
+  "core": 469,
   "setup": 234,
   "allOperations": 2668
  },
@@ -240,7 +240,7 @@
    "total": 449
   },
   "FnbService": {
-   "core": 54,
+   "core": 52,
    "setup": 13,
    "total": 120
   },
@@ -8106,22 +8106,6 @@
    ],
    "enables": []
   },
-  "mergeTableVisits": {
-   "part": "core",
-   "service": "FnbService",
-   "contract": "fnb",
-   "verb": "POST",
-   "path": "/table-visits/{visitId}/merge",
-   "perm": "ORDER_MODIFY",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "EMP-058",
-    "POS-028"
-   ],
-   "enables": []
-  },
   "modifyOrder": {
    "part": "core",
    "service": "OrderService",
@@ -8147,22 +8131,6 @@
     "PTR-008",
     "PTR-015",
     "PTR-016"
-   ],
-   "enables": []
-  },
-  "moveTableVisit": {
-   "part": "core",
-   "service": "FnbService",
-   "contract": "fnb",
-   "verb": "POST",
-   "path": "/table-visits/{visitId}/move",
-   "perm": "ORDER_MODIFY",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "EMP-058",
-    "POS-028"
    ],
    "enables": []
   },

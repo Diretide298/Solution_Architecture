@@ -1434,8 +1434,8 @@ Menus, table service and kitchen handoff. The kitchen display is built here too 
 | POST | `/table-visits/{visitId}/bill/split` | `splitBill` | `ORDER_MODIFY` | ✓ | venue-staff-app |
 | POST | `/table-visits/{visitId}/close` | `closeTableVisit` | `ORDER_CREATE` | — | venue-pos, venue-staff-app |
 | POST | `/table-visits/{visitId}/comp` | `compItem` | `ORDER_MODIFY` | ✓ | venue-staff-app |
-| POST | `/table-visits/{visitId}/merge` | `mergeTableVisits` | `ORDER_MODIFY` | — | venue-pos, venue-staff-app |
-| POST | `/table-visits/{visitId}/move` | `moveTableVisit` | `ORDER_MODIFY` | ✓ | venue-pos, venue-staff-app |
+| POST | `/table-visits/{visitId}/merge` | `mergeTableVisits` | `ORDER_MODIFY` | — | venue-staff-app |
+| POST | `/table-visits/{visitId}/move` | `moveTableVisit` | `ORDER_MODIFY` | ✓ | venue-staff-app |
 | POST | `/table-visits/{visitId}/notify-server` | `notifyServer` | `ORDER_MODIFY` | — | kitchen-display, venue-staff-app |
 | POST | `/table-visits/{visitId}/request-bill` | `requestBill` | `ORDER_MODIFY` | ✓ | venue-staff-app |
 | PUT | `/table-visits/{visitId}/server` | `reassignServer` | `ORDER_MODIFY` | ✓ | venue-staff-app |

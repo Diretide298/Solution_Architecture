@@ -424,7 +424,7 @@ apps:
     - P04
     - P15
     screens: 42
-    operations: 177
+    operations: 175
     permissions: 52
     tiers:
       read:
