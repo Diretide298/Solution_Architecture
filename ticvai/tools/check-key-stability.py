@@ -207,7 +207,11 @@ def self_test(rows, mp, closed=frozenset(), retired=frozenset()):
         m = dict(mp)
         m["SVC-WALLET-RETAIL-3"], m["SVC-WALLET-RETAIL-3#retiredOperation"] = 1, 2
         f = run(w, m)
-        case("new group avoids a number pushed for other work", f["SVC-WALLET-RETAIL-3"], "SVC-WALLET-RETAIL-4")
+        # the next number nobody pushed and no other planned task holds (more planned work can hold 4 already)
+        n = 4
+        while f"SVC-WALLET-RETAIL-{n}" in m or f"SVC-WALLET-RETAIL-{n}" in w or f"SVC-WALLET-RETAIL-{n}" in fixed:
+            n += 1
+        case("new group avoids a number pushed for other work", f["SVC-WALLET-RETAIL-3"], f"SVC-WALLET-RETAIL-{n}")
     # 6. Today's plan against today's map moves nothing.
     f = run(work, mp)
     case("today's plan keeps every key", sum(1 for k, v in f.items() if k != v), 0)
@@ -250,7 +254,8 @@ def self_test(rows, mp, closed=frozenset(), retired=frozenset()):
     # op-retire saying why: blocked. 12. ...and with op-retire's reason, it passes.
     # The one moved has a single operation and the one receiving it several, so the receiving ticket keeps
     # its key under the reconciliation and only the dropped one is at stake.
-    ops = [x for x in sorted(work) if x in pit and gen.key_identity(x)[0] == "ops"]
+    # (keys op-retire already names are left out: their leaving the plan has a reason, so it cannot be the case)
+    ops = [x for x in sorted(work) if x in pit and gen.key_identity(x)[0] == "ops" and x not in retired]
     a = next((x for x in ops if len(pit[x] & work[x]) == 1), None)
     b = next((x for x in ops if x != a and len(pit[x] & work[x]) >= 2), None)
     if a and b:
@@ -265,7 +270,8 @@ def self_test(rows, mp, closed=frozenset(), retired=frozenset()):
         errs, _ = check(rs, mp, closed, retired)
         case(f"work of {a} moved into {b} without a reason is blocked",
              any(e.startswith("renamed") and a in e for e in errs), True)
-        errs, _ = check(rs, mp, closed, retired | {a})
+        # retired as merged into b, which closes the ticket (op-retire's merge = Rejected), so it is closed here too
+        errs, _ = check(rs, mp, closed | {a}, retired | {a})
         case(f"work of {a} moved into {b}, retired in op-retire, passes", errs, [])
     return out
 

@@ -1,5 +1,5 @@
 {
- "note": "Block A tasks that come from no screen or operation, so the slice cannot derive them. Read by tools/build-service-docs.py. Edit this file, not the task sheet. Added 30 September 2026 from the system-design review (audit/ticvai/steps/SD, findings SD-016, 024, 026, 028, 030-032, 034, 046-049, 051, 057, 059, 063) and the AI functions review (docs/active/ai-functions-review-30-september.md). `pool: backend` goes to the least-loaded backend owner; `assignee` names a person. AI engine tasks carry no points: they are sized in engineer-days in their text and planned by the two AI engineers, whose capacity is separate from the developers' (decided 30 September). Since 1 October a task may carry `block` (for example `B1`): it is recorded here with the ADR that asks for it and is not ticketed in the Block A sheet; build-service-docs.py skips it until that block is planned. A task without `block` is Block A. Since 1 October (the sprint plan) a later-block task names the app-module it lands in with `module` (a business module) and `platform` (P01-P17; none = that module's platform work), and build-service-docs.py plans it with the rest of the package. AI-ENGINE-EVAL moved to Kalpita Mejari on 1 October so the two AI engineers' Block A chains end together (gateway, then baseline and suggestions on one side).",
+ "note": "Block A tasks that come from no screen or operation, so the slice cannot derive them. Read by tools/build-service-docs.py. Edit this file, not the task sheet. Added 30 September 2026 from the system-design review (audit/ticvai/steps/SD, findings SD-016, 024, 026, 028, 030-032, 034, 046-049, 051, 057, 059, 063) and the AI functions review (docs/active/ai-functions-review-30-september.md). `pool: backend` goes to the least-loaded backend owner; `assignee` names a person. AI engine tasks carry no points: they are sized in engineer-days in their text and planned by the two AI engineers, whose capacity is separate from the developers' (decided 30 September). Since 1 October a task may carry `block` (for example `B1`): it is recorded here with the ADR that asks for it and is not ticketed in the Block A sheet; build-service-docs.py skips it until that block is planned. A task without `block` is Block A. Since 1 October (the sprint plan) a later-block task names the app-module it lands in with `module` (a business module) and `platform` (P01-P17; none = that module's platform work), and build-service-docs.py plans it with the rest of the package. **The Block A AI chain split across both AI engineers** (Chinmay, 1 October): the baseline layer (estimators, venue profile, starting patterns) and Qdrant tenancy do not call the LLM gateway, so they start on day one beside it; day-one suggestions and the evaluation harness still wait for the gateway (an answer is recorded through its decision point), and the concierge for Qdrant. Kalpita Mejari: gateway, concierge, Help me choose, translations, planner (33 days); the second AI engineer: baseline, Qdrant, suggestions, evaluation (33 days). `appModule: baseline` puts a task in the second AI engine app-module of Block A, so each engineer's module test is of the other's half.",
  "epics": [
   {
    "key": "PLATFORM",
@@ -286,8 +286,10 @@
    "subject": "The baseline-then-learn layer: estimator interface, maturity stages, venue profile, starting patterns",
    "detail": "One interface per AI question with three answers behind it (starting pattern, statistical on the tenant's data, trained model); the stage and 'based on' label on every answer; the venue profile entered at onboarding; starting patterns per venue type with the UAE calendar and weather; no other tenant's data. About 15 engineer-days; the rest of the layer continues in Block B.",
    "depends": [
-    "AI-ENGINE-GATEWAY"
-   ]
+    "SETUP-CI",
+    "SETUP-ENV"
+   ],
+   "appModule": "baseline"
   },
   {
    "key": "AI-ENGINE-SUGGESTIONS",
@@ -297,8 +299,10 @@
    "subject": "Day-one suggestions for the Block A screens: queue balancing, prep plan, upsell",
    "detail": "requestSuggestion answers from the baseline on day one for the kinds Block A screens call (BO-005, GST-031, WEB-044), with the upsell baseline from the Promotions relationship map. About 8 engineer-days.",
    "depends": [
-    "AI-ENGINE-BASELINE"
-   ]
+    "AI-ENGINE-BASELINE",
+    "AI-ENGINE-GATEWAY"
+   ],
+   "appModule": "baseline"
   },
   {
    "key": "AI-ENGINE-CONCIERGE",
@@ -320,9 +324,9 @@
    "subject": "Qdrant tenancy: a collection and a scoped token per tenant, the retrieval client, erasure and snapshots",
    "detail": "Collection-per-tenant provisioning at tenant onboarding, per embedding model behind the alias tenant_<tenantId> (a model change is a shadow collection and an alias swap); per-tenant JWT issuance and rotation, scoped to the tenant's collections; the single retrieval client with no scope parameter that always adds the venue filter; erasure by guest or document payload, checked against the point references in ai.chunk_embedding; offboarding that deletes the collections and revokes the token; per-collection snapshots (ADR-0049). Done when: a token for one tenant cannot read another tenant's collection, a venue-scoped question never returns another venue's chunk, and an erased guest's points are gone and provably so. About 5 engineer-days.",
    "depends": [
-    "SETUP-QDRANT",
-    "AI-ENGINE-GATEWAY"
-   ]
+    "SETUP-QDRANT"
+   ],
+   "appModule": "baseline"
   },
   {
    "key": "AI-ENGINE-GUIDED",
@@ -360,13 +364,14 @@
   {
    "key": "AI-ENGINE-EVAL",
    "epic": "AI-ENGINE",
-   "assignee": "Kalpita Mejari",
+   "assignee": "Second AI engineer",
    "days": 5,
    "subject": "Evaluation harness and the promotion alert",
    "detail": "Offline evaluation of every AI answer type against a fixture, the backtest runner the learned producers will use, and the promotion-ready alert to the admin (AI-D16). About 5 engineer-days.",
    "depends": [
     "AI-ENGINE-GATEWAY"
-   ]
+   ],
+   "appModule": "baseline"
   },
   {
    "key": "KERNEL-TENANT-LIMITS",

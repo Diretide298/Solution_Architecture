@@ -561,10 +561,22 @@ def reconcile_keys(plan: dict[str, set], fixed: set, mp: dict, closed: frozenset
         if ident:
             fam[ident].append(k)
     naturals = set(plan) | set(fixed)
+    # **A pushed ticket that left the plan keeps its operations under another family too** (1 October): an
+    # operation whose contract tag changed (setReaderScannerPeripheral: pushed as SVC-ACCESS-DRAFTED-1, now in the
+    # ACCESS group) is the same work, so the planned task that builds it is written under the pushed key.
+    by_op = defaultdict(set)
+    for k, its in pitems.items():
+        ident = key_identity(k)
+        if ident and ident[0] == "ops" and k not in naturals:
+            for o in its:
+                by_op[o].add(k)
     pairs = []
     for t, work in plan.items():
         ident = key_identity(t)
-        for k in fam.get(ident, ()):
+        cands = list(fam.get(ident, ()))
+        if ident[0] == "ops":
+            cands += sorted({k for o in work for k in by_op.get(o, ())} - set(cands))
+        for k in cands:
             if k in fixed or (k in closed and k != t):
                 continue
             if k != t and k in naturals and ident[0] == "screen":
@@ -1981,8 +1993,15 @@ def main() -> int:
                                        ("OFFLINE", "Offline: POS, Kitchen Display and scanner"))):
         add_am(sp.FOUNDATION, "", None, 1, key=f"AM-FOUNDATION-{code}", name=f"Foundation · {title}", block="A",
                order=(0, i, 0, 0, 0))
+    # **The Block A AI chain split across both AI engineers** (Chinmay, 1 October): two app-modules, one per engineer,
+    # whose halves run side by side (block-a-extra-tasks.json `appModule`); each is module-tested by the other.
     add_am("AI & Intelligence", "AI", None, 1, key="AM-AI-ENGINE-A", block="A", order=(0, 9, 0, 0, 0),
-           name="AI engine · Block A (gateway, baseline, concierge, Help me choose, translations, planner)")
+           name="AI engine · Block A: gateway and guest AI (concierge, Help me choose, translations, planner)")
+    add_am("AI & Intelligence", "AI", None, 1, key="AM-AI-ENGINE-A-BASELINE", block="A", order=(0, 10, 0, 0, 0),
+           name="AI engine · Block A: baseline layer, day-one suggestions, Qdrant tenancy, evaluation")
+    ai_part = {}
+    if EXTRA.exists():
+        ai_part = {e["key"]: e.get("appModule") for e in json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or []}
 
     def foundation_am(k):
         if k.startswith("SETUP-"):
@@ -1992,7 +2011,7 @@ def main() -> int:
         if k.startswith(("OFFLINE-", "POS-KDS")):
             return "AM-FOUNDATION-OFFLINE"
         if k.startswith("AI-ENGINE-"):
-            return "AM-AI-ENGINE-A"
+            return "AM-AI-ENGINE-A-BASELINE" if ai_part.get(k) == "baseline" else "AM-AI-ENGINE-A"
         if k.startswith(("PLATFORM-", "KERNEL-", "ARCH-", "OBS-", "EDGE-")):
             return "AM-FOUNDATION-PLATFORM"
         return None
@@ -2225,8 +2244,10 @@ def main() -> int:
     for t_ in leaf:
         am_tasks[am_of[t_["key"]]].append(t_)
 
+    A_AI = {"AM-AI-ENGINE-A", "AM-AI-ENGINE-A-BASELINE"}
+
     def is_ai_engine(k):
-        return am_info[k]["platform"] == "AI" and k != "AM-AI-ENGINE-A"
+        return am_info[k]["platform"] == "AI" and k not in A_AI
 
     for k, ch in sorted(am_tasks.items()):
         pts = sum(int(x["points"] or 0) for x in ch)
@@ -2304,7 +2325,9 @@ def main() -> int:
     prune_reads()
     for _round in range(10):
         for tk, b in block_tests.items():
-            mods = [f"TEST-{k}" for k, a in am_info.items() if a["block"] == b and k in am_tasks and not is_ai_engine(k)]
+            # the AI engine's module tests may overlap the block test (Chinmay, 1 October): they do not gate it
+            mods = [f"TEST-{k}" for k, a in am_info.items() if a["block"] == b and k in am_tasks
+                    and a["platform"] != "AI"]
             by_key[tk]["dependsOn"] = " ".join(sorted(mods))
             w0, w1 = sp.window_of(final[b], tests["days"])
             by_key[tk]["notBefore"] = w0

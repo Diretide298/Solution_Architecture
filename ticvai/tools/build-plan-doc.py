@@ -99,7 +99,16 @@ def main():
                  {"overtimeHours": 0, "byPerson": {}})
     sprints = [s for s in plan["sprints"] if s["inPlan"]]
     plat_name = plan["platforms"]
-    ai_after = b["overtimeHours"] - b["overtimeHoursDevelopers"]
+    ai_after = b.get("aiUnassignedHours", b["overtimeHours"] - b["overtimeHoursDevelopers"])
+    bd = b.get("blockD") or {}
+    sp_ = b.get("spare") or {}
+    d_line = (f"Block D lands on {d(bd['targetEndsOn'])} at normal hours, without overtime." if bd.get("onTarget") else
+              f"Block D finishes by {d(b['planEnd'])} with about {n(bd.get('overtimeHours', 0))} hours of overtime "
+              f"(at normal hours it would end {d(bd.get('normalEndsOn'))}).") if bd else ""
+    spare_line = (f"The developers' planned work is done by {d(sp_['from'])}; from Sprint {sp_['fromSprint']} to "
+                  f"{d(b['planEnd'])} about {n(sp_['hoursPerSprint'])} hours a sprint ({n(sp_['hours'])} in all) are "
+                  "free for Claude Design returns, defects, change requests and helping the AI developers."
+                  if sp_.get("sprints") else "")
 
     doc = Document()
     st = doc.styles["Normal"]
@@ -130,8 +139,9 @@ def main():
                 f"AI engine {n(b['aiEngineHours'])}.", "Effort:")
     bullet(doc, f" Block A (the first release and all the functionality of Guest Web, Guest App, POS and the Kitchen "
                 f"Display; 40 working days, it was 35) ends Sprint {a['targetSprint']}, {d(a['targetEndsOn'])}, with about "
-                f"{n(opt_a['overtimeHours'])} hours of overtime. Block D finishes by {d(b['planEnd'])} with about "
-                f"{n(b['overtimeHoursDevelopers'])} developer overtime hours over the six months. The AI engine work past "
+                f"{n(opt_a['overtimeHours'])} hours of overtime. {d_line} Developer overtime over the six months: about "
+                f"{n(b['overtimeHoursDevelopers'])} hours. The pace is 5 tasks a developer a day through Block A, rising "
+                f"to 2x by Sprint 11, re-measured after Sprint 2. {spare_line} The AI engine work past "
                 f"{d(b['planEnd'])} is created as tasks and left unassigned for the AI developers joining.",
            "Decided 1 October:")
     table(doc, ["Block", "Sprints", "Ends (decided)", "At normal hours", "App-modules", "Screens", "Journeys tested end to end"],
@@ -194,7 +204,8 @@ def main():
             n(s["planned"]), "; ".join(test_in.get(s["n"], []))]
            for s in sprints], widths=[1.3, 4.2, 2.8, 2.2, 2.2, 3.5])
     para(doc, "Capacity and planned hours are at normal hours; the block test dates are the decided ones (Block A in "
-              f"Sprint {a['targetSprint']}, Block D in Sprint {blocks['D']['targetSprint']}, with overtime). Holidays: " + "; ".join(
+              f"Sprint {a['targetSprint']}, Block D in Sprint {blocks['D']['targetSprint']}"
+              + (", with overtime" if not bd.get("onTarget") else "") + "). Holidays: " + "; ".join(
         f"{d(k)} {v}" for k, v in plan["calendar"]["holidays"].items()) + ". The task-by-task sprint plan is in "
          "\"TICVAI - Sprint Plan.xlsx\" (Sprints, Tasks by sprint, Blocks, People, App-modules, Flows).")
 
@@ -236,9 +247,9 @@ def main():
             f"About {n(opt_a['overtimeHours'])} h of overtime: " + ", ".join(f"{k} {v}" for k, v in opt_a["byPerson"].items())
             + f". Without it Block A ends {d(a.get('normalEndsOn') or a['endsOn'])}. Block A is 40 working days "
               "(decided 1 October; it was 35)."],
-           ["Block D past 2 April", f"Keep its scope; finish by {d(b['planEnd'])} with overtime",
-            f"About {n(b['overtimeHoursDevelopers'])} developer hours over the six months (the People table), about 4 to 5 "
-            f"hours a week each. At normal hours the developers finish {d(b['forecastFinish'])}."],
+           ["Block D past 2 April", f"Keep its scope; finish by {d(b['planEnd'])}",
+            f"{d_line} Developer overtime over the six months: about {n(b['overtimeHoursDevelopers'])} hours (the "
+            f"People table). At normal hours the developers finish {d(b['forecastFinish'])}. {spare_line}"],
            ["AI engine (about 50 AI-engineer weeks against 35)",
             "Every AI engine task is created; those past 2 April are unassigned for the AI developers joining",
             f"About {n(ai_after)} h of AI engine work past 2 April. Two AI engineers alone finish it {d(b['aiFinish'])}."]],

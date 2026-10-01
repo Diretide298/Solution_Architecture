@@ -447,6 +447,16 @@ def main():
     ai_finish = max([it["e"] for it in items if it["kind"] == "AI engine"] or [0.0])   # unassigned ones included
     test_items = [it for it in items if it["kind"] in ("module test", "block test")]
     counted = [p for p in people_rows if p["name"] not in AI_PEOPLE]
+    # Block D against its target, and the developers' spare capacity once their planned work is done (1 October:
+    # it absorbs Claude Design returns, defects, change requests, and helps the AI developers)
+    xd = next((x for x in blocks if x["block"] == "D"), None)
+    block_d = ({"onTarget": xd["normalEndSprint"] <= xd["targetSprint"], "overtimeHours": xd["targetOvertimeHours"],
+                "normalEndsOn": xd["normalEndsOn"], "targetEndsOn": xd["targetEndsOn"]} if xd else {})
+    fin_n = sp.sprint_of_index(max(devs_finish - 1e-6, 0))
+    after = [s_ for s_ in sprints if s_["inPlan"] and s_["n"] > fin_n]
+    spare = {"from": sp.day(max(devs_finish - 1e-6, 0)).isoformat(), "fromSprint": fin_n + 1 if after else None,
+             "sprints": len(after), "hours": round(sum(s_["devIdle"] for s_ in after)),
+             "hoursPerSprint": round(sum(s_["devIdle"] for s_ in after) / len(after)) if after else 0}
     # **Block A's critical path** (asked 1 October): its longest chain of waits with every task on its own person
     # (no one waits for a free person), at the scheduled durations; soft waits hold only the finish. The shortest
     # Block A can take whatever the team size.
@@ -490,7 +500,8 @@ def main():
                   "pace": sched.get("pace") or "", "blockACriticalPathDays": a_critical,
                   "aiUnassignedHours": round(sum(it["hours"] for it in items if it["kind"] == "AI engine"
                                                  and not it["who"])),
-                  "devIdleHoursToPlanEnd": round(sum(s_["devIdle"] for s_ in sprints if s_["inPlan"]))},
+                  "devIdleHoursToPlanEnd": round(sum(s_["devIdle"] for s_ in sprints if s_["inPlan"])),
+                  "blockD": block_d, "spare": spare},
         "calendar": {"start": START.isoformat(), "planEnd": PLAN_END.isoformat(), "sprintDays": sp.SPRINT_DAYS,
                      "holidays": {d.isoformat(): n for d, n in HOLIDAYS.items()}},
         "blocks": blocks, "sprints": sprints, "appModules": ams, "packages": pk, "modules": mod_rows,
@@ -539,6 +550,32 @@ def _opt_a(b, a):
     """Block A's option at its target sprint (team.json sprintPlan.blocks): the overtime it takes, by person."""
     return next((o for o in b.get("blockAOptions") or [] if o["sprint"] == a["targetSprint"]),
                 {"overtimeHours": 0, "byPerson": {}})
+
+
+def d_text(b):
+    """Block D against its target, from the plan: on target without overtime, or the hours it takes."""
+    x = b.get("blockD") or {}
+    if not x:
+        return ""
+    if x.get("onTarget"):
+        return f"Block D lands on {_d(x['targetEndsOn'])} at normal hours, without overtime."
+    return (f"Block D at normal hours ends {_d(x['normalEndsOn'])}; landing it on {_d(x['targetEndsOn'])} takes about "
+            f"{_pp(x['overtimeHours'])} hours of overtime.")
+
+
+def spare_value(b):
+    x = b.get("spare") or {}
+    return f"{_pp(x.get('hours', 0))} hours from {_d(x.get('from'))}" if x.get("sprints") else "none before 2 April"
+
+
+def spare_text(b):
+    """The developers' capacity left once their planned work is done, to 2 April."""
+    x = b.get("spare") or {}
+    if not x.get("sprints"):
+        return "The developers' planned work fills the six months."
+    return (f"The developers' planned work is done by {_d(x['from'])}; from Sprint {x['fromSprint']} to 2 April about "
+            f"{_pp(x['hoursPerSprint'])} hours a sprint ({_pp(x['hours'])} in all) are free. They absorb Claude Design "
+            "returns, defects, change requests, and help the AI developers.")
 
 
 def _style():
@@ -596,10 +633,11 @@ def summary_rows(plan):
          f"Build {_pp(b['buildHours'])} h, testing {_pp(b['testHours'])} h (module tests {_pp(b['moduleTestHours'])}, "
          f"block tests {_pp(b['blockTestHours'])}), AI engine {_pp(b['aiEngineHours'])} h."],
         ["Overtime to finish by 2 April", f"{_pp(b['overtimeHoursDevelopers'])} hours (developers)",
-         f"Decided 1 October: Block D keeps its scope and finishes by 2 April with overtime. The AI engine's "
+         f"Decided 1 October: Block D keeps its scope to 2 April. {d_text(b)} The AI engine's "
          f"{_pp(b.get('aiUnassignedHours', 0))} h past 2 April is not overtime: those tasks are "
          f"unassigned for the AI developers joining. The plan of {PREVIOUS['date']} needed about "
          f"{_pp(PREVIOUS['overtimeHours'])} h without the tests."],
+        ["Spare capacity", spare_value(b), spare_text(b)],
         ["Block A", f"{a['appModuleCount']} app-modules, ends {_d(a['targetEndsOn'])} (Sprint {a['targetSprint']})",
          f"Previously: {PREVIOUS['blockA']}. Now complete, tested and accepted as one block. Decided 1 October: "
          f"Sprint {a['targetSprint']} with about {_pp(_opt_a(b, a)['overtimeHours'])} h of overtime ("
@@ -856,7 +894,7 @@ ARCH_DECISIONS = [
 
 RISKS = [
     ("Back-end owners overloaded in Block A", "Their Block A work runs past Sprint 4 (People sheet).", "Decided 1 October: Block A is 40 working days (it was 35) and ends Sprint 4, 27 November, with the overtime the Summary sheet gives, most of it on the three back-end owners; the two new developers take back-end tasks from their first day. Its critical path is about as long as the window, so overtime cannot be bought later in the block: it has to start early. Without it, Block A ends where the Blocks sheet says at normal hours."),
-    ("Pace below plan", "Measured pace after the first sprints under 9.6 points per developer per day.", "Rerun the plan with the measured pace; blocks B to D re-cut to their sprints."),
+    ("Pace below plan", "The plan assumes 5 tasks a developer a day through Block A, rising gradually to 2x by Sprint 11 (decided 1 October); it is re-measured after Sprint 2.", "If the measured pace is lower, rerun the plan with it; blocks B to D re-cut to their sprints. At the plan of record's 9.58 points a day, Block A needed about 996 hours of overtime to end in Sprint 4 (run of 1 October)."),
     ("Hiring the two developers slips", "Not confirmed by 23 October.", "Blocks C and D move out by the scheduler's figure; the PM decides scope or date."),
     ("Client inputs late", "Wireframe sign-off over 3 working days; sandbox credentials; stations and fares; cabana numbering; real photos.", "Those tickets wait in 'Waiting on client' and do not count against the team's pace."),
     ("Make-or-break answers", "Tax invoice fields, e-invoicing provider, VAT 201 layout, face capture consent, ID-verification provider.", "Defaults are built; a different answer is a change request."),
@@ -942,8 +980,9 @@ def write_md(plan, path):
     w("")
     w("## 8. Finishing by 2 April: overtime")
     w("")
-    w(f"About **{_pp(b['overtimeHoursDevelopers'])} developer hours** past 2 April at normal hours. Decided 1 October: Block D keeps its scope "
-      f"and is finished by 2 April with that overtime; Block A ends Sprint {a['targetSprint']} with about {_pp(_opt_a(b, a)['overtimeHours'])} hours of it. "
+    w(f"About **{_pp(b['overtimeHoursDevelopers'])} developer hours** past 2 April at normal hours. Decided 1 October: Block D keeps its scope; "
+      f"{d_text(b)} Block A ends Sprint {a['targetSprint']} with about {_pp(_opt_a(b, a)['overtimeHours'])} hours of overtime. "
+      f"{spare_text(b)} "
       f"The AI engine's {_pp(b.get('aiUnassignedHours', 0))} hours past 2 April are not overtime: those tasks are unassigned for the AI developers joining. "
       f"The plan of {PREVIOUS['date']} needed about {_pp(PREVIOUS['overtimeHours'])} hours, without the module and block tests.")
     w("")
@@ -971,7 +1010,7 @@ if __name__ == "__main__":
     write_sprint_xlsx(plan, task_rows_, o("handoff/TICVAI - Sprint Plan.xlsx"))
     write_md(plan, o("docs/active/build-plan-presentation.md"))
     b = plan["basis"]
-    print(f"  pace {b['pacePointsPerDeveloperDay']} pts/dev-day, {b['hoursPerPoint']} h/pt; total {b['totalHours']} h "
+    print(f"  pace: {b.get('pace')}; total {b['totalHours']} h "
           f"(build {b['buildHours']}, tests {b['testHours']}, AI engine {b['aiEngineHours']}); developers finish "
           f"{b['forecastFinish']}, AI engine {b['aiFinish']}; overtime to 2 Apr {b['overtimeHours']} h")
     for x in plan["blocks"]:
