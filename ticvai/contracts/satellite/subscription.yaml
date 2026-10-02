@@ -5421,7 +5421,7 @@ paths:
         above it; overlapping exclusive rights for the same market and period are rejected on save.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -5648,7 +5648,7 @@ paths:
         p.17); sensitive functions may need internal approval through the approvals engine.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6120,7 +6120,7 @@ paths:
         rules are flagged; AI analysis of commission against incremental sales is advisory.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6201,7 +6201,7 @@ paths:
         only if transaction amount + exposure <= available credit unless an approved exception exists (approveBookingLimitCommercial).'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6281,7 +6281,7 @@ paths:
         its expiryAction automatically.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6430,7 +6430,7 @@ paths:
         manually per releaseMode; AI under-utilisation flags are advisory.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -7182,7 +7182,7 @@ paths:
         suggestions are advisory.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -7272,7 +7272,7 @@ paths:
         until the lines and adjustments are reconciled; posting and payment execution belong to Finance.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins

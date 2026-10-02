@@ -87,7 +87,7 @@ def retired_keys(mp) -> frozenset:
     out = set(mod.OTHER)
     # A ticket replaced by another (op-retire.py REPLACED, r2; CHG-CLN-002) is retired too: its work was removed
     # from the contract, so it is not "renamed" whatever key now builds the record.
-    out |= set(getattr(mod, "REPLACED", {}))
+    out |= set(getattr(mod, "REPLACED", {})) | set(getattr(mod, "MERGED_R2", {}))
     for k in mp:
         if "#" not in k and any(re.search(rf"-{re.escape(s)}$", k) for s in sids):
             out.add(k)

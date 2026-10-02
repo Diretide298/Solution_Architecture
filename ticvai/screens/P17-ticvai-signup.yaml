@@ -171,6 +171,28 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: textField
+        label: Work email
+        bindsTo: StartProspectSignupRequest.email
+        notes: 'Step one of the prospect sign-up session (DEC-167, "Email + one-time code"): the code
+          goes to this address; "Continue saved setup" is the same field (CHG-CLN-019).'
+        provenance: contract identity.yaml POST /auth/prospect/signup
+      - kind: secondaryButton
+        label: Send code
+        operation: startProspectSignup
+        notes: Sends the one-time code; the answer is the same whether or not the email has a saved setup.
+        provenance: contract identity.yaml POST /auth/prospect/signup
+      - kind: textField
+        label: One-time code
+        bindsTo: VerifyProspectSignupCodeRequest.code
+        notes: Six digits from the email; a right code opens the sign-up session (prospectAuth) the rest
+          of the journey runs on and resumes a saved setup (CHG-CLN-019).
+        provenance: contract identity.yaml POST /auth/prospect/signup/{challengeId}/verify
+      - kind: secondaryButton
+        label: Verify code
+        operation: verifyProspectSignupCode
+        notes: A wrong code says so and counts against the challenge; after five, Send code again.
+        provenance: contract identity.yaml POST /auth/prospect/signup/{challengeId}/verify
       - kind: primaryButton
         derived: true
         impliedBy: submitOnboardingApplication
@@ -209,6 +231,16 @@ screens:
     purpose: Register the organisation
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: startProspectSignup
+    contract: identity
+    purpose: Send the one-time code that opens (or resumes) the sign-up
+    trigger: onAction
+    provenance: DEC-167, 2 October 2026 (CHG-CLN-019)
+  - operationId: verifyProspectSignupCode
+    contract: identity
+    purpose: Prove the email and receive the prospect sign-up session
+    trigger: onAction
+    provenance: DEC-167, 2 October 2026 (CHG-CLN-019)
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 22. 0 of
     0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather

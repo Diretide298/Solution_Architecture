@@ -131,6 +131,18 @@ REPLACED_OPS = {
     "setBundleDefinition": "createBundle", "setBundleComponent": "createBundle", "setGuestChoiceBuild": "createBundle",
 }
 
+# **Merged at r2** (the lead, 2 October 2026, CHG-CLN-017): the regrouping of the operations after the 2 October merges
+# put each of these tickets' work into one planned task with another pushed ticket's work; that task keeps the key
+# whose work it overlaps most, so this ticket is closed as merged into it. Found by check-key-stability on a fresh
+# derive of main (e80beb7b); not a rename the reconciler should have kept: one task can carry only one key.
+MERGED_R2 = {
+    "SVC-ACCESS-SYNC-1": ("VM-ACCESS-SYNC-1", "getOfflinePackage"),
+    "SVC-LEDGER-REPORTING-1": ("VM-LEDGER-REPORTING-1", "getFinancialReport"),
+    "SVC-VENUEOPS-FEED-1": ("VM-VENUEOPS-FEED-1", "configureQueueFeed and getQueueFeedHealth"),
+    "VM-MARKETING-MARKETING-2": ("SVC-MARKETING-MARKETING-4", "recordLostItem"),
+    "VM-ORDER-SYNC-1": ("SVC-ORDER-SYNC-1", "listSyncRejections"),
+}
+
 
 def replaced_note(into: str, into_id, op: str, how: str) -> str:
     return (f"**Replaced by {into}**{f' (#{into_id})' if into_id else ''} (decided 2 October 2026, release "
@@ -182,6 +194,14 @@ def build_plan():
         if key not in mp or key in planned:
             continue
         note = replaced_note(into, mp.get(into), op, how)
+        plan += [(x, "merge", note) for x in [key] + [s_ for s_ in mp if s_.startswith(key + "#")]]
+        covered.add(key)
+    for key, (into, what) in MERGED_R2.items():
+        if key not in mp or key in planned:
+            continue
+        note = (f"**Merged into {into}**{f' (#{mp[into]})' if into in mp else ''} (decided 2 October 2026, release "
+                f"{REPLACED_RELEASE}): its work ({what}) is now built in one task with that ticket's, under that key "
+                "(CHG-CLN-017), so this ticket is closed.")
         plan += [(x, "merge", note) for x in [key] + [s_ for s_ in mp if s_.startswith(key + "#")]]
         covered.add(key)
     # A pushed sub-task whose task is still planned but whose operation or table is no longer under it (the task

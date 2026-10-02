@@ -1,0 +1,48 @@
+id: CHG-CLN-017
+date: '2026-10-02'
+source: cr
+kind: plan
+summary: Five pushed tickets whose work the r2 plan builds inside another pushed ticket's task close as merged into it, so
+  check-key-stability passes on a fresh derive.
+decision:
+  what: 'tools/op-retire.py MERGED_R2 closes SVC-ACCESS-SYNC-1 into VM-ACCESS-SYNC-1 (getOfflinePackage), SVC-LEDGER-REPORTING-1
+    into VM-LEDGER-REPORTING-1 (getFinancialReport), SVC-VENUEOPS-FEED-1 into VM-VENUEOPS-FEED-1 (configureQueueFeed, getQueueFeedHealth),
+    VM-MARKETING-MARKETING-2 into SVC-MARKETING-MARKETING-4 (recordLostItem) and VM-ORDER-SYNC-1 into SVC-ORDER-SYNC-1 (listSyncRejections),
+    each with the note "Merged into <key> (#id) ... release r2". check-key-stability and build-service-docs count them retired
+    and closed.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'The lead, 2 October 2026 (Chinmay waived cooling-off; no ticket has started). A fresh derive of main at e80beb7b reported
+  these five as renamed. Each is a true merge, not a rename the reconciler should have kept: the planned task now holds both
+  tickets'' operations and keeps the key it overlaps most (VM-ACCESS-SYNC-1 holds listScans and syncScans beside getOfflinePackage,
+  and so on), and one task carries one key (council of 1 October, C4).'
+keys_touched:
+  tickets:
+  - SVC-ACCESS-SYNC-1
+  - SVC-LEDGER-REPORTING-1
+  - SVC-VENUEOPS-FEED-1
+  - VM-MARKETING-MARKETING-2
+  - VM-ORDER-SYNC-1
+  files:
+  - tools/op-retire.py
+  - tools/check-key-stability.py
+  - tools/build-service-docs.py
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted:
+  - SVC-ACCESS-SYNC-1 (#17877)
+  - SVC-LEDGER-REPORTING-1 (#18114)
+  - SVC-VENUEOPS-FEED-1 (#17907)
+  - VM-MARKETING-MARKETING-2 (#20812)
+  - VM-ORDER-SYNC-1 (#18306)
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+proposed: 2026-10-02T15:00
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+status: open
+notes: 'check-key-stability on a fresh local derive (not committed) failed with these 5 renames before and passes after,
+  with its 12 self-tests. Cooling-off waived by Chinmay until Mon 5 Oct 2026 (CHG-DOC-023).'

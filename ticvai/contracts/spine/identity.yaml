@@ -5731,6 +5731,129 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /auth/prospect/signup:
+    post:
+      operationId: startProspectSignup
+      x-ticvai-consumed-by:
+        - "P09 ADM-380 Customer & Organization Registration"
+        - "P17 SGN-002 Customer & Organization Registration"
+      x-ticvai-audience:
+      - public
+      - prospect
+      summary: Start (or resume) a TICVAI sign-up with an email and a one-time code
+      description: '**The door of the prospect sign-up session** (decided 2 October 2026, Chinmay: DEC-167, "Email +
+        one-time code"; CHG-CLN-019). A prospect on the public sign-up journey (P17) gives a work email; a one-time
+        code is sent to it. "Continue saved setup" is the same call: an email that already has an onboarding
+        application in progress receives a code that resumes it.
+
+
+        **The response never reveals whether the email has an application.** It is the same either way; only the
+        message differs, and only the owner of the mailbox receives it. Rate-limited per email and per source
+        address. Nothing is provisioned and no tenant exists yet.
+
+        '
+      tags:
+      - prospectAuth
+      x-ticvai-permission: null
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartProspectSignupRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A code was sent if the email is deliverable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProspectSignupChallenge'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
+  /auth/prospect/signup/{challengeId}/verify:
+    parameters:
+    - name: challengeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: verifyProspectSignupCode
+      x-ticvai-consumed-by:
+        - "P09 ADM-380 Customer & Organization Registration"
+        - "P17 SGN-002 Customer & Organization Registration"
+      x-ticvai-audience:
+      - public
+      - prospect
+      summary: Prove the email with the one-time code and receive the prospect sign-up session
+      description: '**Issues the `prospectAuth` session** (DEC-167; CHG-CLN-019, CHG-CLN-010). A right code returns a
+        token scoped to one onboarding application: the application already in progress for this email, or a new
+        one the prospect''s first `submitOnboardingApplication` creates. It carries no tenant and no permission;
+        the sign-up operations accept it as their `prospectAuth` alternative. It expires with the application''s
+        activation or abandonment, or at `expiresAt`, whichever is first; "Continue saved setup" starts again at
+        `startProspectSignup`.
+
+
+        A wrong code answers 422 (`codeInvalid`) and counts against the challenge; after five, once the code has
+        expired, or once it was used, the challenge is spent (409 `codeExpired`) and a new one is started.
+
+        '
+      tags:
+      - prospectAuth
+      x-ticvai-permission: null
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyProspectSignupCodeRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The prospect sign-up session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProspectSignupSession'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The challenge is spent (`codeExpired`) because the code expired, five wrong codes were tried
+            or it was already used; start a new one with startProspectSignup
+          x-ticvai-problem-types:
+          - codeExpired
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The code is wrong (`codeInvalid`); it counts against the challenge
+          x-ticvai-problem-types:
+          - codeInvalid
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
 components:
   securitySchemes:
     bearerAuth:
@@ -5753,7 +5876,74 @@ components:
       in: header
       name: X-Api-Key
       description: Partner, developer and device key (common.yaml apiKeyAuth).
+    prospectAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Prospect sign-up session token (common.yaml prospectAuth), issued by verifyProspectSignupCode; DEC-167, CHG-CLN-019.
   schemas:
+    StartProspectSignupRequest:
+      type: object
+      x-ticvai-persistence: none — request only (DEC-167; CHG-CLN-019)
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 256
+          description: The prospect's work email; the one-time code goes here.
+        locale:
+          type: string
+          maxLength: 16
+          nullable: true
+          description: The language the code message is written in (BCP 47), default English.
+    ProspectSignupChallenge:
+      type: object
+      x-ticvai-persistence: none — the challenge is held by identity for its lifetime (CHG-CLN-019)
+      required:
+      - challengeId
+      - expiresInSeconds
+      properties:
+        challengeId:
+          type: string
+          format: uuid
+        expiresInSeconds:
+          type: integer
+        resendAfterSeconds:
+          type: integer
+    VerifyProspectSignupCodeRequest:
+      type: object
+      x-ticvai-persistence: none — request only (CHG-CLN-019)
+      required:
+      - code
+      properties:
+        code:
+          type: string
+          pattern: ^[0-9]{6}$
+          description: The six-digit one-time code sent to the email.
+    ProspectSignupSession:
+      type: object
+      x-ticvai-persistence: none — a session token, not a table the package reads (CHG-CLN-019)
+      required:
+      - token
+      - expiresAt
+      - resumed
+      properties:
+        token:
+          type: string
+          description: The `prospectAuth` bearer token, scoped to one onboarding application.
+        expiresAt:
+          type: string
+          format: date-time
+        onboardingApplicationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The application in progress for this email, or null until the first `submitOnboardingApplication`.
+        resumed:
+          type: boolean
+          description: True when the email already had an application in progress ("Continue saved setup").
     IdentityRoleSuggestion:
       type: object
       x-ticvai-persistence: none — computed from workforce.work_assignment peers, identity.delegated_access and

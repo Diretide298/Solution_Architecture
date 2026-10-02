@@ -1,0 +1,48 @@
+id: CHG-CLN-019
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: identity gains startProspectSignup and verifyProspectSignupCode, which issue the prospectAuth sign-up session; SGN-002
+  and its console twin ADM-380 bind them.
+decision:
+  what: 'POST /auth/prospect/signup (startProspectSignup: a work email, a one-time code sent, the same answer whether a saved
+    setup exists) and POST /auth/prospect/signup/{challengeId}/verify (verifyProspectSignupCode: the code returns the prospectAuth
+    token scoped to one onboarding application; 422 codeInvalid, 409 codeExpired). Both public with no security, audience
+    public and prospect, permission null, platform scope; four new schemas; identity declares prospectAuth. SGN-002 and ADM-380
+    gain the same Work email, Send code, One-time code and Verify code controls and the two apis, so the twins stay identical
+    (apply-subscription-placement copies ADM-380''s layout and apis onto SGN-002).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'DEC-167 (Chinmay, 2 October, batch 5: "Email + one-time code"); CHG-CLN-010 added prospectAuth to the sign-up operations
+  and logged that nothing issued it; the lead, 2 October 2026: add both operations to identity (additive) and bind them on
+  SGN-002 and its P09 twin.'
+keys_touched:
+  operations:
+  - startProspectSignup
+  - verifyProspectSignupCode
+  schemas:
+  - StartProspectSignupRequest
+  - ProspectSignupChallenge
+  - VerifyProspectSignupCodeRequest
+  - ProspectSignupSession
+  screens:
+  - SGN-002
+  - ADM-380
+  files:
+  - contracts/spine/identity.yaml
+  - screens/P17-ticvai-signup.yaml
+  - screens/P09-platform-admin-console.yaml
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: Additive against r1 (new operations and schemas, a new security scheme). New-operation gates - permission null (public),
+  no configuration noun, not a list. check-contract-shapes asked for the 409 on the verify action (C-ACTION-409). Closes the
+  gap CHG-CLN-010 logged.

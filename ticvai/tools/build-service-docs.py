@@ -671,7 +671,7 @@ def closed_keys() -> frozenset:
     except Exception:
         return frozenset()
     return frozenset([k for k, (kind, _, _) in mod.OTHER.items() if kind == "merge"]
-                     + list(getattr(mod, "REPLACED", {})))
+                     + list(getattr(mod, "REPLACED", {})) + list(getattr(mod, "MERGED_R2", {})))
 
 
 def replaced_screens() -> frozenset:

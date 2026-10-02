@@ -255,3 +255,103 @@ changes:
     tag: r2
     producer-tickets: [SVC-CATALOGUE-DRAFTED-4]
     consumer-tickets: [APP-SETUP-ADM-181]
+
+# BC-021 to BC-028 are one decision (CHG-CLN-018): the eight partner list reads the partner screens moved to Venue
+# Management call (CHG-CLN-004) take PARTNER_VIEW, a staff permission, instead of PLATFORM_TENANT_VIEW, which no venue
+# role holds. No ticket has started and none of these operations is pushed; producer and consumers are planned keys.
+  - id: BC-021
+    contract: subscription
+    operation: listTerritoryMarketDistribution
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-026 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-5]
+    consumer-tickets: [VM-PTR-026]
+  - id: BC-022
+    contract: subscription
+    operation: listPartnerAccessRole
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-029 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-5]
+    consumer-tickets: [VM-PTR-029]
+  - id: BC-023
+    contract: subscription
+    operation: listCommissionMarginIncentive
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-035 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-3]
+    consumer-tickets: [VM-PTR-035]
+  - id: BC-024
+    contract: subscription
+    operation: listCreditLimitExposure
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-036 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-3]
+    consumer-tickets: [VM-PTR-036]
+  - id: BC-025
+    contract: subscription
+    operation: listDepositGuaranteeFinancial
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-037 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-4]
+    consumer-tickets: [VM-PTR-037]
+  - id: BC-026
+    contract: subscription
+    operation: listCommercialAllocationQuota
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-039 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-3]
+    consumer-tickets: [VM-PTR-039]
+  - id: BC-027
+    contract: subscription
+    operation: listPartnerReconciliationException
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-047 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-5]
+    consumer-tickets: [VM-PTR-047]
+  - id: BC-028
+    contract: subscription
+    operation: listCommissionCalculationSettlement
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-048 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-3]
+    consumer-tickets: [VM-PTR-048]

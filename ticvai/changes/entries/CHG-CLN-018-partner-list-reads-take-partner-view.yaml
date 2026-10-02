@@ -1,0 +1,44 @@
+id: CHG-CLN-018
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: The eight partner list reads the moved staff screens call require PARTNER_VIEW instead of PLATFORM_TENANT_VIEW, as
+  approved breaking changes BC-021 to BC-028 (tag r2).
+decision:
+  what: listTerritoryMarketDistribution, listPartnerAccessRole, listCommissionMarginIncentive, listCreditLimitExposure, listDepositGuaranteeFinancial,
+    listCommercialAllocationQuota, listPartnerReconciliationException and listCommissionCalculationSettlement take x-ticvai-permission
+    PARTNER_VIEW. PARTNER_VIEW is already in the Permission vocabulary and its module group, so the vocabulary is unchanged.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'CHG-CLN-004 moved PTR-026, 029, 035, 036, 037, 039, 047 and 048 to Venue Management as staff screens and logged that
+  their reads needed a platform permission no venue role holds; the lead, 2 October 2026: switch them to a staff permission
+  in r2, logged as an approved breaking change (Chinmay approving r2 breaking changes; no ticket started).'
+keys_touched:
+  operations:
+  - listTerritoryMarketDistribution
+  - listPartnerAccessRole
+  - listCommissionMarginIncentive
+  - listCreditLimitExposure
+  - listDepositGuaranteeFinancial
+  - listCommercialAllocationQuota
+  - listPartnerReconciliationException
+  - listCommissionCalculationSettlement
+  files:
+  - contracts/satellite/subscription.yaml
+  - docs/active/breaking-changes.yaml
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - SVC-PLATFORM-DRAFTED-3
+  - SVC-PLATFORM-DRAFTED-4
+  - SVC-PLATFORM-DRAFTED-5
+release_tag: r2
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: check-contract-compat reports each permission change as breaking and passes only with BC-021..BC-028. None of the
+  eight operations is pushed; producer and consumer keys are the planned ones. Closes the gap CHG-CLN-004 logged.
