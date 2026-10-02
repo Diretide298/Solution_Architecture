@@ -2,24 +2,27 @@ id: CHG-DOC-023
 date: '2026-10-02'
 source: audit
 kind: plan
-summary: 'Proposed, not applied: the Block A task changes the 2 October decisions imply (AI gateway scope and size for residency, scrubbing
-  and the guard; kitchen printers and routing rules in POS-KDS-ROUTING; a UAE Pass and ICP integration task; a same-numbers test task).'
+summary: 'Plan change applied: AI-ENGINE-GATEWAY 10→12 days (residency routing, curated models); new AI-ENGINE-SCRUB-GUARD
+  6 days (Block A); POS-KDS-ROUTING 5→8 points (printers, category routing); new ACC-UAEPASS-ICP (later block); new TEST-SAME-NUMBERS
+  (prevention of CHG-FIN-006).'
 decision:
-  what: 'Proposed plan change, for Chinmay after the 24-hour cooling-off: AI-ENGINE-GATEWAY takes residency routing per class, the offline
-    scrubber and the guard (DEC-539, DEC-542, DEC-543), or a new AI-ENGINE-SCRUB-GUARD task; POS-KDS-ROUTING takes kitchen printers
-    and category rules with a fallback station (DEC-187, DEC-189); a new later-block task for UAE Pass and ICP (DEC-457); a new test
-    task for the same-numbers comparison (DEC-559).'
+  what: Approved and applied now. Chinmay waived the 24-hour cooling-off for every change until Monday 5 October 2026, because
+    no work has started yet ('since we haven't started yet we can ship it now instead of cool off; until next Monday we can
+    for all').
   by: Chinmay
   date: '2026-10-02'
-why: 'Chinmay''s decisions of 2 October (workbook Q187, Q189, Q457; the AI residency and PII scrubbing decisions; batch 5 on CHG-FIN-006).
-  docs/active/block-a-extra-tasks.json is a plan input: a plan change cools off for 24 hours and ships only at a release (ticvai/CLAUDE.md
-  rule 9; council of 2 October).'
+why: 'Chinmay''s decisions of 2 October (workbook Q187, Q189, Q457; the AI residency and PII scrubbing decisions; batch 5
+  on CHG-FIN-006). docs/active/block-a-extra-tasks.json is a plan input: a plan change cools off for 24 hours and ships only
+  at a release (ticvai/CLAUDE.md rule 9; council of 2 October).'
 keys_touched:
   files:
   - docs/active/block-a-extra-tasks.json
   other:
   - AI-ENGINE-GATEWAY
+  - AI-ENGINE-SCRUB-GUARD
   - POS-KDS-ROUTING
+  - ACC-UAEPASS-ICP
+  - TEST-SAME-NUMBERS
 root_class: A27 CLIENT-DECISIONS
 tickets:
   started: []
@@ -28,8 +31,9 @@ release_tag: pending
 decision_owner: Chinmay
 proposed: 2026-10-02T08:00
 prevention:
-  type: none
-  reason: 'A plan change: the plan-change rule of check-changelog is its gate; it closes when the lead decides it and a release carries
-    it.'
-status: open
-notes: 'Nothing in block-a-extra-tasks.json was changed by this batch: the sizing (engineer-days, points) is the lead''s call.'
+  type: check
+  ref: tools/check-changelog.py
+  reason: the plan-change rule (kind plan) gates plan files from 5 October; the waiver applies before then only
+status: closed
+notes: Cooling-off waived by Chinmay until Mon 5 Oct 2026 (rules bind from then). Sizing per the apply-docs proposal.
+closed_by_commit: d1e9948b
