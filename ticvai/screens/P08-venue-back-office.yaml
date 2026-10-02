@@ -7158,13 +7158,6 @@ screens:
       provenance: 'derived — BO-104 declares entryState.params  and BO-021 holds none of them. The edge
         carries nothing: BO-021 is opened from BO-104, so this edge is the way back and BO-104 keeps its
         own state'
-    - to: POS-002
-      trigger: Sell — Ticket Catalogue
-      provenance: flow F81 step 1→2
-      crossesDevice: true
-      back: false
-      carries:
-      - orderId
   notes: 'Restored 20 August when the P15 build was rolled back.
 
 
@@ -14887,12 +14880,6 @@ screens:
         holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
         BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
         its own'
-    - to: GST-026
-      trigger: Guest tracks it in the app
-      provenance: flow F17 step 3→4
-      operation: listMerchandise
-      crossesDevice: true
-      back: false
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Cross-platform

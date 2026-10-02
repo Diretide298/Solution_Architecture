@@ -1,0 +1,33 @@
+id: CHG-CLN-007
+date: '2026-10-02'
+source: audit
+kind: process
+summary: check-screen-wiring S-SCREEN-PERMISSION no longer asks a guest screen (P01, P02, P05) for a screen permission; the
+  109 guest entries leave its baseline.
+decision:
+  what: The R255 rule skips the guest platforms instead of baselining WEB-026 and WEB-034; the baseline entries for GST-, WEB-
+    and KSK- screens under S-SCREEN-PERMISSION are removed, since the rule can no longer find them.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'ADR-0025: a guest holds no permission; a guest call resolves to the guest''s own data (GFIX-4). The guest batch asked
+  the lead to baseline WEB-026 and WEB-034 (CHG-SGU-025); the audit TODO of 2 October chose to fix the rule instead.'
+keys_touched:
+  files:
+  - tools/check-screen-wiring.py
+  - handoff/audit-baseline.json
+  screens:
+  - WEB-026
+  - WEB-034
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: On the parent commit check-screen-wiring failed with 2 new findings (WEB-026, WEB-034); it passes after. Staff and
+  partner screens are still held to R255.

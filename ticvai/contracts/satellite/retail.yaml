@@ -1052,6 +1052,8 @@ paths:
   /shop-and-drop:
     post:
       operationId: createShopAndDrop
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
       x-ticvai-audience: [staff, service]
       security:
         - bearerAuth: []
@@ -1146,6 +1148,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-062 Shop & Drop Collection"
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P05 KSK-011 Collect a booking"
         - "P08 BO-143 Retail Global Settings & Controls"
       security:
@@ -1199,6 +1202,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: collectShopAndDrop
+      x-ticvai-consumed-by:
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
       x-ticvai-audience: [staff]
       summary: Hand the goods over
       description: >

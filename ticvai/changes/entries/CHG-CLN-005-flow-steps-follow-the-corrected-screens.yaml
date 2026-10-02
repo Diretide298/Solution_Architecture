@@ -1,0 +1,51 @@
+id: CHG-CLN-005
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: Sixteen flows follow the corrected screens; check-flows reaches 0 failures.
+decision:
+  what: 'F01 s6 and F02 s4 read getMyProfile; F55 s2 reads getMyProfile and listConsentPurposes (the opt-ins ride on checkoutCart
+    and recordCheckoutConsents records them); F53 s2 drops addToWishlist; F18 s2 reads the card on GST-011; F102 s1 drops
+    getTenantConfig and P09 leaves its platforms (step 4 stays on CMS-014); F22 s4 calls createPreview; F50 s6 calls getEntitlementCredential
+    on GST-055; F17 drops at the till (POS-005 createShopAndDrop), tracks on GST-062 and hands over at the exit desk (POS-012),
+    so BO-048 leaves it; F51 s4 is rewritten to the exit desk; F59 s3 re-holds a lapsed seat (no extend, POSV2-11); F88
+    s2 leaves firing and holding to the pass (KIT-003); F74 s1 and s4 call closeShift; F73 s2 sets the till shift policy;
+    F81 s1 starts at Till Home (POS-025); F34 s8 is trimmed (the return restocks).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'The corrections the guest, till and P08/P09 batches left for the flows owner (CHG-SGU-025, CHG-SPO-020, CHG-SPO-021,
+  CHG-SBO-020; design-note corrections KSK-017, GST-026, CMS-006, BO-021, BO-048, BO-082, KIT-002, POS-004), listed in the
+  cleanup pass Chinmay asked for on 2 October 2026; POSV2-11 (DEC-552), DI-407, DEC-059.'
+keys_touched:
+  flows:
+  - F01
+  - F02
+  - F17
+  - F18
+  - F22
+  - F34
+  - F50
+  - F51
+  - F53
+  - F55
+  - F59
+  - F73
+  - F74
+  - F81
+  - F88
+  - F102
+  files:
+  - tools/applied/cleanup-flows-2-october.py
+root_class: A29 JOURNEY-CONTRACT
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-flows.py
+status: open
+notes: check-flows failed on 9 of these steps on the parent commit (an operation the screen does not declare) and passes
+  with 0 failures after. Applied by tools/applied/cleanup-flows-2-october.py; batch CLN.

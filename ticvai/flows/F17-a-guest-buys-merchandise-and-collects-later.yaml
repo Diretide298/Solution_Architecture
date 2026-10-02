@@ -14,7 +14,6 @@ criticality: revenue
 platforms:
 - P04 Venue POS
 - P02 Guest App
-- P08 Venue Management
 offlineBehaviour: The sale is offline-capable; the collection is not. **A retail sale completes on the
   device and journals**; shop-and-drop needs the server to know where the bag is.
 trigger:
@@ -40,23 +39,26 @@ steps:
   - createPayment
   outcome: Stock decrements
 - step: 3
-  screen: BO-048
-  action: Bag is dropped and tagged
+  screen: POS-005
+  action: 'Bag is dropped and tagged at the till'
   operations:
-  - listMerchandise
-  outcome: '**A reference the guest can present**, not a receipt they will lose'
+  - createShopAndDrop
+  outcome: '**A reference the guest can present**, not a receipt they will lose; the ticket they carry claims it too (CHG-CLN-005)'
 - step: 4
-  screen: GST-026
+  screen: GST-062
   action: Guest tracks it in the app
   operations:
-  - listMerchandise
+  - lookupShopAndDrop
   outcome: Where it is, and until when
+  crossesDevice: true
 - step: 5
-  screen: BO-048
-  action: Collected on the way out
+  screen: POS-012
+  action: 'Collected on the way out, at the exit desk'
   operations:
-  - listMerchandise
+  - lookupShopAndDrop
+  - collectShopAndDrop
   outcome: Signed for
+  crossesDevice: true
 branches:
 - at: 1
   condition: Out of stock at this outlet but available at another

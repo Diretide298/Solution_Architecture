@@ -1479,8 +1479,7 @@ paths:
         format: uuid
     post:
       operationId: extendSeatHold
-      x-ticvai-consumed-by:
-        - "P04 POS-004 Sell — Seat Map"
+      x-ticvai-consumed-by: []
       x-ticvai-audience:
       - staff
       summary: Extend a hold

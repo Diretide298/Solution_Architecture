@@ -2470,8 +2470,12 @@ screens:
         edge into it carries them
     uses:
     - posSaleToPayment
-  notes: 'Design: Park_POS_dc.html, "Reserved Seating / Seat Map". Booking fee is a separate line — it
-    is a fee, not part of the seat price, and reporting separates them. Foreign tender: **cash in a currency
+  notes: '**extendSeatHold off the till** (2 October 2026, CHG-CLN-006): flow F59 step 3 no longer calls
+    it, so the declaration POSV2-11 left until then comes off (CHG-SPO-020).
+
+
+    Design: Park_POS_dc.html, "Reserved Seating / Seat Map". Booking fee is a separate line — it is a
+    fee, not part of the seat price, and reporting separates them. Foreign tender: **cash in a currency
     the venue accepts, converted at the rate on the payment** (4.6.11). Change is given in base currency
     only, so the till holds one float and one count per currency it takes in. **Removed 24 August**: cancelPerformance.
     **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens.
@@ -2585,13 +2589,6 @@ screens:
         operation: createSeatHold
         provenance: contract seating.yaml POST /seat-holds
       - kind: secondaryButton
-        label: Extend seat hold
-        operation: extendSeatHold
-        provenance: contract seating.yaml POST /seat-holds/{holdId}/extend
-        notes: '**Not drawn** (v2 accepted: no hold extend; POSV2-11, DEC-552). The declaration stays
-          only until flow F59 step 3 stops calling it from this screen (open entry CHG-SPO-020); then
-          it comes off.'
-      - kind: secondaryButton
         label: Release seat hold
         operation: relinquishSeatHold
         provenance: contract seating.yaml DELETE /seat-holds/{holdId}
@@ -2634,10 +2631,6 @@ screens:
   - operationId: createSeatHold
     contract: seating
     purpose: Hold on selection
-    trigger: onAction
-  - operationId: extendSeatHold
-    contract: seating
-    purpose: Extend during payment
     trigger: onAction
   - operationId: getPerformance
     contract: catalogue
@@ -2835,14 +2828,6 @@ screens:
       provenance: flow F58 step 6→7
       carries:
       - orderId
-    - to: BO-048
-      trigger: Bag is dropped and tagged
-      provenance: flow F17 step 2→3
-      operation: createPayment
-      crossesDevice: true
-      back: false
-      carries:
-      - merchandiseId
     - to: POS-026
       trigger: Receipt
       provenance: 'wiring fix, 2 October 2026 (CHG-WIR-019): the payment''s success branch'
@@ -3098,6 +3083,13 @@ screens:
       - kind: destructiveButton
         label: Cancel order
         provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Leave it with us (Shop & Drop)
+        operation: createShopAndDrop
+        notes: 'After a paid retail sale: the goods wait at a collection point and the guest''s ticket
+          or the drop reference claims them on the way out (4.4.7, R236). Refused for an item that cannot
+          be dropped (chilled, fragile, oversized) or a point that closes before the collect-by time (CHG-CLN-006).'
+        provenance: contract retail.yaml POST /shop-and-drop
   states:
     loading: The payment list.
     error: Could not load. Names which read failed and leaves the payment untouched.
@@ -3176,6 +3168,11 @@ screens:
     purpose: Capture a same-visit Face Tag for the tickets just sold
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: createShopAndDrop
+    contract: retail
+    purpose: Leave the paid goods at a collection point for the way out
+    trigger: onAction
+    provenance: flow F17 step 3, 2 October 2026 (CHG-CLN-006)
   entryState:
     params:
     - name: paymentId
@@ -3361,6 +3358,24 @@ screens:
       - rewardId
       - orderId
     provenance: client-verified
+  - id: formCreateShopAndDrop
+    component: modal
+    trigger: Leave it with us (Shop & Drop)
+    body: '**Collects what `createShopAndDrop` sends before it is called.** Required: `id` (a client UUIDv7,
+      generated silently), `collectionPointId` (picked by name, with its hours), `recordedAt`. Optional:
+      `entitlementId` (the guest''s ticket, scanned), `lineIds`, `collectBy` (venue close by default).
+      `saleId` is the sale just paid. Dismissing sends nothing; the sale stands.'
+    confirm:
+      label: Drop it
+      operation: createShopAndDrop
+    dismiss:
+      label: Cancel
+      discards:
+      - collectionPointId
+      - entitlementId
+      - lineIds
+      - collectBy
+    provenance: contract retail.yaml POST /shop-and-drop
 - id: POS-006
   name: Held Orders
   module: Sell
@@ -5599,6 +5614,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: searchField
+        label: Find dropped goods
+        operation: lookupShopAndDrop
+        notes: By the guest's ticket (scanned), the drop reference or the receipt number, whichever the
+          guest still has (4.4.7, R236; CHG-CLN-006).
+        provenance: contract retail.yaml GET /shop-and-drop/lookup
       - kind: textField
         label: Venue id
         operation: listOrders
@@ -5707,6 +5728,12 @@ screens:
         label: Reserve merchandise
         operation: reserveMerchandise
         provenance: contract retail.yaml POST /outlets/{outletId}/reserve
+      - kind: secondaryButton
+        label: Hand over dropped goods
+        operation: collectShopAndDrop
+        notes: Records who handed over and against what; the guest may take part and leave the rest for
+          later on the same ticket (CHG-CLN-006).
+        provenance: contract retail.yaml POST /shop-and-drop/{dropId}/collect
   states:
     loading: The omnichannel order fulfilment list.
     error: Could not load. Names which read failed and leaves the omnichannel order fulfilment untouched.
@@ -5740,6 +5767,16 @@ screens:
     contract: shift
     purpose: The open or suspended shift on the session's workstation
     trigger: onLoad
+  - operationId: lookupShopAndDrop
+    contract: retail
+    purpose: Find a guest's dropped goods
+    trigger: onAction
+    provenance: flow F17 step 5 and F51 step 4, 2 October 2026 (CHG-CLN-006)
+  - operationId: collectShopAndDrop
+    contract: retail
+    purpose: Hand the dropped goods over
+    trigger: onAction
+    provenance: flow F17 step 5 and F51 step 4, 2 October 2026 (CHG-CLN-006)
   entryState:
     params:
     - name: workstationId
@@ -5835,6 +5872,20 @@ screens:
       - subjectId
       - collectionNote
     provenance: client-verified
+  - id: formCollectShopAndDrop
+    component: confirmDialog
+    trigger: Hand over dropped goods
+    body: '**Collects what `collectShopAndDrop` sends before it is called.** Required: `recordedAt`. Optional:
+      `lineIds` (a partial collection), `verifiedBy` (ticket, reference or receipt). Dismissing sends
+      nothing.'
+    confirm:
+      label: Hand over
+      operation: collectShopAndDrop
+    dismiss:
+      label: Cancel
+      discards:
+      - lineIds
+    provenance: contract retail.yaml POST /shop-and-drop/{dropId}/collect
   gaps:
   - operation: adjustDepositBoxFloat
     removed: true

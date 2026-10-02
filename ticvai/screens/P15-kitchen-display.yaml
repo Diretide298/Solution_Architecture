@@ -310,9 +310,13 @@ screens:
       carries:
       - orderId
       - ticketId
-  notes: '**Built 20 August from board 3 of the client F&B design set.** **The screen the platform exists
-    for.** Bumped, not tapped — a bump bar and a touch target sized for somebody wearing gloves. Nothing
-    on it is more than one action deep. **Operations from the 24 August F&B build wired here** — the contract
+  notes: '**Fire and hold leave the station display** (2 October 2026, CHG-CLN-006): the pass fires and
+    holds courses (DI-407; KIT-003), and flow F88 step 2 no longer calls them here (CHG-SPO-020).
+
+
+    **Built 20 August from board 3 of the client F&B design set.** **The screen the platform exists for.**
+    Bumped, not tapped — a bump bar and a touch target sized for somebody wearing gloves. Nothing on it
+    is more than one action deep. **Operations from the 24 August F&B build wired here** — the contract
     grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Cross-platform
     navigation removed 24 August**: EMP-058. **A till does not navigate to a back office and a guest app
     does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
@@ -418,22 +422,6 @@ screens:
         permission: ORDER_MODIFY
         provenance: contract fnb.yaml PUT /kitchen/tickets/{ticketId}/status
       - kind: secondaryButton
-        label: Fire course
-        operation: fireCourse
-        permission: ORDER_MODIFY
-        provenance: contract fnb.yaml POST /kitchen-tickets/{ticketId}/fire
-        notes: '**The pass fires and holds courses** (DI-407; design-notes correction fnb-retail KIT-002):
-          this control leaves the station display once flow F88 step 2 calls it from the pass (KIT-003)
-          instead (open entry CHG-SPO-020). Not drawn on a station display meanwhile.'
-      - kind: secondaryButton
-        label: Hold course
-        operation: holdCourse
-        permission: ORDER_MODIFY
-        provenance: contract fnb.yaml POST /kitchen-tickets/{ticketId}/hold
-        notes: '**The pass fires and holds courses** (DI-407; design-notes correction fnb-retail KIT-002):
-          this control leaves the station display once flow F88 step 2 calls it from the pass (KIT-003)
-          instead (open entry CHG-SPO-020). Not drawn on a station display meanwhile.'
-      - kind: secondaryButton
         label: Refire item
         operation: refireItem
         permission: ORDER_MODIFY
@@ -473,18 +461,6 @@ screens:
   - operationId: setKitchenTicketStatus
     contract: fnb
     purpose: Advance a kitchen ticket
-    trigger: onAction
-    invalidates:
-    - listKitchenTickets
-  - operationId: fireCourse
-    contract: fnb
-    purpose: Send a held course to the pass
-    trigger: onAction
-    invalidates:
-    - listKitchenTickets
-  - operationId: holdCourse
-    contract: fnb
-    purpose: Stop a course going out
     trigger: onAction
     invalidates:
     - listKitchenTickets
@@ -555,36 +531,6 @@ screens:
       - lineIds
       - stationId
     provenance: contract fnb.yaml PUT /kitchen/tickets/{ticketId}/status
-  - id: formFireCourse
-    component: modal
-    trigger: Fire course
-    body: '**Collects what `fireCourse` sends before it is called.** Required: `recordedAt`, `course`.
-      Optional: `fireAt`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Fire course
-      operation: fireCourse
-    dismiss:
-      label: Cancel
-      discards:
-      - recordedAt
-      - course
-      - fireAt
-    provenance: contract fnb.yaml POST /kitchen-tickets/{ticketId}/fire
-  - id: formHoldCourse
-    component: modal
-    trigger: Hold course
-    body: '**Collects what `holdCourse` sends before it is called.** Required: `recordedAt`, `course`.
-      Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Hold course
-      operation: holdCourse
-    dismiss:
-      label: Cancel
-      discards:
-      - recordedAt
-      - course
-      - reason
-    provenance: contract fnb.yaml POST /kitchen-tickets/{ticketId}/hold
   - id: formRefireItem
     component: modal
     trigger: Refire item

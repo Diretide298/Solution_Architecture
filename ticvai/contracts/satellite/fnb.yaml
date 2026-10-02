@@ -2428,7 +2428,6 @@ paths:
       operationId: fireCourse
       x-ticvai-consumed-by:
         - "P06 EMP-058 Live Table & Service Management"
-        - "P15 KIT-002 Kitchen Display System (KDS)"
         - "P15 KIT-003 Order Firing & Course Management"
       summary: Send a held course to the pass
       description: 'Board 3 of the client F&B pack. **`KitchenTicket.coursing` carried the policy — `holdAndFire`,
@@ -2505,7 +2504,6 @@ paths:
       operationId: holdCourse
       x-ticvai-consumed-by:
         - "P06 EMP-058 Live Table & Service Management"
-        - "P15 KIT-002 Kitchen Display System (KDS)"
         - "P15 KIT-003 Order Firing & Course Management"
       summary: Stop a course going out
       description: 'Board 3. **The other half of firing, and the one that gets forgotten.** A table that

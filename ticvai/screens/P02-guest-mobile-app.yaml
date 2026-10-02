@@ -2822,6 +2822,22 @@ screens:
         - Wallet.lastActivityAt
         operation: getWallet
         provenance: contract wallet.yaml GET /wallets/{subjectId}
+      - kind: detailPanel
+        label: The game card
+        bindsTo: GameCard
+        columns:
+        - GameCard.cardCode
+        - GameCard.kind
+        - GameCard.credits
+        - GameCard.bonusCredits
+        - GameCard.points
+        - GameCard.status
+        - GameCard.blockedReason
+        - GameCard.lastPlayedAt
+        - GameCard.expiresAt
+        operation: getGameCard
+        notes: An arcade card's balance, read by its code, as the web wallet WEB-021 shows it (flow F18 step 2; CHG-CLN-006).
+        provenance: contract games.yaml GET /game-cards/{cardCode}
   states:
     loading: The wallet overview list.
     error: Could not load. Names which read failed and leaves the wallet overview untouched.
@@ -2866,6 +2882,11 @@ screens:
     purpose: Settle the wallet at exit
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: getGameCard
+    contract: games
+    purpose: Balance on a game card
+    trigger: onAction
+    provenance: flow F18 step 2, 2 October 2026 (CHG-CLN-006)
   entryState:
     params:
     - name: subjectId
@@ -11712,12 +11733,6 @@ screens:
       provenance: 'derived — GST-001 declares entryState.params  and GST-062 holds none of them. The edge
         carries nothing: GST-062 is opened from GST-001, so this edge is the way back and GST-001 keeps
         its own state'
-    - to: KSK-017
-      trigger: Or they collect from a kiosk
-      provenance: flow F51 step 3→4
-      operation: lookupShopAndDrop
-      crossesDevice: true
-      back: false
   notes: 4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.
   density: comfortable
   pattern: statusTracker

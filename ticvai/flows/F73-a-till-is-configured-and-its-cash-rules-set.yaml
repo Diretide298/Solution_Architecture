@@ -29,7 +29,9 @@ steps:
 - step: 2
   screen: POS-019
   action: Shift policy is set.
-  operations: []
+  operations:
+  - getTillShiftPolicy
+  - setTillShiftPolicy
   outcome: '**Venue scope, not workstation.** Every till in a venue closes to the same rules or the
     variance report compares nothing.'
   crossesDevice: true

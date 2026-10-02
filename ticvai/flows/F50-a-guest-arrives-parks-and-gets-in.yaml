@@ -64,7 +64,7 @@ steps:
   screen: GST-055
   action: The QR rotates as they walk to the gate.
   operations:
-  - transferOrderTickets
+  - getEntitlementCredential
   outcome: '**Dynamic because a screenshot is a ticket somebody can send.** A static code sold on twice
     is the fraud this prevents.'
   crossesDevice: true

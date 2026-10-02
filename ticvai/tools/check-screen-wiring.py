@@ -229,7 +229,9 @@ def main() -> int:
                           f"{sid}: button {c.get('label')!r} calls {op_id}, which takes a body, and "
                           f"nothing on the screen collects it")
         # --- R255 screen permission ------------------------------------------------------------
-        if perms and "emptyNoAccess" in states and not s.get("permission"):
+        # **Not on a guest surface** (2 October 2026, CHG-CLN-007): a guest holds no permission (ADR-0025), so a guest
+        # screen has none to declare; its no-access state is "not signed in" or "not yours" (GFIX-4).
+        if perms and "emptyNoAccess" in states and not s.get("permission") and not plat.startswith(GUEST_CODES):
             guard.add("S-SCREEN-PERMISSION", sid, f"{sid}: operations need {', '.join(sorted(perms)[:3])}"
                       f"{' ...' if len(perms) > 3 else ''}; the screen declares no permission")
         # --- R265 edits with no read -----------------------------------------------------------

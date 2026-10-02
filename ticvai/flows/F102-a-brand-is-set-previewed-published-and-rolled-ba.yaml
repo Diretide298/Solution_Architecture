@@ -11,7 +11,6 @@ contracts:
 - white-label
 - tenancy
 platforms:
-- P09
 - P13
 trigger:
   description: A tenant changes their look and it reaches every guest surface.
@@ -23,7 +22,6 @@ steps:
   action: Tenant Workspace. See what is live before changing the brand.
   operations:
   - getTenantAppStatus
-  - getTenantConfig
   - getModuleEnablement
   outcome: The current published state is known, so a change can be compared against it. Rewired 23 September
     (L7) from subscription and billing operations, which the screen no longer declares.

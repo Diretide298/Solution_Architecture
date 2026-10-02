@@ -33,12 +33,12 @@ steps:
   - loadGameCredits
   outcome: Credits loaded
 - step: 2
-  screen: GST-026
-  crossesDevice: true
-  action: Checks the balance in the app
+  screen: GST-011
+  action: 'Checks the card''s balance in the app''s wallet'
   operations:
   - getGameCard
   outcome: What is on the card
+  crossesDevice: true
 - step: 3
   screen: BO-395
   crossesDevice: true

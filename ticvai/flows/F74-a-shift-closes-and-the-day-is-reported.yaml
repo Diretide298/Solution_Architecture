@@ -25,6 +25,7 @@ steps:
   - submitShiftCount
   - acceptShiftVariance
   - listDenominations
+  - closeShift
   outcome: F32 walks this in detail; here it is the input to the day. **A counted shift waiting for
     review is still an input to the day**, shown as "Under review", not as missing.
   note: '**2 October (CHG-SOT-001).** `closeShift` (supervisor PIN, any till) joins this step''s operations
@@ -50,7 +51,10 @@ steps:
   screen: BO-043
   action: The daily cash reconciliation lists every shift of the day and resolves the ones still under
     review, one by one.
-  operations: []
+  operations:
+  - listShifts
+  - getShiftCountLines
+  - closeShift
   outcome: '**Daily per venue, shift by shift** (decided 2 October 2026, Chinmay, batch 3 #1 and batch
     6 #215; DEC-059, CHG-CSP-012). Each pending shift is accepted, sent back for a recount or closed by a
     supervisor with their PIN; the count lines are read note by note, never the expected figure first.'

@@ -28,8 +28,6 @@ steps:
   screen: KIT-002
   action: Kitchen Display System (KDS).
   operations:
-  - fireCourse
-  - holdCourse
   - listKitchenTickets
   - notifyServer
   outcome: '**Drawn by the client as FNB-3B.** 4 operations on this step.'

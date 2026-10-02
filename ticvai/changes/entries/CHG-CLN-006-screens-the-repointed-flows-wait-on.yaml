@@ -1,0 +1,56 @@
+id: CHG-CLN-006
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The screen edits that waited on the flows land with them; GST-011 reads a game card, the till drops and hands over
+  shop-and-drop goods, POS-004 loses extendSeatHold and KIT-002 loses firing and holding.
+decision:
+  what: 'GST-011 Wallet Overview declares getGameCard with a game-card panel, as its web twin WEB-021 does. POS-005 Payment
+    declares createShopAndDrop (Leave it with us, with its form); POS-012 Omnichannel Order & Fulfilment Center declares lookupShopAndDrop
+    and collectShopAndDrop (find, then hand over, with its form). POS-004 drops extendSeatHold (POSV2-11 accepted: no hold
+    extend) and KIT-002 drops fireCourse and holdCourse (the pass fires, DI-407), now that F59 and F88 no longer call them
+    there. The flow-derived edges the repointed steps left (POS-005 to BO-048, BO-048 to GST-026, BO-021 to POS-002, GST-062
+    to KSK-017) come off. x-ticvai-consumed-by follows (retail, games, seating, fnb).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'CHG-SPO-020 (KIT-002 and POS-004 wait on F88 s2 and F59 s3), CHG-SPO-001 (POSV2-11, DEC-552), CHG-SGU-018 (getGameCard
+  belongs on the games or wallet screen, not the shop), CHG-SBO-020 (BO-048 and BO-021 edges come from F17 and F81), design-note
+  corrections KSK-017 and GST-062 (collectShopAndDrop is staff-only; staff hand over at the desk); R236.'
+keys_touched:
+  screens:
+  - GST-011
+  - GST-062
+  - POS-004
+  - POS-005
+  - POS-012
+  - KIT-002
+  - BO-048
+  - BO-021
+  operations:
+  - getGameCard
+  - createShopAndDrop
+  - lookupShopAndDrop
+  - collectShopAndDrop
+  - extendSeatHold
+  - fireCourse
+  - holdCourse
+root_class: A29 JOURNEY-CONTRACT
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-011
+  - APP-POS-POS-004
+  - APP-POS-POS-005
+  - APP-POS-POS-012
+  - APP-POS-KIT-002
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'check-screen-wiring S-CONSUMED-MIRROR holds the consumed-by lists to the screens, and check-flows the flows to the
+  screens. Plan effect at the refresh: createShopAndDrop and collectShopAndDrop enter the first-release slice through POS
+  (new SVC sub-tasks), and extendSeatHold leaves it (op-retire puts its sub-task on hold). The edges removed were flow-derived
+  (derive-transitions-from-flows); the refresh does not re-add them once the flows no longer walk them.'
