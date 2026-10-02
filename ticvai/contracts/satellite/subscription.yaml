@@ -71,6 +71,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-380 Customer & Organization Registration"
         - "P17 SGN-002 Customer & Organization Registration"
+        - "P17 SGN-020 Billing & Legal Entity Information"
       summary: A prospect signs themselves up
       description: 'BL-165. **The operator-led path assumes somebody at Softlabs decided this tenant exists.**
         This is the other one.
@@ -3770,7 +3771,6 @@ paths:
       operationId: listMembershipCommercialPricing
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
-        - "P09 ADM-048 Commercial Pricing Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.14-15 (13.1.8

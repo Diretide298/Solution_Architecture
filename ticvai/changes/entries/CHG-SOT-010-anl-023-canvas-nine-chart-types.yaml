@@ -1,0 +1,44 @@
+id: CHG-SOT-010
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: 'The dashboard canvas ANL-023 is drawn from the client''s dashboard specification: a gallery of all twenty marks
+  with the nine complex ones, a data pane of reports, field wells from the report columns, formatting, a 24-tile grid, and
+  session undo and redo.'
+decision:
+  what: Replace the generated Save/Cancel/detail layout with toolbar, gallery, data pane, canvas and field-well regions; bind
+    listReports and getReport for the data pane and wells; confirmations for save (tiles replaced) and archive; log the missing
+    draft, publish and rollback as a contract gap.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026 (batch 3: "ANL-023 is already decided: build all the charts"; workbook Q80): build all chart
+  types, including the nine complex ones. Decision ledger DEC-080; contract CHG-FIN-007; design-notes corrections finance-insights
+  ANL-023 (MATRIX 8.7.12, MATRIX 7.1.46); BOARDREQ MOM-2713/2714.'
+keys_touched:
+  screens:
+  - ANL-023
+  operations:
+  - updateDashboard
+  - getDashboard
+  - deleteDashboard
+  - listReports
+  - getReport
+  schemas:
+  - DashboardTile
+  - ReportColumn
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ANL-023 (#20782)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+notes: 'Block A. Correction 0 fixed here; correction 1 (no dashboard draft or version) logged in CHG-SOT-016. Batch SOT (screens-other,
+  phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets: none started (Block A starts Monday
+  5 October 2026).'
+status: closed
+closed_by_commit: b461f38e

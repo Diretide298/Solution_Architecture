@@ -1,0 +1,49 @@
+id: CHG-SOT-001
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: 'F74 walks the decided shift close: a counted shift waits "Under review" without blocking the next cashier, a supervisor
+  resolves it with their PIN at any till or in the daily cash reconciliation, and a rejected count goes back for a recount;
+  F32 says the same.'
+decision:
+  what: F74 gains the branch at step 1 (the cashier signs out, the shift is pendingVariance, the next cashier opens), a step
+    4 on BO-043 (the daily reconciliation resolves each shift), the recount branch and a deferred exit; F32 branch 7 no longer
+    says the till is the only path.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 3 #1 (POS-007, workbook Q59): "The cashier may sign out, and the shift stays pending
+  until the supervisor accepts. That must not stop the next cashier starting a shift ... At the end-of-day cash reconciliation,
+  they go through each shift"; batch 6 #173-175 (BO-040); pre-apply round ("closeShift is declared on POS-007 and in the daily
+  cash reconciliation"). Decision ledger DEC-059, DEC-173, DEC-175; contract CHG-CSP-012, CHG-CSP-013; DI-805, DI-804.'
+keys_touched:
+  flows:
+  - F74
+  - F32
+  screens:
+  - POS-007
+  - BO-043
+  operations:
+  - closeShift
+  - acceptShiftVariance
+  - rejectShiftVariance
+  - submitShiftCount
+  - openShift
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-007 (#18000)
+  - VM-BO-043 (#18247)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-flows.py
+notes: 'Cross-file: closeShift joins F74 step 1 once POS-007 declares it (screens-pos-staff, CHG-CSP-012 keys_touched); acceptShiftVariance,
+  rejectShiftVariance, getShiftCountLines and closeShift join step 4 once BO-043 declares them (screens-p08-p09). Until then
+  step 4 calls nothing, as F73 step 2 does, so check-flows stays green on both branches. This branch is the prevention CHG-CSP-012
+  names. Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets:
+  none started (Block A starts Monday 5 October 2026).'
+status: closed
+closed_by_commit: b461f38e

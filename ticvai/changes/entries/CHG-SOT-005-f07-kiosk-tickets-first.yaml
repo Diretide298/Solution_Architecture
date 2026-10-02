@@ -1,0 +1,31 @@
+id: CHG-SOT-005
+date: '2026-10-02'
+source: client-review
+kind: spec
+summary: F07 records that the kiosk keeps tickets first, then the date and time, deliberately unlike the web and the app.
+decision:
+  what: Step 4 carries the decision and a note not to align the kiosk with F01; the order of steps is unchanged.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 5 (KSK-004, workbook Q170): "Tickets first" (not the recommended option); supersedes
+  REV3-2 for the kiosk only. Decision ledger DEC-170; registers CHG-DOC-017.'
+keys_touched:
+  flows:
+  - F07
+  screens:
+  - KSK-004
+  - KSK-005
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-flows.py
+notes: 'check-flows holds the step order (KSK-004 before KSK-005) as navigation; the note is what stops a later REV3-2 alignment.
+  Batch SOT (screens-other, phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets: none started
+  (Block A starts Monday 5 October 2026).'
+status: closed
+closed_by_commit: b461f38e

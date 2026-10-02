@@ -2975,17 +2975,17 @@ screens:
     corrections:
     - what: Every field is drawn as a select, including name, registration number and dates.
       why: Text and date inputs; selects only for type, country, level and status.
-      source: screens/P09-platform-admin-console.yaml#ADM-069
+      source: screens/P08-venue-back-office.yaml#ADM-069
     - what: Five tax types are action buttons with no operation.
       why: They are values of one tax-type list (eight values, VAT and GST included).
-      source: screens/P09-platform-admin-console.yaml#ADM-069 | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction
+      source: screens/P08-venue-back-office.yaml#ADM-069 | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction
     - what: The taxable base, rate, jurisdiction level and applicability are missing from the layout.
       why: The taxable base is the field that implements tax on the pre-discount price; without it the 1 September
         rule cannot be configured.
       source: DI-598 | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction
     - what: The screen declares no read of existing profiles.
       why: Its "as saved" state has nothing to load; the profile list is read by the command centre's list operation.
-      source: screens/P09-platform-admin-console.yaml#ADM-069 | contracts/spine/catalogue.yaml#listTaxFeeCalculation
+      source: screens/P08-venue-back-office.yaml#ADM-069 | contracts/spine/catalogue.yaml#listTaxFeeCalculation
     - what: Saving a tax profile is gated by the product-configuration permission at venue scope.
       why: The permission set has a tax-configuration right, used by the finance tax operations; a tax profile is
         a legal setting.
@@ -3056,7 +3056,7 @@ screens:
     - what: The screen has a blank table and unlabelled buttons, and its gaps say the pack gives nothing to draw.
       why: The 29 September close-out defined the rows (findings and scenario results with expected against actual
         totals); the layout should be rebuilt from that shape.
-      source: screens/P09-platform-admin-console.yaml#ADM-077 | contracts/spine/catalogue.yaml#listCalculationValidationReconciliation
+      source: screens/P08-venue-back-office.yaml#ADM-077 | contracts/spine/catalogue.yaml#listCalculationValidationReconciliation
     - what: Nothing runs the test suite or re-validates; the screen only lists results.
       why: The pack's regression run before major changes has no trigger operation on this screen.
       source: contracts/spine/catalogue.yaml#listCalculationValidationReconciliation
@@ -3243,7 +3243,7 @@ screens:
     - what: The exception list is read per settlement (the path needs a settlement), so a centralised queue across
         settlements and providers has no read; the screen also loads it on action, not on arrival.
       why: The screen's purpose is the cross-settlement queue.
-      source: contracts/spine/finance.yaml#listSettlementExceptions | screens/P09-platform-admin-console.yaml#ADM-622
+      source: contracts/spine/finance.yaml#listSettlementExceptions | screens/P08-venue-back-office.yaml#ADM-622
     - what: The pack's columns (order, merchant account, related refund or reversal, match result) are not on the
         exception record, which carries a payment reference only.
       why: Columns cannot bind.
@@ -3257,7 +3257,7 @@ screens:
       rule: Provider, merchant account, legal entity, settlement day, then the bridge Gross sales, Refunds, Chargebacks,
         Fees, Adjustments, Reserve, Net expected, Net received, and the variance as Over or Short. Currency on every
         amount.
-      source: screens/P09-platform-admin-console.yaml#ADM-623
+      source: screens/P08-venue-back-office.yaml#ADM-623
     - element: ordering
       rule: Unsettled and short first, then by age.
       source: designer default
@@ -3286,7 +3286,7 @@ screens:
     outputs:
     - element: posting queue
       rule: Ready to post, Held (with the reason), Posted (with the journal number); counts and values per day.
-      source: screens/P09-platform-admin-console.yaml#ADM-626 | contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult
+      source: screens/P08-venue-back-office.yaml#ADM-626 | contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult
     actions:
     - action: Post
       result: Posts the selected ready settlements; each gets a journal number; confirmation names the total and
@@ -3302,7 +3302,7 @@ screens:
     - what: The only operation is recordSettlement, which settles an inter-entity obligation (one entity paying
         another, at the obligation's rate), and the screen expects an obligation id.
       why: Nothing here posts reconciled provider settlements; the screen's operation serves a different process.
-      source: contracts/spine/finance.yaml#recordSettlement | screens/P09-platform-admin-console.yaml#ADM-626
+      source: contracts/spine/finance.yaml#recordSettlement | screens/P08-venue-back-office.yaml#ADM-626
     decisions:
     - question: Do settlement postings happen automatically after reconciliation, or through this release gate?
       decision: 'Drawn default stands (answer: "Automatic when fully matched; the screen shows status and held days"): Automatic
@@ -3320,7 +3320,7 @@ screens:
       rule: 'A timeline, oldest first: file ingested, line matched or exception raised, resolution (user, action,
         previous state, new state, reason, time, approval), journal posted, period closed. Each step links to its
         record.'
-      source: screens/P09-platform-admin-console.yaml#ADM-627 | contracts/spine/finance.yaml#/components/schemas/SettlementException
+      source: screens/P08-venue-back-office.yaml#ADM-627 | contracts/spine/finance.yaml#/components/schemas/SettlementException
     actions:
     - action: Export evidence
       result: PDF of the trail with the source file reference; retained with payment records for 10 years.
@@ -3332,7 +3332,7 @@ screens:
     - what: The audit columns (user, action, previous state, new state, reason, timestamp, approval) are drawn as
         select fields under a configuration pattern.
       why: They are a read-only trail, not settings.
-      source: screens/P09-platform-admin-console.yaml#ADM-627
+      source: screens/P08-venue-back-office.yaml#ADM-627
     - what: getUnifiedReconciliation returns totals and variances for a date range; it returns no trail.
       why: The evidence comes from the exception's resolver, time and note and from the audit log.
       source: contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation
@@ -3345,7 +3345,7 @@ screens:
       rule: Expected settlement, Expected cash receipt, Provider fees, Refund deductions, Chargeback deductions,
         Currency conversion, Merchant account payout, by expected settlement date; values labelled "Forecast" with
         the basis period.
-      source: screens/P09-platform-admin-console.yaml#ADM-628 | DI-973
+      source: screens/P08-venue-back-office.yaml#ADM-628 | DI-973
     - element: not enough history
       rule: '"Not enough settlement history to forecast yet (needs 90 days; 23 days so far)" with the actuals shown
         instead.'
@@ -5245,9 +5245,13 @@ screens:
       why: The client's dashboard specification describes the canvas in detail (grid, gallery, data pane, field
         wells, formatting).
       source: screens/P16-venue-analytics.yaml#ANL-023 | MATRIX 8.7.12
+      status: fixed
+      by: CHG-SOT-010
     - what: No undo or redo, and no draft or version of a dashboard.
       why: Every save overwrites the live dashboard; the client spec asks for draft, preview, publish and rollback.
       source: MATRIX 7.1.46 | contracts/satellite/reporting.yaml#updateDashboard
+      status: logged
+      by: CHG-SOT-016
     decisions:
     - question: Which visuals ship bindable in the first release?
       decision: Build all chart types, including the nine complex ones.
@@ -5405,18 +5409,26 @@ screens:
         ↓", "Gate Rejection Rate ↓", "Queue Time ↓" are drawn as fields.'
       why: Direction is one yes/no; the arrows are the pack's examples, not inputs.
       source: screens/P16-venue-analytics.yaml#ANL-025 | contracts/satellite/reporting.yaml#/components/schemas/KpiDefinition
+      status: fixed
+      by: CHG-SOT-012
     - what: Currency, decimal precision, measure, aggregation, data source, effective date and status are drawn
         as KPI fields.
       why: None is on the KPI definition; currency and decimals follow the region, the rest live in the formula
         and the active flag.
       source: contracts/satellite/reporting.yaml#/components/schemas/KpiDefinition
+      status: fixed
+      by: CHG-SOT-012
     - what: The gap says the screen declares no write operation.
       why: It declares the create operation; the gap is stale. There is no update or retire operation for a KPI,
         so a mistake cannot be corrected.
       source: screens/P16-venue-analytics.yaml#ANL-025 | contracts/satellite/reporting.yaml#createKpi
+      status: logged
+      by: CHG-SOT-016
     - what: The catalogue has no finance measures (gross sales, net revenue, refunds, tax).
       why: The KPIs every finance and executive board needs cannot be expressed until those measures exist.
       source: contracts/satellite/reporting.yaml#/components/schemas/MetricSource
+      status: fixed
+      by: CHG-FIN-007
   ANL-026:
     summary: 'Where a KPI''s target and its Warning and Critical bands are set, so every dashboard shows the same
       status for the same number. A target is per scope (tenant, region, venue) and per period. The thing to get
@@ -8002,10 +8014,14 @@ screens:
       why: The semantic model is fully described (domains, datasets, grain, fields, relationships); the columns
         can be bound.
       source: screens/P16-venue-analytics.yaml#ANL-066 | contracts/satellite/reporting.yaml#/components/schemas/SemanticModel
+      status: fixed
+      by: CHG-SOT-012
     - what: There is no certification, owner or lineage on a dataset or field.
       why: The client spec asks for certified badges with owner, glossary and lineage; the model has none of these
         fields.
       source: contracts/satellite/reporting.yaml#/components/schemas/SemanticModel
+      status: logged
+      by: CHG-SOT-016
   ANL-067:
     summary: 'Watches data moving from operations into analytics so stale or failed data is caught before anyone
       decides on it. The thing to get right: name what is affected ("Ticketing dataset delayed - affects Revenue
@@ -8201,6 +8217,8 @@ screens:
         billing record.
       source: contracts/spine/finance.yaml#createLegalEntity | screens/P09-platform-admin-console.yaml#ADM-411 |
         contracts/satellite/subscription.yaml#submitOnboardingApplication
+      status: fixed
+      by: CHG-SOT-017
     decisions:
     - question: Is the billing entity saved on the onboarding application (public) before verification?
       decision: 'Drawn default stands (answer: "Yes: saved on the application; nothing provisioned until verified"): Yes;

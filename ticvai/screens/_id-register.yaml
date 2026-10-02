@@ -31,11 +31,11 @@ prefixes:
     authored: 1-318
     fromClientPack: 38-698
   ANL:
-    issued: 70
-    highWaterMark: 71
-    nextFree: 72
+    issued: 71
+    highWaterMark: 72
+    nextFree: 73
     authored: 1-71
-    fromClientPack: 12-70
+    fromClientPack: 12-72
   BO:
     issued: 1186
     highWaterMark: 1190

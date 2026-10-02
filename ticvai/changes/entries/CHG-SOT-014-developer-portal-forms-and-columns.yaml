@@ -1,0 +1,51 @@
+id: CHG-SOT-014
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'The developer portal''s forms ask only what a person types and its tables show names, not plumbing: registration,
+  API clients (sandbox only), quotas, sandboxes, webhooks, usage and listings.'
+decision:
+  what: DEV-002 registration fields labelled (name, email, website, country) and the raw schema fields removed; DEV-003 and
+    DEV-005/007 forms never ask id, status or server fields, API clients are sandbox only; ids dropped from DEV-003/004/005/006/007
+    tables; DEV-004 "Promote to production" becomes Request production access; DEV-005 never lists the signing secret; DEV-008
+    quota form labelled with a client picker.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes corrections platform-foundation DEV-002 (0, 2), DEV-003 (0, 1), DEV-008 (0) in Block A and DEV-004 (0,
+  1), DEV-005 (0, 1, 2), DEV-006 (0), DEV-007 (0, 1) in Block B, process-agent findings of 1-2 October 2026; DI-927; F36 step
+  5. Chinmay, 2 October: apply the open corrections (phase B).'
+keys_touched:
+  screens:
+  - DEV-002
+  - DEV-003
+  - DEV-004
+  - DEV-005
+  - DEV-006
+  - DEV-007
+  - DEV-008
+  operations:
+  - registerDeveloper
+  - createApiClient
+  - createWebhookSubscription
+  - submitIntegrationListing
+  - setApiQuota
+  - requestProductionAccess
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-DEV-002 (#20609)
+  - APP-SETUP-DEV-003 (#20615)
+  - APP-SETUP-DEV-008 (#20616)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+notes: 'Logged in CHG-SOT-016: registerDeveloper requires DEVELOPER_VIEW while its audience is public (DEV-002 correction
+  1); listProductionAccessRequests admits the partner audience for TICVAI''s queue (DEV-008 correction 1). Batch SOT (screens-other,
+  phase B), 2 October 2026; worktree D:/wt/screens-other, branch screens-other. Tickets: none started (Block A starts Monday
+  5 October 2026).'
+status: closed
+closed_by_commit: b461f38e

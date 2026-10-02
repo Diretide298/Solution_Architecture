@@ -2373,6 +2373,8 @@ screens:
       why: An insight cannot be reviewed if the list of insights is not built; add listAiInsights to the Block A slice.
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ANL-019)) | ADR-0059 (Block A slice: handoff/delivery-slice.json)
+      status: logged
+      by: CHG-SOT-016
     - what: The screen declares both reporting.listAnalyticsAnomalies and ai.listAiInsights.
       why: >-
         Two sources of anomalies on one card list will show the same situation twice; ADR-0053 and the insight layer make
@@ -2387,9 +2389,13 @@ screens:
         has only evidence. Add the spec so the "Show query" link works.
       source: >-
         ADR-0054 | contracts/satellite/ai.yaml#explainMetricChange | contracts/satellite/reporting.yaml#askReportingQuestion
+      status: logged
+      by: CHG-SOT-016
     - what: Layout is an unbound primary button, table and Cancel.
       why: Bind the list to listAiInsights and the card actions to decideAiInsight / explainMetricChange.
       source: screens/P16-venue-analytics.yaml#ANL-019
+      status: fixed
+      by: CHG-SOT-011
   KSK-015:
     block: later
     summary: >-
@@ -5494,7 +5500,7 @@ screens:
     corrections:
     - what: Name contains "\t170" and module is Commercial with requiresModule core.
       why: Clean the name; fraud intelligence is an AI capability (riskIntelligence).
-      source: screens/P09-platform-admin-console.yaml#ADM-633
+      source: screens/P08-venue-back-office.yaml#ADM-633
   ADM-637:
     block: later
     summary: >-
@@ -5528,7 +5534,7 @@ screens:
     corrections:
     - what: getChargebackAnalytics is declared twice; name contains "\t175".
       why: Duplicate and stray tab.
-      source: screens/P09-platform-admin-console.yaml#ADM-637
+      source: screens/P08-venue-back-office.yaml#ADM-637
       status: fixed
       by: CHG-WIR-012
   ADM-680:
@@ -5570,7 +5576,7 @@ screens:
     corrections:
     - what: Name ends ".123".
       why: Stray characters.
-      source: screens/P09-platform-admin-console.yaml#ADM-686
+      source: screens/P08-venue-back-office.yaml#ADM-686
   ADM-687:
     block: later
     summary: >-

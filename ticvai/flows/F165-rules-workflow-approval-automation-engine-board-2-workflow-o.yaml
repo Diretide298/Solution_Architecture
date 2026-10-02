@@ -1,11 +1,11 @@
 id: F165
 name: 'Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
-actor: platformAdmin
+actor: venueManager
 wave: 3
 frequency: routine
 criticality: operational
 platforms:
-- P09 TICVAI Web
+- P08 Venue Management
 provenance: derived-from-board
 offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
   not guess.
@@ -24,7 +24,7 @@ steps:
   outcome: Provide administrators and operational managers with a real-time view of all workflow activity
     across TICVAI.
 - step: 2
-  screen: ADM-249
+  screen: BO-084
   action: Works in Unified Approval Inbox & Decision Workspace
   operations:
   - listApprovalRequests
@@ -63,7 +63,7 @@ steps:
   - listWorkflow
   outcome: Ready for the next screen on this board
 - step: 8
-  screen: ADM-252
+  screen: BO-391
   action: Works in SLA, Escalation & Bottleneck Monitor
   operations:
   - listSlaEscalationBottleneck

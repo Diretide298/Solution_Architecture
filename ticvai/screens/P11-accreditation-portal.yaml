@@ -902,6 +902,9 @@ screens:
       label: Cancel
     provenance: contract accreditation.yaml POST /accreditation-applications/{applicationId}/decide; wiring
       fix, 2 October 2026
+  notes: '**One queue component, shared with P08 BO-635** (decided 2 October 2026, Chinmay, workbook Q368;
+    DEC-368, CHG-SOT-018). This screen and BO-635 render the shared `accreditationReview` queue (`screens/_components.yaml`,
+    patterns) against the same operations; build it once and keep the two screens the same.'
 - id: ACC-007
   name: Reviewer Application Detail
   module: Reviewer (Internal)
@@ -1052,6 +1055,10 @@ screens:
     holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system.
     Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus
     and no operation has been drafted from them yet.
+  notes: '**One workspace component, shared with P08 BO-636** (decided 2 October 2026, Chinmay, workbook
+    Q368; DEC-368, CHG-SOT-018). This screen and BO-636 render the shared `accreditationReview` workspace
+    (`screens/_components.yaml`, patterns) against the same operations; build it once and keep the two
+    screens the same.'
 - id: ACC-008
   name: Credential Register
   module: Reviewer (Internal)

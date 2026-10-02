@@ -96,6 +96,39 @@ branches:
     and against which scan.
   severity: requiresStaff
   resolvedBy: Supervisor
+- at: 5
+  condition: The attraction behind this access point is temporarily closed
+  behaviour: '**Denied with the reason and the reopening time, plus a way back** (decided 2 October 2026,
+    Chinmay, BO-147: "Deny + reopening time + a virtual-queue return window where enabled"; DEC-228,
+    CHG-CSP-026). `validateAccess` answers `denyCause` `attractionTemporarilyClosed` with `reopensAt` and,
+    where the venue enables it, a `queueReturnOffer`; SCN-003 shows both so the steward can tell the guest
+    when to come back. The closure travels in the offline package, so an offline gate denies the same way.'
+  severity: recoverable
+  resolvedBy: Steward explains; the guest takes the return window (joinQueue) where offered
+- at: 5
+  condition: A time-bound entitlement is scanned after its window from first scan
+  behaviour: '**Denied as expired, with when the window ended** (decided 2 October 2026, BO-159: "Yes: add
+    time-bound entitlements (validity from first scan)"; DEC-232, CHG-CSP-030). `denyCause`
+    `timeBoundWindowElapsed`, `denyReason` `expired`; the first-scan time travels in the offline package
+    (ADR-0068), so a second gate offline still knows when the window began.'
+  severity: recoverable
+  resolvedBy: Steward explains, or sells an extension at a counter
+- at: 5
+  condition: The handheld has been offline longer than the venue allows
+  behaviour: '**Offline taps are refused until it reconnects** (decided 2 October 2026, BO-471: "Yes: the
+    venue sets a maximum offline duration; readers then refuse offline taps"; DEC-426, CHG-CSP-035).
+    `denyCause` `offlineLimitExceeded`; SCN-003 says the device must sync, not that the ticket is bad, and
+    the age of the bundle is on screen before the limit is reached.'
+  severity: requiresStaff
+  resolvedBy: Steward moves to signal and syncs (SCN-014), or a supervisor swaps the device
+- at: 2
+  condition: The gate's direction is switched live during the shift
+  behaviour: '**The device picks up the new direction from the next push** (decided 2 October 2026, BO-230:
+    "Live direction switch with permission, logged; R221 amended"; DEC-255, CHG-CSP-032). The switch is made
+    in the back office by a holder of `ACCESS_POINT_CONFIGURE`, never by the steward, and is logged; an offline
+    device keeps its old direction until it reconnects and SCN-002 shows which direction it is enforcing.'
+  severity: recoverable
+  resolvedBy: Supervisor (setAccessPointDirection); the device follows on reconnect
 - at: 4
   condition: No network at shift start
   behaviour: SCN-003 offline. The bundle from the previous sync is used and its age is shown. **An old bundle
