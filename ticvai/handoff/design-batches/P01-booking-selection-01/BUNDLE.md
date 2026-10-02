@@ -68,9 +68,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-005` | Ticket Type Selection | A | 15 | 51 | 6 | 27 | 31 | 6 | guest | review (client-verified) |
-| `WEB-006` | Date & Performance Selection | A | 41 | 25 | 6 | 17 | 32 | 6 | guest | review (client-verified) |
-| `WEB-007` | Interactive Seat Selection | A | 13 | 40 | 6 | 30 | 22 | 6 | guest | review (client-verified) |
+| `WEB-005` | Ticket Type Selection | A | 2 | 71 | 6 | 27 | 31 | 6 | guest | review (client-verified) |
+| `WEB-006` | Date & Performance Selection | A | 41 | 19 | 6 | 17 | 32 | 6 | guest | review (client-verified) |
+| `WEB-007` | Interactive Seat Selection | A | 8 | 39 | 6 | 30 | 22 | 6 | guest | review (client-verified) |
 | `WEB-008` | Add-ons & Upsell | A | 19 | 35 | 6 | 56 | 16 | 0 | guest | review (client-verified) |
 | `WEB-009` | Wishlist | A | 3 | 2 | 5 | 1 | 2 | 0 | guest | review (client-verified) |
 | `WEB-047` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (client-verified) |
@@ -119,28 +119,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Product | picker: choose a product | — | — | `getPublishedBookingFlow` ?productId |
 | Product category | picker: choose a product category | — | — | `getPublishedBookingFlow` ?productCategoryId |
 | Flow type key | select | — | Dated day pass · Timed entry · Open dated · Seated fixed performance · Seated date time seat map · Experience workshop · Surf session · Meeting room hourly · Cabana map · Cabana by size · Guided tour by language · Transport … | `getPublishedBookingFlow` ?flowTypeKey |
-
-**Form: Evaluate promotions** (modal, opened by *Evaluate promotions*; *Evaluate promotions* calls `evaluatePromotions`, *Cancel* sends nothing)
-
-**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Venue `venueId` | picker: choose a venue | required | — | — | shows names, sends the id | — | `evaluatePromotions` body |
-| Channel `channel` | select | required | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | — | Where the sale is being made. Matched against `PromotionConditions.channels`, so both sides use the one shared vocabulary. | `evaluatePromotions` body |
-| Subject `subjectId` | picker: choose a subject | optional | — | — | shows names, sends the id | — | `evaluatePromotions` body |
-| Membership tier `membershipTierId` | picker: choose a membership tier | optional | — | — | shows names, sends the id | — | `evaluatePromotions` body |
-| Coupon codes `couponCodes` | list of values (chips) | optional | — | — | — | — | `evaluatePromotions` body |
-| Evaluate at `evaluateAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | For back-office testing of a rule before publishing. | `evaluatePromotions` body |
-| Order `orderId` | picker: choose an order | optional | — | — | shows names, sends the id | The order (`orders.sales_order`) being priced for payment. Sent only by the order service when it confirms an order; when present the evaluation writes one … | `evaluatePromotions` body |
-| Lines `lines` | repeatable rows | required | — | at least 1 | — | — | `evaluatePromotions` body |
-| Line `lines[].lineId` | text field | required | — | — | — | — | `evaluatePromotions` body |
-| Variant `lines[].variantId` | picker: choose a variant | required | — | — | shows names, sends the id | — | `evaluatePromotions` body |
-| Performance `lines[].performanceId` | picker: choose a performance | optional | — | — | shows names, sends the id | — | `evaluatePromotions` body |
-| Quantity `lines[].quantity` | number field | required | — | min 1 | — | — | `evaluatePromotions` body |
-| Unit price `lines[].unitPrice` | money field | required | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `evaluatePromotions` body |
-
-Errors to draw in the form: 400 Validation failed
 
 #### Outputs: what the screen shows and produces
 
@@ -198,19 +176,45 @@ Errors to draw in the form: 400 Validation failed
 | Sort order | 1,234 | — |
 | Target | grouped details | Required with `behaviour` `recommend` on the last question; optional with `filter`, where it is the card shown above the filtered list. |
 
-**Every product variant** (data table, from `listProductVariants`)
+**Card list** (card list, from `listProductVariants`): Each row is a variant with a stepper. Price updates live. Each row shows `ProductVariant.description` (who it is for, what it includes) behind the (i) when `BookingFlowConfig.cardInfo` is on (23SEP-6), its display tags when `ticketTags` is on (23SEP-3) and its own photo (23SEP-4). In the dated flow the rows stay hidden until a time is picked (`performanceReveal` `dateTimeTicket`, REV3-2)
 
 | Shows | Format | Notes |
 |---|---|---|
+| Items | list or chips (count when long) | — |
 | ID | the name it points at, never the id | — |
 | Product | the name it points at, never the id | — |
 | SKU | text | — |
 | Axis values | grouped details | — |
+| Name | text | Taken from their variant tables, 20 September. `axisValues` gives `{size: L}` and no string a guest can read. |
+| Barcode | text | Taken from their variant tables, 20 September. `catalogue.alternative_code` is a partner's own code for a variant and requires `partnerId` … |
+| Is default | yes / no (icon or chip) | Taken from their variant tables. Which variant a product page opens on. |
 | Is active | yes / no (icon or chip) | False when retired. Retired variants are never deleted — orders reference them. |
+| Description | in the reader's language | Who this ticket type is for and what it includes, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September … |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
-**Card list** (card list): Each row is a variant with a stepper. Price updates live. Each row shows `ProductVariant.description` (who it is for, what it includes) behind the (i) when `BookingFlowConfig.cardInfo` is on (23SEP-6), its display tags when `ticketTags` is on (23SEP-3) and its own photo (23SEP-4). In the dated flow the rows stay hidden until a time is picked (`performanceReveal` `dateTimeTicket`, REV3-2)
+**Banner** (banner, from `evaluatePromotions`): Shows near-miss offers — "add one more for the family rate". Uses the rejected list, which exists precisely so this can be said Promotions are evaluated by themselves on every change (`evaluatePromotions`); a guest never fills a promotions form (F01 step 4, GFIX-3).
 
-**Banner** (banner): Shows near-miss offers — "add one more for the family rate". Uses the rejected list, which exists precisely so this can be said
+| Shows | Format | Notes |
+|---|---|---|
+| Total discount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Lines | list or chips (count when long) | — |
+| Line | text | — |
+| Original price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Discounted price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Discount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Applied promotions | list or chips (count when long) | — |
+| Applied | list or chips (count when long) | — |
+| Promotion | the name it points at, never the id | — |
+| Promotion code | text | — |
+| Promotion name | text | — |
+| Discount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Coupon code | text | — |
+| Rejected | list or chips (count when long) | Promotions that matched the products but did not apply, with the reason. This is what a cashier reads to a guest who expected a discount. |
+| Promotion code | text | — |
+| Promotion name | text | — |
+| Reason | chip: Conditions not met, Superseded by better offer, Exclusive promotion applied … | — |
+| Detail | text | — |
 
 **Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.
 
@@ -218,23 +222,12 @@ Errors to draw in the form: 400 Validation failed
 |---|---|---|
 | Steps | list or chips (count when long) | Every step of the type, in the venue's order. Filled from the type when left out on create. |
 
-**The selected product variant** (detail panel, from `listProductVariants`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Product | the name it points at, never the id | — |
-| SKU | text | — |
-| Axis values | grouped details | — |
-| Is active | yes / no (icon or chip) | False when retired. Retired variants are never deleted — orders reference them. |
-
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Quick tour (icon button) | navigation or local | — | — | — | — |
 | Show everything (secondary button) | `listProducts` GET `/products` | — | Product (paged) | 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 403 Authenticated but not permitted at the requested scope | — |
-| Evaluate promotions (primary button) | `evaluatePromotions` POST `/promotions/evaluate` | EvaluatePromotionsRequest | PromotionEvaluation | 400 Validation failed | opens modal first |
 | Continue (primary button) | navigation or local | — | — | — | — |
 
 **Data it reads**: `listProductVariants` (onLoad, List generated variants); `listProductCategories` (onLoad, Category tiles and the experience filter, with descriptions); `listProducts` (onLoad, The tickets of a category or level (`categoryId` …); `getPublishedGuidedChoice` (onLoad, The venue's published Help me choose (404 = none)); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …)
@@ -439,10 +432,10 @@ Also set there, as content the tenant writes: answers: target, answers: filter, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (51 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every output is drawn (71 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-005?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Quick tour, Show everything, Evaluate promotions, Continue.
+- [ ] Every action is wired with its success and its failure: Quick tour, Show everything, Continue.
 - [ ] Every transition is wired: `WEB-006`, `WEB-007`, `WEB-008`, `WEB-010`, `WEB-016`, `WEB-006`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 31 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -497,9 +490,9 @@ Also set there, as content the tenant writes: answers: target, answers: filter, 
 | Product category | picker: choose a product category | — | — | `getPublishedBookingFlow` ?productCategoryId |
 | Flow type key | select | — | Dated day pass · Timed entry · Open dated · Seated fixed performance · Seated date time seat map · Experience workshop · Surf session · Meeting room hourly · Cabana map · Cabana by size · Guided tour by language · Transport … | `getPublishedBookingFlow` ?flowTypeKey |
 
-**Form: Check booking eligibility** (modal, opened by *Check booking eligibility*; *Check booking eligibility* calls `checkBookingEligibility`, *Cancel* sends nothing)
+**Form: Once, on leaving selection, when a chosen product has an eligibility rule** (drawer, opened by *Once, on leaving selection, when a chosen product has an eligibility rule*; *Continue* calls `checkBookingEligibility`, *Back* sends nothing)
 
-**Collects what `checkBookingEligibility` sends before it is called.** Required: `productIds`, `party`. Dismissing sends nothing; the screen behind is unchanged.
+**The party's age and height, asked once per person** (DI-1037; REV3 DG-3) for the products that set a rule, then checked with `checkBookingEligibility`. A person who does not meet a rule is named with the product, and the guest changes the selection; never a button, and never a form of product ids.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -511,9 +504,27 @@ Also set there, as content the tenant writes: answers: target, answers: filter, 
 | Confident swimmer `party[].confidentSwimmer` | toggle | optional | — | — | — | Superseded by the consent record for the product's swim consent question (decided 29 September, rev 3 REV3-26); see `ProductEligibilityRule.swimAbility`. | `checkBookingEligibility` body |
 | Guardian signed `party[].guardianSigned` | toggle | optional | off | — | — | — | `checkBookingEligibility` body |
 
-**Form: Add to cart** (modal, opened by *Add to cart*; *Add to cart* calls `addCartLine`, *Cancel* sends nothing)
+**Form: Once, after the session or date is picked, when the cart has consent questions** (modal, opened by *Once, after the session or date is picked, when the cart has consent questions*; *Next* calls `recordConsentAnswers`, *Back* sends nothing)
 
-**Collects what `addCartLine` sends before it is called; the cart takes the hold server-side.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.
+**The venue's consent questions for this booking**, e.g. *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*: one or several, in the order `Cart.consentQuestions` gives (the booking flow's `BookingFlowConfig.consentQuestionIds` and every cart product's `consentQuestionIds`, each question once). A question asked **per person** is asked for each member of the party; one asked **per booking** once. Themed as the prototype's pop-up (Yes / No, Next). Next sends the answers to `recordConsentAnswers`, which stores each as a consent record (question version, answer, who answered, when). **A blocking answer** (e.g. *No* to the swim question) marks the lines it blocks …
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Cart `cartId` | picker: choose a cart | required | — | — | shows names, sends the id | The cart the answers are given for. `checkoutCart` binds them to its order. | `recordConsentAnswers` body |
+| Answers `answers` | repeatable rows | required | — | at least 1; at most 200 | — | — | `recordConsentAnswers` body |
+| Question `answers[].questionId` | picker: choose a question | required | — | — | shows names, sends the id | — | `recordConsentAnswers` body |
+| Question version `answers[].questionVersion` | number field | required | — | min 1 | — | The version the guest was shown, from `Cart.consentQuestions`. | `recordConsentAnswers` body |
+| Answer `answers[].answer` | segmented control | required | — | Yes · No | — | — | `recordConsentAnswers` body |
+| Cart line `answers[].cartLineId` | picker: choose a cart line | optional | — | — | shows names, sends the id | For a `perPerson` question, the line the person is on. | `recordConsentAnswers` body |
+| Person index `answers[].personIndex` | number field | optional | — | min 0 | — | For a `perPerson` question, the person's row in that line's `eligibilityDeclaration`, counting from 0. | `recordConsentAnswers` body |
+| Person name `answers[].personName` | text field | optional | — | max length 120 | — | — | `recordConsentAnswers` body |
+| Person subject `answers[].personSubjectId` | picker: choose a person subject | optional | — | — | shows names, sends the id | Where the person is a known guest, such as the booker or a family member. | `recordConsentAnswers` body |
+| Source `source` | select | required | — | Guest app · Website · Kiosk · POS · Call centre · Import · Agent recorded · Cookie banner · Checkout | — | `checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents` … | `recordConsentAnswers` body |
+| Answered at `answeredAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `recordConsentAnswers` body |
+
+Errors to draw in the form: 409 The question has changed since the cart was read (`questionVersionSuperseded`); the client re-reads the cart and asks the current version. (ConsentAnswerProblem); 422 A `perPerson` question answered without a person (`personRequired`), a question this cart does not ask (`questionNotAsked`), or a retired one … (ConsentAnswerProblem)
+
+**Sent by *Continue*** (`addCartLine`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -536,28 +547,6 @@ Also set there, as content the tenant writes: answers: target, answers: filter, 
 | Passenger type code `attributes.transport.passengerTypeCode` | text field | optional | — | pattern `^[a-z][a-zA-Z0-9]{0,31}$` | — | The fare table's passenger type (`adult`, `child`, ...). Required on a one-way trip. | `addCartLine` body |
 | Pass type `attributes.transport.passTypeId` | picker: choose a pass type | optional | — | — | shows names, sends the id | Pass purchase only. The `transport.PassType` bought for this station pair. | `addCartLine` body |
 | Pass entitlement `attributes.transport.passEntitlementId` | picker: choose a pass entitlement | optional | — | — | shows names, sends the id | A seat reserved with a pass already owned. The line is zero-priced and validated against the pass (stations covered, an entry left, within validity). | `addCartLine` body |
-
-Errors to draw in the form: 403 The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066).; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The booked window is missing, not allowed or the wrong length for the variant (`windowRequired`, `windowNotAllowed`, `windowLengthMismatch`; rev 3 REV3-13), or … (CartProblem)
-
-**Form: Once, after the session or date is picked, when the cart has consent questions** (modal, opened by *Once, after the session or date is picked, when the cart has consent questions*; *Next* calls `recordConsentAnswers`, *Back* sends nothing)
-
-**The venue's consent questions for this booking**, e.g. *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*: one or several, in the order `Cart.consentQuestions` gives (the booking flow's `BookingFlowConfig.consentQuestionIds` and every cart product's `consentQuestionIds`, each question once). A question asked **per person** is asked for each member of the party; one asked **per booking** once. Themed as the prototype's pop-up (Yes / No, Next). Next sends the answers to `recordConsentAnswers`, which stores each as a consent record (question version, answer, who answered, when). **A blocking answer** (e.g. *No* to the swim question) marks the lines it blocks …
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Cart `cartId` | picker: choose a cart | required | — | — | shows names, sends the id | The cart the answers are given for. `checkoutCart` binds them to its order. | `recordConsentAnswers` body |
-| Answers `answers` | repeatable rows | required | — | at least 1; at most 200 | — | — | `recordConsentAnswers` body |
-| Question `answers[].questionId` | picker: choose a question | required | — | — | shows names, sends the id | — | `recordConsentAnswers` body |
-| Question version `answers[].questionVersion` | number field | required | — | min 1 | — | The version the guest was shown, from `Cart.consentQuestions`. | `recordConsentAnswers` body |
-| Answer `answers[].answer` | segmented control | required | — | Yes · No | — | — | `recordConsentAnswers` body |
-| Cart line `answers[].cartLineId` | picker: choose a cart line | optional | — | — | shows names, sends the id | For a `perPerson` question, the line the person is on. | `recordConsentAnswers` body |
-| Person index `answers[].personIndex` | number field | optional | — | min 0 | — | For a `perPerson` question, the person's row in that line's `eligibilityDeclaration`, counting from 0. | `recordConsentAnswers` body |
-| Person name `answers[].personName` | text field | optional | — | max length 120 | — | — | `recordConsentAnswers` body |
-| Person subject `answers[].personSubjectId` | picker: choose a person subject | optional | — | — | shows names, sends the id | Where the person is a known guest, such as the booker or a family member. | `recordConsentAnswers` body |
-| Source `source` | select | required | — | Guest app · Website · Kiosk · POS · Call centre · Import · Agent recorded · Cookie banner · Checkout | — | `checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents` … | `recordConsentAnswers` body |
-| Answered at `answeredAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `recordConsentAnswers` body |
-
-Errors to draw in the form: 409 The question has changed since the cart was read (`questionVersionSuperseded`); the client re-reads the cart and asks the current version. (ConsentAnswerProblem); 422 A `perPerson` question answered without a person (`personRequired`), a question this cart does not ask (`questionNotAsked`), or a retired one … (ConsentAnswerProblem)
 
 #### Outputs: what the screen shows and produces
 
@@ -591,15 +580,9 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Event | the name it points at, never the id | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Ends at | 1 Oct 2026, 14:30 | — |
-| Approval request | the name it points at, never the id | BL-048. The approval chain and the occurrence lifecycle sat on different entities, so neither was complete: `states/performance.yaml` … |
-| Requires approval to cancel | yes / no (icon or chip) | Cancelling a sold performance is the one transition that needs a name against it. |
 | Status | chip: Scheduled, On sale, Sold out, Suspended, Cancelled, Completed | — |
-| Admission rules | the name it points at, never the id | — |
-| Seat map | the name it points at, never the id | — |
 
 **Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.
 
@@ -611,9 +594,7 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Acquire inventory hold (primary button) | `addCartLine` POST `/carts/{cartId}/lines` | AddCartLineRequest | Cart | 403 The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066).; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The … | opens modal first |
-| Check booking eligibility (secondary button) | `checkBookingEligibility` POST `/eligibility-checks` | EligibilityCheckRequest | EligibilityCheckResult | — | opens modal first |
-| Continue (primary button) | navigation or local | — | — | — | — |
+| Continue (primary button) | `addCartLine` POST `/carts/{cartId}/lines` | AddCartLineRequest | Cart | 403 The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066).; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The … | — |
 | Quick tour (icon button) | navigation or local | — | — | — | — |
 
 **Data it reads**: `getAvailability` (onLoad, Live remaining capacity); `listPerformances` (onLoad, The times of the event for the picked date or range …); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …)
@@ -798,9 +779,9 @@ Also set there, as content the tenant writes: settings.
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (41), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 422).
-- [ ] Every output is drawn (25 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-006?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline, emptyNoResults.
-- [ ] Every action is wired with its success and its failure: Acquire inventory hold, Check booking eligibility, Continue, Quick tour.
+- [ ] Every action is wired with its success and its failure: Continue, Quick tour.
 - [ ] Every transition is wired: `WEB-005`, `WEB-008`, `WEB-010`, `WEB-015`, `WEB-007`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 32 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -852,23 +833,9 @@ Also set there, as content the tenant writes: settings.
 | Product category | picker: choose a product category | — | — | `getPublishedBookingFlow` ?productCategoryId |
 | Flow type key | select | — | Dated day pass · Timed entry · Open dated · Seated fixed performance · Seated date time seat map · Experience workshop · Surf session · Meeting room hourly · Cabana map · Cabana by size · Guided tour by language · Transport … | `getPublishedBookingFlow` ?flowTypeKey |
 
-**Form: Create seat hold** (modal, opened by *Create seat hold*; *Create seat hold* calls `createSeatHold`, *Cancel* sends nothing)
-
-**Collects what `createSeatHold` sends before it is called.** Required: `id`, `performanceId`, `seatIds`, `ttlSeconds`. Optional: `subjectId`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createSeatHold` body |
-| Performance `performanceId` | picker: choose a performance | required | — | — | shows names, sends the id | — | `createSeatHold` body |
-| Seats `seatIds` | list of values (chips) | required | — | at least 1; at most 50; Either is refused with `422` `seat-limit-exceeded`. | — | 50 is the ceiling of the venue setting, not the limit a caller gets. On a guest channel the limit is `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50 … | `createSeatHold` body |
-| Ttl seconds `ttlSeconds` | number field (seconds) | optional | 480 | min 60; max 1800 | — | 8 minutes by default, extendable to 30 in all (decided 28 September, audit R169). | `createSeatHold` body |
-| Subject `subjectId` | picker: choose a subject | optional | — | — | shows names, sends the id | — | `createSeatHold` body |
-
-Errors to draw in the form: 409 One or more seats are no longer available, or the selection breaks a seating rule. (SeatConflictProblem); 422 More seats than one booking may take: above `VenueSettings.seating.maxSeatsPerGuestOrder` on a guest channel (decided 29 September, rev 3 REV3-7), or above 10 … (SeatLimitProblem)
-
 **Form: Recommend seats** (modal, opened by *Recommend seats*; *Recommend seats* calls `recommendSeats`, *Cancel* sends nothing)
 
-**Collects what `recommendSeats` sends before it is called.** Required: `partySize`, `strategy`. Optional: `categoryIds`, `maxPrice`, `accessibleCount`, `maxOptions`. Dismissing sends nothing; the screen behind is unchanged.
+**How many seats, and best available or together.** The party size is the tickets already chosen; the guest only picks the preference, then `recommendSeats` places them.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -890,7 +857,6 @@ Errors to draw in the form: 404 No selection satisfies the constraints
 | Shows | Format | Notes |
 |---|---|---|
 | Performance | the name it points at, never the id | — |
-| Seat map | the name it points at, never the id | — |
 | Totals | grouped details | — |
 | By category | list or chips (count when long) | — |
 | Seats | list or chips (count when long) | — |
@@ -951,7 +917,6 @@ Errors to draw in the form: 404 No selection satisfies the constraints
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create seat hold (primary button) | `createSeatHold` POST `/seat-holds` | CreateSeatHoldRequest | SeatHold | 409 One or more seats are no longer available, or the selection breaks a seating rule. (SeatConflictProblem); 422 More seats than one booking may take: above `VenueSettings.seating.maxSeatsPerGuestOrder` on a guest … | opens modal first |
 | Recommend seats (secondary button) | `recommendSeats` POST `/performances/{performanceId}/seat-recommendations` | SeatRecommendationRequest | inline | 404 No selection satisfies the constraints | opens modal first |
 | Continue to checkout (primary button) | navigation or local | — | — | — | — |
 
@@ -1127,10 +1092,10 @@ Also set there, as content the tenant writes: settings.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (13), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (404, 409, 422).
+- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-007?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline, emptyNoResults.
-- [ ] Every action is wired with its success and its failure: Create seat hold, Recommend seats, Continue to checkout.
+- [ ] Every action is wired with its success and its failure: Recommend seats, Continue to checkout.
 - [ ] Every transition is wired: `WEB-005`, `WEB-008`, `WEB-006`, `WEB-010`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 22 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1693,7 +1658,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Keep it longer (secondary button) | `extendResourceHold` POST `/resource-holds/{holdId}/extend` | — | ResourceHold | 409 Already expired or converted, or the extension limit is reached. `refusedReason` says which. (ResourceHoldExtendProblem) | — |
 | Pick another (secondary button) | `relinquishResourceHold` DELETE `/resource-holds/{holdId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens confirmDialog first |
 
-**Data it reads**: `getVenueMap` (onLoad, The map with its placed spots (label, kind, zone, capacity …); `getMapResourceAvailability` (onLoad, Every spot's status for the day in one call); `getResourceHold` (onInterval, The hold's countdown); `listBookableVenueMaps` (onLoad, Find the venue's published map with bookable spots (with …)
+**Data it reads**: `getVenueMap` (onLoad, The map with its placed spots (label, kind, zone, capacity …); `getMapResourceAvailability` (onLoad, Every spot's status for the day in one call); `getResourceHold` (onInterval, The hold's countdown With the guest session the device …); `listBookableVenueMaps` (onLoad, Find the venue's published map with bookable spots (with …)
 
 **Where the user goes next**
 
@@ -1770,6 +1735,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Coastal Aqua → 'Cabana & locker rentals' → cabana map ('Remaining time' counter)*
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 - ADR-0031 *Contention is leased, not locked — and where a lock is unavoidable it is named* (`docs/adr/0031-contention-and-locking.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 

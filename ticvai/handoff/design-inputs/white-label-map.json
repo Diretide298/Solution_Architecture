@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/build-white-label-map.py",
- "generated": "2026-10-01",
+ "generated": "2026-10-02",
  "note": "Derived from the configuring operations' request schemas and the screens. Never edit; rerun the tool.",
  "elements": [
   {
@@ -6062,11 +6062,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6092,11 +6089,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6122,11 +6116,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6152,11 +6143,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6182,11 +6170,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6212,11 +6197,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6242,10 +6224,9 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
+   "reachesText": "GST-001",
    "specific": [
-    "GST-001",
-    "WEB-001"
+    "GST-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -6272,10 +6253,9 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
+   "reachesText": "GST-001",
    "specific": [
-    "GST-001",
-    "WEB-001"
+    "GST-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -6302,11 +6282,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6332,11 +6309,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6362,11 +6336,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6392,11 +6363,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6422,11 +6390,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6452,11 +6417,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6482,10 +6444,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001, WEB-050",
+   "reachesText": "WEB-050",
    "specific": [
-    "GST-001",
-    "WEB-001",
     "WEB-050"
    ],
    "channel": "",
@@ -6513,11 +6473,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6543,11 +6500,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6573,11 +6527,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6603,11 +6554,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6633,11 +6581,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6663,11 +6608,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6693,11 +6635,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6723,11 +6662,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6753,11 +6689,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6783,11 +6716,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6813,11 +6743,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6843,11 +6770,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6873,11 +6797,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6903,11 +6824,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6933,11 +6851,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -6963,10 +6878,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001, WEB-050",
+   "reachesText": "WEB-050",
    "specific": [
-    "GST-001",
-    "WEB-001",
     "WEB-050"
    ],
    "channel": "",
@@ -6994,11 +6907,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7024,11 +6934,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7054,11 +6961,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7084,11 +6988,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7114,11 +7015,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7144,11 +7042,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7174,11 +7069,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7204,11 +7096,8 @@
     }
    ],
    "reach": "home",
-   "reachesText": "GST-001, WEB-001",
-   "specific": [
-    "GST-001",
-    "WEB-001"
-   ],
+   "reachesText": "the guest home screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7842,12 +7731,8 @@
     }
    ],
    "reach": "pages",
-   "reachesText": "GST-040, GST-057, WEB-045",
-   "specific": [
-    "GST-040",
-    "GST-057",
-    "WEB-045"
-   ],
+   "reachesText": "the content and policy pages",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7873,12 +7758,8 @@
     }
    ],
    "reach": "pages",
-   "reachesText": "GST-040, GST-057, WEB-045",
-   "specific": [
-    "GST-040",
-    "GST-057",
-    "WEB-045"
-   ],
+   "reachesText": "the content and policy pages",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7904,12 +7785,8 @@
     }
    ],
    "reach": "pages",
-   "reachesText": "GST-040, GST-057, WEB-045",
-   "specific": [
-    "GST-040",
-    "GST-057",
-    "WEB-045"
-   ],
+   "reachesText": "the content and policy pages",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7935,12 +7812,8 @@
     }
    ],
    "reach": "pages",
-   "reachesText": "GST-040, GST-057, WEB-045",
-   "specific": [
-    "GST-040",
-    "GST-057",
-    "WEB-045"
-   ],
+   "reachesText": "the content and policy pages",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7966,12 +7839,8 @@
     }
    ],
    "reach": "pages",
-   "reachesText": "GST-040, GST-057, WEB-045",
-   "specific": [
-    "GST-040",
-    "GST-057",
-    "WEB-045"
-   ],
+   "reachesText": "the content and policy pages",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -7997,11 +7866,9 @@
     }
    ],
    "reach": "pages",
-   "reachesText": "GST-040, GST-057, WEB-045",
+   "reachesText": "GST-057",
    "specific": [
-    "GST-040",
-    "GST-057",
-    "WEB-045"
+    "GST-057"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -8028,12 +7895,8 @@
     }
    ],
    "reach": "pages",
-   "reachesText": "GST-040, GST-057, WEB-045",
-   "specific": [
-    "GST-040",
-    "GST-057",
-    "WEB-045"
-   ],
+   "reachesText": "the content and policy pages",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8059,12 +7922,8 @@
     }
    ],
    "reach": "pages",
-   "reachesText": "GST-040, GST-057, WEB-045",
-   "specific": [
-    "GST-040",
-    "GST-057",
-    "WEB-045"
-   ],
+   "reachesText": "the content and policy pages",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8095,12 +7954,8 @@
     }
    ],
    "reach": "pages",
-   "reachesText": "GST-040, GST-057, WEB-045",
-   "specific": [
-    "GST-040",
-    "GST-057",
-    "WEB-045"
-   ],
+   "reachesText": "the content and policy pages",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8131,12 +7986,8 @@
     }
    ],
    "reach": "pages",
-   "reachesText": "GST-040, GST-057, WEB-045",
-   "specific": [
-    "GST-040",
-    "GST-057",
-    "WEB-045"
-   ],
+   "reachesText": "the content and policy pages",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8167,12 +8018,8 @@
     }
    ],
    "reach": "pages",
-   "reachesText": "GST-040, GST-057, WEB-045",
-   "specific": [
-    "GST-040",
-    "GST-057",
-    "WEB-045"
-   ],
+   "reachesText": "the content and policy pages",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8198,11 +8045,8 @@
     }
    ],
    "reach": "faqs",
-   "reachesText": "GST-040, WEB-045",
-   "specific": [
-    "GST-040",
-    "WEB-045"
-   ],
+   "reachesText": "the FAQ screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8228,11 +8072,8 @@
     }
    ],
    "reach": "faqs",
-   "reachesText": "GST-040, WEB-045",
-   "specific": [
-    "GST-040",
-    "WEB-045"
-   ],
+   "reachesText": "the FAQ screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8258,11 +8099,8 @@
     }
    ],
    "reach": "faqs",
-   "reachesText": "GST-040, WEB-045",
-   "specific": [
-    "GST-040",
-    "WEB-045"
-   ],
+   "reachesText": "the FAQ screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8288,11 +8126,8 @@
     }
    ],
    "reach": "faqs",
-   "reachesText": "GST-040, WEB-045",
-   "specific": [
-    "GST-040",
-    "WEB-045"
-   ],
+   "reachesText": "the FAQ screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8318,11 +8153,8 @@
     }
    ],
    "reach": "faqs",
-   "reachesText": "GST-040, WEB-045",
-   "specific": [
-    "GST-040",
-    "WEB-045"
-   ],
+   "reachesText": "the FAQ screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8348,11 +8180,8 @@
     }
    ],
    "reach": "faqs",
-   "reachesText": "GST-040, WEB-045",
-   "specific": [
-    "GST-040",
-    "WEB-045"
-   ],
+   "reachesText": "the FAQ screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8378,11 +8207,8 @@
     }
    ],
    "reach": "faqs",
-   "reachesText": "GST-040, WEB-045",
-   "specific": [
-    "GST-040",
-    "WEB-045"
-   ],
+   "reachesText": "the FAQ screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8408,11 +8234,8 @@
     }
    ],
    "reach": "faqs",
-   "reachesText": "GST-040, WEB-045",
-   "specific": [
-    "GST-040",
-    "WEB-045"
-   ],
+   "reachesText": "the FAQ screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8438,11 +8261,8 @@
     }
    ],
    "reach": "faqs",
-   "reachesText": "GST-040, WEB-045",
-   "specific": [
-    "GST-040",
-    "WEB-045"
-   ],
+   "reachesText": "the FAQ screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -8468,11 +8288,8 @@
     }
    ],
    "reach": "faqs",
-   "reachesText": "GST-040, WEB-045",
-   "specific": [
-    "GST-040",
-    "WEB-045"
-   ],
+   "reachesText": "the FAQ screens",
+   "specific": [],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -9222,11 +9039,10 @@
     }
    ],
    "reach": "web",
-   "reachesText": "GST-031, GST-073, WEB-010, WEB-011, WEB-017, WEB-024, WEB-027, WEB-044",
+   "reachesText": "GST-031, GST-073, WEB-011, WEB-017, WEB-024, WEB-027, WEB-044",
    "specific": [
     "GST-031",
     "GST-073",
-    "WEB-010",
     "WEB-011",
     "WEB-017",
     "WEB-024",
@@ -11890,45 +11706,6 @@
     "bookingFlow.venueOverrides[].settings.cardLayout",
     "bookingFlow.venueOverrides[].settings.searchInBanner",
     "bookingFlow.venueOverrides[].settings.eventBannerDates",
-    "homepage.sections",
-    "homepage.sections[].kind",
-    "homepage.sections[].title",
-    "homepage.sections[].sortOrder",
-    "homepage.sections[].isVisible",
-    "homepage.sections[].contentPageId",
-    "homepage.sections[].maxItems",
-    "homepage.sections[].heroStyle",
-    "banners.title",
-    "banners.subtitle",
-    "banners.imageAssetRef",
-    "banners.placement",
-    "banners.linkTarget",
-    "banners.linkTarget.kind",
-    "banners.linkTarget.moduleKey",
-    "banners.linkTarget.appSection",
-    "banners.linkTarget.contentPageId",
-    "banners.linkTarget.productId",
-    "banners.linkTarget.eventId",
-    "banners.linkTarget.url",
-    "banners.startsAt",
-    "banners.endsAt",
-    "banners.sortOrder",
-    "banners.isActive",
-    "promoBlocks.title",
-    "promoBlocks.description",
-    "promoBlocks.iconAssetRef",
-    "promoBlocks.promotionId",
-    "promoBlocks.linkTarget",
-    "promoBlocks.linkTarget.kind",
-    "promoBlocks.linkTarget.moduleKey",
-    "promoBlocks.linkTarget.appSection",
-    "promoBlocks.linkTarget.contentPageId",
-    "promoBlocks.linkTarget.productId",
-    "promoBlocks.linkTarget.eventId",
-    "promoBlocks.linkTarget.url",
-    "promoBlocks.startsAt",
-    "promoBlocks.endsAt",
-    "promoBlocks.sortOrder",
     "maintenance.isInMaintenance",
     "maintenance.message",
     "maintenance.expectedBackAt",
@@ -12439,8 +12216,7 @@
     "bookingFlows.settings.seatEventDateMode",
     "bookingFlows.settings.extrasStep",
     "bookingFlows.settings.quickTour",
-    "bookingFlows.settings.consentQuestionIds",
-    "seo.locale"
+    "bookingFlows.settings.consentQuestionIds"
    ]
   },
   "WEB-011": {
@@ -12793,27 +12569,6 @@
   },
   "WEB-045": {
    "specific": [
-    "pages.slug",
-    "pages.title",
-    "pages.body",
-    "pages.isEnabled",
-    "pages.iconAssetRef",
-    "pages.categoryCode",
-    "pages.sortOrder",
-    "pages.status",
-    "policies.body",
-    "policies.requiresReconsent",
-    "policies.effectiveFrom",
-    "faqs.categories",
-    "faqs.categories[].code",
-    "faqs.categories[].name",
-    "faqs.categories[].sortOrder",
-    "faqs.categories[].entries",
-    "faqs.categories[].entries[].id",
-    "faqs.categories[].entries[].question",
-    "faqs.categories[].entries[].answer",
-    "faqs.categories[].entries[].sortOrder",
-    "faqs.categories[].entries[].isPublished",
     "maintenance.isInMaintenance",
     "maintenance.message",
     "maintenance.expectedBackAt",
@@ -12871,45 +12626,8 @@
     "brand.introVideoAssetRef",
     "brand.introVideoMode",
     "bookingFlow.venueOverrides",
-    "homepage.sections",
-    "homepage.sections[].kind",
-    "homepage.sections[].title",
-    "homepage.sections[].sortOrder",
-    "homepage.sections[].isVisible",
-    "homepage.sections[].contentPageId",
     "homepage.sections[].maxItems",
     "homepage.sections[].heroStyle",
-    "banners.title",
-    "banners.subtitle",
-    "banners.imageAssetRef",
-    "banners.placement",
-    "banners.linkTarget",
-    "banners.linkTarget.kind",
-    "banners.linkTarget.moduleKey",
-    "banners.linkTarget.appSection",
-    "banners.linkTarget.contentPageId",
-    "banners.linkTarget.productId",
-    "banners.linkTarget.eventId",
-    "banners.linkTarget.url",
-    "banners.startsAt",
-    "banners.endsAt",
-    "banners.sortOrder",
-    "banners.isActive",
-    "promoBlocks.title",
-    "promoBlocks.description",
-    "promoBlocks.iconAssetRef",
-    "promoBlocks.promotionId",
-    "promoBlocks.linkTarget",
-    "promoBlocks.linkTarget.kind",
-    "promoBlocks.linkTarget.moduleKey",
-    "promoBlocks.linkTarget.appSection",
-    "promoBlocks.linkTarget.contentPageId",
-    "promoBlocks.linkTarget.productId",
-    "promoBlocks.linkTarget.eventId",
-    "promoBlocks.linkTarget.url",
-    "promoBlocks.startsAt",
-    "promoBlocks.endsAt",
-    "promoBlocks.sortOrder",
     "maintenance.isInMaintenance",
     "maintenance.message",
     "maintenance.expectedBackAt",
@@ -13393,27 +13111,6 @@
   },
   "GST-040": {
    "specific": [
-    "pages.slug",
-    "pages.title",
-    "pages.body",
-    "pages.isEnabled",
-    "pages.iconAssetRef",
-    "pages.categoryCode",
-    "pages.sortOrder",
-    "pages.status",
-    "policies.body",
-    "policies.requiresReconsent",
-    "policies.effectiveFrom",
-    "faqs.categories",
-    "faqs.categories[].code",
-    "faqs.categories[].name",
-    "faqs.categories[].sortOrder",
-    "faqs.categories[].entries",
-    "faqs.categories[].entries[].id",
-    "faqs.categories[].entries[].question",
-    "faqs.categories[].entries[].answer",
-    "faqs.categories[].entries[].sortOrder",
-    "faqs.categories[].entries[].isPublished",
     "maintenance.isInMaintenance",
     "maintenance.message",
     "maintenance.expectedBackAt",
@@ -13599,17 +13296,7 @@
   },
   "GST-057": {
    "specific": [
-    "pages.slug",
-    "pages.title",
-    "pages.body",
-    "pages.isEnabled",
-    "pages.iconAssetRef",
-    "pages.categoryCode",
-    "pages.sortOrder",
-    "pages.status",
-    "policies.body",
-    "policies.requiresReconsent",
-    "policies.effectiveFrom"
+    "pages.categoryCode"
    ]
   },
   "GST-058": {

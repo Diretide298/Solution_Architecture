@@ -103,7 +103,7 @@
    "loading": "The collect booking, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the collect booking untouched.",
    "emptyFirstRun": "No collect booking yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available"
   },
   "apis": [
@@ -116,7 +116,7 @@
    {
     "operationId": "getOrder",
     "contract": "orders",
-    "purpose": "Read an order",
+    "purpose": "Read an order With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    }
   ],
@@ -201,35 +201,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "label": "Print my tickets",
+       "operation": "reprintOrder",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
     {
      "name": "contentBody",
-     "slot": "carried",
      "components": [
       {
-       "kind": "multiSelect",
-       "label": "Ticket ids",
-       "operation": "transferOrderTickets",
-       "notes": "Required.",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
-       "kind": "textField",
-       "label": "Recipient",
-       "operation": "transferOrderTickets",
-       "notes": "Required.",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
-       "kind": "textField",
-       "label": "Message",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "kind": "selectField",
+       "label": "Send to",
+       "notes": "Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `delivery` `print`, or email or SMS: collecting is printing, not a transfer (DI-637).",
+       "operation": "reprintOrder",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     }
@@ -243,10 +229,11 @@
   },
   "apis": [
    {
-    "operationId": "transferOrderTickets",
+    "operationId": "reprintOrder",
     "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction"
+    "purpose": "Send the guest's own tickets again, or print them (`reprintOrder`); a kiosk changes no owner (GFIX-3)",
+    "trigger": "onAction",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "entryState": {
@@ -266,6 +253,14 @@
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "transferOrderTickets",
+    "removed": true,
+    "why": "A transfer changes the tickets' owner; at a kiosk the guest is resending or printing their own tickets, which is `reprintOrder` by email, SMS or print.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",

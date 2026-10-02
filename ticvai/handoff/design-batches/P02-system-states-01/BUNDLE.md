@@ -70,7 +70,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-043` | Arabic / RTL Experience | A | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (client-verified) |
-| `GST-047` | Maintenance / Upgrade Page | A | 0 | 55 | 7 | 0 | 1 | 2 | guest | notStarted (client-verified) |
+| `GST-047` | Maintenance / Upgrade Page | A | 0 | 49 | 8 | 0 | 1 | 2 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 
@@ -195,18 +195,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Is published | yes / no (icon or chip) | True once any version has been published. |
 | Published version | text | — |
 | Published at | 1 Oct 2026, 14:30 | — |
-| Draft version | text | Staff only. |
-| Has unpublished changes | yes / no (icon or chip) | Staff only. The working draft differs from the current version's `snapshot`. |
-| Active module count | 1,234 | Staff only. `ModuleEnablement` rows with `isEnabled` true. |
-| Licensed module count | 1,234 | Staff only. `ModuleEnablement` rows with `isLicensed` true. |
-| Active page count | 1,234 | Staff only. Content pages that are `published` and enabled. |
 | Is in maintenance | yes / no (icon or chip) | — |
 | Maintenance message | in the reader's language | — |
 | Expected back at | 1 Oct 2026, 14:30 | — |
 | Minimum app version | grouped details | The oldest guest app build still allowed to run (decided 28 September, audit R073). |
 | Availability | chip: Open, Sold out, Closed | The sold-out or closed signal (decided 28 September, audit R073). `open` is the normal state. |
 | Availability message | in the reader's language | What the sold-out or closed screen says (WEB-029). Null shows the default wording. |
-| Recent changes | list or chips (count when long) | Staff only. Names the principal behind each change, so it never reaches a public response. |
 
 **Update the app to continue** (banner, from `getTenantAppStatus`): **Forced upgrade** (decided 28 September, audit R073 (b)): when this app's version is below `minimumAppVersion` for its platform (`ios` or `android`), the screen shows the forcedUpgrade state with a button to the store and nothing else works until the guest updates. Set live from CMS-001 through `setMaintenanceMode`.
 
@@ -275,10 +269,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Forced upgrade (`?state=forcedUpgrade`) | **Update required.** The app's version is below `getTenantAppStatus.minimumAppVersion` for its platform; the screen offers only the store link, because an app too old to talk to the server cannot be trusted to book or pay (decided 28 September, audit R073 (b)). |
 | Sold out (`?state=soldOut`) | **Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)). |
 | Closed (`?state=closed`) | **Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)). |
+| Permission denied (`?state=emptyNoAccess`) | **Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. |
 
 #### Permissions
 
 - `getTenantAppStatus` → no permission · device, guest
+
+**A refused user sees:** **Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.
 
 #### Requirements it meets
 
@@ -330,8 +327,8 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (55 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#GST-047?state=<state>`: loading, error, emptyFirstRun, offline, forcedUpgrade, soldOut, closed.
+- [ ] Every output is drawn (49 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#GST-047?state=<state>`: loading, error, emptyFirstRun, offline, forcedUpgrade, soldOut, closed, emptyNoAccess.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-001`.
 - [ ] Sign-in is asked only where the spec asks for it.

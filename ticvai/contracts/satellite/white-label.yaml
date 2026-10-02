@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 77
+  x-ticvai-screen-count: 81
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
   x-ticvai-requirements: 107
@@ -461,9 +461,6 @@ paths:
     get:
       operationId: getTenantConfig
       x-ticvai-consumed-by:
-        - "P01 WEB-001 Home / Landing"
-        - "P02 GST-001 Home"
-        - "P05 KSK-002 Language Select"
         - "P08 BO-599 Manual Configuration Center"
         - "P08 BO-834 Digital Experience Center"
         - "P13 CMS-001 Tenant Workspace"
@@ -479,6 +476,10 @@ paths:
         version**: `version` is ignored and `TENANT_CONFIGURE` is not needed, because reading the published
         app is not configuring it. The dashboard''s status view (published state, module and page counts,
         recent changes) is `getTenantAppStatus`, not this.
+
+        **A visitor with no session reads `getPublishedTenantConfig`** (decided 2 October, GFIX-1): the
+        published, non-sensitive part of this, resolved from the host and cacheable, so a storefront renders
+        in the tenant''s brand before anyone signs in.
 
         '
       tags:
@@ -1641,9 +1642,6 @@ paths:
     get:
       operationId: listContentPages
       x-ticvai-consumed-by:
-        - "P01 WEB-045 Help Centre & Accessibility"
-        - "P02 GST-040 Help & Support"
-        - "P02 GST-057 Accessibility Information"
         - "P08 BO-837 Page & Landing Builder"
         - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
@@ -1655,6 +1653,9 @@ paths:
         `isEnabled` is true. For a guest `status` is ignored and `TENANT_CONFIGURE` is not needed — reading
         a published page is not configuring it. A staff caller sees every page, and with no `status` gets
         all three states.
+
+        **A guest screen reads `listPublishedContentPages`** (decided 2 October, GFIX-2), which needs no
+        session: help and accessibility pages are public.
 
         '
       tags:
@@ -1856,8 +1857,6 @@ paths:
     get:
       operationId: listFaqs
       x-ticvai-consumed-by:
-        - "P01 WEB-045 Help Centre & Accessibility"
-        - "P02 GST-040 Help & Support"
         - "P09 ADM-018 Localisation & Language Pack"
         - "P12 SUP-006 Knowledge Base Search"
       x-ticvai-audience:
@@ -1867,6 +1866,9 @@ paths:
       summary: List FAQs
       description: 'A guest caller sees only entries whose `isPublished` is true, and needs no `TENANT_CONFIGURE`
         — reading the help content is not configuring it.
+
+        **A guest screen reads `listPublishedFaqs`** (decided 2 October, GFIX-2), which needs no session:
+        help is public.
 
         '
       tags:
@@ -1954,6 +1956,9 @@ paths:
       description: '**The current version of each policy only, with history on request (decided 28
         September, audit R163).** Without `includeHistory` the list holds one entry per `PolicyKind`,
         its current version; with it, every version, newest first within each kind.
+
+        **Staff only. Guests read `listPublishedPolicies`** (decided 2 October, GFIX-2): the current version
+        of each published policy, with no session, for checkout terms, sign-up and the help centre.
 
         '
       tags:
@@ -3057,7 +3062,10 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
+      - {}
       - guestAuth: []
       - bearerAuth: []
       parameters:
@@ -3298,6 +3306,294 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: ../shared/common.yaml#/components/responses/TooManyRequests
+
+  /storefront/tenant-config:
+    get:
+      operationId: getPublishedTenantConfig
+      x-ticvai-consumed-by:
+        - "P01 WEB-001 Home / Landing"
+        - "P02 GST-001 Home"
+        - "P05 KSK-002 Language Select"
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      - device
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-1); the public view of
+        getTenantConfig, shaped like getTenantAppStatus'' public view and served like getCookieConsentRuntime'
+      x-ticvai-read-routing: replica
+      summary: The published guest-facing configuration, before anyone signs in
+      description: '**What a first-time visitor''s storefront renders in** (decided 2 October by Chinmay, GFIX-1).
+        `getTenantConfig` needs a guest or a staff session, so a visitor with neither could not load the
+        tenant''s brand, theme, fonts, header, footer or navigation, and the home page (WEB-001, GST-001), the
+        maintenance and sold-out pages (WEB-029, GST-047) and the kiosk (KSK-002) had nothing to style
+        themselves with. This is that read with no session at all.
+
+
+        **The tenant comes from the host, never from the caller.** The request carries no tenant: the edge
+        resolves the host it arrived on to a tenant with `tenancy.resolveTenantHost` (SD-021), which is the
+        tenant''s verified custom domain or its platform subdomain. The platform subdomain is the tenant slug
+        the guest app and kiosk builds are configured with, so all three shells call the same path. An
+        unknown host is `404` and never falls through to a default tenant.
+
+
+        **Published, non-sensitive fields only.** Read from the current published `ConfigVersion` (never the
+        working draft) plus the live status `setMaintenanceMode` writes. Left out, because a public and
+        cacheable response must not carry them: the draft markers (`isDraft`, `version`, the draft booking
+        flows), notification branding (sender addresses), the enabled payment methods (checkout reads what
+        the gateway offers), licensing, and every CMS status field `getTenantAppStatus` keeps for staff.
+        A module the tenant has not enabled is not listed, so a guest never learns what was not bought.
+
+
+        **Cacheable.** With no session the answer is the same for every visitor of a host and venue and is
+        cached at the edge, invalidated by `publishTenantConfig` and `setMaintenanceMode`; `publishedVersion`
+        lets a client keep its copy when nothing changed. A signed-in guest gets the same answer.
+
+        '
+      tags:
+      - overview
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: '2 October: **servable from a local cache.** The published configuration changes
+        only on a publish, so the app and the kiosk keep the last answer and render from it offline; the
+        language list on KSK-002 comes from it.
+
+        '
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - {}
+      - guestAuth: []
+      parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: The venue the guest picked (WEB-001, GST-001). `bookingFlow` is then the tenant's settings
+          with that venue's `venueOverrides` entry laid over field by field (rev 3 CFG-11); without it, the
+          tenant's own settings.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The published guest-facing configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishedTenantConfig'
+        '404':
+          description: The host belongs to no tenant (`not-found`), or the tenant has published nothing yet
+            (`not-configured`); the storefront shows the platform's neutral holding page.
+          x-ticvai-problem-types:
+          - not-found
+          - not-configured
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /storefront/policies:
+    get:
+      operationId: listPublishedPolicies
+      x-ticvai-consumed-by:
+        - "P01 WEB-012 Checkout — Payment"
+        - "P01 WEB-045 Help Centre & Accessibility"
+        - "P02 GST-009 Review & Payment"
+        - "P02 GST-040 Help & Support"
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      - device
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2); the guest view of
+        listPolicies'
+      x-ticvai-read-routing: replica
+      summary: The tenant's current legal policies, readable before sign-in
+      description: '**Terms, privacy, refund, cookie and accessibility, as a guest reads them** (decided 2 October
+        by Chinmay, GFIX-2). `listPolicies` is staff-only (`TENANT_CONFIGURE`), so no guest could read a
+        policy: not the terms they tick at checkout (WEB-012, GST-009), not the privacy notice before they
+        sign up, not the help centre''s policy tab (WEB-045, GST-040). Every policy is public by nature, so
+        this needs no session.
+
+
+        **The current version of each kind only**, one entry per `PolicyKind` that has been published, with
+        its `version` so a consent records exactly what was shown. A kind never published is absent, not
+        empty. History and who published it stay on `listPolicies`. The tenant comes from the host, as for
+        `getPublishedTenantConfig`. Cached at the edge and invalidated by `setPolicy`.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: '2 October: **servable from a local cache.** A policy changes only when the tenant
+        publishes a new version.
+
+        '
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-bounded: one current version per PolicyKind, five kinds
+      security:
+      - {}
+      - guestAuth: []
+      parameters:
+      - name: kind
+        in: query
+        required: false
+        description: Only this policy kind, how the checkout reads the terms alone.
+        schema:
+          $ref: '#/components/schemas/PolicyKind'
+      responses:
+        '200':
+          description: The current version of each published policy
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 5
+                items:
+                  $ref: '#/components/schemas/PublishedPolicy'
+        '404':
+          description: The host belongs to no tenant (`not-found`).
+          x-ticvai-problem-types:
+          - not-found
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /storefront/faqs:
+    get:
+      operationId: listPublishedFaqs
+      x-ticvai-consumed-by:
+        - "P01 WEB-045 Help Centre & Accessibility"
+        - "P02 GST-040 Help & Support"
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      - device
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2); the public view of
+        listFaqs'
+      x-ticvai-read-routing: replica
+      summary: The published FAQs, readable before sign-in
+      description: '**Help is public** (decided 2 October by Chinmay, GFIX-2). `listFaqs` needs a guest session,
+        so the help centre (WEB-045, GST-040) told a visitor to sign in before they could read how to sign
+        in. This returns the same categories with only the entries whose `isPublished` is true, ordered by
+        `sortOrder` within each category, and categories ordered by `sortOrder`; a category with no published
+        entry is left out. The tenant comes from the host, as for `getPublishedTenantConfig`. Cached at the
+        edge and invalidated by `setFaqs`.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: '2 October: **servable from a local cache.** FAQ content changes only when the
+        tenant edits it.
+
+        '
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-bounded: a tenant's help categories, written by hand in the CMS
+      security:
+      - {}
+      - guestAuth: []
+      responses:
+        '200':
+          description: Published FAQ categories with their published entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublishedFaqCategory'
+        '404':
+          description: The host belongs to no tenant (`not-found`).
+          x-ticvai-problem-types:
+          - not-found
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /storefront/pages:
+    get:
+      operationId: listPublishedContentPages
+      x-ticvai-consumed-by:
+        - "P01 WEB-045 Help Centre & Accessibility"
+        - "P02 GST-040 Help & Support"
+        - "P02 GST-057 Accessibility Information"
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      - device
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2); the public view of
+        listContentPages'
+      x-ticvai-read-routing: replica
+      summary: The live content pages, readable before sign-in
+      description: '**The help, accessibility and information pages a visitor reads** (decided 2 October by
+        Chinmay, GFIX-2). `listContentPages` needs a session and answers staff with drafts; this answers
+        anyone with the live pages only: `status` `published` and `isEnabled` true. Ordered by `sortOrder`,
+        then by slug. `slug` fetches one known page; `categoryCode` is how a screen reads its own category
+        (GST-057 reads the accessibility pages), fixed by the screen and never typed by a guest. The tenant
+        comes from the host, as for `getPublishedTenantConfig`. Cached at the edge and invalidated by
+        `publishTenantConfig`.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: '2 October: **servable from a local cache.** Published content changes only on a
+        publish.
+
+        '
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - {}
+      - guestAuth: []
+      parameters:
+      - name: categoryCode
+        in: query
+        required: false
+        description: Only live pages with this `categoryCode`.
+        schema:
+          type: string
+      - name: slug
+        in: query
+        required: false
+        description: Only the live page with this slug.
+        schema:
+          type: string
+          pattern: ^[a-z0-9-]+$
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Live pages
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PublishedContentPage'
+        '404':
+          description: The host belongs to no tenant (`not-found`).
+          x-ticvai-problem-types:
+          - not-found
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /booking-flow-types:
     get:
@@ -7782,6 +8078,181 @@ components:
                 - $ref: '#/components/schemas/LocalisedText'
                 nullable: true
                 description: Today's hours as shown to a guest, e.g. "10:00 to 22:00".
+    PublishedTenantConfig:
+      x-ticvai-persistence: none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config
+      type: object
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-1)'
+      description: '**The public view of the tenant''s configuration** (`getPublishedTenantConfig`, decided 2 October,
+        GFIX-1). The published parts a guest surface renders with, from the current `ConfigVersion`, and the
+        live status `setMaintenanceMode` writes. Nothing a guest cannot see on the page: no draft marker, no
+        CMS counts, no sender addresses, no licensing, no person.
+
+        '
+      required:
+      - tenantId
+      - publishedVersion
+      - publishedAt
+      - isInMaintenance
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        publishedVersion:
+          type: string
+          description: The `ConfigVersion.version` this answer was read from; a client holding the same version
+            keeps its copy.
+        publishedAt:
+          type: string
+          format: date-time
+        brand:
+          $ref: '#/components/schemas/BrandIdentity'
+        appIcons:
+          $ref: '#/components/schemas/AppIcons'
+        theme:
+          $ref: '#/components/schemas/Theme'
+        fonts:
+          $ref: '#/components/schemas/FontConfig'
+        header:
+          $ref: '#/components/schemas/HeaderConfig'
+        footer:
+          $ref: '#/components/schemas/FooterConfig'
+        navigation:
+          $ref: '#/components/schemas/NavigationConfig'
+        homepage:
+          $ref: '#/components/schemas/HomepageLayout'
+        bookingFlow:
+          allOf:
+          - $ref: '#/components/schemas/BookingFlowConfig'
+          description: The booking-flow display settings, resolved for `venueId` when one was sent (the tenant's
+            values with that venue's `venueOverrides` entry laid over, rev 3 CFG-11).
+        languages:
+          $ref: '#/components/schemas/LanguageConfig'
+        accessibility:
+          $ref: '#/components/schemas/AccessibilitySettings'
+        enabledModules:
+          type: array
+          description: The modules the tenant has enabled and published, so a guest surface hides a tab or a
+            homepage section for a module that is off. Licensing is not shown.
+          items:
+            $ref: '#/components/schemas/ModuleKey'
+        enabledFeatures:
+          type: array
+          description: The `featureKey` of every feature toggle that is on in the published version.
+          items:
+            type: string
+        isInMaintenance:
+          type: boolean
+          description: Live state (`setMaintenanceMode`), as on `getTenantAppStatus`.
+        maintenanceMessage:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+        expectedBackAt:
+          type: string
+          format: date-time
+          nullable: true
+        minimumAppVersion:
+          $ref: '#/components/schemas/MinimumAppVersion'
+        availability:
+          $ref: '#/components/schemas/AppAvailability'
+        availabilityMessage:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+        contact:
+          $ref: '#/components/schemas/VenueContact'
+    PublishedPolicy:
+      x-ticvai-persistence: none — a public projection of whitelabel.policy
+      type: object
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2)'
+      description: The current version of one policy as a guest reads it (`listPublishedPolicies`). Who published
+        it and the partition key stay on `Policy`.
+      required:
+      - kind
+      - version
+      - body
+      - effectiveFrom
+      properties:
+        kind:
+          $ref: '#/components/schemas/PolicyKind'
+        title:
+          type: string
+        version:
+          type: string
+          description: The version a consent records (a guest who consented to version 3 consented to version 3).
+        body:
+          $ref: '#/components/schemas/LocalisedRichText'
+        effectiveFrom:
+          type: string
+          format: date
+        requiresReconsent:
+          type: boolean
+          description: True when guests who consented to an earlier version are asked again on next launch.
+    PublishedFaqCategory:
+      x-ticvai-persistence: none — a public projection of whitelabel.faq_category + whitelabel.faq_entry
+      type: object
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2)'
+      description: One FAQ category with its published entries only (`listPublishedFaqs`).
+      required:
+      - code
+      - name
+      - entries
+      properties:
+        code:
+          type: string
+        name:
+          $ref: '#/components/schemas/LocalisedText'
+        sortOrder:
+          type: integer
+        entries:
+          type: array
+          items:
+            type: object
+            required:
+            - id
+            - question
+            - answer
+            properties:
+              id:
+                type: string
+                format: uuid
+              question:
+                $ref: '#/components/schemas/LocalisedText'
+              answer:
+                $ref: '#/components/schemas/LocalisedRichText'
+              sortOrder:
+                type: integer
+    PublishedContentPage:
+      x-ticvai-persistence: none — a public projection of whitelabel.content_page
+      type: object
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2)'
+      description: A live content page as a guest reads it (`listPublishedContentPages`). Only published and
+        enabled pages exist in this view, so it carries no status.
+      required:
+      - id
+      - slug
+      - title
+      - body
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+          pattern: ^[a-z0-9-]+$
+        title:
+          $ref: '#/components/schemas/LocalisedText'
+        body:
+          $ref: '#/components/schemas/LocalisedRichText'
+        iconAssetRef:
+          type: string
+          format: uuid
+          nullable: true
+        categoryCode:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
   responses:
     NotConfigured:
       description: 'This part of the working draft has never been saved. **Not the same as a missing

@@ -1,0 +1,80 @@
+id: CHG-GST-006
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The guest's own screens declare sign-in (subjectId from session); personal loads on public screens say
+  they run only when signed in; cart and order reads say which guest session they ride on.
+decision:
+  what: Keep personal reads behind sign-in and make every screen that loads the guest's own data say so.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Finding of check-preauth-session (council of 2 October): PS-UNDECLARED-SIGNIN 51 loads of the guest''s own
+  records on screens a visitor can reach, and the personal PS-LOAD-NEEDS-SESSION loads left after CHG-GST-005.'
+keys_touched:
+  screens:
+  - GST-009
+  - GST-010
+  - GST-011
+  - GST-012
+  - GST-013
+  - GST-014
+  - GST-015
+  - GST-016
+  - GST-017
+  - GST-019
+  - GST-020
+  - GST-023
+  - GST-024
+  - GST-028
+  - GST-030
+  - GST-032
+  - GST-034
+  - GST-036
+  - GST-040
+  - GST-041
+  - GST-042
+  - GST-053
+  - GST-054
+  - GST-055
+  - GST-059
+  - GST-074
+  - GST-079
+  - KSK-006
+  - KSK-009
+  - KSK-011
+  - WEB-010
+  - WEB-012
+  - WEB-013
+  - WEB-016
+  - WEB-018
+  - WEB-019
+  - WEB-022
+  - WEB-023
+  - WEB-025
+  - WEB-030
+  - WEB-031
+  - WEB-034
+  - WEB-036
+  - WEB-038
+  - WEB-040
+  - WEB-043
+  - WEB-044
+  - WEB-046
+  - WEB-047
+  - WEB-049
+  - WEB-050
+  files:
+  - tools/applied/guest-signin-declarations-2-october.py
+root_class: 'new: session-before-sign-in'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-preauth-session.py
+status: open
+notes: 'Decided by Chinmay, 2 October: fix before Block A starts. Register: docs/registers/guest-fix-decisions.md
+  (GFIX-6). Not closed: the prevention check arrives with the change-rules branch and is report-only until the lead
+  baselines it; close on the merge commit once run-checks.py runs it.'

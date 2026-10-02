@@ -477,6 +477,9 @@ paths:
         - "P16 ANL-001 Executive Command Center"
         - "P16 ANL-006 Inventory & Waste Intelligence"
         - "P16 ANL-010 Suggestions & Advice"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Ask for an answer, however it is currently produced
       description: '**One operation for thirteen questions, and the reason is the swap.** The client F&B
         boards drew six of these as their own endpoints — `suggestPrice`, `suggestRequisition`, `suggestReplenishment`,
@@ -1227,6 +1230,9 @@ paths:
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
         - "P08 BO-932 Conversational AI Resource Copilot"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1274,6 +1280,9 @@ paths:
         - "P08 BO-928 AI Conflict Resolution Assistant"
         - "P08 BO-932 Conversational AI Resource Copilot"
         - "P13 CMS-104 App Build & Store Publishing"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1354,6 +1363,9 @@ paths:
         - "P08 BO-932 Conversational AI Resource Copilot"
         - "P09 ADM-533 Human Review, Challenge & AI Clarification Workspace"
         - "P13 CMS-104 App Build & Store Publishing"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -4715,6 +4727,9 @@ paths:
         - "P02 GST-032 AI Concierge – Chat"
         - "P05 KSK-015 Assistant"
         - "P06 EMP-020 AI assistant — answer"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-agreed: '29 September: AI system design 2.3 knowledge; our build plan, shape follows recordSuggestionOutcome'
       summary: Say whether an answer helped
       description: 'One label per message per person (AIC-062): helpful or not, and why. Guests can give it on the
@@ -7206,6 +7221,12 @@ paths:
         - "P08 BO-102 Sell"
         - "P08 BO-1048 Seat Upsell Recommendations"
         - "P08 BO-119 Cross-Sell, Upsell & Recommendation Rules"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-agreed: '29 September: AI system design 2.3 recommend (guest-callable), 2.2 A; our build plan, shape
         follows requestSuggestion (guest-callable)'
       summary: Fill a recommendation slot
@@ -7346,6 +7367,12 @@ paths:
         - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-048 Upsell / Cross-Sell"
         - "P08 BO-102 Sell"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-agreed: '29 September: AI system design 2.3 recommend; our build plan, shape follows recordTouchPoint'
       summary: Report what happened to recommended items
       description: 'Impressions, clicks, add-to-cart, dismissals and explicit declines, batched. A `decline` is

@@ -68,7 +68,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-029` | Error / Sold Out / Maintenance | A | 0 | 34 | 7 | 0 | 1 | 2 | guest | review (client-verified) |
+| `WEB-029` | Error / Sold Out / Maintenance | A | 0 | 28 | 7 | 0 | 1 | 2 | guest | review (client-verified) |
 
 ## Thin screens in this batch
 

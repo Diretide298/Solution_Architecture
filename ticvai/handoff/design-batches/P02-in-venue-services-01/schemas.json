@@ -593,79 +593,6 @@
    }
   }
  },
- "CreatePaymentRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "orderId",
-   "tender",
-   "amount",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
-   },
-   "orderId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "tender": {
-    "$ref": "#/components/schemas/TenderKind"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "tenderCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "nullable": true,
-    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
-   },
-   "tenderAmount": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
-   },
-   "walletAuthorisationId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
-   },
-   "walletHoldId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
-   },
-   "returnUrl": {
-    "type": "string",
-    "format": "uri",
-    "nullable": true,
-    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
-   },
-   "terminalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
-   },
-   "deviceId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "CreateQueueRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -967,13 +894,6 @@
     "nullable": true
    }
   }
- },
- "ExchangeRateDecimal": {
-  "type": "string",
-  "x-ticvai-persistence-kind": "valueObject",
-  "x-ticvai-persistence-column": "numeric(18,6)",
-  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
-  "pattern": "^\\d+(\\.\\d{1,6})?$"
  },
  "FnbDeliveryPolicy": {
   "type": "object",
@@ -3329,21 +3249,6 @@
     }
    }
   }
- },
- "TenderKind": {
-  "type": "string",
-  "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
-  "enum": [
-   "cash",
-   "card",
-   "wallet",
-   "voucher",
-   "bankTransfer",
-   "hotelCharge",
-   "installment",
-   "giftCard",
-   "complimentary"
-  ]
  },
  "UpdateParkingEntitlementRequest": {
   "type": "object",

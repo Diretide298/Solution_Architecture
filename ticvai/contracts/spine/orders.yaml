@@ -159,6 +159,8 @@ paths:
       operationId: listMyOrders
       x-ticvai-consumed-by:
         - "P01 WEB-019 Order History"
+        - "P01 WEB-030 Ticket Transfer"
+        - "P02 GST-014 Ticket Transfer"
         - "P02 GST-019 Order History"
       security:
       - guestAuth: []
@@ -2748,7 +2750,6 @@ paths:
         - "P01 WEB-049 Transport — Route & Schedule"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-008 Tickets & Add-ons"
-        - "P02 GST-009 Review & Payment"
         - "P02 GST-026 Retail / Merchandise"
         - "P02 GST-027 Parking – Reserve & Pay"
         - "P02 GST-032 AI Concierge – Chat"
@@ -3197,11 +3198,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-033 Shop"
-        - "P01 WEB-041 Parking – Reserve & Pay"
         - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-009 Review & Payment"
         - "P02 GST-026 Retail / Merchandise"
-        - "P02 GST-027 Parking – Reserve & Pay"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
         - "P05 KSK-006 Review"
@@ -3712,11 +3711,6 @@ paths:
     get:
       operationId: listOrders
       x-ticvai-consumed-by:
-        - "P01 WEB-019 Order History"
-        - "P01 WEB-030 Ticket Transfer"
-        - "P02 GST-014 Ticket Transfer"
-        - "P02 GST-018 Add to Calendar / Reminders"
-        - "P02 GST-019 Order History"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
@@ -4983,11 +4977,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
         - "P01 WEB-033 Shop"
-        - "P01 WEB-041 Parking – Reserve & Pay"
         - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-009 Review & Payment"
         - "P02 GST-026 Retail / Merchandise"
-        - "P02 GST-027 Parking – Reserve & Pay"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P04 POS-005 Payment"
@@ -6025,6 +6017,9 @@ paths:
         - "P04 POS-006 Held Orders"
         - "P04 POS-026 Receipt & Reprint"
         - "P04 POS-030 Sales Journal"
+        - "P05 KSK-009 Ticket issued"
+        - "P05 KSK-010 Print failure"
+        - "P05 KSK-012 Booking found"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
@@ -6148,23 +6143,13 @@ paths:
     post:
       operationId: transferOrderTickets
       x-ticvai-consumed-by:
-        - "P01 WEB-012 Checkout — Payment"
-        - "P01 WEB-013 Booking Confirmation"
         - "P01 WEB-018 My Tickets"
-        - "P01 WEB-019 Order History"
-        - "P01 WEB-023 Membership Management"
         - "P01 WEB-030 Ticket Transfer"
-        - "P02 GST-009 Review & Payment"
-        - "P02 GST-010 Booking Confirmation"
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-014 Ticket Transfer"
-        - "P02 GST-019 Order History"
         - "P02 GST-045 Ticket Delivery & Sharing"
         - "P02 GST-055 Dynamic QR Ticket"
-        - "P05 KSK-009 Ticket issued"
-        - "P05 KSK-010 Print failure"
-        - "P05 KSK-012 Booking found"
       x-ticvai-audience:
       - guest
       summary: Transfer tickets to another guest
@@ -6258,7 +6243,6 @@ paths:
     post:
       operationId: claimTicketTransfer
       x-ticvai-consumed-by:
-        - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-014 Ticket Transfer"
       x-ticvai-audience:
       - guest

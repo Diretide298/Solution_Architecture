@@ -69,7 +69,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-063` | Explore – Search Results | A | 3 | 6 | 5 | 3 | 0 | 0 | guest | notStarted (client-verified) |
+| `GST-063` | Explore – Search Results | A | 2 | 14 | 5 | 3 | 0 | 0 | guest | notStarted (client-verified) |
+
+## Thin screens in this batch
+
+**GST-063 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -101,29 +105,31 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Q | text field | required | — | min length 2 | — | Sends `?q=` to `searchCatalogue`. | `searchCatalogue` ?q |
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `searchCatalogue`. | `searchCatalogue` ?venueId |
+| Search | text field | required | — | min length 2 | — | Sends `?q=` to `searchCatalogue`. | `searchCatalogue` ?q |
 | Kind | select | optional | — | Product · Event · Attraction · Bundle · Membership · Merchandise · Menu item | — | Sends `?kind=` to `searchCatalogue`. | `searchCatalogue` ?kind |
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every money** (data table, from `searchCatalogue`)
+**Results** (card list, from `searchCatalogue`): One card per result: name, summary, photo (`primaryMedia`), from-price (`fromPrice`), sold out shown rather than hidden (`isAvailable`), and `notBookableLabel` for an info-only product. `searchCatalogue` answers with no named schema, so the card binds none. Was the generated table 'Every money'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 …
 
 | Shows | Format | Notes |
 |---|---|---|
-| Amount | text | Decimal string, never a float. Up to 4 decimal places. |
-| Currency | text | Resolved from the region, not stored on the row (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from … |
-| Scale | 1,234 | Resolved from the region alongside `currency`. |
-
-**The selected money** (detail panel, from `searchCatalogue`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Amount | text | Decimal string, never a float. Up to 4 decimal places. |
-| Currency | text | Resolved from the region, not stored on the row (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from … |
-| Scale | 1,234 | Resolved from the region alongside `currency`. |
+| ID | the name it points at, never the id | — |
+| Kind | text | — |
+| Name | text | — |
+| Summary | text | — |
+| From price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Guest listing | chip: Bookable, Info only, Hidden | How a product appears to a guest (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to … |
+| Not bookable label | in the reader's language | The product's label, for an `infoOnly` result; null otherwise (decided 29 September, rev 3 REV3-14). |
+| Primary media | grouped details | The product's `isPrimary` media item, so each result in a listing shows its own photo (decided 29 September, 23SEP-4). |
+| Asset | the image or video | A `MediaAsset` of `assets.yaml`, in status `ready`. |
+| Kind | chip: Image, Video | — |
+| Is primary | yes / no (icon or chip) | The item *Read more* opens on and a listing shows. Exactly one per product. |
+| Display order | 1,234 | — |
+| Alt text | in the reader's language | — |
+| Is available | yes / no (icon or chip) | Shown rather than filtered out. A guest searching for a sold-out attraction should learn it is sold out, not that it does not exist. |
 
 **Where the user goes next**
 
@@ -138,7 +144,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Loading (`?state=loading`) | The search list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the search untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No search yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on q, venueId, kind and the search are still there. Names the active filter and offers to clear it. |
+| Empty, no results (`?state=emptyNoResults`) | Nothing matches what was typed. Names the search, suggests a shorter one and offers to clear it; a sold-out match is shown as sold out, not hidden. |
 | Offline (`?state=offline`) | **The offline banner shows.** Results come only from what was already loaded, with a note that newer items may exist. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 September). |
 
@@ -188,8 +194,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (3), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-063?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-001`, `GST-002`, `GST-004`.

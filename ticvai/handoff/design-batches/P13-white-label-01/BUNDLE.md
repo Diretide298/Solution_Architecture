@@ -1585,22 +1585,22 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 | Social links (`footer.socialLinks`) | — | — | every website screen | — |
 | Social links: platform (`footer.socialLinks[].platform`) | — | — | GST-018, GST-066, GST-073, WEB-011, WEB-017, WEB-018, WEB-024, WEB-027 | — |
 | Social links: uRL (`footer.socialLinks[].url`) | — | — | every website screen | — |
-| Sections (`homepage.sections`) | — | — | GST-001, WEB-001 | — |
-| Sections: kind (`homepage.sections[].kind`) | Hero banner · Quick actions · Tickets · Whats on · Attractions · Membership · Dining · Shop · Promotions · Map · Custom content · Venue overview …; `tickets` needs `ticketsAndBooking`; `whatsOn` … | — | GST-001, WEB-001 | Which module each section needs, proposed, client to correct (decided 28 September, audit R163). |
-| Sections: title (`homepage.sections[].title`) | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | — |
-| Sections: sort order (`homepage.sections[].sortOrder`) | — | — | GST-001, WEB-001 | — |
-| Sections: is visible (`homepage.sections[].isVisible`) | — | — | GST-001, WEB-001 | — |
-| Sections: content page (`homepage.sections[].contentPageId`) | shows names, sends the id | — | GST-001, WEB-001 | — |
-| Sections: max items (`homepage.sections[].maxItems`) | — | — | GST-001, WEB-001 | How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3). |
-| Sections: hero style (`homepage.sections[].heroStyle`) | Carousel · Video · Poster · Split | — | GST-001, WEB-001 | For `heroBanner` only (decided 29 September, MOB-3). |
-| Slug (`pages.slug`) | pattern `^[a-z0-9-]+$` | — | GST-040, GST-057, WEB-045 | — |
-| Content pages title (`pages.title`) | English and Arabic (Arabic right to left) | — | GST-040, GST-057, WEB-045 | — |
-| Body (`pages.body`) | English and Arabic (Arabic right to left) | — | GST-040, GST-057, WEB-045 | Keyed by language code. Values are sanitised HTML. |
-| Content pages is enabled (`pages.isEnabled`) | — | on | GST-040, GST-057, WEB-045 | BL-005. Enablement is not publication. |
-| Icon (`pages.iconAssetRef`) | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | GST-040, GST-057, WEB-045 | — |
-| Category code (`pages.categoryCode`) | — | — | GST-040, GST-057, WEB-045 | — |
-| Content pages sort order (`pages.sortOrder`) | — | — | GST-040, GST-057, WEB-045 | — |
-| Content pages status (`pages.status`) | Draft · Published · Archived | — | GST-040, GST-057, WEB-045 | Only `archived` is taken — send it to withdraw a published page or abandon a draft (`states/content.yaml`). |
+| Sections (`homepage.sections`) | — | — | the guest home screens | — |
+| Sections: kind (`homepage.sections[].kind`) | Hero banner · Quick actions · Tickets · Whats on · Attractions · Membership · Dining · Shop · Promotions · Map · Custom content · Venue overview …; `tickets` needs `ticketsAndBooking`; `whatsOn` … | — | the guest home screens | Which module each section needs, proposed, client to correct (decided 28 September, audit R163). |
+| Sections: title (`homepage.sections[].title`) | English and Arabic (Arabic right to left) | — | the guest home screens | — |
+| Sections: sort order (`homepage.sections[].sortOrder`) | — | — | the guest home screens | — |
+| Sections: is visible (`homepage.sections[].isVisible`) | — | — | the guest home screens | — |
+| Sections: content page (`homepage.sections[].contentPageId`) | shows names, sends the id | — | the guest home screens | — |
+| Sections: max items (`homepage.sections[].maxItems`) | — | — | GST-001 | How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3). |
+| Sections: hero style (`homepage.sections[].heroStyle`) | Carousel · Video · Poster · Split | — | GST-001 | For `heroBanner` only (decided 29 September, MOB-3). |
+| Slug (`pages.slug`) | pattern `^[a-z0-9-]+$` | — | the content and policy pages | — |
+| Content pages title (`pages.title`) | English and Arabic (Arabic right to left) | — | the content and policy pages | — |
+| Body (`pages.body`) | English and Arabic (Arabic right to left) | — | the content and policy pages | Keyed by language code. Values are sanitised HTML. |
+| Content pages is enabled (`pages.isEnabled`) | — | on | the content and policy pages | BL-005. Enablement is not publication. |
+| Icon (`pages.iconAssetRef`) | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the content and policy pages | — |
+| Category code (`pages.categoryCode`) | — | — | GST-057 | — |
+| Content pages sort order (`pages.sortOrder`) | — | — | the content and policy pages | — |
+| Content pages status (`pages.status`) | Draft · Published · Archived | — | the content and policy pages | Only `archived` is taken — send it to withdraw a published page or abandon a draft (`states/content.yaml`). |
 
 #### References
 
@@ -1884,37 +1884,37 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 
 | Field | Allowed values | Default | Reaches | What it changes |
 |---|---|---|---|---|
-| Banners title (`banners.title`) | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | — |
-| Banners subtitle (`banners.subtitle`) | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | — |
-| Image (`banners.imageAssetRef`) | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | GST-001, WEB-001 | — |
-| Banners placement (`banners.placement`) | Homepage hero · Homepage block · Explore · Checkout | — | GST-001, WEB-001 | — |
-| Banners link target (`banners.linkTarget`) | — | — | GST-001, WEB-001 | — |
-| Link target: kind (`banners.linkTarget.kind`) | Module · Content page · Product · Event · External URL · App section · None | — | GST-001, WEB-001 | `appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
-| Link target: module key (`banners.linkTarget.moduleKey`) | Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty … | — | GST-001, WEB-001, WEB-050 | `visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
-| Link target: app section (`banners.linkTarget.appSection`) | Home · Explore · Plan · Tickets · Map · Account · Buy tickets; Required when `kind` is `appSection`. | — | GST-001, WEB-001 | Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it. |
-| Link target: content page (`banners.linkTarget.contentPageId`) | shows names, sends the id | — | GST-001, WEB-001 | — |
-| Link target: product (`banners.linkTarget.productId`) | shows names, sends the id | — | GST-001, WEB-001 | — |
-| Link target: event (`banners.linkTarget.eventId`) | shows names, sends the id | — | GST-001, WEB-001 | — |
-| Link target: uRL (`banners.linkTarget.url`) | — | — | GST-001, WEB-001 | — |
-| Banners starts at (`banners.startsAt`) | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, WEB-001 | — |
-| Banners ends at (`banners.endsAt`) | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, WEB-001 | Must follow `startsAt` when set (decided 28 September, audit R163). Null runs the banner with no end. |
-| Banners sort order (`banners.sortOrder`) | — | — | GST-001, WEB-001 | — |
-| Is active (`banners.isActive`) | — | — | GST-001, WEB-001 | — |
-| Promo blocks title (`promoBlocks.title`) | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | — |
-| Promo blocks description (`promoBlocks.description`) | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | — |
-| Icon (`promoBlocks.iconAssetRef`) | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | GST-001, WEB-001 | — |
-| Promotion (`promoBlocks.promotionId`) | shows names, sends the id | — | GST-001, WEB-001 | Presentation only. A block may point at a promotion; it does not create or price one. |
-| Promo blocks link target (`promoBlocks.linkTarget`) | — | — | GST-001, WEB-001 | — |
-| Link target: kind (`promoBlocks.linkTarget.kind`) | Module · Content page · Product · Event · External URL · App section · None | — | GST-001, WEB-001 | `appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
-| Link target: module key (`promoBlocks.linkTarget.moduleKey`) | Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty … | — | GST-001, WEB-001, WEB-050 | `visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
-| Link target: app section (`promoBlocks.linkTarget.appSection`) | Home · Explore · Plan · Tickets · Map · Account · Buy tickets; Required when `kind` is `appSection`. | — | GST-001, WEB-001 | Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it. |
-| Link target: content page (`promoBlocks.linkTarget.contentPageId`) | shows names, sends the id | — | GST-001, WEB-001 | — |
-| Link target: product (`promoBlocks.linkTarget.productId`) | shows names, sends the id | — | GST-001, WEB-001 | — |
-| Link target: event (`promoBlocks.linkTarget.eventId`) | shows names, sends the id | — | GST-001, WEB-001 | — |
-| Link target: uRL (`promoBlocks.linkTarget.url`) | — | — | GST-001, WEB-001 | — |
-| Promo blocks starts at (`promoBlocks.startsAt`) | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, WEB-001 | — |
-| Promo blocks ends at (`promoBlocks.endsAt`) | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, WEB-001 | Must follow `startsAt` when both are set (decided 28 September, audit R163). |
-| Promo blocks sort order (`promoBlocks.sortOrder`) | — | — | GST-001, WEB-001 | — |
+| Banners title (`banners.title`) | English and Arabic (Arabic right to left) | — | the guest home screens | — |
+| Banners subtitle (`banners.subtitle`) | English and Arabic (Arabic right to left) | — | the guest home screens | — |
+| Image (`banners.imageAssetRef`) | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the guest home screens | — |
+| Banners placement (`banners.placement`) | Homepage hero · Homepage block · Explore · Checkout | — | the guest home screens | — |
+| Banners link target (`banners.linkTarget`) | — | — | the guest home screens | — |
+| Link target: kind (`banners.linkTarget.kind`) | Module · Content page · Product · Event · External URL · App section · None | — | the guest home screens | `appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| Link target: module key (`banners.linkTarget.moduleKey`) | Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty … | — | WEB-050 | `visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| Link target: app section (`banners.linkTarget.appSection`) | Home · Explore · Plan · Tickets · Map · Account · Buy tickets; Required when `kind` is `appSection`. | — | the guest home screens | Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it. |
+| Link target: content page (`banners.linkTarget.contentPageId`) | shows names, sends the id | — | the guest home screens | — |
+| Link target: product (`banners.linkTarget.productId`) | shows names, sends the id | — | the guest home screens | — |
+| Link target: event (`banners.linkTarget.eventId`) | shows names, sends the id | — | the guest home screens | — |
+| Link target: uRL (`banners.linkTarget.url`) | — | — | the guest home screens | — |
+| Banners starts at (`banners.startsAt`) | 1 Oct 2026, 14:30 (venue time zone) | — | the guest home screens | — |
+| Banners ends at (`banners.endsAt`) | 1 Oct 2026, 14:30 (venue time zone) | — | the guest home screens | Must follow `startsAt` when set (decided 28 September, audit R163). Null runs the banner with no end. |
+| Banners sort order (`banners.sortOrder`) | — | — | the guest home screens | — |
+| Is active (`banners.isActive`) | — | — | the guest home screens | — |
+| Promo blocks title (`promoBlocks.title`) | English and Arabic (Arabic right to left) | — | the guest home screens | — |
+| Promo blocks description (`promoBlocks.description`) | English and Arabic (Arabic right to left) | — | the guest home screens | — |
+| Icon (`promoBlocks.iconAssetRef`) | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the guest home screens | — |
+| Promotion (`promoBlocks.promotionId`) | shows names, sends the id | — | the guest home screens | Presentation only. A block may point at a promotion; it does not create or price one. |
+| Promo blocks link target (`promoBlocks.linkTarget`) | — | — | the guest home screens | — |
+| Link target: kind (`promoBlocks.linkTarget.kind`) | Module · Content page · Product · Event · External URL · App section · None | — | the guest home screens | `appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| Link target: module key (`promoBlocks.linkTarget.moduleKey`) | Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty … | — | WEB-050 | `visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| Link target: app section (`promoBlocks.linkTarget.appSection`) | Home · Explore · Plan · Tickets · Map · Account · Buy tickets; Required when `kind` is `appSection`. | — | the guest home screens | Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it. |
+| Link target: content page (`promoBlocks.linkTarget.contentPageId`) | shows names, sends the id | — | the guest home screens | — |
+| Link target: product (`promoBlocks.linkTarget.productId`) | shows names, sends the id | — | the guest home screens | — |
+| Link target: event (`promoBlocks.linkTarget.eventId`) | shows names, sends the id | — | the guest home screens | — |
+| Link target: uRL (`promoBlocks.linkTarget.url`) | — | — | the guest home screens | — |
+| Promo blocks starts at (`promoBlocks.startsAt`) | 1 Oct 2026, 14:30 (venue time zone) | — | the guest home screens | — |
+| Promo blocks ends at (`promoBlocks.endsAt`) | 1 Oct 2026, 14:30 (venue time zone) | — | the guest home screens | Must follow `startsAt` when both are set (decided 28 September, audit R163). |
+| Promo blocks sort order (`promoBlocks.sortOrder`) | — | — | the guest home screens | — |
 
 #### References
 

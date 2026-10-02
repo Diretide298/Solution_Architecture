@@ -68,16 +68,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-025` | Help Centre / FAQ | A | 13 | 44 | 5 | 9 | 5 | 0 | guest | review (client-verified) |
+| `WEB-025` | Help Centre / FAQ | A | 13 | 26 | 5 | 9 | 5 | 0 | guest | review (client-verified) |
 | `WEB-026` | Survey & Feedback | A | 16 | 0 | 5 | 7 | 2 | 0 | guest | review (client-verified) |
 | `WEB-027` | Newsletter Subscription | A | 20 | 35 | 6 | 11 | 1 | 0 | guest | review (client-verified) |
-| `WEB-028` | Contact & Venue Information | A | 0 | 17 | 5 | 0 | 0 | 0 | guest | review (client-verified) |
+| `WEB-028` | Contact & Venue Information | A | 0 | 11 | 5 | 0 | 0 | 0 | guest | review (client-verified) |
 | `WEB-044` | AI Concierge – Home | A | 15 | 15 | 6 | 35 | 4 | 0 | guest | review (client-verified) |
 | `WEB-046` | In-Venue Notifications | A | 11 | 12 | 6 | 5 | 2 | 0 | guest | review (client-verified) |
 
 ## Thin screens in this batch
 
-**WEB-028 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**WEB-025, WEB-028 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

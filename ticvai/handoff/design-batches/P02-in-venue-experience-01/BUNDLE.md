@@ -175,7 +175,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Error (`?state=error`) | Item unavailable, with a route back to the menu |
 | Empty, first run (`?state=emptyFirstRun`) | Not applicable |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listModifierGroups` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listModifierGroups` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute. |
 
 #### Permissions
@@ -183,7 +183,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - `getGuestMenu` → no permission · guest, staff
 - `listModifierGroups` → `PRODUCT_VIEW` (read) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listModifierGroups` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -221,6 +221,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-061` · status **notStarted** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 2 → Menu item detail; Rev 3 feedback → Menu item add-ons & modifiers*. Differences: Rev 3 adds min/max selection rules for each modifier group, priced add-ons, leave-outs and a live total.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -285,7 +286,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Loading (`?state=loading`) | The saved shop drop collection. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the shop drop collection untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No shop drop collection configured. The form opens empty and `lookupShopAndDrop` saves the first one; it says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `lookupShopAndDrop` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 No identifier supplied |
 
@@ -293,7 +294,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - `lookupShopAndDrop` → `ORDER_VIEW` (read) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `lookupShopAndDrop` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -324,6 +325,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 3 → Shop & drop collection*. Differences: Prototype uses a separate SD code; the YAML says the guest collects with the ticket.
 - Flow F51 *A guest shops in the venue and collects on the way out*, step 3: On the way out they find their collection point. → **One lookup, one code.** A guest at the exit with four bags to collect wants one screen, not four orders.
 - Flow F51 branch at step 3 (medium): when The guest leaves without collecting., **Held to the venue policy and then returned to stock.** A collection point full of uncollected bags is a stockroom nobody counted.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

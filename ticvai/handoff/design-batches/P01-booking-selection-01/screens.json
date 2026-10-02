@@ -130,30 +130,18 @@
        "provenance": "decided 29 September, rev 3 REV3-20"
       },
       {
-       "kind": "dataTable",
-       "label": "Every product variant",
-       "bindsTo": "ProductVariant",
-       "columns": [
-        "ProductVariant.id",
-        "ProductVariant.productId",
-        "ProductVariant.sku",
-        "ProductVariant.axisValues",
-        "ProductVariant.isActive"
-       ],
-       "operation": "listProductVariants",
-       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
-      },
-      {
        "kind": "cardList",
        "bindsTo": "ProductVariant[]",
        "notes": "Each row is a variant with a stepper. Price updates live. Each row shows `ProductVariant.description` (who it is for, what it includes) behind the (i) when `BookingFlowConfig.cardInfo` is on (23SEP-6), its display tags when `ticketTags` is on (23SEP-3) and its own photo (23SEP-4). In the dated flow the rows stay hidden until a time is picked (`performanceReveal` `dateTimeTicket`, REV3-2)",
-       "provenance": "carried from the previous definition"
+       "provenance": "carried from the previous definition",
+       "operation": "listProductVariants"
       },
       {
        "kind": "banner",
        "bindsTo": "PromotionEvaluation.rejected",
-       "notes": "Shows near-miss offers — \"add one more for the family rate\". Uses the rejected list, which exists precisely so this can be said",
-       "provenance": "carried from the previous definition"
+       "notes": "Shows near-miss offers — \"add one more for the family rate\". Uses the rejected list, which exists precisely so this can be said Promotions are evaluated by themselves on every change (`evaluatePromotions`); a guest never fills a promotions form (F01 step 4, GFIX-3).",
+       "provenance": "carried from the previous definition",
+       "operation": "evaluatePromotions"
       },
       {
        "kind": "progressIndicator",
@@ -176,35 +164,9 @@
      ]
     },
     {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected product variant",
-       "bindsTo": "ProductVariant",
-       "columns": [
-        "ProductVariant.id",
-        "ProductVariant.productId",
-        "ProductVariant.sku",
-        "ProductVariant.axisValues",
-        "ProductVariant.isActive"
-       ],
-       "operation": "listProductVariants",
-       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
-      }
-     ]
-    },
-    {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Evaluate promotions",
-       "operation": "evaluatePromotions",
-       "provenance": "contract promotions.yaml POST /promotions/evaluate"
-      },
       {
        "kind": "primaryButton",
        "label": "Continue",
@@ -299,30 +261,6 @@
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
-   {
-    "id": "formEvaluatePromotions",
-    "component": "modal",
-    "trigger": "Evaluate promotions",
-    "body": "**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "EvaluatePromotionsRequest",
-    "confirm": {
-     "label": "Evaluate promotions",
-     "operation": "evaluatePromotions"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "venueId",
-      "channel",
-      "lines",
-      "subjectId",
-      "membershipTierId",
-      "couponCodes",
-      "evaluateAt"
-     ]
-    },
-    "provenance": "client-verified"
-   },
    {
     "id": "helpMeChoose",
     "component": "modal",
@@ -470,20 +408,10 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Acquire inventory hold",
-       "operation": "addCartLine",
-       "provenance": "contract catalogue.yaml POST /inventory-holds"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Check booking eligibility",
-       "operation": "checkBookingEligibility",
-       "provenance": "contract catalogue.yaml POST /eligibility-checks"
-      },
-      {
-       "kind": "primaryButton",
        "label": "Continue",
-       "provenance": "carried from the previous definition"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "operation": "addCartLine",
+       "notes": "Adds the chosen time and quantities to the cart (`addCartLine`), which takes the hold server-side; the guest never sees the word hold or a form. Choosing a session adds nothing by itself (DI-1107)."
       }
      ]
     },
@@ -548,15 +476,9 @@
        "label": "The performance",
        "bindsTo": "Performance",
        "columns": [
-        "Performance.id",
-        "Performance.eventId",
         "Performance.startsAt",
         "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
+        "Performance.status"
        ],
        "operation": "getPerformance",
        "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
@@ -674,45 +596,21 @@
   },
   "overlays": [
    {
-    "id": "formCheckBookingEligibility",
-    "component": "modal",
-    "trigger": "Check booking eligibility",
-    "body": "**Collects what `checkBookingEligibility` sends before it is called.** Required: `productIds`, `party`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "EligibilityCheckRequest",
+    "id": "eligibilityDeclaration",
+    "component": "drawer",
+    "trigger": "Once, on leaving selection, when a chosen product has an eligibility rule",
+    "body": "**The party's age and height, asked once per person** (DI-1037; REV3 DG-3) for the products that set a rule, then checked with `checkBookingEligibility`. A person who does not meet a rule is named with the product, and the guest changes the selection; never a button, and never a form of product ids.",
     "confirm": {
-     "label": "Check booking eligibility",
+     "label": "Continue",
      "operation": "checkBookingEligibility"
     },
     "dismiss": {
-     "label": "Cancel",
+     "label": "Back",
      "discards": [
-      "productIds",
       "party"
      ]
     },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formAcquireInventoryHold",
-    "component": "modal",
-    "trigger": "Add to cart",
-    "body": "**Collects what `addCartLine` sends before it is called; the cart takes the hold server-side.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add to cart",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "channelCapacityId",
-      "requestedUnits",
-      "ttlSeconds",
-      "channel"
-     ]
-    },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "consentQuestions",
@@ -842,7 +740,6 @@
        "bindsTo": "SeatAvailability",
        "columns": [
         "SeatAvailability.performanceId",
-        "SeatAvailability.seatMapId",
         "SeatAvailability.totals",
         "SeatAvailability.byCategory",
         "SeatAvailability.seats"
@@ -858,8 +755,9 @@
       {
        "kind": "seatMap",
        "label": "Choose seats",
-       "notes": "**A seat selection screen with no seat map.** `noGeometry` is the state that matters: a map imported from a manifest alone can be sold from a list and not rendered, and the screen has to say which it is rather than showing an empty frame. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking** on the guest channel (default 10, bounds 1-50): a `422 seat-limit-exceeded` from `createSeatHold` reads *Up to {maxSeats} seats per booking*, and the basket lists each seat (decided 29 September, rev 3 REV3-7). Section zoom happens on the same map (23SEP-16). **Sections first** (W2): tap a section to zoom in and see its seats; scroll or pinch out, or *← Whole map*, to return and compare sections, keeping held seats.",
-       "provenance": "minute 2026-08-03 §Ticket Flow Variations by Product Type"
+       "notes": "**A seat selection screen with no seat map.** `noGeometry` is the state that matters: a map imported from a manifest alone can be sold from a list and not rendered, and the screen has to say which it is rather than showing an empty frame. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking** on the guest channel (default 10, bounds 1-50): a `422 seat-limit-exceeded` from `createSeatHold` reads *Up to {maxSeats} seats per booking*, and the basket lists each seat (decided 29 September, rev 3 REV3-7). Section zoom happens on the same map (23SEP-16). **Sections first** (W2): tap a section to zoom in and see its seats; scroll or pinch out, or *← Whole map*, to return and compare sections, keeping held seats. **A tap on a seat is the hold** (`createSeatHold`); its length is the server's default and never a guest input (GFIX-3).",
+       "provenance": "minute 2026-08-03 §Ticket Flow Variations by Product Type",
+       "operation": "createSeatHold"
       },
       {
        "kind": "selectField",
@@ -900,12 +798,6 @@
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create seat hold",
-       "operation": "createSeatHold",
-       "provenance": "contract seating.yaml POST /seat-holds"
-      },
       {
        "kind": "secondaryButton",
        "label": "Recommend seats",
@@ -1006,32 +898,10 @@
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formCreateSeatHold",
-    "component": "modal",
-    "trigger": "Create seat hold",
-    "body": "**Collects what `createSeatHold` sends before it is called.** Required: `id`, `performanceId`, `seatIds`, `ttlSeconds`. Optional: `subjectId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateSeatHoldRequest",
-    "confirm": {
-     "label": "Create seat hold",
-     "operation": "createSeatHold"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "performanceId",
-      "seatIds",
-      "ttlSeconds",
-      "subjectId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "formRecommendSeats",
     "component": "modal",
     "trigger": "Recommend seats",
-    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize`, `strategy`. Optional: `categoryIds`, `maxPrice`, `accessibleCount`, `maxOptions`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**How many seats, and best available or together.** The party size is the tickets already chosen; the guest only picks the preference, then `recommendSeats` places them.",
     "bindsTo": "SeatRecommendationRequest",
     "confirm": {
      "label": "Recommend seats",
@@ -1048,7 +918,7 @@
       "maxOptions"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "dateTimeOnSeatMap",
@@ -1803,7 +1673,7 @@
    {
     "operationId": "getResourceHold",
     "contract": "resources",
-    "purpose": "The hold's countdown",
+    "purpose": "The hold's countdown With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onInterval"
    },
    {

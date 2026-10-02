@@ -1,0 +1,102 @@
+id: CHG-GST-004
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: No guest screen names a staff permission as its no-access state; help, accessibility, contact and maintenance
+  are public; the kiosk needs no permission.
+decision:
+  what: Replace every guest no-access state that names a permission with the guest state (ADR-0025), the public
+    state or the kiosk state.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Process-agent findings (white-label.yaml and finance-insights.yaml corrections on GST-001, GST-038, GST-040,
+  GST-057, KSK-002, GST-019, WEB-045); ADR-0025: a guest holds no permission.'
+keys_touched:
+  screens:
+  - GST-001
+  - GST-002
+  - GST-003
+  - GST-004
+  - GST-005
+  - GST-006
+  - GST-007
+  - GST-009
+  - GST-010
+  - GST-011
+  - GST-012
+  - GST-013
+  - GST-014
+  - GST-015
+  - GST-016
+  - GST-017
+  - GST-018
+  - GST-019
+  - GST-021
+  - GST-023
+  - GST-024
+  - GST-026
+  - GST-027
+  - GST-028
+  - GST-031
+  - GST-032
+  - GST-033
+  - GST-036
+  - GST-037
+  - GST-038
+  - GST-039
+  - GST-040
+  - GST-044
+  - GST-047
+  - GST-048
+  - GST-049
+  - GST-050
+  - GST-055
+  - GST-056
+  - GST-057
+  - GST-058
+  - GST-061
+  - GST-062
+  - GST-065
+  - GST-066
+  - GST-067
+  - GST-068
+  - GST-069
+  - GST-071
+  - GST-072
+  - GST-073
+  - KSK-002
+  - KSK-003
+  - KSK-004
+  - KSK-005
+  - KSK-006
+  - KSK-007
+  - KSK-008
+  - KSK-009
+  - KSK-011
+  - KSK-015
+  - WEB-028
+  - WEB-029
+  - WEB-036
+  - WEB-037
+  - WEB-038
+  - WEB-039
+  - WEB-040
+  - WEB-041
+  - WEB-042
+  - WEB-043
+  - WEB-044
+  - WEB-045
+  - WEB-046
+root_class: 'new: audience-mismatch'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: 'Decided by Chinmay, 2 October: fix before Block A starts. Register: docs/registers/guest-fix-decisions.md
+  (GFIX-4). Not closed: the prevention check arrives with the change-rules branch and is report-only until the lead
+  baselines it; close on the merge commit once run-checks.py runs it.'

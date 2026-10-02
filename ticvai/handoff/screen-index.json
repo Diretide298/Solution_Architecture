@@ -8,7 +8,7 @@
   "route": "/discovery-and-browse/home-landing",
   "operations": [
    "getTenantAppStatus",
-   "getTenantConfig",
+   "getPublishedTenantConfig",
    "listProducts",
    "listMyEntitlements",
    "getCookieConsentRuntime",
@@ -50,17 +50,8 @@
    "marketing.device_consent_category",
    "marketing.tracking_technology",
    "whitelabel.analytics_provider",
-   "whitelabel.booking_flow",
-   "whitelabel.booking_flow_step",
    "whitelabel.config_version",
-   "whitelabel.feature_toggle",
-   "whitelabel.footer_config",
-   "whitelabel.footer_config_column",
-   "whitelabel.footer_config_social_link",
    "whitelabel.guided_choice_answer",
-   "whitelabel.homepage_section",
-   "whitelabel.module_enablement",
-   "whitelabel.navigation_item",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -317,7 +308,7 @@
    "loading": "The home landing list.",
    "error": "Could not load. Names which read failed and leaves the home landing untouched.",
    "emptyFirstRun": "No home landing yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the home landing are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Nothing is on sale at this venue today. Said in the tenant's voice, with **Change venue**; the homepage sections that do not list products stay.",
    "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -402,7 +393,7 @@
    "loading": "The event attraction listing list.",
    "error": "Could not load. Names which read failed and leaves the event attraction listing untouched.",
    "emptyFirstRun": "No event attraction listing yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the event attraction listing are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Nothing matches the search, category or date picked, and the other events are still there. Names what was picked and offers to clear it.",
    "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -468,7 +459,7 @@
    "loading": "The search results list.",
    "error": "Could not load. Names which read failed and leaves the search results untouched.",
    "emptyFirstRun": "No search results yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on q, venueId, kind and the search results are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Nothing matches what was typed. Names the search, suggests a shorter one and offers to clear it; a sold-out match is shown as sold out, not hidden.",
    "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Results come only from what was already loaded, with a note that newer items may exist."
   },
@@ -588,7 +579,7 @@
    "videoUnavailable": "The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader.",
    "error": "Could not load. Names which read failed and leaves the attraction untouched.",
    "emptyFirstRun": "No attraction yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "No performance in the next days shown; the strip says so and offers the calendar.",
    "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -715,30 +706,6 @@
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
-   {
-    "id": "formEvaluatePromotions",
-    "component": "modal",
-    "trigger": "Evaluate promotions",
-    "body": "**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "EvaluatePromotionsRequest",
-    "confirm": {
-     "label": "Evaluate promotions",
-     "operation": "evaluatePromotions"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "venueId",
-      "channel",
-      "lines",
-      "subjectId",
-      "membershipTierId",
-      "couponCodes",
-      "evaluateAt"
-     ]
-    },
-    "provenance": "client-verified"
-   },
    {
     "id": "helpMeChoose",
     "component": "modal",
@@ -892,45 +859,21 @@
   },
   "overlays": [
    {
-    "id": "formCheckBookingEligibility",
-    "component": "modal",
-    "trigger": "Check booking eligibility",
-    "body": "**Collects what `checkBookingEligibility` sends before it is called.** Required: `productIds`, `party`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "EligibilityCheckRequest",
+    "id": "eligibilityDeclaration",
+    "component": "drawer",
+    "trigger": "Once, on leaving selection, when a chosen product has an eligibility rule",
+    "body": "**The party's age and height, asked once per person** (DI-1037; REV3 DG-3) for the products that set a rule, then checked with `checkBookingEligibility`. A person who does not meet a rule is named with the product, and the guest changes the selection; never a button, and never a form of product ids.",
     "confirm": {
-     "label": "Check booking eligibility",
+     "label": "Continue",
      "operation": "checkBookingEligibility"
     },
     "dismiss": {
-     "label": "Cancel",
+     "label": "Back",
      "discards": [
-      "productIds",
       "party"
      ]
     },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formAcquireInventoryHold",
-    "component": "modal",
-    "trigger": "Add to cart",
-    "body": "**Collects what `addCartLine` sends before it is called; the cart takes the hold server-side.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add to cart",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "channelCapacityId",
-      "requestedUnits",
-      "ttlSeconds",
-      "channel"
-     ]
-    },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "consentQuestions",
@@ -1050,32 +993,10 @@
   },
   "overlays": [
    {
-    "id": "formCreateSeatHold",
-    "component": "modal",
-    "trigger": "Create seat hold",
-    "body": "**Collects what `createSeatHold` sends before it is called.** Required: `id`, `performanceId`, `seatIds`, `ttlSeconds`. Optional: `subjectId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateSeatHoldRequest",
-    "confirm": {
-     "label": "Create seat hold",
-     "operation": "createSeatHold"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "performanceId",
-      "seatIds",
-      "ttlSeconds",
-      "subjectId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "formRecommendSeats",
     "component": "modal",
     "trigger": "Recommend seats",
-    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize`, `strategy`. Optional: `categoryIds`, `maxPrice`, `accessibleCount`, `maxOptions`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**How many seats, and best available or together.** The party size is the tickets already chosen; the guest only picks the preference, then `recommendSeats` places them.",
     "bindsTo": "SeatRecommendationRequest",
     "confirm": {
      "label": "Recommend seats",
@@ -1092,7 +1013,7 @@
       "maxOptions"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "dateTimeOnSeatMap",
@@ -1520,117 +1441,15 @@
    {
     "id": "confirmRemoveCartLine",
     "component": "confirmDialog",
-    "trigger": "Remove cart line",
+    "trigger": "Remove",
     "body": "**Names what `removeCartLine` changes and what it leaves alone**, in the consequence rather than the verb. A shopping cart this affects should be identified in the dialog, not just counted.",
     "provenance": "client-verified"
    },
    {
     "id": "confirmAbandonCart",
     "component": "confirmDialog",
-    "trigger": "Abandon cart",
+    "trigger": "Empty cart",
     "body": "**Names what `abandonCart` changes and what it leaves alone**, in the consequence rather than the verb. A shopping cart this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreateCart",
-    "component": "modal",
-    "trigger": "Create cart",
-    "body": "**Collects what `createCart` sends before it is called.** Required: `venueId`, `channel`. Optional: `subjectId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Create cart",
-     "operation": "createCart"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "venueId",
-      "channel",
-      "subjectId",
-      "locale"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formAddCartLine",
-    "component": "modal",
-    "trigger": "Add cart line",
-    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add cart line",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "quantity",
-      "performanceId",
-      "seatIds",
-      "parentLineId",
-      "attributes"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formUpdateCartLine",
-    "component": "modal",
-    "trigger": "Save cart line",
-    "body": "**Collects what `updateCartLine` sends before it is called.** Required: `quantity`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save cart line",
-     "operation": "updateCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "quantity"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCheckoutCart",
-    "component": "modal",
-    "trigger": "Checkout cart",
-    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Checkout cart",
-     "operation": "checkoutCart"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "subjectId",
-      "attendees"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formEvaluatePromotions",
-    "component": "modal",
-    "trigger": "Evaluate promotions",
-    "body": "**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "EvaluatePromotionsRequest",
-    "confirm": {
-     "label": "Evaluate promotions",
-     "operation": "evaluatePromotions"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "venueId",
-      "channel",
-      "lines",
-      "subjectId",
-      "membershipTierId",
-      "couponCodes",
-      "evaluateAt"
-     ]
-    },
     "provenance": "client-verified"
    }
   ]
@@ -1898,12 +1717,12 @@
   "app": "guest-web",
   "route": "/cart-and-checkout/checkout-payment",
   "operations": [
-   "transferOrderTickets",
    "createOrder",
    "createPayment",
    "getOrder",
    "inquirePaymentStatus",
-   "getPublishedBookingFlow"
+   "getPublishedBookingFlow",
+   "listPublishedPolicies"
   ],
   "services": [
    "OrderService",
@@ -1914,7 +1733,6 @@
    "redis"
   ],
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
    "catalogue.inventory_hold",
    "catalogue.product",
@@ -1925,14 +1743,13 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order",
-   "orders.ticket_transfer",
    "payments.provider_connection",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
-   "whitelabel.config_version"
+   "whitelabel.config_version",
+   "whitelabel.policy"
   ],
   "writes": [
-   "access.entitlement",
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.inventory_hold",
@@ -1942,7 +1759,6 @@
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
-   "orders.ticket_transfer",
    "payments.payment_attempt",
    "platform.idempotency_record",
    "platform.outbox",
@@ -2005,79 +1821,7 @@
    "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
-  "overlays": [
-   {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreateOrder",
-    "component": "modal",
-    "trigger": "Create order",
-    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateOrderRequest",
-    "confirm": {
-     "label": "Create order",
-     "operation": "createOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "venueId",
-      "channel",
-      "lines",
-      "recordedAt",
-      "shiftId",
-      "subjectId",
-      "guestLinkId",
-      "catalogueBundleVersion"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreatePayment",
-    "component": "modal",
-    "trigger": "Create payment",
-    "body": "**Collects what `createPayment` sends before it is called.** Required: `id`, `orderId`, `tender`, `amount`, `recordedAt`. Optional: `tenderCurrency`, `tenderAmount`, `walletAuthorisationId`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreatePaymentRequest",
-    "confirm": {
-     "label": "Create payment",
-     "operation": "createPayment"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "orderId",
-      "tender",
-      "amount",
-      "recordedAt",
-      "tenderCurrency",
-      "tenderAmount",
-      "walletAuthorisationId",
-      "deviceId"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ]
+  "overlays": []
  },
  "WEB-013": {
   "name": "Booking Confirmation",
@@ -2087,7 +1831,6 @@
   "app": "guest-web",
   "route": "/cart-and-checkout/order-confirmation",
   "operations": [
-   "transferOrderTickets",
    "getOrder",
    "reprintOrder"
   ],
@@ -2099,20 +1842,16 @@
    "redis"
   ],
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
-   "orders.sales_order",
-   "orders.ticket_transfer"
+   "orders.sales_order"
   ],
   "writes": [
-   "access.entitlement",
    "cache:idempotency",
-   "orders.sales_order",
-   "orders.ticket_transfer"
+   "orders.sales_order"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -2178,31 +1917,12 @@
   },
   "overlays": [
    {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "formReprintOrder",
     "component": "modal",
-    "trigger": "Reprint order",
-    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Resend my tickets",
+    "body": "**Where to send them**: email or SMS to the contact on the order, or another address the guest types. `reprintOrder` with `delivery` email or sms; nothing else is asked.",
     "confirm": {
-     "label": "Reprint order",
+     "label": "Send",
      "operation": "reprintOrder"
     },
     "dismiss": {
@@ -2215,7 +1935,7 @@
       "reason"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -2285,26 +2005,7 @@
    "emptyNoAccess": "**The token is the credential, so there is no permission case** \u2014 either it resolves or it has gone.",
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
-  "overlays": [
-   {
-    "id": "formPayByLink",
-    "component": "modal",
-    "trigger": "Pay by link",
-    "body": "**Collects what `payByLink` sends before it is called.** Required: `providerToken`. Optional: `email`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Pay by link",
-     "operation": "payByLink"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "providerToken",
-      "email"
-     ]
-    },
-    "provenance": "designed"
-   }
-  ]
+  "overlays": []
  },
  "WEB-015": {
   "name": "Branded Queue / Waiting Room",
@@ -3008,10 +2709,8 @@
   "app": "guest-web",
   "route": "/account-and-self-service/order-history",
   "operations": [
-   "transferOrderTickets",
    "listMyOrders",
    "getOrder",
-   "listOrders",
    "createRefundRequest",
    "listTaxInvoices",
    "issueTaxInvoice",
@@ -3028,7 +2727,6 @@
    "redis"
   ],
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
    "ledger.credit_memo",
    "ledger.credit_memo_line",
@@ -3045,17 +2743,14 @@
    "orders.payment",
    "orders.refund_policy",
    "orders.sales_order",
-   "orders.ticket_transfer",
    "pii.subject"
   ],
   "writes": [
-   "access.entitlement",
    "cache:idempotency",
    "ledger.tax_invoice",
    "ledger.tax_invoice_line",
    "ledger.tax_invoice_template",
    "orders.refund",
-   "orders.ticket_transfer",
    "platform.audit_record",
    "platform.outbox"
   ],
@@ -3109,7 +2804,7 @@
    {
     "id": "formCreateRefundRequest",
     "component": "modal",
-    "trigger": "Create refund request",
+    "trigger": "Ask for a refund",
     "body": "**Collects what `createRefundRequest` sends before it is called.** Required: `orderId`, `reason`. Optional: `lineIds`. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Create refund request",
@@ -3121,25 +2816,6 @@
       "orderId",
       "reason",
       "lineIds"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
      ]
     },
     "provenance": "client-verified"
@@ -3442,22 +3118,17 @@
    {
     "id": "formStorePaymentToken",
     "component": "modal",
-    "trigger": "Store payment token",
-    "body": "**Collects what `storePaymentToken` sends before it is called.** Required: `providerId`, `providerToken`, `consentPurposeId`. Optional: `setDefault`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Add a card",
+    "body": "**The gateway's own card form**, hosted by the provider; it returns the token that `storePaymentToken` saves with the guest's consent. No token, provider or consent id is ever a field.",
     "confirm": {
-     "label": "Store payment token",
+     "label": "Save card",
      "operation": "storePaymentToken"
     },
     "dismiss": {
      "label": "Cancel",
-     "discards": [
-      "providerId",
-      "providerToken",
-      "consentPurposeId",
-      "setDefault"
-     ]
+     "discards": []
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "formTransferWalletBalance",
@@ -3491,8 +3162,7 @@
   "operations": [
    "listProducts",
    "getProduct",
-   "getMyMemberships",
-   "listGuestMemberships"
+   "getMyMemberships"
   ],
   "services": [
    "CatalogueService"
@@ -3502,13 +3172,11 @@
   ],
   "reads": [
    "access.entitlement",
-   "catalogue.entitlement_template",
    "catalogue.product",
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
    "marketing.loyalty_position",
-   "orders.sales_order",
    "whitelabel.guided_choice_answer"
   ],
   "writes": [],
@@ -3548,7 +3216,7 @@
    "loading": "The membership plans list.",
    "error": "Could not load. Names which read failed and leaves the membership plans untouched.",
    "emptyFirstRun": "No membership plans yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the membership plans are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Never shown: the plans are the venue's membership products, with no filter a guest sets.",
    "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -3566,9 +3234,7 @@
    "getBillingStatement",
    "listMyPaymentIssues",
    "retryMyDunningPayment",
-   "transferOrderTickets",
    "getMyMemberships",
-   "listGuestMemberships",
    "listInstalmentPlans",
    "createInstalmentPlan"
   ],
@@ -3583,13 +3249,11 @@
   "reads": [
    "access.entitlement",
    "cache:idempotency",
-   "catalogue.entitlement_template",
    "catalogue.product",
    "ledger.tax_invoice_line",
    "marketing.loyalty_position",
    "orders.payment",
    "orders.sales_order",
-   "orders.ticket_transfer",
    "payments.dunning_case",
    "payments.instalment",
    "payments.instalment_plan",
@@ -3597,10 +3261,8 @@
    "payments.token"
   ],
   "writes": [
-   "access.entitlement",
    "cache:idempotency",
    "orders.payment",
-   "orders.ticket_transfer",
    "payments.dunning_case",
    "payments.instalment",
    "payments.instalment_plan",
@@ -3653,7 +3315,7 @@
    {
     "id": "formRetryMyDunningPayment",
     "component": "modal",
-    "trigger": "Retry my dunning payment",
+    "trigger": "Retry the payment",
     "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RetryDunningPaymentRequest",
     "confirm": {
@@ -3664,25 +3326,6 @@
      "label": "Cancel",
      "discards": [
       "paymentTokenId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
      ]
     },
     "provenance": "client-verified"
@@ -4303,7 +3946,7 @@
    "loading": "Venue details",
    "error": "Could not load. Falls back to the tenant contact details from the cached config",
    "emptyFirstRun": "\u2014",
-   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
@@ -4346,7 +3989,7 @@
    "loading": "\u2014",
    "error": "**This screen is the error state.** It distinguishes sold out, closed, and platform unavailable \u2014 three different things a guest must not confuse, because only one means come back later",
    "emptyFirstRun": "\u2014",
-   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.",
    "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's \u2014 an error or maintenance page shown for a dropped signal tells a guest the venue is down.",
    "soldOut": "**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)).",
    "closed": "**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f))."
@@ -4362,8 +4005,7 @@
   "route": "/ticket-transfer",
   "operations": [
    "transferOrderTickets",
-   "claimTicketTransfer",
-   "listOrders",
+   "listMyOrders",
    "createResaleListing"
   ],
   "services": [
@@ -4378,9 +4020,13 @@
    "cache:idempotency",
    "catalogue.entitlement_template",
    "orders.order_line",
+   "orders.order_line_discount",
+   "orders.order_line_eligibility",
+   "orders.payment",
    "orders.resale_listing",
    "orders.sales_order",
-   "orders.ticket_transfer"
+   "orders.ticket_transfer",
+   "pii.subject"
   ],
   "writes": [
    "access.entitlement",
@@ -4453,10 +4099,10 @@
    {
     "id": "formTransferOrderTickets",
     "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Transfer tickets",
+    "body": "**Pick the tickets on their cards, then the friend**: a channel (email, SMS or WhatsApp) and the address, with an optional message. `transferOrderTickets` moves ownership; the recipient claims from the link they receive.",
     "confirm": {
-     "label": "Transfer order tickets",
+     "label": "Transfer tickets",
      "operation": "transferOrderTickets"
     },
     "dismiss": {
@@ -4467,24 +4113,7 @@
       "message"
      ]
     },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formClaimTicketTransfer",
-    "component": "modal",
-    "trigger": "Claim ticket transfer",
-    "body": "**Collects what `claimTicketTransfer` sends before it is called.** Required: `claimToken`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Claim ticket transfer",
-     "operation": "claimTicketTransfer"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "claimToken"
-     ]
-    },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -4610,33 +4239,21 @@
    {
     "id": "formUpdateTableReservation",
     "component": "modal",
-    "trigger": "Save table reservation",
-    "body": "**Collects what `updateTableReservation` sends before it is called.** Required: `outletId`, `partySize`, `startsAt`. Optional: `id`, `subjectId`, `guestName`, `contactPoint`, `durationMinutes`, `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Change reservation",
+    "body": "**Party size and time, or cancel.** `updateTableReservation` with what the guest changed; the outlet, tables, status and visit are the venue's and never shown.",
     "bindsTo": "TableReservation",
     "confirm": {
-     "label": "Save table reservation",
+     "label": "Save",
      "operation": "updateTableReservation"
     },
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "outletId",
       "partySize",
-      "startsAt",
-      "id",
-      "subjectId",
-      "guestName",
-      "contactPoint",
-      "durationMinutes",
-      "tables",
-      "status",
-      "groupId",
-      "notes",
-      "actualPartySize",
-      "tableVisitId"
+      "startsAt"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -4678,7 +4295,7 @@
    "loading": "The offers promotions list.",
    "error": "Could not load. Names which read failed and leaves the offers promotions untouched.",
    "emptyFirstRun": "No offers promotions yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, status, activeAt and the offers promotions are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Never shown as a filter result: no offer is active at this venue now, said plainly.",
    "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -4769,35 +4386,11 @@
    "loading": "The shop list.",
    "error": "Could not load. Names which read failed and leaves the shop untouched.",
    "emptyFirstRun": "No shop yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing.",
-   "emptyNoResults": "Nothing matches the filter on outletId, categoryId, inStockOnly, search and the shop are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Nothing matches the shop, category or search picked; the other products are still there. Names it and offers to clear it.",
    "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
-  "overlays": [
-   {
-    "id": "formAddCartLine",
-    "component": "modal",
-    "trigger": "Add cart line",
-    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add cart line",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "quantity",
-      "performanceId",
-      "seatIds",
-      "parentLineId",
-      "attributes"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ]
+  "overlays": []
  },
  "WEB-034": {
   "name": "Lost & Found",
@@ -4961,8 +4554,8 @@
   "states": {
    "loading": "The multi-currency pricing list.",
    "error": "Could not load. Names which read failed and leaves the multi-currency pricing untouched.",
-   "emptyFirstRun": "No multi-currency pricing yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on asAt, purpose and the multi-currency pricing are still there. Names the active filter and offers to clear it.",
+   "emptyFirstRun": "Not reachable: with no other currency at the venue the screen is not linked, and prices stay in the venue's currency.",
+   "emptyNoResults": "Never shown: the screen sends no filter a guest chose.",
    "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows. Last known rates stay, with their age.** A rate is a number a guest may act on, and an undated one they cannot judge."
   },
@@ -5061,7 +4654,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection \u2014 an order placed offline is food nobody is making."
   },
   "overlays": [
@@ -5228,7 +4821,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused \u2014 availability changes by the minute."
   },
   "overlays": [
@@ -5303,7 +4896,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The last status stays on screen with its age and is never presented as current. Settling the bill waits for the connection."
   },
   "overlays": [
@@ -5379,8 +4972,8 @@
    "loading": "Content resolves in place.",
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
-   "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoResults": "No attraction of the category picked; the other categories stay.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live \u2014 a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect."
   },
   "overlays": []
@@ -5442,7 +5035,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection \u2014 a place taken offline is a place nobody else can see."
   },
   "overlays": [
@@ -5509,8 +5102,6 @@
   "operations": [
    "listParkingFacilities",
    "addCartLine",
-   "checkoutCart",
-   "createPayment",
    "updateParkingEntitlement"
   ],
   "services": [
@@ -5526,41 +5117,19 @@
    "access.parking_facility",
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.variant",
-   "ledger.fx_rate",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
-   "orders.cart_line",
-   "orders.fraud_rule",
-   "orders.order_line",
-   "orders.order_line_discount",
-   "orders.order_line_eligibility",
-   "orders.payment",
-   "orders.sales_order",
-   "payments.provider_connection"
+   "orders.cart_line"
   ],
   "writes": [
    "access.parking_entitlement",
    "cache:idempotency",
-   "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
-   "ledger.journal_entry",
-   "ledger.journal_line",
-   "marketing.consent_record",
    "orders.cart",
    "orders.cart_line",
-   "orders.order_event",
-   "orders.order_line",
-   "orders.order_line_discount",
-   "orders.order_line_eligibility",
-   "orders.payment",
-   "orders.sales_order",
-   "payments.payment_attempt",
-   "platform.idempotency_record",
-   "platform.outbox"
+   "platform.idempotency_record"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -5579,8 +5148,8 @@
    "loading": "Content resolves in place.",
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
-   "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoResults": "Never shown: the car parks are the venue's, with no filter a guest sets.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection.",
    "soldOutForDay": "**The car park is full.** `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then \u2014 there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166)."
   },
@@ -5608,22 +5177,20 @@
    {
     "id": "formUpdateParkingEntitlement",
     "component": "modal",
-    "trigger": "Save parking entitlement",
-    "body": "**Collects what `updateParkingEntitlement` sends before it is called.** Nothing in the body is required. Optional: `plateNumber`, `plateCountry`, `status`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Change plate",
+    "body": "**The plate only.** `updateParkingEntitlement` with the new plate; a guest never sets a status.",
     "bindsTo": "UpdateParkingEntitlementRequest",
     "confirm": {
-     "label": "Save parking entitlement",
+     "label": "Save",
      "operation": "updateParkingEntitlement"
     },
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "plateNumber",
-      "plateCountry",
-      "status"
+      "plate"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -5708,7 +5275,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection."
   },
   "overlays": [
@@ -5807,7 +5374,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** \u2014 and that is said. Redeeming and referring need the connection."
   },
   "overlays": [
@@ -5966,7 +5533,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "overlays": [
@@ -6073,21 +5640,24 @@
   "app": "guest-web",
   "route": "/help-centre-and-accessibility",
   "operations": [
-   "listFaqs",
-   "listContentPages",
-   "getTenantAppStatus"
+   "listPublishedFaqs",
+   "listPublishedContentPages",
+   "getTenantAppStatus",
+   "listPublishedPolicies"
   ],
   "services": [
    "WhiteLabelService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.faq_category",
    "whitelabel.faq_entry",
+   "whitelabel.policy",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -6108,8 +5678,8 @@
    "loading": "Content resolves in place.",
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
-   "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoResults": "No question or page matches what was typed; the categories stay. Names the search and offers to clear it.",
+   "emptyNoAccess": "**Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.",
    "offline": "**The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising a case is disabled offline** \u2014 it needs the connection (decided 28 September, audit R148) \u2014 and the screen says how to reach staff in person instead: the guest services desk, or any member of staff."
   },
   "overlays": []
@@ -6161,7 +5731,7 @@
    "loading": "Content resolves in place.",
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late.",
    "emptyNoResults": "**No unread notifications.** Names the Unread only filter and offers to show all; the read ones are still there."
   },
@@ -6635,10 +6205,10 @@
   "route": "/general/home-default",
   "operations": [
    "getTenantAppStatus",
-   "getGuestProfile",
+   "getMyProfile",
    "listMyEntitlements",
    "searchCatalogue",
-   "getTenantConfig",
+   "getPublishedTenantConfig",
    "getCookieConsentRuntime",
    "recordDeviceConsent",
    "listAnalyticsProviders",
@@ -6677,27 +6247,15 @@
    "catalogue.product_media",
    "catalogue.variant",
    "identity.delegated_access",
-   "marketing.consent_record",
    "marketing.cookie_banner_design",
    "marketing.device_consent",
    "marketing.device_consent_category",
+   "marketing.guest_preference",
    "marketing.guest_profile",
-   "marketing.loyalty_position",
    "marketing.tracking_technology",
-   "pii.subject",
-   "pii.subject_contact",
    "whitelabel.analytics_provider",
-   "whitelabel.booking_flow",
-   "whitelabel.booking_flow_step",
    "whitelabel.config_version",
-   "whitelabel.feature_toggle",
-   "whitelabel.footer_config",
-   "whitelabel.footer_config_column",
-   "whitelabel.footer_config_social_link",
    "whitelabel.guided_choice_answer",
-   "whitelabel.homepage_section",
-   "whitelabel.module_enablement",
-   "whitelabel.navigation_item",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -7200,8 +6758,8 @@
    "loading": "The home default list.",
    "error": "Could not load. Names which read failed and leaves the home default untouched.",
    "emptyFirstRun": "No home default yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on state, includeShared and the home default are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getGuestProfile` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Nothing is on sale at this venue today. Said in the tenant's voice, with **Change venue**; the venue overview and the type tiles stay.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing.",
    "introVideo": "First-launch state (MOB-5): the intro video overlay plays over Home while Home loads behind it; Skip introduction reveals Home."
   },
@@ -7296,8 +6854,8 @@
    "loading": "The explore categories list.",
    "error": "Could not load. Names which read failed and leaves the explore categories untouched.",
    "emptyFirstRun": "No explore categories yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the explore categories are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Nothing in the category picked; the other categories are still there.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
@@ -7427,8 +6985,8 @@
    "loading": "The event attraction listing list.",
    "error": "Could not load. Names which read failed and leaves the event attraction listing untouched.",
    "emptyFirstRun": "No event attraction listing yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the event attraction listing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Nothing matches what was typed or picked; the other tickets are still there. Names it and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
@@ -7577,8 +7135,8 @@
    "videoUnavailable": "The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader.",
    "error": "Could not load. Names which read failed and leaves the attraction untouched.",
    "emptyFirstRun": "No attraction yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getProductEligibilityRule` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "No performance in the next days shown; the strip says so and offers the calendar.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
@@ -7643,7 +7201,7 @@
    "error": "Could not load. Names which read failed and leaves the what's untouched.",
    "emptyFirstRun": "No what's yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on from, to and the what's are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
@@ -7713,7 +7271,7 @@
    "loading": "The event exhibition, read by `getPerformance`.",
    "error": "Could not load. Names which read failed and leaves the event exhibition untouched.",
    "emptyFirstRun": "No event exhibition yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getPerformance` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
@@ -7843,29 +7401,27 @@
    "loading": "The select date time list.",
    "error": "Could not load. Names which read failed and leaves the select date time untouched.",
    "emptyFirstRun": "No select date time yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on from, to and the select date time are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "No time matches the part of the day or the language picked, and the other times are still there. Names the filter and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
    {
-    "id": "formCheckBookingEligibility",
-    "component": "modal",
-    "trigger": "Check booking eligibility",
-    "body": "**Collects what `checkBookingEligibility` sends before it is called.** Required: `productIds`, `party`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "EligibilityCheckRequest",
+    "id": "eligibilityDeclaration",
+    "component": "drawer",
+    "trigger": "Once, on leaving selection, when a chosen product has an eligibility rule",
+    "body": "**The party's age and height, asked once per person** (DI-1037; REV3 DG-3) for the products that set a rule, then checked with `checkBookingEligibility`. A person who does not meet a rule is named with the product, and the guest changes the selection; never a button, and never a form of product ids.",
     "confirm": {
-     "label": "Check booking eligibility",
+     "label": "Continue",
      "operation": "checkBookingEligibility"
     },
     "dismiss": {
-     "label": "Cancel",
+     "label": "Back",
      "discards": [
-      "productIds",
       "party"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "consentQuestions",
@@ -8052,16 +7608,15 @@
   "app": "guest-app",
   "route": "/general/review-and-payment",
   "operations": [
-   "transferOrderTickets",
    "createPayment",
    "inquirePaymentStatus",
    "checkoutCart",
    "getCart",
-   "addCartLine",
    "createOrder",
    "getPaymentLink",
    "payByLink",
-   "getPublishedBookingFlow"
+   "getPublishedBookingFlow",
+   "listPublishedPolicies"
   ],
   "services": [
    "OrderService",
@@ -8072,14 +7627,11 @@
    "redis"
   ],
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.inventory_hold",
-   "catalogue.performance",
    "catalogue.product",
    "catalogue.product_category",
-   "catalogue.variant",
    "ledger.fx_rate",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -8093,14 +7645,14 @@
    "orders.payment_link",
    "orders.reservation",
    "orders.sales_order",
-   "orders.ticket_transfer",
    "payments.provider",
    "payments.provider_connection",
    "platform.scope",
    "promotions.promotion",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
-   "whitelabel.config_version"
+   "whitelabel.config_version",
+   "whitelabel.policy"
   ],
   "writes": [
    "access.entitlement",
@@ -8111,7 +7663,6 @@
    "ledger.journal_line",
    "marketing.consent_record",
    "orders.cart",
-   "orders.cart_line",
    "orders.order_event",
    "orders.order_line",
    "orders.order_line_discount",
@@ -8120,7 +7671,6 @@
    "orders.payment_link",
    "orders.reservation",
    "orders.sales_order",
-   "orders.ticket_transfer",
    "payments.payment_attempt",
    "platform.idempotency_record",
    "platform.outbox",
@@ -8161,140 +7711,10 @@
    "loading": "The review payment, read by `getCart`.",
    "error": "Could not load. Names which read failed and leaves the review payment untouched.",
    "emptyFirstRun": "No review payment yet. Offers Create payment (`createPayment`).",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getPaymentLink` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
-  "overlays": [
-   {
-    "id": "formAcquireInventoryHold",
-    "component": "modal",
-    "trigger": "Add to cart",
-    "body": "**Collects what `addCartLine` sends before it is called; the cart takes the hold server-side.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add to cart",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "channelCapacityId",
-      "requestedUnits",
-      "ttlSeconds",
-      "channel"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreateOrder",
-    "component": "modal",
-    "trigger": "Create order",
-    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateOrderRequest",
-    "confirm": {
-     "label": "Create order",
-     "operation": "createOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "venueId",
-      "channel",
-      "lines",
-      "recordedAt",
-      "shiftId",
-      "subjectId",
-      "guestLinkId",
-      "catalogueBundleVersion"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formPayByLink",
-    "component": "modal",
-    "trigger": "Pay by link",
-    "body": "**Collects what `payByLink` sends before it is called.** Required: `providerToken`. Optional: `email`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Pay by link",
-     "operation": "payByLink"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "providerToken",
-      "email"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreatePayment",
-    "component": "modal",
-    "trigger": "Create payment",
-    "body": "**Collects what `createPayment` sends before it is called.** Required: `id`, `orderId`, `tender`, `amount`, `recordedAt`. Optional: `tenderCurrency`, `tenderAmount`, `walletAuthorisationId`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreatePaymentRequest",
-    "confirm": {
-     "label": "Create payment",
-     "operation": "createPayment"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "orderId",
-      "tender",
-      "amount",
-      "recordedAt",
-      "tenderCurrency",
-      "tenderAmount",
-      "walletAuthorisationId",
-      "deviceId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCheckoutCart",
-    "component": "modal",
-    "trigger": "Checkout cart",
-    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Checkout cart",
-     "operation": "checkoutCart"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "subjectId",
-      "attendees"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ]
+  "overlays": []
  },
  "GST-010": {
   "name": "Booking Confirmation",
@@ -8304,7 +7724,6 @@
   "app": "guest-app",
   "route": "/general/booking-confirmation",
   "operations": [
-   "transferOrderTickets",
    "getOrder",
    "reprintOrder"
   ],
@@ -8316,20 +7735,16 @@
    "redis"
   ],
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
-   "orders.sales_order",
-   "orders.ticket_transfer"
+   "orders.sales_order"
   ],
   "writes": [
-   "access.entitlement",
    "cache:idempotency",
-   "orders.sales_order",
-   "orders.ticket_transfer"
+   "orders.sales_order"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -8355,36 +7770,17 @@
    "loading": "The booking confirmation, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the booking confirmation untouched.",
    "emptyFirstRun": "No booking confirmation yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
    {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "formReprintOrder",
     "component": "modal",
-    "trigger": "Reprint order",
-    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Resend my tickets",
+    "body": "**Where to send them**: email or SMS to the contact on the order, or another address the guest types. `reprintOrder` with `delivery` email or sms; nothing else is asked.",
     "confirm": {
-     "label": "Reprint order",
+     "label": "Send",
      "operation": "reprintOrder"
     },
     "dismiss": {
@@ -8397,7 +7793,7 @@
       "reason"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -8482,7 +7878,7 @@
    "error": "Could not load. Names which read failed and leaves the wallet overview untouched.",
    "emptyFirstRun": "No wallet overview yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "overlays": []
@@ -8561,7 +7957,7 @@
    "error": "Could not load. Names which read failed and leaves the tickets untouched.",
    "emptyFirstRun": "No tickets yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on state, includeShared and the tickets are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection."
   },
   "overlays": [
@@ -8660,7 +8056,7 @@
    "loading": "Availability is live, never cached",
    "error": "Availability unavailable. **Selection is blocked** \u2014 overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getEntitlement` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection."
   },
   "overlays": [
@@ -8717,7 +8113,7 @@
   "operations": [
    "transferOrderTickets",
    "claimTicketTransfer",
-   "listOrders"
+   "listMyOrders"
   ],
   "services": [
    "OrderService"
@@ -8730,8 +8126,12 @@
    "access.entitlement",
    "cache:idempotency",
    "orders.order_line",
+   "orders.order_line_discount",
+   "orders.order_line_eligibility",
+   "orders.payment",
    "orders.sales_order",
-   "orders.ticket_transfer"
+   "orders.ticket_transfer",
+   "pii.subject"
   ],
   "writes": [
    "access.entitlement",
@@ -8764,17 +8164,17 @@
    "error": "Availability unavailable. **Selection is blocked** \u2014 overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket transfer are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection \u2014 a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible."
   },
   "overlays": [
    {
     "id": "formTransferOrderTickets",
     "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Transfer tickets",
+    "body": "**Pick the tickets on their cards, then the friend**: a channel (email, SMS or WhatsApp) and the address, with an optional message. `transferOrderTickets` moves ownership; the recipient claims from the link they receive.",
     "confirm": {
-     "label": "Transfer order tickets",
+     "label": "Transfer tickets",
      "operation": "transferOrderTickets"
     },
     "dismiss": {
@@ -8785,24 +8185,7 @@
       "message"
      ]
     },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formClaimTicketTransfer",
-    "component": "modal",
-    "trigger": "Claim ticket transfer",
-    "body": "**Collects what `claimTicketTransfer` sends before it is called.** Required: `claimToken`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Claim ticket transfer",
-     "operation": "claimTicketTransfer"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "claimToken"
-     ]
-    },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -8822,7 +8205,6 @@
    "listDelegations",
    "grantDelegation",
    "listProducts",
-   "listGuestMemberships",
    "listInstalmentPlans",
    "createInstalmentPlan"
   ],
@@ -8838,7 +8220,6 @@
   "reads": [
    "access.entitlement",
    "cache:idempotency",
-   "catalogue.entitlement_template",
    "catalogue.product",
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
@@ -8898,14 +8279,14 @@
    "error": "Could not load. Names which read failed and leaves the memberships untouched.",
    "emptyFirstRun": "No memberships yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on from, to and the memberships are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getMyMemberships` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
    {
     "id": "formRetryMyDunningPayment",
     "component": "modal",
-    "trigger": "Retry my dunning payment",
+    "trigger": "Retry the payment",
     "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RetryDunningPaymentRequest",
     "confirm": {
@@ -8923,10 +8304,10 @@
    {
     "id": "formGrantDelegation",
     "component": "modal",
-    "trigger": "Grant delegation",
-    "body": "**Collects what `grantDelegation` sends before it is called.** Required: `overSubjectId`, `delegationKind`, `permission`. Optional: `overObjectRef`, `quota`, `validTo`, `isRevocableBySubject`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Let a family member use it",
+    "body": "**Pick the family member, then what they may do, in plain words** (book with it, enter with it, see the bills), and how many times. `grantDelegation` with the person and the permission the choice stands for; no subject id, delegation kind or permission key is shown.",
     "confirm": {
-     "label": "Grant delegation",
+     "label": "Allow",
      "operation": "grantDelegation"
     },
     "dismiss": {
@@ -8941,7 +8322,7 @@
       "isRevocableBySubject"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -9009,8 +8390,8 @@
    "loading": "The reservations list.",
    "error": "Could not load. Names which read failed and leaves the reservations untouched.",
    "emptyFirstRun": "No reservations yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on status, expiringWithinMinutes and the reservations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown as a filter result: an empty tab says there is nothing upcoming (or past) and offers to book.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection \u2014 a table held offline is a table two people think they have."
   },
   "overlays": [
@@ -9076,7 +8457,7 @@
    "loading": "The reservation, read by `getReservation`.",
    "error": "Could not load. Names which read failed and leaves the reservation untouched.",
    "emptyFirstRun": "No reservation yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getReservation` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection \u2014 a table held offline is a table two people think they have."
   },
   "overlays": [
@@ -9101,7 +8482,6 @@
    "getVisitReminder",
    "setVisitReminder",
    "getOrder",
-   "listOrders",
    "issueWalletPass"
   ],
   "services": [
@@ -9154,7 +8534,7 @@
    "error": "Could not load. Names which read failed and leaves the add calendar reminders untouched.",
    "emptyFirstRun": "No add calendar reminders yet. Offers Issue wallet pass (`issueWalletPass`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the add calendar reminders are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrderCalendarEvent` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
@@ -9162,7 +8542,7 @@
     "id": "formSetVisitReminder",
     "component": "modal",
     "trigger": "Save visit reminder",
-    "body": "**Collects what `setVisitReminder` sends before it is called.** Required: `enabled`. Optional: `id`, `orderId`, `subjectId`, `leadTimeMinutes`, `channels`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**On or off, how long before, and by which channels.** `setVisitReminder` for this order; the reminder's id and the guest are the server's.",
     "bindsTo": "VisitReminder",
     "confirm": {
      "label": "Save visit reminder",
@@ -9172,15 +8552,11 @@
      "label": "Cancel",
      "discards": [
       "enabled",
-      "id",
-      "orderId",
-      "subjectId",
       "leadTimeMinutes",
-      "channels",
-      "scopePath"
+      "channels"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "formIssueWalletPass",
@@ -9210,10 +8586,8 @@
   "app": "guest-app",
   "route": "/general/order-history-wallet",
   "operations": [
-   "listOrders",
    "getOrder",
    "listMyOrders",
-   "transferOrderTickets",
    "listTaxInvoices",
    "issueTaxInvoice",
    "getTaxInvoice",
@@ -9229,7 +8603,6 @@
    "redis"
   ],
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
    "ledger.credit_memo",
    "ledger.credit_memo_line",
@@ -9244,16 +8617,13 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order",
-   "orders.ticket_transfer",
    "pii.subject"
   ],
   "writes": [
-   "access.entitlement",
    "cache:idempotency",
    "ledger.tax_invoice",
    "ledger.tax_invoice_line",
    "ledger.tax_invoice_template",
-   "orders.ticket_transfer",
    "platform.audit_record",
    "platform.outbox"
   ],
@@ -9291,30 +8661,10 @@
    "error": "Could not load. Names which read failed and leaves the order history untouched.",
    "emptyFirstRun": "No order history yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
-  "overlays": [
-   {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ]
+  "overlays": []
  },
  "GST-020": {
   "name": "Saved Items / Wishlist",
@@ -9480,8 +8830,8 @@
    "loading": "The interactive map list.",
    "error": "Could not load. Names which read failed and leaves the interactive map untouched.",
    "emptyFirstRun": "No interactive map yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the interactive map are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "No point of that category on this map; the other categories stay.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live \u2014 a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect.",
    "map3dUnavailable": "**No 3D model for this map: the 2D map, same route** (ADR-0069; client meeting 30 September, MoM 4.8). The venue has not published a GLB model for this map (the default for every venue until it supplies one), the phone fails the 3D capability check, or rendering drops below 20 fps. The 2D map shows the same route from `getVenueMapGraph` and the same live position dot; the 2D/3D toggle is hidden and nothing else is said: no message, no error.",
    "weakGps": "**Position approximate** (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or the route runs along an indoor path. The dot dims and an approximate-position ring is drawn round the last confident position, labelled *Position approximate*; the turn list and the remaining distance stay, and *I am at\u2026* (tap a nearby location, or scan its QR sign) re-anchors. Routing does not stop, in 3D or in 2D."
@@ -9626,7 +8976,7 @@
    "loading": "The virtual queue, read by `getWaitingGuest`.",
    "error": "Could not load. Names which read failed and leaves the virtual queue untouched.",
    "emptyFirstRun": "No virtual queue yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection \u2014 a place taken offline is a place nobody else can see."
   },
   "overlays": [
@@ -9753,7 +9103,7 @@
    "error": "Could not load. Names which read failed and leaves the browse order untouched.",
    "emptyFirstRun": "No browse order yet. Offers Create guest F&B order (`createGuestFnbOrder`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on mode, date and the browse order are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getFnbDeliveryPolicy` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection \u2014 an order placed offline is food nobody is making."
   },
   "overlays": [
@@ -10037,7 +9387,7 @@
    "error": "Could not load. Names which read failed and leaves the retail merchandise untouched.",
    "emptyFirstRun": "No retail merchandise yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on outletId, categoryId, inStockOnly, search and the retail merchandise are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
@@ -10096,8 +9446,6 @@
   "route": "/general/parking-reserve-and-pay",
   "operations": [
    "addCartLine",
-   "checkoutCart",
-   "createPayment",
    "updateParkingEntitlement",
    "listParkingFacilities"
   ],
@@ -10114,41 +9462,19 @@
    "access.parking_facility",
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.variant",
-   "ledger.fx_rate",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
-   "orders.cart_line",
-   "orders.fraud_rule",
-   "orders.order_line",
-   "orders.order_line_discount",
-   "orders.order_line_eligibility",
-   "orders.payment",
-   "orders.sales_order",
-   "payments.provider_connection"
+   "orders.cart_line"
   ],
   "writes": [
    "access.parking_entitlement",
    "cache:idempotency",
-   "catalogue.channel_capacity",
-   "catalogue.inventory_hold",
-   "ledger.journal_entry",
-   "ledger.journal_line",
-   "marketing.consent_record",
    "orders.cart",
    "orders.cart_line",
-   "orders.order_event",
-   "orders.order_line",
-   "orders.order_line_discount",
-   "orders.order_line_eligibility",
-   "orders.payment",
-   "orders.sales_order",
-   "payments.payment_attempt",
-   "platform.idempotency_record",
-   "platform.outbox"
+   "platform.idempotency_record"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -10183,8 +9509,8 @@
    "loading": "Terminal or gateway state, shown plainly",
    "error": "**Declined reads differently from unresolved.** An unresolved payment inquires rather than retries, and nothing is issued until it resolves",
    "emptyFirstRun": "\u2014",
-   "emptyNoResults": "Nothing matches the filter on venueId and the parking reserve pay are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: the car parks are the venue's, with no filter a guest sets.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection.",
    "soldOutForDay": "**The car park is full.** `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then \u2014 there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166)."
   },
@@ -10212,22 +9538,20 @@
    {
     "id": "formUpdateParkingEntitlement",
     "component": "modal",
-    "trigger": "Save parking entitlement",
-    "body": "**Collects what `updateParkingEntitlement` sends before it is called.** Nothing in the body is required. Optional: `plateNumber`, `plateCountry`, `status`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Change plate",
+    "body": "**The plate only.** `updateParkingEntitlement` with the new plate; a guest never sets a status.",
     "bindsTo": "UpdateParkingEntitlementRequest",
     "confirm": {
-     "label": "Save parking entitlement",
+     "label": "Save",
      "operation": "updateParkingEntitlement"
     },
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "plateNumber",
-      "plateCountry",
-      "status"
+      "plate"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -10292,8 +9616,8 @@
    "loading": "The parking reservation confirmed list.",
    "error": "Could not load. Names which read failed and leaves the parking reservation confirmed untouched.",
    "emptyFirstRun": "**Paid, entitlement not yet shown.** The order is paid and the entitlement is issued at payment; until it appears the screen shows the order and says the car park pass follows (audit R166).",
-   "emptyNoResults": "Nothing matches the filter on venueId and the parking reservation confirmed are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: the confirmation shows one order's parking.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection."
   },
   "overlays": []
@@ -10538,7 +9862,7 @@
    "loading": "The concierge home, read by `getGuestMenu`.",
    "error": "Could not load. Names which read failed and leaves the concierge home untouched.",
    "emptyFirstRun": "No concierge home yet. Offers Create AI conversation (`createAiConversation`).",
-   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "overlays": [
@@ -10751,35 +10075,11 @@
    "loading": "The concierge chat, read by `getGuestOrderStatus`.",
    "error": "Could not load. Names which read failed and leaves the concierge chat untouched.",
    "emptyFirstRun": "No concierge chat yet. Offers Create guest F&B order (`createGuestFnbOrder`).",
-   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable.",
+   "emptyNoResults": "Nothing the concierge found matches the question; it says so in the conversation and offers to hand over to a person."
   },
   "overlays": [
-   {
-    "id": "formCreateGuestFnbOrder",
-    "component": "modal",
-    "trigger": "Create guest F&B order",
-    "body": "**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`, `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateGuestOrderRequest",
-    "confirm": {
-     "label": "Create guest F&B order",
-     "operation": "createGuestFnbOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "lines",
-      "quotedTotal",
-      "recordedAt",
-      "locationSessionId",
-      "outletId",
-      "fulfilment",
-      "paymentMethod"
-     ]
-    },
-    "provenance": "client-verified"
-   },
    {
     "id": "formAddCartLine",
     "component": "modal",
@@ -10945,7 +10245,7 @@
    "loading": "The saved concierge contextual help.",
    "error": "Could not load. Names which read failed and leaves the concierge contextual help untouched.",
    "emptyFirstRun": "No concierge contextual help configured. The form opens empty and `sendAiMessage` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "overlays": []
@@ -11206,7 +10506,7 @@
    "error": "Could not load. Names which read failed and leaves the loyalty rewards untouched.",
    "emptyFirstRun": "No loyalty rewards yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listLoyaltyProgrammes` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** \u2014 and that is said. Redeeming and referring need the connection."
   },
   "overlays": []
@@ -11265,8 +10565,8 @@
    "loading": "The offers promotions list.",
    "error": "Could not load. Names which read failed and leaves the offers promotions untouched.",
    "emptyFirstRun": "No offers promotions yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, status, activeAt and the offers promotions are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown as a filter result: no offer is active at this venue now, said plainly.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
@@ -11364,8 +10664,8 @@
    "loading": "The digital companion mode list.",
    "error": "Could not load. Names which read failed and leaves the digital companion mode untouched.",
    "emptyFirstRun": "No digital companion mode yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the digital companion mode are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Nothing under the chosen tab right now; the other tabs stay.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing.",
    "map3dUnavailable": "**No 3D model for this map: the 2D map, same route** (ADR-0069; client meeting 30 September, MoM 4.8). The Map view of this screen is GST-021's map (one implementation): where the venue has not published a GLB model (the default until it supplies one), the phone fails the 3D capability check or rendering drops below 20 fps, the 2D map shows with the same route and the same live position dot; the 2D/3D toggle is hidden and nothing else is said.",
    "weakGps": "**Position approximate** (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or indoors. The Map view dims the dot and draws an approximate-position ring round the last confident position, labelled *Position approximate*; directions keep their turn list and remaining distance, and *I am at\u2026* (a nearby location, or its QR sign) re-anchors. Waits, shows and services are unaffected."
@@ -11451,7 +10751,7 @@
    "loading": "The saved profile.",
    "error": "Could not load. Names which read failed and leaves the profile untouched.",
    "emptyFirstRun": "No profile configured. The form opens empty and `recordConsent` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `updateMyProfile` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
@@ -11488,12 +10788,13 @@
   "app": "guest-app",
   "route": "/general/help-and-support",
   "operations": [
-   "listFaqs",
-   "listContentPages",
+   "listPublishedFaqs",
+   "listPublishedContentPages",
    "listMyCases",
    "raiseMyCase",
    "replyToMyCase",
-   "getTenantAppStatus"
+   "getTenantAppStatus",
+   "listPublishedPolicies"
   ],
   "services": [
    "MarketingService",
@@ -11512,6 +10813,7 @@
    "whitelabel.content_page",
    "whitelabel.faq_category",
    "whitelabel.faq_entry",
+   "whitelabel.policy",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -11550,11 +10852,11 @@
   ],
   "machine": null,
   "states": {
-   "loading": "The help support figures; each tile loads on its own.",
+   "loading": "Questions, pages and policies load in place; each list loads on its own.",
    "error": "Could not load. Names which read failed and leaves the help support untouched.",
    "emptyFirstRun": "No help support yet. Offers Raise my case (`raiseMyCase`).",
-   "emptyNoResults": "Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: `listPublishedFaqs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Reading help needs no sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)). **Raising or reading a case needs a signed-in guest**: one who is not signed in is offered sign-in and brought back to this screen; the questions, pages and policies stay readable.",
    "offline": "**The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising a case is disabled offline** \u2014 it needs the connection (decided 28 September, audit R148) \u2014 and the screen says how to reach staff in person instead: the guest services desk, or any member of staff."
   },
   "overlays": [
@@ -11721,7 +11023,7 @@
    "loading": "Terminal or gateway state, shown plainly",
    "error": "**Declined reads differently from unresolved.** An unresolved payment inquires rather than retries, and nothing is issued until it resolves",
    "emptyFirstRun": "\u2014",
-   "emptyNoResults": "Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoResults": "Never shown: the basket has no filter; an empty basket is the first-run state.",
    "emptyNoAccess": "**This is the checkout page, and it is where identity is settled** (ADR-0045, 18 September 2026). An unverified or anonymous guest is not turned away \u2014 they are offered sign-in or, where the site's `guestCheckout` is on, the one-time code. The cart stays intact either way; `checkoutCart` is what refuses.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -11729,50 +11031,15 @@
    {
     "id": "confirmAbandonCart",
     "component": "confirmDialog",
-    "trigger": "Abandon cart",
+    "trigger": "Empty cart",
     "body": "**Names what `abandonCart` changes and what it leaves alone**, in the consequence rather than the verb. A checkout entry this affects should be identified in the dialog, not just counted.",
     "provenance": "client-verified"
    },
    {
     "id": "confirmRemoveCartLine",
     "component": "confirmDialog",
-    "trigger": "Remove cart line",
+    "trigger": "Remove",
     "body": "**Names what `removeCartLine` changes and what it leaves alone**, in the consequence rather than the verb. A checkout entry this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formUpdateCartLine",
-    "component": "modal",
-    "trigger": "Save cart line",
-    "body": "**Collects what `updateCartLine` sends before it is called.** Required: `quantity`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save cart line",
-     "operation": "updateCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "quantity"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCheckoutCart",
-    "component": "modal",
-    "trigger": "Checkout cart",
-    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Checkout cart",
-     "operation": "checkoutCart"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "subjectId",
-      "attendees"
-     ]
-    },
     "provenance": "client-verified"
    }
   ]
@@ -12142,9 +11409,9 @@
   "states": {
    "loading": "The multi-currency pricing list.",
    "error": "Could not load. Names which read failed and leaves the multi-currency pricing untouched.",
-   "emptyFirstRun": "No multi-currency pricing yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on asAt, purpose and the multi-currency pricing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "Not reachable: with no other currency at the venue the screen is not linked, and prices stay in the venue's currency.",
+   "emptyNoResults": "Never shown: the screen sends no filter a guest chose.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows. Last known rates stay, with their age.** A rate is a number a guest may act on, and an undated one they cannot judge."
   },
   "overlays": []
@@ -12200,7 +11467,8 @@
    "loading": "Availability is live, never cached",
    "error": "Availability unavailable. **Selection is blocked** \u2014 overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection \u2014 a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible."
+   "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection \u2014 a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible.",
+   "emptyNoResults": "No ticket to send: the guest holds none that can be shared. Says so and offers My Tickets."
   },
   "overlays": []
  },
@@ -12305,7 +11573,8 @@
    "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's \u2014 an error or maintenance page shown for a dropped signal tells a guest the venue is down.",
    "forcedUpgrade": "**Update required.** The app's version is below `getTenantAppStatus.minimumAppVersion` for its platform; the screen offers only the store link, because an app too old to talk to the server cannot be trusted to book or pay (decided 28 September, audit R073 (b)).",
    "soldOut": "**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)).",
-   "closed": "**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f))."
+   "closed": "**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)).",
+   "emptyNoAccess": "**Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page."
   },
   "overlays": []
  },
@@ -12380,7 +11649,7 @@
    "loading": "The upsell cross-sell, read by `getUpsellSuggestions`.",
    "error": "Could not load. Names which read failed and leaves the upsell cross-sell untouched.",
    "emptyFirstRun": "No upsell cross-sell yet. Offers Add cart line (`addCartLine`).",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getUpsellSuggestions` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
@@ -12471,37 +11740,15 @@
    "loading": "The interactive seat selection, read by `getSeatAvailability`.",
    "error": "Could not load. Names which read failed and leaves the interactive seat selection untouched.",
    "emptyFirstRun": "No interactive seat selection yet. Offers Create seat hold (`createSeatHold`).",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
    {
-    "id": "formCreateSeatHold",
-    "component": "modal",
-    "trigger": "Create seat hold",
-    "body": "**Collects what `createSeatHold` sends before it is called.** Required: `id`, `performanceId`, `seatIds`, `ttlSeconds`. Optional: `subjectId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateSeatHoldRequest",
-    "confirm": {
-     "label": "Create seat hold",
-     "operation": "createSeatHold"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "performanceId",
-      "seatIds",
-      "ttlSeconds",
-      "subjectId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "formRecommendSeats",
     "component": "modal",
     "trigger": "Recommend seats",
-    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize`, `strategy`. Optional: `categoryIds`, `maxPrice`, `accessibleCount`, `maxOptions`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**How many seats, and best available or together.** The party size is the tickets already chosen; the guest only picks the preference, then `recommendSeats` places them.",
     "bindsTo": "SeatRecommendationRequest",
     "confirm": {
      "label": "Recommend seats",
@@ -12518,7 +11765,7 @@
       "maxOptions"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "dateTimeOnSeatMap",
@@ -12612,16 +11859,16 @@
    "loading": "The resource booking cabana list.",
    "error": "Could not load. Names which read failed and leaves the resource booking cabana untouched.",
    "emptyFirstRun": "No resource booking cabana yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the resource booking cabana are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Nothing free on the date picked; offers the next free date.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
    {
     "id": "formAddCartLine",
     "component": "modal",
-    "trigger": "Add cart line",
-    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Add to cart",
+    "body": "**Type, date and guests**, then `addCartLine`; nothing else is asked.",
     "bindsTo": "AddCartLineRequest",
     "confirm": {
      "label": "Add cart line",
@@ -12638,7 +11885,7 @@
       "attributes"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -13217,7 +12464,7 @@
    "loading": "Availability is live, never cached",
    "error": "Availability unavailable. **Selection is blocked** \u2014 overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A ticket already loaded shows its rotating code, derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Transferring a ticket needs the connection."
   },
   "overlays": [
@@ -13253,7 +12500,6 @@
   "app": "guest-app",
   "route": "/general/bundle-package",
   "operations": [
-   "listCatalogueBundles",
    "getBundle",
    "addCartLine"
   ],
@@ -13268,8 +12514,6 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.performance",
-   "catalogue.product",
-   "catalogue.published_bundle",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -13321,16 +12565,16 @@
    "loading": "The bundle package list.",
    "error": "Could not load. Names which read failed and leaves the bundle package untouched.",
    "emptyFirstRun": "No bundle package yet. Offers Add cart line (`addCartLine`).",
-   "emptyNoResults": "Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: the screen opens on one bundle and has no filter.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
    {
     "id": "formAddCartLine",
     "component": "modal",
-    "trigger": "Add cart line",
-    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Add to cart",
+    "body": "**The choices the bundle asks for, and how many.** `addCartLine` with the bundle's variant.",
     "bindsTo": "AddCartLineRequest",
     "confirm": {
      "label": "Add cart line",
@@ -13347,7 +12591,7 @@
       "attributes"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -13359,13 +12603,14 @@
   "app": "guest-app",
   "route": "/general/accessibility-information",
   "operations": [
-   "listContentPages"
+   "listPublishedContentPages"
   ],
   "services": [
    "WhiteLabelService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
    "whitelabel.content_page"
@@ -13401,8 +12646,8 @@
    "loading": "The accessibility information list.",
    "error": "Could not load. Names which read failed and leaves the accessibility information untouched.",
    "emptyFirstRun": "No accessibility information yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on status, categoryCode, slug and the accessibility information are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: the screen sends no filter a guest chose, so an empty list is the first-run state above.",
+   "emptyNoAccess": "**Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.",
    "offline": "**The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising a case is disabled offline** \u2014 it needs the connection (decided 28 September, audit R148) \u2014 and the screen says how to reach staff in person instead: the guest services desk, or any member of staff."
   },
   "overlays": []
@@ -13474,8 +12719,8 @@
    "loading": "The resource availability (cabana) list.",
    "error": "Could not load. Names which read failed and leaves the resource availability (cabana) untouched.",
    "emptyFirstRun": "No resource availability (cabana) yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the resource availability (cabana) are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Nothing free on the date picked; offers the next free date.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
@@ -13612,7 +12857,7 @@
    "error": "Item unavailable, with a route back to the menu",
    "emptyFirstRun": "Not applicable",
    "emptyNoResults": "Never shown: `listModifierGroups` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listModifierGroups` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused \u2014 availability changes by the minute."
   },
   "overlays": [
@@ -13696,7 +12941,7 @@
    "loading": "The saved shop drop collection.",
    "error": "Could not load. Names which read failed and leaves the shop drop collection untouched.",
    "emptyFirstRun": "No shop drop collection configured. The form opens empty and `lookupShopAndDrop` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `lookupShopAndDrop` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection."
   },
   "overlays": []
@@ -13765,7 +13010,7 @@
    "loading": "The search list.",
    "error": "Could not load. Names which read failed and leaves the search untouched.",
    "emptyFirstRun": "No search yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on q, venueId, kind and the search are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Nothing matches what was typed. Names the search, suggests a shorter one and offers to clear it; a sold-out match is shown as sold out, not hidden.",
    "offline": "**The offline banner shows.** Results come only from what was already loaded, with a note that newer items may exist."
   },
   "overlays": []
@@ -13831,7 +13076,7 @@
    "error": "Could not load. Names which read failed and leaves the newsletter preferences untouched.",
    "emptyFirstRun": "No newsletter preferences yet. Offers Record consent (`recordConsent`).",
    "emptyNoResults": "Never shown: `listConsentPurposes` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `listConsentPurposes` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A consent change must reach the server to mean anything."
   },
   "overlays": [
@@ -13965,7 +13210,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Nothing requested yet.** No export, no erasure, no document \u2014 and that is the ordinary state. **The screen explains what each request means before offering it**, because an erasure a guest did not understand is one they will phone about.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW_PII`, which `exportSubjectData` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made \u2014 the legal clock starts when the platform receives it, and a device signed out offline is still signed in."
   },
   "overlays": [
@@ -14093,7 +13338,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**No refunds or listings yet.** The venue's policy is shown regardless, so a guest knows the answer before they need it.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getWaiverStatus` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** Refunds and resale listings need the server \u2014 a queued refund request is a promise nobody made."
   },
   "overlays": [
@@ -14195,7 +13440,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**No cases open.** The concierge sits here too \u2014 most questions never become a case, and that is the intent.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. **Raising a case and replying are disabled offline** \u2014 both need the connection (decided 28 September, audit R148) \u2014 and the screen says how to reach staff in person instead: the guest services desk, or any member of staff."
   },
   "overlays": [
@@ -14295,7 +13540,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Not enrolled.** What a face pass is for, where it works, and what withdrawing it does \u2014 **before** the camera opens.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getFacePassEnrolment` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** Biometric enrolment never happens offline \u2014 a face captured and queued is a face the guest cannot withdraw until it uploads.",
    "subjectNotLinked": "**Refused: that person is not linked to you** (403 `subject-not-linked`). A guest may enrol only themselves or a child linked to them by a family-member or primary-holder delegation; the screen says so and returns to **Who is this for**, which is refreshed in case the link was just removed (decided 28 September, audit R205)."
   },
@@ -14624,29 +13869,24 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**No stored cards.** A guest arrives here after a first purchase, so the empty state is the common one.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "overlays": [
    {
     "id": "formStorePaymentToken",
     "component": "modal",
-    "trigger": "Store payment token",
-    "body": "**Collects what `storePaymentToken` sends before it is called.** Required: `providerId`, `providerToken`, `consentPurposeId`. Optional: `setDefault`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Add a card",
+    "body": "**The gateway's own card form**, hosted by the provider; it returns the token that `storePaymentToken` saves with the guest's consent. No token, provider or consent id is ever a field.",
     "confirm": {
-     "label": "Store payment token",
+     "label": "Save card",
      "operation": "storePaymentToken"
     },
     "dismiss": {
      "label": "Cancel",
-     "discards": [
-      "providerId",
-      "providerToken",
-      "consentPurposeId",
-      "setDefault"
-     ]
+     "discards": []
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "formTransferWalletBalance",
@@ -14672,7 +13912,7 @@
     "id": "formRedeemLoyaltyPoints",
     "component": "modal",
     "trigger": "Redeem loyalty points",
-    "body": "**Collects what `redeemLoyaltyPoints` sends before it is called.** Required: `subjectId`, `programmeId`, `points`. Optional: `rewardId`, `orderId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**How many points to spend.** The guest is the caller and the programme is the venue's; `redeemLoyaltyPoints` is sent with both, never typed.",
     "confirm": {
      "label": "Redeem loyalty points",
      "operation": "redeemLoyaltyPoints"
@@ -14687,7 +13927,7 @@
       "orderId"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -14704,9 +13944,7 @@
    "requestGroupBooking",
    "shareEntitlement",
    "getGroupBooking",
-   "respondToInvitation",
-   "createReferral",
-   "getMyChallenges"
+   "respondToInvitation"
   ],
   "services": [
    "CatalogueService",
@@ -14724,24 +13962,18 @@
    "catalogue.group_package",
    "catalogue.product",
    "identity.delegated_access",
-   "marketing.challenge",
-   "marketing.challenge_progress",
-   "marketing.guest_profile",
    "marketing.invitation",
    "marketing.invitation_campaign",
-   "marketing.referral",
    "orders.group_booking",
    "orders.invitation",
    "orders.sales_order",
-   "pii.subject",
-   "promotions.promotion"
+   "pii.subject"
   ],
   "writes": [
    "access.entitlement",
    "cache:idempotency",
    "identity.delegated_access",
    "marketing.invitation",
-   "marketing.referral",
    "orders.group_booking",
    "orders.sales_order"
   ],
@@ -14772,7 +14004,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Nothing shared.** A guest holding eight tickets sees the option here rather than discovering it at the gate.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listGroupPackages` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Tickets already shared stay visible. Sharing, invitations and referrals need the connection \u2014 a transfer nobody received is a ticket nobody holds."
   },
   "overlays": [
@@ -14780,7 +14012,7 @@
     "id": "formRequestGroupBooking",
     "component": "modal",
     "trigger": "Request group booking",
-    "body": "**Collects what `requestGroupBooking` sends before it is called.** Required: `kind`, `packageProductId`, `preferredDate`, `expectedSize`. Optional: `organisationName`, `yearGroup`, `accessAndDietaryNeeds`, `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`. Dismissing sends nothing; the screen behind is unchanged.\n**30 September (client feedback, CLIENT-RESPONSE-30SEP 1).** The group ticket is chosen first (`packageProductId`: cards with the per-person price and the minimum group size), then *How many people* (`expectedSize`) as a number box the guest types into or steps with \u2212 and + (+10 on the app); no Group size dropdown. The estimate reads *<ticket> \u00b7 Guests \u00d7 <n>*.",
+    "body": "**Only what GST-008 did not ask**: the date wanted and a note. The kind, the package and the expected size come from the booking already started (DI-1000: never ask twice).",
     "bindsTo": "GroupBookingRequest",
     "confirm": {
      "label": "Request group booking",
@@ -14801,7 +14033,7 @@
       "allergiesAndRequests"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "formShareEntitlement",
@@ -14835,33 +14067,6 @@
      "discards": [
       "response",
       "plusOnes"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreateReferral",
-    "component": "modal",
-    "trigger": "Create referral",
-    "body": "**Collects what `createReferral` sends before it is called.** Required: `id`, `referrerSubjectId`, `code`, `status`. Optional: `refereeSubjectId`, `qualifyingAction`, `referrerRewardId`, `refereeRewardId`, `expiresAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Referral",
-    "confirm": {
-     "label": "Create referral",
-     "operation": "createReferral"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "referrerSubjectId",
-      "code",
-      "status",
-      "refereeSubjectId",
-      "qualifyingAction",
-      "referrerRewardId",
-      "refereeRewardId",
-      "expiresAt",
-      "scopePath"
      ]
     },
     "provenance": "client-verified"
@@ -14956,7 +14161,7 @@
    "loading": "Content loads.",
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Only this device is signed in.** The device list holds one row, this one, and the screen says that signing in elsewhere will add a row here.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `verifyGuestEmail` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made \u2014 the legal clock starts when the platform receives it, and a device signed out offline is still signed in."
   },
   "overlays": [
@@ -22374,7 +21579,7 @@
   "route": "/sell/language-select",
   "operations": [
    "getTenantAppStatus",
-   "getTenantConfig"
+   "getPublishedTenantConfig"
   ],
   "services": [
    "WhiteLabelService"
@@ -22384,16 +21589,7 @@
    "redis"
   ],
   "reads": [
-   "whitelabel.booking_flow",
-   "whitelabel.booking_flow_step",
    "whitelabel.config_version",
-   "whitelabel.feature_toggle",
-   "whitelabel.footer_config",
-   "whitelabel.footer_config_column",
-   "whitelabel.footer_config_social_link",
-   "whitelabel.homepage_section",
-   "whitelabel.module_enablement",
-   "whitelabel.navigation_item",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -22425,8 +21621,8 @@
    "loading": "The language select, read by `getTenantAppStatus`.",
    "error": "Could not load. Names which read failed and leaves the language select untouched.",
    "emptyFirstRun": "No language select yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Not available"
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
+   "offline": "**From the cached configuration.** The languages the kiosk last read stay on screen; buying waits for the connection."
   },
   "overlays": []
  },
@@ -22500,8 +21696,8 @@
    "loading": "The what are you list.",
    "error": "Could not load. Names which read failed and leaves the what are you untouched.",
    "emptyFirstRun": "No what are you yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the what are you are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: the kiosk sends no filter a guest chose; the venue is the kiosk's.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available"
   },
   "overlays": []
@@ -22561,7 +21757,7 @@
    "error": "Could not load. Names which read failed and leaves the choose tickets untouched.",
    "emptyFirstRun": "No choose tickets yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available"
   },
   "overlays": []
@@ -22624,33 +21820,10 @@
    "loading": "The choose session list.",
    "error": "Could not load. Names which read failed and leaves the choose session untouched.",
    "emptyFirstRun": "No choose session yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available"
   },
-  "overlays": [
-   {
-    "id": "formAcquireInventoryHold",
-    "component": "modal",
-    "trigger": "Add to cart",
-    "body": "**Collects what `addCartLine` sends before it is called; the cart takes the hold server-side.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add to cart",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "channelCapacityId",
-      "requestedUnits",
-      "ttlSeconds",
-      "channel"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /inventory-holds"
-   }
-  ]
+  "overlays": []
  },
  "KSK-006": {
   "name": "Review",
@@ -22742,76 +21915,10 @@
    "loading": "The review, read by `getCart`.",
    "error": "Could not load. Names which read failed and leaves the review untouched.",
    "emptyFirstRun": "No review yet. Offers Add cart line (`addCartLine`).",
-   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `evaluatePromotions` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available"
   },
-  "overlays": [
-   {
-    "id": "formAddCartLine",
-    "component": "modal",
-    "trigger": "Add cart line",
-    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add cart line",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "quantity",
-      "performanceId",
-      "seatIds",
-      "parentLineId",
-      "attributes"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
-   },
-   {
-    "id": "formCheckoutCart",
-    "component": "modal",
-    "trigger": "Checkout cart",
-    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Checkout cart",
-     "operation": "checkoutCart"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "subjectId",
-      "attendees"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
-   },
-   {
-    "id": "formEvaluatePromotions",
-    "component": "modal",
-    "trigger": "Evaluate promotions",
-    "body": "**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "EvaluatePromotionsRequest",
-    "confirm": {
-     "label": "Evaluate promotions",
-     "operation": "evaluatePromotions"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "venueId",
-      "channel",
-      "lines",
-      "subjectId",
-      "membershipTierId",
-      "couponCodes",
-      "evaluateAt"
-     ]
-    },
-    "provenance": "contract promotions.yaml POST /promotions/evaluate"
-   }
-  ]
+  "overlays": []
  },
  "KSK-007": {
   "name": "Payment",
@@ -22887,7 +21994,7 @@
    "loading": "The saved payment.",
    "error": "Could not load. Names which read failed and leaves the payment untouched.",
    "emptyFirstRun": "No payment configured. The form opens empty and `createPayment` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_CREATE`, which `createPayment` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available. **Card only, and card needs the acquirer**"
   },
   "overlays": []
@@ -22949,7 +22056,7 @@
    "loading": "The saved payment unresolved.",
    "error": "Could not load. Names which read failed and leaves the payment unresolved untouched.",
    "emptyFirstRun": "No payment unresolved configured. The form opens empty and `inquirePaymentStatus` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_CREATE`, which `inquirePaymentStatus` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not applicable"
   },
   "overlays": []
@@ -22962,7 +22069,7 @@
   "app": "guest-app",
   "route": "/sell/ticket-issued",
   "operations": [
-   "transferOrderTickets",
+   "reprintOrder",
    "getOrder"
   ],
   "services": [
@@ -22973,19 +22080,16 @@
    "redis"
   ],
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
-   "orders.sales_order",
-   "orders.ticket_transfer"
+   "orders.sales_order"
   ],
   "writes": [
-   "access.entitlement",
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "orders.sales_order"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -23020,28 +22124,26 @@
    "loading": "The ticket issued, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the ticket issued untouched.",
    "emptyFirstRun": "No ticket issued yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not applicable"
   },
   "overlays": [
    {
-    "id": "formTransferOrderTickets",
+    "id": "sendTickets",
     "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Send to my phone",
+    "body": "**Email or SMS, then the address.** `reprintOrder` with `delivery` email or sms for this order's tickets; nobody else becomes their owner.",
     "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
+     "label": "Send to my phone",
+     "operation": "reprintOrder"
     },
     "dismiss": {
-     "label": "Cancel",
+     "label": "Back",
      "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
+      "destination"
      ]
     },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ]
  },
@@ -23053,7 +22155,7 @@
   "app": "guest-app",
   "route": "/sell/print-failure",
   "operations": [
-   "transferOrderTickets"
+   "reprintOrder"
   ],
   "services": [
    "OrderService"
@@ -23063,14 +22165,12 @@
    "redis"
   ],
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "orders.sales_order"
   ],
   "writes": [
-   "access.entitlement",
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "orders.sales_order"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -23092,7 +22192,7 @@
     "to": "KSK-013",
     "trigger": "They call for help",
     "provenance": "flow F57 step 3\u21924",
-    "operation": "transferOrderTickets"
+    "operation": "reprintOrder"
    }
   ],
   "machine": null,
@@ -23161,7 +22261,7 @@
    "loading": "The collect booking, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the collect booking untouched.",
    "emptyFirstRun": "No collect booking yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available"
   },
   "overlays": []
@@ -23174,7 +22274,7 @@
   "app": "guest-app",
   "route": "/sell/booking-found",
   "operations": [
-   "transferOrderTickets"
+   "reprintOrder"
   ],
   "services": [
    "OrderService"
@@ -23184,14 +22284,12 @@
    "redis"
   ],
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "orders.sales_order"
   ],
   "writes": [
-   "access.entitlement",
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "orders.sales_order"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -23395,7 +22493,7 @@
    "error": "Could not load. Names which read failed and leaves the assistant untouched.",
    "emptyFirstRun": "No assistant yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the assistant are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission."
   },
   "overlays": [
    {

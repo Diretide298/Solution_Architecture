@@ -39,7 +39,7 @@
    "drawn": 134,
    "locked": 25
   },
-  "fullyDrawableBatches": 62
+  "fullyDrawableBatches": 57
  },
  "batches": [
   {
@@ -1851,24 +1851,6 @@
    "status": "pending"
   },
   {
-   "id": "P05-sell-02",
-   "kind": "module",
-   "label": "P05 · Sell (2 of 2)",
-   "platform": "P05",
-   "screens": [
-    "KSK-011",
-    "KSK-012",
-    "KSK-013",
-    "KSK-014",
-    "KSK-016",
-    "KSK-017"
-   ],
-   "drawable": 3,
-   "thin": 3,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "P06-operations-04",
    "kind": "module",
    "label": "P06 · Operations (4 of 5)",
@@ -2585,6 +2567,24 @@
    ],
    "drawable": 7,
    "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "P05-sell-02",
+   "kind": "module",
+   "label": "P05 · Sell (2 of 2)",
+   "platform": "P05",
+   "screens": [
+    "KSK-011",
+    "KSK-012",
+    "KSK-013",
+    "KSK-014",
+    "KSK-016",
+    "KSK-017"
+   ],
+   "drawable": 2,
+   "thin": 4,
    "frames": 0,
    "status": "pending"
   },
@@ -3446,28 +3446,6 @@
    ],
    "drawable": 5,
    "thin": 5,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P05-sell-01",
-   "kind": "module",
-   "label": "P05 · Sell (1 of 2)",
-   "platform": "P05",
-   "screens": [
-    "KSK-001",
-    "KSK-002",
-    "KSK-003",
-    "KSK-004",
-    "KSK-005",
-    "KSK-006",
-    "KSK-007",
-    "KSK-008",
-    "KSK-009",
-    "KSK-010"
-   ],
-   "drawable": 4,
-   "thin": 6,
    "frames": 0,
    "status": "pending"
   },
@@ -4928,6 +4906,28 @@
    "status": "pending"
   },
   {
+   "id": "P05-sell-01",
+   "kind": "module",
+   "label": "P05 · Sell (1 of 2)",
+   "platform": "P05",
+   "screens": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-003",
+    "KSK-004",
+    "KSK-005",
+    "KSK-006",
+    "KSK-007",
+    "KSK-008",
+    "KSK-009",
+    "KSK-010"
+   ],
+   "drawable": 1,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "P06-rentals-01",
    "kind": "module",
    "label": "P06 · Rentals (1 of 3)",
@@ -5587,36 +5587,6 @@
    "status": "drawn"
   },
   {
-   "id": "P01-membership-loyalty-value-01",
-   "kind": "module",
-   "label": "P01 · Membership, Loyalty & Value",
-   "platform": "P01",
-   "screens": [
-    "WEB-021",
-    "WEB-022",
-    "WEB-023",
-    "WEB-024",
-    "WEB-043"
-   ],
-   "drawable": 5,
-   "thin": 0,
-   "frames": 5,
-   "status": "drawn"
-  },
-  {
-   "id": "P01-promotions-01",
-   "kind": "module",
-   "label": "P01 · Promotions",
-   "platform": "P01",
-   "screens": [
-    "WEB-032"
-   ],
-   "drawable": 1,
-   "thin": 0,
-   "frames": 1,
-   "status": "drawn"
-  },
-  {
    "id": "P01-retail-01",
    "kind": "module",
    "label": "P01 · Retail",
@@ -5645,40 +5615,12 @@
    "status": "drawn"
   },
   {
-   "id": "P01-ticketing-01",
-   "kind": "module",
-   "label": "P01 · Ticketing",
-   "platform": "P01",
-   "screens": [
-    "WEB-030",
-    "WEB-031",
-    "WEB-035"
-   ],
-   "drawable": 3,
-   "thin": 0,
-   "frames": 3,
-   "status": "drawn"
-  },
-  {
    "id": "P01-transport-01",
    "kind": "module",
    "label": "P01 · Transport",
    "platform": "P01",
    "screens": [
     "WEB-049"
-   ],
-   "drawable": 1,
-   "thin": 0,
-   "frames": 1,
-   "status": "drawn"
-  },
-  {
-   "id": "P02-discovery-01",
-   "kind": "module",
-   "label": "P02 · Discovery",
-   "platform": "P02",
-   "screens": [
-    "GST-063"
    ],
    "drawable": 1,
    "thin": 0,
@@ -5706,19 +5648,6 @@
    "platform": "P02",
    "screens": [
     "GST-065"
-   ],
-   "drawable": 1,
-   "thin": 0,
-   "frames": 1,
-   "status": "drawn"
-  },
-  {
-   "id": "P02-promotions-01",
-   "kind": "module",
-   "label": "P02 · Promotions",
-   "platform": "P02",
-   "screens": [
-    "GST-037"
    ],
    "drawable": 1,
    "thin": 0,
@@ -5772,30 +5701,42 @@
    "status": "drawn"
   },
   {
-   "id": "P01-engagement-support-01",
-   "kind": "module",
-   "label": "P01 · Engagement & Support",
-   "platform": "P01",
-   "screens": [
-    "WEB-025",
-    "WEB-026",
-    "WEB-027",
-    "WEB-028",
-    "WEB-044",
-    "WEB-046"
-   ],
-   "drawable": 5,
-   "thin": 1,
-   "frames": 6,
-   "status": "drawn"
-  },
-  {
    "id": "P01-high-demand-access-01",
    "kind": "module",
    "label": "P01 · High-Demand Access",
    "platform": "P01",
    "screens": [
     "WEB-015"
+   ],
+   "drawable": 0,
+   "thin": 1,
+   "frames": 1,
+   "status": "drawn"
+  },
+  {
+   "id": "P01-membership-loyalty-value-01",
+   "kind": "module",
+   "label": "P01 · Membership, Loyalty & Value",
+   "platform": "P01",
+   "screens": [
+    "WEB-021",
+    "WEB-022",
+    "WEB-023",
+    "WEB-024",
+    "WEB-043"
+   ],
+   "drawable": 4,
+   "thin": 1,
+   "frames": 5,
+   "status": "drawn"
+  },
+  {
+   "id": "P01-promotions-01",
+   "kind": "module",
+   "label": "P01 · Promotions",
+   "platform": "P01",
+   "screens": [
+    "WEB-032"
    ],
    "drawable": 0,
    "thin": 1,
@@ -5816,28 +5757,6 @@
    "status": "drawn"
   },
   {
-   "id": "P02-account-self-service-01",
-   "kind": "module",
-   "label": "P02 · Account & Self-Service (1 of 2)",
-   "platform": "P02",
-   "screens": [
-    "GST-012",
-    "GST-013",
-    "GST-018",
-    "GST-019",
-    "GST-020",
-    "GST-039",
-    "GST-042",
-    "GST-045",
-    "GST-055",
-    "GST-066"
-   ],
-   "drawable": 9,
-   "thin": 1,
-   "frames": 10,
-   "status": "drawn"
-  },
-  {
    "id": "P02-account-self-service-02",
    "kind": "module",
    "label": "P02 · Account & Self-Service (2 of 2)",
@@ -5851,28 +5770,6 @@
    "drawable": 3,
    "thin": 1,
    "frames": 4,
-   "status": "drawn"
-  },
-  {
-   "id": "P02-booking-selection-01",
-   "kind": "module",
-   "label": "P02 · Booking & Selection",
-   "platform": "P02",
-   "screens": [
-    "GST-007",
-    "GST-008",
-    "GST-048",
-    "GST-049",
-    "GST-050",
-    "GST-056",
-    "GST-058",
-    "GST-072",
-    "GST-074",
-    "GST-075"
-   ],
-   "drawable": 9,
-   "thin": 1,
-   "frames": 10,
    "status": "drawn"
   },
   {
@@ -5891,22 +5788,16 @@
    "status": "drawn"
   },
   {
-   "id": "P02-discovery-browse-01",
+   "id": "P02-discovery-01",
    "kind": "module",
-   "label": "P02 · Discovery & Browse",
+   "label": "P02 · Discovery",
    "platform": "P02",
    "screens": [
-    "GST-001",
-    "GST-002",
-    "GST-003",
-    "GST-004",
-    "GST-005",
-    "GST-006",
-    "GST-057"
+    "GST-063"
    ],
-   "drawable": 6,
+   "drawable": 0,
    "thin": 1,
-   "frames": 7,
+   "frames": 1,
    "status": "drawn"
   },
   {
@@ -5937,19 +5828,16 @@
    "status": "drawn"
   },
   {
-   "id": "P02-ticketing-01",
+   "id": "P02-promotions-01",
    "kind": "module",
-   "label": "P02 · Ticketing",
+   "label": "P02 · Promotions",
    "platform": "P02",
    "screens": [
-    "GST-014",
-    "GST-016",
-    "GST-017",
-    "GST-044"
+    "GST-037"
    ],
-   "drawable": 3,
+   "drawable": 0,
    "thin": 1,
-   "frames": 4,
+   "frames": 1,
    "status": "drawn"
   },
   {
@@ -5969,6 +5857,80 @@
    "status": "drawn"
   },
   {
+   "id": "P01-engagement-support-01",
+   "kind": "module",
+   "label": "P01 · Engagement & Support",
+   "platform": "P01",
+   "screens": [
+    "WEB-025",
+    "WEB-026",
+    "WEB-027",
+    "WEB-028",
+    "WEB-044",
+    "WEB-046"
+   ],
+   "drawable": 4,
+   "thin": 2,
+   "frames": 6,
+   "status": "drawn"
+  },
+  {
+   "id": "P01-ticketing-01",
+   "kind": "module",
+   "label": "P01 · Ticketing",
+   "platform": "P01",
+   "screens": [
+    "WEB-030",
+    "WEB-031",
+    "WEB-035"
+   ],
+   "drawable": 1,
+   "thin": 2,
+   "frames": 3,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-account-self-service-01",
+   "kind": "module",
+   "label": "P02 · Account & Self-Service (1 of 2)",
+   "platform": "P02",
+   "screens": [
+    "GST-012",
+    "GST-013",
+    "GST-018",
+    "GST-019",
+    "GST-020",
+    "GST-039",
+    "GST-042",
+    "GST-045",
+    "GST-055",
+    "GST-066"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 10,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-discovery-browse-01",
+   "kind": "module",
+   "label": "P02 · Discovery & Browse",
+   "platform": "P02",
+   "screens": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-004",
+    "GST-005",
+    "GST-006",
+    "GST-057"
+   ],
+   "drawable": 5,
+   "thin": 2,
+   "frames": 7,
+   "status": "drawn"
+  },
+  {
    "id": "P02-engagement-support-01",
    "kind": "module",
    "label": "P02 · Engagement & Support (1 of 2)",
@@ -5984,28 +5946,6 @@
     "GST-052",
     "GST-053",
     "GST-054"
-   ],
-   "drawable": 8,
-   "thin": 2,
-   "frames": 10,
-   "status": "drawn"
-  },
-  {
-   "id": "P02-in-venue-services-01",
-   "kind": "module",
-   "label": "P02 · In-venue Services",
-   "platform": "P02",
-   "screens": [
-    "GST-021",
-    "GST-022",
-    "GST-023",
-    "GST-024",
-    "GST-025",
-    "GST-027",
-    "GST-028",
-    "GST-029",
-    "GST-038",
-    "GST-070"
    ],
    "drawable": 8,
    "thin": 2,
@@ -6039,6 +5979,66 @@
    "drawable": 0,
    "thin": 2,
    "frames": 2,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-in-venue-services-01",
+   "kind": "module",
+   "label": "P02 · In-venue Services",
+   "platform": "P02",
+   "screens": [
+    "GST-021",
+    "GST-022",
+    "GST-023",
+    "GST-024",
+    "GST-025",
+    "GST-027",
+    "GST-028",
+    "GST-029",
+    "GST-038",
+    "GST-070"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 10,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-booking-selection-01",
+   "kind": "module",
+   "label": "P02 · Booking & Selection",
+   "platform": "P02",
+   "screens": [
+    "GST-007",
+    "GST-008",
+    "GST-048",
+    "GST-049",
+    "GST-050",
+    "GST-056",
+    "GST-058",
+    "GST-072",
+    "GST-074",
+    "GST-075"
+   ],
+   "drawable": 6,
+   "thin": 4,
+   "frames": 10,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-ticketing-01",
+   "kind": "module",
+   "label": "P02 · Ticketing",
+   "platform": "P02",
+   "screens": [
+    "GST-014",
+    "GST-016",
+    "GST-017",
+    "GST-044"
+   ],
+   "drawable": 0,
+   "thin": 4,
+   "frames": 4,
    "status": "drawn"
   },
   {

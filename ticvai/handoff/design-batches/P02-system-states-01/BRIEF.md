@@ -70,7 +70,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-043` | Arabic / RTL Experience | A | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (client-verified) |
-| `GST-047` | Maintenance / Upgrade Page | A | 0 | 55 | 7 | 0 | 1 | 2 | guest | notStarted (client-verified) |
+| `GST-047` | Maintenance / Upgrade Page | A | 0 | 49 | 8 | 0 | 1 | 2 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 

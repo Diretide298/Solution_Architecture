@@ -1,6 +1,6 @@
 # P02-booking-selection-01 — P02 · Booking & Selection
 
-**10 screens · 35 operations · 70 schemas · 10 permissions**
+**10 screens · 32 operations · 66 schemas · 8 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,10 +48,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `AI_USE, GUEST_VIEW, MARKETING_MANAGE, MARKETING_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_VIEW, RESOURCE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `AI_USE, GUEST_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_VIEW, RESOURCE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **10 of these operations work offline**: getBundle, getPublishedBookingFlow, getPublishedGuidedChoice, getVenueMap, listBookableVenueMaps, listCatalogueBundles, listPerformances, listProductCategories
+- **9 of these operations work offline**: getBundle, getPublishedBookingFlow, getPublishedGuidedChoice, getVenueMap, listBookableVenueMaps, listPerformances, listProductCategories, listProductVariants
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -69,20 +69,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-007` | Select Date & Time | A | 25 | 39 | 6 | 20 | 28 | 0 | guest | notStarted (client-verified) |
+| `GST-007` | Select Date & Time | A | 23 | 30 | 6 | 20 | 28 | 0 | guest | notStarted (client-verified) |
 | `GST-008` | Tickets & Add-ons | A | 19 | 66 | 6 | 26 | 25 | 0 | guest | notStarted (client-verified) |
 | `GST-048` | Upsell / Cross-Sell | A | 19 | 9 | 5 | 55 | 9 | 0 | guest | notStarted (designed) |
-| `GST-049` | Interactive Seat Selection | A | 13 | 39 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |
-| `GST-050` | Resource Booking – Cabana | A | 22 | 27 | 6 | 21 | 4 | 6 | guest | notStarted (designed) |
-| `GST-056` | Bundle Package | A | 19 | 34 | 6 | 4 | 4 | 0 | guest | notStarted (designed) |
-| `GST-058` | Resource Availability (Cabana) | A | 3 | 27 | 6 | 17 | 4 | 0 | guest | notStarted (designed) |
-| `GST-072` | Share & Group Booking | A | 17 | 46 | 6 | 30 | 8 | 6 | guest | notStarted (client-verified) |
+| `GST-049` | Interactive Seat Selection | A | 8 | 38 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |
+| `GST-050` | Resource Booking – Cabana | A | 19 | 18 | 6 | 21 | 4 | 6 | guest | notStarted (designed) |
+| `GST-056` | Bundle Package | A | 19 | 14 | 6 | 4 | 4 | 0 | guest | notStarted (designed) |
+| `GST-058` | Resource Availability (Cabana) | A | 0 | 18 | 6 | 17 | 4 | 0 | guest | notStarted (designed) |
+| `GST-072` | Share & Group Booking | A | 14 | 27 | 6 | 8 | 8 | 6 | guest | notStarted (client-verified) |
 | `GST-074` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (designed) |
 | `GST-075` | Book a Space by the Hour | A | 23 | 40 | 6 | 25 | 7 | 0 | guest | notStarted (designed) |
 
 ## Thin screens in this batch
 
-**GST-048 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-048, GST-050, GST-056, GST-058 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

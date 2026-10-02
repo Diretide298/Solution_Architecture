@@ -1647,6 +1647,14 @@
    }
   ]
  },
+ "LocalisedRichText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "description": "Keyed by language code. Values are sanitised HTML.",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
  "LoyaltyPosition": {
   "x-ticvai-persistence": "marketing.loyalty_position",
   "type": "object",
@@ -2340,6 +2348,16 @@
    }
   }
  },
+ "PolicyKind": {
+  "type": "string",
+  "enum": [
+   "privacy",
+   "termsAndConditions",
+   "refund",
+   "cookie",
+   "accessibility"
+  ]
+ },
  "PromotionEvaluation": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -2451,6 +2469,41 @@
       }
      }
     }
+   }
+  }
+ },
+ "PublishedPolicy": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.policy",
+  "type": "object",
+  "x-ticvai-agreed": "2 October: decided by Chinmay, fix before Block A starts (GFIX-2)",
+  "description": "The current version of one policy as a guest reads it (`listPublishedPolicies`). Who published it and the partition key stay on `Policy`.",
+  "required": [
+   "kind",
+   "version",
+   "body",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/PolicyKind"
+   },
+   "title": {
+    "type": "string"
+   },
+   "version": {
+    "type": "string",
+    "description": "The version a consent records (a guest who consented to version 3 consented to version 3)."
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "requiresReconsent": {
+    "type": "boolean",
+    "description": "True when guests who consented to an earlier version are asked again on next launch."
    }
   }
  },

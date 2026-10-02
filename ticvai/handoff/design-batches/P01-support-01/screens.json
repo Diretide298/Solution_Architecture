@@ -157,6 +157,10 @@
   "entryState": {
    "params": [
     {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
      "name": "caseId",
      "from": "deepLink",
      "optional": true
@@ -291,38 +295,41 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every faq category",
-       "bindsTo": "FaqCategory",
+       "kind": "cardList",
+       "label": "Questions and answers",
+       "bindsTo": "PublishedFaqCategory",
        "columns": [
-        "FaqCategory.code",
-        "FaqCategory.name",
-        "FaqCategory.sortOrder",
-        "FaqCategory.entries",
-        "FaqCategory.scopePath"
+        "PublishedFaqCategory.name",
+        "PublishedFaqCategory.entries"
        ],
-       "operation": "listFaqs",
-       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+       "operation": "listPublishedFaqs",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Categories in their order, each opening to its questions. Was the generated table 'Every faq category'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "dataTable",
-       "label": "Every content page",
-       "bindsTo": "ContentPage",
+       "kind": "cardList",
+       "label": "Help and accessibility pages",
+       "bindsTo": "PublishedContentPage",
        "columns": [
-        "ContentPage.id",
-        "ContentPage.slug",
-        "ContentPage.title",
-        "ContentPage.body",
-        "ContentPage.isEnabled",
-        "ContentPage.status",
-        "ContentPage.iconAssetRef",
-        "ContentPage.categoryCode",
-        "ContentPage.sortOrder",
-        "ContentPage.isReferenced",
-        "ContentPage.scopePath"
+        "PublishedContentPage.title",
+        "PublishedContentPage.iconAssetRef"
        ],
-       "operation": "listContentPages",
-       "provenance": "contract white-label.yaml GET /tenant-config/pages"
+       "operation": "listPublishedContentPages",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "The accessibility statement is the page in the `accessibility` category. Was the generated table 'Every content page'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+      },
+      {
+       "kind": "cardList",
+       "label": "Policies",
+       "bindsTo": "PublishedPolicy",
+       "columns": [
+        "PublishedPolicy.title",
+        "PublishedPolicy.version",
+        "PublishedPolicy.effectiveFrom"
+       ],
+       "operation": "listPublishedPolicies",
+       "notes": "The current terms, privacy, refund, cookie and accessibility policies; a card opens the policy's `body` in the guest's language.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
       },
       {
        "kind": "cardList",
@@ -342,26 +349,6 @@
        "provenance": "decided 29 September, rev 3 GAP-B2"
       }
      ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected faq category",
-       "bindsTo": "FaqCategory",
-       "columns": [
-        "FaqCategory.code",
-        "FaqCategory.name",
-        "FaqCategory.sortOrder",
-        "FaqCategory.entries",
-        "FaqCategory.scopePath"
-       ],
-       "operation": "listFaqs",
-       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
-      }
-     ]
     }
    ]
   },
@@ -369,28 +356,37 @@
    "loading": "Content resolves in place.",
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
-   "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoResults": "No question or page matches what was typed; the categories stay. Names the search and offers to clear it.",
+   "emptyNoAccess": "**Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.",
    "offline": "**The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising a case is disabled offline** — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff."
   },
   "apis": [
    {
-    "operationId": "listFaqs",
+    "operationId": "listPublishedFaqs",
     "contract": "white-label",
-    "purpose": "List FAQs",
-    "trigger": "onLoad"
+    "purpose": "The published FAQs, readable before sign-in (GFIX-2)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    },
    {
-    "operationId": "listContentPages",
+    "operationId": "listPublishedContentPages",
     "contract": "white-label",
-    "purpose": "List custom content pages",
-    "trigger": "onLoad"
+    "purpose": "The live help and accessibility pages, readable before sign-in (GFIX-2)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    },
    {
     "operationId": "getTenantAppStatus",
     "contract": "white-label",
     "purpose": "App status and the public *What's new*",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPublishedPolicies",
+    "contract": "white-label",
+    "purpose": "Terms, privacy, refund, cookie and accessibility policies, readable before sign-in (GFIX-2)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    }
   ],
   "entryState": {
@@ -418,6 +414,20 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "listFaqs",
+    "removed": true,
+    "why": "Replaced by `listPublishedFaqs`, the guest read of the same data.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
+   },
+   {
+    "operation": "listContentPages",
+    "removed": true,
+    "why": "Replaced by `listPublishedContentPages`, the guest read of the same data.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",

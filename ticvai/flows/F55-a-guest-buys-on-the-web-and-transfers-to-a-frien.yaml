@@ -52,7 +52,7 @@ steps:
   action: They transfer three tickets.
   operations:
   - transferOrderTickets
-  - listOrders
+  - listMyOrders
   outcome: '**Transferred, not forwarded.** A PDF sent by WhatsApp is a ticket sold four times.'
   crossesDevice: true
 - step: 5

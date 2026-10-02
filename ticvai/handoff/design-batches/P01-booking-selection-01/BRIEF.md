@@ -68,9 +68,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-005` | Ticket Type Selection | A | 15 | 51 | 6 | 27 | 31 | 6 | guest | review (client-verified) |
-| `WEB-006` | Date & Performance Selection | A | 41 | 25 | 6 | 17 | 32 | 6 | guest | review (client-verified) |
-| `WEB-007` | Interactive Seat Selection | A | 13 | 40 | 6 | 30 | 22 | 6 | guest | review (client-verified) |
+| `WEB-005` | Ticket Type Selection | A | 2 | 71 | 6 | 27 | 31 | 6 | guest | review (client-verified) |
+| `WEB-006` | Date & Performance Selection | A | 41 | 19 | 6 | 17 | 32 | 6 | guest | review (client-verified) |
+| `WEB-007` | Interactive Seat Selection | A | 8 | 39 | 6 | 30 | 22 | 6 | guest | review (client-verified) |
 | `WEB-008` | Add-ons & Upsell | A | 19 | 35 | 6 | 56 | 16 | 0 | guest | review (client-verified) |
 | `WEB-009` | Wishlist | A | 3 | 2 | 5 | 1 | 2 | 0 | guest | review (client-verified) |
 | `WEB-047` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (client-verified) |

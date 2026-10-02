@@ -775,6 +775,10 @@
   "entryState": {
    "params": [
     {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
      "name": "favouriteId",
      "from": "navigation"
     }

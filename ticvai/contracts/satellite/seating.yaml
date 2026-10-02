@@ -86,6 +86,9 @@ paths:
       operationId: assignSeats
       x-ticvai-consumed-by:
         - "P08 BO-995 Find Seats For Me"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Pick and hold the best available seats
       description: 'BL-168. **`recommendSeats` returned a set and nothing applied it**, so automatic assignment
         was left to the caller — and every caller wrote the same loop.
@@ -1213,6 +1216,12 @@ paths:
         - "P08 BO-986 Availability Tracker"
         - "P08 BO-994 Choose My Seats"
         - "P08 BO-996 Filters & Interactive Legend"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1278,6 +1287,9 @@ paths:
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-994 Choose My Seats"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1402,6 +1414,9 @@ paths:
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-998 Lock Timeout & Concurrency"
         - "P08 BO-999 Cart & Multi-Seat Management"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1794,6 +1809,9 @@ paths:
         - "P08 BO-1001 View Preview, Compare & Heat Map"
         - "P08 BO-1002 AI Conversational Seat Assistant"
         - "P08 BO-1039 Seat Upgrade Recommendations"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest

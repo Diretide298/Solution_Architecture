@@ -71,7 +71,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-067` | Refunds & Resale | A | 6 | 3 | 6 | 10 | 7 | 6 | guest | notStarted (client-verified) |
 | `GST-069` | Face Pass | A | 12 | 10 | 7 | 36 | 5 | 6 | guest | notStarted (client-verified) |
-| `GST-071` | Payment Methods | A | 9 | 27 | 6 | 7 | 1 | 0 | guest | notStarted (client-verified) |
+| `GST-071` | Payment Methods | A | 9 | 13 | 6 | 7 | 1 | 0 | guest | notStarted (client-verified) |
 | `GST-073` | Security & Sign-in | A | 11 | 23 | 5 | 4 | 2 | 0 | guest | notStarted (designed) |
 
 ## Thin screens in this batch

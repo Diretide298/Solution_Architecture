@@ -36,7 +36,7 @@ steps:
   screen: KSK-010
   action: Or it resolves and the printer fails.
   operations:
-  - transferOrderTickets
+  - reprintOrder
   outcome: '**The sale stands.** A paid guest with no ticket must never be told to pay again — the media
     goes to their phone.'
   crossesDevice: true

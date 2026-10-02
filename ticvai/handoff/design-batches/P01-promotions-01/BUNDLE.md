@@ -68,7 +68,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-032` | Offers & Promotions | A | 3 | 28 | 6 | 1 | 0 | 2 | guest | review (client-verified) |
+| `WEB-032` | Offers & Promotions | A | 0 | 13 | 6 | 1 | 0 | 2 | guest | review (client-verified) |
+
+## Thin screens in this batch
+
+**WEB-032 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -96,34 +100,29 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 #### Inputs: what the user enters or picks
 
-**On the screen**
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `listPromotions`. | `listPromotions` ?venueId |
-| Status | select | optional | — | Draft · Scheduled · Live · Paused · Expired · Ended | — | Sends `?status=` to `listPromotions`. | `listPromotions` ?status |
-| Active at | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Sends `?activeAt=` to `listPromotions`. | `listPromotions` ?activeAt |
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | select | — | Draft · Scheduled · Live · Paused · Expired · Ended | `listPromotions` ?status |
+| Active at | date and time picker | — | — | `listPromotions` ?activeAt |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every promotion** (data table, from `listPromotions`)
+**Offers** (card list, from `listPromotions`): The offers active now at the guest's venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every promotion'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Discount | grouped details | — |
-| Conditions | grouped details | All conditions must hold. An empty object matches everything. |
-| Stacking mode | chip: Exclusive, Stackable, Best only, Stack with group | How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine … |
-| Stacking group | text | — |
-| Precedence | 1,234 | Higher evaluates first where several could apply. |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Max redemptions | 1,234 | — |
 
 **The selected promotion** (detail panel, from `getPromotion`)
 
@@ -132,19 +131,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Discount | grouped details | — |
-| Conditions | grouped details | All conditions must hold. An empty object matches everything. |
-| Stacking mode | chip: Exclusive, Stackable, Best only, Stack with group | How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine … |
-| Stacking group | text | — |
-| Precedence | 1,234 | Higher evaluates first where several could apply. |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Max redemptions | 1,234 | — |
 | Max redemptions per guest | 1,234 | — |
-| Budget cap | AED 1,234.50 | Total discount value after which the promotion stops automatically. Enforced at checkout, where an order whose discount would take the … |
-| ID | the name it points at, never the id | — |
-| Status | chip: Draft, Scheduled, Live, Paused, Expired, Ended | — |
 
 **Data it reads**: `listPromotions` (onLoad, List promotions)
 
@@ -155,7 +145,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Loading (`?state=loading`) | The offers promotions list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the offers promotions untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No offers promotions yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, status, activeAt and the offers promotions are still there. Names the active filter and offers to clear it. |
+| Empty, no results (`?state=emptyNoResults`) | Never shown as a filter result: no offer is active at this venue now, said plainly. |
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
@@ -199,8 +189,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (3), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-032?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] No transition is declared; back returns where the user came from.

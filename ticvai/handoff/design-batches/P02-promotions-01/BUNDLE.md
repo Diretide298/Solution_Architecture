@@ -69,7 +69,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-037` | Offers & Promotions | A | 3 | 42 | 6 | 2 | 0 | 2 | guest | notStarted (client-verified) |
+| `GST-037` | Offers & Promotions | A | 0 | 21 | 6 | 2 | 0 | 2 | guest | notStarted (client-verified) |
+
+## Thin screens in this batch
+
+**GST-037 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -97,34 +101,29 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 #### Inputs: what the user enters or picks
 
-**On the screen**
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `listPromotions`. | `listPromotions` ?venueId |
-| Status | select | optional | — | Draft · Scheduled · Live · Paused · Expired · Ended | — | Sends `?status=` to `listPromotions`. | `listPromotions` ?status |
-| Active at | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Sends `?activeAt=` to `listPromotions`. | `listPromotions` ?activeAt |
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | select | — | Draft · Scheduled · Live · Paused · Expired · Ended | `listPromotions` ?status |
+| Active at | date and time picker | — | — | `listPromotions` ?activeAt |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every promotion** (data table, from `listPromotions`)
+**Offers** (card list, from `listPromotions`): The offers active now at the guest's venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every promotion'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Discount | grouped details | — |
-| Conditions | grouped details | All conditions must hold. An empty object matches everything. |
-| Stacking mode | chip: Exclusive, Stackable, Best only, Stack with group | How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine … |
-| Stacking group | text | — |
-| Precedence | 1,234 | Higher evaluates first where several could apply. |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Max redemptions | 1,234 | — |
 
 **The selected promotion** (detail panel, from `getPromotion`)
 
@@ -133,38 +132,23 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Discount | grouped details | — |
-| Conditions | grouped details | All conditions must hold. An empty object matches everything. |
-| Stacking mode | chip: Exclusive, Stackable, Best only, Stack with group | How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine … |
-| Stacking group | text | — |
-| Precedence | 1,234 | Higher evaluates first where several could apply. |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Max redemptions | 1,234 | — |
 | Max redemptions per guest | 1,234 | — |
-| Budget cap | AED 1,234.50 | Total discount value after which the promotion stops automatically. Enforced at checkout, where an order whose discount would take the … |
-| ID | the name it points at, never the id | — |
-| Status | chip: Draft, Scheduled, Live, Paused, Expired, Ended | — |
 
 **The coupon code** (detail panel, from `getCouponCode`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Code | text | — |
-| Campaign | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The `generateCouponCodes` batch that issued this code. Null where no batch did. |
 | Status | chip: Issued, Assigned, Redeemed, Expired, Voided | — |
-| Assigned subject | the name it points at, never the id | — |
 | Redemption count | 1,234 | — |
-| Max redemptions | 1,234 | — |
 | Discount | grouped details | — |
 | Invalid reason | chip: Expired, Already redeemed, Voided, Not yet valid, Wrong venue, Conditions not met… | Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`. |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
 | Redeemed at | 1 Oct 2026, 14:30 | — |
-| Redeemed order | text | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **Data it reads**: `listPromotions` (onLoad, List promotions)
 
@@ -180,8 +164,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Loading (`?state=loading`) | The offers promotions list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the offers promotions untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No offers promotions yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, status, activeAt and the offers promotions are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, no results (`?state=emptyNoResults`) | Never shown as a filter result: no offer is active at this venue now, said plainly. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 #### Permissions
@@ -190,7 +174,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - `getPromotion` → `PRICE_VIEW` (read) · staff, guest, partner
 - `getCouponCode` → `PRICE_VIEW` (read) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -224,11 +208,12 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 2 → Offers & promotions*. Differences: Promo code entry is here in the prototype; the YAML puts applyCartPromoCode on GST-041.
 - Flow F53 *A guest earns, sees and spends loyalty*, step 3: Offers are shown against what they hold. → **Listed here, evaluated at checkout.** Whether an offer applies needs a cart, which GST-037 does not hold, so the cart evaluates it when the guest pays (audit R292).
 - Flow F53 branch at step 3 (medium): when An offer expired between showing and using., **Refused at use with the reason.** A guest who was shown something they cannot have needs to know it was time, not eligibility.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (3), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (42 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-037?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-001`, `GST-011`.

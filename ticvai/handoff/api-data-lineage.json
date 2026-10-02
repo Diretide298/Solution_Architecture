@@ -72815,5 +72815,103 @@
    "postgres",
    "redis"
   ]
+ },
+ "getPublishedTenantConfig": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/storefront/tenant-config",
+  "reads": [
+   "whitelabel.footer_config",
+   "whitelabel.footer_config_column",
+   "whitelabel.footer_config_social_link",
+   "whitelabel.homepage_section",
+   "whitelabel.navigation_item"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": true,
+  "summary": "The published guest-facing configuration, before anyone signs in",
+  "source": "derived",
+  "audience": [
+   "anonymous",
+   "guest",
+   "device"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listPublishedContentPages": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/storefront/pages",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": true,
+  "summary": "The live content pages, readable before sign-in",
+  "source": "derived",
+  "audience": [
+   "anonymous",
+   "guest",
+   "device"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listPublishedFaqs": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/storefront/faqs",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": true,
+  "summary": "The published FAQs, readable before sign-in",
+  "source": "derived",
+  "audience": [
+   "anonymous",
+   "guest",
+   "device"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listPublishedPolicies": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/storefront/policies",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": true,
+  "summary": "The tenant's current legal policies, readable before sign-in",
+  "source": "derived",
+  "audience": [
+   "anonymous",
+   "guest",
+   "device"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

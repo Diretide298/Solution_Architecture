@@ -68,16 +68,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-025` | Help Centre / FAQ | A | 13 | 44 | 5 | 9 | 5 | 0 | guest | review (client-verified) |
+| `WEB-025` | Help Centre / FAQ | A | 13 | 26 | 5 | 9 | 5 | 0 | guest | review (client-verified) |
 | `WEB-026` | Survey & Feedback | A | 16 | 0 | 5 | 7 | 2 | 0 | guest | review (client-verified) |
 | `WEB-027` | Newsletter Subscription | A | 20 | 35 | 6 | 11 | 1 | 0 | guest | review (client-verified) |
-| `WEB-028` | Contact & Venue Information | A | 0 | 17 | 5 | 0 | 0 | 0 | guest | review (client-verified) |
+| `WEB-028` | Contact & Venue Information | A | 0 | 11 | 5 | 0 | 0 | 0 | guest | review (client-verified) |
 | `WEB-044` | AI Concierge – Home | A | 15 | 15 | 6 | 35 | 4 | 0 | guest | review (client-verified) |
 | `WEB-046` | In-Venue Notifications | A | 11 | 12 | 6 | 5 | 2 | 0 | guest | review (client-verified) |
 
 ## Thin screens in this batch
 
-**WEB-028 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**WEB-025, WEB-028 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -139,39 +139,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Shown**
 
-**The tenant app status** (detail panel, from `getTenantAppStatus`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Is published | yes / no (icon or chip) | True once any version has been published. |
-| Published version | text | — |
-| Published at | 1 Oct 2026, 14:30 | — |
-| Draft version | text | Staff only. |
-| Has unpublished changes | yes / no (icon or chip) | Staff only. The working draft differs from the current version's `snapshot`. |
-| Active module count | 1,234 | Staff only. `ModuleEnablement` rows with `isEnabled` true. |
-| Licensed module count | 1,234 | Staff only. `ModuleEnablement` rows with `isLicensed` true. |
-| Active page count | 1,234 | Staff only. Content pages that are `published` and enabled. |
-| Is in maintenance | yes / no (icon or chip) | — |
-| Maintenance message | in the reader's language | — |
-| Expected back at | 1 Oct 2026, 14:30 | — |
-| Recent changes | list or chips (count when long) | Staff only. Names the principal behind each change, so it never reaches a public response. |
-
 **Every case** (data table, from `listCases`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
 | Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
-| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
 | Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
-| Priority | chip: Low, Normal, High, Urgent | — |
 
 **What's new** (card list, from `getTenantAppStatus`): Newest first, at most 10: version, date and the localised release notes, from `getTenantAppStatus` `whatsNew` (a public field; the staff-only `recentChanges` stays staff only).
 
@@ -204,7 +181,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|
 | Create case (primary button) | `createCase` POST `/cases` | CreateCaseRequest | Case | — | opens modal first |
 
-**Data it reads**: `getTenantAppStatus` (onLoad, App status and recent changes); `listCases` (onLoad, Cases this guest has open)
+**Data it reads**: `getTenantAppStatus` (onLoad, App status and recent changes); `listCases` (onLoad, Cases this guest has open Only when signed in (decided 2 …)
 
 **Where the user goes next**
 
@@ -294,7 +271,7 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (13), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-025?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create case.
 - [ ] Every transition is wired: `WEB-027`.
@@ -707,15 +684,9 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Is published | yes / no (icon or chip) | True once any version has been published. |
 | Published version | text | — |
 | Published at | 1 Oct 2026, 14:30 | — |
-| Draft version | text | Staff only. |
-| Has unpublished changes | yes / no (icon or chip) | Staff only. The working draft differs from the current version's `snapshot`. |
-| Active module count | 1,234 | Staff only. `ModuleEnablement` rows with `isEnabled` true. |
-| Licensed module count | 1,234 | Staff only. `ModuleEnablement` rows with `isLicensed` true. |
-| Active page count | 1,234 | Staff only. Content pages that are `published` and enabled. |
 | Is in maintenance | yes / no (icon or chip) | — |
 | Maintenance message | in the reader's language | — |
 | Expected back at | 1 Oct 2026, 14:30 | — |
-| Recent changes | list or chips (count when long) | Staff only. Names the principal behind each change, so it never reaches a public response. |
 
 **How to reach the venue** (detail panel, from `getTenantAppStatus`): **From `getTenantAppStatus.contact`** (decided 28 September, audit R073 (f)): phone, email, WhatsApp, address and opening hours, set from CMS-001 through `setMaintenanceMode`. Each is optional and a missing one is left out rather than shown blank.
 
@@ -740,14 +711,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Loading (`?state=loading`) | Venue details |
 | Error (`?state=error`) | Could not load. Falls back to the tenant contact details from the cached config |
 | Empty, first run (`?state=emptyFirstRun`) | — |
-| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
+| Permission denied (`?state=emptyNoAccess`) | **Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 #### Permissions
 
 - `getTenantAppStatus` → no permission · device, guest
 
-**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
+**A refused user sees:** **Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.
 
 #### Requirements it meets
 
@@ -792,12 +763,11 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-028` · status **review** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Footer 'Contact', or Discover → 'Contact & venue info'*. Differences: Links to parking and accessibility from the contact cards; otherwise matches.
-- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-028?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `WEB-027`.
@@ -932,7 +902,7 @@ Errors to draw in the form: 422 A setting the answer cannot do without is missin
 | Request suggestion (secondary button) | `requestSuggestion` POST `/ai/suggestions` | inline | Suggestion | 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem) | opens modal first |
 | Send conversation message (secondary button) | `sendConversationMessage` POST `/conversations/{conversationId}/messages` | inline | ConversationMessage | — | opens modal first |
 
-**Data it reads**: `getGuestMenu` (onLoad, The menu a guest sees); `listAiConversations` (onLoad, Earlier conversations)
+**Data it reads**: `getGuestMenu` (onLoad, The menu a guest sees); `listAiConversations` (onLoad, Earlier conversations Only when signed in (decided 2 …)
 
 #### States
 
@@ -942,7 +912,7 @@ Errors to draw in the form: 422 A setting the answer cannot do without is missin
 | Error (`?state=error`) | Could not load. **The rest of the site is unaffected.** |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches. |
-| Permission denied (`?state=emptyNoAccess`) | **Sign in to see this.** A guest who is not signed in is offered the door, not refused. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 No agent available. Returns the reason and offers a case, rather than queuing a guest for somebody who is not there. (HandoverRefusedProblem); 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem) |
 
@@ -957,7 +927,7 @@ Errors to draw in the form: 422 A setting the answer cannot do without is missin
 - `sendConversationMessage` → `CASE_MANAGE` (configure) · staff, guest
 - `recordAnswerFeedback` → `AI_USE` (operate) · staff, guest
 
-**A refused user sees:** **Sign in to see this.** A guest who is not signed in is offered the door, not refused.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -1018,6 +988,7 @@ Also set there, as content the tenant writes: locale.
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-044` · status **review** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Floating 'Ask Sahli' button on every page*. Differences: A floating chat panel rather than a home screen; no conversation history list (listAiConversations).
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1046,7 +1017,7 @@ Also set there, as content the tenant writes: locale.
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): `listMyNotifications` reads the feed (decided 29 September, rev 3 GAP-C1); the location-session claim stays a form on the same screen, so the pattern is kept until the screen is redrawn |
 | Offline | **The offline banner shows.** Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. |
-| Opens with | nothing: it opens on its own · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a … |
+| Opens with | `subjectId` (session) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a … |
 | Route | `/in-venue-notifications` |
 
 **What the spec says about it.** **Web push is weaker than native and it is not absent.** A guest with a tab open gets their queue call; the app does it better and the web does it. **Back in the first release** (decided 29 September, rev 3 GAP-C1): the notifications feed is needed in the first release, which reverses audit R242's deferral of this screen. The `deferred` block is removed and the screen returns to `wave: 2`, where it sat before R242. Queue calls and order status still also show on the queue and order screens, which poll.
@@ -1118,7 +1089,7 @@ Also set there, as content the tenant writes: locale.
 | Loading (`?state=loading`) | Content resolves in place. |
 | Error (`?state=error`) | Could not load. **The rest of the site is unaffected.** |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel. |
-| Permission denied (`?state=emptyNoAccess`) | **Sign in to see this.** A guest who is not signed in is offered the door, not refused. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. |
 | Empty, no results (`?state=emptyNoResults`) | **No unread notifications.** Names the Unread only filter and offers to show all; the read ones are still there. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither a location code nor a seat reference supplied; 409 Code expired or unknown, the location is out of service, or no outlet currently delivers to it — a cabana is useless as an address if nothing serves it. |
@@ -1129,7 +1100,7 @@ Also set there, as content the tenant writes: locale.
 - `listMyNotifications` → no permission · guest
 - `markMyNotificationsRead` → no permission · guest
 
-**A refused user sees:** **Sign in to see this.** A guest who is not signed in is offered the door, not refused.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -1166,6 +1137,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-046` · status **review** · provenance client-verified
 - Prototype (rev 3 (30 September build), verified 2026-10-01, match exact): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Summit Peaks → header 'At the venue' → Alerts*. Differences: Deferred in the YAML (release later, R242: no in-app feed in the first release), but the prototype draws it as a live section, so the client will expect it.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

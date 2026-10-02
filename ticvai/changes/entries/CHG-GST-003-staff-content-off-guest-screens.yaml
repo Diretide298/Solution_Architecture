@@ -1,0 +1,121 @@
+id: CHG-GST-003
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: Staff filters, raw 'Every ...' tables, staff and plumbing columns, raw request forms and staff operations
+  taken off the guest web, app and kiosk screens named in the notes' corrections; the guest screens rebound to guest
+  operations.
+decision:
+  what: Remove them from the screens named in the corrections, keeping each screen's guest behaviour; do not redesign.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Process-agent finding of 1 October, one correction per screen (handoff/design-notes/white-label.yaml, ticketing-guest.yaml
+  and finance-insights.yaml): the 9 September generator''s parameters, response tables and forms were still on the
+  guest screens a designer draws from.'
+keys_touched:
+  screens:
+  - GST-001
+  - GST-002
+  - GST-003
+  - GST-004
+  - GST-005
+  - GST-007
+  - GST-009
+  - GST-010
+  - GST-011
+  - GST-014
+  - GST-015
+  - GST-016
+  - GST-018
+  - GST-019
+  - GST-021
+  - GST-027
+  - GST-028
+  - GST-032
+  - GST-037
+  - GST-038
+  - GST-040
+  - GST-041
+  - GST-044
+  - GST-045
+  - GST-047
+  - GST-049
+  - GST-050
+  - GST-056
+  - GST-057
+  - GST-058
+  - GST-063
+  - GST-071
+  - GST-072
+  - KSK-002
+  - KSK-003
+  - KSK-004
+  - KSK-005
+  - KSK-006
+  - KSK-007
+  - KSK-009
+  - KSK-010
+  - KSK-012
+  - WEB-001
+  - WEB-002
+  - WEB-003
+  - WEB-004
+  - WEB-005
+  - WEB-006
+  - WEB-007
+  - WEB-010
+  - WEB-012
+  - WEB-013
+  - WEB-014
+  - WEB-019
+  - WEB-021
+  - WEB-022
+  - WEB-023
+  - WEB-025
+  - WEB-028
+  - WEB-029
+  - WEB-030
+  - WEB-031
+  - WEB-032
+  - WEB-033
+  - WEB-035
+  - WEB-039
+  - WEB-041
+  - WEB-045
+  operations:
+  - listOrders
+  - listMyOrders
+  - getGuestProfile
+  - getMyProfile
+  - transferOrderTickets
+  - reprintOrder
+  - listGuestMemberships
+  - claimTicketTransfer
+  - checkoutCart
+  - createPayment
+  - addCartLine
+  - listCatalogueBundles
+  - createReferral
+  - getMyChallenges
+  - createCart
+  flows:
+  - F50
+  - F55
+  - F57
+  - F75
+  files:
+  - tools/applied/guest-screen-fixes-2-october.py
+root_class: 'new: audience-mismatch'
+tickets:
+  started: []
+  unstarted:
+  - SVC-CATALOGUE-CATALOGUE-2
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: 'Decided by Chinmay, 2 October: fix before Block A starts. Register: docs/registers/guest-fix-decisions.md
+  (GFIX-3). Not closed: the prevention check arrives with the change-rules branch and is report-only until the lead
+  baselines it; close on the merge commit once run-checks.py runs it.'

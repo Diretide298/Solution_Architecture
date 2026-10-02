@@ -185,73 +185,6 @@
    }
   }
  },
- "BookingFlow": {
-  "x-ticvai-persistence": "whitelabel.booking_flow",
-  "type": "object",
-  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
-  "required": [
-   "flowTypeKey",
-   "name"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "From the path of `createBookingFlowDefinition`."
-   },
-   "flowTypeKey": {
-    "$ref": "#/components/schemas/BookingFlowTypeKey"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 80,
-    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
-   },
-   "isDefaultForType": {
-    "type": "boolean",
-    "default": false,
-    "description": "At most one per venue and type; setting it takes it from the previous default."
-   },
-   "isEnabled": {
-    "type": "boolean",
-    "default": true,
-    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
-   },
-   "steps": {
-    "type": "array",
-    "maxItems": 30,
-    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
-    "items": {
-     "$ref": "#/components/schemas/BookingFlowStep"
-    }
-   },
-   "settings": {
-    "$ref": "#/components/schemas/BookingFlowLevelSettings"
-   },
-   "isValid": {
-    "type": "boolean",
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "The partition key (ADR-0005). Written at `venue` scope."
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
  "BookingFlowConfig": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "description": "**Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** One tenant with several venues (the Kids Club branches, Coastal Aqua beside Union Arena) needs them to differ. The settings in force at a venue are the tenant's, with that venue's entry in `venueOverrides` laid over them field by field. The guest app resolves them for the venue the guest picked (audit R267); `effectiveForVenueId` on `getBookingFlowConfig` returns them resolved.\n",
@@ -828,44 +761,6 @@
   "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
   "pattern": "^\\d+(\\.\\d{1,6})?$"
  },
- "FeatureToggle": {
-  "x-ticvai-persistence": "whitelabel.feature_toggle",
-  "type": "object",
-  "required": [
-   "featureKey",
-   "isEnabled",
-   "changeScope"
-  ],
-  "properties": {
-   "featureKey": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/FeatureKey"
-     }
-    ],
-    "description": "`guestCheckout` is **off by default** (decided 17 September 2026, matrix 2.6.28, placement settled by [ADR-0045](../../docs/adr/0045-every-order-carries-a-proven-contact.md) 18 September): **the venue sets this from the configuration menu**, and it decides which routes the checkout page offers — off, the guest signs in verified at checkout; on, a guest may also check out without an account after proving their contact with a one-time code. **It gates checkout, never the cart.** The kiosk is not governed by it. Rule on `identity` `verifyGuestEmail`.\n"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "isEnabled": {
-    "type": "boolean"
-   },
-   "changeScope": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/ChangeScope"
-     }
-    ],
-    "readOnly": true,
-    "description": "Wallet and payment integrations are `buildTime` on native apps — enabling one needs a release, not a publish.\n"
-   },
-   "requiresConfiguration": {
-    "type": "boolean",
-    "description": "True where the feature needs credentials or setup elsewhere first."
-   }
-  }
- },
  "FontConfig": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -1186,38 +1081,26 @@
    }
   }
  },
- "ModuleEnablement": {
-  "x-ticvai-persistence": "whitelabel.module_enablement",
-  "type": "object",
-  "required": [
-   "moduleKey",
-   "isLicensed",
-   "isEnabled"
+ "ModuleKey": {
+  "type": "string",
+  "enum": [
+   "ticketsAndBooking",
+   "membership",
+   "events",
+   "attractions",
+   "virtualQueue",
+   "diningAndFnb",
+   "shop",
+   "parking",
+   "gamification",
+   "photoGallery",
+   "wallet",
+   "loyalty",
+   "lostAndFound",
+   "map",
+   "visitPlanner"
   ],
-  "properties": {
-   "moduleKey": {
-    "$ref": "#/components/schemas/ModuleKey"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "isLicensed": {
-    "type": "boolean",
-    "description": "From the tenant's subscription. False makes enablement impossible."
-   },
-   "isEnabled": {
-    "type": "boolean"
-   },
-   "referencedBy": {
-    "type": "array",
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "Navigation items and homepage sections pointing at this module. Maintained by `setNavigation` and `setHomepageLayout` in the same transaction as the links they write.",
-    "items": {
-     "type": "string"
-    }
-   }
-  }
+  "description": "`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown."
  },
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_item",
@@ -2395,6 +2278,118 @@
    }
   }
  },
+ "PublishedTenantConfig": {
+  "x-ticvai-persistence": "none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config",
+  "type": "object",
+  "x-ticvai-agreed": "2 October: decided by Chinmay, fix before Block A starts (GFIX-1)",
+  "description": "**The public view of the tenant's configuration** (`getPublishedTenantConfig`, decided 2 October, GFIX-1). The published parts a guest surface renders with, from the current `ConfigVersion`, and the live status `setMaintenanceMode` writes. Nothing a guest cannot see on the page: no draft marker, no CMS counts, no sender addresses, no licensing, no person.\n",
+  "required": [
+   "tenantId",
+   "publishedVersion",
+   "publishedAt",
+   "isInMaintenance"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "publishedVersion": {
+    "type": "string",
+    "description": "The `ConfigVersion.version` this answer was read from; a client holding the same version keeps its copy."
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "brand": {
+    "$ref": "#/components/schemas/BrandIdentity"
+   },
+   "appIcons": {
+    "$ref": "#/components/schemas/AppIcons"
+   },
+   "theme": {
+    "$ref": "#/components/schemas/Theme"
+   },
+   "fonts": {
+    "$ref": "#/components/schemas/FontConfig"
+   },
+   "header": {
+    "$ref": "#/components/schemas/HeaderConfig"
+   },
+   "footer": {
+    "$ref": "#/components/schemas/FooterConfig"
+   },
+   "navigation": {
+    "$ref": "#/components/schemas/NavigationConfig"
+   },
+   "homepage": {
+    "$ref": "#/components/schemas/HomepageLayout"
+   },
+   "bookingFlow": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/BookingFlowConfig"
+     }
+    ],
+    "description": "The booking-flow display settings, resolved for `venueId` when one was sent (the tenant's values with that venue's `venueOverrides` entry laid over, rev 3 CFG-11)."
+   },
+   "languages": {
+    "$ref": "#/components/schemas/LanguageConfig"
+   },
+   "accessibility": {
+    "$ref": "#/components/schemas/AccessibilitySettings"
+   },
+   "enabledModules": {
+    "type": "array",
+    "description": "The modules the tenant has enabled and published, so a guest surface hides a tab or a homepage section for a module that is off. Licensing is not shown.",
+    "items": {
+     "$ref": "#/components/schemas/ModuleKey"
+    }
+   },
+   "enabledFeatures": {
+    "type": "array",
+    "description": "The `featureKey` of every feature toggle that is on in the published version.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "isInMaintenance": {
+    "type": "boolean",
+    "description": "Live state (`setMaintenanceMode`), as on `getTenantAppStatus`."
+   },
+   "maintenanceMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "expectedBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "minimumAppVersion": {
+    "$ref": "#/components/schemas/MinimumAppVersion"
+   },
+   "availability": {
+    "$ref": "#/components/schemas/AppAvailability"
+   },
+   "availabilityMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "contact": {
+    "$ref": "#/components/schemas/VenueContact"
+   }
+  }
+ },
  "TenantAppStatus": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -2569,209 +2564,6 @@
       "at": {
        "type": "string",
        "format": "date-time"
-      }
-     }
-    }
-   }
-  }
- },
- "TenantConfig": {
-  "x-ticvai-persistence": "whitelabel.tenant_config",
-  "type": "object",
-  "description": "**The tenant's working draft**, one row per tenant (see the header). Published versions are `ConfigVersion.snapshot`, not further rows here.\n**Only `tenantId` and `version` are required**, because the draft is built one part at a time: the first `set*` call creates the row with that part alone. A part that is still unset is what `validateTenantConfig` reports (`missingRequiredAsset` and the like) and what blocks `publishTenantConfig` — a storage rule that every part exist would stop the first save.\n",
-  "required": [
-   "tenantId",
-   "version"
-  ],
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "version": {
-    "type": "string",
-    "description": "The draft's working version label; the published one is `ConfigVersion.version`."
-   },
-   "isDraft": {
-    "type": "boolean",
-    "readOnly": true,
-    "description": "True for the working draft, which is the only row."
-   },
-   "brand": {
-    "$ref": "#/components/schemas/BrandIdentity"
-   },
-   "appIcons": {
-    "$ref": "#/components/schemas/AppIcons"
-   },
-   "bookingFlow": {
-    "$ref": "#/components/schemas/BookingFlowConfig"
-   },
-   "bookingFlows": {
-    "type": "array",
-    "readOnly": true,
-    "x-ticvai-derived": "onRead",
-    "description": "Every venue's booking flows in the draft (`whitelabel.booking_flow`), so a publish snapshots them with the rest (decided 29 September, W12).",
-    "items": {
-     "$ref": "#/components/schemas/BookingFlow"
-    }
-   },
-   "theme": {
-    "$ref": "#/components/schemas/Theme"
-   },
-   "fonts": {
-    "$ref": "#/components/schemas/FontConfig"
-   },
-   "footer": {
-    "$ref": "#/components/schemas/FooterConfig"
-   },
-   "notificationBranding": {
-    "type": "object",
-    "nullable": true,
-    "description": "BL-003. **`marketing-crm` holds the templates and nothing said whose identity they wear.** A message sent on behalf of a venue carries that venue's sender name, reply-to and logo — **an operational alert arriving from `noreply@ticvai.com` is one a guest marks as spam.**\nResolved on the template at send time rather than duplicated per template.\n",
-    "properties": {
-     "senderName": {
-      "type": "string"
-     },
-     "replyToEmail": {
-      "type": "string",
-      "format": "email"
-     },
-     "smsSenderId": {
-      "type": "string",
-      "nullable": true
-     },
-     "whatsappBusinessId": {
-      "type": "string",
-      "nullable": true
-     },
-     "logoAssetId": {
-      "type": "string",
-      "format": "uuid",
-      "nullable": true
-     }
-    }
-   },
-   "enabledPaymentMethods": {
-    "type": "array",
-    "nullable": true,
-    "description": "BL-004. **`FeatureToggle` could turn Apple Pay on and could not say which cards a tenant accepts.** Resolved against `orders.PaymentProvider.supportedMethods` — the tenant's choice within what the gateway offers, and **a tenant enabling a method their provider does not support should fail here rather than at checkout.**\n",
-    "items": {
-     "type": "string"
-    }
-   },
-   "accessibility": {
-    "$ref": "#/components/schemas/AccessibilitySettings"
-   },
-   "header": {
-    "$ref": "#/components/schemas/HeaderConfig"
-   },
-   "navigation": {
-    "$ref": "#/components/schemas/NavigationConfig"
-   },
-   "homepage": {
-    "$ref": "#/components/schemas/HomepageLayout"
-   },
-   "modules": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/ModuleEnablement"
-    }
-   },
-   "features": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/FeatureToggle"
-    }
-   },
-   "languages": {
-    "$ref": "#/components/schemas/LanguageConfig"
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "isInMaintenance": {
-    "type": "boolean",
-    "default": false,
-    "description": "Written by `setMaintenanceMode`; read by `getTenantAppStatus`."
-   },
-   "maintenanceMessage": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true,
-    "description": "The message on the branded maintenance screen."
-   },
-   "expectedBackAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "minimumAppVersion": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/MinimumAppVersion"
-     }
-    ],
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "contact": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/VenueContact"
-     }
-    ],
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "availability": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/AppAvailability"
-     }
-    ],
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "availabilityMessage": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true,
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "venues": {
-    "type": "array",
-    "x-ticvai-derived": "onRead",
-    "description": "The tenant's active venues, for the guest venue picker on WEB-001 and GST-001 (decided 28 September, audit R267). Public: returned without a session and cached with the rest of the response. Read from `tenancy` venues; a closed or archived venue is left out.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "venueId",
-      "name"
-     ],
-     "properties": {
-      "venueId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "name": {
-       "$ref": "#/components/schemas/LocalisedText"
-      },
-      "city": {
-       "type": "string",
-       "nullable": true
-      },
-      "openingHours": {
-       "allOf": [
-        {
-         "$ref": "#/components/schemas/LocalisedText"
-        }
-       ],
-       "nullable": true,
-       "description": "Today's hours as shown to a guest, e.g. \"10:00 to 22:00\"."
       }
      }
     }

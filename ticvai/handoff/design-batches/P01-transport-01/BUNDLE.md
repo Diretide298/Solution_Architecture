@@ -276,7 +276,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Save route (secondary button) | `saveFavouriteRoute` POST `/transport/favourite-routes` | inline | FavouriteRoute | 409 The guest already has the maximum number of saved routes.; 422 The stations are the same, or no active route serves them in this order. | — |
 | Remove favourite (destructive button) | `deleteFavouriteRoute` DELETE `/transport/favourite-routes/{favouriteId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens confirmDialog first |
 
-**Data it reads**: `listTransportStations` (onLoad, The stations to pick From and To); `getTransportFareTable` (onLoad, Passenger types and fares of the route); `searchTransportDepartures` (onLoad, Departures for the stations, date, period and party, with …); `getTransportRoute` (onLoad, The route and its stops); `getTransportRouteMap` (onLoad, Stop list, line and bounds for the map); `listTransportPassOffers` (onLoad, Multi-trip and unlimited passes for the station pair); `listMyFavouriteRoutes` (onLoad, The guest's saved routes)
+**Data it reads**: `listTransportStations` (onLoad, The stations to pick From and To); `getTransportFareTable` (onLoad, Passenger types and fares of the route); `searchTransportDepartures` (onLoad, Departures for the stations, date, period and party, with …); `getTransportRoute` (onLoad, The route and its stops); `getTransportRouteMap` (onLoad, Stop list, line and bounds for the map); `listTransportPassOffers` (onLoad, Multi-trip and unlimited passes for the station pair); `listMyFavouriteRoutes` (onLoad, The guest's saved routes Only when signed in (decided 2 …)
 
 **Where the user goes next**
 

@@ -1633,6 +1633,9 @@ paths:
         - "P08 BO-484 Self-Service Experience Command Center"
         - "P08 BO-489 Bonus, Free Game & Benefit View"
         - "P08 BO-490 Game & Ride Eligibility / “What Can I Play?”"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: What this guest can play right now, and what it would cost
       description: 'Board 10.7 — *"What Can I Play?"*, and it is the most useful screen in the pack.
 

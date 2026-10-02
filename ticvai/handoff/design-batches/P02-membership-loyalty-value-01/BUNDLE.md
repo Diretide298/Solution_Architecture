@@ -1,6 +1,6 @@
 # P02-membership-loyalty-value-01 — P02 · Membership, Loyalty & Value
 
-**3 screens · 22 operations · 37 schemas · 11 permissions**
+**3 screens · 21 operations · 37 schemas · 11 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -69,8 +69,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-011` | Wallet Overview | A | 0 | 28 | 6 | 30 | 14 | 6 | guest | notStarted (designed) |
-| `GST-015` | Memberships | A | 10 | 72 | 6 | 53 | 7 | 0 | guest | notStarted (designed) |
+| `GST-011` | Wallet Overview | A | 0 | 13 | 6 | 30 | 14 | 6 | guest | notStarted (designed) |
+| `GST-015` | Memberships | A | 10 | 42 | 6 | 53 | 7 | 0 | guest | notStarted (designed) |
 | `GST-036` | Loyalty & Rewards | A | 0 | 30 | 6 | 52 | 2 | 2 | guest | notStarted (designed) |
 
 ## Thin screens in this batch
@@ -96,7 +96,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (comfortable density): `listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
-| Opens with | `subjectId` (GST-001), `walletId` (navigation) · cold entry: Resolves from the session; a cold arrival is the ordinary case. |
+| Opens with | `subjectId` (session), `walletId` (navigation) · cold entry: Resolves from the session; a cold arrival is the ordinary case. |
 | Route | `/general/wallet-overview` |
 
 **What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -109,40 +109,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every wallet transaction** (data table, from `listWalletTransactions`)
+**Activity** (card list, from `listWalletTransactions`): Was the generated table 'Every wallet transaction'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)). From `wallet.yaml` `listWalletTransactions`.
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | text | — |
 | Kind | chip: Top up, Spend, Refund, Adjustment, Bonus, Expiry… | — |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Balance after | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Order | text | — |
-| Venue | the name it points at, never the id | — |
 | Reason | text | — |
-| Principal | the name it points at, never the id | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
-
-**The selected wallet transaction** (detail panel, from `listWalletTransactions`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | text | — |
-| Kind | chip: Top up, Spend, Refund, Adjustment, Bonus, Expiry… | — |
-| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Balance after | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Order | text | — |
-| Venue | the name it points at, never the id | — |
-| Reason | text | — |
-| Principal | the name it points at, never the id | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 
 **The wallet** (detail panel, from `getWallet`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Subject | the name it points at, never the id | — |
 | Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Credits | list or chips (count when long) | 4.3.5 and 4.3.19. One balance and one bonus balance with one expiry could not express what the requirement asks for — cash, bonus and … |
 | Bonus balance | AED 1,234.50 | Promotional value. Typically non-refundable and spent first. |
@@ -167,7 +147,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the wallet overview untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No wallet overview yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Nothing is due or refundable, or the action does not match the balance (`collect` on a wallet in credit), or `waive` by a guest.; 409 The venue has auto-reload disabled for this wallet type, or the wallet is suspended or closed.; 422 An amount outside the venue's funding rules, or a payment token that is not the holder's.; 422 The card was declined, or `waive` without a reason. |
 
@@ -180,7 +160,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - `getWalletExitBalance` → `WALLET_VIEW` (read) · staff, guest
 - `settleWalletAtExit` → `WALLET_OPERATE` (operate) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -244,11 +224,12 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
 - Flow F53 *A guest earns, sees and spends loyalty*, step 4: Their wallet shows stored value. → **Wallet and points are different things** — one is money the venue owes, the other is a discount it might give.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409, 412, 422).
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-011?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-001`, `GST-020`.
@@ -272,10 +253,12 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (comfortable density): `listDelegations` reads the population and `getMyMemberships` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| Opens with | `guestLinkId` (deepLink), `subjectId` (GST-001), `caseId` (navigation), `statementId` (navigation) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
+| Opens with | `guestLinkId` (deepLink), `subjectId` (session), `caseId` (navigation), `statementId` (navigation) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
 | Route | `/general/memberships` |
 
 **What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Membership. **`listDelegations` and `grantDelegation` are the member list and add-member** Pranay asked for — CF-132 built them as delegated authority rather than a household table. **Rewired on the 20 August review.** **`getGuestLink` restored** — F19 step 1 calls it from here and my rewire dropped it. **A membership that works in another country resolves through the guest link**, and the flow checker caught what the screen edit did not. **Cross-platform navigation removed 24 August**: ADM-003. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Wired 24 August from review**: getSubscription, listSubscriptionInvoices. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **`getSubscription` and `listSubscriptionInvoices` removed the same day they were wired.** `check-screens` refused them: **both carry a staff permission and this is a guest surface.** The reviewer asked for `GET /memberships/current` — a guest-scoped read that does not exist. **That is the correct finding and the wiring was the wrong fix**: it is a new operation, not a missing link. **`getGuestLink` is `service` audience** — a cross-region pseudonymous …
+
+**Known gaps.** The staff-shaped membership list; the guest's own are `getMyMemberships`.
 
 #### Inputs: what the user enters or picks
 
@@ -296,11 +279,10 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Category | picker: choose a category | — | — | `listProducts` ?categoryId |
 | Segment tag | text field | — | max length 120 | `listProducts` ?segmentTag |
 | Guided answers | multi-picker: choose guided answers | — | at most 10 | `listProducts` ?guidedAnswerIds |
-| Include lapsed | toggle | on | — | `listGuestMemberships` ?includeLapsed |
 | Order | picker: choose an order | — | — | `listInstalmentPlans` ?orderId |
 | Status | radio group | — | Active · Completed · In arrears · Cancelled | `listInstalmentPlans` ?status |
 
-**Form: Retry my dunning payment** (modal, opened by *Retry my dunning payment*; *Retry my dunning payment* calls `retryMyDunningPayment`, *Cancel* sends nothing)
+**Form: Retry the payment** (modal, opened by *Retry the payment*; *Retry my dunning payment* calls `retryMyDunningPayment`, *Cancel* sends nothing)
 
 **Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.
 
@@ -312,9 +294,9 @@ Carried, not typed: `caseId`
 
 Errors to draw in the form: 409 The case is already resolved, or the decline is hard and no other card was given.; 422 The payment was declined again.
 
-**Form: Grant delegation** (modal, opened by *Grant delegation*; *Grant delegation* calls `grantDelegation`, *Cancel* sends nothing)
+**Form: Let a family member use it** (modal, opened by *Let a family member use it*; *Allow* calls `grantDelegation`, *Cancel* sends nothing)
 
-**Collects what `grantDelegation` sends before it is called.** Required: `overSubjectId`, `delegationKind`, `permission`. Optional: `overObjectRef`, `quota`, `validTo`, `isRevocableBySubject`. Dismissing sends nothing; the screen behind is unchanged.
+**Pick the family member, then what they may do, in plain words** (book with it, enter with it, see the bills), and how many times. `grantDelegation` with the person and the permission the choice stands for; no subject id, delegation kind or permission key is shown.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -332,41 +314,33 @@ Errors to draw in the form: 409 A cycle, or a minor granting authority over an a
 
 **Shown**
 
-**Every memberships** (data table, from `listDelegations`)
+**Family and who may use it** (card list, from `listDelegations`): Was the generated table 'Every memberships'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Role | the name it points at, never the id | — |
 | Permission | text | From the permission enum. `*` permitted on DENY only. |
-| Subject | the name it points at, never the id | CF-132, CL-05. A grant held by a guest rather than a staff principal. |
 | Over subject | the name it points at, never the id | Whose behalf. Null for a staff grant, which is the existing behaviour — every grant written before 18 August means exactly what it meant … |
 | Over object ref | text | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. |
 | Delegation kind | chip: Primary holder, Family member, Group leader, Attendee, Corporate admin, Corporate … | What kind of relationship this expresses, for display and for reporting. The mechanism does not branch on it — a family member and a group … |
 | Quota | 1,234 | 2.14.15 and 4.3.11. How many the holder may assign. |
 | Is revocable by subject | yes / no (icon or chip) | Whether the person it is over can end it. A guest who linked a family member should be able to unlink them; a corporate member should not … |
-| Scope path | text | — |
 | Effect | chip: ALLOW, DENY | — |
 
-**Every billing statement** (data table, from `listBillingStatements`)
+**Statements** (card list, from `listBillingStatements`): Was the generated table 'Every billing statement'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Period start | 1 Oct 2026 | — |
 | Period end | 1 Oct 2026 | — |
 | Lines | list or chips (count when long) | — |
 | Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Is tax invoice | yes / no (icon or chip) | Always false, and stated rather than assumed. UAE e-invoicing is Peppol five-corner with the FTA as the fifth corner, PINT AE XML and 51 … |
 
-**Every dunning case** (data table, from `listMyPaymentIssues`)
+**Payments that need you** (card list, from `listMyPaymentIssues`): Was the generated table 'Every dunning case'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Order | text | The order whose renewal failed. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | State | chip: Scheduled, In progress, Exhausted, Recovered, Resolved manually | BL-100. `exhausted` and `recovered` are both endings and only one of them is a failure. |
@@ -378,52 +352,25 @@ Errors to draw in the form: 409 A cycle, or a minor granting authority over an a
 | Resolution | chip: Paid by other means, Card replaced, Write off, Cancelled by guest | — |
 | Resolution note | text | What `resolveDunningCase` was told, which had nowhere to land until now. The enum above tells `writeOff` from `cardReplaced`; which … |
 
-**Every product** (data table, from `listProducts`)
+**Membership plans** (card list, from `listProducts`): The venue's membership plans, to join or upgrade. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
-| On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
-| On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
-
-**Every guest membership** (data table, from `listGuestMemberships`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Entitlement | the name it points at, never the id | The `access.Entitlement.id` this membership is — a UUIDv7, like every entitlement id. |
-| Product | the name it points at, never the id | — |
-| Name | text | — |
-| Tier | text | — |
-| Status | chip: Active, Frozen, Suspended, Expired, Cancelled | Derived from the entitlement, not held here. This schema is a view assembled from the entitlement, the product that granted it and the … |
-| Valid from | 1 Oct 2026 | — |
-| Valid to | 1 Oct 2026 | — |
-| Frozen days | 1,234 | Days lost to a freeze and added back to `validTo`. Shown because a guest who paused a pass will check the maths, and a validity date that … |
-| Benefits | list or chips (count when long) | 5.4.31. From the product's entitlement template. |
-| Renews on | 1 Oct 2026 | — |
-| Previous terms | list or chips (count when long) | Prior terms, including lapsed ones. |
+| Media | list or chips (count when long) | The product's own photos and video (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each … |
 
 **The selected billing statement** (detail panel, from `getBillingStatement`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Period start | 1 Oct 2026 | — |
 | Period end | 1 Oct 2026 | — |
 | Lines | list or chips (count when long) | — |
 | Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Is tax invoice | yes / no (icon or chip) | Always false, and stated rather than assumed. UAE e-invoicing is Peppol five-corner with the FTA as the fifth corner, PINT AE XML and 51 … |
 
-**The guest membership** (detail panel, from `getMyMemberships`)
+**Your membership** (detail panel, from `getMyMemberships`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -443,10 +390,10 @@ Errors to draw in the form: 409 A cycle, or a minor granting authority over an a
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Grant delegation (primary button) | `grantDelegation` POST `/guests/{subjectId}/delegations` | inline | DelegatedAccess | 409 A cycle, or a minor granting authority over an adult. Both are refused — a delegation graph with a loop is one nobody can reason about, and the second is a … | opens modal first |
-| Retry my dunning payment (secondary button) | `retryMyDunningPayment` POST `/dunning-cases/{caseId}/retry` | RetryDunningPaymentRequest | DunningCase | 409 The case is already resolved, or the decline is hard and no other card was given.; 422 The payment was declined again. | opens modal first |
+| Let a family member use it (primary button) | `grantDelegation` POST `/guests/{subjectId}/delegations` | inline | DelegatedAccess | 409 A cycle, or a minor granting authority over an adult. Both are refused — a delegation graph with a loop is one nobody can reason about, and the second is a … | opens modal first |
+| Retry the payment (secondary button) | `retryMyDunningPayment` POST `/dunning-cases/{caseId}/retry` | RetryDunningPaymentRequest | DunningCase | 409 The case is already resolved, or the decline is hard and no other card was given.; 422 The payment was declined again. | opens modal first |
 
-**Data it reads**: `listBillingStatements` (onLoad, Membership billing statements); `listMyPaymentIssues` (onLoad, Declined renewals waiting on the guest); `getMyMemberships` (onLoad, A guest's own memberships, benefits and history); `listDelegations` (onLoad, Who may act for this guest, and for whom they may act); `listProducts` (onLoad, List products); `listGuestMemberships` (onLoad, A guest's memberships, benefits and history); `listInstalmentPlans` (onLoad, Instalment plans and schedule)
+**Data it reads**: `listBillingStatements` (onLoad, Membership billing statements); `listMyPaymentIssues` (onLoad, Declined renewals waiting on the guest); `getMyMemberships` (onLoad, A guest's own memberships, benefits and history); `listDelegations` (onLoad, Who may act for this guest, and for whom they may act); `listProducts` (onLoad, List products); `listInstalmentPlans` (onLoad, Instalment plans and schedule)
 
 **Where the user goes next**
 
@@ -461,7 +408,7 @@ Errors to draw in the form: 409 A cycle, or a minor granting authority over an a
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the memberships untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No memberships yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on from, to and the memberships are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getMyMemberships` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 409 A cycle, or a minor granting authority over an adult. Both are refused — a delegation graph with a loop is one nobody can reason about, and the second is a …; 409 The case is already resolved, or the decline is hard and no other card was … |
 
@@ -475,11 +422,10 @@ Errors to draw in the form: 409 A cycle, or a minor granting authority over an a
 - `listDelegations` → `GUEST_VIEW` (read) · staff, guest
 - `grantDelegation` → `GUEST_MANAGE` (configure) · staff, guest
 - `listProducts` → `PRODUCT_VIEW` (read) · staff, guest, partner
-- `listGuestMemberships` → `PRODUCT_VIEW` (read) · staff, guest
 - `listInstalmentPlans` → `PAYMENT_VIEW` (read) · staff, guest
 - `createInstalmentPlan` → `ORDER_CREATE` (operate) · staff, guest, service
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getMyMemberships` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -533,14 +479,15 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Flow F19 *A membership works in another country*, step 1: Guest sees the pass and where it is valid → **Valid here is not the same as bought here**
 - Flow F19 branch at step 1 (requiresStaff): when The guest asks for a refund of a pass used in two regions, Refund policy applies in the selling cell, and the usage evidence is in another. **Nobody has decided who refunds** — CF-31 named the mechanism and not the money.
 - ADR-0010 *Cross-Jurisdiction Entitlements* (`docs/adr/0010-cross-jurisdiction-entitlements.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 403, 409, 422).
-- [ ] Every output is drawn (72 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (42 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Grant delegation, Retry my dunning payment.
+- [ ] Every action is wired with its success and its failure: Let a family member use it, Retry the payment.
 - [ ] Every transition is wired: `GST-001`, `ADM-003`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 7 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -562,7 +509,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (comfortable density): `listLoyaltyProgrammes` reads the population and `getLoyaltyPosition` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** — and that is said. Redeeming and referring need the connection. |
-| Opens with | nothing: it opens on its own |
+| Opens with | `subjectId` (session) |
 | Route | `/loyalty-rewards` |
 
 **What the spec says about it.** Merged with GST-064 on 18 August. **I created GST-064 in the parity sweep without noticing this screen existed** — same two operations, same capability, and the fuzzy match against the client storyboard is what surfaced it. Board 6 panel 6 shows one Loyalty & Rewards screen, not two. **Cross-surface parity, 31 August**: added evaluatePromotions, listPromotions. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate. **Pull audit, 27 September**: evaluatePromotions removed again. It evaluates a cart — `EvaluatePromotionsRequest` requires venueId, channel and at least one line — and this screen has no cart: no entry params, nothing in a basket. The parity pass copied it across without asking what it would be sent. Promotions are evaluated where the cart is.
@@ -645,7 +592,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the loyalty rewards untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No loyalty rewards yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listLoyaltyProgrammes` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** — and that is said. Redeeming and referring need the connection. |
 
 #### Permissions
@@ -656,7 +603,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - `decideRecommendations` → `AI_USE` (operate) · staff, guest, anonymous
 - `recordRecommendationEvents` → `AI_USE` (operate) · staff, guest, anonymous
 
-**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -704,6 +651,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
 - Flow F53 *A guest earns, sees and spends loyalty*, step 1: They check their points. → **Position, not balance.** Tier, points, and what the next tier needs — a number alone tells a guest nothing about whether to come back.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -924,7 +872,6 @@ Method, path, parameters, request and response for every operation these screens
 "grantDelegation": {"method":"POST","path":"/guests/{subjectId}/delegations","contract":"identity","summary":"Let one guest act for another","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"DelegatedAccess"},
 "listBillingStatements": {"method":"GET","path":"/billing-statements","contract":"orders","summary":"What was charged, when, and against which agreement","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listDelegations": {"method":"GET","path":"/guests/{subjectId}/delegations","contract":"identity","summary":"Who may act for this guest, and for whom they may act","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listGuestMemberships": {"method":"GET","path":"/guest/memberships","contract":"catalogue","summary":"A guest's memberships, benefits and history","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"includeLapsed","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listInstalmentPlans": {"method":"GET","path":"/instalment-plans","contract":"payments","summary":"Instalment plans and their schedules","permission":"PAYMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"orderId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listLoyaltyProgrammes": {"method":"GET","path":"/loyalty/programmes","contract":"marketing-crm","summary":"List loyalty programmes","permission":"MARKETING_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMyPaymentIssues": {"method":"GET","path":"/guests/me/payment-issues","contract":"payments","summary":"A guest's own failed recurring payments","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

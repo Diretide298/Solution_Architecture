@@ -189,7 +189,7 @@
    "error": "Could not load. Names which read failed and leaves the tickets untouched.",
    "emptyFirstRun": "No tickets yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on state, includeShared and the tickets are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection."
   },
   "apis": [
@@ -235,6 +235,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "entitlementId",
      "from": "deepLink"
@@ -450,7 +454,7 @@
    "loading": "Availability is live, never cached",
    "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getEntitlement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection."
   },
   "apis": [
@@ -492,6 +496,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "entitlementId",
      "from": "deepLink"
@@ -635,104 +643,18 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listOrders",
-       "notes": "Sends `?venueId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Principal id",
-       "operation": "listOrders",
-       "notes": "Sends `?principalId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Shift id",
-       "operation": "listOrders",
-       "notes": "Sends `?shiftId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Status",
-       "operation": "listOrders",
-       "notes": "Sends `?status=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Created from",
-       "operation": "listOrders",
-       "notes": "Sends `?createdFrom=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Created to",
-       "operation": "listOrders",
-       "notes": "Sends `?createdTo=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every order",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
-      }
-     ]
-    },
-    {
      "name": "contextPanel",
      "slot": "selection",
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected order",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount",
-        "OrderSummary.principalId",
-        "OrderSummary.holdLabel",
-        "OrderSummary.heldUntil"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The visit reminder",
        "bindsTo": "VisitReminder",
        "columns": [
-        "VisitReminder.id",
         "VisitReminder.orderId",
-        "VisitReminder.subjectId",
         "VisitReminder.enabled",
         "VisitReminder.leadTimeMinutes",
-        "VisitReminder.channels",
-        "VisitReminder.scopePath"
+        "VisitReminder.channels"
        ],
        "operation": "getVisitReminder",
        "provenance": "contract orders.yaml GET /orders/{orderId}/reminder"
@@ -742,22 +664,16 @@
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
         "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
         "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.payments"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -796,7 +712,7 @@
    "error": "Could not load. Names which read failed and leaves the add calendar reminders untouched.",
    "emptyFirstRun": "No add calendar reminders yet. Offers Issue wallet pass (`issueWalletPass`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the add calendar reminders are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrderCalendarEvent` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -825,19 +741,10 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "issueWalletPass",
     "contract": "orders",
     "purpose": "Generate an Apple or Google wallet pass",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -874,7 +781,7 @@
     "id": "formSetVisitReminder",
     "component": "modal",
     "trigger": "Save visit reminder",
-    "body": "**Collects what `setVisitReminder` sends before it is called.** Required: `enabled`. Optional: `id`, `orderId`, `subjectId`, `leadTimeMinutes`, `channels`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**On or off, how long before, and by which channels.** `setVisitReminder` for this order; the reminder's id and the guest are the server's.",
     "bindsTo": "VisitReminder",
     "confirm": {
      "label": "Save visit reminder",
@@ -884,15 +791,11 @@
      "label": "Cancel",
      "discards": [
       "enabled",
-      "id",
-      "orderId",
-      "subjectId",
       "leadTimeMinutes",
-      "channels",
-      "scopePath"
+      "channels"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "formIssueWalletPass",
@@ -911,6 +814,14 @@
      ]
     },
     "provenance": "client-verified"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "removed": true,
+    "why": "The staff-scoped order list; the screen opens on one order (`getOrder`), not a list.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -996,83 +907,20 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listOrders",
-       "notes": "Sends `?venueId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Principal id",
-       "operation": "listOrders",
-       "notes": "Sends `?principalId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Shift id",
-       "operation": "listOrders",
-       "notes": "Sends `?shiftId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Status",
-       "operation": "listOrders",
-       "notes": "Sends `?status=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Created from",
-       "operation": "listOrders",
-       "notes": "Sends `?createdFrom=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Created to",
-       "operation": "listOrders",
-       "notes": "Sends `?createdTo=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every order",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every order",
+       "kind": "cardList",
+       "label": "Your orders",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
+        "Order.currency",
+        "Order.lines",
+        "Order.createdAt"
        ],
        "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every order'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -1082,59 +930,23 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected order",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount",
-        "OrderSummary.principalId",
-        "OrderSummary.holdLabel",
-        "OrderSummary.heldUntil"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
         "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
         "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.payments"
        ],
        "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "provenance": "contract orders.yaml GET /orders/{orderId}",
+       "notes": "The selected order: lines, totals, payments and status."
       }
      ]
     }
@@ -1145,16 +957,10 @@
    "error": "Could not load. Names which read failed and leaves the order history untouched.",
    "emptyFirstRun": "No order history yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "getOrder",
     "contract": "orders",
@@ -1166,15 +972,6 @@
     "contract": "orders",
     "purpose": "The orders this guest placed",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
    },
    {
     "operationId": "listTaxInvoices",
@@ -1215,6 +1012,10 @@
   "entryState": {
    "params": [
     {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
      "name": "orderId",
      "from": "deepLink"
     },
@@ -1250,25 +1051,18 @@
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
+  "gaps": [
    {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
+    "operation": "listOrders",
+    "removed": true,
+    "why": "The staff-scoped order list; a guest screen lists the caller's own orders with `listMyOrders` (removed from guest screens on 24 August, back with the 31 August parity pass).",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   },
+   {
+    "operation": "transferOrderTickets",
+    "removed": true,
+    "why": "Transfer is GST-014's; order history views and downloads.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -1440,7 +1234,7 @@
     },
     {
      "name": "subjectId",
-     "from": "GST-001"
+     "from": "session"
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `itemId`."
@@ -1625,7 +1419,7 @@
    "loading": "The saved profile.",
    "error": "Could not load. Names which read failed and leaves the profile untouched.",
    "emptyFirstRun": "No profile configured. The form opens empty and `recordConsent` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `updateMyProfile` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -2074,7 +1868,7 @@
    {
     "operationId": "getGuestSession",
     "contract": "identity",
-    "purpose": "Read the current guest session",
+    "purpose": "Read the current guest session Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -2269,7 +2063,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer order tickets",
+       "label": "Send tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
@@ -2279,17 +2073,17 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "multiSelect",
-       "label": "Ticket ids",
+       "kind": "cardList",
+       "label": "Tickets to send",
        "operation": "transferOrderTickets",
-       "notes": "Required.",
+       "notes": "The guest's tickets as cards; ticking a card picks it.",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       },
       {
        "kind": "textField",
-       "label": "Recipient",
+       "label": "Send to",
        "operation": "transferOrderTickets",
-       "notes": "Required.",
+       "notes": "A channel (email, SMS or WhatsApp), then the address.",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       },
       {
@@ -2306,7 +2100,8 @@
    "loading": "Availability is live, never cached",
    "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible."
+   "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible.",
+   "emptyNoResults": "No ticket to send: the guest holds none that can be shared. Says so and offers My Tickets."
   },
   "apis": [
    {
@@ -2520,7 +2315,7 @@
    "loading": "Availability is live, never cached",
    "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A ticket already loaded shows its rotating code, derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Transferring a ticket needs the connection."
   },
   "apis": [
@@ -2560,6 +2355,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "orderId",
      "from": "deepLink"
@@ -2800,7 +2599,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Nothing requested yet.** No export, no erasure, no document — and that is the ordinary state. **The screen explains what each request means before offering it**, because an erasure a guest did not understand is one they will phone about.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW_PII`, which `exportSubjectData` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in."
   },
   "apis": [

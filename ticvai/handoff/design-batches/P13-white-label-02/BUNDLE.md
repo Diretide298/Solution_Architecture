@@ -213,7 +213,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|---|---|---|
 | Entity kind (`seo.entityKind`) | Content page · Product · Event · Performance · Membership · Promotion · Venue | — | every website screen | — |
 | Entity (`seo.entityId`) | shows names, sends the id | — | every website screen | — |
-| Locale (`seo.locale`) | — | — | GST-031, GST-073, WEB-010, WEB-011, WEB-017, WEB-024, WEB-027, WEB-044 | — |
+| Locale (`seo.locale`) | — | — | GST-031, GST-073, WEB-011, WEB-017, WEB-024, WEB-027, WEB-044 | — |
 | SEO metadata title (`seo.title`) | — | — | every website screen | — |
 | Meta description (`seo.metaDescription`) | — | — | every website screen | — |
 | Keywords (`seo.keywords`) | — | — | every website screen | — |
@@ -1482,9 +1482,9 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 
 | Field | Allowed values | Default | Reaches | What it changes |
 |---|---|---|---|---|
-| Body (`policies.body`) | English and Arabic (Arabic right to left) | — | GST-040, GST-057, WEB-045 | Keyed by language code. Values are sanitised HTML. |
-| Requires reconsent (`policies.requiresReconsent`) | — | — | GST-040, GST-057, WEB-045 | True prompts existing guests to consent again on next launch. Material changes to a privacy notice generally require it. |
-| Effective from (`policies.effectiveFrom`) | 1 Oct 2026 (dd MMM yyyy) | — | GST-040, GST-057, WEB-045 | — |
+| Body (`policies.body`) | English and Arabic (Arabic right to left) | — | the content and policy pages | Keyed by language code. Values are sanitised HTML. |
+| Requires reconsent (`policies.requiresReconsent`) | — | — | the content and policy pages | True prompts existing guests to consent again on next launch. Material changes to a privacy notice generally require it. |
+| Effective from (`policies.effectiveFrom`) | 1 Oct 2026 (dd MMM yyyy) | — | the content and policy pages | — |
 
 #### References
 

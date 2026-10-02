@@ -846,19 +846,19 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|---|---|---|
 | Languages (`languages.languages`) | at least 1 | — | every guest screen (web, app and kiosk) | the language button in the header; Arabic flips every screen right to left |
 | Default language (`languages.defaultLanguage`) | ISO 639-1 code, shown as the language name | — | every guest screen (web, app and kiosk) | the language a first visit opens in |
-| Body (`policies.body`) | English and Arabic (Arabic right to left) | — | GST-040, GST-057, WEB-045 | Keyed by language code. Values are sanitised HTML. |
-| Requires reconsent (`policies.requiresReconsent`) | — | — | GST-040, GST-057, WEB-045 | True prompts existing guests to consent again on next launch. Material changes to a privacy notice generally require it. |
-| Effective from (`policies.effectiveFrom`) | 1 Oct 2026 (dd MMM yyyy) | — | GST-040, GST-057, WEB-045 | — |
-| Categories (`faqs.categories`) | — | — | GST-040, WEB-045 | — |
-| Categories: code (`faqs.categories[].code`) | — | — | GST-040, WEB-045 | — |
-| Categories: name (`faqs.categories[].name`) | English and Arabic (Arabic right to left) | — | GST-040, WEB-045 | — |
-| Categories: sort order (`faqs.categories[].sortOrder`) | — | — | GST-040, WEB-045 | — |
-| Categories: entries (`faqs.categories[].entries`) | — | — | GST-040, WEB-045 | — |
-| Entries: iD (`faqs.categories[].entries[].id`) | shows names, sends the id | — | GST-040, WEB-045 | — |
-| Entries: question (`faqs.categories[].entries[].question`) | English and Arabic (Arabic right to left) | — | GST-040, WEB-045 | — |
-| Entries: answer (`faqs.categories[].entries[].answer`) | English and Arabic (Arabic right to left) | — | GST-040, WEB-045 | Keyed by language code. Values are sanitised HTML. |
-| Entries: sort order (`faqs.categories[].entries[].sortOrder`) | — | — | GST-040, WEB-045 | — |
-| Entries: is published (`faqs.categories[].entries[].isPublished`) | — | — | GST-040, WEB-045 | — |
+| Body (`policies.body`) | English and Arabic (Arabic right to left) | — | the content and policy pages | Keyed by language code. Values are sanitised HTML. |
+| Requires reconsent (`policies.requiresReconsent`) | — | — | the content and policy pages | True prompts existing guests to consent again on next launch. Material changes to a privacy notice generally require it. |
+| Effective from (`policies.effectiveFrom`) | 1 Oct 2026 (dd MMM yyyy) | — | the content and policy pages | — |
+| Categories (`faqs.categories`) | — | — | the FAQ screens | — |
+| Categories: code (`faqs.categories[].code`) | — | — | the FAQ screens | — |
+| Categories: name (`faqs.categories[].name`) | English and Arabic (Arabic right to left) | — | the FAQ screens | — |
+| Categories: sort order (`faqs.categories[].sortOrder`) | — | — | the FAQ screens | — |
+| Categories: entries (`faqs.categories[].entries`) | — | — | the FAQ screens | — |
+| Entries: iD (`faqs.categories[].entries[].id`) | shows names, sends the id | — | the FAQ screens | — |
+| Entries: question (`faqs.categories[].entries[].question`) | English and Arabic (Arabic right to left) | — | the FAQ screens | — |
+| Entries: answer (`faqs.categories[].entries[].answer`) | English and Arabic (Arabic right to left) | — | the FAQ screens | Keyed by language code. Values are sanitised HTML. |
+| Entries: sort order (`faqs.categories[].entries[].sortOrder`) | — | — | the FAQ screens | — |
+| Entries: is published (`faqs.categories[].entries[].isPublished`) | — | — | the FAQ screens | — |
 
 #### References
 

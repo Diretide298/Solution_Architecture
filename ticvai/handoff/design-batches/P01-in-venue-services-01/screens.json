@@ -246,7 +246,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection — an order placed offline is food nobody is making."
   },
   "apis": [
@@ -316,7 +316,7 @@
    {
     "operationId": "getGuestOrderStatus",
     "contract": "fnb",
-    "purpose": "Track an order",
+    "purpose": "Track an order Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -647,7 +647,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute."
   },
   "apis": [
@@ -842,7 +842,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The last status stays on screen with its age and is never presented as current. Settling the bill waits for the connection."
   },
   "apis": [
@@ -867,6 +867,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "orderId",
      "from": "deepLink"
@@ -983,39 +987,17 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listQueues",
-       "notes": "Sends `?venueId=` to `listQueues`.",
-       "provenance": "contract queue.yaml GET /queues"
-      },
-      {
-       "kind": "toggle",
-       "label": "Open only",
-       "operation": "listQueues",
-       "notes": "Sends `?openOnly=` to `listQueues`.",
-       "provenance": "contract queue.yaml GET /queues"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every queue",
+       "kind": "cardList",
+       "label": "Waits",
        "bindsTo": "Queue",
        "columns": [
-        "Queue.code",
         "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
         "Queue.kind",
-        "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
-        "Queue.inQueueOfferEnabled",
-        "Queue.notifyBeforeCallMinutes"
+        "Queue.operatingWindows"
        ],
        "operation": "listQueues",
-       "provenance": "contract queue.yaml GET /queues"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Wait times by category (rides, dining). The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every queue'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "cardList",
@@ -1035,31 +1017,6 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected queue",
-       "bindsTo": "Queue",
-       "columns": [
-        "Queue.code",
-        "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
-        "Queue.kind",
-        "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
-        "Queue.inQueueOfferEnabled",
-        "Queue.notifyBeforeCallMinutes",
-        "Queue.capacityPerCycle",
-        "Queue.cycleMinutes",
-        "Queue.maxPartySize",
-        "Queue.returnWindowMinutes"
-       ],
-       "operation": "listQueues",
-       "provenance": "contract queue.yaml GET /queues"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The venue map graph",
        "bindsTo": "VenueMapGraph",
        "columns": [
@@ -1077,13 +1034,9 @@
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.source",
         "WaitTime.isStale",
         "WaitTime.heightRequirementCm",
         "WaitTime.zone",
@@ -1113,8 +1066,8 @@
    "loading": "Content resolves in place.",
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
-   "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoResults": "No attraction of the category picked; the other categories stay.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect."
   },
   "apis": [
@@ -1336,7 +1289,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection — a place taken offline is a place nobody else can see."
   },
   "apis": [
@@ -1379,6 +1332,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "entryId",
      "from": "deepLink"
@@ -1516,32 +1473,15 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listParkingFacilities",
-       "notes": "Sends `?venueId=` to `listParkingFacilities`.",
-       "provenance": "contract access.yaml GET /parking-facilities"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every parking facility",
+       "kind": "cardList",
+       "label": "Car parks",
        "bindsTo": "ParkingFacility",
        "columns": [
-        "ParkingFacility.id",
-        "ParkingFacility.name",
-        "ParkingFacility.venueId",
-        "ParkingFacility.mode",
-        "ParkingFacility.capacity",
-        "ParkingFacility.takesPayment",
-        "ParkingFacility.vendorSwapTargetDays",
-        "ParkingFacility.vendorName",
-        "ParkingFacility.endpoint",
-        "ParkingFacility.credentialRef",
-        "ParkingFacility.pushLeadMinutes",
-        "ParkingFacility.accessPointIds"
+        "ParkingFacility.name"
        ],
        "operation": "listParkingFacilities",
-       "provenance": "contract access.yaml GET /parking-facilities"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "The venue's car parks by name; no live free-bay count in the first release. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every parking facility'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "cardList",
@@ -1564,19 +1504,7 @@
        "label": "The selected parking facility",
        "bindsTo": "ParkingFacility",
        "columns": [
-        "ParkingFacility.id",
-        "ParkingFacility.name",
-        "ParkingFacility.venueId",
-        "ParkingFacility.mode",
-        "ParkingFacility.capacity",
-        "ParkingFacility.takesPayment",
-        "ParkingFacility.vendorSwapTargetDays",
-        "ParkingFacility.vendorName",
-        "ParkingFacility.endpoint",
-        "ParkingFacility.credentialRef",
-        "ParkingFacility.pushLeadMinutes",
-        "ParkingFacility.accessPointIds",
-        "ParkingFacility.isActive"
+        "ParkingFacility.name"
        ],
        "operation": "listParkingFacilities",
        "provenance": "contract access.yaml GET /parking-facilities"
@@ -1596,19 +1524,7 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Check out",
-       "operation": "checkoutCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Pay",
-       "operation": "createPayment",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save parking entitlement",
+       "label": "Change plate",
        "operation": "updateParkingEntitlement",
        "provenance": "contract access.yaml PATCH /parking-entitlements/{entitlementId}"
       }
@@ -1620,8 +1536,8 @@
    "loading": "Content resolves in place.",
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
-   "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoResults": "Never shown: the car parks are the venue's, with no filter a guest sets.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection.",
    "soldOutForDay": "**The car park is full.** `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then — there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166)."
   },
@@ -1636,18 +1552,6 @@
     "operationId": "addCartLine",
     "contract": "orders",
     "purpose": "Put the car park's parking product in the cart; refused `soldOutForDay` when the car park is at capacity (decided 28 September, audit R166)",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "checkoutCart",
-    "contract": "orders",
-    "purpose": "Turn the cart into an order",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "createPayment",
-    "contract": "orders",
-    "purpose": "Pay for it; the parking entitlement is issued at payment with the order's id (audit R166)",
     "trigger": "onAction"
    },
    {
@@ -1722,22 +1626,34 @@
    {
     "id": "formUpdateParkingEntitlement",
     "component": "modal",
-    "trigger": "Save parking entitlement",
-    "body": "**Collects what `updateParkingEntitlement` sends before it is called.** Nothing in the body is required. Optional: `plateNumber`, `plateCountry`, `status`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Change plate",
+    "body": "**The plate only.** `updateParkingEntitlement` with the new plate; a guest never sets a status.",
     "bindsTo": "UpdateParkingEntitlementRequest",
     "confirm": {
-     "label": "Save parking entitlement",
+     "label": "Save",
      "operation": "updateParkingEntitlement"
     },
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "plateNumber",
-      "plateCountry",
-      "status"
+      "plate"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "checkoutCart",
+    "removed": true,
+    "why": "Parking goes through the basket (R166); checkout is the basket's.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   },
+   {
+    "operation": "createPayment",
+    "removed": true,
+    "why": "Payment is the basket's, after checkout (R166).",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {

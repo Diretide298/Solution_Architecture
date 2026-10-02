@@ -301,7 +301,7 @@
    {
     "operationId": "listMyFavouriteRoutes",
     "contract": "transport",
-    "purpose": "The guest's saved routes",
+    "purpose": "The guest's saved routes Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {

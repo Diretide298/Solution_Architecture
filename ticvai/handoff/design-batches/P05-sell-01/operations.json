@@ -167,6 +167,25 @@
   "requestBody": null,
   "responds": "Order"
  },
+ "getPublishedTenantConfig": {
+  "method": "GET",
+  "path": "/storefront/tenant-config",
+  "contract": "white-label",
+  "summary": "The published guest-facing configuration, before anyone signs in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PublishedTenantConfig"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",
@@ -179,25 +198,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "TenantAppStatus"
- },
- "getTenantConfig": {
-  "method": "GET",
-  "path": "/tenant-config",
-  "contract": "white-label",
-  "summary": "Full working configuration",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "version",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TenantConfig"
  },
  "inquirePaymentStatus": {
   "method": "POST",
@@ -296,14 +296,14 @@
   "requestBody": null,
   "responds": "Page"
  },
- "transferOrderTickets": {
+ "reprintOrder": {
   "method": "POST",
-  "path": "/orders/{orderId}/transfer",
+  "path": "/orders/{orderId}/reprints",
   "contract": "orders",
-  "summary": "Transfer tickets to another guest",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
+  "summary": "Reprint or resend tickets",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {

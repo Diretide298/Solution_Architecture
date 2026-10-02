@@ -1,6 +1,6 @@
 # P01-membership-loyalty-value-01 — P01 · Membership, Loyalty & Value
 
-**5 screens · 52 operations · 65 schemas · 14 permissions**
+**5 screens · 50 operations · 65 schemas · 14 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -68,11 +68,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-021` | Wallet & Gift Cards | A | 4 | 59 | 6 | 37 | 13 | 6 | guest | review (client-verified) |
-| `WEB-022` | Membership Plans | A | 3 | 50 | 6 | 16 | 4 | 0 | guest | review (client-verified) |
-| `WEB-023` | Membership Management | A | 8 | 48 | 6 | 11 | 5 | 0 | guest | review (client-verified) |
+| `WEB-021` | Wallet & Gift Cards | A | 4 | 37 | 6 | 37 | 13 | 6 | guest | review (client-verified) |
+| `WEB-022` | Membership Plans | A | 0 | 20 | 6 | 16 | 4 | 0 | guest | review (client-verified) |
+| `WEB-023` | Membership Management | A | 3 | 31 | 6 | 6 | 5 | 0 | guest | review (client-verified) |
 | `WEB-024` | Devices, Wishlist & Consent | A | 24 | 82 | 6 | 60 | 2 | 4 | guest | review (client-verified) |
 | `WEB-043` | Loyalty & Rewards | A | 8 | 30 | 6 | 56 | 2 | 2 | guest | review (client-verified) |
+
+## Thin screens in this batch
+
+**WEB-022 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -100,9 +104,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 #### Inputs: what the user enters or picks
 
-**Form: Store payment token** (modal, opened by *Store payment token*; *Store payment token* calls `storePaymentToken`, *Cancel* sends nothing)
+**Form: Add a card** (modal, opened by *Add a card*; *Save card* calls `storePaymentToken`, *Cancel* sends nothing)
 
-**Collects what `storePaymentToken` sends before it is called.** Required: `providerId`, `providerToken`, `consentPurposeId`. Optional: `setDefault`. Dismissing sends nothing; the screen behind is unchanged.
+**The gateway's own card form**, hosted by the provider; it returns the token that `storePaymentToken` saves with the guest's consent. No token, provider or consent id is ever a field.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -123,47 +127,24 @@ Errors to draw in the form: 409 Insufficient cash credit, distinct from insuffic
 
 **Shown**
 
-**Every wallet transaction** (data table, from `listWalletTransactions`)
+**Activity** (card list, from `listWalletTransactions`): Was the generated table 'Every wallet transaction'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)). From `wallet.yaml` `listWalletTransactions`.
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | text | — |
 | Kind | chip: Top up, Spend, Refund, Adjustment, Bonus, Expiry… | — |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Balance after | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Order | text | — |
-| Venue | the name it points at, never the id | — |
 | Reason | text | — |
-| Principal | the name it points at, never the id | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 
-**Every payment token** (data table, from `listPaymentTokens`)
+**Saved cards** (card list, from `listPaymentTokens`): Was the generated table 'Every payment token'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
-| Provider | the name it points at, never the id | — |
-| Token | text | Write-only, never returned. The provider's reference to a credential it holds. |
 | Method | text | — |
 | Masked identifier | text | What a guest sees — the last four digits, the card brand. Enough to choose between two saved cards and not enough to use one. |
 | Expires at | 1 Oct 2026 | — |
 | Is default | yes / no (icon or chip) | — |
-| Consent purpose | the name it points at, never the id | Storing a card for future use is a purpose a guest consents to, separate from the payment they are making now. |
-
-**The selected wallet transaction** (detail panel, from `listWalletTransactions`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | text | — |
-| Kind | chip: Top up, Spend, Refund, Adjustment, Bonus, Expiry… | — |
-| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Balance after | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Order | text | — |
-| Venue | the name it points at, never the id | — |
-| Reason | text | — |
-| Principal | the name it points at, never the id | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
 
 **The gift card** (detail panel, from `getGiftCard`)
 
@@ -185,8 +166,6 @@ Errors to draw in the form: 409 Insufficient cash credit, distinct from insuffic
 |---|---|---|
 | Card code | text | A pre-printed card keeps the code printed on it. A generated code (a digital card, or a card issued with no printed code) is the venue … |
 | Kind | text | — |
-| Venue | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Credits | 1,234 | Bought with money. Buys plays. |
 | Bonus credits | 1,234 | From a promotion. Typically non-refundable and spent before paid credits. |
 | Points | 1,234 | Won by playing. Buys prizes. |
@@ -201,8 +180,6 @@ Errors to draw in the form: 409 Insufficient cash credit, distinct from insuffic
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Subject | the name it points at, never the id | — |
 | Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Credits | list or chips (count when long) | 4.3.5 and 4.3.19. One balance and one bonus balance with one expiry could not express what the requirement asks for — cash, bonus and … |
 | Bonus balance | AED 1,234.50 | Promotional value. Typically non-refundable and spent first. |
@@ -216,7 +193,7 @@ Errors to draw in the form: 409 Insufficient cash credit, distinct from insuffic
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Store payment token (primary button) | `storePaymentToken` POST `/payment-tokens` | inline | PaymentToken | 409 The provider cannot hold a stored credential (`tokenisationNotSupported`, `PaymentProvider.supportsTokenisation` false), or the guest has not consented to the … (PaymentProblem) | opens modal first |
+| Add a card (primary button) | `storePaymentToken` POST `/payment-tokens` | inline | PaymentToken | 409 The provider cannot hold a stored credential (`tokenisationNotSupported`, `PaymentProvider.supportsTokenisation` false), or the guest has not consented to the … (PaymentProblem) | opens modal first |
 | Transfer wallet balance (secondary button) | `transferWalletBalance` POST `/wallets/{walletId}/transfer` | inline | WalletTransaction | 409 Insufficient cash credit, distinct from insufficient balance — a guest with 200 of bonus credit and 10 of cash can transfer 10, and telling them they have 200 … (WalletTransferProblem) | opens modal first |
 
 **Data it reads**: `getWallet` (onLoad, Read a guest wallet); `listWalletTransactions` (onLoad, Wallet transaction history); `listPaymentTokens` (onLoad, Saved cards on this account); `getWalletAutoReloadSetting` (onLoad, Show auto top-up); `getWalletExitBalance` (onLoad, Balance due / refundable at exit)
@@ -319,9 +296,9 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (404, 409, 412, 422).
-- [ ] Every output is drawn (59 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-021?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Store payment token, Transfer wallet balance.
+- [ ] Every action is wired with its success and its failure: Add a card, Transfer wallet balance.
 - [ ] Every transition is wired: `WEB-022`, `WEB-023`, `WEB-024`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 13 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -348,85 +325,47 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 **What the spec says about it.** Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and could not fetch what it shows** — the app had these and the browser did not, and there is no reason a membership or a bundle should need an app.
 
+**Known gaps.** The staff-shaped membership list; the guest's own are `getMyMemberships`.
+
 #### Inputs: what the user enters or picks
-
-**On the screen**
-
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `listProducts`. | `listProducts` ?venueId |
-| Kind | select | optional | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | — | Sends `?kind=` to `listProducts`. | `listProducts` ?kind |
-| Is sellable | toggle | optional | — | — | — | Sends `?isSellable=` to `listProducts`. | `listProducts` ?isSellable |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
+| Kind | select | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | `listProducts` ?kind |
+| Is sellable | toggle | — | — | `listProducts` ?isSellable |
 | Category | picker: choose a category | — | — | `listProducts` ?categoryId |
 | Segment tag | text field | — | max length 120 | `listProducts` ?segmentTag |
 | Guided answers | multi-picker: choose guided answers | — | at most 10 | `listProducts` ?guidedAnswerIds |
 | Include lapsed | toggle | on | — | `getMyMemberships` ?includeLapsed |
-| Include lapsed | toggle | on | — | `listGuestMemberships` ?includeLapsed |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every product** (data table, from `listProducts`)
+**Membership plans** (card list, from `listProducts`): Membership products only, for the guest's venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
-| On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
-| On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
+| Media | list or chips (count when long) | The product's own photos and video (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each … |
 
-**Every guest membership** (data table, from `listGuestMemberships`)
+**The plan** (detail panel, from `getProduct`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Entitlement | the name it points at, never the id | The `access.Entitlement.id` this membership is — a UUIDv7, like every entitlement id. |
-| Product | the name it points at, never the id | — |
-| Name | text | — |
-| Tier | text | — |
-| Status | chip: Active, Frozen, Suspended, Expired, Cancelled | Derived from the entitlement, not held here. This schema is a view assembled from the entitlement, the product that granted it and the … |
-| Valid from | 1 Oct 2026 | — |
-| Valid to | 1 Oct 2026 | — |
-| Frozen days | 1,234 | Days lost to a freeze and added back to `validTo`. Shown because a guest who paused a pass will check the maths, and a validity date that … |
-| Benefits | list or chips (count when long) | 5.4.31. From the product's entitlement template. |
-| Renews on | 1 Oct 2026 | — |
-| Previous terms | list or chips (count when long) | Prior terms, including lapsed ones. |
-
-**The selected product** (detail panel, from `getProduct`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
-| Lifecycle state | chip: Draft, In review, Approved, Live, Withdrawn, Archived | — |
-| Is sellable | yes / no (icon or chip) | True only when live and carried by a published bundle. Approval and publication are different acts. |
 | Has variants | yes / no (icon or chip) | — |
 | Variant count | 1,234 | — |
 
-**The guest membership** (detail panel, from `getMyMemberships`)
+**Your membership** (detail panel, from `getMyMemberships`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -442,7 +381,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Renews on | 1 Oct 2026 | — |
 | Previous terms | list or chips (count when long) | Prior terms, including lapsed ones. |
 
-**Data it reads**: `listProducts` (onLoad, List products); `getProduct` (onLoad, Read a product); `getMyMemberships` (onLoad, A guest's own memberships, benefits and history); `listGuestMemberships` (onLoad, A guest's memberships, benefits and history)
+**Data it reads**: `listProducts` (onLoad, List products); `getProduct` (onLoad, Read a product); `getMyMemberships` (onLoad, A guest's own memberships, benefits and history Only when …)
 
 **Where the user goes next**
 
@@ -457,7 +396,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Loading (`?state=loading`) | The membership plans list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the membership plans untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No membership plans yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind, isSellable and the membership plans are still there. Names the active filter and offers to clear it. |
+| Empty, no results (`?state=emptyNoResults`) | Never shown: the plans are the venue's membership products, with no filter a guest sets. |
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 … |
@@ -467,7 +406,6 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - `listProducts` → `PRODUCT_VIEW` (read) · staff, guest, partner
 - `getProduct` → `PRODUCT_VIEW` (read) · staff, guest, partner
 - `getMyMemberships` → `PRODUCT_VIEW` (read) · staff, guest
-- `listGuestMemberships` → `PRODUCT_VIEW` (read) · staff, guest
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
 
@@ -521,8 +459,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (3), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (50 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-022?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `WEB-021`, `WEB-023`, `WEB-024`.
@@ -546,10 +484,12 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listGuestMemberships` reads the population and `getMyMemberships` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| Opens with | `orderId` (deepLink), `caseId` (navigation), `statementId` (navigation) · cold entry: **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the … |
+| Opens with | `subjectId` (session), `orderId` (deepLink), `caseId` (navigation), `statementId` (navigation) · cold entry: **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the … |
 | Route | `/membership-loyalty-and-value/membership-management` |
 
 **What the spec says about it.** Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and could not fetch what it shows** — the app had these and the browser did not, and there is no reason a membership or a bundle should need an app. **Rev 3 (decided 29 September, rev 3 DG-2, no contract change).** The billing statement shows the decline states: a **soft decline** offers *Retry now* (`retryMyDunningPayment`) and *Use another card*; a **hard decline** offers another card only; **declined again** shows the next retry date; then **paid**.
+
+**Known gaps.** The staff-shaped membership list; the guest's own are `getMyMemberships`. No use on Membership Management; moving a membership to a family member is a different operation.
 
 #### Inputs: what the user enters or picks
 
@@ -565,11 +505,10 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Include lapsed | toggle | on | — | `getMyMemberships` ?includeLapsed |
-| Include lapsed | toggle | on | — | `listGuestMemberships` ?includeLapsed |
 | Order | picker: choose an order | — | — | `listInstalmentPlans` ?orderId |
 | Status | radio group | — | Active · Completed · In arrears · Cancelled | `listInstalmentPlans` ?status |
 
-**Form: Retry my dunning payment** (modal, opened by *Retry my dunning payment*; *Retry my dunning payment* calls `retryMyDunningPayment`, *Cancel* sends nothing)
+**Form: Retry the payment** (modal, opened by *Retry the payment*; *Retry my dunning payment* calls `retryMyDunningPayment`, *Cancel* sends nothing)
 
 **Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.
 
@@ -581,58 +520,24 @@ Carried, not typed: `caseId`
 
 Errors to draw in the form: 409 The case is already resolved, or the decline is hard and no other card was given.; 422 The payment was declined again.
 
-**Form: Transfer order tickets** (modal, opened by *Transfer order tickets*; *Transfer order tickets* calls `transferOrderTickets`, *Cancel* sends nothing)
-
-**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Tickets `ticketIds` | multi-picker: choose tickets | required | — | at least 1 | — | The entitlements to hand over. A ticket is an entitlement, so each value is an `Entitlement.id` on this order — the ids in `OrderLine.entitlementIds`. | `transferOrderTickets` body |
-| Recipient `recipient` | group | required | — | — | — | — | `transferOrderTickets` body |
-| Channel `recipient.channel` | segmented control | required | — | Email · SMS · Whatsapp | — | — | `transferOrderTickets` body |
-| Address `recipient.address` | text field | required | — | — | — | — | `transferOrderTickets` body |
-| Message `message` | text area | optional | — | max length 500 | — | — | `transferOrderTickets` body |
-
-Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), already offered (`alreadyOffered`), or the product forbids transfer (`transferNotAllowed`). (TicketTransferProblem)
-
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every membership** (data table, from `listGuestMemberships`)
+**Statements** (card list, from `listBillingStatements`): Was the generated table 'Every billing statement'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| Entitlement | the name it points at, never the id | The `access.Entitlement.id` this membership is — a UUIDv7, like every entitlement id. |
-| Product | the name it points at, never the id | — |
-| Name | text | — |
-| Tier | text | — |
-| Status | chip: Active, Frozen, Suspended, Expired, Cancelled | Derived from the entitlement, not held here. This schema is a view assembled from the entitlement, the product that granted it and the … |
-| Valid from | 1 Oct 2026 | — |
-| Valid to | 1 Oct 2026 | — |
-| Frozen days | 1,234 | Days lost to a freeze and added back to `validTo`. Shown because a guest who paused a pass will check the maths, and a validity date that … |
-| Benefits | list or chips (count when long) | 5.4.31. From the product's entitlement template. |
-| Renews on | 1 Oct 2026 | — |
-| Previous terms | list or chips (count when long) | Prior terms, including lapsed ones. |
-
-**Every billing statement** (data table, from `listBillingStatements`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Period start | 1 Oct 2026 | — |
 | Period end | 1 Oct 2026 | — |
 | Lines | list or chips (count when long) | — |
 | Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Is tax invoice | yes / no (icon or chip) | Always false, and stated rather than assumed. UAE e-invoicing is Peppol five-corner with the FTA as the fifth corner, PINT AE XML and 51 … |
 
-**Every dunning case** (data table, from `listMyPaymentIssues`)
+**Payments that need you** (card list, from `listMyPaymentIssues`): Was the generated table 'Every dunning case'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Order | text | The order whose renewal failed. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | State | chip: Scheduled, In progress, Exhausted, Recovered, Resolved manually | BL-100. `exhausted` and `recovered` are both endings and only one of them is a failure. |
@@ -648,15 +553,13 @@ Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), alr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Period start | 1 Oct 2026 | — |
 | Period end | 1 Oct 2026 | — |
 | Lines | list or chips (count when long) | — |
 | Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Is tax invoice | yes / no (icon or chip) | Always false, and stated rather than assumed. UAE e-invoicing is Peppol five-corner with the FTA as the fifth corner, PINT AE XML and 51 … |
 
-**The guest membership** (detail panel, from `getMyMemberships`)
+**Your membership** (detail panel, from `getMyMemberships`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -676,10 +579,9 @@ Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), alr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Transfer order tickets (primary button) | `transferOrderTickets` POST `/orders/{orderId}/transfer` | inline | TicketTransfer | 409 Ticket already redeemed (`alreadyRedeemed`), already offered (`alreadyOffered`), or the product forbids transfer (`transferNotAllowed`). (TicketTransferProblem) | opens modal first; produces a document or message: Transfer tickets to another guest |
-| Retry my dunning payment (secondary button) | `retryMyDunningPayment` POST `/dunning-cases/{caseId}/retry` | RetryDunningPaymentRequest | DunningCase | 409 The case is already resolved, or the decline is hard and no other card was given.; 422 The payment was declined again. | opens modal first |
+| Retry the payment (secondary button) | `retryMyDunningPayment` POST `/dunning-cases/{caseId}/retry` | RetryDunningPaymentRequest | DunningCase | 409 The case is already resolved, or the decline is hard and no other card was given.; 422 The payment was declined again. | opens modal first |
 
-**Data it reads**: `listBillingStatements` (onLoad, Membership billing statements); `listMyPaymentIssues` (onLoad, Declined renewals waiting on the guest); `getMyMemberships` (onLoad, A guest's own memberships, benefits and history); `listGuestMemberships` (onLoad, A guest's memberships, benefits and history); `listInstalmentPlans` (onLoad, Instalment plans and schedule)
+**Data it reads**: `listBillingStatements` (onLoad, Membership billing statements); `listMyPaymentIssues` (onLoad, Declined renewals waiting on the guest); `getMyMemberships` (onLoad, A guest's own memberships, benefits and history); `listInstalmentPlans` (onLoad, Instalment plans and schedule)
 
 **Where the user goes next**
 
@@ -697,7 +599,7 @@ Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), alr
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on from, to and the membership are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The case is already resolved, or the decline is hard and no other card was given.; 409 The order already has a plan, or is already paid in full.; 409 Ticket already redeemed (`alreadyRedeemed`), already offered (`alreadyOffered`), or the product forbids transfer (`transferNotAllowed`). (TicketTransferProblem); 422 The order or product does not qualify under the instalment policy, or the count … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The case is already resolved, or the decline is hard and no other card was given.; 409 The order already has a plan, or is already paid in full.; 422 The order or product does not qualify under the instalment policy, or the count or frequency is outside it, or the first instalment was declined.; 422 The payment was declined again. |
 
 #### Permissions
 
@@ -705,9 +607,7 @@ Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), alr
 - `getBillingStatement` → `ORDER_VIEW` (read) · guest, staff
 - `listMyPaymentIssues` → no permission · guest
 - `retryMyDunningPayment` → no permission · guest
-- `transferOrderTickets` → no permission · guest
 - `getMyMemberships` → `PRODUCT_VIEW` (read) · staff, guest
-- `listGuestMemberships` → `PRODUCT_VIEW` (read) · staff, guest
 - `listInstalmentPlans` → `PAYMENT_VIEW` (read) · staff, guest
 - `createInstalmentPlan` → `ORDER_CREATE` (operate) · staff, guest, service
 
@@ -715,16 +615,11 @@ Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), alr
 
 #### Requirements it meets
 
-11 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 2.14.23 | System shall provide detailed membership billing statements, payment history, renewal history, taxes, discounts, credits, and downloadable PDF statements accessible through customer self-service … | Ticketing Sales | CONTRACTED | `getBillingStatement` |
-| 19.2.13 | Ticket Transfer - System shall support ticket transfers. | Guest Mobile App & Branding | CONTRACTED | `transferOrderTickets` |
-| 1.1.27 | System shall support ticket ownership transfer between guests according to configurable policies, fees and approval workflows. | Ticketing Catalogue | CONTRACTED | `transferOrderTickets` |
-| 1.6.17 | System shall expose marketplace functionality through APIs for websites, mobile applications, partner platforms, and third-party integrations. | Ticketing Catalogue | CONTRACTED | `transferOrderTickets` |
-| 2.6.39 | Customer should have the ability to view the order transactions with all the details for the logged in users and should be able to resend the tickets / Transfer Tickets to Friend / Download tickets | Ticketing Sales | CONTRACTED | `transferOrderTickets` |
-| 2.13.37 | Ticket Transfer & Reassignment | Ticketing Sales | CONTRACTED | `transferOrderTickets` |
 | 19.2.26 | Membership Wallet - System shall provide membership wallets. | Guest Mobile App & Branding | CONTRACTED | `getMyMemberships` |
 | 19.2.27 | Membership Benefits Display - System shall display membership benefits. | Guest Mobile App & Branding | CONTRACTED | `getMyMemberships` |
 | 19.2.28 | Membership History - System shall display membership history. | Guest Mobile App & Branding | CONTRACTED | `getMyMemberships` |
@@ -761,10 +656,10 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (3), with its required mark, default, format and its error state (409, 422).
+- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-023?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Transfer order tickets, Retry my dunning payment.
+- [ ] Every action is wired with its success and its failure: Retry the payment.
 - [ ] Every transition is wired: `WEB-021`, `WEB-022`, `WEB-024`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 5 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1190,7 +1085,7 @@ Also set there, as content the tenant writes: theme, buttons, links.
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listLoyaltyProgrammes` reads the population and `getLoyaltyPosition` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** — and that is said. Redeeming and referring need the connection. |
-| Opens with | nothing: it opens on its own · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a … |
+| Opens with | `subjectId` (session) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a … |
 | Route | `/loyalty-and-rewards` |
 
 **What the spec says about it.** **P01 Board 3 drew *Membership* with nothing behind it.** `getLoyaltyPosition` and `listLoyaltyProgrammes` were app-only — **the surface a guest checks their points on between visits is the web one.** **`evaluatePromotions` removed 27 September 2026 (audit root R292).** It evaluates promotions against a cart — `EvaluatePromotionsRequest` requires `venueId`, `channel` and at least one line — and this screen arrives with no parameter and holds no cart. Offers apply on WEB-005 and WEB-010, which keep the call.
@@ -1301,7 +1196,7 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 | Error (`?state=error`) | Could not load. **The rest of the site is unaffected.** |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches. |
-| Permission denied (`?state=emptyNoAccess`) | **Sign in to see this.** A guest who is not signed in is offered the door, not refused. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** — and that is said. Redeeming and referring need the connection. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The balance does not cover `points` (`insufficientPoints`). Nothing is held. (LoyaltyRefusedProblem) |
 
@@ -1315,7 +1210,7 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 - `decideRecommendations` → `AI_USE` (operate) · staff, guest, anonymous
 - `recordRecommendationEvents` → `AI_USE` (operate) · staff, guest, anonymous
 
-**A refused user sees:** **Sign in to see this.** A guest who is not signed in is offered the door, not refused.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -1361,6 +1256,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-043` · status **review** · provenance client-verified
 - Prototype (rev 3 (30 September build), verified 2026-10-01, match exact): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Summit Peaks → header 'At the venue' → Loyalty*. Differences: Placed inside the in-venue section; referral code appears under Account → Groups & invitations (YAML createReferral is here).
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1594,7 +1490,6 @@ Method, path, parameters, request and response for every operation these screens
 "listBillingStatements": {"method":"GET","path":"/billing-statements","contract":"orders","summary":"What was charged, when, and against which agreement","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listDelegations": {"method":"GET","path":"/guests/{subjectId}/delegations","contract":"identity","summary":"Who may act for this guest, and for whom they may act","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listGuestDevices": {"method":"GET","path":"/guests/{subjectId}/devices","contract":"marketing-crm","summary":"A guest's registered devices","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listGuestMemberships": {"method":"GET","path":"/guest/memberships","contract":"catalogue","summary":"A guest's memberships, benefits and history","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"includeLapsed","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listInstalmentPlans": {"method":"GET","path":"/instalment-plans","contract":"payments","summary":"Instalment plans and their schedules","permission":"PAYMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"orderId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listLoyaltyProgrammes": {"method":"GET","path":"/loyalty/programmes","contract":"marketing-crm","summary":"List loyalty programmes","permission":"MARKETING_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMfaMethods": {"method":"GET","path":"/auth/mfa/methods","contract":"identity","summary":"Enrolled MFA methods","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"MfaMethod"},
@@ -1617,7 +1512,6 @@ Method, path, parameters, request and response for every operation these screens
 "setWalletAutoReloadSetting": {"method":"PUT","path":"/wallets/{walletId}/auto-reload","contract":"wallet","summary":"Top the wallet up automatically from a stored card when it runs low","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"WalletAutoReloadSetting","responds":"WalletAutoReloadSetting"},
 "settleWalletAtExit": {"method":"POST","path":"/wallets/{walletId}/exit-settlement","contract":"wallet","summary":"Settle a short balance, or refund a credit, when the holder leaves","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletExitSettlement"},
 "storePaymentToken": {"method":"POST","path":"/payment-tokens","contract":"orders","summary":"Save a payment method for future use","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PaymentToken"},
-"transferOrderTickets": {"method":"POST","path":"/orders/{orderId}/transfer","contract":"orders","summary":"Transfer tickets to another guest","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "transferWalletBalance": {"method":"POST","path":"/wallets/{walletId}/transfer","contract":"wallet","summary":"Send balance to another guest","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletTransaction"},
 "verifyMfaEnrolment": {"method":"POST","path":"/auth/mfa/methods/{methodId}","contract":"identity","summary":"Complete enrolment","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MfaMethod"}
 }

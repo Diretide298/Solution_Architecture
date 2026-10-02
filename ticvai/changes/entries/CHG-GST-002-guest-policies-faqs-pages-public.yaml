@@ -1,0 +1,44 @@
+id: CHG-GST-002
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: Public reads of the current policies, the published FAQs and the live content pages (listPublishedPolicies,
+  listPublishedFaqs, listPublishedContentPages under /storefront/), bound on WEB-045, GST-040, GST-057 and the checkout
+  terms of WEB-012 and GST-009.
+decision:
+  what: Add three public, cacheable reads; the staff reads stay as they are; additive.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Process-agent finding (white-label.yaml corrections on WEB-045, GST-040, GST-057): listPolicies is staff-only
+  and listFaqs and listContentPages need a session, so a guest can read no policy and help asks a visitor to sign
+  in.'
+keys_touched:
+  operations:
+  - listPublishedPolicies
+  - listPublishedFaqs
+  - listPublishedContentPages
+  schemas:
+  - PublishedPolicy
+  - PublishedFaqCategory
+  - PublishedContentPage
+  screens:
+  - WEB-045
+  - GST-040
+  - GST-057
+  - WEB-012
+  - GST-009
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: session-before-sign-in'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-preauth-session.py
+status: open
+notes: 'Decided by Chinmay, 2 October: fix before Block A starts. Register: docs/registers/guest-fix-decisions.md
+  (GFIX-2). Not closed: the prevention check arrives with the change-rules branch and is report-only until the lead
+  baselines it; close on the merge commit once run-checks.py runs it.'

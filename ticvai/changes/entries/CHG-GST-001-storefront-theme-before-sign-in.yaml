@@ -1,0 +1,43 @@
+id: CHG-GST-001
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: A public, cacheable read of the published guest-facing configuration, getPublishedTenantConfig (GET /storefront/tenant-config),
+  replaces getTenantConfig on WEB-001, GST-001 and KSK-002.
+decision:
+  what: Add a dedicated public operation returning only the published, non-sensitive configuration, resolved from
+    the host (SD-021); additive.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Process-agent finding (handoff/design-notes/white-label.yaml corrections on WEB-001, GST-001, GST-047, WEB-029,
+  KSK-002): getTenantConfig needs a session, so a first-time visitor''s storefront cannot load the tenant''s brand;
+  confirmed by check-preauth-session (council of 2 October).'
+keys_touched:
+  operations:
+  - getPublishedTenantConfig
+  - getTenantConfig
+  schemas:
+  - PublishedTenantConfig
+  screens:
+  - WEB-001
+  - GST-001
+  - KSK-002
+  flows:
+  - F01
+  - F07
+  - F75
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: session-before-sign-in'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-preauth-session.py
+status: open
+notes: 'Decided by Chinmay, 2 October: fix before Block A starts. Register: docs/registers/guest-fix-decisions.md
+  (GFIX-1). Not closed: the prevention check arrives with the change-rules branch and is report-only until the lead
+  baselines it; close on the merge commit once run-checks.py runs it.'

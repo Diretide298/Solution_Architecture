@@ -505,35 +505,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listGuestMemberships": {
-  "method": "GET",
-  "path": "/guest/memberships",
-  "contract": "catalogue",
-  "summary": "A guest's memberships, benefits and history",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "includeLapsed",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listInstalmentPlans": {
   "method": "GET",
   "path": "/instalment-plans",
@@ -1065,25 +1036,6 @@
   ],
   "requestBody": null,
   "responds": "PaymentToken"
- },
- "transferOrderTickets": {
-  "method": "POST",
-  "path": "/orders/{orderId}/transfer",
-  "contract": "orders",
-  "summary": "Transfer tickets to another guest",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  },
  "transferWalletBalance": {
   "method": "POST",

@@ -2619,7 +2619,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-047 Map Booking — Cabanas & Spots"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
+      - {}
       - guestAuth: []
       - bearerAuth: []
       summary: Every bookable resource on a venue map, free or taken, in one call

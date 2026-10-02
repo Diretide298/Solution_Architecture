@@ -23,25 +23,6 @@
   "requestBody": "AddCartLineRequest",
   "responds": "Cart"
  },
- "checkoutCart": {
-  "method": "POST",
-  "path": "/carts/{cartId}/checkout",
-  "contract": "orders",
-  "summary": "Turn the cart into an order",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Order"
- },
  "claimLocationSession": {
   "method": "POST",
   "path": "/location-sessions",
@@ -98,25 +79,6 @@
   ],
   "requestBody": "CreateGuestOrderRequest",
   "responds": "GuestOrderResult"
- },
- "createPayment": {
-  "method": "POST",
-  "path": "/payments",
-  "contract": "orders",
-  "summary": "Take a payment against an order",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreatePaymentRequest",
-  "responds": "Payment"
  },
  "createTableReservation": {
   "method": "POST",
