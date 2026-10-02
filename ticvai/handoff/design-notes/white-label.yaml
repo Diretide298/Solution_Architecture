@@ -25,8 +25,8 @@ processSummary:
     venue's Help me choose publish, and policies (each save is a new version). Build-time parts (app icons, native
     splash, custom font files, wallet and payment integrations) reach guests only with a new store build, which the
     client publishes under its own Apple and Google accounts (CMS-104). Staff surfaces (POS, scanner, staff app,
-    kitchen display) never take tenant branding; every guest surface carries a fixed "Powered by TICVAI" credit the
-    tenant cannot remove. Arabic is a first-class layout: enabling `ar` requires an Arabic font, the whole layout
+    kitchen display) never take tenant branding; every guest surface carries the "Powered by TICVAI" credit, a
+    toggle that is on by default (decided 2 October 2026, CHG-NOTE-009; DI-297 amended). Arabic is a first-class layout: enabling `ar` requires an Arabic font, the whole layout
     mirrors (numbers, times, codes and logos do not), and every authored text is a per-language value. The step-based
     Site Builder (CMS-102) walks a new tenant through seven steps from a venue-type preset so that a logo, four colours
     and a publish are enough for a working site in about 30 minutes; every step opens the full screen for its details.
@@ -105,13 +105,13 @@ processSummary:
     changeScope: runtime
     changes: [primaryCta on every guest screen's main call to action, payButton on WEB-012 and GST-009, addToCart on WEB-005, WEB-008, GST-008, buyTicketsButton on the P02 Buy tickets button and WEB-001 header CTA, link everywhere, badge on product cards and tags]
     source: [DI-922, DI-918, contracts/satellite/white-label.yaml#/components/schemas/Theme]
-  - element: Dark variant
-    configuredOn: [CMS-005]
+  - element: Dark variant (deprecated)
+    configuredOn: [nowhere; deprecated]
     field: Theme.darkMode {primaryColour, backgroundColour, textColour}
-    values: '#RRGGBB each; derived from the light theme when absent'
-    default: derived
-    changeScope: runtime
-    changes: [P02 only (P01 declares the light theme only)]
+    values: 'kept in the contract for compatibility, ignored, never used or drawn; white label has no dark or light mode (decided 2 October 2026, CHG-NOTE-009)'
+    default: ignored
+    changeScope: none
+    changes: [none: the venue's chosen theme applies on every guest surface]
     source: [contracts/satellite/white-label.yaml#/components/schemas/Theme, screens/P01-guest-web-storefront.yaml, screens/P02-guest-mobile-app.yaml]
   - element: Corner radius, surfaces, buttons
     configuredOn: [CMS-005]
@@ -148,11 +148,11 @@ processSummary:
     changes: [the footer of every P01 page; P02 reaches the same links from Account and Help]
     source: [contracts/satellite/white-label.yaml#setFooter, MATRIX 19.1.7]
   - element: Powered by TICVAI
-    configuredOn: [nowhere; fixed]
-    field: none
-    values: the TICVAI credit; never removable, recoloured only as far as it stays legible on the tenant's background
-    default: always shown
-    changeScope: fixed
+    configuredOn: [CMS-104]
+    field: a Powered by toggle (to be added to the contract)
+    values: 'on | off: off only where the venue''s licence allows; recoloured only as far as it stays legible on the tenant''s background (decided 2 October 2026, CHG-NOTE-009)'
+    default: 'on'
+    changeScope: runtime
     changes: [P01 footer and the powered-by strip above the booking step indicator (also in embedded mode), P02 (Account and launch), P05]
     source: [DI-111, DI-297, DI-250, screens/_design-tokens.yaml, sources/designs/guest-rev3-30-september/TICVAI Engine Controls Manual.dc.html]
   - element: Navigation (web menu, drawer)
@@ -428,9 +428,9 @@ vocabulary:
   avoid: [Book now, Shop, Purchase]
   source: DI-1081
 - term: Powered by TICVAI
-  meaning: The fixed platform credit on every guest surface.
+  meaning: The platform credit on every guest surface; a toggle, on by default, off only where the venue's licence allows.
   avoid: [Built by TICVAI, Made by TICVAI]
-  source: DI-297
+  source: DI-297 | decided 2 October 2026 by Chinmay (CHG-NOTE-009)
 - term: Site Builder
   meaning: The seven-step guided set-up (CMS-102).
   avoid: [Wizard, Onboarding, Setup assistant]
@@ -561,10 +561,14 @@ screens:
     - what: Maintenance, minimum app version, contact and availability are edited through one modal labelled "Save maintenance mode".
       why: Four different live controls behind one maintenance label; label the panel "Live now" and each control by what it does.
       source: R073
-    openQuestions:
-    - question: Should switching on a module or feature be possible without TENANT_PUBLISH approval when the tenant runs an approval matrix (ApprovalKind configurationChange)?
-      default: Draw save-to-draft only; the approval appears on CMS-014 at publish.
-      source: MATRIX 22.10.9
+    decisions:
+    - question: Should switching on a module or feature be possible without TENANT_PUBLISH approval when the tenant runs an
+        approval matrix (ApprovalKind configurationChange)?
+      decision: 'Drawn default accepted: Draw save-to-draft only; the approval appears on CMS-014 at publish.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-146 | CHG-NOTE-009
+      questionSource: MATRIX 22.10.9
 
   CMS-002:
     block: A
@@ -672,6 +676,8 @@ screens:
     - what: Typography also reads and saves the Theme (setTheme, Save theme modal).
       why: The theme belongs to CMS-005; two save points for one record. Remove theme editing here.
       source: screens/P13-white-label-cms.yaml#CMS-005
+      status: fixed
+      by: CHG-WIR-015
     - what: Purpose says "the two typefaces and the scale under them".
       why: FontConfig has no type scale; the scale is TICVAI's fixed token set. Draw no scale control.
       source: [contracts/satellite/white-label.yaml#/components/schemas/FontConfig, screens/_design-tokens.yaml]
@@ -681,10 +687,14 @@ screens:
     - what: formSetFonts sends changeScope.
       why: changeScope is readOnly and derived on read.
       source: contracts/satellite/white-label.yaml#/components/schemas/FontConfig
-    openQuestions:
+    decisions:
     - question: Which faces are bundled (runtime) and which need an upload? The contract stores a free face name.
-      default: Offer the seven prototype pairs plus Tajawal and Baloo Bhaijaan 2 as bundled; anything else is an upload.
-      source: contracts/satellite/white-label.yaml#/components/schemas/FontConfig
+      decision: 'Drawn default accepted: Offer the seven prototype pairs plus Tajawal and Baloo Bhaijaan 2 as bundled; anything
+        else is an upload.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-147 | CHG-NOTE-009
+      questionSource: contracts/satellite/white-label.yaml#/components/schemas/FontConfig
 
   CMS-004:
     block: A
@@ -747,10 +757,13 @@ screens:
     - what: The favicon is set here as BrandIdentity.faviconAssetRef and also generated as web icons from the app icon (AppIcons.derived web 16/32/48).
       why: Two sources for the browser tab icon; the package must say which wins.
       source: contracts/satellite/white-label.yaml#setAppIcons
-    openQuestions:
+    decisions:
     - question: Which favicon does the guest web use when both faviconAssetRef and the derived web icons exist?
-      default: faviconAssetRef when set, else the derived 32 px icon.
-      source: contracts/satellite/white-label.yaml#setAppIcons
+      decision: 'Drawn default accepted: faviconAssetRef when set, else the derived 32 px icon.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-148 | CHG-NOTE-009
+      questionSource: contracts/satellite/white-label.yaml#setAppIcons
 
   CMS-005:
     block: A
@@ -783,16 +796,23 @@ screens:
       rule: Glass (default) / Solid; Solid (default) / Outline / Pill, each as a thumbnail.
       source: DI-1067
     - field: darkMode
-      rule: Optional three colours for the app's dark appearance; empty shows "Derived from your light theme". App only (the web is light).
-      source: [contracts/satellite/white-label.yaml#/components/schemas/Theme, screens/P01-guest-web-storefront.yaml]
+      rule: 'Deprecated: the field stays in the contract for compatibility, is ignored and is never drawn. White label has
+        no dark or light mode; the venue''s chosen theme applies.'
+      source:
+      - contracts/satellite/white-label.yaml#/components/schemas/Theme
+      - screens/P01-guest-web-storefront.yaml
+      - decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     outputs:
     - element: Live component sheet
-      rule: >-
-        The real guest components with the draft values: header, primary and secondary buttons, a ticket card with tags
+      rule: 'The real guest components with the draft values: header, primary and secondary buttons, a ticket card with tags
         and a badge, the step indicator, the cart with Pay, the mobile tab bar with the Buy tickets button, a link, an input
-        and an error message. LTR and RTL toggle; light and dark (app) toggle. Semantic colours (success, warning, danger)
-        stay TICVAI's and are labelled "Fixed".
-      source: [DI-918, screens/_design-tokens.yaml, docs/architecture/rtl-and-theming.md]
+        and an error message. LTR and RTL toggle (no light or dark toggle). Semantic colours (success, warning, danger) stay
+        TICVAI''s and are labelled "Fixed".'
+      source:
+      - DI-918
+      - screens/_design-tokens.yaml
+      - docs/architecture/rtl-and-theming.md
+      - decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     actions:
     - action: Save theme
       result: Writes the draft (runtime, so guests see it after publish). On 400 ContrastProblem the entered colours stay and each failure is listed; there is no save anyway.
@@ -833,23 +853,37 @@ screens:
     - what: emptyFirstRun "No theme editor yet. Offers no create action".
       why: Before the first save getTheme answers 404 not-configured and the first setTheme creates the part; first run is the editor pre-filled from the preset, with Save.
       source: contracts/satellite/white-label.yaml#/info
-    openQuestions:
-    - question: What does secondaryColour colour on guest surfaces? The prototype palette has brand, accent, ink and surface only.
-      default: Secondary buttons, the selected-tab underline and the footer background.
-      source: sources/designs/guest-rev3-30-september/TICVAI Engine Controls Manual.dc.html
-    - question: May a tenant choose a dark guest app? rtl-and-theming.md says the tenant chooses colour, not theme; the contract has darkMode and the mobile prototype a Light/Dark mode.
-      default: Draw darkMode as the app's dark appearance following the device setting; web stays light.
-      source: [docs/architecture/rtl-and-theming.md, contracts/satellite/white-label.yaml#/components/schemas/Theme, sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html]
+    decisions:
+    - question: What does secondaryColour colour on guest surfaces? The prototype palette has brand, accent, ink and surface
+        only.
+      decision: 'Not answered: the workbook cell repeats the dark-mode answer. secondaryColour colours secondary buttons,
+        the selected-tab underline and the footer background (drawn default).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-149 | CHG-NOTE-009
+      questionSource: sources/designs/guest-rev3-30-september/TICVAI Engine Controls Manual.dc.html
+    - question: May a tenant choose a dark guest app? rtl-and-theming.md says the tenant chooses colour, not theme; the contract
+        has darkMode and the mobile prototype a Light/Dark mode.
+      decision: 'White label has no dark or light mode: the venue''s chosen theme is applied. Theme.darkMode is deprecated:
+        kept in the contract for compatibility, ignored, never used or drawn; the guest app has no Light/Dark switch (Pre-apply
+        round, 2 October).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-150 | CHG-NOTE-009
+      questionSource:
+      - docs/architecture/rtl-and-theming.md
+      - contracts/satellite/white-label.yaml#/components/schemas/Theme
+      - sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
 
   CMS-006:
     block: A
-    summary: >-
-      Check the draft theme against every component that carries it, on web, iPhone and Android, light and dark, LTR and
-      RTL, and share a preview link before publishing. It is a preview screen, not version history.
+    summary: Check the draft theme against every component that carries it, on web, iPhone and Android, LTR and RTL, and share
+      a preview link before publishing. It is a preview screen, not version history.
     inputs:
     - field: createPreview {platform, theme, language, expiresInHours}
-      rule: Platform web / ios / android; theme light / dark (dark for apps only); language from the enabled languages; link expiry 1-168 hours (default 24).
-      source: contracts/satellite/white-label.yaml#createPreview
+      rule: Platform web / ios / android; theme always light (the venue's theme; darkMode is deprecated); language from the
+        enabled languages; link expiry 1-168 hours (default 24).
+      source: contracts/satellite/white-label.yaml#createPreview | decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     outputs:
     - element: Component gallery
       rule: >-
@@ -860,6 +894,9 @@ screens:
     - element: Preview link
       rule: The URL with expiry time, copy and QR code for testing on a phone; says it shows the draft, not what is live.
       source: contracts/satellite/white-label.yaml#/components/schemas/Preview
+    - element: PDF ticket and wallet pass
+      rule: In Block A the preview also renders the PDF ticket and the Apple and Google Wallet passes with the draft theme.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     actions:
     - action: Create preview link
       result: A short-lived link rendering the working draft; nothing is published.
@@ -879,13 +916,18 @@ screens:
     - what: The screen is wired to listConfigVersions, diffConfigVersion, publishTenantConfig and restoreConfigVersion (a version table and publish gate).
       why: That is CMS-015 and CMS-014. Component Preview needs getTheme, getFonts, getBrandIdentity, getBookingFlowConfig and createPreview.
       source: [screens/P13-white-label-cms.yaml#CMS-015, screens/P13-white-label-cms.yaml#CMS-014]
+      status: fixed
+      by: CHG-WIR-015
     - what: F102 step 3 to step 4 jumps from CMS-006 to ADM-016 (cross-device, platform console).
       why: A tenant's preview never hands over to the platform console; the next step is CMS-012 or CMS-014.
       source: [F102 step 3, F22 step 4]
-    openQuestions:
+    decisions:
     - question: Should the preview also render the PDF ticket and Apple / Google Wallet pass?
-      default: Not in Block A; leave a placeholder tab.
-      source: TRACKER Actions row 129
+      decision: Previews of the PDF ticket and the Apple/Google Wallet pass are in Block A.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-151 | CHG-NOTE-009
+      questionSource: TRACKER Actions row 129
 
   CMS-007:
     block: A
@@ -895,24 +937,32 @@ screens:
       that the tenant arranges and fills, never invents components.
     inputs:
     - field: sections[] (kind, sortOrder, isVisible, title, maxItems, heroStyle, contentPageId)
-      rule: >-
-        A vertical list of section cards, drag to reorder, eye icon for isVisible, title per language. heroStyle only on
-        heroBanner (Carousel / Video / Poster / Split). maxItems 1 or 2 on attractions, dining, whatsOn and shop for the app
-        Home. contentPageId only on customContent (a picker of pages). Disabled kinds show "Needs <module> (switch on in
-        CMS-001)".
-      source: [contracts/satellite/white-label.yaml#/components/schemas/HomepageLayout, R163, DI-1018]
+      rule: A vertical list of section cards, drag to reorder, eye icon for isVisible, title per language. heroStyle only
+        on heroBanner (Carousel / Video / Poster / Split). Every customisation option in the approved wireframe, including
+        the card count per section (maxItems). contentPageId only on customContent (a picker of pages). Disabled kinds show
+        "Needs <module> (switch on in CMS-001)".
+      source:
+      - contracts/satellite/white-label.yaml#/components/schemas/HomepageLayout
+      - R163
+      - DI-1018
+      - decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     - field: header (HeaderConfig)
       rule: Layout thumbnails Logo left / Logo centre / Logo with menu (required), switches for logo, menu, notifications, background colour.
       source: contracts/satellite/white-label.yaml#/components/schemas/HeaderConfig
     - field: footer (FooterConfig)
-      rule: >-
-        Columns of links (heading, label, URL, or "opens cookie preferences"), then a separate locked group of legal links
-        (terms and privacy required, accessibility and cookie policy optional), copyright, social links. The Powered by
-        TICVAI credit shows in the preview and cannot be edited.
-      source: [contracts/satellite/white-label.yaml#setFooter, DI-111]
+      rule: Columns of links (heading, label, URL, or "opens cookie preferences"), then a separate locked group of legal links
+        (terms and privacy required, accessibility and cookie policy optional), copyright, social links. The Powered by TICVAI
+        credit shows in the preview; whether it shows is the Powered by toggle (CMS-104, default on).
+      source:
+      - contracts/satellite/white-label.yaml#setFooter
+      - DI-111
+      - decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     - field: content page (slug, title, body, isEnabled, icon, categoryCode, sortOrder)
       rule: Slug lowercase letters, digits and hyphens, unique (409); title and body per enabled language; a published page is read-only except Archive.
       source: [contracts/satellite/white-label.yaml#createContentPage, contracts/satellite/white-label.yaml#updateContentPage]
+    - field: Scroll animation
+      rule: 'Per landing-page section: Rise, Scale, Slide, Blur or None (a field to be added).'
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     outputs:
     - element: Split preview
       rule: Web Home and app Home side by side with the draft order, updated on every drag.
@@ -968,13 +1018,23 @@ screens:
     - what: Content blocks (createContentBlock, publishContentBlock) are declared by no Block A screen (only BO-839).
       why: The authoring surface the matrix contracted (BL-172, scheduled and personalised blocks) has no editor.
       source: [MATRIX 22.10.4, MATRIX 22.10.8, screens/P08-venue-back-office.yaml#BO-839]
-    openQuestions:
+    decisions:
     - question: Fixed 2-3 card layout or N-count for the experiences and dining section on the app landing?
-      default: maxItems 1-2 per section as MOB-3 decided.
-      source: [DI-396, DI-1018]
+      decision: Every customisation option in the approved wireframe/prototype, including the card count per section.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-152 | CHG-NOTE-009
+      questionSource:
+      - DI-396
+      - DI-1018
     - question: Selectable scroll animations on the landing page (Rise, Scale, Slide, Blur, None) have no field.
-      default: Draw the default motion only; raise for the contract.
-      source: [DI-1088, sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html]
+      decision: Scroll animation (Rise, Scale, Slide, Blur, None) is a field on landing-page sections.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-153 | CHG-NOTE-009
+      questionSource:
+      - DI-1088
+      - sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
 
   CMS-008:
     block: A
@@ -1031,10 +1091,13 @@ screens:
     - what: Banners and promo blocks are scheduled outside the publish, while the header says every set* writes the draft.
       why: The screen must say "goes live on its schedule, not with Publish"; the contract header lists them as outside the draft, so make the UI say so.
       source: contracts/satellite/white-label.yaml#/info
-    openQuestions:
+    decisions:
     - question: Is a banner's isActive switch a manual pause on top of the schedule?
-      default: Draw it as Pause / Resume; a paused banner does not show even inside its window.
-      source: contracts/satellite/white-label.yaml#/components/schemas/Banner
+      decision: 'Drawn default accepted: Draw it as Pause / Resume; a paused banner does not show even inside its window.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-154 | CHG-NOTE-009
+      questionSource: contracts/satellite/white-label.yaml#/components/schemas/Banner
 
   CMS-011:
     block: A
@@ -1084,16 +1147,23 @@ screens:
     - what: The screen declares only setLanguages and no read, so it cannot show the current languages or the gaps it exists for.
       why: Needs getTenantConfig (languages, translationGaps) on load.
       source: screens/P13-white-label-cms.yaml#CMS-011
+      status: fixed
+      by: CHG-WIR-015
     - what: Default language is drawn as a free textField.
       why: It must be one of the enabled languages (400).
       source: contracts/satellite/white-label.yaml#setLanguages
     - what: The translation workflow the client asked for (enter English, machine-translate, the tenant's team reviews before publishing) has no operation on this screen.
       why: ai proposeTranslations exists but is wired only to BO-785 and BO-793.
       source: [DI-081, DI-083, MATRIX 22.10.15]
-    openQuestions:
+      status: logged
+      by: CHG-WIR-017
+    decisions:
     - question: How are Simplified and Traditional Chinese told apart with two-letter codes?
-      default: Treat zh as Simplified.
-      source: contracts/satellite/white-label.yaml#/components/schemas/LanguageConfig
+      decision: 'Drawn default accepted: Treat zh as Simplified.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-155 | CHG-NOTE-009
+      questionSource: contracts/satellite/white-label.yaml#/components/schemas/LanguageConfig
 
   CMS-012:
     block: A
@@ -1152,6 +1222,10 @@ screens:
     - field: scheduledFor
       rule: Optional date and time in the tenant's time zone (GST); a scheduled job activates it; must be in the future.
       source: contracts/satellite/white-label.yaml#publishTenantConfig
+    - field: Review step (optional)
+      rule: A venue can switch on a review or approval step; otherwise a permission holder simulates (preview) and publishes
+        in one step.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     outputs:
     - element: What changes
       rule: >-
@@ -1200,13 +1274,22 @@ screens:
     - what: The screen does not declare diffConfigVersion or createPreview.
       why: A review step needs a field-level diff (the contract's own reason for diffConfigVersion) and the client asked for a Review and Publish step.
       source: [contracts/satellite/white-label.yaml#diffConfigVersion, DI-194]
+      status: fixed
+      by: CHG-WIR-015
     - what: The detail panel shows maintenance fields as if publish affected them.
       why: Maintenance is live state, never published or restored; show it only as context.
       source: contracts/satellite/white-label.yaml#setMaintenanceMode
-    openQuestions:
-    - question: Does a publish go through the approval matrix (ApprovalKind configurationChange), and must the approver differ from the author as for content blocks?
-      default: Draw a single publish by a TENANT_PUBLISH holder; show "Awaiting approval" only if the matrix applies.
-      source: [MATRIX 22.10.9, contracts/satellite/white-label.yaml#publishContentBlock]
+    decisions:
+    - question: Does a publish go through the approval matrix (ApprovalKind configurationChange), and must the approver differ
+        from the author as for content blocks?
+      decision: 'Publishing: simulate (preview), then a single publish by a permission holder. An optional review/approval
+        step the venue can switch on.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-156 | CHG-NOTE-009
+      questionSource:
+      - MATRIX 22.10.9
+      - contracts/satellite/white-label.yaml#publishContentBlock
 
   CMS-015:
     block: A
@@ -1328,13 +1411,22 @@ screens:
     - what: The mobile prototype offers controls the contract lacks (continue button Bottom bar / Floating pill / Full-width block; date picker Grid / Strip / List; step order Tailored per product / One decision per screen).
       why: Either they become fields or the prototype drops them; the client sees them today.
       source: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
-    openQuestions:
+    decisions:
     - question: Map the stepIndicator values to labels.
-      default: bar = Bar, numbered = Numbered steps (counter), dots = Dots, breadcrumb = Step names, segmented = Segments, pills = Pills, ticks = Ticks, none = None.
-      source: DI-1093
+      decision: 'Drawn default accepted: bar = Bar, numbered = Numbered steps (counter), dots = Dots, breadcrumb = Step names,
+        segmented = Segments, pills = Pills, ticks = Ticks, none = None.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-157 | CHG-NOTE-009
+      questionSource: DI-1093
     - question: Staging and production environments per site (asked 20 August).
-      default: Not modelled; the preview link (CMS-006) is the staging view.
-      source: [DI-393, TRACKER Actions row 102]
+      decision: 'Drawn default accepted: Not modelled; the preview link (CMS-006) is the staging view.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-158 | CHG-NOTE-009
+      questionSource:
+      - DI-393
+      - TRACKER Actions row 102
 
   CMS-017:
     block: A
@@ -1513,10 +1605,14 @@ screens:
     - what: CMS-009 Navigation & Menus, which steps 5 and 6 open for the header menu, the tab bar and the Buy tickets button, is filed under module Food & Beverage and mixes F&B menus (listMenus with an outlet filter, createMenu, setMenuSections) into the navigation editor.
       why: Navigation menus and food menus are different things; the step opens a screen whose list is restaurant menus. Cross-process with fnb-retail, which owns CMS-009.
       source: screens/P13-white-label-cms.yaml#CMS-009
-    openQuestions:
+    decisions:
     - question: Which modules, flows, sections and tabs does each preset propose? No source lists them.
-      default: Water park proposes ticketsAndBooking, diningAndFnb, shop, map; datedDayPass and cabanaMap; heroBanner, tickets, attractions, dining; tabs Home, Explore, Map, Tickets.
-      source: contracts/satellite/white-label.yaml#/components/schemas/SiteSetupProgress
+      decision: 'Drawn default accepted: Water park proposes ticketsAndBooking, diningAndFnb, shop, map; datedDayPass and
+        cabanaMap; heroBanner, tickets, attractions, dining; tabs Home, Explore, Map, Tickets.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-159 | CHG-NOTE-009
+      questionSource: contracts/satellite/white-label.yaml#/components/schemas/SiteSetupProgress
 
   CMS-103:
     block: A
@@ -1604,6 +1700,10 @@ screens:
     - element: Builds
       rule: Platform, version name and build number, configuration version, status (Queued, Building, Built, Failed, Submitted, In review, Approved, Rejected, Released), times; download link for the signed .ipa or .aab.
       source: contracts/satellite/white-label.yaml#/components/schemas/AppBuild
+    - element: Powered by TICVAI
+      rule: 'A configuration toggle, default on: shown on the launch screen under the splash and at the foot of Account, unless
+        the venue''s licence allows switching it off.'
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     actions:
     - action: Request a build
       result: 202 queued; 409 says which of no store account, nothing published, or a build already running. Needs TENANT_PUBLISH.
@@ -1634,10 +1734,16 @@ screens:
     - what: The listing has no place for the TICVAI credit the client asked to keep visible in published apps.
       why: Qossai asked that the TICVAI name always remain visible to app users; nothing says where in the app or listing.
       source: [DI-250, DI-224]
-    openQuestions:
+    decisions:
     - question: Where does "Powered by TICVAI" appear in the published app (launch, Account, About)?
-      default: On the launch screen under the splash and at the foot of Account.
-      source: [DI-250, DI-297]
+      decision: '"Powered by TICVAI" is a configuration toggle, default on: shown unless the venue''s licence allows switching
+        it off (Pre-apply round, 2 October; DI-297 amended).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-160 | CHG-NOTE-009
+      questionSource:
+      - DI-250
+      - DI-297
 
   # =====================================================================================================
   # P09 TICVAI console -- Block A
@@ -1670,6 +1776,10 @@ screens:
     - action: Publish on the tenant's behalf
       result: Same gate as CMS-014 (note required, diff, findings); the version records the platform operator as publisher and the tenant sees it in its audit log.
       source: [contracts/satellite/white-label.yaml#publishTenantConfig, R098]
+    - action: Generate site package (self-hosted)
+      result: 'For a venue that hosts its own site: exports the published site as a package the venue deploys. For a site
+        hosted with TICVAI, platform staff publish under a grant instead.'
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     edgeCases:
     - case: Grant expires mid-edit
       expected: Unsaved edits are kept in the form, actions disable, and a new grant is offered; nothing is half-sent.
@@ -1689,13 +1799,21 @@ screens:
     - what: Purpose says "for this venue" and entry parameters bannerId, pageId and policyKind.
       why: Branding is per tenant; the parameters are left from the bulk attach.
       source: screens/P09-platform-admin-console.yaml#ADM-016
+      status: fixed
+      by: CHG-WIR-016
     - what: F102 hands over from the tenant's CMS-006 to this console screen as step 4.
       why: A tenant's journey never continues on the platform console.
       source: F102 step 3
-    openQuestions:
+    decisions:
     - question: May platform staff publish a tenant's site, or only prepare the draft for the tenant to publish?
-      default: Prepare only; Publish shown but disabled unless the grant includes TENANT_PUBLISH.
-      source: [MATRIX 19.1.24, R098]
+      decision: 'Hosted with TICVAI: platform staff may publish a tenant''s site under a grant. Self-hosted: the venue uses
+        ''Generate site package'' (export).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-144 | CHG-NOTE-009
+      questionSource:
+      - MATRIX 19.1.24
+      - R098
 
   ADM-017:
     block: A
@@ -1726,9 +1844,13 @@ screens:
     - what: F103 "A tenant claims a domain" runs on this platform screen.
       why: The tenant claims on CMS-017; ADM-017 is the support path.
       source: [F103 step 1, screens/P13-white-label-cms.yaml#CMS-017]
+      status: fixed
+      by: CHG-WIR-016
     - what: Shows verificationToken instead of verificationRecord; entry parameters bannerId, pageId, policyKind, version.
       why: The record is what support reads out to the tenant; the parameters are bulk-attach leftovers.
       source: contracts/satellite/white-label.yaml#/components/schemas/CustomDomain
+      status: fixed
+      by: CHG-WIR-015
     openQuestions: []
 
   ADM-018:
@@ -1747,6 +1869,9 @@ screens:
     - field: policy {kind, body, requiresReconsent, effectiveFrom}
       rule: Kind Privacy / Terms and conditions / Refund / Cookie / Accessibility; body must have English and Arabic (400); requiresReconsent asks existing guests to consent again on next launch.
       source: [contracts/satellite/white-label.yaml#setPolicy, R096]
+    - field: Interface languages
+      rule: A tenant can add or select interface languages beyond English and Arabic.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     outputs:
     - element: Policy history
       rule: Current version per kind; with history, every version newest first; versions are read-only.
@@ -1776,21 +1901,25 @@ screens:
     - what: formSetPolicy has no kind selector and the screen sends effectiveFrom, which setPolicy's body does not declare as required.
       why: setPolicy is keyed by the policyKind path parameter; the form must ask for the kind.
       source: contracts/satellite/white-label.yaml#setPolicy
-    openQuestions:
+    decisions:
     - question: Which screen adds a new interface language (UI strings) for the platform?
-      default: None in Block A; English and Arabic ship.
-      source: [DI-083, handoff/localisation.md]
+      decision: A tenant can add or select interface languages beyond English and Arabic.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-145 | CHG-NOTE-009
+      questionSource:
+      - DI-083
+      - handoff/localisation.md
 
   # =====================================================================================================
   # P01 Guest web -- Block A (the guest screens the configuration changes)
   # =====================================================================================================
   WEB-001:
     block: A
-    summary: >-
-      The guest web home, entirely in the tenant's brand: header, hero, the tenant's homepage sections in its order, the
-      ticket categories, banners, the footer with the fixed Powered by TICVAI credit. A first visit asks for the venue
-      first. The one thing to get right for white-label: everything visual comes from the published configuration
-      resolved for the chosen venue, and nothing renders for a disabled module.
+    summary: 'The guest web home, entirely in the tenant''s brand: header, hero, the tenant''s homepage sections in its order,
+      the ticket categories, banners, the footer with the Powered by TICVAI credit (shown by default). A first visit asks
+      for the venue first. The one thing to get right for white-label: everything visual comes from the published configuration
+      resolved for the chosen venue, and nothing renders for a disabled module.'
     inputs:
     - field: Your venue
       rule: >-
@@ -1819,11 +1948,18 @@ screens:
         products show their label when showInfoOnly is on.
       source: [DI-1040, DI-1009, sources/designs/guest-rev3-30-september/TICVAI Engine Controls Manual.dc.html, DI-1054]
     - element: Footer
-      rule: The tenant's columns, the legal links (always present), copyright and social links, then the fixed "Powered by TICVAI" line.
-      source: [contracts/satellite/white-label.yaml#setFooter, DI-111]
+      rule: The tenant's columns, the legal links (always present), copyright and social links, then the "Powered by TICVAI"
+        line unless the venue switched it off (CMS-104).
+      source:
+      - contracts/satellite/white-label.yaml#setFooter
+      - DI-111
+      - decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     - element: Availability banner
       rule: Sold out today or Closed with the tenant's message, under the header; nothing while open.
       source: R073
+    - element: Layout
+      rule: The client-approved web and app wireframes are the layout; change them only where the spec breaks.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-009)
     actions:
     - action: Change venue
       result: Replaces the remembered venue; every venue-scoped screen and the venue's booking-setting overrides reload.
@@ -1851,19 +1987,31 @@ screens:
     - what: The context panel shows staff-only TenantAppStatus fields (draftVersion, hasUnpublishedChanges, counts, recentChanges) and TenantConfig.isDraft on a guest screen.
       why: A guest response never carries them; a guest reads the published configuration to style the page, never to display it.
       source: contracts/satellite/white-label.yaml#getTenantAppStatus
+      status: fixed
+      by: CHG-GST-003
     - what: getTenantConfig (the theme, fonts, header, navigation, homepage) needs a guest session or a staff session; a first-time visitor has neither.
       why: The storefront must render in the tenant's brand before anyone signs in; getTenantAppStatus, getPublishedBookingFlow and getPublishedGuidedChoice already allow an anonymous call.
       source: [contracts/satellite/white-label.yaml#getTenantConfig, contracts/satellite/white-label.yaml#getTenantAppStatus]
+      status: fixed
+      by: CHG-GST-001
     - what: The product table lists staff columns (createdByPrincipalId, approvedByPrincipalId, scopePath) and filters Kind and Is sellable as text fields.
       why: Guest cards show name, image, from-price, tags and availability only.
       source: [DI-026, screens/P01-guest-web-storefront.yaml#WEB-001]
+      status: fixed
+      by: CHG-GST-003
     - what: TenantConfig.venues (name as LocalisedText, from tenancy, active venues) and TenantAppStatus.venues (name as a string, published venues only) describe the same picker differently.
       why: Two shapes and two inclusion rules for one list; the picker cannot show an Arabic venue name from the status read.
       source: [contracts/satellite/white-label.yaml#/components/schemas/TenantConfig, contracts/satellite/white-label.yaml#/components/schemas/TenantAppStatus]
-    openQuestions:
-    - question: Is the web homepage arranged by the same HomepageLayout as the app Home, or does it need its own (DI-285 asks web and mobile independently)?
-      default: One layout; venueOverview and the 1-2 highlights apply to the app only.
-      source: [DI-285, contracts/satellite/white-label.yaml#/components/schemas/HomepageSectionKind]
+    decisions:
+    - question: Is the web homepage arranged by the same HomepageLayout as the app Home, or does it need its own (DI-285 asks
+        web and mobile independently)?
+      decision: The client-approved web and app wireframes are the layout; change them only where the spec breaks.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-163 | CHG-NOTE-009
+      questionSource:
+      - DI-285
+      - contracts/satellite/white-label.yaml#/components/schemas/HomepageSectionKind
 
   WEB-028:
     block: A
@@ -1898,10 +2046,14 @@ screens:
     - what: The detail panel lists the staff-only TenantAppStatus fields.
       why: Not returned to a guest.
       source: contracts/satellite/white-label.yaml#getTenantAppStatus
-    openQuestions:
+    decisions:
     - question: Per-venue contact details?
-      default: Show the tenant contact and each venue's hours until the contract carries per-venue contact.
-      source: contracts/satellite/white-label.yaml#/components/schemas/VenueContact
+      decision: 'Drawn default accepted: Show the tenant contact and each venue''s hours until the contract carries per-venue
+        contact.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-164 | CHG-NOTE-009
+      questionSource: contracts/satellite/white-label.yaml#/components/schemas/VenueContact
 
   WEB-029:
     block: A
@@ -1976,16 +2128,28 @@ screens:
     - what: listPolicies is staff-only (TENANT_CONFIGURE, no guest security), so the Policies tab has nothing a guest can read.
       why: The guest must read the current terms, privacy, refund and cookie policies.
       source: contracts/satellite/white-label.yaml#listPolicies
+      status: fixed
+      by: CHG-GST-002
     - what: emptyNoAccess says "Sign in to see this"; listFaqs and listContentPages need a guest session.
       why: Help is public; FAQs and pages must be readable anonymously.
       source: [contracts/satellite/white-label.yaml#listFaqs, contracts/satellite/white-label.yaml#listContentPages]
+      status: fixed
+      by: CHG-GST-002
     - what: No rule says which content page is the accessibility statement (a categoryCode, a slug, FooterConfig.legalLinks.accessibilityUrl or the accessibility Policy).
       why: Three places can hold it.
       source: [contracts/satellite/white-label.yaml#/components/schemas/FooterConfig, contracts/satellite/white-label.yaml#/components/schemas/PolicyKind]
-    openQuestions:
+      status: fixed
+      by: CHG-GST-003
+    decisions:
     - question: Where does the accessibility statement live?
-      default: The accessibility Policy is the statement; content pages with categoryCode accessibility are the practical guides.
-      source: [contracts/satellite/white-label.yaml#/components/schemas/PolicyKind, DI-243]
+      decision: 'Drawn default accepted: The accessibility Policy is the statement; content pages with categoryCode accessibility
+        are the practical guides.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-165 | CHG-NOTE-009
+      questionSource:
+      - contracts/satellite/white-label.yaml#/components/schemas/PolicyKind
+      - DI-243
 
   # =====================================================================================================
   # P02 Guest app -- Block A
@@ -2033,16 +2197,23 @@ screens:
     - what: The highlights note names a field itemsPerSection set on CMS-007.
       why: The field is HomepageLayout.sections[].maxItems.
       source: contracts/satellite/white-label.yaml#/components/schemas/HomepageLayout
+      status: fixed
+      by: CHG-GST-003
     - what: The venue overview's description and before-you-go text have no source; TenantAppStatus.venues carries name, city and today's hours only.
       why: Home cannot show a venue description that nothing stores.
       source: contracts/satellite/white-label.yaml#/components/schemas/TenantAppStatus
     - what: The guest Home reads getGuestProfile with engagementScore, lifetimeValue and tags, and emptyNoAccess cites GUEST_VIEW.
       why: Staff CRM fields and a staff permission on a guest screen.
       source: MATRIX 19.2.7
-    openQuestions:
+      status: fixed
+      by: CHG-GST-003
+    decisions:
     - question: Where is the venue description for the Home overview authored?
-      default: A content page per venue with categoryCode venueOverview.
-      source: DI-1018
+      decision: 'Drawn default accepted: A content page per venue with categoryCode venueOverview.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-161 | CHG-NOTE-009
+      questionSource: DI-1018
 
   GST-038:
     block: A
@@ -2071,6 +2242,8 @@ screens:
     - what: Guest filters Venue id, Kind and Is sellable as text fields, and emptyNoAccess cites PRODUCT_VIEW.
       why: Staff controls and a staff permission on a guest screen; the venue comes from the session.
       source: screens/P02-guest-mobile-app.yaml#GST-038
+      status: fixed
+      by: CHG-GST-004
     openQuestions: []
 
   GST-040:
@@ -2091,6 +2264,8 @@ screens:
     - what: The layout is a metric dashboard (FAQ count, page count, case count tiles) and emptyNoAccess cites TENANT_CONFIGURE.
       why: Counts mean nothing to a guest; help is public.
       source: screens/P02-guest-mobile-app.yaml#GST-040
+      status: fixed
+      by: CHG-GST-004
     - what: No guest-readable policy operation.
       why: As WEB-045.
       source: contracts/satellite/white-label.yaml#listPolicies
@@ -2169,10 +2344,15 @@ screens:
     - what: The guest screen exposes Status, Category code and Slug as text filters and cites TENANT_CONFIGURE.
       why: The guest sees the accessibility pages; the category is fixed by the app.
       source: screens/P02-guest-mobile-app.yaml#GST-057
-    openQuestions:
+      status: fixed
+      by: CHG-GST-004
+    decisions:
     - question: Which categoryCode marks accessibility pages?
-      default: accessibility
-      source: contracts/satellite/white-label.yaml#/components/schemas/ContentPage
+      decision: 'Drawn default accepted: accessibility'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-162 | CHG-NOTE-009
+      questionSource: contracts/satellite/white-label.yaml#/components/schemas/ContentPage
 
   # =====================================================================================================
   # P08 -- Block A task on a merged screen
@@ -2220,6 +2400,8 @@ screens:
     - what: emptyNoAccess cites TENANT_CONFIGURE; offline says "Not available".
       why: A kiosk device reads the published configuration without a staff permission, and a language list should come from the cached configuration offline.
       source: screens/P05-guest-kiosk.yaml#KSK-002
+      status: fixed
+      by: CHG-GST-004
     openQuestions: []
 
   BO-599:
@@ -2237,6 +2419,8 @@ screens:
     - what: The screen's only call is getTenantConfig and its pack gives no content.
       why: It is navigation; a full configuration read is not needed.
       source: screens/P08-venue-back-office.yaml#BO-599
+      status: fixed
+      by: CHG-WIR-015
     openQuestions: []
 
   BO-834:

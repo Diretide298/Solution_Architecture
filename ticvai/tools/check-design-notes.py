@@ -47,6 +47,17 @@ Checks, per file:
 
 `designer default` is allowed and counted: the brief asks for it to stay rare.
 
+5. **Decided questions** (2 October 2026, CHG-NOTE-001..010): an answered open question moves from `openQuestions`
+   to the screen's `decisions` list. Each decision carries `question`, `decision`, `decidedBy`, `date`
+   (YYYY-MM-DD) and `source`: the decision ledger id (`DEC-<n>`) and the change entries that record it
+   (`CHG-<BATCH>-<nnn>`, each must exist in `changes/entries/`); `reviewable` (a default Chinmay may still
+   overrule) is a boolean; `questionSource` (where the question came from) resolves like any other source. A
+   question may not stay in `openQuestions` once it is decided on the same screen.
+6. **Correction status**: a correction main has acted on carries `status` (`fixed`: main changed the screen;
+   `logged`: the gap is an open change entry, not fixed yet; `withdrawn`: a decision made it moot) and `by`, the
+   change entry that did it (it must exist). A correction with no `status` is still open. Any `CHG-` id named in a
+   source must exist too.
+
     python3 tools/check-design-notes.py              # the package's notes; exit 1 on an error
     python3 tools/check-design-notes.py --dir DIR    # another folder (a trial)
 """
@@ -65,6 +76,18 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 NOTES = ROOT / "handoff" / "design-notes"
 LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 RULE_LISTS = ("inputs", "outputs", "actions", "edgeCases", "corrections", "openQuestions")
+CORRECTION_STATUS = ("fixed", "logged", "withdrawn")
+CHG_ID = re.compile(r"\bCHG-[A-Z]{2,6}-\d{3}\b")
+_ENTRIES: set | None = None
+
+
+def change_ids() -> set:
+    """The change-log entry ids that exist (changes/entries/CHG-<BATCH>-<nnn>-<slug>.yaml)."""
+    global _ENTRIES
+    if _ENTRIES is None:
+        _ENTRIES = {m.group(0) for f in (ROOT / "changes" / "entries").glob("CHG-*.yaml")
+                    if (m := CHG_ID.match(f.name))}
+    return _ENTRIES
 
 
 def _load(path: pathlib.Path):
@@ -473,6 +496,9 @@ def check_file(f: pathlib.Path, ix: Index, errs: list, stats: collections.Counte
             stats[kind] += 1
             if e:
                 errs.append(f"{rel}: {where}: {e}")
+            for cid in CHG_ID.findall(s):
+                if cid not in change_ids():
+                    errs.append(f"{rel}: {where}: {cid} is not a change entry in changes/entries/")
 
     for i, v in enumerate(doc.get("vocabulary") or []):
         src_ok(f"vocabulary[{i}] {((v or {}).get('term') if isinstance(v, dict) else v)!r}", v)
@@ -498,6 +524,46 @@ def check_file(f: pathlib.Path, ix: Index, errs: list, stats: collections.Counte
             for i, it in enumerate(items):
                 stats["rules"] += 1
                 src_ok(f"{sid}.{key}[{i}]", it)
+        for i, c in enumerate(e.get("corrections") or []):
+            if not isinstance(c, dict) or ("status" not in c and "by" not in c):
+                continue
+            stats["corrections " + str(c.get("status"))] += 1
+            if c.get("status") not in CORRECTION_STATUS:
+                errs.append(f"{rel}: {sid}.corrections[{i}]: status {c.get('status')!r} is not one of {CORRECTION_STATUS}")
+            if not CHG_ID.fullmatch(str(c.get("by") or "")):
+                errs.append(f"{rel}: {sid}.corrections[{i}]: `by` must name the change entry (CHG-<BATCH>-<nnn>)")
+            elif c["by"] not in change_ids():
+                errs.append(f"{rel}: {sid}.corrections[{i}]: {c['by']} is not a change entry in changes/entries/")
+        decided_qs = set()
+        for i, d in enumerate(e.get("decisions") or []):
+            where = f"{sid}.decisions[{i}]"
+            stats["decisions"] += 1
+            if not isinstance(d, dict):
+                errs.append(f"{rel}: {where}: a decision must be a mapping")
+                continue
+            for k in ("question", "decision", "decidedBy", "date", "source"):
+                if not d.get(k):
+                    errs.append(f"{rel}: {where}: no `{k}`")
+            if d.get("date") and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(d["date"])):
+                errs.append(f"{rel}: {where}: date {d['date']!r} is not YYYY-MM-DD")
+            if "reviewable" in d and not isinstance(d["reviewable"], bool):
+                errs.append(f"{rel}: {where}: reviewable must be true or false")
+            stats["decisions reviewable"] += bool(d.get("reviewable"))
+            parts = [p.strip() for p in str(d.get("source") or "").split("|") if p.strip()]
+            if parts and not any(CHG_ID.fullmatch(p) for p in parts):
+                errs.append(f"{rel}: {where}: source names no change entry (CHG-<BATCH>-<nnn>) recording the decision")
+            for p in parts:
+                if CHG_ID.fullmatch(p):
+                    if p not in change_ids():
+                        errs.append(f"{rel}: {where}: {p} is not a change entry in changes/entries/")
+                elif not re.fullmatch(r"DEC-\d{3}", p):
+                    errs.append(f"{rel}: {where}: source {p!r} is neither a DEC-<nnn> ledger id nor a CHG id")
+            if d.get("questionSource"):
+                src_ok(where + ".questionSource", {"source": d["questionSource"]})
+            decided_qs.add(str(d.get("question") or "").strip())
+        for i, q in enumerate(e.get("openQuestions") or []):
+            if isinstance(q, dict) and str(q.get("question") or "").strip() in decided_qs:
+                errs.append(f"{rel}: {sid}.openQuestions[{i}]: already decided on this screen; it belongs in `decisions` only")
         for i, c in enumerate(e.get("consistency") or []):
             if isinstance(c, dict):
                 w = c.get("with")
@@ -529,9 +595,11 @@ def main() -> int:
         print(f"  {e}")
     if len(errs) > 200:
         print(f"  … {len(errs) - 200} more")
-    kinds = ", ".join(f"{k} {v}" for k, v in sorted(stats.items()) if k not in ("screens", "rules"))
+    kinds = ", ".join(f"{k} {v}" for k, v in sorted(stats.items())
+                      if k not in ("screens", "rules") and not k.startswith(("decisions", "corrections ")))
+    decided = ", ".join(f"{k} {v}" for k, v in sorted(stats.items()) if k.startswith(("decisions", "corrections ")))
     print(f"design notes: {len(files)} file(s), {stats['screens']} screens, {stats['rules']} rules; "
-          f"sources: {kinds}; {len(errs)} error(s)")
+          f"sources: {kinds}; {decided or 'no decisions'}; {len(errs)} error(s)")
     return 1 if errs else 0
 
 

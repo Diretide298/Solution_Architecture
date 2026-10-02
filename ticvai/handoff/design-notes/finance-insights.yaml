@@ -301,22 +301,33 @@ screens:
       why: 'They are fixed parameters: venue from the home screen, as-at now, purpose tender. A purpose picker would
         let a guest browse internal treasury rates.'
       source: screens/P01-guest-web-storefront.yaml#WEB-035 | contracts/spine/finance.yaml#/components/schemas/FxRatePurpose
+      status: fixed
+      by: CHG-FIN-001
     - what: The rate table and detail panel bind every FX rate field.
       why: Fields such as the manual-rate note (which may state the margin over market), the person who set it and
         the provider reference are internal. The guest needs currency, rate and time only.
       source: contracts/spine/finance.yaml#/components/schemas/FxRate | R127
+      status: fixed
+      by: CHG-FIN-001
     - what: The empty first-run state ("No multi-currency pricing yet… offers no create action").
       why: For a guest this situation means the venue shows no other currency; the screen should not be reachable
         then.
       source: screens/P01-guest-web-storefront.yaml#WEB-035
-    openQuestions:
+      status: fixed
+      by: CHG-FIN-001
+    decisions:
     - question: Is gateway-level currency conversion (the guest is charged in their own currency) in scope?
-      default: Yes, decided 2 October 2026 (Chinmay), for the currencies a venue charges; client sign-off pending.
-        Foreign cash at a till stays recorded in base with change in base.
-      source: MoM 2026-08-10 4.7 Account Creation, Localisation & Multi-Currency | DI-211
+      decision: The guest selects the currency and is charged in it.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-092 | CHG-FIN-001 | CHG-NOTE-003
+      questionSource: MoM 2026-08-10 4.7 Account Creation, Localisation & Multi-Currency | DI-211
     - question: Which wave do web and app multi-currency ship in together?
-      default: Draw both now (GAP-D2 builds them regardless of wave).
-      source: screens/P01-guest-web-storefront.yaml#WEB-035
+      decision: Web and app multi-currency are built now.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-093 | CHG-FIN-001 | CHG-NOTE-003
+      questionSource: screens/P01-guest-web-storefront.yaml#WEB-035
   GST-019:
     summary: 'The signed-in guest''s own orders at this venue, with the tax documents that belong to them: the VAT
       receipt (simplified tax invoice), a full tax invoice on request with a company name and TRN, and any credit
@@ -331,9 +342,10 @@ screens:
         the bilingual English and Arabic layout.'
       source: contracts/spine/finance.yaml#/components/schemas/FinIssueTaxInvoiceRequest | contracts/spine/finance.yaml#issueTaxInvoice
     - field: Tax registration number
-      rule: Free text up to 30 characters, validated as the legal entity's country requires. The exact legal field
-        set is still open with the client's tax adviser (CF-133), so do not hard-code a format in the design.
+      rule: Free text up to 30 characters, validated as the legal entity's country requires. The field set follows UAE law
+        (CHG-FIN-011); the client's tax adviser confirms only the Arabic titles.
       source: contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceRecipient | contracts/spine/finance.yaml#issueTaxInvoice
+        | decided 2 October 2026 by Chinmay (CHG-NOTE-003)
     outputs:
     - element: Order list
       rule: 'Newest first. Each row: visit date, venue, order number, total in AED, status (Paid, Partly refunded,
@@ -341,11 +353,12 @@ screens:
         paid in it shows under the AED total.'
       source: contracts/spine/orders.yaml#listMyOrders | DI-211
     - element: Tax document detail
-      rule: 'Invoice number (e.g. SINV-2026-000123), type in words (VAT receipt / Tax invoice / Combined tax invoice),
-        supplier name and TRN, issue and supply date, lines with VAT rate, a VAT summary per rate, and net, VAT
-        and total. A document is never edited: corrections appear as credit memos listed under the invoice with
-        negative amounts and the status "Partly credited" or "Fully credited".'
+      rule: 'Invoice number (e.g. SINV-2026-000123), type in words (VAT receipt / Tax invoice / Combined tax invoice), supplier
+        name and TRN, issue and supply date, lines with VAT rate, a VAT summary per rate, and net, VAT and total. A document
+        is never edited: corrections appear as tax credit notes listed under the invoice with negative amounts and the status
+        "Partly credited" or "Fully credited".'
       source: contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceStatus
+        | decided 2 October 2026 by Chinmay (CHG-NOTE-003)
     - element: E-invoicing status
       rule: Not shown to guests. Transmission to the tax authority's network is an internal concern.
       source: contracts/spine/finance.yaml#/components/schemas/FinEInvoiceTransmissionStatus
@@ -395,7 +408,7 @@ screens:
     sampleData:
       orders:
       - 12 Oct 2026 · Aquaventure Waterpark · ORD-7F3K2 · AED 897.00 · Paid · VAT receipt SINV-2026-004812
-      - 28 Sep 2026 · Aquaventure Waterpark · ORD-6Q1PA · AED 299.00 · Refunded · Credit memo CN-2026-000233
+      - 28 Sep 2026 · Aquaventure Waterpark · ORD-6Q1PA · AED 299.00 · Refunded · Tax credit note CN-2026-000233
       invoiceDetail:
         number: INV-2026-000123
         buyer: Al Mansoori Trading LLC · TRN 100234567800003
@@ -409,6 +422,8 @@ screens:
       why: The screen's own notes say a guest-facing list must be scoped to the caller. Keep only the guest's own
         orders; remove the staff list, its filters and the staff permission message.
       source: screens/P02-guest-mobile-app.yaml#GST-019
+      status: fixed
+      by: CHG-GST-003
     - what: Five tax-document operations are declared but no component uses them.
       why: There is no invoice list, no request-invoice form and no download in the layout; the design must add
         them.
@@ -416,14 +431,19 @@ screens:
     - what: The purpose still says "order history (wallet)".
       why: The screen was renamed on 31 August; the purpose was not updated.
       source: screens/P02-guest-mobile-app.yaml#GST-019
-    openQuestions:
-    - question: Which fields must a UAE tax invoice and a VAT receipt show, and may a receipt be replaced by a full
-        invoice?
-      default: Draw the fields in the invoice shape; treat replacement as "ask the venue".
-      source: contracts/spine/finance.yaml#issueTaxInvoice
+    decisions:
+    - question: Which fields must a UAE tax invoice and a VAT receipt show, and may a receipt be replaced by a full invoice?
+      decision: UAE tax invoice / VAT receipt fields from the law (researched).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-085 | CHG-FIN-011 | CHG-NOTE-003
+      questionSource: contracts/spine/finance.yaml#issueTaxInvoice
     - question: Should the correcting document be labelled "Credit memo" or "Tax credit note" for UAE guests?
-      default: '"Credit memo" (the contract term) until the client''s tax adviser decides.'
-      source: contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceTemplate
+      decision: The correcting document is the UAE 'tax credit note' (from the law).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-086 | CHG-FIN-011 | CHG-NOTE-003
+      questionSource: contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceTemplate
   GST-044:
     summary: 'The app version of WEB-035, used before the visit and during it. Same rule: the guest pays in the
       selected currency where the venue charges it, and sees an approximate price otherwise. In the app the selector lives in the header (storyboard
@@ -472,6 +492,8 @@ screens:
     - what: Venue, As at and Purpose drawn as controls; full FX rate columns bound.
       why: Same as WEB-035.
       source: screens/P02-guest-mobile-app.yaml#GST-044 | contracts/spine/finance.yaml#/components/schemas/FxRate
+      status: fixed
+      by: CHG-FIN-001
   POS-008:
     summary: 'How the day is going, seen from the terminal: the till''s own sales, tenders, voids and refunds today,
       and the foreign-currency cash it took. What a person may see is set by role: some venues let a cashier see
@@ -576,13 +598,19 @@ screens:
     - what: The approved prototype draws a cross-venue command dashboard.
       why: Broader than "from the terminal" and than what a cashier may see; do not copy its cross-outlet panels.
       source: screens/P04-point-of-sale.yaml#POS-008
-    openQuestions:
+    decisions:
     - question: May the POS show a cashier any running total (tickets sold, own sales), and which roles see revenue?
-      default: Cashier sees own transactions count and own sales only; never expected cash.
-      source: DI-802 | DI-806
+      decision: 'Drawn default accepted: Cashier sees own transactions count and own sales only; never expected cash.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-088 | CHG-NOTE-003
+      questionSource: DI-802 | DI-806
     - question: Are the eight seeded reports right (terminal day view among them)?
-      default: Use the proposed set until the client corrects it.
-      source: R282
+      decision: 'Drawn default accepted: Use the proposed set until the client corrects it.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-089 | CHG-NOTE-003
+      questionSource: R282
   POS-020:
     summary: 'The supervisor''s queue at the till for things that need a decision now: cash variance and drawer
       limit alerts, voids and refunds above threshold, no-sales, and approval requests from cashiers. The one thing
@@ -652,10 +680,15 @@ screens:
     - what: The shift summary report (expected against counted cash) has no role restriction on a shared till.
       why: Shown to a cashier it defeats the blind close; restrict to supervisors.
       source: MoM 2026-08-12 19. Cash/Shift and Till Management | DI-806
-    openQuestions:
+      status: fixed
+      by: CHG-FIN-003
+    decisions:
     - question: Who receives a cash variance alert, and does breaching the drawer limit warn or block?
-      default: Supervisor and finance only; warn, offer a cash lift.
-      source: MATRIX 5.9.8 | MATRIX 5.8.4
+      decision: 'Drawn default accepted: Supervisor and finance only; warn, offer a cash lift.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-090 | CHG-NOTE-003
+      questionSource: MATRIX 5.9.8 | MATRIX 5.8.4
   POS-026:
     summary: 'Right after payment, or when the guest comes back to the counter: print the receipt again, issue a
       full tax invoice with the guest''s company details, or reissue a ticket or wristband. One cart gives one unified
@@ -725,10 +758,13 @@ screens:
       why: Whether a VAT receipt is issued automatically is a template setting that defaults to off; the design
         must show both cases.
       source: contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceTemplate
-    openQuestions:
+    decisions:
     - question: Must a reprinted VAT receipt be marked as a copy?
-      default: Print "Copy" under the title.
-      source: designer default
+      decision: 'Drawn default accepted: Print "Copy" under the title.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-091 | CHG-NOTE-003
+      questionSource: designer default
   EMP-061:
     summary: On a handheld, a retail lead checks stock on hand, allocated and available by item and location and
       the latest movements, one thumb, walking. Today's takings and alerts are secondary.
@@ -750,11 +786,14 @@ screens:
     - what: Filters are free-text "Item id" and "Location id" fields, and a "Confirm" button has no operation.
       why: Spec leak and a dead control; an item search and a location picker are needed.
       source: screens/P06-staff-app.yaml#EMP-061
-    openQuestions:
-    - question: Do takings and a store manager's mobile dashboard belong on a stock screen, or in the reporting
-        area on mobile?
-      default: Keep a single takings figure at the top; the dashboard lives in the reporting area.
-      source: DI-696 | DI-721
+    decisions:
+    - question: Do takings and a store manager's mobile dashboard belong on a stock screen, or in the reporting area on mobile?
+      decision: 'Drawn default accepted: Keep a single takings figure at the top; the dashboard lives in the reporting area.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-361 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-696 | DI-721
   EMP-070:
     summary: 'Inventory alerts a floor lead must act on (low stock, expiring, count variance): acknowledge it and,
       where stock is low, raise a requisition from the alert in two taps.'
@@ -919,10 +958,13 @@ screens:
       why: The 8 September decision is one consolidated, permission-based reporting area, not duplicated screens
         in each module.
       source: DI-721 | DI-702
-    openQuestions:
+    decisions:
     - question: Do advanced users get SQL or scripting templates (12 August) or is it strictly no-code (8 September)?
-      default: No-code only, as the later decision says.
-      source: DI-184 | DI-708
+      decision: 'Drawn default accepted: No-code only, as the later decision says.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-081 | CHG-NOTE-003
+      questionSource: DI-184 | DI-708
   BO-043:
     summary: 'Finance proves each venue''s day balances: every money source (till cash, card gateway settlements,
       bank, wallet) set against the ledger, with the differences named and the unmatched settlement lines to resolve.
@@ -1011,11 +1053,14 @@ screens:
     - what: Provider and status filters are free text.
       why: Pick lists of the providers the venue uses and the settlement statuses.
       source: screens/P08-venue-back-office.yaml#BO-043
-    openQuestions:
-    - question: Daily per venue (R110) against the weekly or monthly runs in the 12 August minutes. Is a monthly
-        roll-up also needed?
-      default: Daily per venue, with a month view that lists the days.
-      source: R110 | DI-258
+    decisions:
+    - question: Daily per venue (R110) against the weekly or monthly runs in the 12 August minutes. Is a monthly roll-up also
+        needed?
+      decision: Daily per venue (applied by CHG-FIN-009), plus a month view listing the days.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-215 | CHG-NOTE-003
+      questionSource: R110 | DI-258
   BO-058:
     summary: 'The report library: find the report rather than build it, run it with its prompts, see recent runs,
       and schedule it to people. The standard reports (end-of-day, sales by channel, payment summary, shift, refunds,
@@ -1131,10 +1176,13 @@ screens:
     - what: The channel list differs across the catalogue, F&B and retail contracts.
       why: Sales by channel is reported three ways today; one closed list is needed.
       source: MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels | MATRIX 1.4.7
-    openQuestions:
+    decisions:
     - question: Does net revenue here include VAT?
-      default: Excluding VAT, stated in the column header.
-      source: MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities
+      decision: Net revenue excludes VAT.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-354 | CHG-FIN-007 | CHG-FIN-006 | CHG-NOTE-003
+      questionSource: MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities
   BO-060:
     summary: 'How many people actually came in: admissions by hour and by entry point against capacity, a live headcount
       of who is inside, and the group breakdown (general admission, group, re-entry). The one thing to get right:
@@ -1322,10 +1370,13 @@ screens:
     - what: Filters are typed ids ("Legal entity id") and a type text field.
       why: 'Pick lists: the entity switcher and the five account types.'
       source: screens/P08-venue-back-office.yaml#BO-074
-    openQuestions:
+    decisions:
     - question: Must a client's chart be importable from a CSV file?
-      default: Draw an "Import" entry point marked later; the contract has no import operation.
-      source: MoM 2026-08-12 13. Chart of Accounts and Account Mapping
+      decision: 'Drawn default accepted: Draw an "Import" entry point marked later; the contract has no import operation.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-082 | CHG-NOTE-003
+      questionSource: MoM 2026-08-12 13. Chart of Accounts and Account Mapping
   BO-075:
     summary: 'Which account each money event posts to, and the tax codes and exemptions those postings use. Without
       a mapping a sale posts to suspense. The one thing to get right: saving replaces the whole mapping set for
@@ -1412,10 +1463,13 @@ screens:
         and the finance tax calculation takes a separate venue-policy flag. One of them must be the source of truth.
       source: contracts/spine/catalogue.yaml#setTaxProfileJurisdiction | contracts/spine/finance.yaml#/components/schemas/CalculateTaxRequest
         | DI-598
-    openQuestions:
+    decisions:
     - question: Is a product-level GL code (DI-466) needed, or is event-type mapping enough?
-      default: Event-type mapping as contracted; draw no product account picker.
-      source: DI-466
+      decision: 'Drawn default accepted: Event-type mapping as contracted; draw no product account picker.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-083 | CHG-NOTE-003
+      questionSource: DI-466
   BO-076:
     summary: 'Deferred revenue (paid for, not yet earned), when it will unwind, and the rules that release it: ticket
       revenue on the visit, gift cards and wallet on use, annual passes straight-line or per visit, unredeemed value
@@ -1481,11 +1535,15 @@ screens:
       why: Splitting a combo or two-venue pass across products or legal entities was agreed; fixed against percentage
         is still open.
       source: DI-267 | MoM 2026-08-12 16. Revenue Recognition Rules and Allocation Splits
-    openQuestions:
-    - question: POS sales recognise immediately (12 August) but rules are per product kind, not per channel. How
-        is a POS-sold dated ticket treated?
-      default: By its product kind's rule; recognised at admission the same day.
-      source: MoM 2026-08-12 8. Deferred Revenue and Ledger Flow | contracts/spine/finance.yaml#/components/schemas/RecognitionSchedule
+    decisions:
+    - question: POS sales recognise immediately (12 August) but rules are per product kind, not per channel. How is a POS-sold
+        dated ticket treated?
+      decision: 'Drawn default stands (answer: "By the product kind''s rule (a dated ticket is recognised at admission)"):
+        By its product kind''s rule; recognised at admission the same day.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-216 | CHG-NOTE-003
+      questionSource: MoM 2026-08-12 8. Deferred Revenue and Ledger Flow | contracts/spine/finance.yaml#/components/schemas/RecognitionSchedule
   BO-077:
     summary: 'Two finance queues in one place: the exchange rates in force for the region (set by hand with a margin,
       or pulled from a provider), and the price variances waiting for review, where a till priced a sale differently
@@ -1561,10 +1619,13 @@ screens:
     - what: The screen is wave 2 while it is in the Block A set-up tickets.
       why: Guest multi-currency (WEB-035, wave 1) needs a tender rate to show anything.
       source: screens/P08-venue-back-office.yaml#BO-077 | screens/P01-guest-web-storefront.yaml#WEB-035
-    openQuestions:
+    decisions:
     - question: Should the margin over market be stored, or only the resulting rate?
-      default: Only the rate, with the margin stated in the note.
-      source: DI-212 | contracts/spine/finance.yaml#/components/schemas/FxRate
+      decision: 'Drawn default accepted: Only the rate, with the margin stated in the note.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-084 | CHG-NOTE-003
+      questionSource: DI-212 | contracts/spine/finance.yaml#/components/schemas/FxRate
   BO-089:
     summary: 'The journal: every posting, and the manual entries waiting for a finance manager. A finance user prepares
       a voucher, a different person approves it, and only then it reaches the ledger. Nothing posted is ever edited
@@ -1631,6 +1692,8 @@ screens:
       why: Two views are needed (the ledger and the approval queue); the create action is the point of the screen
         for a preparer.
       source: screens/P08-venue-back-office.yaml#BO-089
+      status: fixed
+      by: CHG-FIN-005
     - what: There is no way to edit a draft or send a rejected draft back for approval.
       why: The journal state model moves draft to pending only when the entry is created; after a rejection the
         draft can only be approved directly or abandoned.
@@ -1775,11 +1838,17 @@ screens:
     - what: The takings definition says both "gross value of payments" and "payments less refunds".
       why: The label and tooltip need one definition; also whether VAT, wallet top-ups and gift-card sales are included.
       source: contracts/satellite/reporting.yaml#getKpiValues | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi
-    openQuestions:
-    - question: The Vision Book shows net profit, average order value, live visitors with capacity, AI insights
-        and sales by channel on this screen. Which come back, and from what?
-      default: Takings and admissions only (R283); the others as an open placeholder list.
-      source: DI-031 | R283
+      status: fixed
+      by: CHG-FIN-010
+    decisions:
+    - question: The Vision Book shows net profit, average order value, live visitors with capacity, AI insights and sales
+        by channel on this screen. Which come back, and from what?
+      decision: 'Drawn default accepted: Takings and admissions only (R283); the others as an open placeholder list.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-355 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-031 | R283
   BO-106:
     summary: 'Section landing for people and access rights: roles and who holds them, and the way into users, roles
       and rights screens. From this process''s angle it decides who can see finance and reports: rights can be set
@@ -1809,11 +1878,15 @@ screens:
       roles:
       - 'Finance controller · 2 people · reports: whole company · ledger approval · personal-data export'
       - 'Cashier · 46 people · reports: own figures'
-    openQuestions:
-    - question: Which roles are the analytics personas (executive viewer, operations manager, analyst, dashboard
-        designer, data admin)?
-      default: Show the five as proposed role templates bound to the report tiers.
-      source: MATRIX 8.7.1 | MATRIX 8.7.21 | MATRIX 6.1.78
+    decisions:
+    - question: Which roles are the analytics personas (executive viewer, operations manager, analyst, dashboard designer,
+        data admin)?
+      decision: 'Drawn default accepted: Show the five as proposed role templates bound to the report tiers.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-356 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.7.1 | MATRIX 8.7.21 | MATRIX 6.1.78
   BO-133:
     summary: 'The venue''s control over offline trading: what the server refused when tills synced back, which offline
       limits were crossed, and who did what. From the finance angle the screen is about money that exists in the
@@ -1995,11 +2068,15 @@ screens:
     - what: Location and channel comparison duplicates the reporting area.
       why: DI-721.
       source: DI-721 | screens/P16-venue-analytics.yaml#ANL-020
-    openQuestions:
-    - question: Is an AI rebalancing recommendation (move stock from Marina A to North Station) inside AI's agreed
-        rental role?
-      default: Show it as a reporting insight only, no action button.
-      source: DI-772
+    decisions:
+    - question: Is an AI rebalancing recommendation (move stock from Marina A to North Station) inside AI's agreed rental
+        role?
+      decision: 'Drawn default accepted: Show it as a reporting insight only, no action button.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-358 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-772
   BO-593:
     summary: Ask questions about rentals in plain language and get an answer with how it was interpreted, the figures
       behind it and a confidence, within the user's own access. AI's role in rentals is reporting and maintenance-scheduling
@@ -2042,10 +2119,14 @@ screens:
         or category.
       why: Stale notes from before 29 September.
       source: contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi | contracts/satellite/reporting.yaml#getKpiValues
-    openQuestions:
+    decisions:
     - question: Do accreditation dashboards move into the reporting area (DI-721) or stay in the accreditation module?
-      default: Standard "Accreditation" dashboard in the reporting area, linked from the module.
-      source: DI-721
+      decision: 'Drawn default accepted: Standard "Accreditation" dashboard in the reporting area, linked from the module.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-359 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-721
   BO-833:
     summary: 'How challenges perform and what they cost: participants, completion, points awarded, rewards redeemed,
       cost, attributed revenue, repeat visits, and the points liability, compared across challenges and audiences,
@@ -2083,10 +2164,14 @@ screens:
     sampleData:
     - Ski instructors Level 2 · Sat 3 Oct 09:00–12:00 · required 12 · scheduled 10 · checked in 9 · planned gap
       2 · live gap 3 · Short
-    openQuestions:
+    decisions:
     - question: How does the pack's four-level severity map onto covered, tight, short, blocking?
-      default: Informational = tight, Warning = short, High and Critical = blocking.
-      source: contracts/satellite/workforce.yaml#getStaffingCoverage
+      decision: 'Drawn default accepted: Informational = tight, Warning = short, High and Critical = blocking.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-360 | CHG-NOTE-003
+      reviewable: true
+      questionSource: contracts/satellite/workforce.yaml#getStaffingCoverage
   BO-951:
     summary: 'Health of the integrations that feed resource management (HR system, workforce provider, booking sync):
       last success, failures, records affected and what that failure means operationally.'
@@ -2172,6 +2257,8 @@ screens:
     - what: The "Net revenue" tile is bound to the seeded takings KPI.
       why: Takings is venue-wide payments less refunds; it is neither net revenue nor per section.
       source: contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi
+      status: fixed
+      by: CHG-FIN-007
     - what: Section revenue duplicates the reporting area's sales and revenue views.
       why: DI-721.
       source: DI-721 | screens/P16-venue-analytics.yaml#ANL-002
@@ -2343,6 +2430,8 @@ screens:
       why: The finance board cannot be built or reconciled to the ledger until D-185 is decided.
       source: MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi
         | contracts/satellite/reporting.yaml#/components/schemas/MetricSource
+      status: fixed
+      by: CHG-FIN-007
     - what: The seeded "takings" KPI (payments taken less refunds) must not be bound to the Gross sales or the Net
         revenue tile as a stop-gap.
       why: 'Takings is cash-basis and refund-netted, and it ignores discounts; labelling it gross or net breaks
@@ -2352,6 +2441,8 @@ screens:
         the other tiles stay "Definition pending".'
       source: contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi | contracts/satellite/reporting.yaml#getKpiValues
         | contracts/spine/finance.yaml#getDeferredRevenue | MATRIX 5.12.6 | R283
+      status: fixed
+      by: CHG-FIN-007
     - what: Pattern fell back to listDetail, with a "Search finance" field and an empty state that "carries the
         create action".
       why: A dashboard has no population to search and nothing to create; the empty state should say no postings
@@ -2361,17 +2452,28 @@ screens:
       why: DI-721 (agreed) says one permission-based dashboards area, not dashboard screens inside each module;
         DI-260's content stands, its location moves.
       source: DI-721 | DI-260 | screens/P16-venue-analytics.yaml#ANL-013
-    openQuestions:
+    decisions:
     - question: Is Gross sales shown excluding VAT, and are service fees inside it or a separate line?
-      default: Draw excluding VAT, with fees as their own line under Gross sales and a footnote saying so.
-      source: MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities | DI-597
+      decision: 'Drawn default stands (answer: "Excluding VAT; fees on their own line with a footnote"): Draw excluding VAT,
+        with fees as their own line under Gross sales and a footnote saying so.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-217 | CHG-NOTE-003
+      questionSource: MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities | DI-597
     - question: What is the pack's "Attraction" filter in scope terms (a scope node below venue, or a product category)?
-      default: Leave it out; offer Venue plus Product category.
-      source: screens/P08-venue-back-office.yaml#BO-1081
-    - question: Does BO-1081 stay as its own P08 screen (DI-260) or become the Finance standard dashboard in P16
-        opened from Orders & Money (DI-721)?
-      default: Draw it once, as the P16 Finance dashboard; Orders & Money shows a link card to it.
-      source: DI-260 | DI-721
+      decision: 'Drawn default stands (answer: "Product category (venue + category filters)"): Leave it out; offer Venue plus
+        Product category.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-218 | CHG-NOTE-003
+      questionSource: screens/P08-venue-back-office.yaml#BO-1081
+    - question: Does BO-1081 stay as its own P08 screen (DI-260) or become the Finance standard dashboard in P16 opened from
+        Orders & Money (DI-721)?
+      decision: One P16 Finance dashboard; Orders & Money (P08) shows a link card to it.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-219 | CHG-NOTE-003
+      questionSource: DI-260 | DI-721
   BO-1082:
     summary: 'The ledger view of one revenue account: the pack''s number 410000 is the Admissions revenue GL account,
       and its drill path runs GL entry, then journal, then the TICVAI transaction that caused it. A finance user
@@ -2434,10 +2536,14 @@ screens:
         money tile here.
       why: Same word, different unit and source.
       source: contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi
-    openQuestions:
+    decisions:
     - question: Is 410000 a fixed platform account code or the tenant's own chart-of-accounts code?
-      default: Show the tenant's account code and name as read from the chart of accounts.
-      source: DI-259 | contracts/spine/finance.yaml#listLedgerEntries
+      decision: 'Drawn default accepted: Show the tenant''s account code and name as read from the chart of accounts.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-357 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-259 | contracts/spine/finance.yaml#listLedgerEntries
   BO-1170:
     summary: 'Month-end for wallet money: a roll-forward of the wallet liability from opening to closing balance,
       the checks that must pass before the period closes, and the close itself. Wallet balances are a liability
@@ -2468,10 +2574,12 @@ screens:
         approver's name; "Reopened" is an event in the history, not a status.
       source: contracts/spine/finance.yaml#/components/schemas/PeriodStatus | contracts/spine/finance.yaml#/components/schemas/FiscalPeriod
     - element: pre-close checks
-      rule: One row per check with pass or the blocking count and a link to fix it. The ledger's checks are trial
-        balance balances, no unapproved journals, no open shifts, settlements reconciled, recognition run complete,
-        prior period closed and variance exceptions reviewed.
-      source: contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult | F13 step 1
+      rule: One row per check with pass or the blocking count and a link to fix it. The ledger's checks are trial balance
+        balances, no unapproved journals, no open shifts, settlements reconciled, recognition run complete, prior period closed
+        and variance exceptions reviewed. The wallet pre-close checks join them, read from a wallet movement summary (an operation
+        to be added), so none is drawn greyed.
+      source: contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult | F13 step 1 | decided 2 October 2026 by
+        Chinmay (CHG-NOTE-003)
     actions:
     - action: Export close package
       result: PDF and Excel of the roll-forward, the checks and the period history, stamped with who and when.
@@ -2531,12 +2639,14 @@ screens:
         list.
       why: The close cannot block on them, so the screen would show checks nothing runs.
       source: contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult | screens/P08-venue-back-office.yaml#BO-1170
-    openQuestions:
-    - question: Which wallet-specific checks join the period-close checks, and does a wallet movement summary operation
-        get added?
-      default: Draw the roll-forward and the seven ledger checks; show wallet-only checks greyed as "not yet checked
-        by the system".
-      source: contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult | contracts/satellite/wallet.yaml#getWalletLiability
+    decisions:
+    - question: Which wallet-specific checks join the period-close checks, and does a wallet movement summary operation get
+        added?
+      decision: Add a wallet movement summary operation and wallet pre-close checks.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-220 | CHG-NOTE-003
+      questionSource: contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult | contracts/satellite/wallet.yaml#getWalletLiability
   BO-1172:
     summary: 'The finance controls centre (DI-277): one place that shows the transactions and balances with exceptions
       or variances needing review, proves that wallet balances, the wallet sub-ledger, the general ledger and the
@@ -2616,10 +2726,14 @@ screens:
         Health Check".
       why: Page bleed from the pack; this screen is the finance health check only.
       source: screens/P08-venue-back-office.yaml#BO-1172
-    openQuestions:
+    decisions:
     - question: Which approval inbox does the finance approver use to decide a period close?
-      default: The approvals inbox, with a deep link back to this screen showing the checks.
-      source: R144 | contracts/spine/finance.yaml#closeFiscalPeriod
+      decision: 'Drawn default stands (answer: "The approvals inbox, with a deep link to the close checks"): The approvals
+        inbox, with a deep link back to this screen showing the checks.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-221 | CHG-NOTE-003
+      questionSource: R144 | contracts/spine/finance.yaml#closeFiscalPeriod
   ADM-031:
     summary: 'The platform''s security and compliance picture: who holds sensitive rights without a second factor,
       open platform-staff access into tenants, unusual sign-in patterns and override rates, personal-data exports,
@@ -2675,10 +2789,13 @@ screens:
       why: The metric list has no security measures (second-factor coverage, failed sign-ins, grants, exports);
         the screen says "no contract — not specified".
       source: screens/P09-platform-admin-console.yaml#ADM-031 | contracts/satellite/reporting.yaml#/components/schemas/MetricSource
-    openQuestions:
+    decisions:
     - question: Which security measures does the platform compute, and from which logs?
-      default: Draw the tiles above as the intended set, marked "awaiting source".
-      source: DI-732 | F106 step 1
+      decision: 'Drawn default accepted: Draw the tiles above as the intended set, marked "awaiting source".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-077 | CHG-NOTE-003
+      questionSource: DI-732 | F106 step 1
   ADM-068:
     summary: 'The hub of the tax, fee and calculation board: how many tax profiles, jurisdictions, fees, surcharges,
       exemptions and calculation profiles are active, what is broken (products with no tax, conflicts, validation
@@ -2759,15 +2876,21 @@ screens:
         that gap.
       source: contracts/spine/catalogue.yaml#setTaxProfileJurisdiction | contracts/spine/catalogue.yaml#listTaxFeeCalculation
         | contracts/shared/permissions.yaml#/components/schemas/Permission
-    openQuestions:
+    decisions:
     - question: Who uses ADM-068, TICVAI staff maintaining jurisdiction templates, or tenant finance administrators?
-      default: TICVAI staff maintaining templates per country; the VAT return and invoices are drawn on the tenant's
-        finance screens instead.
-      source: screens/P09-platform-admin-console.yaml#ADM-068 | contracts/spine/catalogue.yaml#listTaxFeeCalculation
-    - question: The aiInsights field on the summary, is it in phase one, given AI-assisted finance reporting is
-        phase two?
-      default: Leave the AI panel out of phase one.
-      source: DI-278 | contracts/spine/catalogue.yaml#/components/schemas/TaxFeeCalculationCommandCenterSummary
+      decision: 'Drawn default stands (answer: "TICVAI staff maintain country tax templates; tenants run VAT returns and invoices
+        in VM"): TICVAI staff maintaining templates per country; the VAT return and invoices are drawn on the tenant''s finance
+        screens instead.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-207 | CHG-NOTE-003
+      questionSource: screens/P09-platform-admin-console.yaml#ADM-068 | contracts/spine/catalogue.yaml#listTaxFeeCalculation
+    - question: The aiInsights field on the summary, is it in phase one, given AI-assisted finance reporting is phase two?
+      decision: 'Drawn default stands (answer: "Leave the AI panel out of phase one"): Leave the AI panel out of phase one.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-208 | CHG-NOTE-003
+      questionSource: DI-278 | contracts/spine/catalogue.yaml#/components/schemas/TaxFeeCalculationCommandCenterSummary
   ADM-069:
     summary: 'Define reusable tax profiles per legal entity, country and jurisdiction: tax type, rate, where the
       profile applies, and the taxable base, including the region-configurable rule that tax is charged on the price
@@ -2863,15 +2986,20 @@ screens:
       why: The permission set has a tax-configuration right, used by the finance tax operations; a tax profile is
         a legal setting.
       source: contracts/spine/catalogue.yaml#setTaxProfileJurisdiction | contracts/shared/permissions.yaml#/components/schemas/Permission
-    openQuestions:
-    - question: 'Who configures tax profiles: platform staff in the console under a grant, or the client''s finance
-        team?'
-      default: The client's finance team enters rates and registrations (the contract says so); platform staff only
-        under a grant.
-      source: contracts/spine/catalogue.yaml#setTaxProfileJurisdiction | R098
+    decisions:
+    - question: 'Who configures tax profiles: platform staff in the console under a grant, or the client''s finance team?'
+      decision: 'Drawn default accepted: The client''s finance team enters rates and registrations (the contract says so);
+        platform staff only under a grant.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-078 | CHG-NOTE-003
+      questionSource: contracts/spine/catalogue.yaml#setTaxProfileJurisdiction | R098
     - question: Is the VAT receipt issued automatically on every paid order?
-      default: On for UAE legal entities (the template default is off).
-      source: contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceTemplate
+      decision: 'Drawn default accepted: On for UAE legal entities (the template default is off).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-079 | CHG-NOTE-003
+      questionSource: contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceTemplate
   ADM-077:
     summary: 'The last check before pricing and tax changes go live: configuration findings (missing profiles, invalid
       rates, overlapping rules, rounding problems) and the results of stored test scenarios, each compared against
@@ -2939,10 +3067,13 @@ screens:
         billing company, the licence to the operator.
       source: screens/P09-platform-admin-console.yaml#ADM-411 | DI-830
     - field: legal name, trade licence number, TRN, TRN certificate
-      rule: Legal name exactly as on the trade licence. TRN shown for VAT-registered countries; the certificate
-        is uploaded as a PDF or image and checked against the typed number. Not registered for VAT is an explicit
-        choice, not a blank.
+      rule: Legal name exactly as on the trade licence. TRN shown for VAT-registered countries; the certificate is uploaded
+        as a PDF or image and checked against the typed number. Not registered for VAT is an explicit choice, not a blank.
+        Saved on a billing-entity record (the invoiced company and its TRN certificate) in the subscription contract. The
+        required documents are configurable per country; the default is the trade licence always and the VAT certificate when
+        a TRN is entered.
       source: DI-830 | contracts/satellite/subscription.yaml#/components/schemas/PartnerDocument | contracts/spine/finance.yaml#/components/schemas/LegalEntity
+        | decided 2 October 2026 by Chinmay (CHG-NOTE-003)
     - field: country, currency, fiscal year start
       rule: Country first; currency and its decimals follow from it; fiscal year start defaults to January (UAE)
         and April for India.
@@ -2984,13 +3115,19 @@ screens:
     - what: '"Commercial Customer ≠ Operating Venue" is drawn as the primary button.'
       why: It is a rule about the data (payer may differ from operator), so it is a switch, not an action.
       source: screens/P09-platform-admin-console.yaml#ADM-411
-    openQuestions:
+    decisions:
     - question: Which record holds the invoiced company (billing entity) and its TRN certificate?
-      default: Draw the fields; leave the save target to the subscription contract.
-      source: contracts/satellite/subscription.yaml#submitOnboardingApplication | DI-830
+      decision: A new billing-entity record (invoiced company and TRN certificate) in the subscription contract.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-209 | CHG-NOTE-003
+      questionSource: contracts/satellite/subscription.yaml#submitOnboardingApplication | DI-830
     - question: Which document types are mandatory per country (trade licence, VAT certificate)?
-      default: Trade licence always; VAT certificate when a TRN is entered.
-      source: contracts/satellite/subscription.yaml#/components/schemas/PartnerDocument
+      decision: Trade licence always; VAT certificate when a TRN is entered; configurable per country.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-210 | CHG-NOTE-003
+      questionSource: contracts/satellite/subscription.yaml#/components/schemas/PartnerDocument
   ADM-619:
     summary: 'The hub of the reconciliation and settlement board: how much TICVAI recorded against what providers
       reported, how much matched, what did not, what settlement was expected against what arrived, and how many
@@ -3046,15 +3183,21 @@ screens:
         matched, has exceptions, resolved, failed), and the record has no expected date or received amount.
       why: Settlement expected, received and overdue cannot be shown from the declared data.
       source: contracts/spine/finance.yaml#/components/schemas/SettlementStatus | screens/P09-platform-admin-console.yaml#ADM-619
-    openQuestions:
-    - question: Whose settlements does this platform screen show, TICVAI's own payment orchestration across tenants
-        or one tenant's?
-      default: Cross-tenant operational view for TICVAI payment operations, amounts per tenant, no guest data.
-      source: screens/P09-platform-admin-console.yaml#ADM-619 | contracts/spine/finance.yaml#listSettlements
-    - question: The 12 August minutes say monthly file reconciliation; the contract decided daily per venue. Confirm
-        daily.
-      default: Daily per venue.
-      source: DI-268 | MoM 2026-08-12 17. Payments Reconciliation | R110
+    decisions:
+    - question: Whose settlements does this platform screen show, TICVAI's own payment orchestration across tenants or one
+        tenant's?
+      decision: 'Drawn default stands (answer: "Cross-tenant ops view: amounts per tenant, no guest data"): Cross-tenant operational
+        view for TICVAI payment operations, amounts per tenant, no guest data.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-211 | CHG-NOTE-003
+      questionSource: screens/P09-platform-admin-console.yaml#ADM-619 | contracts/spine/finance.yaml#listSettlements
+    - question: The 12 August minutes say monthly file reconciliation; the contract decided daily per venue. Confirm daily.
+      decision: Reconciliation is daily per venue.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-212 | CHG-FIN-009 | CHG-NOTE-003
+      questionSource: DI-268 | MoM 2026-08-12 17. Payments Reconciliation | R110
   ADM-622:
     summary: 'The queue of reconciliation exceptions that the automatic steps could not explain: each with what
       TICVAI recorded, what the provider reported, the difference and the likely cause, and a resolution that is
@@ -3156,10 +3299,14 @@ screens:
         another, at the obligation's rate), and the screen expects an obligation id.
       why: Nothing here posts reconciled provider settlements; the screen's operation serves a different process.
       source: contracts/spine/finance.yaml#recordSettlement | screens/P09-platform-admin-console.yaml#ADM-626
-    openQuestions:
+    decisions:
     - question: Do settlement postings happen automatically after reconciliation, or through this release gate?
-      default: Automatic for fully matched days; this screen shows status and the held ones.
-      source: DI-258
+      decision: 'Drawn default stands (answer: "Automatic when fully matched; the screen shows status and held days"): Automatic
+        for fully matched days; this screen shows status and the held ones.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-213 | CHG-NOTE-003
+      questionSource: DI-258
   ADM-627:
     summary: 'The evidence trail of how one payment became reconciled and closed: ingested from which file, matched
       how, which exception, who resolved it with what reason and approval, and which journal posted it. Read-only
@@ -3210,11 +3357,14 @@ screens:
     - what: The forecast is served by getUnifiedReconciliation, which returns past totals and variances only.
       why: No operation returns a settlement forecast.
       source: contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation
-    openQuestions:
-    - question: Is the reconciliation simulator and AI advisor in phase one, given AI finance reporting is phase
-        two?
-      default: Build the actuals view; forecast and advisor drawn but switched off.
-      source: DI-278 | DI-280
+    decisions:
+    - question: Is the reconciliation simulator and AI advisor in phase one, given AI finance reporting is phase two?
+      decision: 'Drawn default stands (answer: "Actuals now; forecast and advisor drawn but switched off"): Build the actuals
+        view; forecast and advisor drawn but switched off.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-214 | CHG-NOTE-003
+      questionSource: DI-278 | DI-280
   PTR-014:
     summary: 'A partner''s own money with the venue: how it pays (credit account invoiced monthly, prepaid wallet
       drawn down per sale, or card per transaction), what it has paid, what is due, and its statement of account.
@@ -3274,10 +3424,14 @@ screens:
     - what: The purpose "Take the money, and be unambiguous about whether it worked" is a checkout purpose.
       why: Derived from the name, not from a requirement.
       source: screens/P10-partner-reseller-portal.yaml#PTR-014
-    openQuestions:
+    decisions:
     - question: Does PTR-014 survive next to PTR-013, PTR-046 and PTR-017, or merge into PTR-046?
-      default: Keep it as the partner's "Payments" summary with links into the statement.
-      source: DI-557
+      decision: 'Drawn default stands (answer: "Keep as the partner''s Payments summary"): Keep it as the partner''s "Payments"
+        summary with links into the statement.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-222 | CHG-NOTE-003
+      questionSource: DI-557
   PTR-018:
     summary: 'A partner''s own sales performance: bookings, tickets, gross sales, commission earned, cancellations,
       by product and period, in a fixed set of partner reports. The partner sees only what it sold.'
@@ -3388,10 +3542,14 @@ screens:
       why: The tiles above have no declared source until those reads exist or a seeded dashboard is defined for
         them.
       source: screens/P15-kitchen-display.yaml#KIT-010
-    openQuestions:
+    decisions:
     - question: Is this shown on the kitchen display device (no one signed in) or only to a signed-in kitchen manager?
-      default: A signed-in manager; the assistant and recommendations need a person whose role scopes the answer.
-      source: DI-964 | screens/P15-kitchen-display.yaml#KIT-010
+      decision: 'Drawn default accepted: A signed-in manager; the assistant and recommendations need a person whose role scopes
+        the answer.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-087 | CHG-NOTE-003
+      questionSource: DI-964 | screens/P15-kitchen-display.yaml#KIT-010
   ANL-001:
     summary: 'The executive home of the one consolidated reporting area: a CEO or GM opens it (often on a phone)
       and in ten seconds knows today''s gross sales, net revenue, visitors, transactions and occupancy against target
@@ -3565,13 +3723,20 @@ screens:
         described.
       why: The gap is stale; the binding problem is the missing getKpiValues declaration, not the schemas.
       source: screens/P16-venue-analytics.yaml#ANL-001 | contracts/satellite/reporting.yaml#/components/schemas/KpiValue
-    openQuestions:
+    decisions:
     - question: Does Gross sales include VAT and fees?
-      default: Draw Gross sales excluding VAT, with "excl. VAT" in the tile subtitle.
-      source: MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities
+      decision: Gross sales exclude VAT (D-185 default).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-308 | CHG-FIN-007 | CHG-NOTE-003
+      questionSource: MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities
     - question: Which BI persona (executive viewer) maps to which REPORT_VIEW tier?
-      default: Draw the executive at tenant scope; venue managers see their venue only.
-      source: MATRIX 8.7.1 | MATRIX 8.7.21 | MATRIX 6.1.78
+      decision: 'Drawn default accepted: Draw the executive at tenant scope; venue managers see their venue only.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-309 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.7.1 | MATRIX 8.7.21 | MATRIX 6.1.78
   ANL-002:
     summary: 'The sales board for a commercial or F&B/retail manager: how products and attractions sell by channel,
       what discounts and upsell/cross-sell did, deferred against recognised revenue, and sales forecast against
@@ -3668,13 +3833,21 @@ screens:
         and retail frames, but DI-715 scopes it together with ANL-016.
       why: Two sales boards with no stated ownership will drift; the split must be decided (see consistency).
       source: DI-715 | screens/P16-venue-analytics.yaml#ANL-002
-    openQuestions:
+    decisions:
     - question: Is "B2C" a reporting group (Web + Mobile + Kiosk) or should Channel gain a b2c value?
-      default: Show the platform channels, with B2C as a labelled group.
-      source: MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels | MATRIX 1.4.7 | MATRIX 8.7.4
+      decision: 'Drawn default accepted: Show the platform channels, with B2C as a labelled group.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-310 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels | MATRIX 1.4.7 | MATRIX 8.7.4
     - question: Merge ANL-002 into ANL-016, or keep both with the split proposed?
-      default: Keep both with the split proposed.
-      source: DI-715
+      decision: 'Drawn default accepted: Keep both with the split proposed.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-311 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-715
   ANL-003:
     summary: 'Period performance of operating units — outlet, store, venue or department — for an operations or
       F&B / retail manager: revenue, transactions, items sold, attachment rate, service and stock exceptions, ranked
@@ -3756,13 +3929,21 @@ screens:
       why: Revenue, transactions and items sold by scope with comparison come from getKpiValues (groupBy/interval),
         not from getDashboard alone.
       source: contracts/satellite/reporting.yaml#getKpiValues
-    openQuestions:
+    decisions:
     - question: How is attachment rate defined (items per transaction, share of tickets with an F&B purchase)?
-      default: Show the tile with "Definition pending".
-      source: MATRIX 6.1.61 | MATRIX 6.1.63
+      decision: 'Drawn default accepted: Show the tile with "Definition pending".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-312 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 6.1.61 | MATRIX 6.1.63
     - question: How is the outlet performance score composed?
-      default: Omit the score column.
-      source: MATRIX 4.5.25 | MATRIX 8.7.1
+      decision: 'Drawn default accepted: Omit the score column.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-313 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 4.5.25 | MATRIX 8.7.1
   ANL-004:
     summary: 'Product performance for a commercial, F&B or retail manager: which products, price points and promotions
       earn the revenue and the margin, and which sell in volume but earn little (menu engineering / SKU performance).
@@ -3836,10 +4017,14 @@ screens:
     - what: The Product & Pricing board is specified with treemap, scatter and waterfall.
       why: None can bind until ReportColumn carries an encoding role; use bar and table meanwhile.
       source: MATRIX 8.7.4 | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile
-    openQuestions:
+    decisions:
     - question: What is margin for admission tickets (no cost of sale) — excluded, or a contribution after commission?
-      default: Margin shown only where a cost exists.
-      source: MATRIX 8.7.4
+      decision: 'Drawn default accepted: Margin shown only where a cost exists.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-314 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.7.4
   ANL-005:
     summary: 'Cost, margin and profitability for F&B and retail managers: food cost %, gross margin %, and a bridge
       from gross sales to contribution margin, plus promotion and pricing margin erosion. It answers the packs''
@@ -3907,11 +4092,14 @@ screens:
     - what: The margin bridge's stages are not a defined measure set and waterfall cannot bind.
       why: A bridge that cannot be totalled cannot be reconciled to the P&L.
       source: MATRIX 4.1.16 | MATRIX 8.7.28 | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile
-    openQuestions:
-    - question: Is the margin bridge fixed platform-wide or tenant-configurable (e.g. a venue without a food-cost
-        stage)?
-      default: Fixed order, stage omitted when it has no value.
-      source: MATRIX 4.1.16 | MATRIX 8.7.28
+    decisions:
+    - question: Is the margin bridge fixed platform-wide or tenant-configurable (e.g. a venue without a food-cost stage)?
+      decision: 'Drawn default accepted: Fixed order, stage omitted when it has no value.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-315 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 4.1.16 | MATRIX 8.7.28
   ANL-006:
     summary: 'Inventory and waste intelligence for F&B and retail managers: theoretical against actual usage, waste
       %, expiring batches, count variances and waste-risk suggestions. The one thing to get right: the gap between
@@ -4035,10 +4223,14 @@ screens:
       why: The tiles need getKpiValues (conversion is a MetricSource) or a report; listSegments alone draws none
         of them.
       source: contracts/satellite/reporting.yaml#getKpiValues
-    openQuestions:
+    decisions:
     - question: Which stages count in the funnel, and is "visits" sourced from web analytics?
-      default: Five stages as drawn, visits labelled "from web analytics".
-      source: MATRIX 8.7.1 | MATRIX 8.7.2
+      decision: 'Drawn default accepted: Five stages as drawn, visits labelled "from web analytics".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-316 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.7.1 | MATRIX 8.7.2
   ANL-008:
     summary: 'Demand forecasting for operations, F&B and retail planners: expected attendance, demand and revenue
       by day, hour, channel or product, as a range, so someone orders, staffs or prepares differently. The one thing
@@ -4123,11 +4315,14 @@ screens:
       why: The contract and design 5.6 forbid a bare percentage — a range and a maturity stage are shown instead;
         the client should be told.
       source: MATRIX 8.2.29 | MATRIX 8.2.33 | contracts/satellite/ai.yaml#/components/schemas/AiForecastPoint
-    openQuestions:
-    - question: DI-280 says data-dependent forecasting cannot be delivered in phase one; the 29 Sep design ships
-        a baseline-first forecast with maturity stages. Which applies to this screen?
-      default: Show the baseline forecast with "Starting" and "Limited historical data".
-      source: DI-280 | contracts/satellite/ai.yaml#/components/schemas/AiMaturity
+    decisions:
+    - question: DI-280 says data-dependent forecasting cannot be delivered in phase one; the 29 Sep design ships a baseline-first
+        forecast with maturity stages. Which applies to this screen?
+      decision: Baseline-first forecast with maturity stages.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-317 | CHG-NOTE-003
+      questionSource: DI-280 | contracts/satellite/ai.yaml#/components/schemas/AiMaturity
   ANL-009:
     summary: 'The assistant and action centre for managers: ask a business question in plain words, see what is
       raised, acknowledge alerts, and approve or reject what the assistant has proposed. It collapses five client
@@ -4216,11 +4411,15 @@ screens:
     - what: Alert filters "Workstation id", "Shift id", "Item id" are free-text ids.
       why: Spec leak; use severity and status filters.
       source: screens/P16-venue-analytics.yaml#ANL-009
-    openQuestions:
-    - question: DI-278 makes AI-assisted finance reporting phase two. Should finance-ledger questions (deferred
-        revenue, journals) be refused in phase one?
-      default: Answer sales and attendance questions; finance-ledger metrics answer "not available yet".
-      source: DI-278
+    decisions:
+    - question: DI-278 makes AI-assisted finance reporting phase two. Should finance-ledger questions (deferred revenue, journals)
+        be refused in phase one?
+      decision: 'Drawn default stands (answer: "From ADM-068: AI finance reporting in phase two; ledger questions answer ''not
+        available yet''"): Answer sales and attendance questions; finance-ledger metrics answer "not available yet".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-318 | CHG-NOTE-003
+      questionSource: DI-278
   ANL-012:
     summary: 'The operations control room: what is happening right now across every venue the user may see — people
       on site, entries and exits, occupancy, gate status, active tills, queues, incidents and device exceptions.
@@ -4305,10 +4504,14 @@ screens:
     - what: '"Map or venue layout" is asked for on this board.'
       why: The map mark cannot bind yet; use the gate status grid meanwhile.
       source: MATRIX 8.7.33 | MATRIX 8.9.1 | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile
-    openQuestions:
+    decisions:
     - question: What is the stale threshold for live tiles (60 s, 2 min)?
-      default: Stale after 2 minutes without a refresh.
-      source: DI-711
+      decision: 'Drawn default accepted: Stale after 2 minutes without a refresh.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-319 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-711
   ANL-013:
     summary: 'Revenue pulse: intraday revenue tempo with its comparisons and breakdowns, drillable from consolidated
       revenue to site, business unit, channel, product and transaction. The one thing to get right: every "Revenue"
@@ -4364,6 +4567,8 @@ screens:
     - what: Twelve tiles are labelled bare "Revenue ...".
       why: Gross sales, net revenue and recognised revenue are different measures and must never share a label.
       source: MATRIX 5.12.6
+      status: fixed
+      by: CHG-FIN-002
     - what: '"Revenue by Site / Attraction / Product / Channel / Business Unit / Payment Method" are drawn as single
         metric tiles.'
       why: They are breakdowns; draw them as bar or donut marks.
@@ -4377,13 +4582,21 @@ screens:
         KPIs must be defined.
       source: contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi | MoM 2026-08-12 14. Finance
         Module Walkthrough — Dashboards, Chart of Accounts & Entities
-    openQuestions:
+    decisions:
     - question: What is a "business unit" in the drill path — department, a tenancy scope node, or a cost centre?
-      default: Treat business unit as department.
-      source: MATRIX 6.1.67 | screens/P16-venue-analytics.yaml#ANL-013
+      decision: 'Drawn default accepted: Treat business unit as department.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-320 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 6.1.67 | screens/P16-venue-analytics.yaml#ANL-013
     - question: Should a multi-country tenant see a converted group total, and at what rate?
-      default: Per-currency subtotals only.
-      source: contracts/shared/common.yaml#/components/schemas/Money
+      decision: 'Drawn default accepted: Per-currency subtotals only.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-321 | CHG-NOTE-003
+      reviewable: true
+      questionSource: contracts/shared/common.yaml#/components/schemas/Money
   ANL-014:
     summary: 'Attendance and footfall: how many people came, when, through which gates, on what tickets, and how
       that compares with what was sold and with the forecast. It implements the admissions half of the client''s
@@ -4512,10 +4725,14 @@ screens:
     - what: DI-704's example leaves 90–95% undefined (80–90 warning, above 95 critical).
       why: The board spec's 80/95 rule closes the gap; DI-704's example should be corrected.
       source: DI-704 | MATRIX 8.2.36 | MATRIX 1.1.40
-    openQuestions:
+    decisions:
     - question: Do holds and blocked inventory count as consumed in utilisation?
-      default: Count holds as reserved (in utilisation), exclude blocked from sellable.
-      source: MATRIX 8.2.36 | MATRIX 1.1.40
+      decision: 'Drawn default accepted: Count holds as reserved (in utilisation), exclude blocked from sellable.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-322 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.2.36 | MATRIX 1.1.40
   ANL-016:
     summary: 'Sales and channel performance: one scorecard of commercial performance across POS, B2C (web, app,
       kiosk), B2B and OTA, with conversion, basket size, discount use and channel mix. It implements the client''s
@@ -4579,10 +4796,14 @@ screens:
       why: The scorecard's money tiles cannot bind until these are defined as KPIs (takings is payments, not sales).
       source: contracts/satellite/reporting.yaml#/components/schemas/MetricSource | MoM 2026-08-12 14. Finance Module
         Walkthrough — Dashboards, Chart of Accounts & Entities
-    openQuestions:
+    decisions:
     - question: Is commission shown as a deduction from net revenue or as a separate cost line?
-      default: Separate line, not deducted from Net revenue.
-      source: MATRIX 2.7.55
+      decision: 'Drawn default accepted: Separate line, not deducted from Net revenue.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-323 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 2.7.55
   ANL-017:
     summary: 'Customer, membership and loyalty pulse: acquisition, renewals, retention, member visits, loyalty activity
       and points liability, with inactive members flagged for follow-up. It implements the client''s Customer &
@@ -4633,10 +4854,14 @@ screens:
     - what: emptyFirstRun says "Carries the create action".
       why: There is nothing to create on a pulse dashboard; first run is "No members yet".
       source: screens/P16-venue-analytics.yaml#ANL-017
-    openQuestions:
+    decisions:
     - question: Is points liability shown to non-finance roles?
-      default: Shown only with finance or tenant report scope.
-      source: DI-248
+      decision: 'Drawn default accepted: Shown only with finance or tenant report scope.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-324 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-248
   ANL-020:
     summary: 'Multi-site comparison for enterprise management: compare sites, venues, attractions or business units
       on like-for-like KPIs, this month against last month or the same period last year, and drill into why they
@@ -4707,10 +4932,14 @@ screens:
       why: Draw them only once defined as KPIs; "outlet performance score" is also undefined; bare "Revenue" must
         become Net revenue.
       source: contracts/satellite/reporting.yaml#/components/schemas/MetricSource | MATRIX 4.5.25 | MATRIX 8.7.1
-    openQuestions:
+    decisions:
     - question: Group comparison across currencies — converted at what rate, or kept per currency?
-      default: Per-currency groups.
-      source: contracts/shared/common.yaml#/components/schemas/Money
+      decision: 'Drawn default accepted: Per-currency groups.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-325 | CHG-NOTE-003
+      reviewable: true
+      questionSource: contracts/shared/common.yaml#/components/schemas/Money
   ANL-021:
     summary: 'The one catalogue of dashboards, inside the single permission-based reporting area (no copies of it
       inside each module). A login sees only the dashboards of modules it is entitled to, narrowed to its own scope;
@@ -4833,12 +5062,16 @@ screens:
         dashboard from a custom one or show a published version.
       source: contracts/satellite/reporting.yaml#Dashboard | contracts/satellite/reporting.yaml#ReportDefinition
         | MATRIX 7.1.46
-    openQuestions:
-    - question: Does Dashboard gain an origin flag (standard, custom, AI-generated) and a lifecycle status with
-        a version, as ReportDefinition has?
-      default: Draw Shared/Private and Archived, which exist; draw the Status and Version columns in a visibly pending
-        style tied to ANL-029.
-      source: MATRIX 7.4.45 | MATRIX 11.1.2 | DI-706
+    decisions:
+    - question: Does Dashboard gain an origin flag (standard, custom, AI-generated) and a lifecycle status with a version,
+        as ReportDefinition has?
+      decision: 'Drawn default accepted: Draw Shared/Private and Archived, which exist; draw the Status and Version columns
+        in a visibly pending style tied to ANL-029.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-326 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 7.4.45 | MATRIX 11.1.2 | DI-706
   ANL-022:
     summary: 'A short wizard (Basics, Scope, Data areas, Starting point) that ends in the canvas. Nothing is saved
       until Finish, because a dashboard cannot be created without at least one tile: the Starting point step supplies
@@ -4937,10 +5170,15 @@ screens:
     - what: Category, Tags and Language have no field on the dashboard
       why: Only name, module, description, venueId and isShared are stored; these three cannot be saved.
       source: contracts/satellite/reporting.yaml#CreateDashboardRequest
-    openQuestions:
+    decisions:
     - question: Does a dashboard carry an Arabic name and description, or one name shown in both languages?
-      default: One name field; flag the Arabic layout of the wizard RTL but do not draw a second name field.
-      source: DI-019
+      decision: 'Drawn default accepted: One name field; flag the Arabic layout of the wizard RTL but do not draw a second
+        name field.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-327 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-019
   ANL-023:
     summary: 'The canvas where a dashboard is laid out: tiles on a grid, each bound to a report and drawn as one
       visual. The one thing to get right: the canvas may only offer what can actually be drawn and bound, and saving
@@ -5006,10 +5244,13 @@ screens:
     - what: No undo or redo, and no draft or version of a dashboard.
       why: Every save overwrites the live dashboard; the client spec asks for draft, preview, publish and rollback.
       source: MATRIX 7.1.46 | contracts/satellite/reporting.yaml#updateDashboard
-    openQuestions:
+    decisions:
     - question: Which visuals ship bindable in the first release?
-      default: Number, line, area, bar, stacked bars, pie, donut, table and gauge; the rest shown as coming.
-      source: MATRIX 8.7.1 | MATRIX 8.7.2 | MATRIX 8.7.12
+      decision: Build all chart types, including the nine complex ones.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-080 | CHG-FIN-007 | CHG-NOTE-003
+      questionSource: MATRIX 8.7.1 | MATRIX 8.7.2 | MATRIX 8.7.12
   ANL-024:
     summary: 'The bounded catalogue of visuals the canvas drags from, as the client asked: an itemised list, like
       a bounded Power BI or Zoho canvas. Its contents are the contract''s twenty marks, not a server collection.
@@ -5092,14 +5333,22 @@ screens:
     - what: handoff/board-dashboard-requirements.md still says eight marks
       why: The enum went from eight to twenty on 22 September; a designer reading that summary would draw too few.
       source: contracts/satellite/reporting.yaml#DashboardTile
-    openQuestions:
-    - question: Which wells (Axis, Legend, Values, Small multiples, Tooltips, Filters) does each mark accept, so
-        the nine unavailable marks can bind?
-      default: Show them as "Not yet available"; do not draw well layouts for them.
-      source: MATRIX 8.7.12 | MATRIX 8.7.1 | MATRIX 8.7.2
+    decisions:
+    - question: Which wells (Axis, Legend, Values, Small multiples, Tooltips, Filters) does each mark accept, so the nine
+        unavailable marks can bind?
+      decision: 'Drawn default accepted: Show them as "Not yet available"; do not draw well layouts for them.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-328 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.7.12 | MATRIX 8.7.1 | MATRIX 8.7.2
     - question: Default category limit for pie and donut, and is the remainder grouped as Other?
-      default: Six slices plus Other.
-      source: MATRIX 8.7.1 | MATRIX 8.7.24
+      decision: 'Drawn default accepted: Six slices plus Other.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-329 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.7.1 | MATRIX 8.7.24
   ANL-025:
     summary: 'Where an authorised business user defines a company-wide KPI once, so "revenue" means the same on
       every dashboard. The one thing to get right: the formula is written against the business catalogue, not tables,
@@ -5275,10 +5524,14 @@ screens:
         '
       source: contracts/satellite/reporting.yaml#MetricSource | contracts/satellite/reporting.yaml#ReportingSystemKpi
         | MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities
-    openQuestions:
+    decisions:
     - question: What is the period format, and does a fiscal-year target follow the tenant's fiscal calendar?
-      default: Month, quarter and calendar year pickers.
-      source: DI-263 | MATRIX 5.7.89
+      decision: 'Drawn default accepted: Month, quarter and calendar year pickers.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-330 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-263 | MATRIX 5.7.89
   ANL-027:
     summary: 'Sets what data a dashboard''s tiles read and which filters a viewer gets. In the contract a tile reads
       a report definition, so dataset, measure and aggregation belong to that report; this screen sets the dashboard-wide
@@ -5297,8 +5550,8 @@ screens:
         '
       source: contracts/satellite/reporting.yaml#DashboardTile | contracts/satellite/reporting.yaml#ReportFilter
     - field: Mandatory, Optional, Defaulted (pack filter kinds)
-      rule: Mandatory = the parameter is required; Defaulted = it has a default value; both come from the report's
-        parameter definition. Hidden has no field (see open question).
+      rule: Mandatory = the parameter is required; Defaulted = it has a default value; both come from the report's parameter
+        definition. Hidden has no field (see decisions).
       source: contracts/satellite/reporting.yaml#ReportParameter
     - field: Date range
       rule: When no dates are given a run covers today in the venue's time zone; a range longer than the report's
@@ -5368,14 +5621,22 @@ screens:
     - what: getSemanticModel requires tenant-level reporting permission
       why: A venue-level author (REPORT_MANAGE at venue) cannot read the catalogue this screen loads.
       source: contracts/satellite/reporting.yaml#getSemanticModel | contracts/satellite/reporting.yaml#createReport
-    openQuestions:
-    - question: Where do page scope, locked filters and hidden filters live, given dashboards have no pages and
-        tiles have untyped parameters?
-      default: Two scopes (visual, dashboard) plus report; no lock or hide toggles.
-      source: MATRIX 6.1.78
+    decisions:
+    - question: Where do page scope, locked filters and hidden filters live, given dashboards have no pages and tiles have
+        untyped parameters?
+      decision: 'Drawn default accepted: Two scopes (visual, dashboard) plus report; no lock or hide toggles.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-331 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 6.1.78
     - question: Does dragging a dataset field onto the canvas create a hidden report definition per tile?
-      default: Yes, as the lead decides for ANL-023; this screen then shows that report's parameters.
-      source: DI-703 | contracts/satellite/reporting.yaml#DashboardTile
+      decision: 'Drawn default accepted: Yes, as the lead decides for ANL-023; this screen then shows that report''s parameters.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-332 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-703 | contracts/satellite/reporting.yaml#DashboardTile
   ANL-028:
     summary: 'Configures how a viewer moves from a headline number to the transactions behind it: drill down and
       up a real hierarchy, drill through to a detail page that keeps the filters and has a visible Back, and how
@@ -5456,10 +5717,14 @@ screens:
       why: DashboardTile has only an untyped parameters object; the interaction framework is meant to be central,
         not per chart, and the semantic model declares no hierarchies.
       source: contracts/satellite/reporting.yaml#DashboardTile | contracts/satellite/reporting.yaml#SemanticModel
-    openQuestions:
+    decisions:
     - question: Where are hierarchies declared (semantic model) and where is a tile's interaction setting stored?
-      default: Draw the editor; mark it pending the interaction-framework decision.
-      source: MATRIX 8.7.28
+      decision: 'Drawn default accepted: Draw the editor; mark it pending the interaction-framework decision.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-333 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.7.28
   ANL-029:
     summary: 'Governs who sees a dashboard and how a change reaches production: draft, preview and validate, approval,
       publish, with versions and rollback. The client asked for an approval step before publishing. The thing to
@@ -5548,13 +5813,21 @@ screens:
     - what: The gap says no schema with described properties
       why: Dashboard is described; the missing part is a version history schema, which is the real gap.
       source: screens/P16-venue-analytics.yaml#ANL-029
-    openQuestions:
+    decisions:
     - question: Is dashboard publishing a configurationChange approval or its own approval kind, and who may approve?
-      default: Draw an approver picker limited to people who can manage reports, excluding the author.
-      source: DI-706 | MATRIX 8.7.1 | MATRIX 8.7.21 | MATRIX 6.1.78
+      decision: 'Drawn default accepted: Draw an approver picker limited to people who can manage reports, excluding the author.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-334 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-706 | MATRIX 8.7.1 | MATRIX 8.7.21 | MATRIX 6.1.78
     - question: Is promotion between environments (staging to production) in scope?
-      default: Not drawn.
-      source: MATRIX 7.1.46
+      decision: 'Drawn default accepted: Not drawn.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-335 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 7.1.46
   ANL-030:
     summary: 'Two jobs: validate a dashboard before it is published, and show its health after. Validation stops
       a dashboard with a blocking problem from being submitted; health tells the owner whether viewers are seeing
@@ -5637,10 +5910,14 @@ screens:
         replace of the live dashboard, so "prevents dashboards with critical errors from being published" cannot
         be enforced.
       source: contracts/satellite/reporting.yaml#updateDashboard | DI-706 | MATRIX 7.4.45 | MATRIX 11.1.2 | screens/P16-venue-analytics.yaml#ANL-030
-    openQuestions:
+    decisions:
     - question: Is "preview as a role" (see what a venue manager would see) in scope?
-      default: Not drawn; preview is with the designer's access and says so.
-      source: MATRIX 8.7.1 | MATRIX 8.7.21 | MATRIX 6.1.78
+      decision: 'Drawn default accepted: Not drawn; preview is with the designer''s access and says so.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-336 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.7.1 | MATRIX 8.7.21 | MATRIX 6.1.78
   ANL-031:
     summary: 'The report library: the eight standard reports every venue starts with, plus the venue''s own. It
       lists only reports the login may run; a report needing tenant-level access is absent for a venue user, not
@@ -5864,10 +6141,14 @@ screens:
     - what: Data Owner, Security Classification and certification are not in the model
       why: The client wants certified badges with owner and lineage; the model has a sensitive flag per field only.
       source: contracts/satellite/reporting.yaml#SemanticModel | MATRIX 8.7.11 | MATRIX 6.1.78
-    openQuestions:
+    decisions:
     - question: Is the report's data area the semantic-model dataset or the DataSource list, and who maps them?
-      default: Draw datasets from the catalogue; show the data area name on the report.
-      source: contracts/satellite/reporting.yaml#DataSource | ADR-0054
+      decision: 'Drawn default accepted: Draw datasets from the catalogue; show the data area name on the report.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-337 | CHG-NOTE-003
+      reviewable: true
+      questionSource: contracts/satellite/reporting.yaml#DataSource | ADR-0054
   ANL-034:
     summary: 'Chooses the report''s columns from the data area''s fields, in business names, and sets each column''s
       label, order, sort and format. The thing to get right: what a field allows (group by, total, filter) decides
@@ -6075,10 +6356,14 @@ screens:
     - what: The gap says no write operation
       why: updateReport is declared; the gap text is stale.
       source: screens/P16-venue-analytics.yaml#ANL-036
-    openQuestions:
+    decisions:
     - question: Do reports get calculated columns and period comparison, or do those stay KPI-only?
-      default: Show them disabled with "Available for KPIs".
-      source: MATRIX 6.1.78
+      decision: 'Drawn default accepted: Show them disabled with "Available for KPIs".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-338 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 6.1.78
   ANL-037:
     summary: 'The client calls cross-domain reporting one of the most important capabilities of the report builder:
       ticket sales with F&B spend per visitor, admissions with membership, and so on. The thing to get right: today
@@ -6128,11 +6413,15 @@ screens:
       why: updateReport is declared; the content (primary dataset, related datasets, cardinality) is drawable from
         the semantic model.
       source: screens/P16-venue-analytics.yaml#ANL-037
-    openQuestions:
+    decisions:
     - question: How does a definition name more than one dataset - a list of sources with declared joins, or a cross-domain
         dataset published in the semantic model?
-      default: Draw primary plus related datasets; mark Save as pending.
-      source: MATRIX 8.7.11 | MATRIX 8.7.14 | MATRIX 6.1.78
+      decision: 'Drawn default accepted: Draw primary plus related datasets; mark Save as pending.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-339 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.7.11 | MATRIX 8.7.14 | MATRIX 6.1.78
   ANL-038:
     summary: 'How the finished report looks on screen, in Excel and in PDF, in English and in Arabic. The thing
       to get right is money and language: money keeps the currency''s decimals (AED 2, BHD/KWD/OMR 3, never rounded
@@ -6202,13 +6491,21 @@ screens:
       why: Money precision follows the currency (3 decimals for BHD/KWD/OMR) and records are in base currency; letting
         a user pick 2 decimals for BHD drops the third.
       source: DI-306 | DI-211
-    openQuestions:
+    decisions:
     - question: Is the report language chosen per run, per schedule, or by the reader's profile?
-      default: By the reader's language; the schedule's recipients get the owner's choice.
-      source: DI-019
+      decision: 'Drawn default accepted: By the reader''s language; the schedule''s recipients get the owner''s choice.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-340 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-019
     - question: Western or Arabic-Indic digits in Arabic PDFs?
-      default: Western digits.
-      source: DI-019
+      decision: 'Drawn default accepted: Western digits.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-341 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-019
   ANL-039:
     summary: 'Checks a report before it is saved or shared: run it, see what came back, how long it took, what constrained
       it, and whether totals look right. The thing to get right: there is no sample mode - a test run is a real
@@ -6272,10 +6569,14 @@ screens:
       why: runReport runs a saved definition and every save publishes a version, so an unsaved change cannot be
         tested.
       source: contracts/satellite/reporting.yaml#runReport | contracts/satellite/reporting.yaml#updateReport
-    openQuestions:
+    decisions:
     - question: Can a draft definition be test-run before it is published?
-      default: Draw "Test run" on the draft; mark it pending.
-      source: MATRIX 7.4.45 | MATRIX 11.1.2
+      decision: 'Drawn default accepted: Draw "Test run" on the draft; mark it pending.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-342 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 7.4.45 | MATRIX 11.1.2
   ANL-040:
     summary: 'Runs a report and shows the result: prompts, the table with totals, and exports. The header states
       exactly what was run, so a figure can be reproduced months later. The thing to get right: large results run
@@ -6446,8 +6747,8 @@ screens:
         Heavy schedules are spread across the window, so say "around 07:00".
       source: contracts/satellite/reporting.yaml#Cadence | contracts/satellite/reporting.yaml#createReportSchedule
     - field: parameters
-      rule: The report's prompts, fixed for every run; date prompts offered as "the previous day", "the previous
-        week" (see open question).
+      rule: The report's prompts, fixed for every run; date prompts offered as "the previous day", "the previous week" (see
+        decisions).
       source: contracts/satellite/reporting.yaml#CreateReportScheduleRequest
     - field: recipients
       rule: People in the tenant, email addresses, SFTP or webhook destinations; at least one. Recipients outside
@@ -6482,8 +6783,8 @@ screens:
       source: contracts/satellite/reporting.yaml#updateReportSchedule | contracts/satellite/reporting.yaml#deleteReportSchedule
     edgeCases:
     - case: The owner loses access or leaves
-      expected: The schedule keeps the owner's (now reduced) access; flag schedules whose owner is inactive for
-        reassignment (see open question).
+      expected: The schedule keeps the owner's (now reduced) access; flag schedules whose owner is inactive for reassignment
+        (see decisions).
       source: contracts/satellite/reporting.yaml#ReportSchedule
     - case: The report is retired
       expected: A report with an active schedule cannot be retired; the schedule list shows which reports are pinned
@@ -6537,13 +6838,21 @@ screens:
     - what: dayOfWeek 0 to 6 does not say which day is 0
       why: UAE weeks start on Monday; an off-by-one sends the weekly report on the wrong day.
       source: contracts/satellite/reporting.yaml#Cadence
-    openQuestions:
+    decisions:
     - question: Do recipient groups (Finance team, Operations leads) and email templates join the schedule?
-      default: Pick people and addresses individually; show the default email text read-only.
-      source: DI-714 | TRACKER Actions row 257
+      decision: 'Drawn default accepted: Pick people and addresses individually; show the default email text read-only.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-343 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-714 | TRACKER Actions row 257
     - question: How does a scheduled run express "the previous day" when parameters are fixed values?
-      default: Draw relative presets; flag pending.
-      source: contracts/satellite/reporting.yaml#CreateReportScheduleRequest
+      decision: 'Drawn default accepted: Draw relative presets; flag pending.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-344 | CHG-NOTE-003
+      reviewable: true
+      questionSource: contracts/satellite/reporting.yaml#CreateReportScheduleRequest
   ANL-043:
     summary: 'Who receives which report, in what format, by which route, and under whose access. A subscription
       is not a schedule: the schedule says when, the subscription says who and how, and one schedule can feed several.
@@ -6556,8 +6865,7 @@ screens:
       rule: Required. Dashboards and KPI summaries cannot be subscribed to (see correction).
       source: contracts/satellite/reporting.yaml#ReportSubscription
     - field: schedule
-      rule: Optional link to an existing schedule; without one the subscription has no timing of its own (see open
-        question).
+      rule: Optional link to an existing schedule; without one the subscription has no timing of its own (see decisions).
       source: contracts/satellite/reporting.yaml#ReportSubscription
     - field: recipients
       rule: A person in the tenant or an email address; addresses outside the tenant are marked External.
@@ -6619,13 +6927,21 @@ screens:
     - what: The gap says no write operation and nothing drawable
       why: createReportSubscription is declared and the subscription schema gives a full row.
       source: screens/P16-venue-analytics.yaml#ANL-043
-    openQuestions:
+    decisions:
     - question: Is a subscription without a schedule allowed, and when does it send?
-      default: Require a schedule.
-      source: contracts/satellite/reporting.yaml#ReportSubscription
+      decision: 'Drawn default accepted: Require a schedule.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-345 | CHG-NOTE-003
+      reviewable: true
+      questionSource: contracts/satellite/reporting.yaml#ReportSubscription
     - question: Can a recipient unsubscribe themselves from an email link?
-      default: Not drawn.
-      source: contracts/satellite/reporting.yaml#ReportSubscription
+      decision: 'Drawn default accepted: Not drawn.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-346 | CHG-NOTE-003
+      reviewable: true
+      questionSource: contracts/satellite/reporting.yaml#ReportSubscription
   ANL-044:
     summary: 'Configures how a generated report reaches people: route, format, file and message. The thing to get
       right: the pack''s four "buttons" are delivery routes, not actions, and most of the pack''s settings (subject,
@@ -6641,8 +6957,7 @@ screens:
       rule: PDF, Excel, CSV, JSON.
       source: contracts/satellite/reporting.yaml#ReportSubscription
     - field: attachment or secure link
-      rule: Exports are produced as signed, expiring download links; personal data should go by link only (see open
-        question).
+      rule: Exports are produced as signed, expiring download links; personal data should go by link only (see decisions).
       source: contracts/satellite/reporting.yaml#ReportExport
     - field: Time zone
       rule: Not a choice; the venue's zone.
@@ -6674,10 +6989,14 @@ screens:
     - what: The four channel buttons are drawn as actions with no operation
       why: They are values of the route; there is nothing to call.
       source: contracts/satellite/reporting.yaml#ReportSubscription
-    openQuestions:
+    decisions:
     - question: Must reports with personal data go by secure link only, never as an attachment?
-      default: Link only for personal data; attachment allowed otherwise.
-      source: contracts/satellite/reporting.yaml#ReportExport
+      decision: 'Drawn default accepted: Link only for personal data; attachment allowed otherwise.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-347 | CHG-NOTE-003
+      reviewable: true
+      questionSource: contracts/satellite/reporting.yaml#ReportExport
   ANL-045:
     summary: 'Where people collect exports and administrators see what data left the platform. Exports are always
       asynchronous: requested, generating, ready (with a signed link that expires), failed or expired. The thing
@@ -6811,7 +7130,7 @@ screens:
       source: contracts/satellite/reporting.yaml#ReportSchedule
     edgeCases:
     - case: Status suppressed
-      expected: Shown as "Not sent - report was empty" when the schedule skips empty reports (see open question).
+      expected: Shown as "Not sent - report was empty" when the schedule skips empty reports (see decisions).
       source: contracts/satellite/reporting.yaml#ReportDelivery | contracts/satellite/reporting.yaml#CreateReportScheduleRequest
     consistency:
     - with: ANL-041
@@ -6846,10 +7165,14 @@ screens:
       why: A delivery carries its subscription, report, one attempted time and counts, not a job id, a schedule
         or start and end times.
       source: contracts/satellite/reporting.yaml#ReportDelivery
-    openQuestions:
+    decisions:
     - question: What does a suppressed delivery mean, and how many retries happen before Failed?
-      default: Suppressed = empty report skipped; three retries.
-      source: contracts/satellite/reporting.yaml#ReportDelivery
+      decision: 'Drawn default accepted: Suppressed = empty report skipped; three retries.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-348 | CHG-NOTE-003
+      reviewable: true
+      questionSource: contracts/satellite/reporting.yaml#ReportDelivery
   ANL-049:
     summary: 'Reconstructs who did what with reports: created, changed, published, ran, viewed, exported, shared,
       scheduled, subscribed, changed permissions, archived. It is a read-only trail, newest first, that nobody can
@@ -7088,10 +7411,14 @@ screens:
         only create / update / delete and isShared.
       why: A generated dashboard can be shared without the agreed approval step.
       source: DI-706 | contracts/satellite/reporting.yaml#/components/schemas/Dashboard | contracts/satellite/reporting.yaml#updateDashboard
-    openQuestions:
+    decisions:
     - question: Until an approval operation exists, may a generated dashboard be shared at all?
-      default: Save private only; the share control is shown disabled with "Needs approval".
-      source: DI-706
+      decision: 'Drawn default accepted: Save private only; the share control is shown disabled with "Needs approval".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-349 | CHG-NOTE-003
+      reviewable: true
+      questionSource: DI-706
   ANL-054:
     summary: 'AI report generator: a user describes a report ("weekly refunds by venue and reason") and gets a report
       built on the same semantic model, permissions and calculations as a hand-built one, to preview, save and schedule.
@@ -7251,10 +7578,14 @@ screens:
     - what: The client asks for a confidence percentage and a single AED impact per recommendation.
       why: The contract shows impact as a range and forbids a bare percentage; the client should be told why.
       source: MATRIX 8.6.19 | MATRIX 8.3.68 | MATRIX 8.6.21 | MATRIX 3.6.37 | contracts/satellite/ai.yaml#/components/schemas/AiInsight
-    openQuestions:
+    decisions:
     - question: What is the impact shape (amount, unit, basis, period) used to rank and total recommendations?
-      default: A range on a named metric per month.
-      source: MATRIX 8.6.21 | MATRIX 3.6.37
+      decision: 'Drawn default accepted: A range on a named metric per month.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-350 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.6.21 | MATRIX 3.6.37
   ANL-061:
     summary: 'The analytics administrator''s one view of platform health: data freshness, failed refreshes, usage,
       KPIs in force, open alerts. The thing to get right: freshness first, because a revenue figure that stopped
@@ -7402,11 +7733,14 @@ screens:
     - what: The 14 "columns" are domain values
       why: Executive ... Resources are values of the KPI's domain, a filter, not columns.
       source: screens/P16-venue-analytics.yaml#ANL-062
-    openQuestions:
-    - question: Which finance KPIs ship (gross sales, net revenue, recognised and deferred revenue, refunds) and
-        with what formulas?
-      default: Show them as proposed rows awaiting formula.
-      source: MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities | DI-260
+    decisions:
+    - question: Which finance KPIs ship (gross sales, net revenue, recognised and deferred revenue, refunds) and with what
+        formulas?
+      decision: Finance KPIs seeded with formulas.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-351 | CHG-FIN-007 | CHG-NOTE-003
+      questionSource: MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities | DI-260
   ANL-063:
     summary: 'Central targets and scorecards: set targets per scope and period, and see every KPI against target
       with variance, direction and status. The thing to get right: targets exist for organisation, region and venue
@@ -7492,7 +7826,7 @@ screens:
       rule: A site picker; never a typed path.
       source: contracts/satellite/reporting.yaml#SiteNormalisationBasis
     - field: periodStart, periodEnd
-      rule: Required; one basis per site per period. Periods for one site should not overlap (see open question).
+      rule: Required; one basis per site per period. Periods for one site should not overlap (see decisions).
       source: contracts/satellite/reporting.yaml#SiteNormalisationBasis
     - field: visitors, operatingHours, staffedPositions, areaSquareMetres
       rule: Whole visitors; hours, positions (average staffed over the period) and area to one decimal; none negative;
@@ -7556,10 +7890,14 @@ screens:
     - what: The benchmark read is triggered on load with no KPI
       why: It requires a KPI id; the screen needs a KPI picker first.
       source: contracts/satellite/reporting.yaml#getAnalyticsBenchmark
-    openQuestions:
+    decisions:
     - question: Is saving bases a replace of the whole set or an upsert per site and period, and may periods overlap?
-      default: Upsert per site and period; overlapping periods refused.
-      source: contracts/satellite/reporting.yaml#setSiteNormalisationBasis
+      decision: 'Drawn default accepted: Upsert per site and period; overlapping periods refused.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-352 | CHG-NOTE-003
+      reviewable: true
+      questionSource: contracts/satellite/reporting.yaml#setSiteNormalisationBasis
   ANL-065:
     summary: 'The register of every source feeding analytics, its refresh state and its health. Read-only: sources
       are connected by the platform, not added here. The thing to get right is the security principle the pack calls
@@ -7759,10 +8097,14 @@ screens:
       why: The screen only lists dashboards; default dashboard, theme, language, mobile and full-screen settings
         cannot be saved.
       source: contracts/satellite/reporting.yaml#listDashboards | screens/P16-venue-analytics.yaml#ANL-068
-    openQuestions:
+    decisions:
     - question: Where is the default dashboard per role stored?
-      default: Draw the setting; mark pending.
-      source: MATRIX 8.7.1 | MATRIX 8.7.21 | MATRIX 6.1.78 | ADR-0041
+      decision: 'Drawn default accepted: Draw the setting; mark pending.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-353 | CHG-NOTE-003
+      reviewable: true
+      questionSource: MATRIX 8.7.1 | MATRIX 8.7.21 | MATRIX 6.1.78 | ADR-0041
   ANL-069:
     summary: 'Shows which dashboards and reports are actually used, by whom, and how heavy they are, so the estate
       can be pruned: four hundred reports of which thirty are opened is four hundred things to maintain. The thing
@@ -7855,7 +8197,11 @@ screens:
         billing record.
       source: contracts/spine/finance.yaml#createLegalEntity | screens/P09-platform-admin-console.yaml#ADM-411 |
         contracts/satellite/subscription.yaml#submitOnboardingApplication
-    openQuestions:
+    decisions:
     - question: Is the billing entity saved on the onboarding application (public) before verification?
-      default: Yes; nothing is provisioned until verification passes.
-      source: contracts/satellite/subscription.yaml#submitOnboardingApplication
+      decision: 'Drawn default stands (answer: "Yes: saved on the application; nothing provisioned until verified"): Yes;
+        nothing is provisioned until verification passes.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-223 | CHG-NOTE-003
+      questionSource: contracts/satellite/subscription.yaml#submitOnboardingApplication

@@ -1,0 +1,163 @@
+id: CHG-NOTE-001
+date: '2026-10-02'
+source: audit
+kind: design-input
+summary: 'AI: the 19 open questions Chinmay decided on 2 October move to `decisions` (1 reviewable defaults); 8 rule edits
+  where a decision changes the drawing; 29 corrections marked fixed, 1 logged and 0 withdrawn against the change entries
+  that acted on main.'
+decision:
+  what: Record each decided question of handoff/design-notes/ai.yaml as a decision on its screen (question, decision,
+    decidedBy Chinmay, date, the DEC ledger id and this entry; reviewable for a non-critical default), update the screen's
+    inputs, outputs, actions, edge cases and sample data where the decision changes what is drawn, and mark each correction
+    main has already acted on (status fixed / logged / withdrawn, by the change entry), so the open corrections are the
+    ones without a status.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay''s answers of 2 October to the open-questions workbook (Q1-Q17, Q274-Q275): batches 1-6, the critical sets,
+  and "show me only critical" for the non-critical defaults; the later rounds win (Door follow-ups, Pre-apply round: roles
+  as preset permission configurations, darkMode deprecated, Powered by as a toggle default on, closeShift on POS-007 plus
+  the daily reconciliation). The design notes still listed them as open, so a design session would draw the old default.
+  The corrections'' status was read from the screens on main after the wiring (CHG-WIR-001..027), guest (CHG-GST-001..006),
+  door (CHG-DOOR-001..006), finance (CHG-FIN-001..011) and loyalty (CHG-SEED-008) fixes.'
+keys_touched:
+  screens:
+  - ADM-004
+  - ADM-037
+  - ADM-471
+  - ADM-483
+  - ADM-491
+  - ADM-492
+  - ADM-506
+  - ADM-508
+  - ADM-519
+  - ADM-520
+  - ADM-523
+  - ADM-526
+  - ADM-527
+  - ADM-549
+  - ADM-554
+  - ADM-556
+  - ADM-637
+  - ADM-696
+  - ANL-019
+  - ANL-055
+  - ANL-059
+  - ANL-060
+  - BO-091
+  - BO-102
+  - BO-598
+  - BO-772
+  - BO-793
+  - BO-919
+  - BO-927
+  - BO-932
+  - BO-970
+  - EMP-019
+  - EMP-020
+  - GST-031
+  - GST-033
+  - GST-048
+  - GST-054
+  - KSK-015
+  - SUP-006
+  - SUP-018
+  - WEB-008
+  - WEB-044
+  files:
+  - handoff/design-notes/ai.yaml
+  - handoff/design-notes/README.md
+  - tools/check-design-notes.py
+  other:
+  - DEC-001
+  - DEC-002
+  - DEC-003
+  - DEC-004
+  - DEC-005
+  - DEC-006
+  - DEC-007
+  - DEC-008
+  - DEC-009
+  - DEC-010
+  - DEC-011
+  - DEC-012
+  - DEC-013
+  - DEC-014
+  - DEC-015
+  - DEC-016
+  - DEC-017
+  - DEC-274
+  - DEC-275
+root_class: A26 BUSINESS-RULES
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: 'check-design-notes now validates `decisions` (fields, date, a DEC id and an existing CHG id in source, questionSource
+  resolved, no question left in both lists) and correction `status`/`by` (fixed, logged or withdrawn, by an existing change
+  entry), and refuses any CHG id a source names that has no entry. Before this change the notes had no `decisions` key,
+  so nothing recorded that a question was answered.
+
+
+  Decisions by kind: {''answered'': 7, ''default accepted'': 11, ''default (non-critical, reviewable)'': 1}.
+
+
+  Corrections by entry: CHG-GST-004 2 fixed; CHG-WIR-012 19 fixed; CHG-WIR-013 8 fixed; CHG-WIR-014 1 logged. Corrections
+  with no status (142) are still open.
+
+
+  Tickets: none started (Block A starts Monday 5 October 2026); the notes feed the design batches at the next refresh,
+  not ticket text.
+
+
+  Answers that change the drawn default:
+
+  - DEC-001 (Q1) ADM-037: With BYOK, the AI engine maps each AI task to the client provider''s equivalent model from TICVAI''s
+  curated range (tiers, not model names: research section 2.3); usage is billed to the client''s own key. Closes AI-D20
+  (deferred to the AI workshop).
+
+  - DEC-002 (Q2) ADM-037: A client cannot change the model per agent. TICVAI curates the model for each task; setAiProvider/setAiModel
+  refuse a model outside the curated map for that task (new problem type, e.g. modelNotCurated). Overturns AI-D18''s ''warns,
+  never blocks''.
+
+  - DEC-003 (Q3) ADM-508: Forecast publication is approved by whoever holds that module''s AI publish permission; no default
+  role. Uses the per-module permission checklist with presets (see the ADM-554 decision).
+
+  - DEC-007 (Q7) ADM-554: Role builder: roles are preset permission configurations (All, Viewer, Mid-level and the like),
+  not fixed default roles. Picking a preset fills the per-module permission checklist, which stays editable, and the role
+  can be renamed. Each module carries its own "Publish AI model" permission; AI release promotion goes to whoever holds
+  it (Pre-apply round, 2 October).
+
+  - DEC-008 (Q8) BO-091: The AI spend ceiling is shown and set in the tenant''s selected currency (default USD), with
+  tokens shown alongside.
+
+  - DEC-009 (Q9) BO-919: The event forecast covers every requirement kind (staff, pos, kiosk, gates, fnb, retail, stock,
+  resource, equipment, facility), filtered to what the venue configured. Action: a curated model per AI/ML task with 3-4
+  alternatives (done as research; see the curated-range decision).
+
+  - DEC-275 (Q275) BO-772: Guests who checked out without an account receive marketing only if they ticked the checkout
+  opt-in (unticked by default, source checkout); nothing is sent without it. Replaces the drawn ''not targeted until the
+  consent question is answered''.
+
+
+  Rule edits:
+
+  - ADM-037 patch inputs (DEC-001)
+
+  - ADM-037 patch outputs (DEC-002)
+
+  - ADM-037 add edgeCases (DEC-002)
+
+  - ADM-508 add outputs (DEC-003)
+
+  - ADM-554 patch actions (DEC-007)
+
+  - BO-091 add outputs (DEC-008)
+
+  - BO-919 add outputs (DEC-009)
+
+  - BO-772 add edgeCases (DEC-275)'

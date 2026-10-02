@@ -1,0 +1,35 @@
+id: CHG-NOTE-010
+date: '2026-10-02'
+source: audit
+kind: design-input
+summary: Two venue-operations questions on retention periods (BO-192, BO-629) wait on research into UAE and GCC law; they
+  stay open questions in the design notes, and nothing is applied.
+decision:
+  what: Research UAE/GCC law and propose default retention periods per data category, marked "pending counsel"; BO-629
+    (rejected and superseded document files) follows the BO-192 research. Until then the notes keep both as open questions
+    with their drawn defaults.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, Critical set 1 of 2 October (workbook Q240 and Q459): "Research UAE/GCC law and propose defaults per category,
+  marked pending counsel" and "As BO-192". The ledger marks both needs-research, so this batch applies nothing for them.'
+keys_touched:
+  screens:
+  - BO-192
+  - BO-629
+  files:
+  - handoff/design-notes/venue-operations.yaml
+  other:
+  - DEC-240
+  - DEC-459
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: Open until the research is done and Chinmay accepts the proposed periods; then the two questions move to `decisions`
+  on BO-192 and BO-629 and this entry closes. check-design-notes keeps a decided question from staying in openQuestions.

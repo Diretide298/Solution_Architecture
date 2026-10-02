@@ -336,6 +336,8 @@ screens:
         Those come from the provider SDK, the UAE Pass redirect and the client's token store; no guest types them.
         The overlays should not exist (refreshToken is already noted as "not a button").
       source: screens/P01-guest-web-storefront.yaml#WEB-016; contracts/spine/identity.yaml#guestUaePassLogin
+      status: fixed
+      by: CHG-DOOR-006
     - what: verifyGuestOtp accepts a code of 4 to 10 characters while the agreed rule is exactly six digits.
       why: >-
         The screen copy says six; a contract that accepts 4 lets a shorter code through and the copy becomes wrong.
@@ -346,11 +348,13 @@ screens:
         The channel follows from the identifier and the tenant's configured delivery (WhatsApp/SMS/email); asking
         a guest to pick a channel is a question they cannot answer.
       source: contracts/spine/identity.yaml#requestGuestOtp; DI-209
-    openQuestions:
-    - question: >-
-        DI-974 names the tabs "Log in" and "Register"; every other door in the package says Sign in. Which wording?
-      default: Draw "Sign in" and "Create account" for consistency with every staff and guest door.
-      source: DI-974; screens/P04-point-of-sale.yaml#POS-000
+    decisions:
+    - question: DI-974 names the tabs "Log in" and "Register"; every other door in the package says Sign in. Which wording?
+      decision: 'Drawn default accepted: Draw "Sign in" and "Create account" for consistency with every staff and guest door.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-099 | CHG-NOTE-005
+      questionSource: DI-974; screens/P04-point-of-sale.yaml#POS-000
   GST-042:
     block: A
     summary: >-
@@ -415,6 +419,8 @@ screens:
         and refreshToken.
       why: SDK and redirect values, not guest input; remove the overlays.
       source: screens/P02-guest-mobile-app.yaml#GST-042
+      status: fixed
+      by: CHG-DOOR-006
     - what: Contract accepts a 4 to 10 character code; agreed rule is six digits.
       why: Same misalignment as WEB-016.
       source: contracts/spine/identity.yaml#verifyGuestOtp; DI-1034
@@ -524,6 +530,8 @@ screens:
         A guest holds no permission (ADR-0025); a guest can never be shown a missing-permission state. verifyGuestEmail's
         GUEST_VIEW is a staff permission on a guest/anonymous operation and should be null for the guest path.
       source: contracts/spine/identity.yaml#verifyGuestEmail; ADR-0025
+      status: fixed
+      by: CHG-GST-004
     - what: '"Register guest device" is a button with a form asking platform and token.'
       why: >-
         Push-token registration is done by the app silently at launch; a guest cannot type a push token. Remove
@@ -753,9 +761,13 @@ screens:
       why: >-
         recordDeviceHeartbeat's audience is device only; the peripheral reports it. Show the last heartbeat read-only.
       source: contracts/spine/tenancy.yaml#recordDeviceHeartbeat
+      status: fixed
+      by: CHG-WIR-021
     - what: Purpose is "Till Configuration — from the client design board, 20 August".
       why: A placeholder; the purpose is configuring this workstation in place (F73 step 1).
       source: screens/P04-point-of-sale.yaml#POS-016; F73 step 1
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         16 text fields are raw schema property names, not inputs: id, cashierPrincipalId, cashierName, venueId,
         workstationId, shiftId, status, openingFloat, openingDenominations, withdrawnTotal ....
@@ -768,6 +780,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P04-point-of-sale.yaml#POS-016
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every registered device' drop id, driver, workstationId,
         pushToken, pushPlatform, pushFailureCount.
@@ -776,13 +790,15 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P04-point-of-sale.yaml#POS-016
-    openQuestions:
-    - question: >-
-        Which terminal toggles (printer, offline continuity, screen prompts, key sounds, training mode) are workstation
+    decisions:
+    - question: Which terminal toggles (printer, offline continuity, screen prompts, key sounds, training mode) are workstation
         settings, and which are venue policy that the till only reads?
-      default: >-
-        Draw them as read-only values inherited from the venue profile with the profile name, editable only on BO-123.
-      source: DI-800; ADR-0018
+      decision: 'Drawn default accepted: Draw them as read-only values inherited from the venue profile with the profile name,
+        editable only on BO-123.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-097 | CHG-NOTE-005
+      questionSource: DI-800; ADR-0018
   POS-019:
     block: A
     summary: >-
@@ -848,11 +864,15 @@ screens:
         The name and DI-309 promise templates and policies (opening/closing rules, exceptions and alerts); the contract
         offers no such operation. Either add the shift-policy operations or rename the screen to a shift list.
       source: screens/P04-point-of-sale.yaml#POS-019; contracts/spine/tenancy.yaml#setVenueSettings; DI-309
+      status: fixed
+      by: CHG-WIR-021
     - what: Venue settings are edited from a till.
       why: >-
         Venue-wide configuration (TENANT_CONFIGURE) belongs in Venue Management (BO-1063); a till is a device the
         venue configures, not a place to configure the venue.
       source: ADR-0018; contracts/spine/tenancy.yaml#setVenueSettings
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every shift' drop id, workstationId, venueId, scopePath,
         principalId.
@@ -861,10 +881,13 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P04-point-of-sale.yaml#POS-019
-    openQuestions:
+    decisions:
     - question: Should the cashier ever see expected sales during or at close?
-      default: No; the blind close stands.
-      source: DI-806; POSV2-3
+      decision: The cashier never sees expected sales during or at close (blind close).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-098 | CHG-FIN-003 | CHG-NOTE-005
+      questionSource: DI-806; POSV2-3
   POS-025:
     block: A
     summary: >-
@@ -940,6 +963,8 @@ screens:
         Reading the current shift on a workstation should need the shift-view permission, not the right to open
         one.
       source: contracts/spine/shift.yaml#getCurrentShift
+      status: fixed
+      by: CHG-DOOR-005
   BO-053:
     block: A
     summary: >-
@@ -1138,6 +1163,8 @@ screens:
         The purpose is "Give somebody the permissions their job needs"; setRolePermissions exists (used on BO-116)
         and is missing here, and no grant operation is declared.
       source: screens/P08-venue-back-office.yaml#BO-054; contracts/spine/tenancy.yaml#setRolePermissions
+      status: fixed
+      by: CHG-WIR-021
     - what: entryState reads campaignId.
       why: That belongs to the access-review items call, not to the screen's entry.
       source: screens/P08-venue-back-office.yaml#BO-054
@@ -1148,6 +1175,8 @@ screens:
         Where a role is defined and where it is granted must be stated once; a venue-level role list with tenant-level
         permissions is ambiguous for a venue manager.
       source: contracts/spine/tenancy.yaml#setRolePermissions; contracts/spine/identity.yaml#listRoles
+      status: fixed
+      by: CHG-WIR-021
     - what: 'Tables show every schema field, plumbing included: ''Every role'' drop id, inheritsFromRoleId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -1405,6 +1434,8 @@ screens:
         evaluateApprovalRequirement answers "does this need approval and from whom" for the raising screen (till,
         purchase order) before a request exists; it has no meaning on a request already raised.
       source: contracts/spine/approvals.yaml#evaluateApprovalRequirement
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Waiting for a decision' drop id, outOfOfficeDelegateId,
         reopenedFrom, subjectContract, subjectType, subjectId, scopePath.
@@ -1587,9 +1618,13 @@ screens:
         screen.
       why: Unrelated configuration attached by board position; remove both.
       source: screens/P08-venue-back-office.yaml#BO-116
+      status: fixed
+      by: CHG-WIR-021
     - what: Pattern commandCentre with tiles counting merchandise, sale boards and workstations.
       why: The job is arranging products on a board; a count of workstations says nothing here.
       source: screens/P08-venue-back-office.yaml#BO-116
+      status: fixed
+      by: CHG-WIR-023
     - what: formUpdateSaleBoard asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -1684,6 +1719,8 @@ screens:
         The designer's population is sale boards (listSaleBoards), which it does not declare; the audit log belongs
         to BO-068 or BO-126.
       source: screens/P08-venue-back-office.yaml#BO-124
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Create and Save sale board forms ask for `id`, and the deploy form for status, counts and timestamps.
       why: Server or client-generated values; the deploy form needs version, target and strategy only.
@@ -1691,10 +1728,14 @@ screens:
     - what: '"Record device heartbeat" button.'
       why: Device-audience operation.
       source: contracts/spine/tenancy.yaml#recordDeviceHeartbeat
+      status: fixed
+      by: CHG-WIR-021
     - what: No drag-and-drop canvas, product picker or preview is declared.
       why: >-
         DI-157 and DI-310 describe a visual designer per workstation type; the screen is generated as a list.
       source: DI-157; DI-310
+      status: fixed
+      by: CHG-WIR-023
     - what: formUpdateSaleBoard asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -1715,6 +1756,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-124
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every audit' drop id, principalId, orgUnitId, workstationId;
         'Every registered device' drop id, driver, workstationId, pushToken, pushPlatform, pushFailureCount.
@@ -1829,6 +1872,8 @@ screens:
         Those operate on ticket media (a wristband or card carrying entitlements), not on digital assets; the word
         "media" collided. Remove them.
       source: contracts/spine/orders.yaml#appendEntitlementToMedia; screens/P13-white-label-cms.yaml#CMS-010
+      status: fixed
+      by: CHG-WIR-021
     - what: requiresModule is 'ticketing'.
       why: The asset library serves every guest surface; core.
       source: screens/P13-white-label-cms.yaml#CMS-010
@@ -1840,6 +1885,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P13-white-label-cms.yaml#CMS-010
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every media asset' drop id, customMetadata; 'Every collection'
         drop id, venueId, parentCollectionId, coverAssetId.
@@ -1889,6 +1936,8 @@ screens:
     - what: The screen declares only reads; nothing grants or removes a role.
       why: The purpose is "Say who in the tenant may change what"; without a grant operation it cannot.
       source: screens/P13-white-label-cms.yaml#CMS-019
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every principal' drop id, primaryRoleId; 'Every role'
         drop id, inheritsFromRoleId.
@@ -1984,6 +2033,8 @@ screens:
     - what: Purpose says "The screen this app sits on. Everything else is entered from here".
       why: ADM-002 is the dashboard and ADM-003 is entered from it; the purpose is cross-tenant cell health.
       source: screens/P09-platform-admin-console.yaml#ADM-003
+      status: fixed
+      by: CHG-WIR-023
     - what: Propagate cross region entitlement and Reconcile redemptions are buttons with forms.
       why: >-
         Both are service-audience operations between cells (F19); no operator calls them. Show cross-region status
@@ -1991,12 +2042,16 @@ screens:
       source: >-
         contracts/spine/cross-region.yaml#propagateCrossRegionEntitlement; contracts/spine/cross-region.yaml#reconcileRedemptions;
         F19 step 2
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         getCrossRegionEntitlement, getWalletAllocation and setWalletAllocationPolicy (tenant permissions TICKET_LOOKUP,
         ORDER_VIEW, REGION_CONFIGURE) on a cell health screen.
       why: >-
         Tenant data and a region money policy do not belong on platform cell health and would need an R098 grant.
       source: R098; contracts/spine/cross-region.yaml#setWalletAllocationPolicy
+      status: fixed
+      by: CHG-WIR-021
     - what: 'Tables show every schema field, plumbing included: ''Every cell job'' drop id.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -2150,13 +2205,15 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-005
-    openQuestions:
-    - question: >-
-        Is opening a grant needed for getSsoConfig/setSsoConfig only, or does TICVAI configure tenant SSO at all
-        (versus the tenant's own admin in Venue Management)?
-      default: >-
-        Draw SSO configuration behind the grant on this screen, and the same card on the tenant's identity settings.
-      source: R098; contracts/spine/identity.yaml#setSsoConfig
+    decisions:
+    - question: Is opening a grant needed for getSsoConfig/setSsoConfig only, or does TICVAI configure tenant SSO at all (versus
+        the tenant's own admin in Venue Management)?
+      decision: 'Drawn default accepted: Draw SSO configuration behind the grant on this screen, and the same card on the
+        tenant''s identity settings.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-094 | CHG-NOTE-005
+      questionSource: R098; contracts/spine/identity.yaml#setSsoConfig
   ADM-008:
     block: A
     summary: >-
@@ -2257,9 +2314,13 @@ screens:
         Partner commercial terms are the tenant's B2B business (PARTNER_MANAGE, a tenant permission) and SSO is
         tenant identity; neither belongs to TICVAI's plan catalogue, and both would need an R098 grant here.
       source: R098; contracts/satellite/subscription.yaml#createPartnerAgreement
+      status: fixed
+      by: CHG-WIR-021
     - what: Purpose reads "Find subscription & plan management for this venue".
       why: Subscriptions are per tenant, not per venue.
       source: screens/P09-platform-admin-console.yaml#ADM-008
+      status: fixed
+      by: CHG-WIR-023
     - what: requiresModule is 'membership'.
       why: Guest membership module, unrelated to TICVAI's subscription.
       source: screens/P09-platform-admin-console.yaml#ADM-008
@@ -2274,6 +2335,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every plan' drop id; 'Every subscription invoice' drop
         id, lines, planVersionUsed; 'Every cell' drop id, clusterId, regionId; 'Every tenant' drop id, terminationRequestedByPrincipalId.
@@ -2345,6 +2408,8 @@ screens:
     - what: The gaps entry says nothing reads the password policy.
       why: getPasswordPolicy now exists; the screen should declare it and drop the stale gap.
       source: contracts/spine/identity.yaml#getPasswordPolicy; screens/P09-platform-admin-console.yaml#ADM-342
+      status: fixed
+      by: CHG-WIR-021
     - what: Tenant-config operations with no tenant picker or platform-staff grant.
       why: >-
         On the Console every tenant write needs the R098 pattern; otherwise the screen is the tenant's own and belongs
@@ -2368,12 +2433,14 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
-    openQuestions:
-    - question: >-
-        DI-729 says MFA for sensitive approvals is a business option (on/off); the contract makes it a floor the
-        tenant can only raise. Which holds?
-      default: The contract floor holds (step-up cannot be configured away); draw the floor locked.
-      source: DI-729; contracts/spine/approvals.yaml#setStepUpPolicy
+    decisions:
+    - question: DI-729 says MFA for sensitive approvals is a business option (on/off); the contract makes it a floor the tenant
+        can only raise. Which holds?
+      decision: 'Drawn default accepted: The contract floor holds (step-up cannot be configured away); draw the floor locked.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-095 | CHG-NOTE-005
+      questionSource: DI-729; contracts/spine/approvals.yaml#setStepUpPolicy
   ADM-354:
     block: A
     summary: >-
@@ -2421,6 +2488,8 @@ screens:
       why: >-
         API clients are developer integrations, not approval providers; the list is listApprovalExternalProviders.
       source: contracts/satellite/public-api.yaml#listApiClients
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Eight selectFields with no binding (system name, direction, authentication, mappings, error handling, sync
         mode).
@@ -2429,6 +2498,8 @@ screens:
     - what: listApprovalExternalDispatches and recordExternalApprovalDecision exist and are not declared.
       why: DI-733 asks for retry handling; the dispatch list is how it is seen.
       source: DI-733
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: listApiClients (DEVELOPER_VIEW),
         listApprovalExternalProviders (APPROVAL_VIEW), setApprovalExternalProvider (APPROVAL_CONFIGURE).
@@ -2439,6 +2510,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-WIR-021
   ADM-412:
     block: A
     summary: >-
@@ -2578,14 +2651,15 @@ screens:
         They were generated from a response schema; ids, statuses and computed totals are not typed by anybody.
         Replace with the real form the write operation needs (or a read-only summary).
       source: screens/P14-developer-portal.yaml#DEV-002
-    openQuestions:
-    - question: >-
-        Which door does a developer sign in through? P14 belongs to TICVAI Control, whose doors are ADM-001 (platform
+    decisions:
+    - question: Which door does a developer sign in through? P14 belongs to TICVAI Control, whose doors are ADM-001 (platform
         staff) and PTR-001 (partners).
-      default: >-
-        Developers sign in through the partner door with a developer account; draw a "Sign in to the Developer Portal"
-        variant of PTR-001.
-      source: screens/P14-developer-portal.yaml#DEV-002; screens/P10-partner-reseller-portal.yaml#PTR-001
+      decision: 'Drawn default accepted: Developers sign in through the partner door with a developer account; draw a "Sign
+        in to the Developer Portal" variant of PTR-001.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-096 | CHG-NOTE-005
+      questionSource: screens/P14-developer-portal.yaml#DEV-002; screens/P10-partner-reseller-portal.yaml#PTR-001
   DEV-003:
     block: A
     summary: >-
@@ -2792,6 +2866,8 @@ screens:
     - what: listDetail pattern with MFA-method and SSO-provider tables; emptyFirstRun "No sign yet".
       why: Rebuild as a sign-in form; listSsoProviders feeds an SSO button, not a table.
       source: screens/P06-staff-app.yaml#EMP-001
+      status: fixed
+      by: CHG-DOOR-001
     - what: selectRole is not declared though staff hold several roles.
       why: ADR-0003 multi-role prompt; F64 has the steward take a venue and a role.
       source: ADR-0003; F64 step 1
@@ -2803,6 +2879,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P06-staff-app.yaml#EMP-001
+      status: fixed
+      by: CHG-DOOR-001
   EMP-002:
     block: B
     summary: >-
@@ -2829,6 +2907,8 @@ screens:
         would be refused.
       source: >-
         contracts/spine/identity.yaml#/components/schemas/LoginResponse; contracts/spine/identity.yaml#listRoles
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every MFA method' drop id; 'Every SSO provider' drop
         id, scopePath; 'Every role' drop id, inheritsFromRoleId.
@@ -2837,6 +2917,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P06-staff-app.yaml#EMP-002
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -2987,12 +3069,18 @@ screens:
         resolvePermissions (simulate a principal's permissions, PERMISSION_VIEW) is on the scanner's sign-in.
       why: An administration tool; a steward signing in never calls it.
       source: contracts/spine/identity.yaml#resolvePermissions
+      status: fixed
+      by: CHG-WIR-021
     - what: getCurrentShift with emptyNoAccess naming SHIFT_OPEN.
       why: A scanner has no cash shift; a steward would be shown a missing-permission state at sign-in.
       source: screens/P07-staff-scanner.yaml#SCN-001
+      status: fixed
+      by: CHG-WIR-021
     - what: listDetail with MFA-method and SSO-provider tables.
       why: Rebuild as a sign-in form.
       source: screens/P07-staff-scanner.yaml#SCN-001
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every MFA method' drop id; 'Every SSO provider' drop
         id, scopePath.
@@ -3001,6 +3089,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P07-staff-scanner.yaml#SCN-001
+      status: fixed
+      by: CHG-WIR-021
   SCN-011:
     block: B
     summary: >-
@@ -3105,17 +3195,25 @@ screens:
         Rebuild as a sign-in form; the session tables belong to a signed-in security screen; the copy must say Venue
         Management.
       source: screens/P12-support-agent-console.yaml#SUP-001
+      status: fixed
+      by: CHG-WIR-021
     - what: LoginRequest.workstationId is required.
       why: A back-office browser has no workstation.
       source: contracts/spine/identity.yaml#/components/schemas/LoginRequest
+      status: fixed
+      by: CHG-WIR-021
     - what: No SSO sign-in operation is declared though listSsoProviders is.
       why: startSsoAuthorization/completeSsoAuthorization are the SSO path.
       source: contracts/spine/identity.yaml#completeSsoAuthorization
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         The door is planned in Block B (done by 24 November) while Block A's Venue Management screens (BO-084, BO-085,
         BO-124) need it to be tested.
       why: Block A screens of an app cannot be tested end to end without its door.
       source: screens/P12-support-agent-console.yaml#SUP-001
+      status: fixed
+      by: CHG-DOOR-004
     - what: >-
         Tables show every schema field, plumbing included: 'Every active session' drop sessionId, principalId, roleId,
         workstationId, venueId; 'Every MFA method' drop id; 'Every SSO provider' drop id, scopePath.
@@ -3124,6 +3222,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P12-support-agent-console.yaml#SUP-001
+      status: fixed
+      by: CHG-WIR-021
   BO-036:
     block: B
     summary: >-
@@ -3232,11 +3332,15 @@ screens:
         The screen does too much; workstation configuration and deployment are BO-129/BO-126. Keep devices, credentials
         and assignment.
       source: screens/P08-venue-back-office.yaml#BO-036; ADR-0067
+      status: fixed
+      by: CHG-WIR-021
     - what: Shows a button or form for recordDeviceHeartbeat, whose only audience is device.
       why: >-
         No person calls these: a device or another service does. A staff member pressing them is refused 403. Remove
         the button and its form; show the effect (e.g. last heartbeat) read-only if useful.
       source: contracts/spine/tenancy.yaml#recordDeviceHeartbeat; ADR-0025
+      status: fixed
+      by: CHG-WIR-021
     - what: formRegisterDevice asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -3247,11 +3351,15 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-036
+      status: fixed
+      by: CHG-WIR-021
     - what: formRecordDeviceHeartbeat asks the person for status.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-036
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every registered device' drop id, driver, workstationId,
         pushToken, pushPlatform, pushFailureCount; 'Every workstation' drop id, venueId, regionId, departmentId,
@@ -3262,10 +3370,13 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P08-venue-back-office.yaml#BO-036
-    openQuestions:
+    decisions:
     - question: Are BO-036 and BO-127 the same screen?
-      default: One device register; draw BO-036.
-      source: R276
+      decision: BO-127 is merged into BO-036 as one device register.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-166 | CHG-NOTE-005
+      questionSource: R276
   BO-057:
     block: B
     summary: >-
@@ -3294,6 +3405,8 @@ screens:
         The purpose ("Know who is allowed to do what") needs certification records; a principal list cannot show
         them.
       source: screens/P08-venue-back-office.yaml#BO-057
+      status: fixed
+      by: CHG-WIR-021
     - what: 'Tables show every schema field, plumbing included: ''Every principal'' drop id, primaryRoleId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -3362,11 +3475,15 @@ screens:
         Production clients are issued by TICVAI on an approved request and sandbox clients belong to developers
         (DI-927); a tenant creating clients bypasses certification.
       source: DI-927; contracts/satellite/public-api.yaml#createApiClient
+      status: fixed
+      by: CHG-WIR-021
     - what: formCreateApiClient asks the person for status, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-067
+      status: fixed
+      by: CHG-WIR-021
     - what: formCreateWebhookSubscription asks the person for status, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -3429,6 +3546,8 @@ screens:
     - what: Resolve permissions (simulate a principal's permissions) is a button on the audit log.
       why: A permission simulator belongs to role management (BO-054/BO-1066).
       source: contracts/spine/identity.yaml#resolvePermissions
+      status: fixed
+      by: CHG-WIR-021
     - what: Filters are free-text id fields (org unit id, principal id, workstation id, subject ref).
       why: Nobody knows a UUID; use pickers.
       source: screens/P08-venue-back-office.yaml#BO-068
@@ -3554,6 +3673,8 @@ screens:
     - what: listIndexJobs (AI index jobs, AI_CONFIGURE) on approval analytics.
       why: Unrelated.
       source: screens/P08-venue-back-office.yaml#BO-088
+      status: fixed
+      by: CHG-WIR-021
     - what: 'Tables show every schema field, plumbing included: ''Every index job'' drop id, sourceId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -3642,6 +3763,8 @@ screens:
       why: >-
         A placeholder purpose; a dashboard needs measures (sales per board, errors) that no operation provides.
       source: screens/P08-venue-back-office.yaml#BO-122
+      status: fixed
+      by: CHG-WIR-023
     - what: 'Tables show every schema field, plumbing included: ''Every sale board'' drop id, venueId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -3703,6 +3826,8 @@ screens:
     - what: Purpose is a placeholder ("from the client design board, 20 August").
       why: The purpose is defining the profiles workstations are assigned (ADR-0018).
       source: screens/P08-venue-back-office.yaml#BO-123
+      status: fixed
+      by: CHG-WIR-023
     - what: formSetConfigurationProfile asks the person for status, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -3765,6 +3890,8 @@ screens:
     - what: getWorkstationHealth, listAlerts, Report incident and Record device heartbeat on a button editor.
       why: Unrelated; attached by board position.
       source: screens/P08-venue-back-office.yaml#BO-125
+      status: fixed
+      by: CHG-WIR-021
     - what: requiresModule 'ticketing' while F&B and retail boards also have buttons.
       why: Should be core (or the board's own module).
       source: screens/P08-venue-back-office.yaml#BO-125
@@ -3773,6 +3900,8 @@ screens:
         No person calls these: a device or another service does. A staff member pressing them is refused 403. Remove
         the button and its form; show the effect (e.g. last heartbeat) read-only if useful.
       source: contracts/spine/tenancy.yaml#recordDeviceHeartbeat; ADR-0025
+      status: fixed
+      by: CHG-WIR-021
     - what: formUpdateSaleBoard asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -3783,11 +3912,15 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-125
+      status: fixed
+      by: CHG-WIR-021
     - what: formReportIncident asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P08-venue-back-office.yaml#BO-125
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every product' drop id, venueId, scopePath, createdByPrincipalId,
         approvedByPrincipalId, responsibleDepartmentId; 'Every alert' drop id, ruleId, scopePath, workstationId,
@@ -3849,9 +3982,13 @@ screens:
     - what: Start rollout (startRollout, PLATFORM_RELEASE_PROMOTE) on a venue screen.
       why: Platform release rollout is TICVAI's; tenant staff cannot hold the permission.
       source: R229
+      status: fixed
+      by: CHG-WIR-021
     - what: Run report on a deployment screen.
       why: Unrelated.
       source: screens/P08-venue-back-office.yaml#BO-126
+      status: fixed
+      by: CHG-WIR-021
     - what: formDeployConfigurationProfile asks the person for status, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -3914,6 +4051,8 @@ screens:
     - what: Save offline policy on a monitor.
       why: Offline policy is configuration (BO-206/BO-131); a monitor should link there.
       source: contracts/spine/tenancy.yaml#setOfflinePolicy
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every workstation' drop id, venueId, regionId, departmentId,
         scopePath, accessPointId.
@@ -3991,6 +4130,8 @@ screens:
     - what: configureWorkstation and setConnectivityThresholds share the screen with firmware rollout.
       why: Too many jobs; workstation and connectivity have their own screens.
       source: screens/P08-venue-back-office.yaml#BO-129
+      status: fixed
+      by: CHG-WIR-021
     - what: formSetConfigurationProfile asks the person for status, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -4110,6 +4251,8 @@ screens:
       why: >-
         Retail global settings (return policy, receipt rules) are outlet configuration in retail, not venue settings.
       source: ADR-0029; contracts/spine/tenancy.yaml#setVenueSettings
+      status: fixed
+      by: CHG-WIR-021
   BO-145:
     block: B
     summary: >-
@@ -4176,6 +4319,8 @@ screens:
         R091 adopted a read and a narrower configure split; access offline policy should use the access module's
         permission.
       source: R091; contracts/spine/tenancy.yaml#setOfflinePolicy
+      status: fixed
+      by: CHG-WIR-001
   BO-284:
     block: B
     summary: >-
@@ -4972,6 +5117,8 @@ screens:
     - what: Duplicates BO-084's queue with its own unbound columns.
       why: One inbox; the board tile should open BO-084.
       source: screens/P08-venue-back-office.yaml#BO-084
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -5017,6 +5164,8 @@ screens:
     - what: The table has no columns and there is no assign or claim operation.
       why: DI-723 asks for assign and reassign to department or person.
       source: DI-723
+      status: logged
+      by: CHG-WIR-024
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -5130,6 +5279,8 @@ screens:
     - what: Uses evaluateApprovalRequirement instead of getApprovalRequestScore.
       why: The score operation is the AI context; evaluate answers whether approval is required.
       source: contracts/satellite/ai.yaml#getApprovalRequestScore
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -5577,6 +5728,8 @@ screens:
     - what: Only withdrawApprovalRequest; cancellation, expiry and reopening have no operation.
       why: The purpose names four lifecycle actions.
       source: screens/P08-venue-back-office.yaml#BO-380
+      status: logged
+      by: CHG-WIR-024
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -5788,6 +5941,8 @@ screens:
     - what: listDelegations (GUEST_VIEW) is the guest delegation operation.
       why: Approval delegation uses listApprovalDelegations.
       source: contracts/spine/approvals.yaml#listApprovalDelegations
+      status: fixed
+      by: CHG-WIR-021
     - what: Fields are prefilled with sample names ("Delegator Ahmed Raza", "Delegate To Sara Khan").
       why: Sample data baked into labels.
       source: screens/P08-venue-back-office.yaml#BO-385
@@ -6066,6 +6221,8 @@ screens:
       why: >-
         Tenants cannot hold DEVELOPER_ADMIN; device certification is a different object from API integration certification.
       source: R229; contracts/satellite/public-api.yaml#certifyIntegration
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -6736,6 +6893,8 @@ screens:
     - what: Purpose is about measuring event financial performance.
       why: Purpose does not match the name.
       source: screens/P08-venue-back-office.yaml#BO-718
+      status: fixed
+      by: CHG-WIR-023
   BO-727:
     block: B
     summary: >-
@@ -6766,6 +6925,8 @@ screens:
     - what: Ten tiles (sales, orders, preparation time, stock alerts) with only listOutlets behind them.
       why: No operation provides the figures.
       source: screens/P08-venue-back-office.yaml#BO-727
+      status: logged
+      by: CHG-WIR-024
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -6832,6 +6993,8 @@ screens:
     - what: Only listOutlets; nothing assigns a device.
       why: setDeviceAssignment exists.
       source: contracts/spine/tenancy.yaml#setDeviceAssignment
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -7367,6 +7530,8 @@ screens:
     - what: Platform service health on a tenant screen.
       why: API, cache and database health are TICVAI's; the tenant sees status only.
       source: screens/P08-venue-back-office.yaml#BO-1069
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -7429,6 +7594,8 @@ screens:
     - what: createApiClient on a tenant screen.
       why: As BO-067.
       source: DI-927
+      status: fixed
+      by: CHG-WIR-021
   BO-1074:
     block: B
     summary: Subscribe consumers to seat lifecycle events with signature and retry settings.
@@ -7641,6 +7808,8 @@ screens:
     - what: createApiClient and setApiClientStatus on a tenant wallet screen.
       why: As BO-067.
       source: DI-927
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 14 labels bound).
       why: >-
@@ -9051,6 +9220,8 @@ screens:
     - what: setApprovalRetentionPolicy on an analytics retention screen.
       why: Approval records are not reports.
       source: contracts/spine/approvals.yaml#setApprovalRetentionPolicy
+      status: fixed
+      by: CHG-WIR-021
   ADM-001:
     block: B
     summary: >-
@@ -9110,17 +9281,25 @@ screens:
         A person signing in has no session yet and must see none of that; session management is a separate signed-in
         screen. Rebuild as a form (as WEB-016 and POS-000 were).
       source: screens/P09-platform-admin-console.yaml#ADM-001; F104 step 1
+      status: fixed
+      by: CHG-WIR-021
     - what: The login form requires workstationId.
       why: >-
         A browser at the Console has no workstation; LoginRequest makes it required for every login. Make it optional
         for web surfaces or define what a web door sends.
       source: contracts/spine/identity.yaml#/components/schemas/LoginRequest
+      status: fixed
+      by: CHG-WIR-021
     - what: startSsoAuthorization and completeSsoAuthorization exist but are not declared on any staff door.
       why: listSsoProviders is declared and nothing uses the provider to sign in.
       source: contracts/spine/identity.yaml#startSsoAuthorization
+      status: fixed
+      by: CHG-WIR-021
     - what: emptyNoAccess names SESSION_FORCE_LOGOUT.
       why: A door has no no-access state; the person is not signed in.
       source: screens/P09-platform-admin-console.yaml#ADM-001
+      status: fixed
+      by: CHG-DOOR-003
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: forceLogout (SESSION_FORCE_LOGOUT),
         listActiveSessions (SESSION_FORCE_LOGOUT), revokeAllSessions (SESSION_FORCE_LOGOUT).
@@ -9131,6 +9310,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every active session' drop sessionId, principalId, roleId,
         workstationId, venueId; 'Every MFA method' drop id; 'Every SSO provider' drop id, scopePath.
@@ -9139,6 +9320,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-001
+      status: fixed
+      by: CHG-WIR-021
   ADM-002:
     block: B
     summary: >-
@@ -9165,6 +9348,8 @@ screens:
     - what: getSsoConfig (USER_MANAGE) on the platform home.
       why: Tenant SSO is not platform-home content and needs a grant.
       source: R098
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every tenant' drop id, planId, accountManagerPrincipalId;
         'Every cell' drop id, clusterId, regionId.
@@ -9233,6 +9418,8 @@ screens:
     - what: Purpose "for this venue".
       why: A tenant hierarchy.
       source: screens/P09-platform-admin-console.yaml#ADM-006
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: getSsoConfig (USER_MANAGE),
         listOrgUnits (SCOPE_VIEW), createOrgUnit (SCOPE_MANAGE).
@@ -9243,6 +9430,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every tenant' drop id, planId, accountManagerPrincipalId;
         'Every cell' drop id, clusterId, regionId; 'Every org unit' drop id, parentId.
@@ -9315,6 +9504,8 @@ screens:
     - what: Purpose "for this venue".
       why: Licences are per tenant.
       source: screens/P09-platform-admin-console.yaml#ADM-007
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: getSsoConfig (USER_MANAGE).
       why: >-
@@ -9324,6 +9515,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every cell' drop id, clusterId, regionId; 'Every tenant'
         drop id, terminationRequestedByPrincipalId.
@@ -9382,6 +9575,8 @@ screens:
     - what: Purpose "for this venue"; cells and SSO tables repeated from the tenant directory.
       why: Billing needs invoices and the subscription only.
       source: screens/P09-platform-admin-console.yaml#ADM-009
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: getSsoConfig (USER_MANAGE).
       why: >-
@@ -9391,6 +9586,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every subscription invoice' drop id, lines, planVersionUsed;
         'Every cell' drop id, clusterId, regionId; 'Every tenant' drop id, terminationRequestedByPrincipalId.
@@ -9399,6 +9596,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-009
+      status: fixed
+      by: CHG-WIR-021
     - what: requiresModule is 'membership' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
@@ -9428,6 +9627,8 @@ screens:
     - what: Purpose "for this venue".
       why: Usage is per tenant.
       source: screens/P09-platform-admin-console.yaml#ADM-010
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: getSsoConfig (USER_MANAGE).
       why: >-
@@ -9437,6 +9638,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every cell' drop id, clusterId, regionId; 'Every tenant'
         drop id, terminationRequestedByPrincipalId.
@@ -9529,6 +9732,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every cell' drop id, clusterId, regionId; 'Every tenant'
         drop id, terminationRequestedByPrincipalId.
@@ -9588,6 +9793,8 @@ screens:
     - what: Purpose "for this venue".
       why: Cells are per tenant and region.
       source: screens/P09-platform-admin-console.yaml#ADM-012
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: getSsoConfig (USER_MANAGE).
       why: >-
@@ -9597,6 +9804,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every cell' drop id, clusterId, regionId; 'Every tenant'
         drop id, terminationRequestedByPrincipalId.
@@ -9652,6 +9861,8 @@ screens:
         Six screens offering decommission is six places to make the worst mistake; keep decommission on ADM-003
         only.
       source: screens/P09-platform-admin-console.yaml#ADM-003
+      status: fixed
+      by: CHG-WIR-021
     - what: 'Tables show every schema field, plumbing included: ''Every cell job'' drop id.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -9707,6 +9918,8 @@ screens:
     - what: No scaling operation; the cell operations are copied.
       why: Nothing reads or writes a scaling policy.
       source: screens/P09-platform-admin-console.yaml#ADM-014
+      status: fixed
+      by: CHG-WIR-023
     - what: 'Tables show every schema field, plumbing included: ''Every cell job'' drop id.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -9784,6 +9997,8 @@ screens:
     - what: Purpose "for this venue"; tenant, cells and SSO tables copied from the tenant directory.
       why: Quotas are per API client within a tenant's budget (ADR-0064).
       source: ADR-0064; screens/P09-platform-admin-console.yaml#ADM-015
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: getSsoConfig (USER_MANAGE),
         getApiUsage (DEVELOPER_VIEW), listApiClients (DEVELOPER_VIEW), listProductionAccessRequests (DEVELOPER_VIEW),
@@ -9795,6 +10010,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every cell' drop id, clusterId, regionId; 'Every tenant'
         drop id, terminationRequestedByPrincipalId; 'Every API client' drop id, developerId, clientId, allowedTenantIds;
@@ -9892,6 +10109,8 @@ screens:
     - what: Plan creation (createPlan, createPlanVersion) on global defaults.
       why: Plans belong to ADM-008/ADM-392.
       source: screens/P09-platform-admin-console.yaml#ADM-008
+      status: fixed
+      by: CHG-WIR-021
     - what: 'Tables show every schema field, plumbing included: ''Every plan'' drop id.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -9934,6 +10153,8 @@ screens:
     - what: Purpose "Find the right one quickly, and act on it without opening it" is generic.
       why: Say platform staff.
       source: screens/P09-platform-admin-console.yaml#ADM-020
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: listPrincipals (USER_MANAGE),
         createPrincipal (USER_MANAGE), getPrincipal (USER_MANAGE), updatePrincipal (USER_MANAGE).
@@ -9976,6 +10197,8 @@ screens:
     - what: Purpose "for this venue".
       why: Platform roles have no venue.
       source: screens/P09-platform-admin-console.yaml#ADM-021
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: listRoles (ROLE_MANAGE),
         createRole (ROLE_MANAGE).
@@ -10058,9 +10281,13 @@ screens:
     - what: Purpose "for this venue".
       why: Releases are platform-wide.
       source: screens/P09-platform-admin-console.yaml#ADM-022
+      status: fixed
+      by: CHG-WIR-023
     - what: ADM-022 and ADM-023 declare the same seven release operations.
       why: Near-duplicates; ADM-023 should be the staging approval step only.
       source: screens/P09-platform-admin-console.yaml#ADM-023
+      status: fixed
+      by: CHG-WIR-021
     - what: 'Tables show every schema field, plumbing included: ''Every release'' drop id, createdByPrincipalId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -10134,6 +10361,8 @@ screens:
     - what: Purpose "for this venue"; same operations as ADM-022.
       why: Platform-wide; duplicate.
       source: screens/P09-platform-admin-console.yaml#ADM-023
+      status: fixed
+      by: CHG-WIR-023
     - what: 'Tables show every schema field, plumbing included: ''Every release'' drop id, createdByPrincipalId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -10169,6 +10398,8 @@ screens:
     - what: Purpose "Push live ... for this venue".
       why: Release notices target tenants.
       source: screens/P09-platform-admin-console.yaml#ADM-024
+      status: fixed
+      by: CHG-WIR-023
     - what: formPublishSupportNotice asks the person for publishedAt, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -10215,6 +10446,8 @@ screens:
     - what: Purpose "for this venue".
       why: Upgrades are per tenant.
       source: screens/P09-platform-admin-console.yaml#ADM-025
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -10249,6 +10482,8 @@ screens:
     - what: Purpose "Answer a question without needing a person".
       why: Copied from a help screen.
       source: screens/P09-platform-admin-console.yaml#ADM-026
+      status: fixed
+      by: CHG-WIR-023
     - what: formPublishSupportNotice asks the person for publishedAt, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -10314,6 +10549,8 @@ screens:
     - what: Purpose "for this venue".
       why: Platform-wide.
       source: screens/P09-platform-admin-console.yaml#ADM-027
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -10347,6 +10584,8 @@ screens:
     - what: Purpose "for this venue".
       why: Platform-wide.
       source: screens/P09-platform-admin-console.yaml#ADM-028
+      status: fixed
+      by: CHG-WIR-023
     - what: formRegisterEnvironment asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -10422,6 +10661,8 @@ screens:
     - what: Decommission cell and Save cell tier on a deployment monitor.
       why: Copied cell actions.
       source: screens/P09-platform-admin-console.yaml#ADM-029
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every cell job' drop id; 'Every rollout' drop id, releaseId,
         startedByPrincipalId, approvedByPrincipalId.
@@ -10711,6 +10952,8 @@ screens:
     - what: Purpose "Answer a question without needing a person"; operations are support notices only.
       why: An escalation console needs the escalation queue.
       source: screens/P09-platform-admin-console.yaml#ADM-035
+      status: fixed
+      by: CHG-WIR-023
     - what: formPublishSupportNotice asks the person for publishedAt, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -10765,6 +11008,8 @@ screens:
         listAnnouncements and publishAnnouncement (tenant staff announcements, WORKFORCE_VIEW, ANNOUNCEMENT_PUBLISH).
       why: Staff announcements are the tenant's; a platform broadcast is a support notice.
       source: R098
+      status: fixed
+      by: CHG-WIR-021
     - what: formPublishSupportNotice asks the person for publishedAt, id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -10775,6 +11020,8 @@ screens:
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
         them invites nonsense values. Keep them out of the form.
       source: screens/P09-platform-admin-console.yaml#ADM-036
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every support notice' drop id, affectedTenantIds, publishedByPrincipalId,
         scopePath; 'Every announcement' drop id, venueIds, departmentIds, roleIds, publishedByPrincipalId.
@@ -10783,6 +11030,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P09-platform-admin-console.yaml#ADM-036
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -11185,6 +11434,8 @@ screens:
     - what: Only a read (listSlaEscalationReminder); nothing saves.
       why: setApprovalSlaPolicy is the write.
       source: contracts/spine/approvals.yaml#setApprovalSlaPolicy
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -11582,6 +11833,8 @@ screens:
     - what: The only operation creates an autonomous action; nothing lists executions.
       why: A monitor needs the read.
       source: screens/P09-platform-admin-console.yaml#ADM-253
+      status: logged
+      by: CHG-WIR-024
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: createAutomationAutonomouAction
         (APPROVAL_CONFIGURE).
@@ -12546,6 +12799,8 @@ screens:
     - what: Only signApprovalDecision (an approver's act) on a management screen.
       why: Configuring which stages need a signature is a policy write.
       source: contracts/spine/approvals.yaml#signApprovalDecision
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -12778,6 +13033,8 @@ screens:
     - what: Only listApprovalRequests.
       why: API configuration is not an approval list.
       source: screens/P09-platform-admin-console.yaml#ADM-351
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -13450,6 +13707,8 @@ screens:
     - what: setTrialConfiguration on a monitor.
       why: A monitor should link to the trial configuration.
       source: screens/P09-platform-admin-console.yaml#ADM-374
+      status: fixed
+      by: CHG-WIR-021
   ADM-375:
     block: B
     summary: TICVAI customer renewals in the next 30/60/90 days with value, usage trend, payment health and risk.
@@ -13501,6 +13760,8 @@ screens:
     - what: Uses listMembershipRenewalRetention, the guest membership read.
       why: TICVAI customer renewals are subscriptions, not guest memberships.
       source: contracts/satellite/subscription.yaml#getSubscription
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -13555,6 +13816,8 @@ screens:
     - what: Uses listRenewalAuto (guest membership renewals).
       why: Wrong domain.
       source: screens/P09-platform-admin-console.yaml#ADM-376
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -14364,6 +14627,8 @@ screens:
     - what: The only operation is createPartnerQuote (PARTNER_MANAGE, a tenant's B2B quote).
       why: Package approval is a TICVAI commercial act; a partner quote is the tenant's business.
       source: R098
+      status: fixed
+      by: CHG-WIR-021
     - what: A button labelled "Board 4 — Required Package Data Model".
       why: Pack heading as a button.
       source: screens/P09-platform-admin-console.yaml#ADM-408
@@ -14612,6 +14877,8 @@ screens:
     - what: Only createTenant; nothing reads provisioning progress.
       why: A command centre needs the job reads (listCellJobs).
       source: contracts/satellite/subscription.yaml#listCellJobs
+      status: fixed
+      by: CHG-WIR-021
   ADM-420:
     block: B
     summary: >-
@@ -14627,6 +14894,8 @@ screens:
     - what: Only createOrgUnit; the tenant itself is created by createTenant.
       why: The purpose is tenant provisioning.
       source: contracts/satellite/subscription.yaml#createTenant
+      status: fixed
+      by: CHG-WIR-021
   ADM-421:
     block: B
     summary: >-
@@ -14687,6 +14956,8 @@ screens:
     - what: Operations are createPrincipal and setPasswordPolicy; nothing creates a venue.
       why: createOrgUnit is the venue write.
       source: contracts/spine/tenancy.yaml#createOrgUnit
+      status: fixed
+      by: CHG-WIR-021
   ADM-422:
     block: B
     summary: >-
@@ -14714,6 +14985,8 @@ screens:
     - what: Operations are getTenantLicences and addLicenceAddOn; nothing creates the administrator.
       why: createPrincipal under a grant (as ADM-421) and setPasswordPolicy are the writes.
       source: contracts/spine/identity.yaml#createPrincipal
+      status: fixed
+      by: CHG-WIR-021
     - what: Fields are check-marked status lines ("✓ Administrator Account Created").
       why: Progress outputs, not inputs.
       source: screens/P09-platform-admin-console.yaml#ADM-422
@@ -14750,6 +15023,8 @@ screens:
     - what: Only listVenueTypeTemplates (TENANT_CONFIGURE).
       why: Module activation is licence data.
       source: contracts/satellite/subscription.yaml#getTenantLicences
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -14784,6 +15059,8 @@ screens:
     - what: Only updateRegionSettings.
       why: A venue template is not region money settings.
       source: screens/P09-platform-admin-console.yaml#ADM-425
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -14811,6 +15088,8 @@ screens:
     - what: Only runGoLiveValidation.
       why: Applying defaults is a configuration write (setVenueSettingsDefaults, region settings).
       source: contracts/spine/tenancy.yaml#setVenueSettingsDefaults
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -15321,6 +15600,8 @@ screens:
     - what: Uses listRenewalAuto and setRenewalAutoMembership (guest membership operations).
       why: TICVAI customer renewal is a subscription matter.
       source: contracts/satellite/subscription.yaml#getSubscription
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 10 labels bound).
       why: >-
@@ -15679,6 +15960,8 @@ screens:
     - what: No operation is declared.
       why: A simulator needs a simulate operation.
       source: screens/P09-platform-admin-console.yaml#ADM-618
+      status: logged
+      by: CHG-WIR-024
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -15724,12 +16007,18 @@ screens:
         A door shows none of that; credit belongs to the partner's credit screen (and setting or overriding a limit
         is the tenant's act, not the partner's).
       source: screens/P10-partner-reseller-portal.yaml#PTR-001; contracts/spine/orders.yaml#overrideCreditLimit
+      status: fixed
+      by: CHG-WIR-021
     - what: Generated as listDetail with session, MFA and SSO tables.
       why: Rebuild as a sign-in form.
       source: screens/P10-partner-reseller-portal.yaml#PTR-001
+      status: fixed
+      by: CHG-WIR-021
     - what: LoginRequest.workstationId is required.
       why: A partner's browser has no workstation.
       source: contracts/spine/identity.yaml#/components/schemas/LoginRequest
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         Tables show every schema field, plumbing included: 'Every active session' drop sessionId, principalId, roleId,
         workstationId, venueId; 'Every MFA method' drop id; 'Every SSO provider' drop id, scopePath; 'Every partner
@@ -15739,6 +16028,8 @@ screens:
         venue name, role name) and keep raw ids for the detail panel's copy action. The package itself says narrowing
         the columns is still owed.
       source: screens/P10-partner-reseller-portal.yaml#PTR-001
+      status: fixed
+      by: CHG-WIR-021
   PTR-003:
     block: B
     summary: The partner company's own details and its users; a partner admin invites and deactivates colleagues.
@@ -15771,6 +16062,8 @@ screens:
     - what: Purpose "What we hold about staff".
       why: These are the partner's users.
       source: screens/P10-partner-reseller-portal.yaml#PTR-003
+      status: fixed
+      by: CHG-WIR-023
     - what: 'Tables show every schema field, plumbing included: ''Every principal'' drop id, primaryRoleId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -15797,6 +16090,8 @@ screens:
     - what: Purpose "for this venue".
       why: Quotes belong to the partner.
       source: screens/P10-partner-reseller-portal.yaml#PTR-011
+      status: fixed
+      by: CHG-WIR-023
     - what: formCreatePartnerQuote asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -15923,6 +16218,8 @@ screens:
     - what: Purpose "for this venue".
       why: Sub-agents belong to the partner.
       source: screens/P10-partner-reseller-portal.yaml#PTR-020
+      status: fixed
+      by: CHG-WIR-023
     - what: >-
         Tables show every schema field, plumbing included: 'Every delegated access' drop id, principalId, roleId,
         subjectId, overSubjectId, scopePath.
@@ -17187,18 +17484,22 @@ screens:
     - what: The screen calls scoreVsiAssessment.
       why: The welcome page scores nothing.
       source: screens/P17-ticvai-signup.yaml#SGN-001
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
       source: screens/P17-ticvai-signup.yaml#SGN-001; screens/_components.yaml#contentSpec.emptyStates
-    openQuestions:
+    decisions:
     - question: What session does a prospect have between "Start new setup" and activation (to save and continue)?
-      default: >-
-        A prospect sign-up session created by SGN-002 (email + one-time code); draw "Continue saved setup" as sign-in
-        with that code.
-      source: screens/P17-ticvai-signup.yaml#SGN-001
+      decision: 'Drawn default stands (answer: "Email + one-time code"): A prospect sign-up session created by SGN-002 (email
+        + one-time code); draw "Continue saved setup" as sign-in with that code.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-167 | CHG-NOTE-005
+      questionSource: screens/P17-ticvai-signup.yaml#SGN-001
   SGN-002:
     block: B
     summary: >-
@@ -17611,6 +17912,8 @@ screens:
     - what: setModuleListing (edits the module catalogue) is offered to the prospect.
       why: A prospect must not edit TICVAI's catalogue.
       source: contracts/satellite/subscription.yaml#setModuleListing
+      status: fixed
+      by: CHG-WIR-021
     - what: >-
         A sign-up screen calls operations a prospect cannot call: setModuleListing (staff), listModuleCatalogue
         (staff/guest).
@@ -17619,6 +17922,8 @@ screens:
         401/403 as drawn. Either the call moves behind the prospect's own sign-up session, or the operation needs
         a public/prospect audience.
       source: ADR-0025; contracts/satellite/subscription.yaml#setModuleListing
+      status: fixed
+      by: CHG-WIR-021
   SGN-017:
     block: B
     summary: Add capacity packs and options without moving tier.
@@ -17650,6 +17955,8 @@ screens:
     - what: setTrialConfiguration (TICVAI's trial settings) on the prospect's choice.
       why: The prospect chooses; TICVAI configures trials elsewhere.
       source: contracts/satellite/subscription.yaml#setTrialConfiguration
+      status: fixed
+      by: CHG-WIR-021
   SGN-019:
     block: B
     summary: Contract duration and billing cycle.

@@ -1,0 +1,447 @@
+id: CHG-NOTE-004
+date: '2026-10-02'
+source: audit
+kind: design-input
+summary: 'F&B and retail: the 109 open questions Chinmay decided on 2 October move to `decisions` (20 reviewable defaults);
+  39 rule edits where a decision changes the drawing; 135 corrections marked fixed, 0 logged and 0 withdrawn against the
+  change entries that acted on main.'
+decision:
+  what: Record each decided question of handoff/design-notes/fnb-retail.yaml as a decision on its screen (question, decision,
+    decidedBy Chinmay, date, the DEC ledger id and this entry; reviewable for a non-critical default), update the screen's
+    inputs, outputs, actions, edge cases and sample data where the decision changes what is drawn, and mark each correction
+    main has already acted on (status fixed / logged / withdrawn, by the change entry), so the open corrections are the
+    ones without a status.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay''s answers of 2 October to the open-questions workbook (Q28-Q76, Q171-Q206, Q284-Q307): batches 1-6, the
+  critical sets, and "show me only critical" for the non-critical defaults; the later rounds win (Door follow-ups, Pre-apply
+  round: roles as preset permission configurations, darkMode deprecated, Powered by as a toggle default on, closeShift
+  on POS-007 plus the daily reconciliation). The design notes still listed them as open, so a design session would draw
+  the old default. The corrections'' status was read from the screens on main after the wiring (CHG-WIR-001..027), guest
+  (CHG-GST-001..006), door (CHG-DOOR-001..006), finance (CHG-FIN-001..011) and loyalty (CHG-SEED-008) fixes.'
+keys_touched:
+  screens:
+  - BO-020
+  - BO-021
+  - BO-039
+  - BO-040
+  - BO-041
+  - BO-042
+  - BO-044
+  - BO-045
+  - BO-046
+  - BO-048
+  - BO-049
+  - BO-050
+  - BO-051
+  - BO-052
+  - BO-065
+  - BO-078
+  - BO-079
+  - BO-080
+  - BO-081
+  - BO-082
+  - BO-083
+  - BO-104
+  - BO-105
+  - BO-1065
+  - BO-109
+  - BO-110
+  - BO-111
+  - BO-112
+  - BO-113
+  - BO-114
+  - BO-134
+  - BO-135
+  - BO-136
+  - BO-137
+  - BO-138
+  - BO-139
+  - BO-140
+  - BO-142
+  - BO-452
+  - BO-499
+  - BO-502
+  - BO-503
+  - BO-504
+  - BO-505
+  - BO-510
+  - BO-513
+  - BO-533
+  - BO-539
+  - BO-542
+  - BO-729
+  - BO-730
+  - BO-731
+  - BO-733
+  - CMS-009
+  - EMP-003
+  - EMP-008
+  - EMP-009
+  - EMP-030
+  - EMP-052
+  - EMP-053
+  - EMP-054
+  - EMP-055
+  - EMP-056
+  - EMP-058
+  - EMP-060
+  - EMP-062
+  - EMP-063
+  - EMP-064
+  - EMP-065
+  - EMP-066
+  - EMP-067
+  - EMP-068
+  - EMP-071
+  - EMP-074
+  - EMP-078
+  - EMP-080
+  - EMP-088
+  - EMP-097
+  - EMP-098
+  - EMP-099
+  - EMP-100
+  - GST-024
+  - GST-062
+  - GST-070
+  - KIT-003
+  - KIT-004
+  - KIT-005
+  - KIT-006
+  - KIT-007
+  - KIT-008
+  - KIT-009
+  - KSK-016
+  - KSK-017
+  - POS-001
+  - POS-007
+  - POS-009
+  - POS-011
+  - POS-012
+  - POS-013
+  - POS-015
+  - POS-018
+  - POS-021
+  - POS-022
+  - POS-023
+  - POS-024
+  - POS-028
+  - WEB-036
+  - WEB-038
+  - WEB-042
+  files:
+  - handoff/design-notes/fnb-retail.yaml
+  - handoff/design-notes/README.md
+  - tools/check-design-notes.py
+  other:
+  - DEC-028
+  - DEC-029
+  - DEC-030
+  - DEC-031
+  - DEC-032
+  - DEC-033
+  - DEC-034
+  - DEC-035
+  - DEC-036
+  - DEC-037
+  - DEC-038
+  - DEC-039
+  - DEC-040
+  - DEC-041
+  - DEC-042
+  - DEC-043
+  - DEC-044
+  - DEC-045
+  - DEC-046
+  - DEC-047
+  - DEC-048
+  - DEC-049
+  - DEC-050
+  - DEC-051
+  - DEC-052
+  - DEC-053
+  - DEC-054
+  - DEC-055
+  - DEC-056
+  - DEC-057
+  - DEC-058
+  - DEC-059
+  - DEC-060
+  - DEC-061
+  - DEC-062
+  - DEC-063
+  - DEC-064
+  - DEC-065
+  - DEC-066
+  - DEC-067
+  - DEC-068
+  - DEC-069
+  - DEC-070
+  - DEC-071
+  - DEC-072
+  - DEC-073
+  - DEC-074
+  - DEC-075
+  - DEC-076
+  - DEC-171
+  - DEC-172
+  - DEC-173
+  - DEC-174
+  - DEC-175
+  - DEC-176
+  - DEC-177
+  - DEC-178
+  - DEC-179
+  - DEC-180
+  - DEC-181
+  - DEC-182
+  - DEC-183
+  - DEC-184
+  - DEC-185
+  - DEC-186
+  - DEC-187
+  - DEC-188
+  - DEC-189
+  - DEC-190
+  - DEC-191
+  - DEC-192
+  - DEC-193
+  - DEC-194
+  - DEC-195
+  - DEC-196
+  - DEC-197
+  - DEC-198
+  - DEC-199
+  - DEC-200
+  - DEC-201
+  - DEC-202
+  - DEC-203
+  - DEC-204
+  - DEC-205
+  - DEC-206
+  - DEC-284
+  - DEC-285
+  - DEC-286
+  - DEC-287
+  - DEC-288
+  - DEC-289
+  - DEC-290
+  - DEC-291
+  - DEC-292
+  - DEC-293
+  - DEC-294
+  - DEC-295
+  - DEC-296
+  - DEC-297
+  - DEC-298
+  - DEC-299
+  - DEC-300
+  - DEC-301
+  - DEC-302
+  - DEC-303
+  - DEC-304
+  - DEC-305
+  - DEC-306
+  - DEC-307
+root_class: A26 BUSINESS-RULES
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: 'check-design-notes now validates `decisions` (fields, date, a DEC id and an existing CHG id in source, questionSource
+  resolved, no question left in both lists) and correction `status`/`by` (fixed, logged or withdrawn, by an existing change
+  entry), and refuses any CHG id a source names that has no entry. Before this change the notes had no `decisions` key,
+  so nothing recorded that a question was answered.
+
+
+  Decisions by kind: {''default accepted'': 53, ''answered'': 35, ''already applied on main'': 1, ''default (non-critical,
+  reviewable)'': 20}.
+
+
+  Corrections by entry: CHG-FIN-003 4 fixed; CHG-GST-004 2 fixed; CHG-WIR-008 115 fixed; CHG-WIR-009 8 fixed; CHG-WIR-010
+  6 fixed. Corrections with no status (340) are still open.
+
+
+  Tickets: none started (Block A starts Monday 5 October 2026); the notes feed the design batches at the next refresh,
+  not ticket text.
+
+
+  Answers that change the drawn default:
+
+  - DEC-031 (Q31) BO-044: Outlet names: English, plus the local language where the country requires it.
+
+  - DEC-034 (Q34) BO-045: F&B prices are owned by F&B: the F&B service has its own catalogue table (prices migrated into
+  F&B so ticketing scales in isolation); an outlet may set its own price. The central catalogue prices tickets and single-price
+  booths. Fix the stale MenuItem text (''pricing and tax come from the catalogue variant''); withdraw the F&B notes''
+  correction asking to drop the menu''s own price; check BO-045 and the F&B screens read F&B''s catalogue.
+
+  - DEC-049 (Q49) CMS-009: Three navigation editors (header, footer, tab bar), each saved on its own. The DNS/custom-domain
+  and landing-page-template parts of this answer are separate decisions (see related).
+
+  - DEC-052 (Q52) GST-024: A guest F&B order keeps its own payment step and its own receipt (DI-293''s one receipt does
+  not apply to F&B).
+
+  - DEC-059 (Q59) POS-007: A cashier may sign out with the variance pending; the shift shows "Under review" on the cashier''s
+  view and never blocks the next cashier opening a shift on that till. A supervisor resolves it with closeShift on POS-007
+  (supervisor PIN, any till) or in the daily cash reconciliation, which lists every shift and resolves them one by one
+  (Pre-apply round, 2 October).
+
+  - DEC-060 (Q60) POS-007: Blind close: the cashier sees only that a variance was recorded; the supervisor sees the amount.
+  [already applied: CHG-FIN-003]
+
+  - DEC-061 (Q61) POS-011: Store credit is a gift card issued at the refund amount (the drawn default).
+
+  - DEC-064 (Q64) POS-021: Outlet setting ''Payment timing'': Pay first, or Send to kitchen first then pay. Refines R261
+  per outlet.
+
+  - DEC-067 (Q67) POS-024: ''Remove table'' marks the table Out of service (setTableLayout never deletes).
+
+  - DEC-068 (Q68) POS-028: Change covers and change server on the till in Block A (updateTableVisit, transferTableVisit);
+  table transfer to another table only after r2.
+
+  - DEC-070 (Q70) WEB-036: Outlet property: ''Inside the venue (needs an admission ticket)'' or ''Standalone (no ticket)''.
+  Inside-venue outlets need admission for guest ordering; a standalone restaurant sells takeaway/delivery without a ticket.
+
+  - DEC-071 (Q71) WEB-036: The guest F&B order keeps its own payment step and receipt; DI-293''s one cart/one receipt
+  does not apply to F&B.
+
+  - DEC-173 (Q173) BO-040: As POS-007: the cashier signs out, the shift is pending (''Under review'') and the next cashier
+  can start.
+
+  - DEC-175 (Q175) BO-040: A supervisor can reject a variance so the cashier recounts and resubmits (DI-804).
+
+  - DEC-176 (Q176) BO-040: Add a read for the closing count lines (denomination breakdown) for review.
+
+  - DEC-178 (Q178) BO-042: The cashier signs as witness with a PIN on the same device (step-up).
+
+  - DEC-179 (Q179) BO-042: Drawer limit setting: the till warns when the drawer is over the limit and offers a cash lift.
+
+  - DEC-181 (Q181) BO-104: The F&B hub shows F&B takings; admissions are dropped from it.
+
+  - DEC-183 (Q183) BO-109: Till layout per outlet, with a till override (Workstation.saleBoard).
+
+  - DEC-185 (Q185) BO-112: Prep sheets print from a print template, to kitchen printers and the browser.
+
+  - DEC-187 (Q187) BO-134: Kitchen printers are in release 1.
+
+  - DEC-188 (Q188) BO-134: One kitchen serves several outlets through a producing outlet (one kitchen outlet produces
+  for several).
+
+  - DEC-189 (Q189) BO-135: Kitchen routing: item routing plus category rules plus a fallback station (DI-323).
+
+  - DEC-192 (Q192) BO-139: A waste-approval policy the venue can switch on or off; when on, value bands and a photo above
+  a value.
+
+  - DEC-194 (Q194) BO-140: Daily counts (''6 left'') on menu items; an item goes sold out automatically at zero.
+
+  - DEC-195 (Q195) BO-142: A discount or price-override limit is a percentage or an amount, chosen per limit by the venue.
+
+  - DEC-196 (Q196) BO-729: Outlet type and department are fields on the outlet (DI-319).
+
+  - DEC-197 (Q197) BO-731: A late-night window is one window past midnight, marked ''ends next day''.
+
+  - DEC-199 (Q199) EMP-008: A server without a till gets a service summary: covers, tables, sales, tips.
+
+  - DEC-200 (Q200) EMP-009: No cash on handhelds: a server''s handheld takes no cash payment; cash goes to a till. The
+  server''s End shift has no cash count.
+
+  - DEC-202 (Q202) EMP-052: A table shows Reserved when the booking names it, or N minutes (venue-set) before a pre-allocated
+  booking.
+
+  - DEC-204 (Q204) EMP-055: Seating preference and occasion are fields on a table booking.
+
+  - DEC-205 (Q205) EMP-060: Turn time, no-show rate, covers and wait accuracy, all from reporting.
+
+  - DEC-206 (Q206) KSK-016: Kiosks inside the venue need admission for F&B; F&B keeps its own receipt (from WEB-036).
+
+  - DEC-304 (Q304) EMP-078: Rental card hold: pre-authorisation on the payment terminal; the reference is stored on the
+  booking; check-out is blocked until it succeeds.
+
+  - DEC-307 (Q307) EMP-098: Usage beyond the paid time is charged at the normal rate (DI-499).
+
+
+  Rule edits:
+
+  - BO-044 patch inputs (DEC-031)
+
+  - BO-045 add outputs (DEC-034)
+
+  - GST-024 add outputs (DEC-052)
+
+  - POS-007 patch outputs (DEC-059)
+
+  - POS-007 add edgeCases (DEC-059)
+
+  - POS-007 patch inputs (DEC-174)
+
+  - POS-007 sample (DEC-059)
+
+  - POS-021 add inputs (DEC-064)
+
+  - POS-021 patch actions (DEC-064)
+
+  - WEB-036 add inputs (DEC-070)
+
+  - WEB-036 add outputs (DEC-071)
+
+  - WEB-036 patch inputs (DEC-072)
+
+  - BO-040 patch edgeCases (DEC-173)
+
+  - BO-040 patch outputs (DEC-174)
+
+  - BO-040 add edgeCases (DEC-175)
+
+  - BO-040 add outputs (DEC-176)
+
+  - BO-042 patch inputs (DEC-178)
+
+  - BO-042 add outputs (DEC-179)
+
+  - BO-104 patch outputs (DEC-181)
+
+  - BO-104 sample (DEC-181)
+
+  - BO-109 add inputs (DEC-183)
+
+  - BO-112 patch outputs (DEC-185)
+
+  - BO-134 add inputs (DEC-187)
+
+  - BO-134 patch inputs (DEC-188)
+
+  - BO-135 patch inputs (DEC-189)
+
+  - BO-135 add inputs (DEC-189)
+
+  - BO-139 patch edgeCases (DEC-192)
+
+  - BO-140 add outputs (DEC-194)
+
+  - BO-142 patch inputs (DEC-195)
+
+  - BO-729 patch inputs (DEC-196)
+
+  - BO-731 patch inputs (DEC-197)
+
+  - EMP-008 add outputs (DEC-199)
+
+  - EMP-009 add edgeCases (DEC-200)
+
+  - EMP-052 patch edgeCases (DEC-202)
+
+  - EMP-055 add inputs (DEC-204)
+
+  - EMP-060 add outputs (DEC-205)
+
+  - KSK-016 add edgeCases (DEC-206)
+
+  - EMP-098 add outputs (DEC-307)
+
+  - BO-044 patch edgeCases (open-question pointer rewritten from the decision on the screen)'

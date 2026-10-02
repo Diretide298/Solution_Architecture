@@ -369,18 +369,23 @@ screens:
         The reason is set by what happened (guestRequested when the guest presses the button; assistantFailed, outOfScope,
         negativeSentiment by the platform) and the summary is Sahli's own. The guest presses one button.
       source: contracts/satellite/marketing-crm.yaml#handoverToAgent
-    openQuestions:
-    - question: >-
-        DI-195 deferred the concierge chat design to "a dedicated AI workshop" (third-party LLM with PII masking, token billing).
-        The AI sessions of 18 and 21 September settled masking and providers; billing for a client-chosen provider is still
-        deferred (AI-D20). Can DI-195 be closed?
-      default: Draw the concierge as above; billing has no guest-visible effect.
-      source: DI-195 | MoM 30 Sep 4.1 (AI-D20) | MoM 30 Sep 4.1
+    decisions:
+    - question: DI-195 deferred the concierge chat design to "a dedicated AI workshop" (third-party LLM with PII masking,
+        token billing). The AI sessions of 18 and 21 September settled masking and providers; billing for a client-chosen
+        provider is still deferred (AI-D20). Can DI-195 be closed?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw the concierge as above; billing has
+        no guest-visible effect.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-016 | CHG-NOTE-001
+      questionSource: DI-195 | MoM 30 Sep 4.1 (AI-D20) | MoM 30 Sep 4.1
     - question: Does Sahli remember earlier conversations for a signed-in guest across web and app, or only within a visit?
-      default: >-
-        Signed-in guests see their own history on both surfaces (listAiConversations); anonymous visitors see only the current
-        conversation.
-      source: contracts/satellite/ai.yaml#listAiConversations
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Signed-in guests see their own history on
+        both surfaces (listAiConversations); anonymous visitors see only the current conversation.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-017 | CHG-NOTE-001
+      questionSource: contracts/satellite/ai.yaml#listAiConversations
   GST-031:
     block: A
     summary: >-
@@ -481,10 +486,14 @@ screens:
         GST-031 is the guest app; the cold entry is a guest opening a notification about their own conversation (e.g. an agent
         replied).
       source: screens/P02-guest-mobile-app.yaml#GST-031
-    openQuestions:
+    decisions:
     - question: Is Sahli a tab of the app's bottom bar, or reached from home and the floating button only?
-      default: Floating button on every screen plus an entry on home, as the web prototype; no dedicated tab.
-      source: DI-1069 | screens/P01-guest-web-storefront.yaml#WEB-044 (wireframe.prototype.view)
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Floating button on every screen plus an
+        entry on home, as the web prototype; no dedicated tab.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-011 | CHG-NOTE-001
+      questionSource: DI-1069 | screens/P01-guest-web-storefront.yaml#WEB-044 (wireframe.prototype.view)
   GST-033:
     block: A
     summary: >-
@@ -565,10 +574,14 @@ screens:
         a drawn screen), marked client-verified.
       why: There is no client-drawn layout for this screen; it should be treated as designed, not verified.
       source: screens/P02-guest-mobile-app.yaml#GST-033 (wireframe)
-    openQuestions:
+    decisions:
     - question: On which screens does contextual help appear (product detail, cart, booking detail, ride detail)?
-      default: Product/attraction detail, cart and booking detail, as a small "Ask Sahli about this" link.
-      source: designer default
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Product/attraction detail, cart and booking
+        detail, as a small "Ask Sahli about this" link.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-012 | CHG-NOTE-001
+      questionSource: designer default
   GST-048:
     block: A
     summary: >-
@@ -668,6 +681,8 @@ screens:
         A guest holds no permission (ADR-0025); WEB-008 already says so. With nothing to offer, the step is skipped, not shown
         empty.
       source: screens/P01-guest-web-storefront.yaml#WEB-008 (states.emptyNoAccess) | DI-428
+      status: fixed
+      by: CHG-GST-004
     - what: emptyFirstRun "No upsell cross-sell yet. Offers Add cart line".
       why: There is nothing to add when there are no offers; the step is skipped.
       source: DI-428
@@ -676,10 +691,14 @@ screens:
         The client set at most three recommendations at checkout; the Extras placements should request maxItems 3 (or the
         default follow the placement strategy's limit of 3).
       source: DI-959 | contracts/satellite/ai.yaml#decideRecommendations
-    openQuestions:
+    decisions:
     - question: Does the Extras step show only add-ons and upgrades, or also cross-venue offers (another park in the tenant)?
-      default: Only offers for the venue and date in the cart; no partner or OTA offers in release 1 (AI-D08).
-      source: ADR-0052 (AI-D08) | ADR-0051 (AI functions review 30 Sep §7)
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Only offers for the venue and date in the
+        cart; no partner or OTA offers in release 1 (AI-D08).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-013 | CHG-NOTE-001
+      questionSource: ADR-0052 (AI-D08) | ADR-0051 (AI functions review 30 Sep §7)
   WEB-008:
     block: A
     summary: >-
@@ -764,12 +783,15 @@ screens:
     - what: The WEB-008 to WEB-016 transition (sign-in after add-ons) is missing from navigation.
       why: The prototype and REV3-3 put sign-in on leaving this step.
       source: screens/P01-guest-web-storefront.yaml#WEB-008 (wireframe.prototype.differences) | DI-1043
-    openQuestions:
-    - question: >-
-        Is the swim-vest add-on offered here for non-swimmers (Help me choose answer), and is the splash-and-river pass a
-        separate product?
-      default: The vest is an add-on on this step; the splash-and-river pass is its own product (as built).
-      source: DI-1118
+    decisions:
+    - question: Is the swim-vest add-on offered here for non-swimmers (Help me choose answer), and is the splash-and-river
+        pass a separate product?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): The vest is an add-on on this step; the
+        splash-and-river pass is its own product (as built).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-015 | CHG-NOTE-001
+      questionSource: DI-1118
   GST-054:
     block: A
     summary: >-
@@ -859,11 +881,14 @@ screens:
         Make sure the plan operations return shops and kiosks as points; the screen draws them as plan items with their own
         icon.
       source: TRACKER Tracker row 13 | MoM 30 Sep 4.7
-    openQuestions:
+    decisions:
     - question: Does each applied AI change show what it cost or saves (e.g. a fast pass it added)?
-      default: >-
-        An item that costs money shows its price on the proposal and is added to the cart only when the guest books the plan.
-      source: DI-1021 | screens/P02-guest-mobile-app.yaml#GST-054 (bookVisitPlan requiresGuestConfirmation)
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): An item that costs money shows its price
+        on the proposal and is added to the cart only when the guest books the plan.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-014 | CHG-NOTE-001
+      questionSource: DI-1021 | screens/P02-guest-mobile-app.yaml#GST-054 (bookVisitPlan requiresGuestConfirmation)
   BO-091:
     block: A
     summary: >-
@@ -921,6 +946,10 @@ screens:
     - element: bring your own key
       rule: Read-only line saying whether this tenant may use its own provider key (decided by TICVAI per tenant).
       source: contracts/satellite/ai.yaml#getAiByokEnablement | MoM 21 Sep 4.10 (AI-D14)
+    - element: Ceiling currency
+      rule: The ceiling is shown and set in the tenant's selected currency (USD unless the tenant picks another, e.g. AED),
+        with the token count beside it as the second figure.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-001)
     actions:
     - action: Save AI policy
       result: >-
@@ -1006,6 +1035,8 @@ screens:
     - what: getAiByokEnablement is not declared, though its description says BO-091 reads it.
       why: Declare it so the screen can say whether the venue may bring its own key.
       source: contracts/satellite/ai.yaml#getAiByokEnablement
+      status: fixed
+      by: CHG-WIR-012
     - what: >-
         The form exposes engine tuning (retrieveTopK, rerankTopK, semanticCacheThreshold, negativeCacheTtlSeconds, chunking,
         quantisation, hnsw, cascade).
@@ -1013,10 +1044,13 @@ screens:
         These are platform tuning, not venue manager decisions; hide them behind an Advanced section visible to TICVAI staff
         only, or leave them to the console.
       source: contracts/satellite/ai.yaml#setAiPolicy | designer default
-    openQuestions:
+    decisions:
     - question: Is the ceiling expressed to the venue in AED or in tokens?
-      default: AED (cost per row is Money); tokens shown as a secondary figure.
-      source: contracts/satellite/ai.yaml#getAiUsage (rows.cost) | ADR-0020 (AI-D02)
+      decision: The AI spend ceiling is shown and set in the tenant's selected currency (default USD), with tokens shown alongside.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-008 | CHG-NOTE-001
+      questionSource: contracts/satellite/ai.yaml#getAiUsage (rows.cost) | ADR-0020 (AI-D02)
   BO-919:
     block: A
     summary: >-
@@ -1048,6 +1082,11 @@ screens:
     - element: scenario result
       rule: The scenario's figures beside the base version's, clearly labelled "What-if", with the changes listed.
       source: contracts/satellite/ai.yaml#createForecastScenario
+    - element: Requirement kinds covered
+      rule: Every requirement kind (staff, pos, kiosk, gates, fnb, retail, stock, resource, equipment, facility), filtered
+        to what the venue has configured. The model behind each task comes from TICVAI's curated range (the best-suited model
+        plus 3-4 alternatives).
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-001)
     actions:
     - action: Run what-if
       result: Creates the scenario and shows its requirements next to the base; nothing is allocated.
@@ -1106,12 +1145,15 @@ screens:
         Superseded by plan decision 10 and ADR-0051 (baseline first, from day one). Mark DI-280 superseded so it stops reaching
         the bundle.
       source: DI-280 | ADR-0051 | ADR-0051 (AI-D17)
-    openQuestions:
+    decisions:
     - question: Which resource types does the event forecast cover in release 1 (staff, gates, F&B tills, rentable equipment)?
-      default: >-
-        The requirement kinds of AiOperationalRequirement (staff, pos, kiosk, gates, fnb, retail, stock, resource, equipment,
-        facility), filtered to those the venue has configured.
-      source: contracts/satellite/ai.yaml#/components/schemas/AiOperationalRequirement
+      decision: 'The event forecast covers every requirement kind (staff, pos, kiosk, gates, fnb, retail, stock, resource,
+        equipment, facility), filtered to what the venue configured. Action: a curated model per AI/ML task with 3-4 alternatives
+        (done as research; see the curated-range decision).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-009 | CHG-NOTE-001
+      questionSource: contracts/satellite/ai.yaml#/components/schemas/AiOperationalRequirement
   BO-927:
     block: A
     summary: >-
@@ -1215,11 +1257,15 @@ screens:
         Bind the table to listOperationalRequirements, the buttons to decideOperationalRequirement, and move standards to
         the venue AI profile (setAiVenueSettings).
       source: screens/P08-venue-back-office.yaml#BO-927 | contracts/satellite/ai.yaml#setAiVenueSettings
-    openQuestions:
-    - question: >-
-        Does an accepted requirement create draft shifts in Workforce, or only a coverage target the rota manager works to?
-      default: A coverage target (recommendation) shown on the rota; shifts are created by a person in Workforce.
-      source: contracts/satellite/ai.yaml#decideOperationalRequirement ("a person applies it there")
+    decisions:
+    - question: Does an accepted requirement create draft shifts in Workforce, or only a coverage target the rota manager
+        works to?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): A coverage target (recommendation) shown
+        on the rota; shifts are created by a person in Workforce.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-010 | CHG-NOTE-001
+      questionSource: contracts/satellite/ai.yaml#decideOperationalRequirement ("a person applies it there")
   ADM-037:
     block: A
     summary: >-
@@ -1254,10 +1300,12 @@ screens:
         instead of failing".
       source: contracts/satellite/ai.yaml#setAiProvider | DI-971
     - field: BYOK enablement
-      rule: >-
-        Platform-only switch (PLATFORM_AI_MANAGE and an open grant): enabled, per task or all tasks, allowed tasks, reason.
-        Shows managedBy (TICVAI / tenant) on each provider row.
-      source: contracts/satellite/ai.yaml#setAiByokEnablement | MoM 21 Sep 4.10 (AI-D14)
+      rule: 'Platform-only switch (PLATFORM_AI_MANAGE and an open grant): enabled, per task or all tasks, allowed tasks, reason.
+        Shows managedBy (TICVAI / tenant) on each provider row. With BYOK the engine maps each AI task to that provider''s
+        equivalent model from TICVAI''s curated range (tiers per task, not model names), and the usage is billed to the client''s
+        own key; there is no billing choice on this screen.'
+      source: contracts/satellite/ai.yaml#setAiByokEnablement | MoM 21 Sep 4.10 (AI-D14) | decided 2 October 2026 by Chinmay
+        (CHG-NOTE-001)
     outputs:
     - element: providers table
       rule: >-
@@ -1265,10 +1313,11 @@ screens:
         14 days; the 14-day threshold is a designer default), last verified, managed by. Expired or never-verified rows flagged.
       source: contracts/satellite/ai.yaml#listAiProviders | designer default
     - element: model fit
-      rule: >-
-        Per task a fitness band; warnings "Underpowered for configuration assistant", "Overpowered (cost) for FAQ answers",
-        "Not scored" shown as amber notes after save; they never block the choice.
-      source: MoM 21 Sep 4.10 (AI-D18) | DI-967 | DI-971 | contracts/satellite/ai.yaml#setAiProvider
+      rule: 'Per task the model is TICVAI''s curated choice. A client cannot change the model per agent: a model outside the
+        curated map for that task is refused (modelNotCurated) with the error on the model field, so no "warns, never blocks"
+        notes are drawn. The fitness band stays as information beside the curated choice.'
+      source: MoM 21 Sep 4.10 (AI-D18) | DI-967 | DI-971 | contracts/satellite/ai.yaml#setAiProvider | decided 2 October 2026
+        by Chinmay (CHG-NOTE-001)
     actions:
     - action: Test AI provider
       result: >-
@@ -1292,6 +1341,10 @@ screens:
     - case: Every provider fails at runtime
       expected: Not this screen's state, but the provider rows show the last failed verification so the cause is findable.
       source: contracts/satellite/ai.yaml#sendAiMessage (503)
+    - case: A model outside the curated map for the task
+      expected: Refused (modelNotCurated); the model field lists the curated choices for that task. AI-D18's "warns, never
+        blocks" no longer applies.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-001)
     consistency:
     - with: BO-091
       note: The venue sees the provider serving it and whether BYOK is allowed, read-only.
@@ -1343,15 +1396,23 @@ screens:
     - what: emptyFirstRun says "Offers no create action - this screen declares no operation that makes one".
       why: setAiProvider creates a provider (id optional); the first-run state should offer Add provider.
       source: contracts/satellite/ai.yaml#setAiProvider
-    openQuestions:
+    decisions:
     - question: Who pays when a client picks its own provider or a costlier model?
-      default: >-
-        Deferred to the AI workshop (AI-D20); until then managed Azure OpenAI in UAE North, re-billed per token, is the default
-        and the screen shows no billing choice.
-      source: MoM 30 Sep 4.1 (AI-D20) | ADR-0020 (AI-D02) | ADR-0020 (AI-D03) | MoM 30 Sep 4.1
+      decision: 'With BYOK, the AI engine maps each AI task to the client provider''s equivalent model from TICVAI''s curated
+        range (tiers, not model names: research section 2.3); usage is billed to the client''s own key. Closes AI-D20 (deferred
+        to the AI workshop).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-001 | CHG-NOTE-001
+      questionSource: MoM 30 Sep 4.1 (AI-D20) | ADR-0020 (AI-D02) | ADR-0020 (AI-D03) | MoM 30 Sep 4.1
     - question: How much may a client change the pre-selected model per agent itself?
-      default: Only through BYOK where TICVAI enabled it; every change logged.
-      source: DI-967 | MoM 21 Sep §6
+      decision: A client cannot change the model per agent. TICVAI curates the model for each task; setAiProvider/setAiModel
+        refuse a model outside the curated map for that task (new problem type, e.g. modelNotCurated). Overturns AI-D18's
+        'warns, never blocks'.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-002 | CHG-NOTE-001
+      questionSource: DI-967 | MoM 21 Sep §6
   ADM-508:
     block: A
     summary: >-
@@ -1389,6 +1450,10 @@ screens:
         A line of actuals over the published forecast's range band (P10-P90) and most-likely line, so misses are visible as
         points outside the band.
       source: contracts/satellite/ai.yaml#getForecast | designer default
+    - element: Who may approve publication
+      rule: Whoever holds that module's AI publish permission (the per-module "Publish AI model" check in the role builder;
+        roles are preset permission configurations, never fixed default roles). TICVAI staff only through a grant.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-001)
     actions:
     - action: Publish
       result: >-
@@ -1446,6 +1511,8 @@ screens:
     - what: purpose ends mid-sentence ("Forecast vs Actual Example:").
       why: Truncated from the board.
       source: screens/P09-platform-admin-console.yaml#ADM-508
+      status: fixed
+      by: CHG-WIR-013
     - what: In Block A only runForecast and publishForecastVersion are in the slice.
       why: >-
         A version cannot be published from a screen that cannot list versions or show their gates; add listForecastVersions
@@ -1457,10 +1524,14 @@ screens:
         Forecasting is an AI capability (requiresModule ai, family forecasting); a tenant with analytics but no AI would see
         a screen with nothing behind it.
       source: contracts/satellite/ai.yaml#/components/schemas/AiPolicy (enabledCapabilities forecasting)
-    openQuestions:
+    decisions:
     - question: Who approves forecast publication at a tenant - the console operator or the venue's own analyst?
-      default: A tenant user with AI_APPROVE (the operation's permission); TICVAI staff only through a grant.
-      source: contracts/satellite/ai.yaml#publishForecastVersion
+      decision: Forecast publication is approved by whoever holds that module's AI publish permission; no default role. Uses
+        the per-module permission checklist with presets (see the ADM-554 decision).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-003 | CHG-NOTE-001
+      questionSource: contracts/satellite/ai.yaml#publishForecastVersion
   ADM-520:
     block: A
     summary: >-
@@ -1560,13 +1631,15 @@ screens:
         screen, or these screens belong to the tenant's own administrators.
       source: >-
         screens/P09-platform-admin-console.yaml#ADM-037 (notes, R098) | contracts/satellite/ai.yaml#listAiCapabilities (scopePath)
-    openQuestions:
-    - question: >-
-        Who runs the governance boards day to day - TICVAI staff on the console, or the tenant's own AI governance lead?
-      default: >-
-        TICVAI staff through a grant for the first release; the open item on central versus per-module placement (MoM 18 Sep
-        §6) stays with Chinmay's team.
-      source: MoM 18 Sep 4.4 and §6 | TRACKER Actions row 316
+    decisions:
+    - question: Who runs the governance boards day to day - TICVAI staff on the console, or the tenant's own AI governance
+        lead?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): TICVAI staff through a grant for the first
+        release; the open item on central versus per-module placement (MoM 18 Sep §6) stays with Chinmay''s team.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-004 | CHG-NOTE-001
+      questionSource: MoM 18 Sep 4.4 and §6 | TRACKER Actions row 316
   ADM-523:
     block: A
     summary: >-
@@ -1665,15 +1738,20 @@ screens:
       why: >-
         Tools are platform facts replicated read-only into tenants; the tenant board should only read them (listAiTools).
       source: contracts/satellite/ai.yaml#setAiTool
+      status: fixed
+      by: CHG-WIR-012
     - what: In Block A only createAiGovernancePolicyDraft is in the slice.
       why: A saved draft cannot be found again without listAiGovernancePolicyVersions; add it to the slice.
       source: >-
         ADR-0059 (Block A slice: tasks.csv (APP-SETUP-ADM-523)) | ADR-0059 (Block A slice: handoff/delivery-slice.json)
-    openQuestions:
-    - question: >-
-        Are the action verbs the client's ten, or the five the minutes name (read, recommend, prepare, modify, execute)?
-      default: The contract's ten, grouped into the minutes' five headings.
-      source: MoM 18 Sep 4.1 | contracts/satellite/ai.yaml#/components/schemas/AiGovernanceRule
+    decisions:
+    - question: Are the action verbs the client's ten, or the five the minutes name (read, recommend, prepare, modify, execute)?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): The contract''s ten, grouped into the minutes''
+        five headings.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-005 | CHG-NOTE-001
+      questionSource: MoM 18 Sep 4.1 | contracts/satellite/ai.yaml#/components/schemas/AiGovernanceRule
   ADM-526:
     block: A
     summary: >-
@@ -1748,10 +1826,14 @@ screens:
         from getEffectiveAiPolicy.exceptions per capability.
       source: >-
         screens/P09-platform-admin-console.yaml#ADM-526 | contracts/satellite/ai.yaml#/components/schemas/AiEffectivePolicy
-    openQuestions:
+    decisions:
     - question: Maximum length of an exception?
-      default: No cap in the contract; the form suggests 30 days and warns beyond 90.
-      source: designer default
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): No cap in the contract; the form suggests
+        30 days and warns beyond 90.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-006 | CHG-NOTE-001
+      questionSource: designer default
   ADM-527:
     block: A
     summary: >-
@@ -1822,6 +1904,8 @@ screens:
       why: >-
         Move the example to sample data; bind the results to the simulation response and the version picker to listAiGovernancePolicyVersions.
       source: screens/P09-platform-admin-console.yaml#ADM-527
+      status: fixed
+      by: CHG-WIR-013
     - what: In Block A only simulateAiGovernancePolicy is in the slice.
       why: A draft has to be chosen from a list; add listAiGovernancePolicyVersions to the Block A slice.
       source: >-
@@ -2011,10 +2095,10 @@ screens:
       source: contracts/satellite/ai.yaml#listAiTrainingRuns
     actions:
     - action: Promote
-      result: >-
-        Moves one stage and resolves the promotionReady alert; AI_APPROVE (tenant) or PLATFORM_AI_MANAGE (platform release);
-        refused to service callers.
-      source: contracts/satellite/ai.yaml#promoteAiRelease | ADR-0051 (AI-D16)
+      result: Moves one stage and resolves the promotionReady alert; the holder of that module's "Publish AI model" permission
+        for a tenant release (chosen on the per-module checklist; roles are preset, editable permission configurations) or
+        PLATFORM_AI_MANAGE for a platform release; refused to service callers.
+      source: contracts/satellite/ai.yaml#promoteAiRelease | ADR-0051 (AI-D16) | decided 2 October 2026 by Chinmay (CHG-NOTE-001)
     - action: Roll back
       result: Pointer switch back; immediate; recorded.
       source: contracts/satellite/ai.yaml#rollbackAiRelease
@@ -2057,10 +2141,16 @@ screens:
     - what: Layout has an unbound table, an unlabelled primary button and a publishGate with no operation.
       why: Bind the table to releases/evaluations and the buttons to promote and roll back.
       source: screens/P09-platform-admin-console.yaml#ADM-554
-    openQuestions:
+    decisions:
     - question: Is promotion a tenant decision (tenant admin with AI_APPROVE) or TICVAI's?
-      default: The tenant's admin for a tenant release; TICVAI for a platform release (as the operation's permissions say).
-      source: contracts/satellite/ai.yaml#promoteAiRelease | ADR-0051 (AI-D16)
+      decision: 'Role builder: roles are preset permission configurations (All, Viewer, Mid-level and the like), not fixed
+        default roles. Picking a preset fills the per-module permission checklist, which stays editable, and the role can
+        be renamed. Each module carries its own "Publish AI model" permission; AI release promotion goes to whoever holds
+        it (Pre-apply round, 2 October).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-007 | CHG-NOTE-001
+      questionSource: contracts/satellite/ai.yaml#promoteAiRelease | ADR-0051 (AI-D16)
   ADM-556:
     block: A
     summary: >-
@@ -2143,6 +2233,8 @@ screens:
         takes only rootCause and remediation.
       why: Either extend closeAiIncident/AiIncident with these fields or drop them from the form.
       source: contracts/satellite/ai.yaml#closeAiIncident | screens/P09-platform-admin-console.yaml#ADM-556
+      status: logged
+      by: CHG-WIR-014
   ANL-019:
     block: A
     summary: >-
@@ -2235,6 +2327,8 @@ screens:
         ai.listAiInsights (kind anomaly) the one list. Drop listAnalyticsAnomalies here or define which wins.
       source: >-
         contracts/satellite/ai.yaml#listAiInsights | contracts/satellite/reporting.yaml#listAnalyticsAnomalies | ADR-0053
+      status: fixed
+      by: CHG-WIR-012
     - what: AiMetricChangeExplanation carries no query or semantic spec.
       why: >-
         ADR-0054 says the answer shows the query it ran; NaturalLanguageAnswer has semanticSpec and generatedQuery, explainMetricChange
@@ -2302,6 +2396,8 @@ screens:
     - what: emptyNoAccess names PRODUCT_VIEW; emptyFirstRun says "Offers no create action".
       why: A guest holds no permission; the first-run state of a kiosk assistant is its greeting with starter chips.
       source: ADR-0025
+      status: fixed
+      by: CHG-GST-004
     - what: createAiConversation is not declared though sendAiMessage needs a conversation.
       why: Declare it (opened silently on the first tap).
       source: contracts/satellite/ai.yaml#createAiConversation
@@ -2358,6 +2454,8 @@ screens:
     - what: purpose "The tab that is already in the shell."
       why: Not a purpose; it is "Ask and be answered within your role, with the source".
       source: DI-964
+      status: fixed
+      by: CHG-WIR-013
   EMP-020:
     block: later
     summary: >-
@@ -2408,6 +2506,8 @@ screens:
         AI-D13 - knowledge from the vector store, numbers from the semantic layer. Declare askReportingQuestion for numeric
         questions, or say how sendAiMessage routes to it.
       source: ADR-0054 | contracts/satellite/reporting.yaml#askReportingQuestion
+      status: fixed
+      by: CHG-WIR-012
   EMP-040:
     block: later
     summary: >-
@@ -2503,6 +2603,8 @@ screens:
         Agents search content; collection engineering belongs to knowledge administration. Declare semanticSearch for the
         agent's search.
       source: contracts/satellite/ai.yaml#listKnowledgeCollections | contracts/satellite/ai.yaml#semanticSearch
+      status: fixed
+      by: CHG-WIR-012
     - what: entry params bannerId, pageId, policyKind, version.
       why: Left over from the white-label bulk attach; a knowledge search takes a query.
       source: screens/P12-support-agent-console.yaml#SUP-006 (notes)
@@ -2544,6 +2646,8 @@ screens:
     - what: purpose is a pasted board description; layout is a "Review → Execute" button and Cancel.
       why: Bind the form to setCustomerServiceCopilot and the profile list to listAssistantProfiles.
       source: screens/P12-support-agent-console.yaml#SUP-018
+      status: fixed
+      by: CHG-WIR-013
     - what: requiresModule marketing.
       why: The copilot is an AI capability; it needs the AI module as well.
       source: contracts/satellite/ai.yaml#configureAssistantProfile
@@ -2662,6 +2766,8 @@ screens:
     - what: Declares listAnalyticsAnomalies and listAiInsights.
       why: Same duplication as ANL-019; one list.
       source: contracts/satellite/ai.yaml#listAiInsights
+      status: fixed
+      by: CHG-WIR-012
   ANL-059:
     block: later
     summary: >-
@@ -2692,6 +2798,8 @@ screens:
     - what: No operation returns who asked, what was accessed or whether it was exported.
       why: Those live in decision records and interactions (searchAiDecisions, listAiInteractions); declare them.
       source: contracts/satellite/ai.yaml#searchAiDecisions | contracts/satellite/ai.yaml#listAiInteractions
+      status: fixed
+      by: CHG-WIR-012
   ANL-060:
     block: later
     summary: >-
@@ -2732,6 +2840,8 @@ screens:
     - what: publishPromptTemplate (AI_APPROVE) on a venue analytics screen.
       why: Prompt publication is model governance (ADM-037 / console); here read-only.
       source: contracts/satellite/ai.yaml#publishPromptTemplate
+      status: fixed
+      by: CHG-WIR-012
   ANL-071:
     block: later
     summary: >-
@@ -3121,9 +3231,13 @@ screens:
         in purpose.
       why: Never a bare percentage (ADR-0051, design 5.6); show the range by horizon and measured accuracy instead.
       source: ADR-0051 | screens/P09-platform-admin-console.yaml#ADM-506
+      status: fixed
+      by: CHG-WIR-013
     - what: The board example is pasted into purpose.
       why: Move it to sample data.
       source: screens/P09-platform-admin-console.yaml#ADM-506
+      status: fixed
+      by: CHG-WIR-013
   ADM-507:
     block: later
     summary: >-
@@ -3575,6 +3689,8 @@ screens:
     - what: purpose is a pasted board text describing the Employee App workspace.
       why: The mobile part belongs to the Staff App; this screen is the back-office copilot.
       source: screens/P08-venue-back-office.yaml#BO-932
+      status: fixed
+      by: CHG-WIR-013
     - what: Conversation history shown as a table.
       why: Own conversations as a list, as on the other assistants.
       source: contracts/satellite/ai.yaml#listAiConversations
@@ -3705,6 +3821,8 @@ screens:
     - what: setAiVenueSettings is not declared though this is where the profile is collected.
       why: The AI review names the configuration assistant as the place to collect the venue AI profile; declare it.
       source: contracts/satellite/ai.yaml#getAiVenueSettings ("or by the configuration assistant in conversation")
+      status: fixed
+      by: CHG-WIR-012
   ADM-472:
     block: later
     summary: >-
@@ -4000,6 +4118,8 @@ screens:
         The assistant only drafts (ADR-0020); pricing is written by the plan's executor after approval, through the owning
         API. Remove the direct write from this screen.
       source: ADR-0020 | contracts/satellite/ai.yaml#/components/schemas/AiActionPlan
+      status: fixed
+      by: CHG-WIR-012
     - what: Table columns are board values ("AED 120", "AED 20", "Adult / Saturday / B2C").
       why: Sample values, not columns.
       source: screens/P09-platform-admin-console.yaml#ADM-483
@@ -4179,6 +4299,8 @@ screens:
     - what: Columns are a board row ("Family Package", "Rejected", "Administrator").
       why: Values, not columns; and purpose is cut mid-sentence ("so the administrator understands what").
       source: screens/P09-platform-admin-console.yaml#ADM-491
+      status: fixed
+      by: CHG-WIR-013
   ADM-492:
     block: later
     summary: >-
@@ -4213,6 +4335,8 @@ screens:
         Designing a workflow is not approving this plan; approval is decideProposedAction (or the central approval engine).
         Remove approveWorkflow here.
       source: contracts/spine/catalogue.yaml#approveWorkflow | contracts/satellite/ai.yaml#decideProposedAction
+      status: fixed
+      by: CHG-WIR-012
     - what: No AI-generated summary for the approver.
       why: The approval engine requirement asks for an AI-generated summary on approval screens.
       source: TRACKER Actions row 76
@@ -4415,6 +4539,8 @@ screens:
     - what: Only generateConfiguration and getActionPlan are declared - no decide or execute operation.
       why: Approval needs decideProposedAction (or the plan approval path) and execution monitoring; declare them.
       source: contracts/satellite/ai.yaml#decideProposedAction
+      status: fixed
+      by: CHG-WIR-012
   ADM-519:
     block: later
     summary: >-
@@ -4452,12 +4578,15 @@ screens:
         highRisk: 3
         violations: 0
         readyToPromote: 0
-    openQuestions:
+    decisions:
     - question: One central AI governance dashboard, or widgets in each module's dashboard?
-      default: >-
-        Both - this centre for the governance lead, and the same tiles available as widgets on module command centres (a command
-        centre is a saved dashboard).
-      source: MoM 18 Sep 4.4 | TRACKER Actions row 316 | ADR-0041
+      decision: 'Drawn default accepted: Both - this centre for the governance lead, and the same tiles available as widgets
+        on module command centres (a command centre is a saved dashboard).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-274 | CHG-NOTE-001
+      reviewable: true
+      questionSource: MoM 18 Sep 4.4 | TRACKER Actions row 316 | ADR-0041
   ADM-521:
     block: later
     summary: >-
@@ -5016,6 +5145,8 @@ screens:
         A catalogue product-governance read attached by name resemblance; AI governance health comes from the ai operations.
         Remove it.
       source: contracts/spine/catalogue.yaml#listGovernanceRiskMonitoring
+      status: fixed
+      by: CHG-WIR-012
   ADM-550:
     block: later
     summary: >-
@@ -5224,6 +5355,8 @@ screens:
         flag or simulateRecommendationDecision.
       source: >-
         contracts/satellite/ai.yaml#recordRecommendationEvents | contracts/satellite/ai.yaml#simulateRecommendationDecision
+      status: fixed
+      by: CHG-WIR-012
     - what: The upsell suggestion panel binds getUpsellSuggestions, which the screen does not declare.
       why: Bind the preview to the declared slot preview, as on WEB-008.
       source: ADR-0052
@@ -5259,6 +5392,8 @@ screens:
       why: >-
         Name it "AI interaction log" or bind the platform audit log; today it misleads auditors looking for platform actions.
       source: screens/P09-platform-admin-console.yaml#ADM-004
+      status: fixed
+      by: CHG-WIR-012
   ADM-633:
     block: later
     summary: >-
@@ -5336,6 +5471,8 @@ screens:
     - what: getChargebackAnalytics is declared twice; name contains "\t175".
       why: Duplicate and stray tab.
       source: screens/P09-platform-admin-console.yaml#ADM-637
+      status: fixed
+      by: CHG-WIR-012
   ADM-680:
     block: later
     summary: >-
@@ -5413,6 +5550,8 @@ screens:
     - what: Disable / raise threshold / suspend buttons bind no operation; only explainRecommendationDecision is declared.
       why: Declare pauseAiCapability, rollbackAiRelease and the strategy write for thresholds.
       source: contracts/satellite/ai.yaml#pauseAiCapability
+      status: fixed
+      by: CHG-WIR-012
   ADM-697:
     block: later
     summary: >-
@@ -5513,10 +5652,20 @@ screens:
         uplift: +2 to +5 pts open rate
         basedOn: typical evening hour for email in UAE; 4 weeks of your sends
         stage: Learning
-    openQuestions:
+    edgeCases:
+    - case: A guest who checked out without an account
+      expected: Targeted only if they ticked the checkout opt-in (unticked by default, recorded with source checkout); nothing
+        is sent without it.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-001)
+    decisions:
     - question: May guests who checked out without an account receive marketing?
-      default: Not targeted until the consent question is answered.
-      source: MoM 18 Sep 4.8 | TRACKER Actions row 319
+      decision: Guests who checked out without an account receive marketing only if they ticked the checkout opt-in (unticked
+        by default, source checkout); nothing is sent without it. Replaces the drawn 'not targeted until the consent question
+        is answered'.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-275 | CHG-NOTE-001
+      questionSource: MoM 18 Sep 4.8 | TRACKER Actions row 319
   BO-782:
     block: later
     summary: >-
@@ -5559,6 +5708,8 @@ screens:
     - what: Declares setLocalizationBrandingCustomer (waiver form languages, GUEST_MANAGE).
       why: Unrelated waiver configuration; remove.
       source: contracts/satellite/marketing-crm.yaml#setLocalizationBrandingCustomer
+      status: fixed
+      by: CHG-WIR-012
   BO-970:
     block: later
     summary: >-
@@ -5578,6 +5729,8 @@ screens:
     - what: '"Save seats" calls updateSeats directly next to the AI proposal.'
       why: Applying the AI's proposal should go through its approval (decideProposedAction), not a direct seat write.
       source: ADR-0020 | contracts/satellite/ai.yaml#decideProposedAction
+      status: fixed
+      by: CHG-WIR-012
   BO-975:
     block: later
     summary: >-

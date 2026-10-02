@@ -489,6 +489,8 @@ screens:
         The directory calls one product write in inventory and the rest in catalogue; permissions and audit for
         one record are split across two services.
       source: contracts/satellite/inventory.yaml#bulkUpdateProducts
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         List operation(s) listAlternativeCodes return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -632,6 +634,8 @@ screens:
         not on a product.
       why: The client's publish step needs all output formats previewed (DI-444).
       source: DI-444 | contracts/spine/orders.yaml#printTicketProof
+      status: logged
+      by: CHG-WIR-027
     - what: The screen's module is "Orders & Money" while it is the product configuration.
       why: Navigation would file the product record under money; it belongs with Sell beside BO-007.
       source: screens/P08-venue-back-office.yaml#BO-008
@@ -641,14 +645,15 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listProductVersions
-    openQuestions:
-    - question: >-
-        Which sections are visible for each product kind (for example no attributes on a gift card, no entitlement
+    decisions:
+    - question: Which sections are visible for each product kind (for example no attributes on a gift card, no entitlement
         on retail)?
-      default: >-
-        Show identity, guest view, channels and versions for every kind; ticket types, entitlement, eligibility
-        and policies for admission, timed, dated, open-dated, seated, membership and rental.
-      source: contracts/spine/catalogue.yaml#/components/schemas/ProductKind | DI-433
+      decision: 'Drawn default accepted: Show identity, guest view, channels and versions for every kind; ticket types, entitlement,
+        eligibility and policies for admission, timed, dated, open-dated, seated, membership and rental.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-102 | CHG-NOTE-006
+      questionSource: contracts/spine/catalogue.yaml#/components/schemas/ProductKind | DI-433
   BO-009:
     block: A
     summary: >-
@@ -975,6 +980,8 @@ screens:
         vs bundle) is what put it here.
       source: >-
         contracts/spine/catalogue.yaml#reportBundleApplied | contracts/spine/catalogue.yaml#listCatalogueBundles
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         List operation(s) listCatalogueBundles return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -1168,6 +1175,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listAlternativeCodes
+      status: fixed
+      by: CHG-WIR-025
   BO-015:
     block: B
     summary: >-
@@ -1325,6 +1334,8 @@ screens:
         here is force release.
       source: >-
         contracts/spine/catalogue.yaml#acquireInventoryHold | contracts/spine/catalogue.yaml#relinquishInventoryHold
+      status: fixed
+      by: CHG-WIR-025
   BO-019:
     block: B
     summary: >-
@@ -1359,6 +1370,8 @@ screens:
         Blackouts live on entitlement templates (blackoutDates) and are edited on BO-012; a closures screen needs
         a write for them or a link.
       source: contracts/spine/catalogue.yaml#createEntitlementTemplate | DI-452
+      status: logged
+      by: CHG-WIR-027
   BO-022:
     block: C
     summary: >-
@@ -1505,6 +1518,8 @@ screens:
         A refunds desk does not park sales or create orders at a workstation; they belong to the POS (venue-operations
         / fnb-retail processes).
       source: contracts/spine/orders.yaml#holdOrder | contracts/spine/orders.yaml#createOrder
+      status: fixed
+      by: CHG-WIR-025
   BO-024:
     block: A
     summary: >-
@@ -1565,6 +1580,8 @@ screens:
         Taking a new payment or adding a tip is a till act (workstation scope); the exceptions screen resolves existing
         payments.
       source: contracts/spine/orders.yaml#addTip | contracts/spine/orders.yaml#createPayment
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         No read operation: the screen declares only createPayment, addTip, capturePayment, inquirePaymentStatus,
         closeDepositBoxes, settleDeposit and nothing that returns the current configuration.
@@ -1575,6 +1592,8 @@ screens:
         contracts/spine/orders.yaml#createPayment | contracts/spine/orders.yaml#addTip | contracts/spine/orders.yaml#capturePayment
         | contracts/spine/orders.yaml#inquirePaymentStatus | contracts/spine/shift.yaml#closeDepositBoxes | contracts/spine/finance.yaml#settleDeposit
         | screens/P08-venue-back-office.yaml#BO-024
+      status: fixed
+      by: CHG-WIR-025
   BO-026:
     block: C
     summary: >-
@@ -1622,6 +1641,8 @@ screens:
       why: >-
         Media here is a ticket credential, not an image asset; the asset-library operations do not belong.
       source: contracts/satellite/assets.yaml#replaceMediaAsset
+      status: fixed
+      by: CHG-WIR-025
     - what: No operation reissues or replaces a credential; only lists are declared.
       why: The replacement act is missing.
       source: >-
@@ -1657,6 +1678,8 @@ screens:
         An approver cannot see or decide anything; it needs the pending refunds list and the approve or decline
         act.
       source: contracts/spine/orders.yaml#createRefundRequest
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         No read operation: the screen declares only createRefundRequest and nothing that returns the current configuration.
       why: >-
@@ -1664,6 +1687,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#createRefundRequest | screens/P08-venue-back-office.yaml#BO-028
+      status: fixed
+      by: CHG-WIR-025
   BO-037:
     block: B
     summary: >-
@@ -1698,6 +1723,8 @@ screens:
         device's package with it.
       why: The screen needs a venue-scoped read of each device's package version.
       source: contracts/spine/access.yaml#getOfflinePackage
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         List operation(s) listCatalogueBundles return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -1765,6 +1792,8 @@ screens:
         The screen carries the full performance and seat-recommendation set (createPerformances, recommendSeats).
       why: Opening hours are venue and outlet settings; performance editing belongs to BO-015.
       source: screens/P08-venue-back-office.yaml#BO-063
+      status: fixed
+      by: CHG-WIR-025
   BO-092:
     block: A
     summary: >-
@@ -1810,14 +1839,15 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/venue-map.yaml#listVenueMaps
-    openQuestions:
-    - question: >-
-        What image formats and sizes may tenants upload for the illustrated base map (benchmark an interactive 3D-style
+    decisions:
+    - question: What image formats and sizes may tenants upload for the illustrated base map (benchmark an interactive 3D-style
         map)?
-      default: >-
-        Accept PDF, SVG, DWG, DXF and raster for geometry; show a guidance panel with a placeholder recommendation
-        until agreed.
-      source: DI-203 | TRACKER Actions row 74
+      decision: 'Drawn default accepted: Accept PDF, SVG, DWG, DXF and raster for geometry; show a guidance panel with a placeholder
+        recommendation until agreed.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-103 | CHG-NOTE-006
+      questionSource: DI-203 | TRACKER Actions row 74
   BO-093:
     block: A
     summary: >-
@@ -1947,12 +1977,6 @@ screens:
         path: Riverwalk 4 to 5
         reason: maintenance
         reopens: 2026-11-15 09:00
-    openQuestions:
-    - question: >-
-        Do rental booths and stations appear on the live map as points, or does the map builder need a booth/station
-        kind?
-      default: Draw them as kiosk points linked to the rental outlet until decided.
-      source: DI-773 | TRACKER Actions row 173
     corrections:
     - what: >-
         List operation(s) listCatalogueBundles return a bare array, not the paged list envelope (items, nextCursor,
@@ -1960,6 +1984,14 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listCatalogueBundles
+    decisions:
+    - question: Do rental booths and stations appear on the live map as points, or does the map builder need a booth/station
+        kind?
+      decision: 'Drawn default accepted: Draw them as kiosk points linked to the rental outlet until decided.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-104 | CHG-NOTE-006
+      questionSource: DI-773 | TRACKER Actions row 173
   BO-097:
     block: A
     summary: >-
@@ -2014,6 +2046,8 @@ screens:
         contracts/satellite/resources.yaml#checkOutResource | contracts/satellite/resources.yaml#checkInResource
         | contracts/spine/orders.yaml#authoriseStoredValue | contracts/spine/orders.yaml#relinquishStoredValue |
         contracts/spine/orders.yaml#captureStoredValue | screens/P08-venue-back-office.yaml#BO-097
+      status: fixed
+      by: CHG-WIR-025
   BO-115:
     block: B
     summary: >-
@@ -2055,6 +2089,8 @@ screens:
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: >-
         contracts/spine/catalogue.yaml#listProductCategories | contracts/spine/tenancy.yaml#listSaleBoards
+      status: fixed
+      by: CHG-WIR-025
   BO-117:
     block: A
     summary: >-
@@ -2120,16 +2156,22 @@ screens:
         Sale boards are a POS layout concern (POS board 4C) unrelated to product import or the assistant; they belong
         on the POS layout screen.
       source: contracts/spine/tenancy.yaml#updateSaleBoard | F86 step 3
+      status: fixed
+      by: CHG-WIR-025
     - what: requestSuggestion (13 suggestion kinds) is offered as a generic form.
       why: >-
         The assistant here is generateConfiguration; a free suggestion form with a kind picker is not a product-import
         task.
       source: contracts/satellite/ai.yaml#requestSuggestion
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         List operation(s) listSaleBoards return a bare array, not the paged list envelope (items, nextCursor, hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/tenancy.yaml#listSaleBoards
+      status: fixed
+      by: CHG-WIR-025
   BO-119:
     block: B
     summary: >-
@@ -2172,6 +2214,8 @@ screens:
       source: >-
         contracts/satellite/promotions.yaml#createUpsellRule | contracts/satellite/promotions.yaml#deleteUpsellRule
         | contracts/satellite/ai.yaml#decideRecommendations | screens/P08-venue-back-office.yaml#BO-119
+      status: fixed
+      by: CHG-WIR-025
   BO-130:
     block: A
     summary: >-
@@ -2225,6 +2269,8 @@ screens:
         Devices replay their own journals; a supervisor resolves a rejection rather than typing a sync batch. The
         resolve operation (resolveSyncRejection) is what the screen needs.
       source: contracts/spine/orders.yaml#syncOrders | contracts/spine/orders.yaml#listSyncRejections
+      status: fixed
+      by: CHG-WIR-025
   BO-132:
     block: C
     summary: >-
@@ -2419,6 +2465,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setGroupPackageExperience | screens/P08-venue-back-office.yaml#BO-268
+      status: fixed
+      by: CHG-WIR-025
   BO-269:
     block: C
     summary: >-
@@ -2447,6 +2495,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setGroupQuotationProposal | screens/P08-venue-back-office.yaml#BO-269
+      status: logged
+      by: CHG-WIR-027
   BO-270:
     block: C
     summary: >-
@@ -2493,6 +2543,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#approveGroupDiscountException | screens/P08-venue-back-office.yaml#BO-271
+      status: logged
+      by: CHG-WIR-027
   BO-272:
     block: C
     summary: >-
@@ -2534,6 +2586,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setGroupBookingHandover | screens/P08-venue-back-office.yaml#BO-273
+      status: fixed
+      by: CHG-WIR-025
   BO-274:
     block: C
     summary: >-
@@ -2578,6 +2632,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setGroupOperationalPlanning | screens/P08-venue-back-office.yaml#BO-275
+      status: logged
+      by: CHG-WIR-027
   BO-276:
     block: C
     summary: >-
@@ -2903,6 +2959,8 @@ screens:
         A view of an order needs getOrder and getOrderStatement; editing lines this way bypasses modify, exchange
         and refund.
       source: contracts/spine/orders.yaml#setOrderDetailTransaction
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         No read operation: the screen declares only setOrderDetailTransaction and nothing that returns the current
         configuration.
@@ -2911,6 +2969,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setOrderDetailTransaction | screens/P08-venue-back-office.yaml#BO-305
+      status: fixed
+      by: CHG-WIR-025
   BO-306:
     block: C
     summary: >-
@@ -2936,6 +2996,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setReservationHoldPolicy | screens/P08-venue-back-office.yaml#BO-306
+      status: logged
+      by: CHG-WIR-027
   BO-307:
     block: C
     summary: >-
@@ -2963,6 +3025,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setOrderReservationStatus | screens/P08-venue-back-office.yaml#BO-307
+      status: logged
+      by: CHG-WIR-027
   BO-308:
     block: C
     summary: >-
@@ -2986,6 +3050,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#createOrderSourceChannel | screens/P08-venue-back-office.yaml#BO-308
+      status: logged
+      by: CHG-WIR-027
   BO-309:
     block: C
     summary: >-
@@ -3009,6 +3075,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setCustomerGuestAccount | screens/P08-venue-back-office.yaml#BO-309
+      status: logged
+      by: CHG-WIR-027
   BO-310:
     block: C
     summary: >-
@@ -3127,12 +3195,16 @@ screens:
     - what: setOrderAmendment takes the new values as loose strings with no order id.
       why: It duplicates modify, exchange and reschedule without their rules.
       source: contracts/spine/orders.yaml#setOrderAmendment
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         No read operation: the screen declares only setOrderAmendment and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/orders.yaml#setOrderAmendment | screens/P08-venue-back-office.yaml#BO-315
+      status: fixed
+      by: CHG-WIR-025
   BO-316:
     block: C
     summary: >-
@@ -3158,6 +3230,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setAmendmentEligibilityPolicy | screens/P08-venue-back-office.yaml#BO-316
+      status: logged
+      by: CHG-WIR-027
   BO-317:
     block: C
     summary: >-
@@ -3181,6 +3255,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setCancellationPartialPolicy | screens/P08-venue-back-office.yaml#BO-317
+      status: logged
+      by: CHG-WIR-027
   BO-318:
     block: C
     summary: >-
@@ -3213,6 +3289,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setRefundPolicy | contracts/spine/orders.yaml#setRefundCalculationPolicy | screens/P08-venue-back-office.yaml#BO-318
+      status: fixed
+      by: CHG-WIR-025
   BO-319:
     block: C
     summary: >-
@@ -3257,6 +3335,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setAfterSaleFinancial | screens/P08-venue-back-office.yaml#BO-321
+      status: logged
+      by: CHG-WIR-027
   BO-322:
     block: C
     summary: >-
@@ -3283,6 +3363,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#approveExceptionServiceRecovery | screens/P08-venue-back-office.yaml#BO-322
+      status: logged
+      by: CHG-WIR-027
   BO-323:
     block: C
     summary: >-
@@ -3614,6 +3696,8 @@ screens:
     - what: approveDecision names no request; its body is only decision, comment and delegate.
       why: The decision cannot be attached to a request without its id.
       source: contracts/satellite/promotions.yaml#approveDecision
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         No read operation: the screen declares only approveDecision and nothing that returns the current configuration.
       why: >-
@@ -3621,6 +3705,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#approveDecision | screens/P08-venue-back-office.yaml#BO-374
+      status: fixed
+      by: CHG-WIR-025
   BO-399:
     block: C
     summary: >-
@@ -3651,6 +3737,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setCreditEligibilityRules | screens/P08-venue-back-office.yaml#BO-399
+      status: logged
+      by: CHG-WIR-027
   BO-414:
     block: C
     summary: >-
@@ -3668,6 +3756,8 @@ screens:
     - what: getWallet reads one guest wallet; a dashboard across the operation needs aggregates.
       why: The KPIs have no source.
       source: contracts/satellite/wallet.yaml#getWallet
+      status: logged
+      by: CHG-WIR-027
   BO-415:
     block: C
     summary: >-
@@ -3749,6 +3839,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletFundingRules | screens/P08-venue-back-office.yaml#BO-417
+      status: fixed
+      by: CHG-WIR-025
   BO-418:
     block: C
     summary: >-
@@ -3771,6 +3863,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletFundingRules | screens/P08-venue-back-office.yaml#BO-418
+      status: fixed
+      by: CHG-WIR-025
   BO-419:
     block: C
     summary: >-
@@ -3796,6 +3890,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setCreditEligibilityRules | screens/P08-venue-back-office.yaml#BO-419
+      status: logged
+      by: CHG-WIR-027
   BO-420:
     block: C
     summary: >-
@@ -3814,6 +3910,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#updateCreditType | screens/P08-venue-back-office.yaml#BO-420
+      status: fixed
+      by: CHG-WIR-025
   BO-422:
     block: C
     summary: >-
@@ -3834,6 +3932,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/satellite/wallet.yaml#adjustWallet | screens/P08-venue-back-office.yaml#BO-422
+      status: fixed
+      by: CHG-WIR-025
   BO-423:
     block: C
     summary: >-
@@ -3933,6 +4033,8 @@ screens:
         The pricing governance is venue-wide; the list should be the pricing versions or change requests, not AI
         signals.
       source: contracts/spine/catalogue.yaml#listPricing | screens/P08-venue-back-office.yaml#BO-443
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         List operation(s) listDynamicPriceRules return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -3957,12 +4059,16 @@ screens:
         The screen sits in Games & Rides (redemption of game points for prizes) but reads coupon redemption analytics.
       why: Two meanings of redemption; DI-878 is prize redemption.
       source: DI-878 | contracts/satellite/promotions.yaml#listRedemption
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         List operation(s) listRedemption return a bare array, not the paged list envelope (items, nextCursor, hasMore);
         rows of listRedemption carry no identifier.
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listRedemption
+      status: fixed
+      by: CHG-WIR-025
   BO-448:
     block: C
     summary: >-
@@ -4030,6 +4136,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/satellite/wallet.yaml#topUpWallet | screens/P08-venue-back-office.yaml#BO-488
+      status: fixed
+      by: CHG-WIR-025
   BO-518:
     block: B
     summary: >-
@@ -4108,6 +4216,8 @@ screens:
       why: >-
         First-time channel setup needs product channels (updateProduct channels or publishChannelAvailability).
       source: contracts/satellite/subscription.yaml#setChannelListing
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         No read operation: the screen declares only setPrices, setChannelListing and nothing that returns the current
         configuration.
@@ -4116,6 +4226,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setPrices | contracts/satellite/subscription.yaml#setChannelListing | screens/P08-venue-back-office.yaml#BO-601
+      status: fixed
+      by: CHG-WIR-025
   BO-637:
     block: B
     summary: >-
@@ -4157,6 +4269,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/catalogue.yaml#approveWorkflow | screens/P08-venue-back-office.yaml#BO-637
+      status: logged
+      by: CHG-WIR-027
   BO-642:
     block: B
     summary: >-
@@ -4179,6 +4293,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#approveDecision | screens/P08-venue-back-office.yaml#BO-642
+      status: fixed
+      by: CHG-WIR-025
   BO-694:
     block: B
     summary: >-
@@ -4204,6 +4320,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-694
+      status: fixed
+      by: CHG-WIR-026
   BO-695:
     block: B
     summary: >-
@@ -4237,6 +4355,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-695
+      status: fixed
+      by: CHG-WIR-026
     - what: >-
         List operation(s) listEventTypes return a bare array, not the paged list envelope (items, nextCursor, hasMore).
       why: >-
@@ -4275,6 +4395,8 @@ screens:
         The pack text of another screen (board 1 no. 08) was attached; the name and the only operation (cloneEvent)
         are about duplication.
       source: screens/P08-venue-back-office.yaml#BO-696 | F234 step 4
+      status: fixed
+      by: CHG-WIR-026
     - what: cloneEvent's request body is not specified in the packet (only eventId comes back).
       why: The screen needs the parts-to-copy and date-shift inputs to exist in the contract.
       source: contracts/spine/catalogue.yaml#cloneEvent
@@ -4284,6 +4406,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/catalogue.yaml#cloneEvent | screens/P08-venue-back-office.yaml#BO-696
+      status: fixed
+      by: CHG-WIR-025
   BO-697:
     block: B
     summary: >-
@@ -4308,6 +4432,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventSchedule | screens/P08-venue-back-office.yaml#BO-697
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-694, BO-700, BO-703, BO-706 and others and does not describe
         this screen (Event Schedule Command Center).
@@ -4315,6 +4441,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-697
+      status: fixed
+      by: CHG-WIR-026
   BO-698:
     block: B
     summary: >-
@@ -4337,6 +4465,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventSchedule | screens/P08-venue-back-office.yaml#BO-698
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-715, BO-723 and does not describe this screen (Dynamic
         Performance Duration Configuration).
@@ -4344,6 +4474,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-698
+      status: fixed
+      by: CHG-WIR-026
   BO-699:
     block: B
     summary: >-
@@ -4374,6 +4506,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/catalogue.yaml#rescheduleEvent | screens/P08-venue-back-office.yaml#BO-699
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-696, BO-709, BO-724 and does not describe this screen (Schedule
         Change & Rescheduling Configuration).
@@ -4381,6 +4515,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-699
+      status: fixed
+      by: CHG-WIR-026
   BO-700:
     block: B
     summary: >-
@@ -4406,6 +4542,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-700
+      status: fixed
+      by: CHG-WIR-026
     - what: >-
         List operation(s) listSpaces return a bare array, not the paged list envelope (items, nextCursor, hasMore).
       why: >-
@@ -4437,6 +4575,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/catalogue.yaml#setSpace | screens/P08-venue-back-office.yaml#BO-701
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-704, BO-711, BO-717, BO-721 and does not describe this
         screen (Venue Master Configuration).
@@ -4444,6 +4584,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-701
+      status: fixed
+      by: CHG-WIR-026
   BO-702:
     block: B
     summary: >-
@@ -4466,6 +4608,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/catalogue.yaml#setSpace | screens/P08-venue-back-office.yaml#BO-702
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-708, BO-714, BO-720 and does not describe this screen (Space
         Access Rules Configuration).
@@ -4473,6 +4617,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-702
+      status: fixed
+      by: CHG-WIR-026
   BO-703:
     block: B
     summary: >-
@@ -4499,6 +4645,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventCapacityProfile | screens/P08-venue-back-office.yaml#BO-703
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-694, BO-697, BO-700, BO-706 and others and does not describe
         this screen (Seating & Capacity Command Center).
@@ -4506,6 +4654,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-703
+      status: fixed
+      by: CHG-WIR-026
   BO-704:
     block: B
     summary: >-
@@ -4529,6 +4679,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventCapacityProfile | screens/P08-venue-back-office.yaml#BO-704
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-701, BO-711, BO-717, BO-721 and does not describe this
         screen (Event Capacity Profile Configuration).
@@ -4536,6 +4688,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-704
+      status: fixed
+      by: CHG-WIR-026
   BO-705:
     block: B
     summary: >-
@@ -4563,6 +4717,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventCapacityProfile | screens/P08-venue-back-office.yaml#BO-705
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-712, BO-718 and does not describe this screen (Seating
         Mode & Reservation Configuration).
@@ -4570,6 +4726,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-705
+      status: fixed
+      by: CHG-WIR-026
   BO-706:
     block: B
     summary: >-
@@ -4597,6 +4755,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventRegistration | screens/P08-venue-back-office.yaml#BO-706
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-694, BO-697, BO-700, BO-703 and others and does not describe
         this screen (Registration & Attendance Command Center).
@@ -4604,6 +4764,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-706
+      status: fixed
+      by: CHG-WIR-026
   BO-707:
     block: B
     summary: >-
@@ -4629,6 +4791,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventRegistration | screens/P08-venue-back-office.yaml#BO-707
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-695, BO-719, BO-722 and does not describe this screen (Attendee
         Data & Registration Form Configuration).
@@ -4636,6 +4800,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-707
+      status: fixed
+      by: CHG-WIR-026
   BO-708:
     block: B
     summary: >-
@@ -4665,6 +4831,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-708
+      status: fixed
+      by: CHG-WIR-026
     - what: >-
         List operation(s) listAccessProfiles return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -4698,6 +4866,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventRegistration | screens/P08-venue-back-office.yaml#BO-709
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-696, BO-699, BO-724 and does not describe this screen (Event
         Admission & Entry Policy Configuration).
@@ -4705,6 +4875,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-709
+      status: fixed
+      by: CHG-WIR-026
   BO-710:
     block: B
     summary: >-
@@ -4728,6 +4900,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-710
+      status: fixed
+      by: CHG-WIR-026
   BO-711:
     block: B
     summary: >-
@@ -4755,6 +4929,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventResourcePlan | screens/P08-venue-back-office.yaml#BO-711
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-701, BO-704, BO-717, BO-721 and does not describe this
         screen (Event Resource Requirement Configuration).
@@ -4762,6 +4938,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-711
+      status: fixed
+      by: CHG-WIR-026
   BO-712:
     block: B
     summary: >-
@@ -4791,6 +4969,8 @@ screens:
       source: >-
         contracts/spine/catalogue.yaml#setEventResourcePlan | contracts/satellite/workforce.yaml#createRotaAssignment
         | screens/P08-venue-back-office.yaml#BO-712
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-705, BO-718 and does not describe this screen (Staff &
         Role Assignment Configuration).
@@ -4798,6 +4978,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-712
+      status: fixed
+      by: CHG-WIR-026
   BO-713:
     block: B
     summary: >-
@@ -4817,6 +4999,8 @@ screens:
     - what: The purpose describes sponsors and sponsorship agreements, not contractors.
       why: Pack text of a different screen; the operation is the resource plan.
       source: screens/P08-venue-back-office.yaml#BO-713
+      status: fixed
+      by: CHG-WIR-026
     - what: >-
         No read operation: the screen declares only setEventResourcePlan and nothing that returns the current configuration.
       why: >-
@@ -4824,6 +5008,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventResourcePlan | screens/P08-venue-back-office.yaml#BO-713
+      status: fixed
+      by: CHG-WIR-025
   BO-715:
     block: B
     summary: >-
@@ -4846,6 +5032,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventResourcePlan | screens/P08-venue-back-office.yaml#BO-715
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-698, BO-723 and does not describe this screen (Resource
         Location & Deployment Configuration).
@@ -4853,6 +5041,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-715
+      status: fixed
+      by: CHG-WIR-026
   BO-716:
     block: A
     summary: >-
@@ -4885,6 +5075,8 @@ screens:
         The pack text of a command-centre screen (board 7 no. 01) was attached to the lifecycle screen; the only
         operation is setEventLifecycleState.
       source: screens/P08-venue-back-office.yaml#BO-716 | F240 step 1
+      status: fixed
+      by: CHG-WIR-026
     - what: >-
         No read operation: the screen declares only setEventLifecycleState and nothing that returns the current
         configuration.
@@ -4893,6 +5085,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventLifecycleState | screens/P08-venue-back-office.yaml#BO-716
+      status: fixed
+      by: CHG-WIR-025
   BO-717:
     block: B
     summary: >-
@@ -4922,6 +5116,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventLifecycleState | screens/P08-venue-back-office.yaml#BO-717
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-701, BO-704, BO-711, BO-721 and does not describe this
         screen (Lifecycle Transition Configuration).
@@ -4929,6 +5125,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-717
+      status: fixed
+      by: CHG-WIR-026
   BO-719:
     block: B
     summary: >-
@@ -4952,6 +5150,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/catalogue.yaml#rescheduleEvent | screens/P08-venue-back-office.yaml#BO-719
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-695, BO-707, BO-722 and does not describe this screen (Event
         Cancellation Workflow Configuration).
@@ -4959,6 +5159,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-719
+      status: fixed
+      by: CHG-WIR-026
   BO-720:
     block: B
     summary: >-
@@ -4979,12 +5181,16 @@ screens:
       why: >-
         A configuration screen needs a write for the defaults; today the treatment is chosen per reschedule.
       source: contracts/spine/catalogue.yaml#rescheduleEvent
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         No read operation: the screen declares only rescheduleEvent and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/catalogue.yaml#rescheduleEvent | screens/P08-venue-back-office.yaml#BO-720
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-702, BO-708, BO-714 and does not describe this screen (Ticket,
         Reservation & Customer Treatment Configuration).
@@ -4992,6 +5198,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-720
+      status: fixed
+      by: CHG-WIR-026
   BO-721:
     block: B
     summary: >-
@@ -5019,6 +5227,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-721
+      status: fixed
+      by: CHG-WIR-026
     - what: >-
         List operation(s) listPerformanceTemplates return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -5056,6 +5266,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-722
+      status: fixed
+      by: CHG-WIR-026
     - what: >-
         List operation(s) listCreditTypes return a bare array, not the paged list envelope (items, nextCursor, hasMore).
       why: >-
@@ -5084,6 +5296,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setPerformanceTemplate | screens/P08-venue-back-office.yaml#BO-723
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-698, BO-715 and does not describe this screen (Peak, Off-Peak
         & Super Prime Time Configuration).
@@ -5091,6 +5305,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-723
+      status: fixed
+      by: CHG-WIR-026
   BO-724:
     block: B
     summary: >-
@@ -5113,6 +5329,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setPerformanceTemplate | screens/P08-venue-back-office.yaml#BO-724
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-696, BO-699, BO-709 and does not describe this screen (Walk-In
         / There-and-Then Booking Configuration).
@@ -5120,6 +5338,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-724
+      status: fixed
+      by: CHG-WIR-026
   BO-725:
     block: B
     summary: >-
@@ -5138,6 +5358,8 @@ screens:
         The only operation lists templates; a command centre of performances needs performance occupancy (listPerformances).
       why: Templates do not carry today's bookings.
       source: contracts/spine/catalogue.yaml#listPerformanceTemplates
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The purpose text is shared word for word with BO-694, BO-697, BO-700, BO-703 and others and does not describe
         this screen (Performance Operations Command Center).
@@ -5145,6 +5367,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P08-venue-back-office.yaml#BO-725
+      status: fixed
+      by: CHG-WIR-026
     - what: >-
         List operation(s) listPerformanceTemplates return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -5170,6 +5394,8 @@ screens:
     - what: The purpose describes participant analytics, not photo and video assignment.
       why: Pack text of another screen.
       source: screens/P08-venue-back-office.yaml#BO-726
+      status: fixed
+      by: CHG-WIR-026
     - what: >-
         No read operation: the screen declares only assignPerformanceMedia and nothing that returns the current
         configuration.
@@ -5178,6 +5404,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#assignPerformanceMedia | screens/P08-venue-back-office.yaml#BO-726
+      status: fixed
+      by: CHG-WIR-025
   BO-761:
     block: B
     summary: >-
@@ -5250,6 +5478,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#approveCampaignWorkflow | screens/P08-venue-back-office.yaml#BO-770
+      status: logged
+      by: CHG-WIR-027
   BO-778:
     block: C
     summary: >-
@@ -5299,6 +5529,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setEventResourcePlan | screens/P08-venue-back-office.yaml#BO-914
+      status: fixed
+      by: CHG-WIR-025
   BO-915:
     block: B
     summary: >-
@@ -5357,6 +5589,8 @@ screens:
     - what: The purpose also describes an AI resource intelligence engine.
       why: Two pack screens' text merged into one purpose.
       source: screens/P08-venue-back-office.yaml#BO-922
+      status: fixed
+      by: CHG-WIR-026
   BO-946:
     block: B
     summary: >-
@@ -5373,6 +5607,8 @@ screens:
     - what: The only read is the ticket demand forecast (booking curve), not resource demand.
       why: Resource forecast accuracy needs actuals of resource use.
       source: contracts/spine/catalogue.yaml#listDemandBookingCurve
+      status: logged
+      by: CHG-WIR-027
   BO-953:
     block: C
     summary: >-
@@ -5469,6 +5705,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/satellite/seating.yaml#setMapZones | screens/P08-venue-back-office.yaml#BO-957
+      status: fixed
+      by: CHG-WIR-025
   BO-958:
     block: C
     summary: >-
@@ -5492,6 +5730,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/satellite/seating.yaml#setMapZones | screens/P08-venue-back-office.yaml#BO-958
+      status: fixed
+      by: CHG-WIR-025
   BO-959:
     block: C
     summary: >-
@@ -5517,6 +5757,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#setMapZones | contracts/satellite/ai.yaml#proposeSeatMapChanges | screens/P08-venue-back-office.yaml#BO-959
+      status: fixed
+      by: CHG-WIR-025
   BO-960:
     block: C
     summary: >-
@@ -5537,6 +5779,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/satellite/seating.yaml#setMapZones | screens/P08-venue-back-office.yaml#BO-960
+      status: fixed
+      by: CHG-WIR-025
   BO-961:
     block: C
     summary: >-
@@ -5558,6 +5802,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/satellite/seating.yaml#setMapZones | screens/P08-venue-back-office.yaml#BO-961
+      status: fixed
+      by: CHG-WIR-025
   BO-962:
     block: C
     summary: >-
@@ -5707,6 +5953,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#commitImportJob | contracts/satellite/seating.yaml#publishSeatMap | screens/P08-venue-back-office.yaml#BO-972
+      status: fixed
+      by: CHG-WIR-025
   BO-973:
     block: C
     summary: >-
@@ -5761,6 +6009,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#cloneSeatMap | contracts/satellite/seating.yaml#copySeatMapSection | screens/P08-venue-back-office.yaml#BO-976
+      status: fixed
+      by: CHG-WIR-025
   BO-977:
     block: C
     summary: >-
@@ -5793,6 +6043,8 @@ screens:
       why: Assignment needs updatePerformance (seatMapId) or a bulk assignment write.
       source: >-
         contracts/satellite/seating.yaml#publishSeatMap | contracts/spine/catalogue.yaml#updatePerformance
+      status: fixed
+      by: CHG-WIR-025
   BO-979:
     block: C
     summary: >-
@@ -5856,6 +6108,8 @@ screens:
       source: >-
         contracts/satellite/seating.yaml#validateSeatMap | contracts/satellite/seating.yaml#publishSeatMap | contracts/satellite/ai.yaml#proposeSeatMapChanges
         | screens/P08-venue-back-office.yaml#BO-982
+      status: fixed
+      by: CHG-WIR-025
   BO-983:
     block: C
     summary: >-
@@ -5904,6 +6158,8 @@ screens:
     - what: The operations are seat categories, not a seat status model.
       why: Categories are commercial; statuses are lifecycle; no operation configures statuses.
       source: contracts/satellite/seating.yaml#createSeatCategory
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         List operation(s) listSeatCategories return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -5997,6 +6253,8 @@ screens:
       source: >-
         contracts/satellite/seating.yaml#createSeatBlock | contracts/satellite/maintenance.yaml#createWorkOrder
         | screens/P08-venue-back-office.yaml#BO-990
+      status: fixed
+      by: CHG-WIR-025
   BO-991:
     block: C
     summary: >-
@@ -6016,6 +6274,8 @@ screens:
     - what: listSeats lists seats of a map; it has no history.
       why: A seat history needs an event read.
       source: contracts/satellite/seating.yaml#listSeats
+      status: logged
+      by: CHG-WIR-027
   BO-992:
     block: C
     summary: >-
@@ -6090,6 +6350,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/satellite/seating.yaml#assignSeats | screens/P08-venue-back-office.yaml#BO-995
+      status: fixed
+      by: CHG-WIR-025
   BO-996:
     block: C
     summary: >-
@@ -6123,12 +6385,16 @@ screens:
     - what: listRealTimeAvailability is promotions checkout validation, not seat locks.
       why: Seat locks are seating's; the screen reads the wrong contract.
       source: contracts/satellite/promotions.yaml#listRealTimeAvailability
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         List operation(s) listRealTimeAvailability return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listRealTimeAvailability
+      status: fixed
+      by: CHG-WIR-025
   BO-998:
     block: C
     summary: >-
@@ -6147,6 +6413,8 @@ screens:
         The configuration screen declares hold operations (extend, release) rather than a policy write.
       why: Lock timeouts are configured, not performed, here.
       source: contracts/satellite/seating.yaml#extendSeatHold
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         No read operation: the screen declares only extendSeatHold, relinquishSeatHold and nothing that returns
         the current configuration.
@@ -6156,6 +6424,8 @@ screens:
       source: >-
         contracts/satellite/seating.yaml#extendSeatHold | contracts/satellite/seating.yaml#relinquishSeatHold |
         screens/P08-venue-back-office.yaml#BO-998
+      status: fixed
+      by: CHG-WIR-025
   BO-999:
     block: C
     summary: >-
@@ -6203,6 +6473,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#recommendSeats | screens/P08-venue-back-office.yaml#BO-1001
+      status: fixed
+      by: CHG-WIR-025
   BO-1002:
     block: C
     summary: >-
@@ -6221,6 +6493,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#recommendSeats | screens/P08-venue-back-office.yaml#BO-1002
+      status: fixed
+      by: CHG-WIR-025
   BO-1003:
     block: C
     summary: >-
@@ -6289,6 +6563,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#createSeatHoldPool | screens/P08-venue-back-office.yaml#BO-1005
+      status: fixed
+      by: CHG-WIR-025
   BO-1006:
     block: C
     summary: >-
@@ -6307,6 +6583,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#setSeatHoldType | screens/P08-venue-back-office.yaml#BO-1006
+      status: fixed
+      by: CHG-WIR-025
   BO-1007:
     block: C
     summary: >-
@@ -6328,6 +6606,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#setSeatHoldType | screens/P08-venue-back-office.yaml#BO-1007
+      status: fixed
+      by: CHG-WIR-025
   BO-1008:
     block: C
     summary: >-
@@ -6349,6 +6629,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#releaseSeatHoldPool | screens/P08-venue-back-office.yaml#BO-1008
+      status: fixed
+      by: CHG-WIR-025
   BO-1009:
     block: C
     summary: >-
@@ -6370,6 +6652,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#releaseSeatHoldPool | screens/P08-venue-back-office.yaml#BO-1009
+      status: fixed
+      by: CHG-WIR-025
   BO-1011:
     block: C
     summary: >-
@@ -6453,6 +6737,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/satellite/seating.yaml#setSeatRules | screens/P08-venue-back-office.yaml#BO-1014
+      status: fixed
+      by: CHG-WIR-025
   BO-1015:
     block: C
     summary: >-
@@ -6473,6 +6759,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/satellite/seating.yaml#setSeatRules | screens/P08-venue-back-office.yaml#BO-1015
+      status: fixed
+      by: CHG-WIR-025
   BO-1016:
     block: C
     summary: >-
@@ -6492,6 +6780,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/satellite/seating.yaml#setSeatRules | screens/P08-venue-back-office.yaml#BO-1016
+      status: fixed
+      by: CHG-WIR-025
   BO-1017:
     block: C
     summary: >-
@@ -6544,6 +6834,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#setAccessibleSeating | screens/P08-venue-back-office.yaml#BO-1019
+      status: fixed
+      by: CHG-WIR-025
   BO-1020:
     block: C
     summary: >-
@@ -6566,6 +6858,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#setAccessibleSeating | screens/P08-venue-back-office.yaml#BO-1020
+      status: fixed
+      by: CHG-WIR-025
   BO-1021:
     block: C
     summary: >-
@@ -6585,6 +6879,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/satellite/seating.yaml#setSeatRules | screens/P08-venue-back-office.yaml#BO-1021
+      status: fixed
+      by: CHG-WIR-025
   BO-1022:
     block: C
     summary: >-
@@ -6646,6 +6942,8 @@ screens:
     - what: Group types are listed through group requests; nothing defines a group type.
       why: The configuration needs its own write.
       source: contracts/satellite/seating.yaml#listGroupSeatRequests
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         List operation(s) listGroupSeatRequests return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -6682,6 +6980,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#createGroupSeatRequest | screens/P08-venue-back-office.yaml#BO-1025
+      status: fixed
+      by: CHG-WIR-025
   BO-1026:
     block: C
     summary: >-
@@ -6703,6 +7003,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#allocateGroupSeats | screens/P08-venue-back-office.yaml#BO-1026
+      status: fixed
+      by: CHG-WIR-025
   BO-1027:
     block: C
     summary: >-
@@ -6723,6 +7025,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#allocateGroupSeats | screens/P08-venue-back-office.yaml#BO-1027
+      status: fixed
+      by: CHG-WIR-025
   BO-1028:
     block: C
     summary: >-
@@ -6744,6 +7048,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#setGroupSeatRoster | screens/P08-venue-back-office.yaml#BO-1028
+      status: fixed
+      by: CHG-WIR-025
   BO-1029:
     block: C
     summary: >-
@@ -6841,6 +7147,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#setSeatRecommendationRules | screens/P08-venue-back-office.yaml#BO-1034
+      status: fixed
+      by: CHG-WIR-025
   BO-1035:
     block: C
     summary: >-
@@ -6860,6 +7168,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#setSeatRecommendationRules | screens/P08-venue-back-office.yaml#BO-1035
+      status: fixed
+      by: CHG-WIR-025
   BO-1036:
     block: C
     summary: >-
@@ -6879,6 +7189,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#setSeatRecommendationRules | screens/P08-venue-back-office.yaml#BO-1036
+      status: fixed
+      by: CHG-WIR-025
   BO-1037:
     block: C
     summary: >-
@@ -6898,6 +7210,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#setSeatRecommendationRules | screens/P08-venue-back-office.yaml#BO-1037
+      status: fixed
+      by: CHG-WIR-025
   BO-1038:
     block: C
     summary: >-
@@ -6930,6 +7244,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#recommendSeats | screens/P08-venue-back-office.yaml#BO-1039
+      status: fixed
+      by: CHG-WIR-025
   BO-1040:
     block: C
     summary: >-
@@ -6952,6 +7268,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#reassignSeats | screens/P08-venue-back-office.yaml#BO-1040
+      status: fixed
+      by: CHG-WIR-025
   BO-1041:
     block: C
     summary: >-
@@ -6971,6 +7289,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#setSeatRecommendationRules | screens/P08-venue-back-office.yaml#BO-1041
+      status: fixed
+      by: CHG-WIR-025
   BO-1042:
     block: C
     summary: >-
@@ -7017,6 +7337,8 @@ screens:
     - what: The screen only lists strategies; nothing writes a seat pricing rule.
       why: The purpose is configuration (section, row, seat rules with floor, ceiling and step).
       source: screens/P08-venue-back-office.yaml#BO-1044
+      status: logged
+      by: CHG-WIR-027
   BO-1045:
     block: A
     summary: >-
@@ -7138,6 +7460,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#simulatePriceBreakdownCalculation | screens/P08-venue-back-office.yaml#BO-1049
+      status: logged
+      by: CHG-WIR-027
   BO-1050:
     block: B
     summary: >-
@@ -7170,6 +7494,8 @@ screens:
     - what: The only read lists seats of a map; it carries no sales or revenue.
       why: Analytics need a reporting read.
       source: contracts/satellite/seating.yaml#listSeats
+      status: logged
+      by: CHG-WIR-027
   BO-1055:
     block: C
     summary: >-
@@ -7211,6 +7537,8 @@ screens:
       why: >-
         Stakeholder holds (VIP, sponsor, media) are a seating concept; the report needs that source.
       source: contracts/spine/catalogue.yaml#listInventoryHolds
+      status: fixed
+      by: CHG-WIR-025
   BO-1058:
     block: B
     summary: >-
@@ -7257,6 +7585,8 @@ screens:
         The purpose is a platform-wide tenant and environment command centre, which belongs to the TICVAI Console.
       why: A venue back-office screen cannot show other tenants; the operations are venue map lists.
       source: screens/P08-venue-back-office.yaml#BO-1061
+      status: fixed
+      by: CHG-WIR-026
     - what: >-
         List operation(s) listVenueMaps return a bare array, not the paged list envelope (items, nextCursor, hasMore).
       why: >-
@@ -7298,6 +7628,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/seating.yaml#cloneSeatMap | contracts/spine/tenancy.yaml#setConfigurationProfile | screens/P08-venue-back-office.yaml#BO-1070
+      status: fixed
+      by: CHG-WIR-025
   BO-1072:
     block: C
     summary: >-
@@ -7316,6 +7648,8 @@ screens:
         An API catalogue reads seat maps; it should read the published API definitions (developer portal).
       why: The operation does not serve the purpose.
       source: contracts/satellite/seating.yaml#listSeatMaps
+      status: fixed
+      by: CHG-WIR-025
   BO-1079:
     block: C
     summary: >-
@@ -7334,12 +7668,16 @@ screens:
       why: An audit view needs listAuditRecords or a seating audit read.
       source: >-
         contracts/satellite/seating.yaml#getSeatReconciliation | contracts/spine/tenancy.yaml#listAuditRecords
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         List operation(s) getSeatReconciliation return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/seating.yaml#getSeatReconciliation
+      status: fixed
+      by: CHG-WIR-025
   BO-1083:
     block: C
     summary: >-
@@ -7401,6 +7739,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#createWalletType | contracts/satellite/wallet.yaml#updateWalletType | screens/P08-venue-back-office.yaml#BO-1085
+      status: fixed
+      by: CHG-WIR-025
   BO-1086:
     block: C
     summary: >-
@@ -7445,6 +7785,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#updateWalletType | screens/P08-venue-back-office.yaml#BO-1087
+      status: fixed
+      by: CHG-WIR-025
   BO-1088:
     block: C
     summary: >-
@@ -7485,6 +7827,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#updateWalletType | screens/P08-venue-back-office.yaml#BO-1089
+      status: fixed
+      by: CHG-WIR-025
   BO-1090:
     block: C
     summary: >-
@@ -7506,6 +7850,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#updateWalletType | screens/P08-venue-back-office.yaml#BO-1090
+      status: fixed
+      by: CHG-WIR-025
   BO-1091:
     block: C
     summary: >-
@@ -7530,6 +7876,8 @@ screens:
       source: >-
         contracts/satellite/wallet.yaml#updateWalletType | contracts/satellite/wallet.yaml#linkWalletCredential
         | screens/P08-venue-back-office.yaml#BO-1091
+      status: fixed
+      by: CHG-WIR-025
   BO-1092:
     block: C
     summary: >-
@@ -7555,6 +7903,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#publishWalletConfiguration | screens/P08-venue-back-office.yaml#BO-1092
+      status: fixed
+      by: CHG-WIR-025
   BO-1093:
     block: C
     summary: >-
@@ -7600,10 +7950,6 @@ screens:
         bonus: Top up 500, get 50 Bonus credit (expires in 90 days)
         approvalAbove: AED 1,000.00
         velocity: 5 top-ups an hour, AED 3,000 a day
-    openQuestions:
-    - question: Is the auto-reload use case valid for the client?
-      default: Draw it, marked optional per wallet type.
-      source: TRACKER Actions row 108
     corrections:
     - what: >-
         No read operation: the screen declares only setWalletFundingRules and nothing that returns the current configuration.
@@ -7612,6 +7958,15 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletFundingRules | screens/P08-venue-back-office.yaml#BO-1094
+      status: fixed
+      by: CHG-WIR-025
+    decisions:
+    - question: Is the auto-reload use case valid for the client?
+      decision: 'Drawn default accepted: Draw it, marked optional per wallet type.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-105 | CHG-NOTE-006
+      questionSource: TRACKER Actions row 108
   BO-1095:
     block: C
     summary: >-
@@ -7631,6 +7986,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletFundingRules | screens/P08-venue-back-office.yaml#BO-1095
+      status: fixed
+      by: CHG-WIR-025
   BO-1096:
     block: C
     summary: >-
@@ -7658,6 +8015,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletFundingRules | screens/P08-venue-back-office.yaml#BO-1096
+      status: fixed
+      by: CHG-WIR-025
   BO-1097:
     block: C
     summary: >-
@@ -7679,6 +8038,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletFundingRules | screens/P08-venue-back-office.yaml#BO-1097
+      status: fixed
+      by: CHG-WIR-025
   BO-1098:
     block: C
     summary: >-
@@ -7700,6 +8061,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletFundingRules | screens/P08-venue-back-office.yaml#BO-1098
+      status: fixed
+      by: CHG-WIR-025
   BO-1099:
     block: C
     summary: >-
@@ -7720,6 +8083,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletFundingRules | screens/P08-venue-back-office.yaml#BO-1099
+      status: fixed
+      by: CHG-WIR-025
   BO-1100:
     block: C
     summary: >-
@@ -7742,6 +8107,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#reverseWalletFunding | contracts/satellite/wallet.yaml#adjustWallet | screens/P08-venue-back-office.yaml#BO-1100
+      status: fixed
+      by: CHG-WIR-025
   BO-1101:
     block: C
     summary: >-
@@ -7763,6 +8130,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletFundingRules | screens/P08-venue-back-office.yaml#BO-1101
+      status: fixed
+      by: CHG-WIR-025
   BO-1102:
     block: C
     summary: >-
@@ -7819,6 +8188,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#createCreditType | contracts/satellite/wallet.yaml#updateCreditType | screens/P08-venue-back-office.yaml#BO-1104
+      status: fixed
+      by: CHG-WIR-025
   BO-1105:
     block: C
     summary: >-
@@ -7833,6 +8204,8 @@ screens:
     - what: Issuance rules are written through updateCreditType, which changes a credit type.
       why: An issuance rule (trigger to credit) is a different record.
       source: contracts/satellite/wallet.yaml#updateCreditType
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         No read operation: the screen declares only updateCreditType and nothing that returns the current configuration.
       why: >-
@@ -7840,6 +8213,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#updateCreditType | screens/P08-venue-back-office.yaml#BO-1105
+      status: fixed
+      by: CHG-WIR-025
   BO-1106:
     block: C
     summary: >-
@@ -7862,6 +8237,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setCreditEligibilityRules | screens/P08-venue-back-office.yaml#BO-1106
+      status: logged
+      by: CHG-WIR-027
   BO-1107:
     block: C
     summary: >-
@@ -7896,6 +8273,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#updateCreditType | screens/P08-venue-back-office.yaml#BO-1108
+      status: fixed
+      by: CHG-WIR-025
   BO-1109:
     block: C
     summary: >-
@@ -7939,6 +8318,8 @@ screens:
       source: >-
         contracts/satellite/wallet.yaml#setCreditConsumptionPolicy | contracts/satellite/wallet.yaml#simulateCreditConsumption
         | screens/P08-venue-back-office.yaml#BO-1110
+      status: fixed
+      by: CHG-WIR-025
   BO-1111:
     block: A
     summary: >-
@@ -7968,6 +8349,8 @@ screens:
       why: >-
         DI-527 asks for a customer-level view of balances and expiry dates; expireCreditLots only acts.
       source: DI-527 | contracts/satellite/wallet.yaml#expireCreditLots
+      status: fixed
+      by: CHG-WIR-025
   BO-1112:
     block: C
     summary: >-
@@ -7991,6 +8374,8 @@ screens:
       source: >-
         contracts/satellite/wallet.yaml#simulateCreditConsumption | contracts/satellite/wallet.yaml#publishWalletConfiguration
         | screens/P08-venue-back-office.yaml#BO-1112
+      status: fixed
+      by: CHG-WIR-025
   BO-1113:
     block: C
     summary: >-
@@ -8028,6 +8413,8 @@ screens:
     - what: createSharedWallet creates a wallet, not a reusable model.
       why: Models need their own record.
       source: contracts/satellite/wallet.yaml#createSharedWallet
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         No read operation: the screen declares only createSharedWallet and nothing that returns the current configuration.
       why: >-
@@ -8035,6 +8422,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#createSharedWallet | screens/P08-venue-back-office.yaml#BO-1114
+      status: fixed
+      by: CHG-WIR-025
   BO-1115:
     block: C
     summary: >-
@@ -8057,6 +8446,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setSharedWalletMembers | screens/P08-venue-back-office.yaml#BO-1115
+      status: fixed
+      by: CHG-WIR-025
   BO-1116:
     block: C
     summary: >-
@@ -8085,6 +8476,8 @@ screens:
       source: >-
         contracts/satellite/wallet.yaml#setSharedWalletMembers | contracts/satellite/wallet.yaml#transferWalletBalance
         | screens/P08-venue-back-office.yaml#BO-1116
+      status: fixed
+      by: CHG-WIR-025
   BO-1117:
     block: C
     summary: >-
@@ -8106,6 +8499,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setSharedWalletMembers | screens/P08-venue-back-office.yaml#BO-1117
+      status: fixed
+      by: CHG-WIR-025
   BO-1118:
     block: C
     summary: >-
@@ -8130,6 +8525,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setSharedWalletMembers | screens/P08-venue-back-office.yaml#BO-1118
+      status: fixed
+      by: CHG-WIR-025
   BO-1119:
     block: C
     summary: >-
@@ -8193,6 +8590,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#transferWalletBalance | screens/P08-venue-back-office.yaml#BO-1121
+      status: fixed
+      by: CHG-WIR-025
   BO-1122:
     block: C
     summary: >-
@@ -8275,6 +8674,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setGiftCardProduct | screens/P08-venue-back-office.yaml#BO-1124
+      status: logged
+      by: CHG-WIR-027
   BO-1125:
     block: C
     summary: >-
@@ -8302,6 +8703,8 @@ screens:
       source: >-
         contracts/satellite/wallet.yaml#issueGiftCard | contracts/satellite/wallet.yaml#activateGiftCard | contracts/satellite/wallet.yaml#redeemGiftCard
         | screens/P08-venue-back-office.yaml#BO-1125
+      status: fixed
+      by: CHG-WIR-025
   BO-1126:
     block: C
     summary: >-
@@ -8346,6 +8749,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#createVoucherType | screens/P08-venue-back-office.yaml#BO-1127
+      status: fixed
+      by: CHG-WIR-025
   BO-1128:
     block: C
     summary: >-
@@ -8388,6 +8793,8 @@ screens:
     - what: No operation stores presentation (sections, order, labels).
       why: The configuration has no write.
       source: contracts/satellite/wallet.yaml#listVoucherTypes
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         List operation(s) listVoucherTypes return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -8416,6 +8823,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#expireCreditLots | screens/P08-venue-back-office.yaml#BO-1130
+      status: fixed
+      by: CHG-WIR-025
   BO-1131:
     block: C
     summary: >-
@@ -8465,6 +8874,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#publishWalletConfiguration | screens/P08-venue-back-office.yaml#BO-1132
+      status: fixed
+      by: CHG-WIR-025
   BO-1133:
     block: C
     summary: >-
@@ -8481,6 +8892,8 @@ screens:
     - what: A command centre declares only a configuration write (setWalletChannelRules).
       why: Usage needs a read of transactions by channel.
       source: contracts/satellite/wallet.yaml#setWalletChannelRules
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         No read operation: the screen declares only setWalletChannelRules and nothing that returns the current configuration.
       why: >-
@@ -8488,6 +8901,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1133
+      status: fixed
+      by: CHG-WIR-025
   BO-1134:
     block: C
     summary: >-
@@ -8513,6 +8928,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1134
+      status: logged
+      by: CHG-WIR-027
   BO-1135:
     block: C
     summary: >-
@@ -8534,6 +8951,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1135
+      status: logged
+      by: CHG-WIR-027
   BO-1136:
     block: C
     summary: >-
@@ -8556,6 +8975,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1136
+      status: logged
+      by: CHG-WIR-027
   BO-1137:
     block: C
     summary: >-
@@ -8578,6 +8999,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#linkWalletCredential | screens/P08-venue-back-office.yaml#BO-1137
+      status: logged
+      by: CHG-WIR-027
   BO-1138:
     block: C
     summary: >-
@@ -8598,6 +9021,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1138
+      status: logged
+      by: CHG-WIR-027
   BO-1139:
     block: C
     summary: >-
@@ -8622,6 +9047,8 @@ screens:
       source: >-
         contracts/satellite/wallet.yaml#setWalletChannelRules | contracts/satellite/wallet.yaml#setWalletAuthenticationPolicy
         | screens/P08-venue-back-office.yaml#BO-1139
+      status: logged
+      by: CHG-WIR-027
   BO-1140:
     block: C
     summary: >-
@@ -8647,6 +9074,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1140
+      status: logged
+      by: CHG-WIR-027
   BO-1141:
     block: C
     summary: >-
@@ -8724,6 +9153,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletTransferRules | screens/P08-venue-back-office.yaml#BO-1144
+      status: logged
+      by: CHG-WIR-027
   BO-1145:
     block: C
     summary: >-
@@ -8746,6 +9177,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletTransferRules | screens/P08-venue-back-office.yaml#BO-1145
+      status: logged
+      by: CHG-WIR-027
   BO-1146:
     block: A
     summary: >-
@@ -8789,6 +9222,8 @@ screens:
       why: Either the contract gains a per-source destination or the purpose is narrowed.
       source: >-
         screens/P08-venue-back-office.yaml#BO-1146 | contracts/satellite/wallet.yaml#setWalletRefundPolicy
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         setRefundPolicy needs REGION_CONFIGURE while setWalletRefundPolicy needs WALLET_CONFIGURE on the same screen.
       why: >-
@@ -8804,6 +9239,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setRefundPolicy | contracts/satellite/wallet.yaml#setWalletRefundPolicy | screens/P08-venue-back-office.yaml#BO-1146
+      status: fixed
+      by: CHG-WIR-025
   BO-1147:
     block: C
     summary: >-
@@ -8827,6 +9264,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletRefundPolicy | contracts/spine/orders.yaml#createRefund | screens/P08-venue-back-office.yaml#BO-1147
+      status: fixed
+      by: CHG-WIR-025
   BO-1148:
     block: C
     summary: >-
@@ -8845,6 +9284,8 @@ screens:
         The only operation reverses a top-up; payment, transfer and refund reversals have no operation.
       why: The listed operations cannot be performed.
       source: contracts/satellite/wallet.yaml#reverseWalletFunding
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         No read operation: the screen declares only reverseWalletFunding and nothing that returns the current configuration.
       why: >-
@@ -8852,6 +9293,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#reverseWalletFunding | screens/P08-venue-back-office.yaml#BO-1148
+      status: fixed
+      by: CHG-WIR-025
   BO-1149:
     block: C
     summary: >-
@@ -8875,6 +9318,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#adjustWallet | contracts/spine/approvals.yaml#setApprovalMatrix | screens/P08-venue-back-office.yaml#BO-1149
+      status: fixed
+      by: CHG-WIR-025
   BO-1150:
     block: C
     summary: >-
@@ -8897,6 +9342,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletRestriction | contracts/satellite/wallet.yaml#suspendWallet | screens/P08-venue-back-office.yaml#BO-1150
+      status: fixed
+      by: CHG-WIR-025
   BO-1151:
     block: C
     summary: >-
@@ -8916,6 +9363,8 @@ screens:
         The queue cannot resolve a dispute; resolveWalletDispute exists but is declared only on BO-1179.
       why: The work happens here.
       source: contracts/satellite/wallet.yaml#resolveWalletDispute
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         List operation(s) listWalletDisputes return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -8961,6 +9410,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1153
+      status: logged
+      by: CHG-WIR-027
   BO-1154:
     block: C
     summary: >-
@@ -8982,6 +9433,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1154
+      status: logged
+      by: CHG-WIR-027
   BO-1155:
     block: C
     summary: >-
@@ -9005,6 +9458,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1155
+      status: logged
+      by: CHG-WIR-027
   BO-1156:
     block: C
     summary: >-
@@ -9023,6 +9478,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1156
+      status: logged
+      by: CHG-WIR-027
   BO-1157:
     block: C
     summary: >-
@@ -9063,6 +9520,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1158
+      status: logged
+      by: CHG-WIR-027
   BO-1159:
     block: C
     summary: >-
@@ -9088,6 +9547,8 @@ screens:
       source: >-
         contracts/satellite/wallet.yaml#setWalletRiskRules | contracts/satellite/wallet.yaml#setWalletRestriction
         | screens/P08-venue-back-office.yaml#BO-1159
+      status: logged
+      by: CHG-WIR-027
   BO-1161:
     block: C
     summary: >-
@@ -9105,6 +9566,8 @@ screens:
     - what: The simulation operation is credit consumption, not risk rule testing.
       why: A security sandbox needs a rule backtest.
       source: contracts/satellite/wallet.yaml#simulateCreditConsumption
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         No read operation: the screen declares only simulateCreditConsumption and nothing that returns the current
         configuration.
@@ -9113,6 +9576,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#simulateCreditConsumption | screens/P08-venue-back-office.yaml#BO-1161
+      status: fixed
+      by: CHG-WIR-025
   BO-1162:
     block: A
     summary: >-
@@ -9156,6 +9621,8 @@ screens:
       why: >-
         The pack text of another board was attached; the operations are versioning, audit and risk-rule status.
       source: screens/P08-venue-back-office.yaml#BO-1162
+      status: fixed
+      by: CHG-WIR-026
     - what: The operations are tenant-scoped while the screen sits in the venue back office.
       why: >-
         A venue user would edit the tenant's wallet configuration; show the tenant scope explicitly or restrict
@@ -9203,6 +9670,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletAccountingMapping | screens/P08-venue-back-office.yaml#BO-1164
+      status: logged
+      by: CHG-WIR-027
   BO-1165:
     block: C
     summary: >-
@@ -9289,6 +9758,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletAccountingMapping | screens/P08-venue-back-office.yaml#BO-1169
+      status: logged
+      by: CHG-WIR-027
   BO-1171:
     block: C
     summary: >-
@@ -9324,11 +9795,15 @@ screens:
     - what: The catalogue reads wallet types, not API definitions.
       why: The operation does not serve the purpose.
       source: contracts/satellite/wallet.yaml#listWalletTypes
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         List operation(s) listWalletTypes return a bare array, not the paged list envelope (items, nextCursor, hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/wallet.yaml#listWalletTypes
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         No write operation: a configuration screen (Wallet API Catalogue & Endpoint Configuration) declares only
         reads (listWalletTypes).
@@ -9336,6 +9811,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/wallet.yaml#listWalletTypes
+      status: fixed
+      by: CHG-WIR-025
   BO-1175:
     block: C
     summary: >-
@@ -9358,6 +9835,8 @@ screens:
       source: >-
         contracts/satellite/wallet.yaml#setWalletChannelRules | contracts/satellite/wallet.yaml#setWalletIntegrationMapping
         | screens/P08-venue-back-office.yaml#BO-1175
+      status: logged
+      by: CHG-WIR-027
   BO-1176:
     block: C
     summary: >-
@@ -9382,6 +9861,8 @@ screens:
       source: >-
         contracts/satellite/wallet.yaml#setWalletRiskRules | contracts/satellite/public-api.yaml#createWebhookSubscription
         | screens/P08-venue-back-office.yaml#BO-1176
+      status: fixed
+      by: CHG-WIR-025
   BO-1178:
     block: C
     summary: >-
@@ -9398,6 +9879,8 @@ screens:
     - what: No operation configures retry or resilience.
       why: The screen has only a reconciliation read.
       source: contracts/satellite/wallet.yaml#getWalletReconciliation
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         No write operation: a configuration screen (Synchronization, Retry & Resilience Configuration) declares
         only reads (getWalletReconciliation).
@@ -9450,6 +9933,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#publishWalletConfiguration | screens/P08-venue-back-office.yaml#BO-1180
+      status: fixed
+      by: CHG-WIR-025
   BO-1181:
     block: C
     summary: >-
@@ -9587,12 +10072,14 @@ screens:
         readiness:
           fareTable: false
           timetable: false
-    openQuestions:
-    - question: >-
-        Are the popular-route card's starting fare, featured order and image set per route in the back office?
-      default: >-
-        Routes carry a featured order and an image; the starting fare is computed from the lowest fare.
-      source: DI-1119
+    decisions:
+    - question: Are the popular-route card's starting fare, featured order and image set per route in the back office?
+      decision: 'Drawn default accepted: Routes carry a featured order and an image; the starting fare is computed from the
+        lowest fare.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-106 | CHG-NOTE-006
+      questionSource: DI-1119
   BO-1185:
     block: A
     summary: >-
@@ -9698,10 +10185,13 @@ screens:
           days:
           - fri
           - sat
-    openQuestions:
+    decisions:
     - question: Is the 30-day release horizon right for the client?
-      default: 30, editable per timetable.
-      source: REV3-21 | contracts/satellite/transport.yaml#createTransportTimetable
+      decision: 'Drawn default accepted: 30, editable per timetable.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-107 | CHG-NOTE-006
+      questionSource: REV3-21 | contracts/satellite/transport.yaml#createTransportTimetable
   BO-1187:
     block: C
     summary: >-
@@ -9833,10 +10323,6 @@ screens:
         - App
         - Point of sale
         raised: AED 48,215.00
-    openQuestions:
-    - question: Are donations taxable, and may a tax or service fee be enabled on them?
-      default: No tax on donations; a switch for a tax or fee, off by default.
-      source: DI-472 | TRACKER Actions row 143
     corrections:
     - what: >-
         List operation(s) listDonationCampaigns return a bare array, not the paged list envelope (items, nextCursor,
@@ -9844,6 +10330,14 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listDonationCampaigns
+    decisions:
+    - question: Are donations taxable, and may a tax or service fee be enabled on them?
+      decision: 'Drawn default stands (answer: "No tax; optional fee switch"): No tax on donations; a switch for a tax or
+        fee, off by default.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-169 | CHG-NOTE-006
+      questionSource: DI-472 | TRACKER Actions row 143
   ADM-048:
     block: B
     summary: >-
@@ -9915,6 +10409,11 @@ screens:
         The modules that use this list (ticketing, B2C, POS, kiosk, B2B, group sales, membership, F&B, retail, rental)
         as chips, so a change's reach is visible.
       source: contracts/spine/catalogue.yaml#setPriceListMaster
+    - element: Where this screen lives
+      rule: 'A venue screen: it moves to Venue Management (P08) and merges with BO-008 product, BO-009 price matrix, BO-010
+        promotions and BO-011 bundles, so one surface edits each record. TICVAI staff reach it only under a platform-staff
+        grant (R098).'
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-006)
     actions:
     - action: Duplicate
       result: New draft list with "copied from" set; the user is asked for the new code and validity.
@@ -9953,19 +10452,27 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setPriceListMaster | screens/P09-platform-admin-console.yaml#ADM-049
-    openQuestions:
-    - question: >-
-        The pack-derived Commercial screens (ADM-048 to ADM-317, ADM-559 to ADM-698) live on the TICVAI Console
-        but configure venue-scoped records that the venue also edits on P08 (BO-009, BO-010, BO-011). Who uses them:
-        the venue's own commercial team, or TICVAI staff acting for a tenant?
-      default: >-
-        P08 is the venue's working surface; P09 shows the same records for TICVAI staff under a platform-staff grant
-        (R098), with identical vocabulary and components.
-      source: >-
-        R098 | screens/P09-platform-admin-console.yaml#ADM-049 | contracts/spine/catalogue.yaml#setPriceListMaster
+      status: fixed
+      by: CHG-WIR-025
+    decisions:
+    - question: 'The pack-derived Commercial screens (ADM-048 to ADM-317, ADM-559 to ADM-698) live on the TICVAI Console but
+        configure venue-scoped records that the venue also edits on P08 (BO-009, BO-010, BO-011). Who uses them: the venue''s
+        own commercial team, or TICVAI staff acting for a tenant?'
+      decision: 'The 410 workshop-pack screens on the TICVAI Console (370 Commercial, 20 Catalogue lifecycle, 20 Rules and
+        workflow) are venue screens: move them to Venue Management (P08) and merge them with BO-008 product, BO-009 price
+        matrix, BO-010 promotions, BO-011 bundles and the rules/workflow screens, so one surface edits each record. TICVAI
+        staff reach them only through a platform-staff grant (R098).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-100 | CHG-NOTE-006
+      questionSource: R098 | screens/P09-platform-admin-console.yaml#ADM-049 | contracts/spine/catalogue.yaml#setPriceListMaster
     - question: Which way does price list priority run (does the higher or the lower number win)?
-      default: Label it "Higher number wins" and show the overlapping lists.
-      source: contracts/spine/catalogue.yaml#createPriceList
+      decision: 'Drawn default stands (answer: "Default: higher number wins"): Label it "Higher number wins" and show the
+        overlapping lists.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-101 | CHG-NOTE-006
+      questionSource: contracts/spine/catalogue.yaml#createPriceList
   ADM-050:
     block: A
     summary: >-
@@ -10073,6 +10580,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setRateStructure | screens/P09-platform-admin-console.yaml#ADM-051
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Per Ticket, Per Resource, Per Package, Per Membership Period.
       why: >-
@@ -10120,6 +10629,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setProductServicePrice | screens/P09-platform-admin-console.yaml#ADM-052
+      status: logged
+      by: CHG-WIR-027
     - what: 'Pack actions with no operation: Ticket Type, Event, Venue.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
@@ -10205,6 +10716,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setPriceHierarchyInheritance | screens/P09-platform-admin-console.yaml#ADM-055
+      status: logged
+      by: CHG-WIR-027
   ADM-056:
     block: B
     summary: >-
@@ -10298,6 +10811,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/catalogue.yaml#listCustomerSegmentProfile
+      status: logged
+      by: CHG-WIR-027
   ADM-060:
     block: B
     summary: >-
@@ -10322,6 +10837,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/catalogue.yaml#listMembershipLoyaltyPricing
+      status: logged
+      by: CHG-WIR-027
   ADM-061:
     block: B
     summary: >-
@@ -10344,6 +10861,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/catalogue.yaml#listResidencyNationalityMarket
+      status: logged
+      by: CHG-WIR-027
   ADM-062:
     block: B
     summary: >-
@@ -10365,6 +10884,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/catalogue.yaml#listChannelBasedPricing
+      status: logged
+      by: CHG-WIR-027
   ADM-063:
     block: B
     summary: >-
@@ -10391,6 +10912,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/catalogue.yaml#listLocationVenueEvent
+      status: logged
+      by: CHG-WIR-027
   ADM-064:
     block: B
     summary: >-
@@ -10418,6 +10941,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/catalogue.yaml#listQuantityGroupVolume
+      status: logged
+      by: CHG-WIR-027
   ADM-065:
     block: B
     summary: >-
@@ -10441,6 +10966,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/catalogue.yaml#listEffectiveDateSeason
+      status: logged
+      by: CHG-WIR-027
   ADM-066:
     block: B
     summary: >-
@@ -10461,6 +10988,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/catalogue.yaml#listTimeslotPerformanceTime
+      status: logged
+      by: CHG-WIR-027
   ADM-067:
     block: B
     summary: >-
@@ -10489,6 +11018,8 @@ screens:
       why: Static pricing rule priority cannot be changed here.
       source: >-
         contracts/spine/catalogue.yaml#listPricingRulePriority | contracts/spine/catalogue.yaml#setRulePriorityConflict
+      status: logged
+      by: CHG-WIR-027
   ADM-070:
     block: B
     summary: >-
@@ -10520,6 +11051,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setTaxRuleTreatment | screens/P09-platform-admin-console.yaml#ADM-070
+      status: logged
+      by: CHG-WIR-027
     - what: 'Pack actions with no operation: Out of Scope, Fixed Tax.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
@@ -10574,6 +11107,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setFeeApplicabilityCharging | screens/P09-platform-admin-console.yaml#ADM-072
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         Pack actions with no operation: Product, Product Category, Channel, Venue, Event, Customer Type, Membership,
         Transaction Type ….
@@ -10609,6 +11144,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/catalogue.yaml#listFeeWaiverTax
+      status: logged
+      by: CHG-WIR-027
   ADM-074:
     block: B
     summary: >-
@@ -10691,6 +11228,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#simulatePriceBreakdownCalculation | screens/P09-platform-admin-console.yaml#ADM-076
+      status: logged
+      by: CHG-WIR-027
   ADM-078:
     block: B
     summary: >-
@@ -10743,6 +11282,8 @@ screens:
       source: >-
         contracts/spine/catalogue.yaml#setPricingChangeRequest | contracts/spine/catalogue.yaml#submitPricingChangeRequest
         | contracts/spine/catalogue.yaml#decidePricingChangeRequest | screens/P09-platform-admin-console.yaml#ADM-079
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         Pack actions with no operation: Price Change, Price List Change, Eligibility Rule Change, Tax Change, Fee
         Change, Formula Change, Currency/Rounding Change, Emergency Change.
@@ -10835,6 +11376,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#approvePricingWorkflowAuthority | screens/P09-platform-admin-console.yaml#ADM-083
+      status: fixed
+      by: CHG-WIR-025
   ADM-084:
     block: B
     summary: >-
@@ -10859,6 +11402,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#publishPricingEffectiveDate | screens/P09-platform-admin-console.yaml#ADM-084
+      status: logged
+      by: CHG-WIR-027
     - what: 'Pack actions with no operation: Scheduled Publication, Staged Publication.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
@@ -10977,6 +11522,8 @@ screens:
       source: >-
         contracts/spine/catalogue.yaml#setDynamicPricingStrategy | contracts/spine/catalogue.yaml#transitionDynamicPricingStrategy
         | screens/P09-platform-admin-console.yaml#ADM-089
+      status: fixed
+      by: CHG-WIR-025
   ADM-090:
     block: A
     summary: >-
@@ -11019,6 +11566,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setDemandOccupancyAvailability | screens/P09-platform-admin-console.yaml#ADM-090
+      status: fixed
+      by: CHG-WIR-025
   ADM-091:
     block: A
     summary: >-
@@ -11056,6 +11605,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setBookingVelocityTime | screens/P09-platform-admin-console.yaml#ADM-091
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Sales per Hour, Sales per Day, Sales per Week, Current Booking Pace, Expected
         Booking Pace, Historical Booking Curve, Remaining Inventory.
@@ -11102,6 +11653,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/catalogue.yaml#listChannelCustomerSegment
+      status: logged
+      by: CHG-WIR-027
   ADM-094:
     block: B
     summary: >-
@@ -11319,6 +11872,8 @@ screens:
     - what: No operation accepts or dismisses a recommendation.
       why: The decision is the point of the screen.
       source: contracts/spine/catalogue.yaml#listPricingRecommendationExplainability
+      status: fixed
+      by: CHG-WIR-025
   ADM-107:
     block: B
     summary: >-
@@ -11390,6 +11945,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setPricing | screens/P09-platform-admin-console.yaml#ADM-109
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         Pack actions with no operation: Save Scenario, Compare Scenario, Send for Approval, Start Experiment, Discard.
       why: >-
@@ -11414,6 +11971,8 @@ screens:
     - what: The purpose repeats the screen name and nothing creates a scenario.
       why: A what-if screen needs a write for the scenario's assumptions.
       source: contracts/spine/catalogue.yaml#listScenarioModelingWhat
+      status: fixed
+      by: CHG-WIR-026
     - what: >-
         Pack actions with no operation: Low Demand, Expected Demand, High Demand, Competitor Price Drop, Competitor
         Price Increase, Inventory Reduction, Custom Scenario, Save ….
@@ -11448,6 +12007,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setPricingExperiment | screens/P09-platform-admin-console.yaml#ADM-111
+      status: logged
+      by: CHG-WIR-027
   ADM-112:
     block: B
     summary: >-
@@ -11515,6 +12076,8 @@ screens:
         The monitor's only operation creates a live price (createLiveDynamicPrice) and there is no read of executions.
       why: A monitor needs a list; executing a price from a monitor bypasses governance.
       source: contracts/spine/catalogue.yaml#createLiveDynamicPrice
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         No read operation: the screen declares only createLiveDynamicPrice and nothing that returns the current
         configuration.
@@ -11651,6 +12214,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setLifecycleStatuWorkflow | screens/P09-platform-admin-console.yaml#ADM-120
+      status: logged
+      by: CHG-WIR-027
   ADM-121:
     block: A
     summary: >-
@@ -11704,6 +12269,12 @@ screens:
     - element: transfer jobs
       rule: Direction, source and target environment, products, missing references, status.
       source: contracts/spine/catalogue.yaml#listProductImportExport
+    - element: How production changes
+      rule: Never merge or reverse-migrate a production database. Schema goes forward only, through versioned migrations (expand,
+        then contract). Configuration moves as a versioned package exported with stable keys, diffed against production, approved,
+        applied as an idempotent upsert by key and audited; rollback re-applies the previous package. Secrets and environment
+        settings never travel in it.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-006)
     sampleData:
       job:
         direction: import
@@ -11712,11 +12283,16 @@ screens:
         products: 18
         missingReferences:
         - tax profile AE-VAT-5
-    openQuestions:
-    - question: >-
-        After go-live, is configuration promoted from pre-production to production only as configuration?
-      default: Show transfers as configuration-only jobs with approval.
-      source: TRACKER Actions row 284
+    decisions:
+    - question: After go-live, is configuration promoted from pre-production to production only as configuration?
+      decision: 'Industry standard for production change: never merge or reverse-migrate production databases. Schema goes
+        forward-only through versioned migrations (expand then contract). Configuration moves as a versioned package exported
+        with stable keys, diffed against production, approved, applied as an idempotent upsert by key, and audited; rollback
+        re-applies the previous package. Secrets and environment settings never travel in it.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-168 | CHG-NOTE-006
+      questionSource: TRACKER Actions row 284
   ADM-123:
     block: B
     summary: >-
@@ -11742,6 +12318,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setProductContextOwnership | screens/P09-platform-admin-console.yaml#ADM-123
+      status: logged
+      by: CHG-WIR-027
   ADM-124:
     block: B
     summary: >-
@@ -11768,6 +12346,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#publishChannelAvailability | screens/P09-platform-admin-console.yaml#ADM-124
+      status: logged
+      by: CHG-WIR-027
   ADM-125:
     block: B
     summary: >-
@@ -11823,6 +12403,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setCatalogueReview | screens/P09-platform-admin-console.yaml#ADM-127
+      status: logged
+      by: CHG-WIR-027
   ADM-128:
     block: B
     summary: >-
@@ -11859,6 +12441,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#approveWorkflow | screens/P09-platform-admin-console.yaml#ADM-129
+      status: fixed
+      by: CHG-WIR-025
   ADM-130:
     block: B
     summary: >-
@@ -11885,6 +12469,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#approveReviewDecision | screens/P09-platform-admin-console.yaml#ADM-130
+      status: fixed
+      by: CHG-WIR-025
   ADM-131:
     block: B
     summary: >-
@@ -11929,6 +12515,8 @@ screens:
         The screen lists rollbacks but declares no write; requestPricingRollback handles subject product as well.
       why: Rollback cannot be started from the rollback screen.
       source: contracts/spine/catalogue.yaml#requestPricingRollback
+      status: fixed
+      by: CHG-WIR-025
   ADM-133:
     block: B
     summary: >-
@@ -12094,6 +12682,8 @@ screens:
     - what: The screen lists all promotions (listPromotions) but shows one.
       why: It needs getPromotion and getPromotionUsage for the selected promotion.
       source: contracts/satellite/promotions.yaml#getPromotion
+      status: fixed
+      by: CHG-WIR-025
   ADM-141:
     block: B
     summary: >-
@@ -12122,6 +12712,8 @@ screens:
         but are not declared.
       why: A "status manager" that cannot change status.
       source: contracts/satellite/promotions.yaml#listPromotionLifecycleStatus
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         List operation(s) listPromotionLifecycleStatus return a bare array, not the paged list envelope (items,
         nextCursor, hasMore).
@@ -12313,6 +12905,8 @@ screens:
       source: >-
         contracts/satellite/promotions.yaml#setPromotionRule | contracts/satellite/promotions.yaml#setPromotionStackingRule
         | screens/P09-platform-admin-console.yaml#ADM-148
+      status: logged
+      by: CHG-WIR-027
     - what: 'Pack actions with no operation: Nested condition groups.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
@@ -12350,6 +12944,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listPercentageFixedDiscount
+      status: logged
+      by: CHG-WIR-027
   ADM-150:
     block: B
     summary: >-
@@ -12380,6 +12976,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listCartTransactionThreshold
+      status: logged
+      by: CHG-WIR-027
   ADM-151:
     block: B
     summary: >-
@@ -12409,6 +13007,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listVolumeBulkTier
+      status: logged
+      by: CHG-WIR-027
   ADM-152:
     block: B
     summary: >-
@@ -12435,6 +13035,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listTimeBasedSeasonal
+      status: logged
+      by: CHG-WIR-027
   ADM-153:
     block: B
     summary: >-
@@ -12464,6 +13066,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listCustomerMembershipSegment
+      status: logged
+      by: CHG-WIR-027
   ADM-154:
     block: B
     summary: >-
@@ -12504,6 +13108,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listPaymentMethodBank
+      status: logged
+      by: CHG-WIR-027
   ADM-155:
     block: B
     summary: >-
@@ -12533,6 +13139,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listSpecialPriceGuest
+      status: logged
+      by: CHG-WIR-027
   ADM-156:
     block: B
     summary: >-
@@ -12564,6 +13172,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listDiscountLimitGuardrail
+      status: logged
+      by: CHG-WIR-027
   ADM-157:
     block: B
     summary: >-
@@ -12585,6 +13195,8 @@ screens:
         evaluatePromotions (evaluateAt, lines, coupon codes) already returns the working; reuse it.
       source: >-
         contracts/satellite/promotions.yaml#setRuleTestRecommendation | contracts/satellite/promotions.yaml#evaluatePromotions
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         No read operation: the screen declares only setRuleTestRecommendation and nothing that returns the current
         configuration.
@@ -12593,6 +13205,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setRuleTestRecommendation | screens/P09-platform-admin-console.yaml#ADM-157
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Campaign Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager,
         Venue Manager.
@@ -12673,6 +13287,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setCouponPromoCode | screens/P09-platform-admin-console.yaml#ADM-159
+      status: fixed
+      by: CHG-WIR-025
   ADM-160:
     block: B
     summary: >-
@@ -12709,6 +13325,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listUniqueCodeGeneration
+      status: fixed
+      by: CHG-WIR-025
   ADM-161:
     block: B
     summary: >-
@@ -12734,6 +13352,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listCodeEligibilityRestriction
+      status: logged
+      by: CHG-WIR-027
   ADM-162:
     block: B
     summary: >-
@@ -12763,6 +13383,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listUsageCapacityFrequency
+      status: logged
+      by: CHG-WIR-027
   ADM-163:
     block: B
     summary: >-
@@ -12791,6 +13413,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listValidityDateTime
+      status: logged
+      by: CHG-WIR-027
   ADM-164:
     block: A
     summary: >-
@@ -12830,6 +13454,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setCodeDistributionManager | screens/P09-platform-admin-console.yaml#ADM-164
+      status: fixed
+      by: CHG-WIR-025
   ADM-165:
     block: B
     summary: >-
@@ -12957,6 +13583,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setBuyGetBogo | screens/P09-platform-admin-console.yaml#ADM-169
+      status: logged
+      by: CHG-WIR-027
   ADM-170:
     block: B
     summary: >-
@@ -12982,6 +13610,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listMultiBuyQuantity
+      status: logged
+      by: CHG-WIR-027
   ADM-171:
     block: B
     summary: >-
@@ -13031,6 +13661,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setFixedPriceOffer | screens/P09-platform-admin-console.yaml#ADM-172
+      status: logged
+      by: CHG-WIR-027
   ADM-173:
     block: A
     summary: >-
@@ -13061,6 +13693,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setGiftFreeProduct | screens/P09-platform-admin-console.yaml#ADM-173
+      status: logged
+      by: CHG-WIR-027
   ADM-174:
     block: A
     summary: >-
@@ -13092,6 +13726,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setCrossCategoryPromotion | screens/P09-platform-admin-console.yaml#ADM-174
+      status: logged
+      by: CHG-WIR-027
   ADM-175:
     block: B
     summary: >-
@@ -13147,6 +13783,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listAdvancedOfferGuardrail
+      status: logged
+      by: CHG-WIR-027
   ADM-177:
     block: B
     summary: >-
@@ -13167,6 +13805,8 @@ screens:
       why: A simulator needs a request (compare evaluatePromotions).
       source: >-
         contracts/satellite/promotions.yaml#listOfferBasketTrace | contracts/satellite/promotions.yaml#evaluatePromotions
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Single transaction, Historical transaction replay, Sample customer segment,
         Forecast simulation, Bulk scenario testing.
@@ -13282,6 +13922,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setBundleComponent | screens/P09-platform-admin-console.yaml#ADM-180
+      status: fixed
+      by: CHG-WIR-025
   ADM-181:
     block: A
     summary: >-
@@ -13333,6 +13975,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setGuestChoiceBuild | screens/P09-platform-admin-console.yaml#ADM-181
+      status: fixed
+      by: CHG-WIR-025
   ADM-182:
     block: C
     summary: >-
@@ -13403,6 +14047,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listBundleValidityScheduling
+      status: logged
+      by: CHG-WIR-027
   ADM-185:
     block: C
     summary: >-
@@ -13454,6 +14100,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listRevenueAllocationCost
+      status: logged
+      by: CHG-WIR-027
   ADM-187:
     block: C
     summary: >-
@@ -13475,6 +14123,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#simulateBundlePreviewRecommendation | screens/P09-platform-admin-console.yaml#ADM-187
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Campaign Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager,
         Venue Manager.
@@ -13489,6 +14139,8 @@ screens:
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
       source: screens/P09-platform-admin-console.yaml#ADM-187
+      status: fixed
+      by: CHG-WIR-026
   ADM-188:
     block: C
     summary: >-
@@ -13684,6 +14336,8 @@ screens:
     - what: The simulation is a list with no input.
       why: A scenario must be sent.
       source: contracts/satellite/promotions.yaml#listDynamicBundle2
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         List operation(s) listDynamicBundle2, listDynamicBundle, listDynamicBundleRule return a bare array, not
         the paged list envelope (items, nextCursor, hasMore); rows of listDynamicBundle2, listDynamicBundle, listDynamicBundleRule
@@ -13743,6 +14397,8 @@ screens:
         Resale eligibility is a different concept from promotion eligibility; it belongs with resale configuration,
         and its priceCategory field is typed Money.
       source: contracts/spine/orders.yaml#setResaleEligibilityRule
+      status: fixed
+      by: CHG-WIR-025
     - what: Every criterion is a free string and nested groups are a string.
       why: A rule engine needs field, operator and value; the typed analogue is PromotionConditions.
       source: contracts/satellite/promotions.yaml#setEligibilityRule
@@ -13755,6 +14411,8 @@ screens:
       source: >-
         contracts/satellite/promotions.yaml#setEligibilityRule | contracts/spine/orders.yaml#setResaleEligibilityRule
         | screens/P09-platform-admin-console.yaml#ADM-199
+      status: fixed
+      by: CHG-WIR-025
     - what: 'Pack actions with no operation: Multiple condition sets.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
@@ -13910,6 +14568,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listTargetingConflictFrequency
+      status: logged
+      by: CHG-WIR-027
   ADM-207:
     block: C
     summary: >-
@@ -13983,6 +14643,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listPromotionPriorityHierarchy
+      status: logged
+      by: CHG-WIR-027
   ADM-210:
     block: C
     summary: >-
@@ -14005,6 +14667,8 @@ screens:
       source: >-
         contracts/satellite/promotions.yaml#setPromotionStackingRule | contracts/satellite/promotions.yaml#setPromotionRule
         | screens/P09-platform-admin-console.yaml#ADM-210
+      status: logged
+      by: CHG-WIR-027
   ADM-211:
     block: C
     summary: >-
@@ -14089,6 +14753,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listDiscountCapMaximum
+      status: logged
+      by: CHG-WIR-027
   ADM-215:
     block: C
     summary: >-
@@ -14244,6 +14910,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listRedemptionDiscountExposure
+      status: logged
+      by: CHG-WIR-027
   ADM-221:
     block: C
     summary: >-
@@ -14307,6 +14975,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#approveCampaignWorkflow | screens/P09-platform-admin-console.yaml#ADM-223
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Sequential approval, Parallel approval, Conditional approval, Mandatory
         approval, Optional review.
@@ -14334,6 +15004,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#approveDecision | screens/P09-platform-admin-console.yaml#ADM-224
+      status: fixed
+      by: CHG-WIR-025
   ADM-225:
     block: C
     summary: >-
@@ -14383,6 +15055,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listCampaignExperimentTest
+      status: fixed
+      by: CHG-WIR-025
   ADM-227:
     block: C
     summary: >-
@@ -14547,6 +15221,8 @@ screens:
         The screen also reads the dynamic pricing rules view (listChannelCustomerSegment) as analytics.
       why: A pricing configuration view is not promotion analytics.
       source: contracts/spine/catalogue.yaml#listChannelCustomerSegment
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         List operation(s) listCustomerSegmentChannel return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listCustomerSegmentChannel carry no identifier.
@@ -14672,6 +15348,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#createChannelProfile | screens/P09-platform-admin-console.yaml#ADM-259
+      status: logged
+      by: CHG-WIR-027
   ADM-260:
     block: B
     summary: >-
@@ -14697,6 +15375,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setProductCatalogue | screens/P09-platform-admin-console.yaml#ADM-260
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         Pack actions with no operation: Assign Products, Remove Products, Disable, Copy Assignment, Import Assignment.
       why: >-
@@ -14727,6 +15407,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setChannelPricingCommercial | screens/P09-platform-admin-console.yaml#ADM-261
+      status: logged
+      by: CHG-WIR-027
   ADM-262:
     block: B
     summary: >-
@@ -14818,6 +15500,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setChannelFeePayment | screens/P09-platform-admin-console.yaml#ADM-266
+      status: logged
+      by: CHG-WIR-027
   ADM-267:
     block: B
     summary: >-
@@ -14841,6 +15525,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#publishChannelReadinessValidation | screens/P09-platform-admin-console.yaml#ADM-267
+      status: logged
+      by: CHG-WIR-027
   ADM-268:
     block: B
     summary: >-
@@ -14927,6 +15613,8 @@ screens:
     - what: Rebalancing has no write here; setChannelAllocations (BO-013) is the writer.
       why: The operational adjustment cannot be made from the screen.
       source: contracts/spine/catalogue.yaml#setChannelAllocations
+      status: fixed
+      by: CHG-WIR-025
   ADM-273:
     block: B
     summary: >-
@@ -15002,6 +15690,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/catalogue.yaml#listChannelGovernanceSla
+      status: logged
+      by: CHG-WIR-027
   ADM-277:
     block: B
     summary: >-
@@ -15067,6 +15757,8 @@ screens:
     - what: The screen also writes the promotion eligibility rule (setEligibilityRule).
       why: Promotion eligibility is a different concept.
       source: contracts/satellite/promotions.yaml#setEligibilityRule
+      status: fixed
+      by: CHG-WIR-025
     - what: priceCategory is typed Money and ownership period a date-time.
       why: A category is an id; a period is a duration.
       source: contracts/spine/orders.yaml#setResaleEligibilityRule
@@ -15079,6 +15771,8 @@ screens:
       source: >-
         contracts/spine/orders.yaml#setResaleEligibilityRule | contracts/satellite/promotions.yaml#setEligibilityRule
         | screens/P09-platform-admin-console.yaml#ADM-279
+      status: fixed
+      by: CHG-WIR-025
     - what: 'Pack actions with no operation: Identity verification requirement, Membership restriction.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
@@ -15124,6 +15818,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#createListingSeller | screens/P09-platform-admin-console.yaml#ADM-281
+      status: fixed
+      by: CHG-WIR-025
     - what: 'Pack actions with no operation: Single ticket listing, Multiple ticket listing.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
@@ -15201,6 +15897,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#approveListingModeration | screens/P09-platform-admin-console.yaml#ADM-284
+      status: fixed
+      by: CHG-WIR-025
   ADM-285:
     block: C
     summary: >-
@@ -15259,6 +15957,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setResaleMarketplaceRecommendation | screens/P09-platform-admin-console.yaml#ADM-287
+      status: fixed
+      by: CHG-WIR-025
   ADM-288:
     block: C
     summary: >-
@@ -15751,6 +16451,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setUpgradeConversionPath | screens/P09-platform-admin-console.yaml#ADM-309
+      status: logged
+      by: CHG-WIR-027
   ADM-310:
     block: C
     summary: >-
@@ -15775,6 +16477,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/orders.yaml#listUpgradeEligibilityQualification
+      status: logged
+      by: CHG-WIR-027
   ADM-311:
     block: C
     summary: >-
@@ -15805,6 +16509,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/orders.yaml#listUpgradeTimingUsage
+      status: logged
+      by: CHG-WIR-027
   ADM-312:
     block: C
     summary: >-
@@ -15831,6 +16537,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/orders.yaml#listUpgradeFinancialTreatment
+      status: logged
+      by: CHG-WIR-027
   ADM-313:
     block: C
     summary: >-
@@ -15852,6 +16560,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setProRataResidual | screens/P09-platform-admin-console.yaml#ADM-313
+      status: logged
+      by: CHG-WIR-027
   ADM-314:
     block: C
     summary: >-
@@ -15876,6 +16586,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/spine/orders.yaml#listPersonTypeProduct
+      status: logged
+      by: CHG-WIR-027
   ADM-315:
     block: C
     summary: >-
@@ -15924,6 +16636,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#createUpgradeCredentialRegeneration | screens/P09-platform-admin-console.yaml#ADM-316
+      status: fixed
+      by: CHG-WIR-025
   ADM-317:
     block: C
     summary: >-
@@ -15985,6 +16699,8 @@ screens:
       why: A prospect has no cell and no channels; the assessment uses the answers only.
       source: >-
         contracts/spine/catalogue.yaml#listSaleChannel | contracts/satellite/subscription.yaml#scoreVsiAssessment
+      status: fixed
+      by: CHG-WIR-025
   ADM-559:
     block: C
     summary: >-
@@ -16069,6 +16785,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-561
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Payment Method Configuration\t9".
       why: >-
@@ -16101,6 +16819,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-562
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Channel & Touchpoint Payment Configuration\t10".
       why: >-
@@ -16127,6 +16847,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-563
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Venue, Location & Business Unit Payment
         Assignment\t11".
@@ -16163,6 +16885,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-564
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Currency & Payment Currency Configuration\t12".
       why: >-
@@ -16186,6 +16910,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-565
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Payment Eligibility & Availability Rule
         Builder\t13".
@@ -16219,6 +16945,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-566
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Payment Fees, Surcharges & Commercial
         Rules\t14".
@@ -16290,6 +17018,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#simulatePaymentConfiguration | screens/P09-platform-admin-console.yaml#ADM-568
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Payment Configuration Simulator & Validation
         Center\t16".
@@ -16406,6 +17136,8 @@ screens:
       source: >-
         contracts/satellite/payments.yaml#createPaymentProviderConnection | contracts/satellite/payments.yaml#testPaymentProviderConnection
         | screens/P09-platform-admin-console.yaml#ADM-571
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Provider Connection & Adapter Configuration\t29".
       why: >-
@@ -16494,6 +17226,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setPaymentRoutingRules | screens/P09-platform-admin-console.yaml#ADM-574
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Routing Strategy, Priority & Load Distribution\t33".
       why: >-
@@ -16524,6 +17258,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setPaymentFailoverPolicy | screens/P09-platform-admin-console.yaml#ADM-575
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Failover, Retry & Resilience Manager\t34".
       why: >-
@@ -16598,6 +17334,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#simulatePaymentRouting | screens/P09-platform-admin-console.yaml#ADM-578
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Payment Routing Simulator, Decision Trace
         & AI Advisor\t37".
@@ -16682,6 +17420,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setPaymentTerminalConfiguration | screens/P09-platform-admin-console.yaml#ADM-583
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "EMV & Card-Present Processing Configuration\t53".
       why: >-
@@ -16704,6 +17444,8 @@ screens:
     - what: The monitor reads terminals, not payment attempts.
       why: Needs a read of transactions by terminal.
       source: contracts/satellite/payments.yaml#listPaymentTerminals
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Card-Present Transaction Monitor & Operations\t55".
       why: >-
@@ -16844,6 +17586,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-591
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Digital Wallet & Mobile Payment Configuration\t72".
       why: >-
@@ -16871,6 +17615,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#createPaymentLink | screens/P09-platform-admin-console.yaml#ADM-592
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Payment Link Builder & Configuration\t73".
       why: >-
@@ -16916,6 +17662,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setHostedCheckoutConfiguration | screens/P09-platform-admin-console.yaml#ADM-594
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Hosted Checkout, Redirect & Return Flow
         Configuration\t75".
@@ -16943,6 +17691,8 @@ screens:
     - what: A monitor without a list of sessions.
       why: The only operation queries one payment.
       source: contracts/spine/orders.yaml#inquirePaymentStatus
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         No read operation: the screen declares only inquirePaymentStatus and nothing that returns the current configuration.
       why: >-
@@ -16977,6 +17727,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setPaymentAuthenticationPolicy | screens/P09-platform-admin-console.yaml#ADM-596
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Authentication, Tokenization & Recurring
         Payment Controls\t78".
@@ -17012,6 +17764,8 @@ screens:
       source: >-
         contracts/satellite/payments.yaml#setHostedCheckoutConfiguration | contracts/spine/orders.yaml#inquirePaymentStatus
         | screens/P09-platform-admin-console.yaml#ADM-597
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Digital Payment Exception, Recovery &
         Expiry Center\t79".
@@ -17041,6 +17795,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#simulatePaymentConfiguration | screens/P09-platform-admin-console.yaml#ADM-598
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Digital Payment Simulator, Conversion
         & AI Advisor\t80".
@@ -17082,6 +17838,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setMixedTenderRules | screens/P09-platform-admin-console.yaml#ADM-600
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Mixed Tender Rule & Combination Builder\t93".
       why: >-
@@ -17181,6 +17939,8 @@ screens:
       why: >-
         setB2bPaymentTerms has no matching get; the form opens empty for an account that already has terms.
       source: contracts/satellite/payments.yaml#setB2bPaymentTerms
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         Instalment eligibility uses its own product-kind list (membership, annualPass, seasonPass, groupBooking,
         event), not the catalogue's ProductKind.
@@ -17233,6 +17993,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setMixedTenderRules | screens/P09-platform-admin-console.yaml#ADM-605
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Advanced Payment Eligibility, Sequence
         & Restriction Rules\t98".
@@ -17364,6 +18126,8 @@ screens:
         The staff workspace creates refund requests with the guest-initiated operation (no permission).
       why: Staff refunds go through createRefund; createRefundRequest is the guest app's.
       source: contracts/spine/orders.yaml#createRefundRequest
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Refund Request & Eligibility Workspace\t117".
       why: >-
@@ -17395,6 +18159,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setRefundPolicy | screens/P09-platform-admin-console.yaml#ADM-611
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Refund Policy & Rule Configuration\t118".
       why: >-
@@ -17420,6 +18186,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/wallet.yaml#setWalletRefundPolicy | screens/P09-platform-admin-console.yaml#ADM-612
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Refund Allocation & Original Tender Manager\t119".
       why: >-
@@ -17450,6 +18218,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/orders.yaml#voidPayment | screens/P09-platform-admin-console.yaml#ADM-613
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Void, Reversal & Cancellation Manager\t120".
       why: >-
@@ -17499,6 +18269,8 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#inquirePaymentStatus | screens/P09-platform-admin-console.yaml#ADM-615
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Refund Processing, Provider Status & Recovery
         Center\t122".
@@ -17525,6 +18297,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/orders.yaml#createRefund | screens/P09-platform-admin-console.yaml#ADM-616
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Payment Adjustment & Financial Correction
         Manager\t123".
@@ -17579,6 +18353,8 @@ screens:
       source: >-
         contracts/satellite/payments.yaml#setReconciliationSource | contracts/spine/finance.yaml#ingestSettlementFile
         | screens/P09-platform-admin-console.yaml#ADM-620
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Reconciliation Source & Import Manager\t141".
       why: >-
@@ -17610,6 +18386,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setReconciliationMatchingRules | screens/P09-platform-admin-console.yaml#ADM-621
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Transaction Matching & Reconciliation
         Engine\t142".
@@ -17746,6 +18524,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setPaymentRiskRules | screens/P09-platform-admin-console.yaml#ADM-631
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Velocity, Behavioral & Transaction Risk
         Controls\t168".
@@ -17780,6 +18560,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setPaymentRiskRules | screens/P09-platform-admin-console.yaml#ADM-632
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Risk Lists, Signals & Payment Control
         Center\t169".
@@ -17838,6 +18620,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#submitChargebackEvidence | screens/P09-platform-admin-console.yaml#ADM-635
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Chargeback Evidence & Representment Workspace\t173".
       why: >-
@@ -17889,6 +18673,8 @@ screens:
       source: >-
         contracts/satellite/payments.yaml#simulatePaymentConfiguration | contracts/satellite/ai.yaml#backtestRiskStrategy
         | screens/P09-platform-admin-console.yaml#ADM-638
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Payment Executive Intelligence, Risk Simulator
         & AI Advisor\t176".
@@ -17969,6 +18755,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-641
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Revenue, Incremental revenue, Membership conversion, Capacity utilization,
         Inventory movement.
@@ -18028,6 +18816,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-643
+      status: fixed
+      by: CHG-WIR-025
   ADM-644:
     block: C
     summary: >-
@@ -18049,6 +18839,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-644
+      status: fixed
+      by: CHG-WIR-025
   ADM-645:
     block: C
     summary: >-
@@ -18072,6 +18864,8 @@ screens:
       source: >-
         contracts/satellite/promotions.yaml#setRecommendationSuppression | contracts/satellite/promotions.yaml#updateRecommendationStrategy
         | screens/P09-platform-admin-console.yaml#ADM-645
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         Pack actions with no operation: Revenue potential, Product affinity, Customer propensity, Inventory, Capacity,
         Commercial priority, Campaign priority.
@@ -18099,6 +18893,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-646
+      status: fixed
+      by: CHG-WIR-025
   ADM-647:
     block: C
     summary: >-
@@ -18125,6 +18921,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listRecommendationStrategies
+      status: fixed
+      by: CHG-WIR-025
   ADM-648:
     block: C
     summary: >-
@@ -18146,6 +18944,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-648
+      status: fixed
+      by: CHG-WIR-025
   ADM-649:
     block: C
     summary: >-
@@ -18215,6 +19015,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-651
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Current product, Product variant, Customer type, Guest type, Membership,
         Channel, Venue, Timeslot ….
@@ -18242,6 +19044,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/orders.yaml#quoteUpgrade | screens/P09-platform-admin-console.yaml#ADM-652
+      status: fixed
+      by: CHG-WIR-025
   ADM-653:
     block: C
     summary: >-
@@ -18262,6 +19066,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/orders.yaml#quoteUpgrade | screens/P09-platform-admin-console.yaml#ADM-653
+      status: fixed
+      by: CHG-WIR-025
   ADM-654:
     block: C
     summary: >-
@@ -18282,6 +19088,8 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: contracts/spine/orders.yaml#quoteUpgrade | screens/P09-platform-admin-console.yaml#ADM-654
+      status: fixed
+      by: CHG-WIR-025
   ADM-655:
     block: C
     summary: >-
@@ -18304,6 +19112,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-655
+      status: fixed
+      by: CHG-WIR-025
   ADM-656:
     block: C
     summary: >-
@@ -18327,6 +19137,8 @@ screens:
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | contracts/spine/orders.yaml#quoteUpgrade
         | screens/P09-platform-admin-console.yaml#ADM-656
+      status: fixed
+      by: CHG-WIR-025
   ADM-657:
     block: C
     summary: >-
@@ -18367,6 +19179,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-658
+      status: fixed
+      by: CHG-WIR-025
   ADM-659:
     block: C
     summary: >-
@@ -18411,6 +19225,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setProductRelationships | screens/P09-platform-admin-console.yaml#ADM-660
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Experience Extension, Destination Extension, Service Add-On, Partner Product.
       why: >-
@@ -18480,6 +19296,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setProductRelationships | screens/P09-platform-admin-console.yaml#ADM-663
+      status: fixed
+      by: CHG-WIR-025
   ADM-664:
     block: C
     summary: >-
@@ -18501,6 +19319,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setProductRelationships | screens/P09-platform-admin-console.yaml#ADM-664
+      status: fixed
+      by: CHG-WIR-025
   ADM-665:
     block: C
     summary: >-
@@ -18520,6 +19340,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-665
+      status: fixed
+      by: CHG-WIR-025
   ADM-666:
     block: C
     summary: >-
@@ -18539,6 +19361,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-666
+      status: fixed
+      by: CHG-WIR-025
   ADM-667:
     block: C
     summary: >-
@@ -18578,6 +19402,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-668
+      status: fixed
+      by: CHG-WIR-025
   ADM-669:
     block: C
     summary: >-
@@ -18626,6 +19452,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listRecommendationStrategies
+      status: fixed
+      by: CHG-WIR-025
   ADM-671:
     block: C
     summary: >-
@@ -18645,6 +19473,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-671
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Current product, Basket value, Guest count, Guest type, Current venue, Selected
         date, Selected timeslot, Current channel ….
@@ -18672,6 +19502,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-672
+      status: fixed
+      by: CHG-WIR-025
   ADM-673:
     block: C
     summary: >-
@@ -18691,6 +19523,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-673
+      status: fixed
+      by: CHG-WIR-025
   ADM-674:
     block: C
     summary: >-
@@ -18710,6 +19544,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-674
+      status: fixed
+      by: CHG-WIR-025
   ADM-675:
     block: C
     summary: >-
@@ -18729,6 +19565,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-675
+      status: fixed
+      by: CHG-WIR-025
   ADM-676:
     block: C
     summary: >-
@@ -18767,6 +19605,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setRecommendationSuppression | screens/P09-platform-admin-console.yaml#ADM-677
+      status: logged
+      by: CHG-WIR-027
   ADM-678:
     block: C
     summary: >-
@@ -18819,6 +19659,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-681
+      status: fixed
+      by: CHG-WIR-025
   ADM-682:
     block: C
     summary: >-
@@ -18846,6 +19688,8 @@ screens:
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#getRecommendationPerformance
+      status: logged
+      by: CHG-WIR-027
   ADM-683:
     block: C
     summary: >-
@@ -18880,6 +19724,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-684
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Customer propensity, Product affinity, Historical acceptance, Revenue, Incremental
         revenue, Capacity, Inventory, Commercial priority ….
@@ -18906,6 +19752,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setRecommendationSuppression | screens/P09-platform-admin-console.yaml#ADM-685
+      status: logged
+      by: CHG-WIR-027
   ADM-688:
     block: C
     summary: >-
@@ -18927,6 +19775,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-688
+      status: fixed
+      by: CHG-WIR-025
   ADM-689:
     block: C
     summary: >-
@@ -19046,6 +19896,8 @@ screens:
     - what: Model drift is read from recommendation performance, which carries no model metrics.
       why: Needs an AI model performance read (ai process).
       source: contracts/satellite/promotions.yaml#getRecommendationPerformance
+      status: logged
+      by: CHG-WIR-027
     - what: >-
         List operation(s) getRecommendationPerformance return a bare array, not the paged list envelope (items,
         nextCursor, hasMore); rows of getRecommendationPerformance carry no identifier.
@@ -19096,6 +19948,8 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-698
+      status: fixed
+      by: CHG-WIR-025
     - what: >-
         Pack actions with no operation: Simulate, Create Experiment, Create Draft, Send for Approval, Dismiss, Snooze.
       why: >-

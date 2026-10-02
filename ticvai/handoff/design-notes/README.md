@@ -58,8 +58,17 @@ screens:
     edgeCases:  [{case, expected, source}]       # offline, refusals, limits, races
     consistency: [{with, note}]                  # where this screen must match another
     sampleData: {...}                            # realistic values (AED, Arabic and English names)
-    corrections: [{what, why, source}]           # where the package is wrong; the lead raises these as change requests
+    corrections: [{what, why, source, status, by}] # where the package is wrong; the lead raises these as change requests.
+                                                 # status (once main acts): fixed | logged | withdrawn; by: the CHG id
     openQuestions: [{question, default, source}] # what to draw until it is answered
+    decisions:                                   # an open question once answered (moved here, never left in both)
+      - question: ...
+        decision: ...                            # what was decided, in the decider's terms
+        decidedBy: Chinmay
+        date: '2026-10-02'
+        source: DEC-001 | CHG-NOTE-001           # the decisions-ledger id and the change entries that record it
+        reviewable: true                         # optional: a default the lead may still overrule before its block is tasked
+        questionSource: ...                      # where the question came from (checked like any source)
 inputToOutput:                  # white-label only: worked examples, configuration in, guest screen out
   - input: CMS-005 Primary colour #0E7C86
     output: ...
@@ -83,5 +92,14 @@ inputToOutput:                  # white-label only: worked examples, configurati
   edge case or the correction.
 - **Corrections are not applied here.** The screens, contracts and flows stay as they are until the
   lead raises a change request. Draw what the note says; the corrections list says why it differs.
+- **A correction main has acted on says so** (2 October 2026, CHG-NOTE-001..009): `status: fixed` when the screen on
+  main already carries the fix, `status: logged` when the fix needs a contract change that is logged as an open
+  change entry (the wiring batches' contract-gap entries), `status: withdrawn` when a decision made it moot; `by`
+  names the change entry. **A correction with no `status` is still open** and is what the lead still has to raise.
+- **Answered questions move to `decisions`.** When the lead answers an open question, it leaves `openQuestions` and
+  becomes a decision on the same screen, and the screen's inputs, outputs, actions, edge cases and sample data are
+  updated where the answer changes them (citing `decided <date> by <who> (CHG-...)`). A question still waiting on
+  research or the client stays in `openQuestions`.
 - Validate with `python tools/check-design-notes.py`: it parses every file, checks every screen id, and
-  resolves every source against the register, contract, flow or file it names (0 errors to commit).
+  resolves every source against the register, contract, flow or file it names; it checks every decision's fields
+  and every correction's status, and that every `CHG-` id named exists in `changes/entries/` (0 errors to commit).

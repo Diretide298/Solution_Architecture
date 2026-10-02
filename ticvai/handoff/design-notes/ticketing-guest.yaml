@@ -213,10 +213,15 @@ screens:
           never sees unsellable products (the guest call is scoped to what is on sale), and "Every money"
           binds the search result's fromPrice as if it were a list. They must not reach the design.
         source: screens/P01-guest-web-storefront.yaml#WEB-002 layout; contracts/spine/catalogue.yaml#searchCatalogue
-    openQuestions:
-      - question: Should the category tiles show a product count ("Day passes · 4"), as in the 29 July selling reference?
-        default: Show the count on desktop tiles only.
-        source: DI-026
+        status: fixed
+        by: CHG-GST-003
+    decisions:
+    - question: Should the category tiles show a product count ("Day passes · 4"), as in the 29 July selling reference?
+      decision: 'Drawn default accepted: Show the count on desktop tiles only.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-114 | CHG-NOTE-007
+      questionSource: DI-026
 
   WEB-003:
     summary: >-
@@ -342,6 +347,8 @@ screens:
           A guest does not pick a date range here; the single-event page uses the 7-day strip and the
           dated booking picks the date on WEB-006. The range pickers are listPerformances parameters.
         source: screens/P01-guest-web-storefront.yaml#WEB-004 layout; DI-920
+        status: fixed
+        by: CHG-GST-003
       - what: The prototype labels this screen WEB-003b.
         why: Its id is WEB-004; the label will confuse the handoff to the front-end team.
         source: screens/P01-guest-web-storefront.yaml#WEB-004 wireframe.prototype.differences
@@ -485,16 +492,26 @@ screens:
       - what: The prototype's Read more panel on the multi-park flow still prices guests at single-park rates (Adult AED 325, Infant AED 475).
         why: A prototype defect; the counters on the page are the reference. Do not copy the Read more prices.
         source: screens/P01-guest-web-storefront.yaml#WEB-005 wireframe.prototype.differences
-    openQuestions:
-      - question: How many supervisors are free per group, and is it per group ticket?
-        default: A separate free guest type, up to 1 per 10 guests.
-        source: DI-1114
-      - question: Is each group card's minimum set per group ticket?
-        default: Each group ticket carries its own minimum, default 10.
-        source: DI-1116
-      - question: Is the swim vest an add-on product and the splash and river pass a separate product?
-        default: The vest is an add-on; the splash and river pass is its own product filtered by the swim answer.
-        source: DI-1118
+    decisions:
+    - question: How many supervisors are free per group, and is it per group ticket?
+      decision: 'Drawn default accepted: A separate free guest type, up to 1 per 10 guests.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-115 | CHG-NOTE-007
+      questionSource: DI-1114
+    - question: Is each group card's minimum set per group ticket?
+      decision: 'Drawn default accepted: Each group ticket carries its own minimum, default 10.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-116 | CHG-NOTE-007
+      questionSource: DI-1116
+    - question: Is the swim vest an add-on product and the splash and river pass a separate product?
+      decision: 'Drawn default accepted: The vest is an add-on; the splash and river pass is its own product filtered by the
+        swim answer.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-117 | CHG-NOTE-007
+      questionSource: DI-1118
 
   WEB-006:
     summary: >-
@@ -594,22 +611,28 @@ screens:
           The hold is taken by addCartLine when the guest sets a quantity; the guest never sees the word
           hold or a form. Since 30 September, choosing a session must add nothing.
         source: screens/P01-guest-web-storefront.yaml#WEB-006 actionBar; DI-1107
+        status: fixed
+        by: CHG-GST-003
       - what: '"Check booking eligibility" is a secondary button with a modal collecting productIds and party.'
         why: >-
           Eligibility is the per-person age and height declaration asked once on leaving selection, not a
           button; it should be drawn as that panel.
         source: DI-1037; REV3 DG-3
+        status: fixed
+        by: CHG-GST-003
       - what: The 30 September swim answer is three options for the party (All of us, Some of us, None of us) changing the products and prices, while REV3-26 models swim as a Yes/No consent per person or per booking.
         why: >-
           Two models for one question; the guidedAnswerIds filter has only requiresSwimmer true/false and
           no "some of us" vest counter. Needs one model before the build.
         source: DI-1108; REV3-26; contracts/spine/catalogue.yaml#searchCatalogue (guidedAnswerIds "leaves out products whose consent questions include the swim question")
-    openQuestions:
-      - question: Is the swim question a party-level three-way answer (filter) or a per-person consent, or both?
-        default: >-
-          Draw the on-page three-way question (All, Some, None of us) as the filter, and record the
-          consent once per booking from it; no second pop-up.
-        source: DI-1118; DI-1108
+    decisions:
+    - question: Is the swim question a party-level three-way answer (filter) or a per-person consent, or both?
+      decision: 'Drawn default accepted: Draw the on-page three-way question (All, Some, None of us) as the filter, and record
+        the consent once per booking from it; no second pop-up.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-118 | CHG-NOTE-007
+      questionSource: DI-1118; DI-1108
 
   WEB-007:
     summary: >-
@@ -705,6 +728,8 @@ screens:
           A tap on a seat is the hold; the guest never chooses a hold length. ttlSeconds is the server
           default (480 s) and is never a guest input.
         source: screens/P01-guest-web-storefront.yaml#WEB-007 overlays.formCreateSeatHold; contracts/satellite/seating.yaml#/components/schemas/CreateSeatHoldRequest
+        status: fixed
+        by: CHG-GST-003
       - what: The seat hold lasts 8 minutes but the cart's lease window is 15 minutes, and the screens show both as a countdown.
         why: Two clocks on one booking confuse the guest; show one countdown, Cart.expiresAt (the earliest lease).
         source: contracts/spine/orders.yaml#addCartLine; contracts/spine/orders.yaml#/components/schemas/Cart (expiresAt)
@@ -881,22 +906,33 @@ screens:
       - what: '"Transfer order tickets" is the primary action on the payment screen.'
         why: Transfers happen after purchase from the tickets (WEB-030); on this screen it would offer to give away tickets not yet paid for.
         source: screens/P01-guest-web-storefront.yaml#WEB-012 actionBar; F55 step 4
+        status: fixed
+        by: CHG-GST-003
       - what: '"Create order", "Create payment" and "Inquire payment status" are buttons with forms that collect id, venueId, channel, lines, tender, recordedAt.'
         why: All three happen behind Pay; the inquiry is automatic in the unknown-outcome state.
         source: screens/P01-guest-web-storefront.yaml#WEB-012 overlays
+        status: fixed
+        by: CHG-GST-003
       - what: The prototype offers Tabby split-in-4, pay on arrival and invoice/PO, against the 28 September decision of card or wallet only.
         why: Not in the first release; draw card, Apple Pay, Google Pay and wallet only.
         source: screens/P01-guest-web-storefront.yaml#WEB-012 wireframe.prototype.differences; R080
       - what: DI-1035 (29 September) keeps a match prompt after the code ("Use this profile" / "Not me"), while the screen removed the "is this you?" step on 28 September (R120 b, matches attach automatically).
         why: Contradictory decisions; the W1 rule (straight to T&Cs after the code) supports the automatic match.
         source: DI-1035; screens/P01-guest-web-storefront.yaml#WEB-012 notes (R120 b); REV3 DG-1
-    openQuestions:
-      - question: May a guest-checkout customer be marketed on the opt-in taken at checkout?
-        default: Unticked by default; nothing sent without it.
-        source: DI-954
-      - question: Is the post-code match prompt (DI-1035) still wanted after W1 and R120 (b)?
-        default: No prompt; a verified match attaches automatically.
-        source: DI-1035; MoM 29 Sep W1
+    decisions:
+    - question: May a guest-checkout customer be marketed on the opt-in taken at checkout?
+      decision: 'Drawn default stands (answer: "Same as WEB-011: default accepted (batch 2)"): Unticked by default; nothing
+        sent without it.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-119 | CHG-NOTE-007
+      questionSource: DI-954
+    - question: Is the post-code match prompt (DI-1035) still wanted after W1 and R120 (b)?
+      decision: 'Drawn default accepted: No prompt; a verified match attaches automatically.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-120 | CHG-NOTE-007
+      questionSource: DI-1035; MoM 29 Sep W1
 
   WEB-013:
     summary: >-
@@ -948,6 +984,8 @@ screens:
       - what: '"Transfer order tickets" is the primary action, with a form collecting ticketIds and recipient.'
         why: The primary action here is the tickets themselves (wallet, resend); transfer is secondary and opens WEB-030.
         source: screens/P01-guest-web-storefront.yaml#WEB-013 actionBar
+        status: fixed
+        by: CHG-GST-003
       - what: The prototype allows editing attendee details after purchase and Reissue QR; neither is declared on this screen.
         why: Either declare the operations or leave them out of the design.
         source: screens/P01-guest-web-storefront.yaml#WEB-013 wireframe.prototype.differences
@@ -990,6 +1028,8 @@ screens:
       - what: Two pay buttons (Pay now, and Pay by link with a form collecting providerToken).
         why: One Pay button; the provider token comes from the gateway, not a form.
         source: screens/P01-guest-web-storefront.yaml#WEB-014 layout
+        status: fixed
+        by: CHG-GST-003
       - what: No prototype frame exists (match none).
         why: The screen needs a frame before build; it reuses WEB-012's payment component.
         source: screens/P01-guest-web-storefront.yaml#WEB-014 wireframe
@@ -1084,6 +1124,8 @@ screens:
       - what: The layout carries both "Every order" from listMyOrders and "Every order" from listOrders (the staff-scoped list).
         why: A guest screen must use only the caller-scoped listMyOrders; listOrders was removed from guest screens for that reason on 24 August and came back with the 31 August parity pass.
         source: screens/P01-guest-web-storefront.yaml#WEB-019 notes; contracts/spine/orders.yaml#listMyOrders
+        status: fixed
+        by: CHG-GST-003
       - what: issueTaxInvoice (a staff operation) is declared on a guest screen.
         why: The guest views and downloads invoices; issuing is not a guest action.
         source: screens/P01-guest-web-storefront.yaml#WEB-019 apis
@@ -1145,6 +1187,8 @@ screens:
       - what: Raw "Store payment token" primary button with a form collecting providerId, providerToken, consentPurposeId.
         why: A guest saves a card through the gateway form; the token fields are never shown.
         source: screens/P01-guest-web-storefront.yaml#WEB-021 overlays
+        status: fixed
+        by: CHG-GST-003
       - what: '"Every wallet transaction" is bound to retail.yaml in one region and wallet.yaml in another.'
         why: The transactions are wallet.yaml's listWalletTransactions; the retail reference is a generator slip.
         source: screens/P01-guest-web-storefront.yaml#WEB-021 layout
@@ -1180,9 +1224,13 @@ screens:
       - what: Filter fields "Venue id", "Kind" and "Is sellable" and a raw product table.
         why: The page lists membership products only, for the guest's venue; the filters are generated parameters.
         source: screens/P01-guest-web-storefront.yaml#WEB-022 layout
+        status: fixed
+        by: CHG-GST-003
       - what: Both getMyMemberships and listGuestMemberships are declared.
         why: One guest-scoped read is enough; listGuestMemberships is the staff-shaped list.
         source: screens/P01-guest-web-storefront.yaml#WEB-022 apis
+        status: fixed
+        by: CHG-GST-003
 
   WEB-023:
     summary: >-
@@ -1219,6 +1267,8 @@ screens:
       - what: '"Transfer order tickets" is the primary action on Membership Management.'
         why: It has no use on this screen (the prototype's membership transfer to a family member is a different operation).
         source: screens/P01-guest-web-storefront.yaml#WEB-023 wireframe.prototype.differences
+        status: fixed
+        by: CHG-GST-003
 
   WEB-030:
     summary: >-
@@ -1267,9 +1317,13 @@ screens:
       - what: Staff list filters "Venue id", "Principal id", "Shift id", "Status", created from/to over listOrders.
         why: A guest picks among their own orders (listMyOrders) and their tickets; staff filters must not appear.
         source: screens/P01-guest-web-storefront.yaml#WEB-030 layout; contracts/spine/orders.yaml#listMyOrders
+        status: fixed
+        by: CHG-GST-003
       - what: '"Claim ticket transfer" sits on the sender''s screen with a claimToken form.'
         why: The recipient claims from the link (in the app, GST-014, or a claim landing); the token is never typed.
         source: screens/P01-guest-web-storefront.yaml#WEB-030 overlays.formClaimTicketTransfer
+        status: fixed
+        by: CHG-GST-003
       - what: Not on the wireframe board.
         why: Needs a frame before build.
         source: screens/P01-guest-web-storefront.yaml#WEB-030 notes
@@ -1332,10 +1386,15 @@ screens:
       - what: '"Save table reservation" with a form exposing outletId, tables, status, tableVisitId, actualPartySize.'
         why: Staff fields; a guest may change party size and time, or cancel.
         source: screens/P01-guest-web-storefront.yaml#WEB-031 overlays.formUpdateTableReservation
-    openQuestions:
-      - question: Are water-park groups booked into a session?
-        default: Group requests take a date and, for session products, a session.
-        source: DI-1117
+        status: fixed
+        by: CHG-GST-003
+    decisions:
+    - question: Are water-park groups booked into a session?
+      decision: 'Drawn default accepted: Group requests take a date and, for session products, a session.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-121 | CHG-NOTE-007
+      questionSource: DI-1117
 
   WEB-032:
     summary: >-
@@ -1363,6 +1422,8 @@ screens:
       - what: Filters "Venue id", "Status", "Active at" and a raw promotions table.
         why: A guest sees active offers for their venue only; status and venue are not guest inputs.
         source: screens/P01-guest-web-storefront.yaml#WEB-032 layout
+        status: fixed
+        by: CHG-GST-003
 
   WEB-033:
     summary: >-
@@ -1403,6 +1464,8 @@ screens:
       - what: '"Outlet id" and "Category id" text fields, an "In stock only" toggle and a "Lookup merchandise" primary button (a barcode price check).'
         why: Barcode lookup is a till operation; a guest browses categories and an outlet chosen from names.
         source: screens/P01-guest-web-storefront.yaml#WEB-033 layout
+        status: fixed
+        by: CHG-GST-003
       - what: No browsable shop frame before arrival in the prototype; not on the wireframe board.
         why: Needs a frame; the At the venue shop is the nearest reference.
         source: screens/P01-guest-web-storefront.yaml#WEB-033 wireframe
@@ -1446,6 +1509,8 @@ screens:
       - what: '"Venue id" text field, "Open only" toggle and an "Every queue" table.'
         why: The map is the venue's; a guest filters by category (rides, dining) not by queue records.
         source: screens/P01-guest-web-storefront.yaml#WEB-039 layout
+        status: fixed
+        by: CHG-GST-003
       - what: No map3dUnavailable or weak-GPS state is drawn.
         why: Both need frames.
         source: screens/P01-guest-web-storefront.yaml#WEB-039 wireframe.prototype.differences
@@ -1495,10 +1560,15 @@ screens:
       - what: Separate "Check out" and "Pay" buttons and a "Save parking entitlement" form exposing status.
         why: Checkout is the basket's; a guest may change the plate, not set an entitlement status.
         source: screens/P01-guest-web-storefront.yaml#WEB-041 layout
-    openQuestions:
-      - question: Which wave do web and app parking ship in?
-        default: Draw both now; the wave is the client's pick.
-        source: REV3 GAP-D2
+        status: fixed
+        by: CHG-GST-003
+    decisions:
+    - question: Which wave do web and app parking ship in?
+      decision: 'Drawn default accepted: Draw both now; the wave is the client''s pick.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-122 | CHG-NOTE-007
+      questionSource: REV3 GAP-D2
 
   WEB-048:
     summary: >-
@@ -1628,13 +1698,19 @@ screens:
       - what: The layout keeps Passengers in the top filter row and a primary "Search Trips" button.
         why: Since 30 September passengers come after a departure is chosen and departures list without a search.
         source: screens/P01-guest-web-storefront.yaml#WEB-049 layout; DI-1109; DI-1110
-    openQuestions:
-      - question: Are each popular route's from-fare, featured order and image set per route in the back office?
-        default: Routes carry a featured order and an image; the from-fare is the lowest fare.
-        source: DI-1119
-      - question: Who approves the street-map tile provider?
-        default: Draw the map; hide it offline.
-        source: screens/P01-guest-web-storefront.yaml#WEB-049 openQuestions
+    decisions:
+    - question: Are each popular route's from-fare, featured order and image set per route in the back office?
+      decision: 'Drawn default accepted: Routes carry a featured order and an image; the from-fare is the lowest fare.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-123 | CHG-NOTE-007
+      questionSource: DI-1119
+    - question: Who approves the street-map tile provider?
+      decision: 'Drawn default accepted: Draw the map; hide it offline.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-124 | CHG-NOTE-007
+      questionSource: screens/P01-guest-web-storefront.yaml#WEB-049 openQuestions
 
   WEB-050:
     summary: >-
@@ -1757,6 +1833,8 @@ screens:
       - what: Raw filter fields "Venue id", "Kind", "Is sellable" and an "Every product" table.
         why: Generated parameters; the tab is scoped to the venue the guest picked.
         source: screens/P02-guest-mobile-app.yaml#GST-002 layout
+        status: fixed
+        by: CHG-GST-003
       - what: No wireframe frame (status notStarted) although the v4 prototype draws Explore.
         why: Needs a frame from the v4 build.
         source: screens/P02-guest-mobile-app.yaml#GST-002 wireframe
@@ -1805,6 +1883,8 @@ screens:
       - what: Raw filters (Venue id, Kind, Is sellable) and tables "Every product", "Every performance", "Every money".
         why: Generated parameters and response tables; not guest content.
         source: screens/P02-guest-mobile-app.yaml#GST-003 layout
+        status: fixed
+        by: CHG-GST-003
       - what: A transition to BO-005 (a supervisor sees the queue building) from flow F21.
         why: A guest app never navigates to the back office; the notes already say cross-platform navigation was removed, yet the edge remains.
         source: screens/P02-guest-mobile-app.yaml#GST-003 navigation; screens/P02-guest-mobile-app.yaml#GST-003 notes
@@ -1862,6 +1942,8 @@ screens:
       - what: From/To date pickers and an "Every performance" table on the item page.
         why: Generated listPerformances parameters; the item page has no date range.
         source: screens/P02-guest-mobile-app.yaml#GST-004 layout
+        status: fixed
+        by: CHG-GST-003
 
   GST-005:
     summary: >-
@@ -1980,6 +2062,8 @@ screens:
       - what: A primary "Check booking eligibility" button and a From/To range with an "Every performance" table.
         why: Eligibility is the once-asked party panel; the range is a generated parameter.
         source: screens/P02-guest-mobile-app.yaml#GST-007 layout
+        status: fixed
+        by: CHG-GST-003
 
   GST-008:
     summary: >-
@@ -2046,10 +2130,13 @@ screens:
       - what: Supervisors and a water-park group's session are not in the contract.
         why: Drawn in the 30 September build; requestGroupBooking has packageProductId and expectedSize only.
         source: screens/P02-guest-mobile-app.yaml#GST-008 notes; DI-1114; DI-1117
-    openQuestions:
-      - question: Free supervisors per N guests, per group ticket?
-        default: Up to 1 per 10 guests, a separate free row.
-        source: DI-1114
+    decisions:
+    - question: Free supervisors per N guests, per group ticket?
+      decision: 'Drawn default accepted: Up to 1 per 10 guests, a separate free row.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-108 | CHG-NOTE-007
+      questionSource: DI-1114
   GST-041:
     summary: >-
       The app's basket and the start of checkout. Block A. On mobile the basket is a bottom bar with the
@@ -2254,9 +2341,13 @@ screens:
       - what: Staff filters (Venue id, Principal id, Shift id, Status, Created from/to) over listOrders.
         why: Guest screens use listMyOrders; staff filters must not appear.
         source: screens/P02-guest-mobile-app.yaml#GST-014 layout
+        status: fixed
+        by: CHG-GST-003
       - what: '"Claim ticket transfer" as a button with a claimToken form.'
         why: Claiming happens from the link; the token is never typed.
         source: screens/P02-guest-mobile-app.yaml#GST-014 overlays.formClaimTicketTransfer
+        status: fixed
+        by: CHG-GST-003
 
   GST-045:
     summary: >-
@@ -2275,6 +2366,8 @@ screens:
       - what: The form shows "Ticket ids" as a multi-select and "Recipient" as one text field.
         why: Tickets are picked from cards; recipient is channel plus address.
         source: screens/P02-guest-mobile-app.yaml#GST-045 layout; contracts/spine/orders.yaml#transferOrderTickets
+        status: fixed
+        by: CHG-GST-003
       - what: '"Keep ownership and rename the holder" (DI-200) has no operation.'
         why: transferOrderTickets moves ownership; renaming the holder is not declared.
         source: DI-200; contracts/spine/orders.yaml#transferOrderTickets
@@ -2334,6 +2427,8 @@ screens:
       - what: Filters "Status" as a select and "Expiring within minutes" as a number field.
         why: A guest sees Upcoming and Past tabs; expiry is shown on each card.
         source: screens/P02-guest-mobile-app.yaml#GST-016 layout
+        status: fixed
+        by: CHG-GST-003
 
   GST-017:
     summary: >-
@@ -2387,9 +2482,13 @@ screens:
       - what: Staff filters (Venue id, Principal id, Shift id, Status, Created from/to) over listOrders.
         why: The screen opens on one order; no list or staff filters.
         source: screens/P02-guest-mobile-app.yaml#GST-018 layout
+        status: fixed
+        by: CHG-GST-003
       - what: The reminder form exposes id, subjectId and scopePath.
         why: Internal fields; the guest sets on/off, lead time and channels.
         source: screens/P02-guest-mobile-app.yaml#GST-018 overlays.formSetVisitReminder
+        status: fixed
+        by: CHG-GST-003
   GST-049:
     summary: >-
       Seat selection in the app. Block A. Same interaction agreed on the web and confirmed on 30
@@ -2434,6 +2533,8 @@ screens:
       - what: '"Create seat hold" primary button with a ttlSeconds form.'
         why: A tap is the hold; the length is the server default.
         source: screens/P02-guest-mobile-app.yaml#GST-049 overlays.formCreateSeatHold
+        status: fixed
+        by: CHG-GST-003
 
   GST-050:
     summary: >-
@@ -2467,10 +2568,14 @@ screens:
       - what: No prototype frame (match none).
         why: The v4 build draws cabanas on the map only; this flow needs a frame.
         source: screens/P02-guest-mobile-app.yaml#GST-050 wireframe
-    openQuestions:
-      - question: Confirm cabana numbering and prices.
-        default: R01-R10, T01-T08, S01-S06, B01-B10; Family 6 AED 995, Medium 10 AED 1,295, Large 15 AED 1,855, XL 20 AED 2,295.
-        source: DI-1055; STATUS-29SEP (Open or needs client input)
+    decisions:
+    - question: Confirm cabana numbering and prices.
+      decision: 'Drawn default accepted: R01-R10, T01-T08, S01-S06, B01-B10; Family 6 AED 995, Medium 10 AED 1,295, Large
+        15 AED 1,855, XL 20 AED 2,295.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-110 | CHG-NOTE-007
+      questionSource: DI-1055; STATUS-29SEP (Open or needs client input)
 
   GST-058:
     summary: >-
@@ -2526,6 +2631,8 @@ screens:
       - what: The screen opens on an "Every bundle" table from listCatalogueBundles.
         why: It opens on one bundle (bundleId from Item Detail); a list of all bundles is not this screen.
         source: screens/P02-guest-mobile-app.yaml#GST-056 layout
+        status: fixed
+        by: CHG-GST-003
       - what: No prototype frame (match none).
         why: The v4 build draws the meal combo; link it.
         source: screens/P02-guest-mobile-app.yaml#GST-056 wireframe
@@ -2577,6 +2684,8 @@ screens:
       - what: '"Create referral" with a form exposing id, referrerSubjectId, code, status, scopePath; and the challenges panel.'
         why: Referrals and challenges are not this screen's job; the referral write has no reader yet.
         source: screens/P02-guest-mobile-app.yaml#GST-072 notes; screens/P02-guest-mobile-app.yaml#GST-072 overlays.formCreateReferral
+        status: fixed
+        by: CHG-GST-003
       - what: The request form asks kind, packageProductId and expectedSize again.
         why: They come from GST-008; the client said never ask twice.
         source: screens/P02-guest-mobile-app.yaml#GST-072 overlays.formRequestGroupBooking; DI-1000
@@ -2617,6 +2726,8 @@ screens:
       - what: '"Venue id" field and "Every money" table.'
         why: Generated plumbing.
         source: screens/P02-guest-mobile-app.yaml#GST-063 layout
+        status: fixed
+        by: CHG-GST-003
   GST-052:
     summary: >-
       Ready-made day plans for the venue (Thrill day, Family day, Relaxed day) a guest can take instead
@@ -2654,10 +2765,13 @@ screens:
       - what: No prototype frame (match none).
         why: Needs a frame.
         source: screens/P02-guest-mobile-app.yaml#GST-052 wireframe
-    openQuestions:
-      - question: Who defines the ready-made plans per venue, and where?
-        default: The venue configures presets as saved planner inputs per park.
-        source: screens/P02-guest-mobile-app.yaml#GST-052 (Ready-made plans notes)
+    decisions:
+    - question: Who defines the ready-made plans per venue, and where?
+      decision: 'Drawn default accepted: The venue configures presets as saved planner inputs per park.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-111 | CHG-NOTE-007
+      questionSource: screens/P02-guest-mobile-app.yaml#GST-052 (Ready-made plans notes)
 
   GST-053:
     summary: >-
@@ -2708,10 +2822,13 @@ screens:
       - what: Group sharing (in-app QR, agreed 10 August) is not drawn and no operation backs it.
         why: The notes say sharing was agreed but do not say whether it is in the Block A planner.
         source: DI-241; screens/P02-guest-mobile-app.yaml#GST-053 notes
-    openQuestions:
-      - question: Is plan sharing by QR in the Block A planner?
-        default: Draw a Share button; leave it out of the build until confirmed.
-        source: DI-241
+    decisions:
+    - question: Is plan sharing by QR in the Block A planner?
+      decision: 'Drawn default accepted: Draw a Share button; leave it out of the build until confirmed.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-112 | CHG-NOTE-007
+      questionSource: DI-241
 
   GST-059:
     summary: >-
@@ -2776,6 +2893,8 @@ screens:
       - what: Product filters "Venue id", "Kind", "Is sellable" and an "Every product" table on the map.
         why: The map filters by point category; the filters are generated.
         source: screens/P02-guest-mobile-app.yaml#GST-021 layout
+        status: fixed
+        by: CHG-GST-003
       - what: A transition to BO-096 (an attendant checks what is free) from flow F25.
         why: A guest app does not navigate to the back office.
         source: screens/P02-guest-mobile-app.yaml#GST-021 navigation
@@ -2827,6 +2946,8 @@ screens:
       - what: '"Venue id" text field and an "Every parking facility" table on a confirmation screen.'
         why: The confirmation shows one order's parking.
         source: screens/P02-guest-mobile-app.yaml#GST-028 layout
+        status: fixed
+        by: CHG-GST-003
 
   GST-032:
     summary: >-
@@ -2862,13 +2983,19 @@ screens:
       - what: '"Create guest F&B order" is the primary action with a form exposing id, lines, quotedTotal, recordedAt.'
         why: An order made from the chat is confirmed on a card in the conversation; the raw form is not a guest screen.
         source: screens/P02-guest-mobile-app.yaml#GST-032 overlays.formCreateGuestFnbOrder
+        status: fixed
+        by: CHG-GST-003
       - what: Purpose "Add ai concierge – chat for this venue" and no prototype frame.
         why: The purpose is generated and the screen needs a frame; DI-195 deferred the chat design to the AI workshop.
         source: screens/P02-guest-mobile-app.yaml#GST-032 purpose; DI-195
-    openQuestions:
-      - question: Is the concierge chat design settled after the AI workshop?
-        default: Draw the chat with grounded answers and hand-over; leave billing out of the guest UI.
-        source: DI-195
+    decisions:
+    - question: Is the concierge chat design settled after the AI workshop?
+      decision: 'Drawn default accepted: Draw the chat with grounded answers and hand-over; leave billing out of the guest
+        UI.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-109 | CHG-NOTE-007
+      questionSource: DI-195
 
   GST-037:
     summary: >-
@@ -3139,16 +3266,23 @@ screens:
       - what: Raw filters (Venue id, Kind, Is sellable) and twelve "Every …" tables, and some 25 operation buttons (game cards, retail returns, exchanges, sync orders) on the sell screen.
         why: The sell screen is tiles, cards and the cart; post-sale actions live on POS-011, POS-026 and POS-030, and the hot functions are Refund, Check transaction and Print last receipt.
         source: screens/P04-point-of-sale.yaml#POS-002 layout; DI-132
+        status: fixed
+        by: CHG-WIR-018
       - what: Cross-device edges to BO-045, BO-130, BO-133, BO-084 and GST-026 remain in navigation.
         why: A till does not navigate to the back office or the guest app; the notes say these were removed.
         source: screens/P04-point-of-sale.yaml#POS-002 navigation; screens/P04-point-of-sale.yaml#POS-002 notes
+        status: fixed
+        by: CHG-WIR-019
       - what: The approved build adds a waitlist for sold-out events, gift-voucher face-value sales and group bundles with no declared operations.
         why: Either declare them or leave them out of the design.
         source: screens/P04-point-of-sale.yaml#POS-002 wireframe.prototype.differences
-    openQuestions:
-      - question: Which hot functions sit always visible beside the search ("magic banner")?
-        default: Refund, Check transaction, Print last receipt, plus search.
-        source: DI-132; DI-088
+    decisions:
+    - question: Which hot functions sit always visible beside the search ("magic banner")?
+      decision: 'Drawn default accepted: Refund, Check transaction, Print last receipt, plus search.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-113 | CHG-NOTE-007
+      questionSource: DI-132; DI-088
 
   POS-003:
     summary: >-
@@ -3177,6 +3311,8 @@ screens:
       - what: Acquire, Release and Renew inventory hold buttons on the step.
         why: The hold is taken when the line is added; the cashier sees a countdown, not hold controls (the approved build has none).
         source: screens/P04-point-of-sale.yaml#POS-003 wireframe.prototype.differences
+        status: fixed
+        by: CHG-WIR-018
       - what: The screen is modelled as a page, while the 3 August decision made it a drawer step.
         why: Recorded gap; the design should draw the drawer.
         source: screens/P04-point-of-sale.yaml#POS-003 gaps
@@ -3214,6 +3350,8 @@ screens:
       - what: '"Save performance" (updatePerformance) and "Evaluate approval requirement" on the seat map.'
         why: A till does not edit performances; approval is asked when a discount needs it, not as a button.
         source: screens/P04-point-of-sale.yaml#POS-004 layout
+        status: fixed
+        by: CHG-WIR-018
       - what: The approved build has a zone-priced general-admission flow (zones, tiers, keep the party together) with no screen.
         why: Draw it in the drawer as the zone-only seat model.
         source: screens/P04-point-of-sale.yaml#POS-004 wireframe.prototype.differences; DI-410
@@ -3253,6 +3391,8 @@ screens:
       - what: Receipt has no screen in P04 and the success branch has nowhere to go.
         why: Recorded gap; POS-026 Receipt & Reprint should be the exit.
         source: screens/P04-point-of-sale.yaml#POS-005 gaps
+        status: fixed
+        by: CHG-WIR-019
       - what: Raw retail-sale filters (Outlet id, Shift id, Created from/to) on the payment screen.
         why: Payment completes one sale; no list.
         source: screens/P04-point-of-sale.yaml#POS-005 layout
@@ -3449,6 +3589,8 @@ screens:
       - what: Raw filters "Venue id", "Kind", "Is sellable".
         why: A kiosk is bound to its venue; generated filters must not reach the design.
         source: screens/P05-guest-kiosk.yaml#KSK-003 layout
+        status: fixed
+        by: CHG-GST-003
 
   KSK-004:
     summary: >-
@@ -3458,6 +3600,9 @@ screens:
       - field: quantities
         rule: Steppers at least 64 px; plus disabled at the channel's purchase limit with the reason ("Up to 6 tickets per purchase").
         source: DI-464; DI-172; DI-1106
+      - field: Order of steps
+        rule: 'Tickets first, then date and time: the kiosk differs from web and app (REV3-2 is superseded for the kiosk only).'
+        source: decided 2 October 2026 by Chinmay (CHG-NOTE-007)
     consistency:
       - with: WEB-005
         note: Same one-line-per-ticket rule.
@@ -3467,13 +3612,18 @@ screens:
       - what: The kiosk order is tickets (KSK-004) then session (KSK-005), against the guest-channel rule of date, then time, then tickets.
         why: REV3-2 applies to guest booking; the kiosk is guest-facing. Confirm whether the kiosk follows it.
         source: F07 step 4-5; REV3-2
+        status: withdrawn
+        by: CHG-NOTE-007
       - what: Availability is bound to getAvailability's inline response with no schema.
         why: Recorded gap; REV3-1 names the page response.
         source: screens/P05-guest-kiosk.yaml#KSK-004 gaps
-    openQuestions:
-      - question: Does the kiosk follow date, then time, then tickets like web and app?
-        default: Yes for dated products; undated go straight to quantities.
-        source: REV3-2; DI-116
+    decisions:
+    - question: Does the kiosk follow date, then time, then tickets like web and app?
+      decision: The kiosk keeps tickets first, then date and time (unlike web and app). Supersedes REV3-2 for the kiosk only.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-170 | CHG-NOTE-007
+      questionSource: REV3-2; DI-116
 
   KSK-005:
     summary: >-
@@ -3492,6 +3642,8 @@ screens:
       - what: '"Acquire inventory hold" as the primary button.'
         why: The hold is taken when the tickets are added; the guest taps a session.
         source: screens/P05-guest-kiosk.yaml#KSK-005 layout
+        status: fixed
+        by: CHG-GST-003
 
   KSK-006:
     summary: >-
@@ -3533,6 +3685,8 @@ screens:
       - what: The screen lays out eight raw CreatePaymentRequest text fields (id, orderId, tender, amount, tenderedAmount, walletAuthorisationId, deviceId, recordedAt).
         why: A guest never types these; the terminal and the kiosk fill them.
         source: screens/P05-guest-kiosk.yaml#KSK-007 layout
+        status: fixed
+        by: CHG-GST-003
 
   KSK-008:
     summary: >-
@@ -3566,6 +3720,8 @@ screens:
       - what: '"Transfer order tickets" is the primary action.'
         why: A kiosk does not transfer tickets; sending a copy is reprintOrder by email or SMS.
         source: screens/P05-guest-kiosk.yaml#KSK-009 layout
+        status: fixed
+        by: CHG-GST-003
 
   KSK-010:
     summary: >-
@@ -3581,6 +3737,8 @@ screens:
       - what: The recovery is modelled as a ticket transfer with ticketIds and recipient fields.
         why: It is a resend of the guest's own tickets (reprintOrder by email or SMS), not a change of owner.
         source: screens/P05-guest-kiosk.yaml#KSK-010 layout; contracts/spine/orders.yaml#transferOrderTickets
+        status: fixed
+        by: CHG-GST-003
 
   KSK-012:
     summary: >-
@@ -3630,6 +3788,8 @@ screens:
       - what: Ten order-changing actions (create, discount, refund, exchange, hold, modify, reschedule, resume, void) on a lookup screen.
         why: The purpose is to answer a question without acting; the employee app has a basic validity lookup, not sales.
         source: screens/P06-staff-app.yaml#EMP-014 layout; DI-128
+        status: fixed
+        by: CHG-WIR-018
 
   EMP-018:
     summary: >-
@@ -3656,6 +3816,8 @@ screens:
       - what: Create channel capacity, Save channel allocations and Save channel capacity on a steward's handheld.
         why: Capacity authoring is a back-office job; the purpose is to read.
         source: screens/P06-staff-app.yaml#EMP-033 layout
+        status: fixed
+        by: CHG-WIR-018
 
   EMP-034:
     summary: >-
@@ -3674,6 +3836,8 @@ screens:
       - what: Product authoring actions (Save alternative codes, Save product attributes, Transition product lifecycle) on a walk-up sale.
         why: A seller does not author the catalogue.
         source: screens/P06-staff-app.yaml#EMP-034 layout; screens/P04-point-of-sale.yaml#POS-002 notes
+        status: fixed
+        by: CHG-WIR-018
 
   EMP-035:
     summary: >-
@@ -3719,13 +3883,21 @@ screens:
       - what: Staff-side actions (Override credit limit, Save b2b credit limit, Apply manual discount, Void order) on the partner's dashboard.
         why: A partner cannot set or override its own limit; those are venue actions.
         source: screens/P10-partner-reseller-portal.yaml#PTR-002 layout
+        status: fixed
+        by: CHG-WIR-018
       - what: 'The purpose reads "The screen this app sits on…".'
         why: Generic; the dashboard is the partner's credit and bookings overview.
         source: screens/P10-partner-reseller-portal.yaml#PTR-002 purpose
-    openQuestions:
-      - question: POS-style reseller interface, website-style portal, or both per customer?
-        default: Wireframe both (Chinmay's action); decide after review.
-        source: MoM 29 Sep 3; TRACKER 30-September Tracker row 30 (T10)
+        status: fixed
+        by: CHG-WIR-020
+    decisions:
+    - question: POS-style reseller interface, website-style portal, or both per customer?
+      decision: 'Drawn default stands (answer: "Wireframe both; decide after review"): Wireframe both (Chinmay''s action);
+        decide after review.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-224 | CHG-NOTE-007
+      questionSource: MoM 29 Sep 3; TRACKER 30-September Tracker row 30 (T10)
 
   PTR-005:
     summary: >-
@@ -3741,6 +3913,8 @@ screens:
       - what: Order actions (create, discount, exchange, hold, modify, void) on an inventory view.
         why: Booking is PTR-008; this view reads and returns allocation.
         source: screens/P10-partner-reseller-portal.yaml#PTR-005 layout
+        status: fixed
+        by: CHG-WIR-018
 
   PTR-006:
     summary: >-
@@ -3770,6 +3944,8 @@ screens:
       - what: Availability bound to an inline response with no schema; purpose copied from guest search.
         why: Recorded gap; purpose should be availability for the partner's products.
         source: screens/P10-partner-reseller-portal.yaml#PTR-007 gaps
+        status: fixed
+        by: CHG-WIR-020
 
   PTR-008:
     summary: >-
@@ -3785,6 +3961,8 @@ screens:
       - what: Staff list filters and refund, void and discount actions on Booking Creation.
         why: The partner creates a booking; venue-side actions are not the partner's.
         source: screens/P10-partner-reseller-portal.yaml#PTR-008 layout
+        status: fixed
+        by: CHG-WIR-018
 
   PTR-009:
     summary: >-
@@ -3815,6 +3993,8 @@ screens:
       - what: Promotion list filters and "Analyse promotion conflicts" on the partner's cart.
         why: Promotion analysis is a venue tool.
         source: screens/P10-partner-reseller-portal.yaml#PTR-010 layout
+        status: fixed
+        by: CHG-WIR-018
 
   PTR-012:
     summary: >-
@@ -3829,6 +4009,8 @@ screens:
       - what: Raw CreatePaymentRequest text fields and Add tip.
         why: A partner checkout has no tip and never types payment fields.
         source: screens/P10-partner-reseller-portal.yaml#PTR-012 layout
+        status: fixed
+        by: CHG-WIR-018
 
   PTR-013:
     summary: >-
@@ -3839,6 +4021,8 @@ screens:
       - what: Override credit limit and Save b2b credit limit.
         why: Venue actions; the partner reads.
         source: screens/P10-partner-reseller-portal.yaml#PTR-013 layout
+        status: fixed
+        by: CHG-WIR-018
 
   PTR-015:
     summary: >-
@@ -3853,6 +4037,8 @@ screens:
       - what: Venue-side actions (refund, void, discount) on the partner's history.
         why: The partner requests changes; the venue performs them.
         source: screens/P10-partner-reseller-portal.yaml#PTR-015 layout
+        status: fixed
+        by: CHG-WIR-018
 
   PTR-016:
     summary: >-
@@ -3867,6 +4053,8 @@ screens:
       - what: Order-changing actions on a download screen.
         why: Download and resend only.
         source: screens/P10-partner-reseller-portal.yaml#PTR-016 layout
+        status: fixed
+        by: CHG-WIR-018
 
   ANL-018:
     summary: >-

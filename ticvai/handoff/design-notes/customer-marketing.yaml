@@ -229,10 +229,15 @@ screens:
           A guest cannot know a variant id. Saving belongs on the product and date cards (WEB-005/WEB-006/GST-004).
           Here the screen only lists, books and removes. Replace the modal with a "Browse" link when the list is empty.
         source: screens/P01-guest-web-storefront.yaml#WEB-009
-    openQuestions:
-      - question: Does a wishlist entry for a performance that has passed stay, or should the platform drop it, and should a guest be told when a saved date is about to sell out?
-        default: Keep it under "Past dates" (no deletion); no sell-out alert until a journey for it is configured.
-        source: contracts/satellite/marketing-crm.yaml#getWishlist
+    decisions:
+    - question: Does a wishlist entry for a performance that has passed stay, or should the platform drop it, and should a
+        guest be told when a saved date is about to sell out?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Keep it under "Past dates" (no deletion);
+        no sell-out alert until a journey for it is configured.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-022 | CHG-NOTE-002
+      questionSource: contracts/satellite/marketing-crm.yaml#getWishlist
 
   GST-020:
     summary: >-
@@ -397,12 +402,15 @@ screens:
       - what: The emptyFirstRun state offers "Add to wishlist" on a checkout step.
         why: Derived from the bulk-attached operations. The empty state of this step is "Nothing to fill in - continue to payment", and the step is normally skipped.
         source: F01 step 6
-    openQuestions:
-      - question: May a guest who checks out without an account be marketed to on the strength of the checkout opt-in (is it sufficient consent under PDPL)?
-        default: >-
-          Draw the unticked opt-in beside the terms. Record it with source "checkout". Send nothing promotional
-          to a guest-checkout buyer unless they ticked it.
-        source: M18-15 (audit R-M18-15); DI-940; DI-954
+    decisions:
+    - question: May a guest who checks out without an account be marketed to on the strength of the checkout opt-in (is it
+        sufficient consent under PDPL)?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw the unticked opt-in beside the terms.
+        Record it with source "checkout". Send nothing promotional to a guest-checkout buyer unless they ticked it.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-023 | CHG-NOTE-002
+      questionSource: M18-15 (audit R-M18-15); DI-940; DI-954
 
   WEB-017:
     summary: >-
@@ -605,6 +613,8 @@ screens:
       - what: The emptyNoAccess state names GUEST_VIEW, and emptyFirstRun says the first consent "saves the first profile".
         why: A guest holds no staff permission (ADR-0025), and a profile always exists for a signed-in guest. These states come from the configEditor pattern and do not apply.
         source: screens/P01-guest-web-storefront.yaml#WEB-020
+        status: fixed
+        by: CHG-GST-004
 
   GST-065:
     summary: >-
@@ -659,6 +669,8 @@ screens:
       - what: No getGuestConsents on GST-065, and the emptyNoAccess state names GUEST_VIEW.
         why: The consent toggles need the current state. A guest holds no staff permission (ADR-0025).
         source: contracts/satellite/marketing-crm.yaml#getGuestConsents
+        status: fixed
+        by: CHG-GST-004
       - what: The "Save marketing subscription" modal asks the guest for id, subjectId, channel, listName, isSubscribed and unsubscribeToken.
         why: These are system and row fields; the guest flips a toggle per list and channel.
         source: screens/P02-guest-mobile-app.yaml#GST-065
@@ -705,10 +717,15 @@ screens:
       - what: Purpose is "Record newsletter subscription for this venue"; there is no listConsentPurposes or getGuestConsents.
         why: The page needs the current consent per channel to show the two-part layout.
         source: contracts/satellite/marketing-crm.yaml#getGuestConsents
-    openQuestions:
-      - question: Should a signed-out visitor be able to sign up for a newsletter with just an email (footer sign-up)? No operation accepts an email without a guest subject.
-        default: Not drawn. The footer link says "Get our news - sign in or create an account".
-        source: screens/P01-guest-web-storefront.yaml#WEB-027; contracts/satellite/marketing-crm.yaml#setMarketingSubscription
+    decisions:
+    - question: Should a signed-out visitor be able to sign up for a newsletter with just an email (footer sign-up)? No operation
+        accepts an email without a guest subject.
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Not drawn. The footer link says "Get our
+        news - sign in or create an account".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-025 | CHG-NOTE-002
+      questionSource: screens/P01-guest-web-storefront.yaml#WEB-027; contracts/satellite/marketing-crm.yaml#setMarketingSubscription
 
   WEB-024:
     summary: >-
@@ -956,6 +973,8 @@ screens:
       - what: emptyNoAccess names CASE_VIEW.
         why: A guest holds no staff permission (ADR-0025).
         source: screens/P02-guest-mobile-app.yaml#GST-068
+        status: fixed
+        by: CHG-GST-004
 
   WEB-026:
     summary: >-
@@ -1009,10 +1028,14 @@ screens:
       - what: WEB-026 lacks raiseMyCase, which GST-035 has.
         why: Cross-surface parity. A guest reporting a problem on the web has the same need.
         source: screens/P02-guest-mobile-app.yaml#GST-035
-    openQuestions:
-      - question: Should the government satisfaction service (the "happiness meter" seen on a reference site) be integrated, and does it replace or sit beside the venue's own rating?
-        default: Own rating only; no government widget drawn.
-        source: DI-112
+    decisions:
+    - question: Should the government satisfaction service (the "happiness meter" seen on a reference site) be integrated,
+        and does it replace or sit beside the venue's own rating?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Own rating only; no government widget drawn.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-024 | CHG-NOTE-002
+      questionSource: DI-112
 
   GST-035:
     summary: >-
@@ -1101,10 +1124,15 @@ screens:
       - what: The prototype has no lost-item form; it uses the generic case form.
         why: Record this as a prototype gap so the build does not copy it.
         source: screens/P01-guest-web-storefront.yaml#WEB-034
-    openQuestions:
-      - question: Which operation records a guest's lost-item report so it is matchable - recordLostItem alongside the case, or an extended raiseMyCase?
-        default: Draw the item fields; send them as the case detail until the operation is chosen.
-        source: contracts/satellite/marketing-crm.yaml#recordLostItem
+    decisions:
+    - question: Which operation records a guest's lost-item report so it is matchable - recordLostItem alongside the case,
+        or an extended raiseMyCase?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw the item fields; send them as the case
+        detail until the operation is chosen.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-026 | CHG-NOTE-002
+      questionSource: contracts/satellite/marketing-crm.yaml#recordLostItem
 
   GST-034:
     summary: >-
@@ -1275,10 +1303,16 @@ screens:
       - what: listLoyaltyProgrammes carries permission MARKETING_VIEW and the screen's emptyNoAccess names it.
         why: A guest holds no staff permission (ADR-0025). The guest needs "the programmes I am in", not every programme.
         source: contracts/satellite/marketing-crm.yaml#listLoyaltyProgrammes
-    openQuestions:
-      - question: The full loyalty configuration (tiers, earn rules, redemption, expiry) is still pending a dedicated workshop.
-        default: Draw Bronze, Silver, Gold, Platinum, points expiring 12 months after they are earned, and a small rewards catalogue as sample data only.
-        source: DI-382; MoM 2026-08-20 6
+        status: fixed
+        by: CHG-GST-004
+    decisions:
+    - question: The full loyalty configuration (tiers, earn rules, redemption, expiry) is still pending a dedicated workshop.
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw Bronze, Silver, Gold, Platinum, points
+        expiring 12 months after they are earned, and a small rewards catalogue as sample data only.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-020 | CHG-NOTE-002
+      questionSource: DI-382; MoM 2026-08-20 6
 
   WEB-043:
     summary: >-
@@ -1313,10 +1347,13 @@ screens:
       - what: Same shape and permission issues as GST-036 (getLoyaltyPosition shape, listLoyaltyProgrammes MARKETING_VIEW, rewards and badges unwired).
         why: See GST-036.
         source: contracts/satellite/marketing-crm.yaml#getLoyaltyPosition
-    openQuestions:
-      - question: Same programme-configuration question as GST-036.
-        default: Same sample tiers.
-        source: DI-382
+    decisions:
+    - question: Same programme-configuration question as GST-036.
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Same sample tiers.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-027 | CHG-NOTE-002
+      questionSource: DI-382
 
   CMS-041:
     summary: >-
@@ -1359,6 +1396,8 @@ screens:
       - what: Every field (Waiver ID, Name, Description) is a select, and only a list read is declared.
         why: Text fields; the master needs a write (createForm).
         source: contracts/satellite/marketing-crm.yaml#createForm
+        status: fixed
+        by: CHG-WIR-005
 
   CMS-043:
     summary: >-
@@ -1477,6 +1516,8 @@ screens:
       - what: The list is bound to setLocalizationBrandingCustomer (a write).
         why: Needs a read.
         source: contracts/satellite/marketing-crm.yaml#setLocalizationBrandingCustomer
+        status: fixed
+        by: CHG-WIR-005
 
   CMS-050:
     summary: >-
@@ -1543,6 +1584,8 @@ screens:
       - what: The list is bound to setWaiverVerificationValidation (a write).
         why: Needs a read of submissions awaiting review.
         source: contracts/satellite/marketing-crm.yaml#setWaiverVerificationValidation
+        status: fixed
+        by: CHG-WIR-005
 
   CMS-056:
     summary: >-
@@ -1674,22 +1717,30 @@ screens:
           operation on POS-027; no staff operation creates a guest profile, and topUpWallet is declared only on BO-488.
         why: Both are client-verified in the prototype (DI-097 asks for top-up). Declare a staff profile-create operation and topUpWallet here, or move top-up to the till's wallet screen and say so.
         source: screens/P04-point-of-sale.yaml#POS-027; contracts/satellite/wallet.yaml#topUpWallet; DI-097
+        status: fixed
+        by: CHG-WIR-005
       - what: getLoyaltyPosition lists "POS-002 Sell - Ticket Catalogue" among its consumers.
         why: >-
           At a till the caller is the cashier, so getLoyaltyPosition would return the cashier's own points.
           A named guest's position at the till comes from identifyGuest (loyalty) or getGuestLoyalty. POS-002 (and
           POS-027 for search results) should declare getGuestLoyalty instead (screen change, as decided 1 October).
         source: contracts/satellite/marketing-crm.yaml#getLoyaltyPosition; contracts/satellite/marketing-crm.yaml#getGuestLoyalty
+        status: fixed
+        by: CHG-WIR-005
       - what: recordConsent is declared guest-audience only, although its description says an agent may record consent on a guest's behalf with GUEST_MANAGE.
         why: A till (and BO-748) cannot record the consent a guest gives in person. Add the staff audience to recordConsent with the agent-recorded rule.
         source: contracts/satellite/marketing-crm.yaml#recordConsent
       - what: Open reservations are not shown on the prototype's guest card.
         why: The panel's purpose names them (visible before the sale, not after); add them to the build.
         source: screens/P04-point-of-sale.yaml#POS-027
-    openQuestions:
-      - question: What does the till do with a barred guest (refuse the sale, require a supervisor, or only warn)?
-        default: Show the red banner and disable "Attach to sale" until a supervisor overrides.
-        source: contracts/satellite/marketing-crm.yaml#/components/schemas/GuestIdentification
+    decisions:
+    - question: What does the till do with a barred guest (refuse the sale, require a supervisor, or only warn)?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Show the red banner and disable "Attach
+        to sale" until a supervisor overrides.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-021 | CHG-NOTE-002
+      questionSource: contracts/satellite/marketing-crm.yaml#/components/schemas/GuestIdentification
 
   BO-005:
     summary: >-
@@ -1727,6 +1778,8 @@ screens:
           should read the queue status result or the message dispatches, not listCampaigns. Remove the campaign
           operations from BO-005.
         source: contracts/satellite/queue.yaml#setQueueStatus; F09 step 5; R254
+        status: fixed
+        by: CHG-WIR-001
       - what: Two primary buttons, "Call next parties" (callNextParties) and "Call next" (no operation).
         why: The same act appears twice; keep one.
         source: screens/P08-venue-back-office.yaml#BO-005
@@ -1767,6 +1820,8 @@ screens:
       - what: The screen has createForm but no listForms or getForm, so existing forms cannot be opened or versioned.
         why: listForms ("the builder's list") is consumed by no screen. Add listForms and getForm.
         source: contracts/satellite/marketing-crm.yaml#listForms
+        status: fixed
+        by: CHG-WIR-005
       - what: Components are a text field labelled "Mandatory / Optional / Conditional / Hidden" and a select labelled "Key requirement - 12.1.2".
         why: The first is a per-field control; the second leaks a matrix reference into the UI (the bundle rule forbids it).
         source: screens/P08-venue-back-office.yaml#BO-618
@@ -1833,6 +1888,8 @@ screens:
       - what: The screen has list states but no list operation (listSegments is not declared here).
         why: Opening an existing segment to edit needs a read. Add listSegments (and a get).
         source: contracts/satellite/marketing-crm.yaml#listSegments
+        status: fixed
+        by: CHG-WIR-005
 
   BO-766:
     summary: >-
@@ -1911,6 +1968,8 @@ screens:
           Builder's purpose is the general campaign, which is createCampaign (CreateCampaignRequest), plus
           launchCampaign and testSendCampaign. Wire those; keep invitations on their own screen.
         source: contracts/satellite/marketing-crm.yaml#createInvitationCampaign; contracts/satellite/marketing-crm.yaml#createCampaign
+        status: fixed
+        by: CHG-WIR-005
       - what: CreateCampaignRequest has no objective, success target, owner, brand, products or budget fields, and no offer reference.
         why: The purpose and DI-383 require them, and the offer must be a reference to a pre-configured offer. Add them or reduce the purpose.
         source: contracts/satellite/marketing-crm.yaml#/components/schemas/CreateCampaignRequest; DI-383; MoM 2026-08-20 4.6
@@ -2040,13 +2099,21 @@ screens:
       - what: getLoyaltyRules ("every rule a loyalty programme runs on") is consumed by no screen; BO-827 can replace the set but cannot read it.
         why: A whole-set replace without reading the current set erases rules. Add getLoyaltyRules.
         source: contracts/satellite/marketing-crm.yaml#getLoyaltyRules
+        status: fixed
+        by: CHG-WIR-005
       - what: The primary action is "Create loyalty programme" (createLoyaltyProgramme) on a rules screen that enters with a programmeId.
         why: The screen's act is editing that programme's rules. Programme creation belongs on the programme list.
         source: screens/P08-venue-back-office.yaml#BO-827
-    openQuestions:
-      - question: Full loyalty configuration (tiers, earn and redemption rules, expiry) is pending a dedicated workshop.
-        default: Sample rules above; points expire 12 months after being earned.
-        source: DI-382
+        status: fixed
+        by: CHG-WIR-005
+    decisions:
+    - question: Full loyalty configuration (tiers, earn and redemption rules, expiry) is pending a dedicated workshop.
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Sample rules above; points expire 12 months
+        after being earned.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-018 | CHG-NOTE-002
+      questionSource: DI-382
 
   SUP-002:
     summary: >-
@@ -2141,9 +2208,13 @@ screens:
       - what: getSeoMetadata (the metadata in force for one page) is consumed by no screen.
         why: The editor must load what is in force before saving. Add getSeoMetadata.
         source: contracts/satellite/marketing-crm.yaml#getSeoMetadata
+        status: fixed
+        by: CHG-WIR-005
       - what: A slug change needs createUrlRedirect, declared only on BO-842.
         why: The redirect must be created when the slug is changed here.
         source: contracts/satellite/marketing-crm.yaml#createUrlRedirect
+        status: fixed
+        by: CHG-WIR-005
 
   CMS-018:
     summary: >-
@@ -2226,6 +2297,11 @@ screens:
       - element: Scan runs
         rule: Each run with source, channel, findings, newly detected and missing counts.
         source: contracts/satellite/marketing-crm.yaml#listCookieScans
+      - element: Where a scan comes from
+        rule: A bought scanner API (hybrid) runs the scheduled scans and feeds recordCookieScan; the manual "Upload scan report"
+          path stays for a venue that scans elsewhere. The source column says Scanner or Upload per run. The banner, its runtime,
+          the registry and the consent logs stay TICVAI's own.
+        source: decided 2 October 2026 by Chinmay (CHG-NOTE-002)
     consistency:
       - with: CMS-026
         note: Approved technologies appear in the banner's preference centre per category.
@@ -2240,10 +2316,14 @@ screens:
       - what: The action bar holds "Analytics Tracker", "Embedded Service" and "Other tracking technology" as buttons.
         why: These are technology types (a filter or the type field), not actions. The action is Add technology (setTrackingTechnology).
         source: screens/P13-white-label-cms.yaml#CMS-025
-    openQuestions:
-      - question: Is the scanner bought or built (CF-127)?
-        default: Draw the manual "Upload scan report" path and the schedule; the source column shows which produced each run.
-        source: contracts/satellite/marketing-crm.yaml#recordCookieScan
+    decisions:
+    - question: Is the scanner bought or built (CF-127)?
+      decision: 'Cookie scanner: buy a scanner API (hybrid). Our banner, runtime, registry and consent logs stay; a bought
+        scanner API feeds recordCookieScan; the manual ''Upload scan report'' path stays.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-019 | CHG-NOTE-002
+      questionSource: contracts/satellite/marketing-crm.yaml#recordCookieScan
 
   CMS-026:
     summary: >-
@@ -2330,6 +2410,8 @@ screens:
       - what: getLostItemMatches ("candidate matches, scored") is consumed by no screen; the "Find matches" button is wired to matchLostItem, which ties, claims, returns or disposes.
         why: The register cannot suggest matches. Wire getLostItemMatches to the find action and keep matchLostItem for the decisions.
         source: contracts/satellite/marketing-crm.yaml#getLostItemMatches; contracts/satellite/marketing-crm.yaml#matchLostItem
+        status: fixed
+        by: CHG-WIR-005
       - what: recordLostItem is not on BO-073, so staff cannot hand in a found item here.
         why: The register needs its "found" side. Add recordLostItem.
         source: contracts/satellite/marketing-crm.yaml#recordLostItem
@@ -2387,6 +2469,8 @@ screens:
       - what: Sale boards (listSaleBoards, updateSaleBoard) - POS layouts - sit on a campaign screen.
         why: A sale board is a workstation layout (WORKSTATION_CONFIGURE); it has nothing to do with campaign and audience management. Remove them.
         source: contracts/spine/tenancy.yaml#updateSaleBoard
+        status: fixed
+        by: CHG-WIR-005
       - what: BO-118 and BO-764 overlap (campaign list plus create).
         why: Two campaign command centres will drift. Merge them or define BO-118 as the POS-context view.
         source: screens/P08-venue-back-office.yaml#BO-764
@@ -2416,10 +2500,16 @@ screens:
       - what: The client design input for this board is recommendation touchpoints (cart, checkout, post-purchase per channel) with a guest-view preview, which are recommendation strategy operations, not marketing journeys.
         why: The screen is wired to journeys only; recommendation strategies live on the ADM recommendation screens.
         source: DI-961; contracts/satellite/promotions.yaml#updateRecommendationStrategy
-    openQuestions:
-      - question: Is BO-120 a marketing-journey screen or the recommendation touchpoint configuration from the 21 September board?
-        default: Marketing journeys list; recommendation touchpoints stay on the ADM recommendation screens.
-        source: DI-961
+    decisions:
+    - question: Is BO-120 a marketing-journey screen or the recommendation touchpoint configuration from the 21 September
+        board?
+      decision: 'Drawn default accepted: Marketing journeys list; recommendation touchpoints stay on the ADM recommendation
+        screens.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-277 | CHG-NOTE-002
+      reviewable: true
+      questionSource: DI-961
 
   BO-121:
     summary: >-
@@ -2603,6 +2693,8 @@ screens:
       - what: The 360 is wired to listCustomerServiceProfile (the support service view) and listCustomerSegmentProfile (catalogue pricing eligibility rules).
         why: Segment pricing rules are not a guest view. The CRM 360 needs getGuestProfile, getGuestLoyalty, getGuestTimeline, getGuestConsents and getGuestIntelligence; reuse the service view only for the support panel.
         source: contracts/spine/catalogue.yaml#listCustomerSegmentProfile; contracts/satellite/marketing-crm.yaml#getGuestTimeline
+        status: fixed
+        by: CHG-WIR-005
 
   BO-738:
     summary: >-
@@ -2627,6 +2719,8 @@ screens:
       - what: The timeline screen declares getGuestIntelligence (scores) and not getGuestTimeline, while BO-743 AI Guest Intelligence declares getGuestTimeline and not getGuestIntelligence.
         why: The two reads are swapped between the screens. Put getGuestTimeline on BO-738 and getGuestIntelligence on BO-743.
         source: contracts/satellite/marketing-crm.yaml#getGuestTimeline; contracts/satellite/marketing-crm.yaml#getGuestIntelligence
+        status: fixed
+        by: CHG-WIR-005
 
   BO-740:
     summary: >-
@@ -2655,6 +2749,8 @@ screens:
       - what: The screen's only write is updateGuestPreferences ("Save guest preferences").
         why: Family linking is getGuestRelationships and setGuestRelationships (declared on BO-741). Wire them here.
         source: contracts/satellite/marketing-crm.yaml#setGuestRelationships
+        status: fixed
+        by: CHG-WIR-005
 
   BO-741:
     summary: >-
@@ -2696,6 +2792,8 @@ screens:
       - what: The screen's only operation is setGuestRelationships ("Save guest relationships").
         why: A history screen needs reads (orders, entitlements, wallet, cases, documents); relationship editing belongs on BO-740/BO-741.
         source: contracts/satellite/marketing-crm.yaml#setGuestRelationships; screens/P08-venue-back-office.yaml#BO-742
+        status: fixed
+        by: CHG-WIR-005
 
   BO-743:
     summary: >-
@@ -2718,6 +2816,8 @@ screens:
       - what: Declares getGuestTimeline and uploadGuestDocument but not getGuestIntelligence.
         why: See BO-738; and uploading documents has nothing to do with AI insight.
         source: contracts/satellite/marketing-crm.yaml#getGuestIntelligence; contracts/satellite/marketing-crm.yaml#uploadGuestDocument
+        status: fixed
+        by: CHG-WIR-005
 
   BO-744:
     summary: >-
@@ -2796,10 +2896,17 @@ screens:
       - what: getGuestMatchPolicy and setGuestMatchPolicy (how returning guests are recognised at checkout) sit on this review screen.
         why: They configure checkout matching, a policy setting that belongs with identity resolution (BO-745) or checkout configuration.
         source: contracts/satellite/marketing-crm.yaml#setGuestMatchPolicy
-    openQuestions:
-      - question: How is the guest notified of a likely duplicate and asked to confirm (push or email), and which operation records their answer?
-        default: Show the guest response column as "Not available" until an operation exists.
-        source: DI-377
+        status: fixed
+        by: CHG-WIR-005
+    decisions:
+    - question: How is the guest notified of a likely duplicate and asked to confirm (push or email), and which operation
+        records their answer?
+      decision: 'Drawn default accepted: Show the guest response column as "Not available" until an operation exists.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-278 | CHG-NOTE-002
+      reviewable: true
+      questionSource: DI-377
 
   BO-747:
     summary: >-
@@ -2843,9 +2950,13 @@ screens:
       - what: recordConsent is guest-audience only, but this staff screen calls it.
         why: Add the staff audience with the agent-recorded rule (see POS-027).
         source: contracts/satellite/marketing-crm.yaml#recordConsent
+        status: logged
+        by: CHG-WIR-007
       - what: listVersioningEffectiveDate (waiver form versions) is wired as the consent version list.
         why: Waiver versions are not consent statement versions; the consent statement versions are policy versions (listPolicies) and purpose notice versions.
         source: contracts/satellite/marketing-crm.yaml#listVersioningEffectiveDate; contracts/satellite/white-label.yaml#listPolicies
+        status: fixed
+        by: CHG-WIR-005
 
   BO-749:
     summary: >-
@@ -2894,6 +3005,8 @@ screens:
       - what: BO-750 and CMS-034 both read listDataSubjectCustomer; setPrivacyRequest ("raise or progress a privacy request") is consumed by no screen.
         why: The queue cannot move a request through its statuses. Wire setPrivacyRequest and pick one owning screen.
         source: contracts/satellite/marketing-crm.yaml#setPrivacyRequest
+        status: fixed
+        by: CHG-WIR-005
 
   BO-751:
     summary: >-
@@ -2917,6 +3030,8 @@ screens:
       - what: Retention is set in two places - setDataRetentionPolicy (marketing-crm) and setDataRetentionSetting (tenancy), both on this screen.
         why: Decided 29 September that retention is a tenant setting per data class; the marketing-crm policy should derive from it or be removed.
         source: contracts/spine/tenancy.yaml#setDataRetentionSetting; contracts/satellite/marketing-crm.yaml#setDataRetentionPolicy
+        status: fixed
+        by: CHG-WIR-005
 
   BO-752:
     summary: >-
@@ -3062,6 +3177,8 @@ screens:
       - what: The purpose ("Work with notifications for this venue") is a template, and the primary action sends a transactional message.
         why: A partner portal's notifications page is a feed of messages to the partner; sending to guests from it needs a stated use case. Reword the purpose and confirm the send action.
         source: screens/P10-partner-reseller-portal.yaml#PTR-004
+        status: fixed
+        by: CHG-WIR-006
 
   PTR-021:
     summary: >-
@@ -3077,6 +3194,8 @@ screens:
       - what: The partner screen exposes staff controls (Assigned to principal id filter, Escalate, Save case with status and assignee).
         why: A partner should raise, read and reply; assignment and status are venue-side.
         source: screens/P10-partner-reseller-portal.yaml#PTR-021
+        status: fixed
+        by: CHG-WIR-005
 
   BO-938:
     summary: >-
@@ -3088,6 +3207,8 @@ screens:
       - what: raiseMyCase (a guest-only operation for guest cases) is declared beside raiseResourceRequest.
         why: An employee request is not a guest case; remove raiseMyCase.
         source: contracts/satellite/marketing-crm.yaml#raiseMyCase; contracts/satellite/resources.yaml#raiseResourceRequest
+        status: fixed
+        by: CHG-WIR-005
 
   BO-754:
     summary: >-
@@ -3134,10 +3255,16 @@ screens:
     sampleData:
       list: Corporate partners 2026 - imported 28 Sep 2026 - 1,450 rows - 1,212 matched - 180 leads - 58 quarantined
       consentBasis: Existing customers, email consent recorded at source (import)
-    openQuestions:
-      - question: Import formats and validation rules for customer and segment migration are pending a dedicated data-migration workshop.
-        default: CSV and XLSX with a downloadable template (first name, last name, email, mobile, language, external id).
-        source: MoM 2026-08-20 4.4; DI-381
+    decisions:
+    - question: Import formats and validation rules for customer and segment migration are pending a dedicated data-migration
+        workshop.
+      decision: 'Drawn default accepted: CSV and XLSX with a downloadable template (first name, last name, email, mobile,
+        language, external id).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-279 | CHG-NOTE-002
+      reviewable: true
+      questionSource: MoM 2026-08-20 4.4; DI-381
 
   BO-757:
     summary: >-
@@ -3161,6 +3288,8 @@ screens:
       - what: Only createSegment is declared; no preview, no list.
         why: The purpose asks for a preview of top behaviours and freshness; add previewSegment and listSegments.
         source: contracts/satellite/marketing-crm.yaml#previewSegment
+        status: fixed
+        by: CHG-WIR-005
 
   BO-758:
     summary: >-
@@ -3182,6 +3311,8 @@ screens:
       - what: Only createSegment is declared.
         why: Same as BO-757 - add previewSegment (reachable by channel is in the purpose).
         source: contracts/satellite/marketing-crm.yaml#previewSegment
+        status: fixed
+        by: CHG-WIR-005
 
   BO-759:
     summary: >-
@@ -3215,6 +3346,8 @@ screens:
       - what: Only createSegment is declared.
         why: The distribution preview needs a read; add previewSegment.
         source: contracts/satellite/marketing-crm.yaml#previewSegment
+        status: fixed
+        by: CHG-WIR-005
 
   BO-762:
     summary: >-
@@ -3322,6 +3455,8 @@ screens:
       - what: listSegments is declared on the composer, but no template read (listMessageTemplates) is.
         why: The composer starts from a template and does not choose audiences.
         source: contracts/satellite/marketing-crm.yaml#listMessageTemplates
+        status: fixed
+        by: CHG-WIR-005
 
   BO-769:
     summary: >-
@@ -3364,10 +3499,16 @@ screens:
       - what: recordTouchPoint (service audience) is declared on this staff screen.
         why: Touches are recorded by services; the screen needs a read of touches for multi-touch views.
         source: contracts/satellite/marketing-crm.yaml#recordTouchPoint
-    openQuestions:
-      - question: What attribution window does the client want (default proposed 7 days)?
-        default: 7 days, shown on every revenue figure.
-        source: R094
+        status: fixed
+        by: CHG-WIR-005
+    decisions:
+    - question: What attribution window does the client want (default proposed 7 days)?
+      decision: 'Drawn default accepted: 7 days, shown on every revenue figure.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-280 | CHG-NOTE-002
+      reviewable: true
+      questionSource: R094
 
   BO-774:
     summary: >-
@@ -3387,6 +3528,8 @@ screens:
       - what: Only listJourneys is declared.
         why: Goal rate and errors need getJourneyPerformance.
         source: contracts/satellite/marketing-crm.yaml#getJourneyPerformance
+        status: fixed
+        by: CHG-WIR-005
 
   BO-775:
     summary: >-
@@ -3444,6 +3587,8 @@ screens:
       - what: The screen's only operation is createJourney.
         why: Branching and simulation need the journey read and a simulation; nothing in the contract simulates a marketing journey.
         source: contracts/satellite/marketing-crm.yaml#createJourney
+        status: fixed
+        by: CHG-WIR-005
 
   BO-779:
     summary: >-
@@ -3499,6 +3644,8 @@ screens:
       - what: Only listJourneys is declared.
         why: Node analytics need getJourneyPerformance.
         source: contracts/satellite/marketing-crm.yaml#getJourneyPerformance
+        status: fixed
+        by: CHG-WIR-005
 
   BO-223:
     summary: >-
@@ -3510,6 +3657,8 @@ screens:
       - what: The list is listJourneys (marketing automation journeys) beside simulateGuestJourney (access).
         why: "\"Journey\" means two things here; this screen simulates access journeys (listGuestJourney / journey profiles), not marketing journeys. Replace listJourneys."
         source: contracts/spine/access.yaml#simulateGuestJourney; contracts/spine/access.yaml#listGuestJourney
+        status: fixed
+        by: CHG-WIR-005
 
   BO-677:
     summary: >-
@@ -3548,6 +3697,8 @@ screens:
       - what: The only operation is setLocalizationBrandingCustomer, which sets a WAIVER version's languages, branding and channels.
         why: Accreditation communication branding is not a waiver version; the screen needs the communication branding and sender identity configuration instead.
         source: contracts/satellite/marketing-crm.yaml#setLocalizationBrandingCustomer
+        status: fixed
+        by: CHG-WIR-005
       - what: A select labelled "Key requirement - 12.1.57".
         why: A matrix reference leaks into the UI.
         source: screens/P08-venue-back-office.yaml#BO-678
@@ -3572,6 +3723,8 @@ screens:
       - what: sendTransactionalMessage is service and partner audience only, but is the staff screen's only action.
         why: A staff bulk send needs a staff-audience operation (and a population selector); the transactional send is per message.
         source: contracts/satellite/marketing-crm.yaml#sendTransactionalMessage
+        status: fixed
+        by: CHG-WIR-005
 
   BO-784:
     summary: >-
@@ -3657,6 +3810,8 @@ screens:
       - what: getMarketingSubscription and setMarketingSubscription are guest-only operations on this staff screen.
         why: Staff need a staff read of a guest's subscriptions and a list of subscribers; staff should not write a guest's subscription.
         source: contracts/satellite/marketing-crm.yaml#getMarketingSubscription
+        status: fixed
+        by: CHG-WIR-005
 
   BO-789:
     summary: >-
@@ -3824,10 +3979,14 @@ screens:
         source: contracts/satellite/marketing-crm.yaml#listConsentPreferenceCommunication; DI-562
     sampleData:
       decisions: ["MKT-AUTUMN to Rahul Menon - WhatsApp - consent Withdrawn - blocked", "TKT-CONFIRM to Rahul Menon - WhatsApp - transactional - allowed"]
-    openQuestions:
-      - question: Is a guest-checkout opt-in sufficient marketing consent?
-        default: Treated as consent with source checkout; shown as such in the decision row.
-        source: M18-15 (audit R-M18-15); DI-940
+    decisions:
+    - question: Is a guest-checkout opt-in sufficient marketing consent?
+      decision: 'Drawn default stands (answer: "From WEB-011: the checkout opt-in, unticked by default, recorded with source
+        checkout"): Treated as consent with source checkout; shown as such in the decision row.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-276 | CHG-NOTE-002
+      questionSource: M18-15 (audit R-M18-15); DI-940
 
   ADM-045:
     summary: >-
@@ -3863,6 +4022,8 @@ screens:
       - what: listVersioningEffectiveDate (waiver form versions) is declared.
         why: Workflow versions are not waiver versions; use the approvals contract's workflow version history.
         source: contracts/satellite/marketing-crm.yaml#listVersioningEffectiveDate; contracts/spine/approvals.yaml#listRuleWorkflow
+        status: fixed
+        by: CHG-WIR-005
 
   BO-794:
     summary: >-
@@ -3930,6 +4091,8 @@ screens:
       - what: The screen writes setCustomerServiceCopilot (the agent-side copilot), the same operation as BO-798.
         why: The guest-facing chatbot and the agent copilot are different things; the chatbot needs its own configuration (identity, channels, hours, handover).
         source: contracts/satellite/marketing-crm.yaml#setCustomerServiceCopilot
+        status: fixed
+        by: CHG-WIR-005
 
   BO-798:
     summary: >-
@@ -3946,6 +4109,8 @@ screens:
       - what: Intents and knowledge sources have no operation; setCustomerServiceCopilot is the only write.
         why: Knowledge collections (listKnowledgeCollections, ingestKnowledgeDocument) exist in the AI contract and are not wired here.
         source: contracts/satellite/ai.yaml#ingestKnowledgeDocument
+        status: fixed
+        by: CHG-WIR-005
 
   BO-799:
     summary: >-
@@ -3969,6 +4134,8 @@ screens:
       - what: handoverToAgent (guest audience) is declared on the agent workspace.
         why: The guest's side hands over; the agent claims (claimConversation). Replace it.
         source: contracts/satellite/marketing-crm.yaml#handoverToAgent; contracts/satellite/marketing-crm.yaml#claimConversation
+        status: fixed
+        by: CHG-WIR-005
 
   BO-800:
     summary: >-
@@ -4049,6 +4216,8 @@ screens:
       - what: listMyCases (guest audience) is declared.
         why: A staff command centre reads listCases; remove listMyCases.
         source: contracts/satellite/marketing-crm.yaml#listMyCases
+        status: fixed
+        by: CHG-WIR-005
 
   BO-805:
     summary: >-
@@ -4102,6 +4271,8 @@ screens:
       - what: setCaseInvestigationResolution (link a record to a case) is declared on the taxonomy screen.
         why: Linking a record is a case-workspace act; remove it.
         source: contracts/satellite/marketing-crm.yaml#setCaseInvestigationResolution
+        status: fixed
+        by: CHG-WIR-005
 
   BO-808:
     summary: >-
@@ -4118,6 +4289,8 @@ screens:
       - what: Read-only; no operation assigns or reassigns cases here.
         why: Reassignment needs updateCase (assignee) on this screen.
         source: contracts/satellite/marketing-crm.yaml#updateCase
+        status: fixed
+        by: CHG-WIR-005
 
   BO-809:
     summary: >-
@@ -4134,6 +4307,8 @@ screens:
       - what: setApprovalSlaPolicy (approval workflow SLA, approvals contract) is declared beside setSlaPolicy.
         why: Approval SLAs are a different object; remove it from the case SLA screen.
         source: contracts/spine/approvals.yaml#setApprovalSlaPolicy
+        status: fixed
+        by: CHG-WIR-005
 
   BO-810:
     summary: >-
@@ -4183,6 +4358,8 @@ screens:
       - what: setRefundCompensationService raises one request; nothing configures the compensation matrix or thresholds.
         why: The configuration in the purpose has no operation.
         source: contracts/satellite/marketing-crm.yaml#setRefundCompensationService
+        status: fixed
+        by: CHG-WIR-005
 
   BO-813:
     summary: >-
@@ -4194,6 +4371,8 @@ screens:
       - what: listMyCases (guest audience) is declared.
         why: Remove it; staff analytics read listCases or a reporting read.
         source: contracts/satellite/marketing-crm.yaml#listMyCases
+        status: fixed
+        by: CHG-WIR-005
 
   BO-814:
     summary: >-
@@ -4246,6 +4425,8 @@ screens:
       - what: The only operation is createForm.
         why: Metric definitions and follow-up thresholds are not forms; they need their own configuration.
         source: contracts/satellite/marketing-crm.yaml#createForm
+        status: fixed
+        by: CHG-WIR-005
 
   BO-818:
     summary: >-
@@ -4301,6 +4482,8 @@ screens:
       - what: Only setRefundCompensationService (one request) is declared; nothing defines the automation rules.
         why: Rules need their own configuration operation.
         source: contracts/satellite/marketing-crm.yaml#setRefundCompensationService
+        status: fixed
+        by: CHG-WIR-005
 
   BO-823:
     summary: >-
@@ -4334,6 +4517,8 @@ screens:
       - what: Purpose reads "Change how availability behaves here, and see which level the current value came from".
         why: Configuration-screen template; the screen sets the agent's own availability.
         source: screens/P12-support-agent-console.yaml#SUP-003
+        status: fixed
+        by: CHG-WIR-006
 
   SUP-004:
     summary: >-
@@ -4360,6 +4545,8 @@ screens:
       - what: The queue screen carries the full case toolset (case filters as text fields, Create case, Escalate, Reopen, Save case, Add case message).
         why: The conversation queue is about conversations; case work happens in SUP-013 / SUP-005. Keep listConversations, claim and transfer.
         source: screens/P12-support-agent-console.yaml#SUP-004
+        status: fixed
+        by: CHG-WIR-005
 
   SUP-005:
     summary: >-
@@ -4386,6 +4573,8 @@ screens:
       - what: Purpose is "Work with live chat workspace for this venue" and the case filters appear as text fields.
         why: Template purpose; the workspace serves one conversation.
         source: screens/P12-support-agent-console.yaml#SUP-005
+        status: fixed
+        by: CHG-WIR-006
 
   SUP-007:
     summary: >-
@@ -4485,6 +4674,8 @@ screens:
       - what: createCaseClassificationIntelligent "stores nothing", and createCase is not declared.
         why: The screen classifies and previews but cannot raise the case. Add createCase.
         source: contracts/satellite/marketing-crm.yaml#createCaseClassificationIntelligent; contracts/satellite/marketing-crm.yaml#createCase
+        status: fixed
+        by: CHG-WIR-005
       - what: Every field is a select field (Customer, Subject, Description, Attachments).
         why: Subject and description are text; customer is a search; attachments an upload.
         source: screens/P12-support-agent-console.yaml#SUP-012
@@ -4509,6 +4700,8 @@ screens:
       - what: The table is bound to setCaseInvestigationResolution (a write), and getCase, addCaseMessage and updateCase are not declared.
         why: The workspace cannot read the case, reply or resolve.
         source: contracts/satellite/marketing-crm.yaml#getCase; contracts/satellite/marketing-crm.yaml#addCaseMessage
+        status: fixed
+        by: CHG-WIR-005
 
   SUP-014:
     summary: >-
@@ -4525,6 +4718,8 @@ screens:
       - what: The list is bound to setOrderBookingTicket (a write) and there is no order search read.
         why: The agent must find the order first; add the order read.
         source: contracts/satellite/marketing-crm.yaml#setOrderBookingTicket
+        status: fixed
+        by: CHG-WIR-005
 
   SUP-015:
     summary: >-
@@ -4571,6 +4766,8 @@ screens:
       - what: Read-only; closing a case (updateCase with a resolution note) is not declared.
         why: The screen governs closure but cannot close.
         source: contracts/satellite/marketing-crm.yaml#updateCase
+        status: fixed
+        by: CHG-WIR-005
 
   SUP-019:
     summary: >-
@@ -4598,6 +4795,8 @@ screens:
       - what: listQueues (ride and attraction virtual queues, queue contract) is declared.
         why: Ride queues are not customer-service queues; remove it.
         source: contracts/satellite/queue.yaml#listQueues
+        status: fixed
+        by: CHG-WIR-005
       - what: Name, code, thresholds and hours are select fields.
         why: Typed values.
         source: screens/P12-support-agent-console.yaml#SUP-020
@@ -4623,6 +4822,8 @@ screens:
       - what: Only the performance read is declared; setSlaPolicy is not.
         why: The screen defines policies it cannot save.
         source: contracts/satellite/marketing-crm.yaml#setSlaPolicy
+        status: fixed
+        by: CHG-WIR-005
 
   SUP-023:
     summary: >-
@@ -4634,6 +4835,8 @@ screens:
       - what: Read-only; reassignment (updateCase) is not declared.
         why: DI-546 asks for reassigning to balance load.
         source: DI-546; contracts/satellite/marketing-crm.yaml#updateCase
+        status: fixed
+        by: CHG-WIR-005
 
   SUP-024:
     summary: >-
@@ -4694,6 +4897,8 @@ screens:
       - what: The tiles and table are bound to getMyChallenges, the caller's own challenges.
         why: A command centre needs programme-wide figures; there is no list or analytics operation for challenges.
         source: contracts/satellite/marketing-crm.yaml#getMyChallenges
+        status: fixed
+        by: CHG-WIR-005
 
   BO-826:
     summary: >-
@@ -4714,6 +4919,8 @@ screens:
       - what: The primary action is "Create challenge" and listBadges is not declared.
         why: The screen manages badges; it needs listBadges and setBadge as its main act.
         source: contracts/satellite/marketing-crm.yaml#listBadges
+        status: fixed
+        by: CHG-WIR-005
 
   BO-828:
     summary: >-
@@ -4776,6 +4983,8 @@ screens:
       - what: Participant progress is bound to getLoyaltyPosition (the caller's own position, guest audience).
         why: Staff read a named guest with getGuestLoyalty; the leaderboard operations are unwired.
         source: contracts/satellite/marketing-crm.yaml#getLoyaltyPosition; contracts/satellite/marketing-crm.yaml#getGuestLoyalty
+        status: fixed
+        by: CHG-WIR-005
 
   BO-832:
     summary: >-
@@ -4803,6 +5012,8 @@ screens:
       - what: Still declares createForm and searchMedia as its own operations.
         why: The screen is merged into P13 (DI-996); its operations should be the CMS screens'.
         source: DI-996
+        status: fixed
+        by: CHG-WIR-005
 
   BO-841:
     summary: >-
@@ -4814,6 +5025,8 @@ screens:
       - what: Declares setLocalizationBrandingCustomer, which sets a waiver version's languages and branding.
         why: Unrelated to personalisation; and the screen is merged into P13 (DI-996).
         source: contracts/satellite/marketing-crm.yaml#setLocalizationBrandingCustomer; DI-996
+        status: fixed
+        by: CHG-WIR-005
 
   BO-842:
     summary: >-
@@ -4862,6 +5075,8 @@ screens:
       - what: Declares only listWaiver (the operations command centre read).
         why: A template builder needs the waiver template list and the layout write (listWaiverTemplateMaster, setDigitalWaiverForm, createForm).
         source: contracts/satellite/marketing-crm.yaml#setDigitalWaiverForm
+        status: fixed
+        by: CHG-WIR-005
 
   BO-846:
     summary: >-
@@ -4873,6 +5088,8 @@ screens:
       - what: setDigitalWaiverForm (saves a waiver's layout) is the write on the assignment rules screen.
         why: Assignment is the trigger and eligibility rules (see CMS-047), not the layout.
         source: contracts/satellite/marketing-crm.yaml#setDigitalWaiverForm
+        status: fixed
+        by: CHG-WIR-005
 
   BO-847:
     summary: >-
@@ -4885,6 +5102,8 @@ screens:
       - what: Declares listWaiverTriggerEligibility, while BO-848 Signature Experience declares listVersioningEffectiveDate.
         why: The two reads are swapped; versions belong here.
         source: contracts/satellite/marketing-crm.yaml#listVersioningEffectiveDate
+        status: fixed
+        by: CHG-WIR-005
 
   BO-848:
     summary: >-
@@ -4893,14 +5112,20 @@ screens:
       and offline behaviour. Group waivers may need a signature pad.
     sampleData:
       setup: Waiver station at Deep Dive desk - tablet - signature + initials on clause 4 - receipt by email
-    openQuestions:
-      - question: Which signature-capture device (USB stylus pad) is supported for group waivers?
-        default: Finger signature on the tablet; pad support shown as "coming".
-        source: DI-756
     corrections:
       - what: Declares listVersioningEffectiveDate (version history).
         why: See BO-847; the signing setup needs the signatory and channel configuration.
         source: contracts/satellite/marketing-crm.yaml#listVersioningEffectiveDate
+        status: fixed
+        by: CHG-WIR-005
+    decisions:
+    - question: Which signature-capture device (USB stylus pad) is supported for group waivers?
+      decision: 'Drawn default accepted: Finger signature on the tablet; pad support shown as "coming".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-281 | CHG-NOTE-002
+      reviewable: true
+      questionSource: DI-756
 
   BO-849:
     summary: >-
@@ -4925,6 +5150,8 @@ screens:
       - what: Declares only listMinorGuardianGroup.
         why: Pre-arrival chasing needs the participant status and a send-link operation.
         source: contracts/satellite/marketing-crm.yaml#listParticipantWaiverStatus
+        status: fixed
+        by: CHG-WIR-005
 
   BO-851:
     summary: >-
@@ -4952,6 +5179,8 @@ screens:
       - what: Declares setWaiverVerificationValidation (a reviewer's decision) and getWaiverStatus, but no evidence search.
         why: The repository read (listComplianceEvidenceWaiver) belongs here.
         source: contracts/satellite/marketing-crm.yaml#listComplianceEvidenceWaiver
+        status: fixed
+        by: CHG-WIR-005
 
   BO-853:
     summary: >-
@@ -4979,6 +5208,8 @@ screens:
       - what: The KPIs are drawn as select fields (Active Consent Purposes, Pending Policy Approvals) and listCustomerPrivacyConsent (one guest's privacy 360) is declared.
         why: Counts are tiles; a single guest's 360 is CMS-032's.
         source: screens/P13-white-label-cms.yaml#CMS-021
+        status: fixed
+        by: CHG-WIR-005
 
   CMS-022:
     summary: >-
@@ -4996,6 +5227,8 @@ screens:
       - what: Read-only; no write for processing purposes.
         why: A registry that is the foundation of consent must be editable (with approval through CMS-030).
         source: contracts/satellite/marketing-crm.yaml#listDataProcessingPurpose
+        status: fixed
+        by: CHG-WIR-005
 
   CMS-023:
     summary: >-
@@ -5056,16 +5289,20 @@ screens:
       - field: Face enrolment
         rule: Explicit biometric consent; for minors, guardian consent (age set by counsel).
         source: R205; DI-1085
-    openQuestions:
-      - question: Is an opt-in ticked at guest checkout sufficient marketing consent under PDPL?
-        default: Draw it unticked and record it with source checkout; nothing is sent without it.
-        source: M18-15 (audit R-M18-15); DI-940
     sampleData:
       capturePoint: Guest checkout - web - Coastal Aqua - 1) Terms (implied) 2) Send me offers and news by email (unticked) 3) by WhatsApp (unticked) 4) Preferred contact email/phone
     corrections:
       - what: Each capture point is a select field.
         why: Capture points are rows each opening their own configuration.
         source: screens/P13-white-label-cms.yaml#CMS-027
+    decisions:
+    - question: Is an opt-in ticked at guest checkout sufficient marketing consent under PDPL?
+      decision: 'Drawn default stands (answer: "From WEB-011: as above"): Draw it unticked and record it with source checkout;
+        nothing is sent without it.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-282 | CHG-NOTE-002
+      questionSource: M18-15 (audit R-M18-15); DI-940
 
   CMS-028:
     summary: >-
@@ -5093,18 +5330,22 @@ screens:
       age is hard-coded or shipped as a default; until counsel sets it, a missing date of birth counts as a minor.
     inputs:
       - field: Country rule
-        rule: Age below which a guardian consents; verification method; purposes a minor may never be asked for (marketing, biometrics pending DI-1085).
-        source: contracts/satellite/marketing-crm.yaml#setMinorGuardianAge; R205
-    openQuestions:
-      - question: Children's biometric data - exclude entirely, or allow with a guardian-signed consent?
-        default: Face enrolment of minors offered only with guardian consent recorded (R205 default); draw the rule as configurable.
-        source: DI-1085; R205
+        rule: Age below which a guardian consents; verification method; purposes a minor may never be asked for (marketing,
+          biometrics only with guardian consent on the venue's form, and only where the venue has not switched minors off).
+        source: contracts/satellite/marketing-crm.yaml#setMinorGuardianAge; R205 | decided 2 October 2026 by Chinmay (CHG-NOTE-002)
     sampleData:
       rule: UAE - guardian consent under 18 (to be confirmed by counsel) - guardian verified by OTP - marketing to minors not allowed
     corrections:
       - what: The fields are one guardian's record (Guardian name, Email, Mobile, Consent status).
         why: This is a configuration screen; guardian records belong to CMS-054 and BO-740.
         source: screens/P13-white-label-cms.yaml#CMS-029
+    decisions:
+    - question: Children's biometric data - exclude entirely, or allow with a guardian-signed consent?
+      decision: 'Children''s biometric data: as BO-187 (guardian consent, configurable).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-283 | CHG-NOTE-002
+      questionSource: DI-1085; R205
 
   CMS-030:
     summary: >-
@@ -5171,6 +5412,8 @@ screens:
       - what: The action bar lists intake channels (Customer Portal, POS, API, Authorized Representative) as buttons, and no write is declared.
         why: Channels are a field of a new request; setPrivacyRequest exists and is unwired.
         source: contracts/satellite/marketing-crm.yaml#setPrivacyRequest
+        status: fixed
+        by: CHG-WIR-005
 
   CMS-035:
     summary: >-
@@ -5209,6 +5452,8 @@ screens:
       - what: Review, Extend, Archive, Delete, Place Hold and Release Hold have no operation.
         why: runDataRetention and a legal hold write are needed.
         source: contracts/satellite/marketing-crm.yaml#runDataRetention
+        status: fixed
+        by: CHG-WIR-005
 
   CMS-038:
     summary: >-
@@ -5220,6 +5465,8 @@ screens:
       - what: The list is bound to setPrivacyComplianceException (a write); buttons are team names.
         why: Needs a list read; teams are assignees.
         source: contracts/satellite/marketing-crm.yaml#setPrivacyComplianceException
+        status: fixed
+        by: CHG-WIR-005
 
   CMS-039:
     summary: >-

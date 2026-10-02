@@ -1,0 +1,766 @@
+id: CHG-NOTE-008
+date: '2026-10-02'
+source: audit
+kind: design-input
+summary: 'venue operations: the 243 open questions Chinmay decided on 2 October move to `decisions` (196 reviewable defaults);
+  32 rule edits where a decision changes the drawing; 195 corrections marked fixed, 19 logged and 0 withdrawn against
+  the change entries that acted on main.'
+decision:
+  what: Record each decided question of handoff/design-notes/venue-operations.yaml as a decision on its screen (question,
+    decision, decidedBy Chinmay, date, the DEC ledger id and this entry; reviewable for a non-critical default), update
+    the screen's inputs, outputs, actions, edge cases and sample data where the decision changes what is drawn, and mark
+    each correction main has already acted on (status fixed / logged / withdrawn, by the change entry), so the open corrections
+    are the ones without a status.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay''s answers of 2 October to the open-questions workbook (Q125-Q143, Q225-Q239, Q241-Q273, Q362-Q458, Q460-Q538):
+  batches 1-6, the critical sets, and "show me only critical" for the non-critical defaults; the later rounds win (Door
+  follow-ups, Pre-apply round: roles as preset permission configurations, darkMode deprecated, Powered by as a toggle
+  default on, closeShift on POS-007 plus the daily reconciliation). The design notes still listed them as open, so a design
+  session would draw the old default. The corrections'' status was read from the screens on main after the wiring (CHG-WIR-001..027),
+  guest (CHG-GST-001..006), door (CHG-DOOR-001..006), finance (CHG-FIN-001..011) and loyalty (CHG-SEED-008) fixes.'
+keys_touched:
+  screens:
+  - ACC-001
+  - ACC-002
+  - ACC-003
+  - ACC-004
+  - ACC-005
+  - ACC-006
+  - ACC-007
+  - ACC-008
+  - ANL-070
+  - BO-001
+  - BO-002
+  - BO-003
+  - BO-004
+  - BO-006
+  - BO-030
+  - BO-031
+  - BO-032
+  - BO-033
+  - BO-034
+  - BO-035
+  - BO-038
+  - BO-064
+  - BO-066
+  - BO-069
+  - BO-071
+  - BO-096
+  - BO-098
+  - BO-103
+  - BO-108
+  - BO-144
+  - BO-146
+  - BO-147
+  - BO-148
+  - BO-149
+  - BO-150
+  - BO-152
+  - BO-153
+  - BO-155
+  - BO-156
+  - BO-157
+  - BO-159
+  - BO-160
+  - BO-162
+  - BO-163
+  - BO-164
+  - BO-165
+  - BO-166
+  - BO-167
+  - BO-168
+  - BO-169
+  - BO-171
+  - BO-174
+  - BO-175
+  - BO-180
+  - BO-184
+  - BO-185
+  - BO-186
+  - BO-187
+  - BO-188
+  - BO-190
+  - BO-191
+  - BO-194
+  - BO-196
+  - BO-197
+  - BO-198
+  - BO-199
+  - BO-202
+  - BO-203
+  - BO-204
+  - BO-205
+  - BO-207
+  - BO-208
+  - BO-210
+  - BO-212
+  - BO-214
+  - BO-215
+  - BO-218
+  - BO-219
+  - BO-222
+  - BO-225
+  - BO-228
+  - BO-229
+  - BO-230
+  - BO-231
+  - BO-234
+  - BO-236
+  - BO-237
+  - BO-239
+  - BO-241
+  - BO-243
+  - BO-244
+  - BO-247
+  - BO-248
+  - BO-251
+  - BO-254
+  - BO-255
+  - BO-261
+  - BO-334
+  - BO-335
+  - BO-336
+  - BO-337
+  - BO-338
+  - BO-342
+  - BO-347
+  - BO-355
+  - BO-358
+  - BO-394
+  - BO-395
+  - BO-396
+  - BO-397
+  - BO-398
+  - BO-400
+  - BO-401
+  - BO-402
+  - BO-403
+  - BO-404
+  - BO-405
+  - BO-406
+  - BO-407
+  - BO-408
+  - BO-409
+  - BO-410
+  - BO-411
+  - BO-412
+  - BO-413
+  - BO-421
+  - BO-424
+  - BO-425
+  - BO-426
+  - BO-427
+  - BO-428
+  - BO-429
+  - BO-430
+  - BO-431
+  - BO-432
+  - BO-433
+  - BO-434
+  - BO-435
+  - BO-436
+  - BO-437
+  - BO-438
+  - BO-439
+  - BO-440
+  - BO-442
+  - BO-445
+  - BO-446
+  - BO-447
+  - BO-449
+  - BO-450
+  - BO-451
+  - BO-453
+  - BO-454
+  - BO-455
+  - BO-456
+  - BO-457
+  - BO-458
+  - BO-459
+  - BO-460
+  - BO-461
+  - BO-471
+  - BO-474
+  - BO-475
+  - BO-476
+  - BO-477
+  - BO-481
+  - BO-484
+  - BO-486
+  - BO-506
+  - BO-508
+  - BO-509
+  - BO-519
+  - BO-574
+  - BO-575
+  - BO-576
+  - BO-577
+  - BO-578
+  - BO-581
+  - BO-582
+  - BO-583
+  - BO-586
+  - BO-587
+  - BO-592
+  - BO-615
+  - BO-616
+  - BO-617
+  - BO-619
+  - BO-620
+  - BO-621
+  - BO-622
+  - BO-623
+  - BO-624
+  - BO-625
+  - BO-626
+  - BO-627
+  - BO-628
+  - BO-630
+  - BO-631
+  - BO-632
+  - BO-633
+  - BO-634
+  - BO-635
+  - BO-636
+  - BO-640
+  - BO-643
+  - BO-644
+  - BO-645
+  - BO-646
+  - BO-647
+  - BO-648
+  - BO-649
+  - BO-650
+  - BO-651
+  - BO-653
+  - BO-655
+  - BO-656
+  - BO-657
+  - BO-658
+  - BO-659
+  - BO-660
+  - BO-662
+  - BO-665
+  - BO-666
+  - BO-667
+  - BO-668
+  - BO-669
+  - BO-672
+  - BO-673
+  - BO-674
+  - BO-680
+  - BO-681
+  - BO-682
+  - BO-693
+  - BO-714
+  - BO-854
+  - BO-855
+  - BO-859
+  - BO-863
+  - BO-868
+  - BO-872
+  - BO-874
+  - BO-875
+  - BO-877
+  - BO-878
+  - BO-879
+  - BO-880
+  - BO-881
+  - BO-882
+  - BO-883
+  - BO-884
+  - BO-885
+  - BO-887
+  - BO-888
+  - BO-889
+  - BO-890
+  - BO-891
+  - BO-892
+  - BO-893
+  - BO-894
+  - BO-895
+  - BO-896
+  - BO-899
+  - BO-900
+  - BO-901
+  - BO-902
+  - BO-903
+  - BO-910
+  - BO-911
+  - BO-912
+  - BO-917
+  - BO-918
+  - BO-921
+  - BO-936
+  - BO-939
+  - BO-941
+  - BO-942
+  - BO-943
+  - BO-981
+  - CMS-071
+  - EMP-004
+  - EMP-005
+  - EMP-006
+  - EMP-007
+  - EMP-010
+  - EMP-017
+  - EMP-021
+  - EMP-022
+  - EMP-023
+  - EMP-024
+  - EMP-025
+  - EMP-026
+  - EMP-027
+  - EMP-032
+  - EMP-037
+  - EMP-038
+  - EMP-039
+  - EMP-044
+  - EMP-045
+  - EMP-047
+  - EMP-048
+  - EMP-050
+  - GST-055
+  - GST-069
+  - POS-029
+  - SCN-003
+  - SCN-007
+  - SCN-008
+  - SCN-009
+  - SCN-013
+  - SCN-014
+  - SCN-015
+  - SCN-016
+  - WEB-018
+  - WEB-040
+  - WEB-047
+  files:
+  - handoff/design-notes/venue-operations.yaml
+  - handoff/design-notes/README.md
+  - tools/check-design-notes.py
+  other:
+  - DEC-125
+  - DEC-126
+  - DEC-127
+  - DEC-128
+  - DEC-129
+  - DEC-130
+  - DEC-131
+  - DEC-132
+  - DEC-133
+  - DEC-134
+  - DEC-135
+  - DEC-136
+  - DEC-137
+  - DEC-138
+  - DEC-139
+  - DEC-140
+  - DEC-141
+  - DEC-142
+  - DEC-143
+  - DEC-225
+  - DEC-226
+  - DEC-227
+  - DEC-228
+  - DEC-229
+  - DEC-230
+  - DEC-231
+  - DEC-232
+  - DEC-233
+  - DEC-234
+  - DEC-235
+  - DEC-236
+  - DEC-237
+  - DEC-238
+  - DEC-239
+  - DEC-241
+  - DEC-242
+  - DEC-243
+  - DEC-244
+  - DEC-245
+  - DEC-246
+  - DEC-247
+  - DEC-248
+  - DEC-249
+  - DEC-250
+  - DEC-251
+  - DEC-252
+  - DEC-253
+  - DEC-254
+  - DEC-255
+  - DEC-256
+  - DEC-257
+  - DEC-258
+  - DEC-259
+  - DEC-260
+  - DEC-261
+  - DEC-262
+  - DEC-263
+  - DEC-264
+  - DEC-265
+  - DEC-266
+  - DEC-267
+  - DEC-268
+  - DEC-269
+  - DEC-270
+  - DEC-271
+  - DEC-272
+  - DEC-273
+  - DEC-362
+  - DEC-363
+  - DEC-364
+  - DEC-365
+  - DEC-366
+  - DEC-367
+  - DEC-368
+  - DEC-369
+  - DEC-370
+  - DEC-371
+  - DEC-372
+  - DEC-373
+  - DEC-374
+  - DEC-375
+  - DEC-376
+  - DEC-377
+  - DEC-378
+  - DEC-379
+  - DEC-380
+  - DEC-381
+  - DEC-382
+  - DEC-383
+  - DEC-384
+  - DEC-385
+  - DEC-386
+  - DEC-387
+  - DEC-388
+  - DEC-389
+  - DEC-390
+  - DEC-391
+  - DEC-392
+  - DEC-393
+  - DEC-394
+  - DEC-395
+  - DEC-396
+  - DEC-397
+  - DEC-398
+  - DEC-399
+  - DEC-400
+  - DEC-401
+  - DEC-402
+  - DEC-403
+  - DEC-404
+  - DEC-405
+  - DEC-406
+  - DEC-407
+  - DEC-408
+  - DEC-409
+  - DEC-410
+  - DEC-411
+  - DEC-412
+  - DEC-413
+  - DEC-414
+  - DEC-415
+  - DEC-416
+  - DEC-417
+  - DEC-418
+  - DEC-419
+  - DEC-420
+  - DEC-421
+  - DEC-422
+  - DEC-423
+  - DEC-424
+  - DEC-425
+  - DEC-426
+  - DEC-427
+  - DEC-428
+  - DEC-429
+  - DEC-430
+  - DEC-431
+  - DEC-432
+  - DEC-433
+  - DEC-434
+  - DEC-435
+  - DEC-436
+  - DEC-437
+  - DEC-438
+  - DEC-439
+  - DEC-440
+  - DEC-441
+  - DEC-442
+  - DEC-443
+  - DEC-444
+  - DEC-445
+  - DEC-446
+  - DEC-447
+  - DEC-448
+  - DEC-449
+  - DEC-450
+  - DEC-451
+  - DEC-452
+  - DEC-453
+  - DEC-454
+  - DEC-455
+  - DEC-456
+  - DEC-457
+  - DEC-458
+  - DEC-460
+  - DEC-461
+  - DEC-462
+  - DEC-463
+  - DEC-464
+  - DEC-465
+  - DEC-466
+  - DEC-467
+  - DEC-468
+  - DEC-469
+  - DEC-470
+  - DEC-471
+  - DEC-472
+  - DEC-473
+  - DEC-474
+  - DEC-475
+  - DEC-476
+  - DEC-477
+  - DEC-478
+  - DEC-479
+  - DEC-480
+  - DEC-481
+  - DEC-482
+  - DEC-483
+  - DEC-484
+  - DEC-485
+  - DEC-486
+  - DEC-487
+  - DEC-488
+  - DEC-489
+  - DEC-490
+  - DEC-491
+  - DEC-492
+  - DEC-493
+  - DEC-494
+  - DEC-495
+  - DEC-496
+  - DEC-497
+  - DEC-498
+  - DEC-499
+  - DEC-500
+  - DEC-501
+  - DEC-502
+  - DEC-503
+  - DEC-504
+  - DEC-505
+  - DEC-506
+  - DEC-507
+  - DEC-508
+  - DEC-509
+  - DEC-510
+  - DEC-511
+  - DEC-512
+  - DEC-513
+  - DEC-514
+  - DEC-515
+  - DEC-516
+  - DEC-517
+  - DEC-518
+  - DEC-519
+  - DEC-520
+  - DEC-521
+  - DEC-522
+  - DEC-523
+  - DEC-524
+  - DEC-525
+  - DEC-526
+  - DEC-527
+  - DEC-528
+  - DEC-529
+  - DEC-530
+  - DEC-531
+  - DEC-532
+  - DEC-533
+  - DEC-534
+  - DEC-535
+  - DEC-536
+  - DEC-537
+  - DEC-538
+root_class: A26 BUSINESS-RULES
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open
+notes: 'check-design-notes now validates `decisions` (fields, date, a DEC id and an existing CHG id in source, questionSource
+  resolved, no question left in both lists) and correction `status`/`by` (fixed, logged or withdrawn, by an existing change
+  entry), and refuses any CHG id a source names that has no entry. Before this change the notes had no `decisions` key,
+  so nothing recorded that a question was answered.
+
+
+  Decisions by kind: {''default accepted'': 20, ''answered'': 27, ''default (non-critical, reviewable)'': 196}.
+
+
+  Corrections by entry: CHG-WIR-001 175 fixed; CHG-WIR-002 13 fixed; CHG-WIR-003 7 fixed; CHG-WIR-004 19 logged. Corrections
+  with no status (1184) are still open.
+
+
+  Tickets: none started (Block A starts Monday 5 October 2026); the notes feed the design batches at the next refresh,
+  not ticket text.
+
+
+  Still open here (needs research, CHG-NOTE-010): BO-192 (1), BO-629 (1).
+
+
+  Answers that change the drawn default:
+
+  - DEC-128 (Q128) BO-188: Biometric capture and retention need the guest''s consent first, on the venue''s own consent
+  form. Where TICVAI stores the data, the venue is warned that the guest must accept a consent form.
+
+  - DEC-136 (Q136) GST-055: Dynamic QR rotation step: 30 seconds (the venue''s setting).
+
+  - DEC-138 (Q138) GST-069: Superseded: children MAY be enrolled with guardian consent on the venue''s form; the minor
+  age is per country and the venue can switch minors off (Critical set 1, BO-187). The batch-4 default (''not available
+  for under-18s'') no longer applies.
+
+  - DEC-225 (Q225) ANL-070: Add an analytics governance policy operation (masking, export restriction, retention, sharing,
+  AI/API access).
+
+  - DEC-227 (Q227) BO-146: Zone security classification levels: Public / Restricted / Secure / Critical (renamable).
+
+  - DEC-228 (Q228) BO-147: An access point whose attraction is temporarily closed denies, shows the reopening time, and
+  offers a virtual-queue return window where enabled.
+
+  - DEC-229 (Q229) BO-152: Overlapping calendar entries: the venue sets a priority per entry.
+
+  - DEC-230 (Q230) BO-153: Topology publication approval is a policy the venue switches on or off; when on, a second person
+  approves.
+
+  - DEC-231 (Q231) BO-157: Journey rules get an ''Applies to'' picker: venue-wide by default, or chosen products/admission
+  profiles.
+
+  - DEC-232 (Q232) BO-159: Time-bound product entitlements (validity from first scan, e.g. 60 minutes) belong to the access
+  engine.
+
+  - DEC-233 (Q233) BO-165: QR refresh: 30 s default; offer 15/30/45/60 and custom (5 s minimum).
+
+  - DEC-236 (Q236) BO-186: Face Pass enrolment: the app, the staffed counters and a self-service kiosk (consent shown);
+  not the turnstile.
+
+  - DEC-237 (Q237) BO-187: Minors: enrolment with guardian consent on the venue''s form; the minor age is set per country;
+  the venue can switch minors off. Supersedes the GST-069 default.
+
+  - DEC-239 (Q239) BO-190: Face re-enrolment review: images behind ''View images (logged)'', needing a specific permission;
+  score and references always visible.
+
+  - DEC-241 (Q241) BO-196: Adding an access device needs a secure enrolment code and a pending-approval stage.
+
+  - DEC-245 (Q245) BO-203: A device''s approver into production must differ from the person who tested it.
+
+  - DEC-254 (Q254) BO-229: A second approver for permanent locks, whitelisting, and releasing identity/permanent locks;
+  none for ''until end of day''.
+
+  - DEC-255 (Q255) BO-230: A gate''s direction can be switched live (Entry to Exit) with a specific permission, and the
+  switch is logged. R221 is amended.
+
+  - DEC-260 (Q260) BO-247: Dual authorisation to release locks: as BO-229.
+
+  - DEC-261 (Q261) BO-248: Security reviewer and face-change photos: as BO-190 (behind ''View images (logged)'', permission
+  needed).
+
+  - DEC-266 (Q266) BO-336: Map the pack''s 13 Virtual Ticket status names onto the entitlement model; add any missing
+  states.
+
+  - DEC-368 (Q368) ACC-006: One queue and one workspace component, used in both P11 (ACC-006, ACC-007) and P08 (BO-635,
+  BO-636).
+
+  - DEC-397 (Q397) BO-427: Whether an all-games pass covers games added after sale: the venue configures it; default yes
+  (type-based passes cover new games).
+
+  - DEC-426 (Q426) BO-471: The venue sets a maximum offline duration; readers then refuse offline taps.
+
+  - DEC-457 (Q457) BO-627: UAE Pass and ICP verification integrated in release 1 (needs client access).
+
+  - DEC-461 (Q461) BO-631: Face matching for accreditation duplicates only where the venue enables it, with applicant
+  consent and the venue''s legal sign-off; off by default.
+
+  - DEC-530 (Q530) EMP-027: Another supervisor must close a critical incident (the person who completed the corrective
+  action cannot close it).
+
+
+  Also changed:
+
+  - VO-R15: "Powered by TICVAI" is a toggle on CMS-104, on by default
+
+  - BO-493 branding rule: "Powered by TICVAI" no longer "fixed"
+
+  - BO-335 openQuestions[1] was a correction filed as a question ("Write-only; no read of the current configuration");
+  it moves to the screen''s corrections, still open
+
+
+  Rule edits:
+
+  - BO-188 add inputs (DEC-128)
+
+  - GST-069 patch inputs (DEC-138)
+
+  - ANL-070 patch actions (DEC-225)
+
+  - BO-146 patch inputs (DEC-227)
+
+  - BO-147 patch inputs (DEC-228)
+
+  - BO-152 patch edgeCases (DEC-229)
+
+  - BO-152 add inputs (DEC-229)
+
+  - BO-153 add inputs (DEC-230)
+
+  - BO-157 add inputs (DEC-231)
+
+  - BO-159 patch edgeCases (DEC-232)
+
+  - BO-165 patch inputs (DEC-233)
+
+  - BO-186 add inputs (DEC-236)
+
+  - BO-187 patch inputs (DEC-237)
+
+  - BO-190 add outputs (DEC-239)
+
+  - BO-196 patch edgeCases (DEC-241)
+
+  - BO-203 add edgeCases (DEC-245)
+
+  - BO-229 patch actions (DEC-254)
+
+  - BO-230 add actions (DEC-255)
+
+  - BO-247 patch edgeCases (DEC-260)
+
+  - BO-248 patch outputs (DEC-261)
+
+  - BO-336 patch outputs (DEC-266)
+
+  - BO-471 patch inputs (DEC-426)
+
+  - BO-627 patch inputs (DEC-457)
+
+  - BO-631 add outputs (DEC-461)
+
+  - BO-180 patch inputs (open-question pointer rewritten from the decision on the screen)
+
+  - BO-436 patch edgeCases (open-question pointer rewritten from the decision on the screen)
+
+  - BO-440 patch edgeCases (open-question pointer rewritten from the decision on the screen)
+
+  - BO-446 patch edgeCases (open-question pointer rewritten from the decision on the screen)
+
+  - BO-456 patch edgeCases (open-question pointer rewritten from the decision on the screen)
+
+  - BO-460 patch actions (open-question pointer rewritten from the decision on the screen)
+
+  - BO-650 patch actions (open-question pointer rewritten from the decision on the screen)
+
+  - BO-666 patch edgeCases (open-question pointer rewritten from the decision on the screen)'

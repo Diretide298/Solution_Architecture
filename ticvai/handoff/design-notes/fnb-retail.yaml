@@ -221,8 +221,9 @@ screens:
       source: contracts/satellite/fnb.yaml#/components/schemas/CreateGuestOrderLine
     - field: Payment
       rule: Card or digital wallet only on the guest web. "Add to my table's bill" appears only where the location session
-        joined an open table visit and the outlet runs a tab. Room charge is not offered (see open questions).
-      source: contracts/spine/orders.yaml#createPayment | R080 | contracts/satellite/fnb.yaml#createGuestFnbOrder
+        joined an open table visit and the outlet runs a tab. Room charge is not offered.
+      source: contracts/spine/orders.yaml#createPayment | R080 | contracts/satellite/fnb.yaml#createGuestFnbOrder | decided
+        2 October 2026 by Chinmay (CHG-NOTE-004)
     - field: Book a table (date, time, party size)
       rule: 'One screen: restaurant, date, time and party size, plus an optional note for allergies or requests. No table
         picking (a host seats the party on the night) and no duration field (the venue sets it). Name and contact are prefilled
@@ -232,6 +233,11 @@ screens:
       rule: 'Party size and a seating preference: Any (default), Indoor, Outdoor, Bar, Booth, High chair needed. Two screens
         at most.'
       source: contracts/satellite/fnb.yaml#joinRestaurantWaitlist | DI-1001
+    - field: Where the outlet is (an outlet property)
+      rule: Inside the venue (needs an admission ticket) or Standalone (no ticket). Ordering from an inside-the-venue outlet
+        needs admission (a ticket or a claimed location in the venue); a standalone restaurant outside the venue sells takeaway
+        and delivery without a ticket.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     outputs:
     - element: Outlet list
       rule: Only outlets open now, so a guest is never sent to a restaurant that closed an hour ago. Each card shows photo,
@@ -279,6 +285,10 @@ screens:
       rule: The quoted wait ("About 25 min") and the status in plain words ("You're on the list", then "Your table is ready,
         come to the host stand by 19:42" when notified). "Leave the waitlist" is always visible.
       source: contracts/satellite/fnb.yaml#/components/schemas/RestaurantWaitlist | R073
+    - element: Receipt
+      rule: The F&B order has its own payment step and its own receipt; it does not join the guest's ticket receipt (DI-293's
+        one receipt does not apply to F&B).
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     actions:
     - action: Scan the code / Enter lounger or table number
       result: 'Claims the location. Success shows "Ordering to Lounger B-14". Where an open table visit exists, the guest
@@ -491,20 +501,30 @@ screens:
       why: This breaks web and app parity, and "cancelling is free" is a promise the web cannot keep. Add updateTableReservation
         here, plus a guest read of the guest's own reservations and waitlist entries.
       source: DI-970 | DI-1084 | contracts/satellite/fnb.yaml#updateTableReservation | contracts/satellite/fnb.yaml#listTableReservations
-    openQuestions:
+    decisions:
     - question: Takeaway and delivery to an address (DG-5, DI-1039, 29 September) let someone buy food without an admission
         ticket, which DI-292 (14 August) put out of scope. Which stands?
-      default: Draw takeaway and delivery as outlet options (they are the later, specific decision). In-venue ordering needs
-        a location or a ticket; flag this to the client.
-      source: DI-292 | DI-1039
+      decision: 'Outlet property: ''Inside the venue (needs an admission ticket)'' or ''Standalone (no ticket)''. Inside-venue
+        outlets need admission for guest ordering; a standalone restaurant sells takeaway/delivery without a ticket.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-070 | CHG-NOTE-004
+      questionSource: DI-292 | DI-1039
     - question: Does a guest F&B order go through the one shared cart and checkout (one receipt, DI-293), or does it keep
         its own pay step after createGuestFnbOrder (F11 step 4 on GST-009)?
-      default: Draw a "Review and pay" step that reuses the shared checkout's payment component, card or wallet. The receipt
-        joins the guest's other purchases.
-      source: DI-293 | F11 step 4 | contracts/satellite/fnb.yaml#createGuestFnbOrder
+      decision: The guest F&B order keeps its own payment step and receipt; DI-293's one cart/one receipt does not apply to
+        F&B.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-071 | CHG-NOTE-004
+      questionSource: DI-293 | F11 step 4 | contracts/satellite/fnb.yaml#createGuestFnbOrder
     - question: When is room charge (paymentMethod roomCharge) offered to a guest, if ever?
-      default: Not shown.
-      source: contracts/satellite/fnb.yaml#/components/schemas/CreateGuestOrderRequest | R080
+      decision: 'Not answered: the workbook cell repeats the sibling WEB-036 answer. Room charge is not shown to guests (drawn
+        default).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-072 | CHG-NOTE-004
+      questionSource: contracts/satellite/fnb.yaml#/components/schemas/CreateGuestOrderRequest | R080
   WEB-037:
     summary: 'One dish: what is in it, what may be changed, and the side panel where the guest chooses before adding. Allergens
       are read here more often than anywhere else in the platform, usually on a phone browser. In-venue ordering shows it
@@ -713,10 +733,13 @@ screens:
       why: Either declare the payment of the visit's bill (card or wallet) or drop "settle the bill" and say "Pay at the
         table". The rev 3 prototype has no bill view at all.
       source: screens/P01-guest-web-storefront.yaml#WEB-038 | contracts/satellite/fnb.yaml#/components/schemas/CreateGuestOrderRequest
-    openQuestions:
+    decisions:
     - question: Can a guest pay the table's bill from the web or app, or is the bill view read-only?
-      default: Read-only bill with "Ask your server to pay"; no pay button.
-      source: contracts/satellite/fnb.yaml#getGuestBill | F48 step 5
+      decision: 'Drawn default accepted: Read-only bill with "Ask your server to pay"; no pay button.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-073 | CHG-NOTE-004
+      questionSource: contracts/satellite/fnb.yaml#getGuestBill | F48 step 5
   WEB-042:
     summary: 'Buy merchandise on the web, pay online at checkout, and collect it on the way out (shop and drop) or have
       it delivered home. Later, find what is waiting and where. Paying creates the shop-and-drop; nothing is reserved unpaid
@@ -864,16 +887,26 @@ screens:
       why: Web and app differ in what a guest can do, with nothing recording it as deliberate. Either both offer an unpaid
         hold (until the end of the visit day, R169) or neither does.
       source: DI-970 | R236 | R169 | screens/P02-guest-mobile-app.yaml#GST-026
-    openQuestions:
+    decisions:
     - question: Where can shop-and-drop be collected and what hours do the points keep? Who sets the list?
-      default: Draw the two points from the prototype (gate desk, car park kiosk) with their hours, plus home delivery.
-      source: F17 step 1
+      decision: 'Drawn default accepted: Draw the two points from the prototype (gate desk, car park kiosk) with their hours,
+        plus home delivery.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-074 | CHG-NOTE-004
+      questionSource: F17 step 1
     - question: Should the web and app offer an unpaid "hold to pay at the shop", or only paid shop and drop?
-      default: Paid only on the web (R236). The app's hold is drawn as secondary until decided.
-      source: R236 | R169 | DI-970
+      decision: 'Drawn default accepted: Paid only on the web (R236). The app''s hold is drawn as secondary until decided.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-075 | CHG-NOTE-004
+      questionSource: R236 | R169 | DI-970
     - question: Is "scan an item in the shop with your phone" wanted on the guest web?
-      default: Not drawn.
-      source: contracts/satellite/retail.yaml#lookupMerchandise | F51 step 1
+      decision: 'Drawn default accepted: Not drawn.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-076 | CHG-NOTE-004
+      questionSource: contracts/satellite/retail.yaml#lookupMerchandise | F51 step 1
   GST-024:
     summary: 'The app''s in-venue food ordering. A guest on a lounger, at a table or in a seat scans the code with the app''s
       camera, orders, pays and gets the food brought or calls at the counter (F11, F48). It can also be opened from the
@@ -906,6 +939,10 @@ screens:
       rule: Large order number, destination or collection point, and ready time; then GST-025. A push and the in-venue notifications
         feed (GST-030) carry later status changes.
       source: F48 step 5 | contracts/satellite/fnb.yaml#/components/schemas/GuestOrderResult
+    - element: Payment and receipt
+      rule: The F&B order keeps its own payment step and its own receipt; it never joins the ticket cart's one receipt (DI-293
+        does not apply to F&B).
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     actions:
     - action: Add
       result: A dish with modifier groups opens the GST-061 panel. A dish without them goes straight into the basket.
@@ -962,15 +999,20 @@ screens:
       why: 'For a guest caller, permission does not apply (ADR-0025): an operation with a staff and guest audience resolves
         to the guest''s own data. An empty outlet list has nothing to "create"; it should name the next opening time.'
       source: ADR-0025 | screens/P02-guest-mobile-app.yaml#GST-024
+      status: fixed
+      by: CHG-GST-004
     - what: claimTableSession and listModifierGroups are declared.
       why: claimTableSession was superseded by claimLocationSession on 26 September. Modifier groups come with each dish
         in getGuestMenu. Same correction as WEB-036.
       source: contracts/satellite/fnb.yaml#claimTableSession | contracts/satellite/fnb.yaml#/components/schemas/GuestMenu
-    openQuestions:
+    decisions:
     - question: Takeaway or delivery to an address versus "no F&B without admission"; one cart versus the F&B order's own
         payment.
-      default: As WEB-036.
-      source: DI-292 | DI-1039 | DI-293 | F11 step 4
+      decision: A guest F&B order keeps its own payment step and its own receipt (DI-293's one receipt does not apply to F&B).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-052 | CHG-NOTE-004
+      questionSource: DI-292 | DI-1039 | DI-293 | F11 step 4
   GST-025:
     summary: 'App order tracking, functionally identical to WEB-038: the kitchen''s real status, a pickup card when it is
       ready, the per-dish state, and the table bill where the order is on a table visit. Push and the in-venue feed carry
@@ -1249,6 +1291,8 @@ screens:
     - what: The empty state for no access names ORDER_VIEW.
       why: A guest holds no permission to name; for a guest the lookup resolves to the guest's own drops.
       source: ADR-0025 | screens/P02-guest-mobile-app.yaml#GST-062
+      status: fixed
+      by: CHG-GST-004
     - what: The navigation leads to GST-061 (Menu Item Detail).
       why: That edge was derived from parameters and has no meaning here.
       source: screens/P02-guest-mobile-app.yaml#GST-062 | R251
@@ -1374,13 +1418,21 @@ screens:
     - what: TableReservation has no seating preference or occasion, which the client asked for and the prototype shows.
       why: See WEB-036.
       source: DI-688 | contracts/satellite/fnb.yaml#/components/schemas/TableReservation
-    openQuestions:
+    decisions:
     - question: Seating preference and occasion on a table booking, as fields or in the note?
-      default: Draw both as optional choices, marked pending a field.
-      source: DI-688
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw both as optional choices, marked pending
+        a field.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-053 | CHG-NOTE-004
+      questionSource: DI-688
     - question: The party size from which a deposit applies (prototype 6+, contract default 1, "client to correct").
-      default: Show the rule as the venue sets it ("Deposit for parties of 6 or more").
-      source: contracts/spine/orders.yaml#/components/schemas/DiningDepositPolicy
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Show the rule as the venue sets it ("Deposit
+        for parties of 6 or more").'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-054 | CHG-NOTE-004
+      questionSource: contracts/spine/orders.yaml#/components/schemas/DiningDepositPolicy
   POS-001:
     summary: 'Shift opening on a till, used once per cashier shift (not on every sign-in or return from a break, DI-777):
       the cashier counts the opening float note by note and coin by coin while the till checks its own hardware in parallel,
@@ -1491,6 +1543,8 @@ screens:
         '
       why: Its purpose is "Count the opening float and open the till" — a count form with a hardware panel, not a queue.
       source: screens/P04-point-of-sale.yaml#POS-001 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: 'Thirteen operations that belong to other screens are attached, each with a button: Close shift, Accept shift
         variance, Reopen, Suspend, Create cash movement, Record no sale, Adjust deposit box float, and the shift lists.
 
@@ -1501,6 +1555,8 @@ screens:
 
         '
       source: R254 | R080
+      status: fixed
+      by: CHG-WIR-008
     - what: The offline state says "Opens locally and syncs".
       why: openShift is online only (F32, R257) and the screen's own transition says opening does not work offline.
       source: contracts/spine/shift.yaml#openShift | screens/P04-point-of-sale.yaml#POS-001
@@ -1513,12 +1569,16 @@ screens:
     - what: The edge to Close Shift is guarded by shift.reopen.
       why: Closing needs the close permission; reopen is a supervisor reversal of a closed shift.
       source: screens/P04-point-of-sale.yaml#POS-001 | contracts/spine/shift.yaml#closeShift
+      status: fixed
+      by: CHG-WIR-008
     - what: 'approveShiftOpen takes only a reason, while reopenShift carries a supervisor PIN step-up on the same device.
 
         '
       why: An opening approved without proof the supervisor was present is the control R144 replaced on reopen; use the
         same step-up.
       source: contracts/spine/shift.yaml#approveShiftOpen | contracts/spine/shift.yaml#reopenShift | R144
+      status: fixed
+      by: CHG-WIR-008
     - what: 'F32 says a till with a failed device can still open with a manager''s approval, but openShift refuses when
         a required device is absent.
 
@@ -1528,10 +1588,14 @@ screens:
     - what: The v2 frame's "Report to facilities" button on a failed device.
       why: No operation behind it; dropped (POSV2-8).
       source: POSV2-8
-    openQuestions:
+    decisions:
     - question: Is a float count needed for a cashier who does not handle cash (a card-only F&B counter)?
-      default: Always count when the till has a cash drawer; skip the count only where the till has no drawer configured.
-      source: designer default
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Always count when the till has a cash drawer;
+        skip the count only where the till has no drawer configured.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-058 | CHG-NOTE-004
+      questionSource: designer default
   POS-007:
     summary: 'The end of a cashier''s shift: count the drawer blind, declare non-cash totals, give a reason if the count
       is off, and close. Above the venue''s threshold, a supervisor accepts the variance on this till with their PIN — the
@@ -1555,19 +1619,17 @@ screens:
         '
       source: DI-803 | R222
     - field: Supervisor acceptance
-      rule: 'Supervisor''s PIN on this till (not the cashier whose shift it is) and a reason of at least 3 characters. Only
-        when the variance is above the venue threshold (proposed AED 20.00).
-
-        '
-      source: contracts/spine/shift.yaml#acceptShiftVariance | R080 | contracts/spine/tenancy.yaml#setVenueSettings
+      rule: Supervisor's PIN on any till at the venue (not the cashier whose shift it is) and a reason of at least 3 characters.
+        Only when the variance is above the venue threshold (proposed AED 20.00).
+      source: contracts/spine/shift.yaml#acceptShiftVariance | R080 | contracts/spine/tenancy.yaml#setVenueSettings | decided
+        2 October 2026 by Chinmay (CHG-NOTE-004)
     outputs:
     - element: Result after submission
-      rule: 'Within threshold: "Shift closed" with the closing receipt printing. Above threshold: "Over/short recorded —
-        a supervisor must accept it" and the shift waits; the amount appears on the supervisor''s step. Per non-cash tender:
-        declared vs captured.
-
-        '
-      source: contracts/spine/shift.yaml#closeShift | DI-806
+      rule: 'Within threshold: "Shift closed" with the closing receipt printing. Above threshold: "Over/short recorded — a
+        supervisor must accept it" the cashier may sign out, and the cashier''s view shows "Under review"; the pending shift
+        never blocks the next cashier opening a shift on this till. The amount appears only on the supervisor''s step. Per
+        non-cash tender: declared vs captured.'
+      source: contracts/spine/shift.yaml#closeShift | DI-806 | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     - element: Closing receipt and report
       rule: 'Prints a closing receipt itemised by denomination; the closing report is emailed to finance automatically.
 
@@ -1607,6 +1669,11 @@ screens:
     - case: The till runs another shift after this one
       expected: Each cashier closes their own drawer; the till stays usable for the next cashier.
       source: F32 step 6
+    - case: No supervisor is free when the cashier closes
+      expected: The cashier signs out; the shift stays pending ("Under review"). A supervisor resolves it later on any till
+        with their PIN (closeShift on this screen) or in the daily cash reconciliation, which lists every shift and resolves
+        them one by one. The next cashier can open a shift meanwhile.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     consistency:
     - with: POS-001
       note: Same denomination counter component and drawer order.
@@ -1617,9 +1684,9 @@ screens:
     sampleData:
       cashier: J. Smith · Till 14 · shift 09:42–18:00
       counted: AED 8,460.00 cash counted · card declared AED 12,215.50 · wallet AED 1,040.00
-      result: Over/short recorded — a supervisor must accept it
-      supervisorView: 'Expected AED 8,480.00 · Counted AED 8,460.00 · Short AED 20.00 · reason: Miscount — ''2 × AED 10
-        notes in the coin tray'''
+      result: Over/short recorded · Under review
+      supervisorView: 'Expected AED 8,480.00 · Counted AED 8,460.00 · Short AED 20.00 · reason: Miscount — ''2 × AED 10 notes
+        in the coin tray'''
     corrections:
     - what: 'The screen is modelled as an approval inbox and carries fourteen bulk-attached operations with buttons (Open
         shift, Approve shift open, Reopen, Resume, Suspend, Create cash movement, Record no sale, Adjust deposit box float,
@@ -1631,30 +1698,46 @@ screens:
 
         '
       source: screens/P04-point-of-sale.yaml#POS-007 | R254 | F87 step 4
+      status: fixed
+      by: CHG-WIR-008
     - what: 'The client asked for a cashier variance reason list (Till error, Unrecorded refund, Miscount, Other) and a
         comment, but closeShift has only free notes.
 
         '
       why: Reasons are the data (the same rule as R222); a code is needed for reporting.
       source: DI-803 | contracts/spine/shift.yaml#closeShift
+      status: fixed
+      by: CHG-FIN-003
     - what: 'The client asked that a supervisor can reject a flagged variance so the cashier recounts and resubmits; acceptShiftVariance
         only accepts, and a closed shift can only be reopened by a supervisor step-up.
 
         '
       why: There is no reject-and-recount path for DI-804.
       source: DI-804 | contracts/spine/shift.yaml#acceptShiftVariance | contracts/spine/shift.yaml#reopenShift
+      status: fixed
+      by: CHG-FIN-003
     - what: The client-approved build shows COUNTED and EXPECTED side by side while counting.
       why: Contradicts the blind count (R080(e), POSV2-3, DI-271).
       source: screens/P04-point-of-sale.yaml#POS-007 | R080 | POSV2-3
-    openQuestions:
+      status: fixed
+      by: CHG-FIN-003
+    decisions:
     - question: If no supervisor is available, may the cashier sign out with the variance logged for later review instead
         of being blocked?
-      default: Blocked — the shift waits for a supervisor's acceptance on this till; the cashier may sign out and the shift
-        stays pending.
-      source: DI-805 | TRACKER 30-Sep/Tracker row 30 | TRACKER Workshops/Actions row 276
+      decision: A cashier may sign out with the variance pending; the shift shows "Under review" on the cashier's view and
+        never blocks the next cashier opening a shift on that till. A supervisor resolves it with closeShift on POS-007 (supervisor
+        PIN, any till) or in the daily cash reconciliation, which lists every shift and resolves them one by one (Pre-apply
+        round, 2 October).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-059 | CHG-NOTE-004
+      questionSource: DI-805 | TRACKER 30-Sep/Tracker row 30 | TRACKER Workshops/Actions row 276
     - question: After submission, does the cashier see the variance amount, or only the supervisor?
-      default: The cashier sees only that a variance was recorded; the amount appears on the supervisor's step.
-      source: DI-806 | R080
+      decision: 'Blind close: the cashier sees only that a variance was recorded; the supervisor sees the amount.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-060 | CHG-FIN-003 | CHG-NOTE-004
+      questionSource: DI-806 | R080
   POS-009:
     summary: 'Who is on duty right now, on which till, and their own clock: a supervisor sees the venue''s staff on shift
       (role, till, shift times, status), and any staff member clocks in or out and starts or ends a break here — the v2
@@ -1719,12 +1802,16 @@ screens:
         '
       why: A roster is a read plus attendance; money and shift lifecycle belong on POS-001/POS-007/POS-017.
       source: screens/P04-point-of-sale.yaml#POS-009 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: The screen notes describe foreign-currency counting at close ("Close counts each foreign currency separately").
       why: That note belongs to the close (POS-007); it misleads a roster design.
       source: screens/P04-point-of-sale.yaml#POS-009
     - what: createRotaAssignment ("Create rota assignment") is on the till.
       why: Rota planning is a back-office workforce task; the till shows the rota and takes attendance.
       source: contracts/satellite/workforce.yaml#createRotaAssignment | R254
+      status: fixed
+      by: CHG-WIR-008
   POS-011:
     summary: 'Returns, refunds and exchanges at the till: the cashier finds the sale from the receipt, the policy is checked
       **before** the goods are taken back, then a merchandise return (with the item''s condition), a refund to the original
@@ -1826,6 +1913,8 @@ screens:
         '
       why: None of these serve a return; bulk-attached by resemblance.
       source: screens/P04-point-of-sale.yaml#POS-011 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: The offline state says "Working from the local journal. The till keeps taking money".
       why: Refunds and returns are refused offline (F58 branch at 8); the state must say so.
       source: F58 step 8 | screens/P04-point-of-sale.yaml#POS-011
@@ -1839,13 +1928,22 @@ screens:
     - what: The purpose reads "Returns, Refunds & Exchanges — from the client design board, 20 August".
       why: Not a purpose a designer can act on.
       source: screens/P04-point-of-sale.yaml#POS-011
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-010
+    decisions:
     - question: Which tender is "store credit" (DI-796) — a gift card, a voucher or the guest's wallet?
-      default: Gift card, issued at the refund amount.
-      source: DI-796 | contracts/spine/orders.yaml#createRefund
+      decision: Store credit is a gift card issued at the refund amount (the drawn default).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-061 | CHG-NOTE-004
+      questionSource: DI-796 | contracts/spine/orders.yaml#createRefund
     - question: Void of a sale still in the same shift vs refund — is void a separate action on this screen?
-      default: Void lives in the Sales Journal (POS-030) and the exceptions screen; this screen refunds.
-      source: POSV2-1
+      decision: 'Not answered: the workbook cell repeats the sibling POS-011 answer (store credit = gift card). Void stays
+        in the Sales Journal (POS-030) and the exceptions screen; this screen refunds (drawn default).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-062 | CHG-NOTE-004
+      questionSource: POSV2-1
   POS-012:
     summary: 'Orders that did not start at this counter, fulfilled here: an online or app order collected at the counter
       (food, merchandise, Shop & Drop) and takeaway and delivery orders. The cashier finds the order, makes sure the goods
@@ -1918,6 +2016,8 @@ screens:
         '
       why: Bulk-attached; a collection counter needs the order list and the handover.
       source: screens/P04-point-of-sale.yaml#POS-012 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: 'The prototype and v2 use this screen as the cart''s order-type selector (Dine-in, Quick service, Takeaway,
         Delivery with Own delivery / Delivery partner), while the package defines it as an online-order collection centre
         (F60).
@@ -1978,13 +2078,21 @@ screens:
         '
       why: The refused-on-replay list is the screen's job; cash and gate packages are other screens'.
       source: screens/P04-point-of-sale.yaml#POS-013 | MATRIX 2.3.1 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: The purpose reads "Mobile POS, Event Sales & Offline Operations — from the client design board, 20 August".
       why: The prototype covers only offline and sync; there is no mobile form factor or event-sales mode to draw.
       source: screens/P04-point-of-sale.yaml#POS-013
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-010
+    decisions:
     - question: Does each offline till sell tickets from a pre-allocated quota (e.g. 100 per node), as agreed on 5 August?
-      default: Capacity products are blocked offline (DI-074); quotas are shown only if the venue configures them.
-      source: DI-142 | DI-074
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Capacity products are blocked offline (DI-074);
+        quotas are shown only if the venue configures them.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-063 | CHG-NOTE-004
+      questionSource: DI-142 | DI-074
   POS-015:
     summary: 'A supervisor''s live view of cash on this till and outlet: the opening float, cash in and out, safe drops,
       and which cash drawers are open and who holds them. The one thing to get right: it is a supervisor view — a cashier
@@ -2038,6 +2146,8 @@ screens:
       why: No purpose a designer can act on; the client asked for live cash status per till with expected cash and card
         totals for supervisors.
       source: screens/P04-point-of-sale.yaml#POS-015 | DI-273 | DI-308
+      status: fixed
+      by: CHG-WIR-010
     - what: 'DI-273 asks for expected cash per till on a screen of the till app, while the blind count forbids showing a
         cashier the expected cash.
 
@@ -2128,9 +2238,13 @@ screens:
         '
       why: A safe drop needs the open drawers and the withdraw operation; listDepositBoxes is missing.
       source: screens/P04-point-of-sale.yaml#POS-018 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: The purpose is "Safe Drop & Cash Transfer Management — from the client design board, 20 August".
       why: Not a purpose; and "cash transfer" between drawers has no operation.
       source: screens/P04-point-of-sale.yaml#POS-018
+      status: fixed
+      by: CHG-WIR-010
   POS-021:
     summary: 'The counter till for food and drink: a cashier at a quick-service counter, café or bar (Bite & Go, a pool
       bar) takes a guest''s order from the outlet''s menu in force, adds the dish options, picks the order type, then **sends
@@ -2181,6 +2295,11 @@ screens:
     - field: Discount / promo code
       rule: Applied on the cart, never on the payment screen. Automatic promotions apply by themselves on every cart change.
       source: DI-786 | contracts/satellite/promotions.yaml#evaluatePromotions
+    - field: Payment timing (an outlet setting)
+      rule: Pay first, or Send to kitchen first then pay (R261 per outlet). Under Pay first the primary button is "Charge
+        AED 110.25" and the kitchen receives the order once paid; under Send first the primary is "Send to kitchen", then
+        "Charge".
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     outputs:
     - element: Menu board
       rule: 'Tabs are the menu''s sections in the outlet''s own order (not alphabetical), each with its item count. Item
@@ -2214,13 +2333,11 @@ screens:
       source: POSV2-4
     actions:
     - action: Send to kitchen
-      result: 'Primary action while the order is unsent. Places the F&B order and its kitchen tickets (one per station)
-        and shows the order number at once ("Order BNG-004127 · sent to Grill, Fryer"). The primary button then becomes
-        "Charge AED 110.25". A refusal names the line (item unavailable, options incomplete, meal already redeemed) and
-        offers Remove line.
-
-        '
-      source: R261 | F108 step 3 | contracts/satellite/fnb.yaml#createFnbOrder
+      result: Primary action while the order is unsent at an outlet set to Send first (at a Pay first outlet the order goes
+        to the kitchen after Charge). Places the F&B order and its kitchen tickets (one per station) and shows the order number
+        at once ("Order BNG-004127 · sent to Grill, Fryer"). The primary button then becomes "Charge AED 110.25". A refusal
+        names the line (item unavailable, options incomplete, meal already redeemed) and offers Remove line.
+      source: R261 | F108 step 3 | contracts/satellite/fnb.yaml#createFnbOrder | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     - action: Charge AED x
       result: Goes to Payment (POS-005) with the cart, guest, discount, order type, table and tax totals. Needs payment.take.
       source: screens/P04-point-of-sale.yaml#POS-021 | F108 step 4
@@ -2328,12 +2445,16 @@ screens:
         '
       why: A cashier never picks the outlet or a menu; the screen's own cold-entry note says so.
       source: screens/P04-point-of-sale.yaml#POS-021 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: listMenus (a back-office read needing PRODUCT_VIEW) and listModifierGroups are attached on load.
       why: 'The contract says "Back-office use. A terminal reads its menu from the catalogue bundle", and the guest-menu
         read already returns each item''s option groups. Re-derive the screen''s operations from its purpose.
 
         '
       source: contracts/satellite/fnb.yaml#listMenus | contracts/satellite/fnb.yaml#getGuestMenu | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: '"Add cart line" opens a modal collecting variantId, quantity, performanceId, seatIds, parentLineId and attributes;
         "Evaluate promotions" opens a modal collecting venueId, channel and lines.
 
@@ -2374,24 +2495,34 @@ screens:
 
         '
       source: screens/P04-point-of-sale.yaml#POS-021 | POSV2-4 | POSV2-2
-    openQuestions:
-    - question: 'The client still lists "F&B quick service vs dine-in" as an open policy item. Does every POS F&B order
-        send before charging, or does quick service at some outlets charge first?
+    decisions:
+    - question: 'The client still lists "F&B quick service vs dine-in" as an open policy item. Does every POS F&B order send
+        before charging, or does quick service at some outlets charge first?
 
         '
-      default: Send to kitchen, then charge, for every order type (R261).
-      source: TRACKER 30-Sep/Tracker row 30 | TRACKER Workshops/Actions row 275 | R261
-    - question: 'When the menu in force changes (breakfast ends at 11:00) while a cart is open, do lines keep the price
-        they were added at?
+      decision: 'Outlet setting ''Payment timing'': Pay first, or Send to kitchen first then pay. Refines R261 per outlet.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-064 | CHG-NOTE-004
+      questionSource: TRACKER 30-Sep/Tracker row 30 | TRACKER Workshops/Actions row 275 | R261
+    - question: 'When the menu in force changes (breakfast ends at 11:00) while a cart is open, do lines keep the price they
+        were added at?
 
         '
-      default: Keep the quoted price; the server accepts the order at the quoted price and records any variance for finance,
-        never shown to the cashier.
-      source: contracts/spine/orders.yaml#createOrder
+      decision: 'Not answered: the workbook cell repeats the sibling POS-021 payment-timing answer. The question takes its
+        drawn default.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-065 | CHG-NOTE-004
+      questionSource: contracts/spine/orders.yaml#createOrder
     - question: The v2 board opens on a "Popular" tab. Nothing on the till ranks items. Is "Popular" a section the outlet
         curates?
-      default: Show only the menu's own sections; a Popular section appears only if the outlet created it.
-      source: designer default
+      decision: 'Not answered: the workbook cell repeats the sibling POS-021 payment-timing answer. The question takes its
+        drawn default.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-066 | CHG-NOTE-004
+      questionSource: designer default
   POS-022:
     summary: 'The step that puts a till''s food order on the kitchen rail **before** the guest pays, gives the guest an
       order number (and buzzer where used), and later lets the counter hand over the ready order. It is not a place a cashier
@@ -2513,6 +2644,8 @@ screens:
     - what: There is no cancel on the screen, although F108 resolves "guest walks away" with cancelFnbOrder.
       why: Send-then-charge makes an unpaid sent order an everyday case; the counter needs Cancel order.
       source: F108 step 3 | contracts/satellite/fnb.yaml#cancelFnbOrder
+      status: fixed
+      by: CHG-WIR-008
     - what: F108's exit state "uncollected" has no operation; markOrderCollected only records a collection.
       why: The flow says uncollected orders are recorded and counted; nothing can record one from the counter.
       source: F108 step 6 | contracts/satellite/fnb.yaml#markOrderCollected
@@ -2647,6 +2780,8 @@ screens:
       why: The till reads its catalogue from the local bundle and checks stock with the barcode lookup; the outlet comes
         from the session.
       source: contracts/satellite/retail.yaml#listMerchandise | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: The v2 candidate has no size or variant picker, shows "Open-dated · any day" on merchandise and a "Low capacity"
         chip.
       why: Variants with their own barcodes and stock were agreed (DI-354); validity and capacity are ticket words (use
@@ -2706,10 +2841,15 @@ screens:
     - what: Text fields "Venue id" and "Kind", tables "Every outlet" and "Every menu", and listMenus are on the screen.
       why: The outlet is the till's; the menu is not edited here (86 needs only the items). Plumbing on a manager's screen.
       source: screens/P04-point-of-sale.yaml#POS-024 | R254
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-008
+    decisions:
     - question: setTableLayout matches tables by id (update or add). How is a table removed from the layout?
-      default: Draw a Remove table action; until the contract says, removal marks the table Out of service.
-      source: contracts/satellite/fnb.yaml#setTableLayout
+      decision: '''Remove table'' marks the table Out of service (setTableLayout never deletes).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-067 | CHG-NOTE-004
+      questionSource: contracts/satellite/fnb.yaml#setTableLayout
   POS-028:
     summary: 'Table service from the till for a restaurant outlet (Oasis Bistro): a host or server sees the floor hall by
       hall, drawn to scale with real table shapes, seats a walk-in or a booking with its number of covers, recalls a table''s
@@ -2852,6 +2992,8 @@ screens:
       why: DI-106 puts bill splitting on POS-028; without these the till cannot recall or settle a table.
       source: contracts/satellite/fnb.yaml#getTableVisit | contracts/satellite/fnb.yaml#getBill | contracts/satellite/fnb.yaml#splitBill
         | contracts/satellite/fnb.yaml#requestBill | DI-106
+      status: fixed
+      by: CHG-WIR-008
     - what: closeTableVisit takes its own payments list, a second tender path beside Payment (POS-005).
       why: '"A till has one tender flow, not one per module." The contract should say how payments taken on POS-005 settle
         and close the visit, and the screen''s "Close visit & charge" must go through POS-005.
@@ -2877,15 +3019,22 @@ screens:
     - what: The offline state talks about "two tills moving the same party", but moving is deferred.
       why: POSV2-8 took move and merge off this screen.
       source: screens/P04-point-of-sale.yaml#POS-028 | POSV2-8
-    openQuestions:
-    - question: Should Add guest (covers change), Change server and Transfer table from the table activity log be on the
-        till in r1?
-      default: Change covers and change server only (updateTableVisit, transferTableVisit); no transfer to another table
-        until after r2.
-      source: DI-338 | POSV2-8
+    decisions:
+    - question: Should Add guest (covers change), Change server and Transfer table from the table activity log be on the till
+        in r1?
+      decision: Change covers and change server on the till in Block A (updateTableVisit, transferTableVisit); table transfer
+        to another table only after r2.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-068 | CHG-NOTE-004
+      questionSource: DI-338 | POSV2-8
     - question: Does a reservation taken at the till ask for a deposit?
-      default: No deposit field unless the venue has switched dining deposits on; off by default and none in the first release.
-      source: R077 | DI-1049 | DI-791
+      decision: 'Drawn default accepted: No deposit field unless the venue has switched dining deposits on; off by default
+        and none in the first release.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-069 | CHG-NOTE-004
+      questionSource: R077 | DI-1049 | DI-791
   KSK-011:
     summary: At the kiosk, a guest who booked online turns the booking reference into printed tickets or wristbands (on
       to KSK-012, Booking found). This is a ticket collection screen, not a retail one; it is on this list only because
@@ -2947,6 +3096,11 @@ screens:
         collect: Hatch 2
         readyAbout: '12:40'
         total: AED 76.00
+    edgeCases:
+    - case: Food and tickets bought together
+      expected: The kiosk is inside the venue, where F&B needs admission; the F&B order keeps its own payment and receipt,
+        separate from the tickets.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     corrections:
     - what: After "Create guest F&B order" there is no payment step and no confirmation; the only exit is to the Shop (KSK-017).
       why: Payment is required before the kitchen sees a guest order. The kiosk needs its review and payment steps (KSK-006,
@@ -2960,12 +3114,14 @@ screens:
         tracker.
       why: Plumbing; the screen is a menu, a basket and pay.
       source: screens/P05-guest-kiosk.yaml#KSK-016 | R254
-    openQuestions:
-    - question: Are F&B kiosks only inside the gate? A kiosk outside would sell food without admission (DI-292). Do food
-        and tickets bought together at a kiosk go on one receipt (DI-293)?
-      default: Kiosk food ordering inside the venue only. Food and tickets bought together at a kiosk share one cart and
-        one payment.
-      source: DI-292 | DI-293
+    decisions:
+    - question: Are F&B kiosks only inside the gate? A kiosk outside would sell food without admission (DI-292). Do food and
+        tickets bought together at a kiosk go on one receipt (DI-293)?
+      decision: Kiosks inside the venue need admission for F&B; F&B keeps its own receipt (from WEB-036).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-206 | CHG-NOTE-004
+      questionSource: DI-292 | DI-293
   KSK-017:
     summary: Buy merchandise at the kiosk in the same kiosk cart as tickets and food, or hold an item to pay for at the
       shop until the end of the visit day.
@@ -3007,11 +3163,15 @@ screens:
         collecting variantId and seatIds.'
       why: Guest kiosk; the guest projection carries none of these.
       source: screens/P05-guest-kiosk.yaml#KSK-017 | contracts/satellite/retail.yaml#/components/schemas/GuestMerchandiseItem
-    openQuestions:
+    decisions:
     - question: 'The size picker: GuestMerchandiseItem has no size or variant dimension. Is each size a separate item, as
         with SKUs like TSH-MB-GRN-M?'
-      default: Draw size buttons that switch between sibling items.
-      source: contracts/satellite/retail.yaml#/components/schemas/GuestMerchandiseItem
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw size buttons that switch between sibling
+        items.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-057 | CHG-NOTE-004
+      questionSource: contracts/satellite/retail.yaml#/components/schemas/GuestMerchandiseItem
   EMP-003:
     summary: 'The screen a staff handheld sits on between tasks, and for a restaurant host or server it is the start of
       every service. It must be a role-based home: what this person needs now (open incidents first, then their own work)
@@ -3087,11 +3247,15 @@ screens:
         till by a supervisor (R080(e)), not from a phone home screen. F08 step 4 and F64 step 4 need only getCurrentShift
         and listIncidents.
       source: R254 | R080 | F08 step 4 | F64 step 4 | screens/P06-staff-app.yaml#EMP-003
+      status: fixed
+      by: CHG-WIR-008
     - what: The pattern approvalInbox, driven by approveShiftOpen, and the empty state "Nothing is waiting, which is the
         good outcome" are wrong for a home.
       why: The purpose is "the screen the device sits on between tasks". It is a role dashboard and launcher, not a decision
         queue.
       source: DI-227 | screens/P06-staff-app.yaml#EMP-003
+      status: fixed
+      by: CHG-WIR-008
     - what: requiresModule maintenance should be core.
       why: Every staff member's home is gated on the maintenance licence today. A tenant that licenses only F&B would have
         no home.
@@ -3106,12 +3270,16 @@ screens:
         be chips with the incident vocabulary, or removed from the home.
       why: The home shows the open incidents; filtering belongs on the incident list.
       source: screens/P06-staff-app.yaml#EMP-003 | contracts/satellite/maintenance.yaml#listIncidents
-    openQuestions:
+    decisions:
     - question: Which roles are the restaurant roles on the staff app (host, server, captain or supervisor), and which of
         the restaurant destinations does each see?
-      default: Draw two variants. The host sees Floor, Reservations, Waitlist and New reservation. The server sees Floor
-        filtered to My tables, the table sheet and the bill. The supervisor sees both, plus Performance and Configuration.
-      source: DI-227 | TRACKER Workshops/Actions row 89
+      decision: 'Drawn default stands (answer: "Host and Server variants; a supervisor sees both"): Draw two variants. The
+        host sees Floor, Reservations, Waitlist and New reservation. The server sees Floor filtered to My tables, the table
+        sheet and the bill. The supervisor sees both, plus Performance and Configuration.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-198 | CHG-NOTE-004
+      questionSource: DI-227 | TRACKER Workshops/Actions row 89
   EMP-009:
     summary: 'End the person''s shift cleanly: push anything unsynced, hand over what is still open, then close. For a restaurant
       server, ending a shift means handing their open tables to another server and clocking out. Only a person who holds
@@ -3150,6 +3318,9 @@ screens:
     - case: Shift forgotten
       expected: Auto-closed after the venue limit and labelled "Auto-closed (not counted)", not "Closed".
       source: F08 step 8 | MATRIX 5.9.5
+    - case: A server on a handheld
+      expected: No cash is taken on a handheld; cash goes to a till. The server's End shift has no cash count.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     sampleData:
       cashier: Omar Ziad · Oasis Bistro bar till 2
       count:
@@ -3177,6 +3348,8 @@ screens:
       why: Bulk-attach. An end-of-shift screen does not open a shift, approve an opening float or open the drawer. F72 step
         3 needs closeShift, acceptShiftVariance and listCashMovements.
       source: R254 | F72 step 3 | F08 step 8
+      status: fixed
+      by: CHG-WIR-008
     - what: Pattern approvalInbox with "Waiting for a decision" over cash movements.
       why: Lifts and adds are not decisions waiting for anybody. The screen is a close-out sequence (sync, hand over, count,
         result).
@@ -3185,11 +3358,15 @@ screens:
       why: R080(e) and the operation's own description require a supervisor PIN step-up on the same device. reopenShift
         carries a supervisorStepUp object for the same kind of control.
       source: R080 | R144 | contracts/spine/shift.yaml#acceptShiftVariance | contracts/spine/shift.yaml#reopenShift
+      status: fixed
+      by: CHG-WIR-008
     - what: F08 step 8 has the steward end the shift with closeShift, and F72 step 3 has the supervisor close it ("closing
         and accepting a variance are supervisor acts"). closeShift is the cashier's own blind count.
       why: The flows contradict each other on who closes. A steward or server with no till cannot submit a count, because
         countedCash needs at least one line.
       source: F08 step 8 | F72 step 3 | contracts/spine/shift.yaml#closeShift
+      status: fixed
+      by: CHG-FIN-003
     - what: No hand-over of open tables and no clock-out on End shift, though F08 says "tasks reassigned, never silently
         closed" and DI-492 asks for shift closing on the employee app.
       why: For a server, the hand-over of open tables (reassignServer) and clock-out (recordAttendance on EMP-024) are what
@@ -3198,11 +3375,15 @@ screens:
     - what: Module placement. EMP-009 is a core staff-app or till screen, not F&B.
       why: Its operations are the shift contract. F&B adds only the open-table hand-over step.
       source: TRACKER Workshops/Actions row 63 | F72 step 3
-    openQuestions:
-    - question: Does a server on a handheld ever hold cash (a payment taken in cash at the table on EMP-059), and if so,
-        against whose drawer?
-      default: Draw the server's End shift without a cash count. Keep the cash count for till holders only.
-      source: contracts/spine/orders.yaml#createPayment | DI-805
+    decisions:
+    - question: Does a server on a handheld ever hold cash (a payment taken in cash at the table on EMP-059), and if so, against
+        whose drawer?
+      decision: 'No cash on handhelds: a server''s handheld takes no cash payment; cash goes to a till. The server''s End
+        shift has no cash count.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-200 | CHG-NOTE-004
+      questionSource: contracts/spine/orders.yaml#createPayment | DI-805
   EMP-008:
     summary: 'A read-only summary of what this person did on their shift, read before the shift is closed by someone else.
       From the F&B angle the person is a server or a bar cashier. The bar cashier holds a till and has a cash shift. The
@@ -3227,6 +3408,9 @@ screens:
       rule: Shift incidents (no-sales, manager overrides) listed with time and reason, so the person sees what a reviewer
         will see.
       source: contracts/spine/shift.yaml#/components/schemas/Shift
+    - element: Service summary (a server without a till)
+      rule: Covers, tables, sales and tips for the server's service; no cash figures.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     sampleData:
       person: Omar Ziad · Bar cashier · Oasis Bistro bar till 2
       shift: Thu 15 Oct 2026 · 16:00 to 23:30 GST · Open
@@ -3242,11 +3426,15 @@ screens:
       why: F72 step 1 declares this screen read-only, because "the person being reviewed could sign off their own review".
         Suspending is the break mechanism and belongs on the till or the home, not on the summary.
       source: F72 step 1 | R254 | contracts/spine/shift.yaml#suspendShift
+      status: fixed
+      by: CHG-WIR-008
     - what: The summary shows openingFloat, salesTotal, refundsTotal and liftsTotal while the shift is open, which lets
         the cashier work out the expected cash before the blind count.
       why: Blind close (R080(e)). POSV2-3 removed "Expected in drawer", and whether the cashier sees expected sales at all
         is still open with the client (DI-806).
       source: R080 | POSV2-3 | DI-806 | TRACKER Workshops/Actions row 276
+      status: fixed
+      by: CHG-WIR-008
     - what: There is no source for a server's own summary (covers served, tables closed, sales by server, gratuity). The
         Shift record is a till (workstation) shift, so a server with no till sees an empty screen.
       why: Tips and sales attribution follow the server (transferTableVisit, reassignServer), and the matrix asks for waiter
@@ -3260,11 +3448,13 @@ screens:
     - what: Raw data tables "Every shift" and "Every cash movement" with id, scopePath, currencyScale and principalId columns.
       why: Plumbing on a user's screen. The person reads their own shift, in words.
       source: screens/P06-staff-app.yaml#EMP-008
-    openQuestions:
+    decisions:
     - question: Does a server without a till get a shift summary (covers, sales, tips), and from which source?
-      default: Draw the till variant only. For a server, show a placeholder card "Your service summary" with covers and
-        tables, marked pending.
-      source: MATRIX 4.9.7 | DI-492
+      decision: 'A server without a till gets a service summary: covers, tables, sales, tips.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-199 | CHG-NOTE-004
+      questionSource: MATRIX 4.9.7 | DI-492
   EMP-030:
     summary: 'Staff help a guest find a place: an outlet that is open now, a gate, toilets, the way to a lounger. From the
       F&B angle it answers "where can this guest eat right now, and how long is the wait", and, for a runner, "where is
@@ -3314,6 +3504,8 @@ screens:
       why: A staff screen calling guest operations bypasses the staff permission model. A staff-audience read, or the venue-map
         live state, is needed.
       source: contracts/satellite/fnb.yaml#listDiningOutlets | contracts/satellite/fnb.yaml#listDeliveryLocations
+      status: fixed
+      by: CHG-WIR-008
     - what: getVenueMapLive is declared and reaches no component (the screen's own gap).
       why: F70 step 2 depends on it for closures and queues, so the map otherwise shows an outlet that shut an hour ago.
       source: F70 step 2 | screens/P06-staff-app.yaml#EMP-030
@@ -3321,6 +3513,8 @@ screens:
         with outletId, menuId, imageAssetRef and servingOutletIds columns.'
       why: Plumbing on a user's screen. Ordering method is a chip, and the lists are map pins and a search.
       source: screens/P06-staff-app.yaml#EMP-030
+      status: fixed
+      by: CHG-WIR-008
     - what: requiresModule ticketing, and module placement under F&B.
       why: The venue map is a core wayfinding screen (venue-map contract). Gating it on ticketing hides it from an F&B-only
         tenant, and F&B only adds the dining layer.
@@ -3434,9 +3628,9 @@ screens:
         statuses changed by others are not seen until sync.
       source: contracts/satellite/fnb.yaml#getTableMap | DI-071 | DI-072
     - case: A booking with no table assigned
-      expected: 'Most bookings carry no table until seating, so the map cannot mark them Reserved. Upcoming arrivals show
-        in a side strip ("Next: 20:00 Al Suwaidi · 6") instead.'
-      source: contracts/satellite/fnb.yaml#createTableReservation | DI-689
+      expected: 'A table shows Reserved when the booking names it, or from N minutes (the venue''s setting) before a pre-allocated
+        booking. Otherwise the next arrivals show in a side strip ("Next: 20:00 Al Suwaidi · 6").'
+      source: contracts/satellite/fnb.yaml#createTableReservation | DI-689 | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     consistency:
     - with: POS-028
       note: Same halls, same table glyphs, same status names, colours and filter chips (the v2 till has Main Hall, Terrace
@@ -3515,20 +3709,28 @@ screens:
       why: Configuration on the live service map. Layout editing is EMP-053 (and BO-729, BO-044, POS-024), and F80 says
         configuration does not work offline while service does.
       source: F94 step 1 | R254 | screens/P06-staff-app.yaml#EMP-052
+      status: fixed
+      by: CHG-WIR-008
     - what: The pattern statusTracker ("reads one record") and an empty state that offers nothing.
       why: The floor plan is a spatial board of many tables. With no tables configured, the empty state points a manager
         to Table & seating configuration.
       source: screens/P06-staff-app.yaml#EMP-052
-    openQuestions:
+    decisions:
     - question: Does "Table closed" persist after payment until someone resets the table (which acts like the cleaning status
         DI-336 excluded), or does a paid table go straight back to Vacant?
-      default: Draw "Table closed" as a short-lived state with a one-tap "Make available" on the tile. Avoid "clean", "clear"
-        and "reset" wording.
-      source: DI-336 | contracts/satellite/fnb.yaml#clearTable
+      decision: 'Drawn default stands (answer: "A short ''Table closed'' state, then ''Make available''"): Draw "Table closed"
+        as a short-lived state with a one-tap "Make available" on the tile. Avoid "clean", "clear" and "reset" wording.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-201 | CHG-NOTE-004
+      questionSource: DI-336 | contracts/satellite/fnb.yaml#clearTable
     - question: 'When does a table show Reserved, given the host normally allocates the table at seating (DI-689)? Options:
         only when the booking names a table, or from N minutes before a pre-allocated booking.'
-      default: Reserved only where a table is named on the booking. Otherwise the next arrivals show in the side strip.
-      source: DI-689 | DI-336 | contracts/satellite/fnb.yaml#createTableReservation
+      decision: A table shows Reserved when the booking names it, or N minutes (venue-set) before a pre-allocated booking.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-202 | CHG-NOTE-004
+      questionSource: DI-689 | DI-336 | contracts/satellite/fnb.yaml#createTableReservation
   EMP-053:
     summary: 'Where a restaurant manager lays out the room: tables drawn on each hall in their real shape, seats and position,
       grouped into sections with a server each, with the pairs of tables that can be pushed together. It is configuration
@@ -3619,11 +3821,15 @@ screens:
       why: Two write paths for one row means two conflict behaviours on one screen. Pick one per screen (the editor saves
         the whole layout) and say which.
       source: contracts/satellite/fnb.yaml#setTableLayout | contracts/satellite/fnb.yaml#createTable | contracts/satellite/fnb.yaml#updateTable
+      status: fixed
+      by: CHG-WIR-008
     - what: setTableCombinations (PRODUCT_CONFIGURE) sits on the live service screen EMP-058 and not here, even though it
         is configuration.
       why: It is declared before service and saved with the layout. During service the host only uses a combination when
         seating.
       source: contracts/satellite/fnb.yaml#setTableCombinations | F94 step 1 | F29 step 2
+      status: fixed
+      by: CHG-WIR-008
     - what: The board frame fnb-4c is claimed by both EMP-053 and EMP-060.
       why: A frame drawn once cannot be the design of two screens. One of the two mappings is wrong.
       source: screens/P06-staff-app.yaml#EMP-053 | screens/P06-staff-app.yaml#EMP-060
@@ -3631,11 +3837,14 @@ screens:
         to scale.
       why: DI-793 asks for a to-scale plan of the actual hall layout.
       source: DI-793 | contracts/satellite/fnb.yaml#/components/schemas/TableDefinition
-    openQuestions:
+    decisions:
     - question: Is the floor-plan editor meant for a phone at all, or a tablet or back office only?
-      default: Draw it for a tablet in landscape. On a phone, show the plan read-only with an "Edit on a tablet or in Back
-        Office" note.
-      source: DI-793 | screens/P06-staff-app.yaml#EMP-053
+      decision: 'Drawn default stands (answer: "Tablet (landscape) + back office; read-only on a phone"): Draw it for a tablet
+        in landscape. On a phone, show the plan read-only with an "Edit on a tablet or in Back Office" note.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-203 | CHG-NOTE-004
+      questionSource: DI-793 | screens/P06-staff-app.yaml#EMP-053
   EMP-054:
     summary: 'The host''s book for the restaurant: who is coming, when, how many, and for how long, as a day timeline on
       a tablet and an agenda list on a phone, with week and month views for looking ahead. The one thing to get right: bookings
@@ -3719,6 +3928,8 @@ screens:
         the client's frame fnb-4d.
       why: An operation drawn for this board is not wired to it.
       source: contracts/satellite/fnb.yaml#resolveBookingConflict | screens/P06-staff-app.yaml#EMP-054
+      status: fixed
+      by: CHG-WIR-008
     - what: The host cannot cancel, move or change a booking from the calendar.
       why: updateTableReservation is guest-only and self-scoped (guestAuth). There is no staff operation to change or cancel
         a booking taken by phone.
@@ -3759,6 +3970,10 @@ screens:
         the amount, basis (per guest, per table or % of minimum spend), hold expiry (15 minutes), refund cut-off and late-cancel
         terms. It is paid through the till cart. Unpaid at expiry, the booking is cancelled.
       source: DI-1049 | REV3-8b | DI-1048 | R169 | contracts/satellite/fnb.yaml#/components/schemas/TableReservationDeposit
+    - field: Seating preference and occasion
+      rule: Seating area (indoor, terrace, majlis) and occasion (birthday, anniversary, business) are fields on the booking,
+        not folded into the requests text.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     actions:
     - action: Book table
       result: Creates the booking as Booked (or Awaiting deposit) and offers "Send confirmation" by SMS, WhatsApp or email,
@@ -3795,6 +4010,8 @@ screens:
       why: A host booking for a caller is not the caller. The staff app needs a staff-audience create with a permission,
         which records who took the booking.
       source: contracts/satellite/fnb.yaml#createTableReservation
+      status: fixed
+      by: CHG-WIR-008
     - what: '"Edit" has no operation: updateTableReservation is guest-only.'
       why: The screen is Create / Edit, and the matrix asks for amendment and cancellation.
       source: contracts/satellite/fnb.yaml#updateTableReservation | MATRIX 4.9.10 | MATRIX 13.3.11
@@ -3806,15 +4023,20 @@ screens:
         this screen, though this screen is the client's frame fnb-4e.
       why: The confirmation and reminder are what keep the no-show rate down, and the duration needs a default.
       source: contracts/satellite/fnb.yaml#sendBookingConfirmation | contracts/satellite/fnb.yaml#getFnbReservationPolicy
+      status: fixed
+      by: CHG-WIR-008
     - what: The deposit note says the deposit is adjusted against the final bill, and the Bill has no line for a deposit
         applied.
       why: DI-337 asks for the deposit to be adjusted against the final bill. See EMP-059.
       source: DI-337 | contracts/satellite/fnb.yaml#/components/schemas/Bill
-    openQuestions:
+    decisions:
     - question: Should a booking capture seating-area preference (indoor, terrace, majlis) and the occasion? The waitlist
         has seatingPreference and the reservation does not.
-      default: Fold them into the requests text until a field exists.
-      source: DI-791 | DI-337 | contracts/satellite/fnb.yaml#/components/schemas/RestaurantWaitlist
+      decision: Seating preference and occasion are fields on a table booking.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-204 | CHG-NOTE-004
+      questionSource: DI-791 | DI-337 | contracts/satellite/fnb.yaml#/components/schemas/RestaurantWaitlist
   EMP-056:
     summary: 'The host''s list of walk-in parties waiting for a table: add a party in a few taps, tell them a wait the system
       computed, message them when the table is ready, and take them off when they leave. A walk-in with a free table is
@@ -3887,13 +4109,19 @@ screens:
         uses joinRestaurantWaitlist as the trigger for waiting to notified, notified to seated, and waiting to walked away.
       why: The walkedAway status exists for the wait-time report, and nothing can set it. Notified should be notifyWaitlistParty.
       source: contracts/satellite/fnb.yaml#/components/schemas/RestaurantWaitlist
+      status: fixed
+      by: CHG-WIR-008
     - what: RestaurantWaitlist has no guest name or contact, only subjectId.
       why: A walk-in without a profile cannot be called by SMS or WhatsApp, and the host cannot read the list by name.
       source: contracts/satellite/fnb.yaml#notifyWaitlistParty | contracts/satellite/fnb.yaml#/components/schemas/RestaurantWaitlist
+      status: fixed
+      by: CHG-WIR-008
     - what: quoteWaitTime and notifyWaitlistParty are on EMP-058, not on the waitlist screen. The form exposes id, outletId,
         status, notifiedAt and holdExpiresAt as inputs.
       why: The quote and the call belong to the waitlist (F29 branch at 1). The status and times are system fields.
       source: F29 step 1 | screens/P06-staff-app.yaml#EMP-056 | R254
+      status: fixed
+      by: CHG-WIR-008
   EMP-058:
     summary: 'The table sheet for one table during service, opened by tapping it on the floor plan: seat the party (walk-in
       or booking), see where the table is in its meal, order, add a guest, change the server, move the party to another
@@ -4000,6 +4228,8 @@ screens:
       why: Combinations are pre-service configuration (EMP-053). The waitlist actions belong to EMP-056. R254 re-derives
         operations from purpose.
       source: R254 | F94 step 1 | F29 step 1 | contracts/satellite/fnb.yaml#setTableCombinations
+      status: fixed
+      by: CHG-WIR-008
     - what: The pattern configEditor with text fields for id, tableId, covers, serverPrincipalId, subjectId and recordedAt,
         and a "Create F&B order" modal collecting id, outletId, serviceMode and lines.
       why: Plumbing on a user's screen. recordedAt is device time, set by the app. Ordering is a menu, like the till's order
@@ -4009,12 +4239,14 @@ screens:
         free to seated only by claimTableSession (the guest's claim).
       why: The host's seat has no transition on the table, so the map's state after a host seats is undefined.
       source: F29 step 1 | contracts/satellite/fnb.yaml#openTableVisit
-    openQuestions:
-    - question: May a server release the next course from the handheld (F29 step 5), or does only the kitchen pass fire
-        (DI-407)?
-      default: Show the course strip read-only, plus a "Ready for mains" action that is drawn but marked pending the decision.
-        Never label it "Fire" on the floor.
-      source: DI-407 | F29 step 5 | DI-333
+    decisions:
+    - question: May a server release the next course from the handheld (F29 step 5), or does only the kitchen pass fire (DI-407)?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Show the course strip read-only, plus a
+        "Ready for mains" action that is drawn but marked pending the decision. Never label it "Fire" on the floor.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-050 | CHG-NOTE-004
+      questionSource: DI-407 | F29 step 5 | DI-333
   EMP-059:
     summary: 'The table''s bill at the end of the visit: every line across every order, service charge and VAT, the split
       the party asks for, comps for service recovery, payment, and closing the table. The one thing to get right: the split
@@ -4145,6 +4377,9 @@ screens:
     - element: Tables now
       rule: Occupancy by hall from the live map, in the floor-plan colours.
       source: contracts/satellite/fnb.yaml#getTableMap | DI-792
+    - element: Restaurant measures
+      rule: Turn time, no-show rate, covers and wait accuracy, all from reporting (never computed on the device).
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     sampleData:
       service: Oasis Bistro dinner · Thu 15 Oct 2026
       bookings:
@@ -4171,6 +4406,8 @@ screens:
       why: A restaurant performance view does not lead to retail stock. F80 also runs bill, then live service, then performance,
         then retail, against its own name ("configured, reserved, seated and billed").
       source: F80 step 3 | F94 step 2 | screens/P06-staff-app.yaml#EMP-060
+      status: fixed
+      by: CHG-WIR-009
     - what: The board frame fnb-4c is the same as EMP-053's.
       why: One frame cannot be the design of two screens.
       source: screens/P06-staff-app.yaml#EMP-060 | screens/P06-staff-app.yaml#EMP-053
@@ -4178,11 +4415,14 @@ screens:
         with no operation, and a read gated on ORDER_MODIFY.'
       why: Plumbing on a user's screen, and a manager who only views is refused.
       source: screens/P06-staff-app.yaml#EMP-060 | contracts/satellite/fnb.yaml#listTableReservations
-    openQuestions:
+    decisions:
     - question: Which restaurant measures does the client want on the staff app (turn time, no-show rate, covers, wait accuracy),
         and are they computed by reporting or on the device?
-      default: Draw the bookings counts and the occupancy now. Draw turn time and wait accuracy as greyed cards marked "coming".
-      source: DI-400 | TRACKER Workshops/Actions row 89
+      decision: Turn time, no-show rate, covers and wait accuracy, all from reporting.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-205 | CHG-NOTE-004
+      questionSource: DI-400 | TRACKER Workshops/Actions row 89
   EMP-062:
     summary: 'Store Stock & Availability is the shop-floor handheld lookup. A staff member scans or searches a product and
       sees on hand against available here (net of what is held for online orders and collections), plus stock at sibling
@@ -4252,6 +4492,8 @@ screens:
 
         '
       source: DI-361 | R254 | F28 step 1 | screens/P06-staff-app.yaml#EMP-062
+      status: fixed
+      by: CHG-WIR-008
     - what: 'It reads stock positions (one record, status tracker) but not the shop-floor reads that exist for exactly this:
         getOutletStock ("shaped for a handheld on a shop floor, low stock first, with sibling outlet availability") and
         lookupMerchandise.
@@ -4262,10 +4504,16 @@ screens:
 
         '
       source: DI-233 | contracts/satellite/retail.yaml#getOutletStock | contracts/satellite/retail.yaml#lookupMerchandise
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-008
+    decisions:
     - question: Do pending online purchases awaiting pickup or shipment count in Allocated?
-      default: Yes. Allocated covers everything held for an order or a collection.
-      source: DI-361 | R171
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Yes. Allocated covers everything held for
+        an order or a collection.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-051 | CHG-NOTE-004
+      questionSource: DI-361 | R171
   EMP-063:
     summary: 'The handheld side of requisitions: an outlet manager or storekeeper sees what is running low, raises a request
       (from a suggestion or from scratch) and tracks its status. Approval happens in the back office. The one thing to get
@@ -4304,6 +4552,8 @@ screens:
 
         '
       source: DI-234 | contracts/satellite/inventory.yaml#getSuggestedRequisitions | contracts/satellite/inventory.yaml#updateRequisitionLines
+      status: fixed
+      by: CHG-WIR-008
     - what: 'The no-access state names the stock-view permission, while listing requisitions needs the procurement-view
         permission. The filters are "Status" and "Raised by principal id" text fields.
 
@@ -4349,6 +4599,8 @@ screens:
         '
       source: contracts/satellite/inventory.yaml#listStockTransfers | contracts/satellite/inventory.yaml#getStockTransfer
         | contracts/satellite/inventory.yaml#receiveStockTransfer
+      status: fixed
+      by: CHG-WIR-008
     - what: Transfers have no approval step, although this screen is named for approved inter-store transfers.
       why: See the BO-080 correction.
       source: DI-362
@@ -4473,6 +4725,8 @@ screens:
         '
       source: contracts/satellite/inventory.yaml#createGoodsReceipt | contracts/satellite/inventory.yaml#receiveStockTransfer
         | F35 step 2
+      status: fixed
+      by: CHG-WIR-008
     - what: 'F35 step 3 rejects damaged transfer cases "at the door, before the receipt is posted" with rejectReceivedGoods.
 
         '
@@ -4481,6 +4735,8 @@ screens:
 
         '
       source: F35 step 3 | contracts/satellite/inventory.yaml#rejectReceivedGoods | contracts/satellite/inventory.yaml#receiveStockTransfer
+      status: fixed
+      by: CHG-WIR-008
     - what: The rejection reasons are a fixed list.
       why: The client asked for a user-defined reason list that can be extended without development.
       source: DI-363
@@ -4532,9 +4788,13 @@ screens:
 
         '
       source: F30 step 4 | F30 step 5 | F30 step 7 | R110 | contracts/satellite/inventory.yaml#listStockCounts
+      status: fixed
+      by: CHG-WIR-008
     - what: The first-run state offers "Request recount".
       why: First run should offer "Start count" (or "No count assigned to you").
       source: screens/P06-staff-app.yaml#EMP-066
+      status: fixed
+      by: CHG-WIR-008
     - what: Bulk RFID counting is requested but has no operation or device.
       why: Open with the client. The RFID reader is still on the hardware list.
       source: DI-365 | TRACKER 30-Sep/Tracker row 28
@@ -4587,6 +4847,8 @@ screens:
 
         '
       source: R254 | F28 step 2 | screens/P06-staff-app.yaml#EMP-067
+      status: fixed
+      by: CHG-WIR-008
     - what: The reason list is not configurable.
       why: The client asked for a user-defined reason list that can be extended without development.
       source: DI-363
@@ -4630,10 +4892,16 @@ screens:
     - what: There is no list, cancel or collect of reservations on the screen, although those operations exist.
       why: A hold that cannot be seen or released from the handheld is held until it expires.
       source: contracts/satellite/retail.yaml#cancelMerchandiseReservation | contracts/satellite/retail.yaml#collectMerchandiseReservation
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-008
+    decisions:
     - question: Is a merchandise collection hold the same thing as an inventory stock reservation (and so counted in Allocated)?
-      default: Yes, it reduces Available.
-      source: R171 | DI-361
+      decision: 'Drawn default accepted: Yes, it reduces Available.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-301 | CHG-NOTE-004
+      reviewable: true
+      questionSource: R171 | DI-361
   EMP-069:
     summary: 'Barcode, serial and traceability on the handheld: scan a barcode for price and stock, or a serial to find
       exactly one item (a watch at the jewellery counter, a camera returned under warranty). The one thing to get right
@@ -4714,8 +4982,8 @@ screens:
       expected: Row shows the status in grey with no check-out action; the attendant is told to sell a new rental instead.
       source: contracts/satellite/rental.yaml#/components/schemas/RentalBooking | contracts/satellite/rental.yaml#updateRentalBooking
     - case: Device offline
-      expected: 'See the open question on offline. Until decided: banner "Offline - showing the queue as of 10:42", rows
-        loaded before the drop stay openable, scan of an unloaded booking says it cannot be found offline.
+      expected: 'Banner "Offline - showing the queue as of 10:42", rows loaded before the drop stay openable, scan of an unloaded
+        booking says it cannot be found offline.
 
         '
       source: DI-071 | DI-072 | screens/P06-staff-app.yaml#EMP-071
@@ -4805,24 +5073,30 @@ screens:
 
         '
       source: contracts/satellite/rental.yaml#/components/schemas/RentalBooking
-    openQuestions:
+    decisions:
     - question: 'What does the handheld do offline at the rental counter? All 30 staff-app rental screens have the offline
         state as TODO. check-out, equipment assignment, inspection, return and incident are offline-capable in the contract,
         but the reads they depend on (the booking list and one booking) are not, and a card deposit hold needs the payment
         network.
 
         '
-      default: 'Draw an offline banner; allow check-out only for a booking already loaded, with a cash deposit or a supervisor
-        override; queue the call and show "Will sync". Returns may be recorded offline with the statement marked "Settles
-        when back online".
-
-        '
-      source: DI-070 | DI-071 | DI-072 | contracts/satellite/rental.yaml#checkOutRental | contracts/satellite/rental.yaml#getRentalBooking
+      decision: 'Drawn default stands (answer: "Offline: check-out of bookings already loaded, with a cash deposit or supervisor
+        approval; returns queue"): Draw an offline banner; allow check-out only for a booking already loaded, with a cash
+        deposit or a supervisor override; queue the call and show "Will sync". Returns may be recorded offline with the statement
+        marked "Settles when back online".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-302 | CHG-NOTE-004
+      questionSource: DI-070 | DI-071 | DI-072 | contracts/satellite/rental.yaml#checkOutRental | contracts/satellite/rental.yaml#getRentalBooking
     - question: How long does an uncollected booking hold its equipment before it becomes a no-show? R169 sets hold lengths
         for seats, carts and merchandise but none for a rental.
-      default: Show "Late arrival +N min" in amber from the booked start; offer "Mark no-show" only to a supervisor (it
-        goes through the booking modification screen BO-542).
-      source: R169 | contracts/satellite/rental.yaml#updateRentalBooking
+      decision: 'Drawn default accepted: Show "Late arrival +N min" in amber from the booked start; offer "Mark no-show" only
+        to a supervisor (it goes through the booking modification screen BO-542).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-303 | CHG-NOTE-004
+      reviewable: true
+      questionSource: R169 | contracts/satellite/rental.yaml#updateRentalBooking
   EMP-072:
     summary: 'Finding the guest''s booking from the QR voucher they show. On the handheld this is the scan action of the
       check-out queue and a result card, not a destination of its own; the card confirms the guest and booking before the
@@ -4970,6 +5244,8 @@ screens:
         (which returns available asset ids for a serialised product) is not bound.
       why: Without it the "select manually" path in DI-760 cannot be drawn.
       source: contracts/satellite/rental.yaml#getRentalAvailability | DI-760
+      status: fixed
+      by: CHG-WIR-008
   EMP-075:
     summary: 'The scan-and-validate behaviour of the equipment step (merge into EMP-074). Each scan resolves the tag and
       is checked before it is accepted: right product, free, in service, not overdue for maintenance. The point is that
@@ -5135,12 +5411,15 @@ screens:
       why: Either a supervisor step-up on the same device or a hand-off to the back office must be drawn; today neither
         is possible.
       source: contracts/satellite/rental.yaml#requestRentalCommercialOverride
-    openQuestions:
-    - question: How is the card hold taken and linked? The check-out carries the amount and method but no authorisation
-        reference; the booking has depositAuthorisationId with no writer named.
-      default: Draw "Present card" on the payment terminal, then the hold reference shown on the panel; check-out stays
-        disabled until the hold is approved.
-      source: contracts/satellite/rental.yaml#/components/schemas/RentalCheckOut | contracts/satellite/rental.yaml#/components/schemas/RentalBooking
+    decisions:
+    - question: How is the card hold taken and linked? The check-out carries the amount and method but no authorisation reference;
+        the booking has depositAuthorisationId with no writer named.
+      decision: 'Rental card hold: pre-authorisation on the payment terminal; the reference is stored on the booking; check-out
+        is blocked until it succeeds.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-304 | CHG-NOTE-004
+      questionSource: contracts/satellite/rental.yaml#/components/schemas/RentalCheckOut | contracts/satellite/rental.yaml#/components/schemas/RentalBooking
   EMP-079:
     summary: 'The group case of the equipment step (merge into EMP-074): ten bikes for a school group go out in one action,
       one row per participant with the unit assigned to each.
@@ -5205,11 +5484,15 @@ screens:
       why: Pack artefacts read literally - the first is a channel choice, the second has no meaning, and an activation step
         is not a configuration editor. No operation sends the confirmation either.
       source: screens/P06-staff-app.yaml#EMP-080
-    openQuestions:
-    - question: Does the rental clock start at the booked start or at handover? A guest who arrives 15 minutes late for
-        a 1-hour kayak - due back at the booked end or one hour after handover?
-      default: Due back = booked end time; the attendant may set dueBackAt later only with a supervisor.
-      source: contracts/satellite/rental.yaml#/components/schemas/RentalCheckOut | DI-761
+    decisions:
+    - question: Does the rental clock start at the booked start or at handover? A guest who arrives 15 minutes late for a
+        1-hour kayak - due back at the booked end or one hour after handover?
+      decision: 'Drawn default accepted: Due back = booked end time; the attendant may set dueBackAt later only with a supervisor.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-305 | CHG-NOTE-004
+      reviewable: true
+      questionSource: contracts/satellite/rental.yaml#/components/schemas/RentalCheckOut | DI-761
   EMP-081:
     summary: 'Everything currently out, for the attendant and the station supervisor: who has what, when it is due back,
       and what is late. One list with chips for Due soon and Overdue (the contract makes them one query at two thresholds),
@@ -5492,6 +5775,8 @@ screens:
       why: A staff device cannot call it as declared; the screen needs a staff-callable "remind guest about rental" or the
         audience widened, with the template chosen by name.
       source: contracts/satellite/marketing-crm.yaml#sendTransactionalMessage | screens/P06-staff-app.yaml#EMP-088
+      status: fixed
+      by: CHG-WIR-008
   EMP-089:
     summary: 'A group rental while out - one booking, many units, each possibly in a different state (out, swapped, returned
       early, late). After consolidation this is the rental detail with one row per participant/unit.
@@ -5751,11 +6036,15 @@ screens:
         ("1 of 2 paddles back") cannot be expressed.
       why: The return carries returned and missing asset ids only; hybrid kits are common at a kayak station.
       source: contracts/satellite/rental.yaml#/components/schemas/RentalReturn | contracts/satellite/rental.yaml#setRentalInventoryModel
-    openQuestions:
-    - question: On a partial group return, is part of the deposit released now, or is the whole hold kept until the last
-        unit is back?
-      default: Keep the whole hold until the booking closes; show "Deposit settles when all units are back".
-      source: DI-767 | contracts/satellite/rental.yaml#returnRental
+    decisions:
+    - question: On a partial group return, is part of the deposit released now, or is the whole hold kept until the last unit
+        is back?
+      decision: 'Drawn default stands (answer: "Hold the whole deposit until every unit is back"): Keep the whole hold until
+        the booking closes; show "Deposit settles when all units are back".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-306 | CHG-NOTE-004
+      questionSource: DI-767 | contracts/satellite/rental.yaml#returnRental
   EMP-098:
     summary: 'The statement: every charge from the return on one page, against one deposit - extra time, damage, missing
       items - then what is captured, released and, if charges exceed the deposit, still owed. This is what the guest is
@@ -5770,6 +6059,10 @@ screens:
 
         '
       source: contracts/satellite/rental.yaml#/components/schemas/RentalSettlement | DI-499 | DI-306
+    - element: Extra time
+      rule: 'Usage beyond the paid time is charged at the normal rate (DI-499): a wheelchair paid for one hour and used for
+        three is charged two more hours at the hourly rate.'
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     actions:
     - action: Waive extra-time fee
       result: An override with original and adjusted amounts and a reason; recorded, not silent.
@@ -5794,11 +6087,14 @@ screens:
       why: The settlement says a written-off bike against a AED 200 hold leaves a real debt; the statement needs a Charge
         path for the balance.
       source: contracts/satellite/rental.yaml#/components/schemas/RentalSettlement
-    openQuestions:
+    decisions:
     - question: Is usage beyond the paid time charged at the normal rate (DI-499 - a wheelchair paid for one hour and used
         for three is charged two extra hours) or at the late-fee rate of the fee policy?
-      default: Show it as one line, "Extra time", priced by the fee policy, with the rate shown.
-      source: DI-499 | contracts/satellite/rental.yaml#/components/schemas/RentalFeePolicy
+      decision: Usage beyond the paid time is charged at the normal rate (DI-499).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-307 | CHG-NOTE-004
+      questionSource: DI-499 | contracts/satellite/rental.yaml#/components/schemas/RentalFeePolicy
   EMP-099:
     summary: 'Settle the deposit and give the guest the final statement: Release in full, or Capture part and release the
       rest, or capture in full when a unit is not returned. The deposit''s movements (held, captured, released) are listed
@@ -5833,6 +6129,8 @@ screens:
         (listDepositActivity).
       why: Without it the "transaction history" of the deposit cannot be shown.
       source: contracts/satellite/payments.yaml#listDepositActivity | screens/P06-staff-app.yaml#EMP-099
+      status: fixed
+      by: CHG-WIR-008
   EMP-100:
     summary: 'Close the return and decide what happens to each unit: back to available (after its turnaround), or faulty
       and off to maintenance. Ends with the rental completion summary the client asked for.
@@ -5866,6 +6164,8 @@ screens:
       why: The attendant needs a per-booking choice in the two simplified states; the unit's next state should be part of
         the return, not a separate maintenance status change per unit.
       source: contracts/satellite/maintenance.yaml#setAssetStatus | DI-500 | screens/P06-staff-app.yaml#EMP-100
+      status: fixed
+      by: CHG-WIR-008
   BO-020:
     summary: 'The back-office order desk for an outlet manager or F&B supervisor: every live F&B order across the outlets
       the user may see, in the nine-state lifecycle, with the few acts a back office legitimately takes on an order (accept
@@ -6071,6 +6371,8 @@ screens:
 
         '
       source: R254 | DI-323 | screens/P08-venue-back-office.yaml#BO-135
+      status: fixed
+      by: CHG-WIR-008
     - what: '"Create F&B order" (createFnbOrder) and the purpose "Take, amend and route an F&B order from the back office".
 
         '
@@ -6080,6 +6382,8 @@ screens:
 
         '
       source: R261 | POSV2-4 | contracts/satellite/fnb.yaml#createFnbOrder
+      status: fixed
+      by: CHG-WIR-008
     - what: 'The cancel dialog says that once accepted "the reason comes from the void reason list (guestChangedMind, enteredInError,
         itemUnavailable, qualityIssue, duplicate, other), Other makes the note required". The contract''s cancelFnbOrder.reason
         is a different list (outletRefused, guestCancelled, itemUnavailable, tooLong, error) with no "other".
@@ -6093,16 +6397,21 @@ screens:
     - what: The no-access state names the permission key ORDER_VIEW (the same pattern on every screen in this part).
       why: Permission keys are never user-facing; say "You don't have access to F&B orders — ask your venue manager".
       source: screens/P08-venue-back-office.yaml#BO-020 | designer default
-    openQuestions:
+    decisions:
     - question: Which outlets accept guest orders automatically, and where is that configured?
-      default: 'Show Accept only on orders still in Ordered; no outlet setting is drawn (no contract field exists for "automatic
-        where the outlet is configured").
-
-        '
-      source: contracts/satellite/fnb.yaml#acceptFnbOrder
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Show Accept only on orders still in Ordered;
+        no outlet setting is drawn (no contract field exists for "automatic where the outlet is configured").'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-028 | CHG-NOTE-004
+      questionSource: contracts/satellite/fnb.yaml#acceptFnbOrder
     - question: Outlet-level visibility (an outlet manager sees only their outlet) — how is it implemented?
-      default: The outlet filter lists only outlets the user's grants reach; no extra control.
-      source: DI-331 | TRACKER Workshops/Actions row 85
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): The outlet filter lists only outlets the
+        user''s grants reach; no extra control.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-029 | CHG-NOTE-004
+      questionSource: DI-331 | TRACKER Workshops/Actions row 85
   BO-021:
     summary: 'Staff look up any order at the venue by its number or receipt and see where it is — for a guest at the counter
       asking "where is my food?", a runner confirming a hand-over, or a supervisor checking a disputed sale. One thing to
@@ -6180,6 +6489,8 @@ screens:
 
         '
       source: screens/P08-venue-back-office.yaml#BO-021 | contracts/satellite/fnb.yaml#getGuestOrderStatus | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: 'The board frame cited for BO-021 (Retail Board 3 RET-3A) and flow F81 step 1 are the "Retail Sales & POS Command
         Center" — a cross-store sales dashboard (sales today, tills open, tender mix), not an order search.
 
@@ -6189,10 +6500,14 @@ screens:
     - what: Navigation exits to POS-002 "Sell — Ticket Catalogue" carrying orderId (from F81).
       why: A back-office search does not open a till's sell screen on another device; follows from the wrong RET-3A mapping.
       source: F81 step 1 | R251
-    openQuestions:
+    decisions:
     - question: Is Order Search F&B-only, or every order at the venue (tickets, retail, F&B — one cart, one receipt)?
-      default: Draw it venue-wide with a module chip on each result; F&B results open the F&B status view.
-      source: DI-293 | screens/P08-venue-back-office.yaml#BO-021
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw it venue-wide with a module chip on
+        each result; F&B results open the F&B status view.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-030 | CHG-NOTE-004
+      questionSource: DI-293 | screens/P08-venue-back-office.yaml#BO-021
   BO-039:
     summary: 'A directory of every till session at the venue — open, on break, counting, waiting for a variance to be accepted,
       closed, auto-closed — for the duty manager, cash office and finance. It watches tills; it does not run them. One thing
@@ -6310,10 +6625,14 @@ screens:
 
         '
       source: R254 | F32 step 2 | F32 step 5 | F32 step 6 | contracts/spine/shift.yaml#getCurrentShift
+      status: fixed
+      by: CHG-WIR-008
     - what: '"Accept shift variance" (acceptShiftVariance) is a button on BO-039.'
       why: The one path past a variance is a supervisor on the till with a PIN step-up; the back office does not accept
         it.
       source: R080 | contracts/spine/shift.yaml#acceptShiftVariance | POSV2-3
+      status: fixed
+      by: CHG-WIR-008
     - what: 'Pattern approvalInbox, table "Waiting for a decision", empty state "Nothing is waiting, which is the good outcome".
 
         '
@@ -6331,6 +6650,8 @@ screens:
         '
       why: A shift directory has no product link, and a back-office user has no shift in the session.
       source: R251 | screens/P08-venue-back-office.yaml#BO-039
+      status: fixed
+      by: CHG-WIR-009
     - what: 'DI-273 asks for open and closed sessions "with expected cash and card totals" and a live till monitor; the
         contract withholds expectedCash until the count (R207) and Shift has no per-tender totals (salesTotal is not split
         by cash/card).
@@ -6339,15 +6660,24 @@ screens:
       why: The agreed view cannot be drawn for open shifts from the contract; either the decision narrows or Shift gains
         per-tender totals.
       source: DI-273 | contracts/spine/shift.yaml#/components/schemas/Shift
-    openQuestions:
-    - question: May a supervisor approve an out-of-tolerance opening float remotely from the back office, or only at the
-        till?
-      default: Draw "Approve opening float" here; the contract does not restrict it to the till.
-      source: contracts/spine/shift.yaml#approveShiftOpen | F32 step 1
+      status: fixed
+      by: CHG-WIR-008
+    decisions:
+    - question: May a supervisor approve an out-of-tolerance opening float remotely from the back office, or only at the till?
+      decision: 'Drawn default stands (answer: "Back office too"): Draw "Approve opening float" here; the contract does not
+        restrict it to the till.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-171 | CHG-NOTE-004
+      questionSource: contracts/spine/shift.yaml#approveShiftOpen | F32 step 1
     - question: Allam asked to explore merging shift-closing and till-closing screens; is BO-039 also the place for BO-040's
         list?
-      default: Keep both (BO-040 is a filtered view of BO-039 with the variance columns first).
-      source: DI-309 | TRACKER Workshops/Actions row 63
+      decision: 'Drawn default stands (answer: "Keep both"): Keep both (BO-040 is a filtered view of BO-039 with the variance
+        columns first).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-172 | CHG-NOTE-004
+      questionSource: DI-309 | TRACKER Workshops/Actions row 63
   BO-040:
     summary: 'Since R080 (e) this is a watch list, not an approval screen. It lists the shifts whose count left a variance
       beyond the venue threshold, waiting for a supervisor to accept it on the till, and the history of variances accepted
@@ -6382,11 +6712,13 @@ screens:
       rule: Variance, accepted by (supervisor name), accepted at, reason; never the cashier's own name (approver-is-cashier).
       source: contracts/spine/shift.yaml#acceptShiftVariance
     - element: Where it is resolved
-      rule: 'Each waiting row carries the instruction "A supervisor accepts this on the till (Close Shift) with their PIN",
-        not a button.
-
-        '
-      source: R080 | F32 step 7
+      rule: Each waiting row carries the instruction "A supervisor accepts this on any till (Close Shift) with their PIN,
+        or asks for a recount", not a button.
+      source: R080 | F32 step 7 | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
+    - element: Count breakdown
+      rule: The closing count by denomination (the shift's count lines), beside the totals, for review; a read of the count
+        lines is to be added.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     actions:
     - action: Open shift details
       result: Opens the shift in the Shift Directory with movements and approvals; no decision act on this screen.
@@ -6399,14 +6731,21 @@ screens:
       expected: Acceptance is refused on the till; the row stays waiting until another supervisor accepts.
       source: contracts/spine/shift.yaml#acceptShiftVariance
     - case: The cashier left with the variance unaccepted and no supervisor present
-      expected: The row stays waiting with its age shown; the fallback is an open client decision.
-      source: DI-805 | TRACKER 30-Sep/Tracker row 30 | TRACKER Workshops/Client Inputs row 59
+      expected: The cashier signs out and the shift is pending ("Under review" on the cashier's view); the next cashier can
+        open a shift. The row stays waiting with its age until a supervisor resolves it, and the daily cash reconciliation
+        lists it.
+      source: DI-805 | TRACKER 30-Sep/Tracker row 30 | TRACKER Workshops/Client Inputs row 59 | decided 2 October 2026 by
+        Chinmay (CHG-NOTE-004)
     - case: Month-end with a shift still waiting
       expected: Shown as a period-close blocker with the till and supervisor to chase.
       source: F13 step 1
     - case: 3-decimal currency venue (BHD/KWD)
       expected: All amounts at 3 decimals, never rounded.
       source: DI-306
+    - case: The supervisor does not accept the variance
+      expected: 'The supervisor asks for a recount (reject): the cashier counts blind again and resubmits through submitShiftCount;
+        every count is kept and the latest is measured (DI-804).'
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     consistency:
     - with: POS-007
       note: The till's close screen is where the variance is accepted; its wording for the variance must match this list.
@@ -6441,18 +6780,24 @@ screens:
 
         '
       source: R080 | contracts/spine/shift.yaml#acceptShiftVariance | POSV2-3
+      status: fixed
+      by: CHG-WIR-008
     - what: 'Bulk-attached till and lifecycle operations: Approve shift open, Close shift, Create cash movement, Open shift,
         Record no sale, Reopen shift, Resume shift, Suspend shift, getCurrentShift.
 
         '
       why: None serves "see the tills waiting for a variance"; they belong to POS-001/POS-007/POS-013/POS-020 and BO-039.
       source: R254 | screens/P08-venue-back-office.yaml#BO-040
+      status: fixed
+      by: CHG-WIR-008
     - what: Name "Variance Approval" and purpose "Accept or refuse a till that did not balance".
       why: 'Nothing is approved here and the contract has no refuse (acceptShiftVariance only). Rename e.g. "Till Variances"
         with purpose "See which tills are waiting for a variance to be accepted, and which were".
 
         '
       source: R080 | contracts/spine/shift.yaml#acceptShiftVariance
+      status: fixed
+      by: CHG-WIR-008
     - what: 'Flow F13 step 2 has the finance controller "clear outstanding shift variances" on BO-040 with acceptShiftVariance.
 
         '
@@ -6461,29 +6806,45 @@ screens:
 
         '
       source: F13 step 2 | R080
+      status: fixed
+      by: CHG-WIR-008
     - what: 'Pattern approvalInbox with columns id, workstationId, venueId, scopePath, currency; text filters "Workstation
         id", "Status"; exits to BO-008 Product Detail; entry state shiftId from session.
 
         '
       why: Plumbing and derived navigation with no meaning for this screen.
       source: R251 | screens/P08-venue-back-office.yaml#BO-040
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-009
+    decisions:
     - question: If no supervisor is available, may the cashier log out with the variance logged for later review?
-      default: No; the row waits until a supervisor accepts at a till (the contract's only path).
-      source: DI-805 | TRACKER 30-Sep/Tracker row 30
+      decision: 'As POS-007: the cashier signs out, the shift is pending (''Under review'') and the next cashier can start.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-173 | CHG-NOTE-004
+      questionSource: DI-805 | TRACKER 30-Sep/Tracker row 30
     - question: Must the variance be accepted on the same till the shift was counted on, or any till at the venue?
-      default: Any till at the venue, with the supervisor's PIN (the contract names the shift, not the device).
-      source: contracts/spine/shift.yaml#acceptShiftVariance
+      decision: 'Drawn default stands (answer: "Any till, with supervisor PIN"): Any till at the venue, with the supervisor''s
+        PIN (the contract names the shift, not the device).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-174 | CHG-NOTE-004
+      questionSource: contracts/spine/shift.yaml#acceptShiftVariance
     - question: 'The client asked that a supervisor can reject a variance so the cashier recounts and resubmits; the contract
         has accept only (reopen is the way back). Is reject needed?
 
         '
-      default: No reject drawn anywhere; a recount goes through Reopen shift on BO-039.
-      source: DI-804 | contracts/spine/shift.yaml#reopenShift
-    - question: Which screen shows the denomination breakdown of the closing count for review (no read returns the count
-        lines)?
-      default: Show totals only here; the itemised count is on the printed closing receipt.
-      source: DI-272 | contracts/spine/shift.yaml#closeShift
+      decision: A supervisor can reject a variance so the cashier recounts and resubmits (DI-804).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-175 | CHG-NOTE-004
+      questionSource: DI-804 | contracts/spine/shift.yaml#reopenShift
+    - question: Which screen shows the denomination breakdown of the closing count for review (no read returns the count lines)?
+      decision: Add a read for the closing count lines (denomination breakdown) for review.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-176 | CHG-NOTE-004
+      questionSource: DI-272 | contracts/spine/shift.yaml#closeShift
   BO-041:
     summary: 'The log of cash that moves in or out of a till without a sale: opening float, cash out (lift), cash in (add),
       safe drops and banking taken from a box, and no-sales. A supervisor or the cash office reads it per shift to see who
@@ -6590,9 +6951,13 @@ screens:
 
         '
       source: F32 step 5 | R254 | contracts/spine/shift.yaml#recordNoSale
+      status: fixed
+      by: CHG-WIR-008
     - what: No read returns no-sales; listCashMovements returns lifts, adds and the float only.
       why: The purpose includes no-sales; they live as NoSaleEvent / Shift.incidents with no list operation bound.
       source: contracts/spine/shift.yaml#listCashMovements | contracts/spine/shift.yaml#recordNoSale
+      status: fixed
+      by: CHG-WIR-008
     - what: listCashMovements is per shift (path shiftId); there is no venue- or day-level movement list.
       why: '"Every cash movement" across tills cannot be shown; the design is shift-first until a venue-level read exists.'
       source: contracts/spine/shift.yaml#listCashMovements
@@ -6605,10 +6970,16 @@ screens:
         '
       why: Plumbing labels and derived navigation; use "Record cash out / cash in" and names.
       source: R251 | screens/P08-venue-back-office.yaml#BO-041
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-009
+    decisions:
     - question: Should a lift or add be recordable from the back office at all, when the cash is at the till?
-      default: Keep it (R276 kept createCashMovement here) as a supervisor entry with a mandatory reason.
-      source: R276 | contracts/spine/shift.yaml#createCashMovement
+      decision: 'Drawn default stands (answer: "Yes: supervisor entry with mandatory reason"): Keep it (R276 kept createCashMovement
+        here) as a supervisor entry with a mandatory reason.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-177 | CHG-NOTE-004
+      questionSource: R276 | contracts/spine/shift.yaml#createCashMovement
   BO-042:
     summary: 'The cash office takes cash out of cashiers'' deposit boxes mid-shift — to the safe or for banking — so a busy
       drawer never holds more than it should. Each withdrawal is a lift that lowers the box''s expected close figure, so
@@ -6627,8 +6998,9 @@ screens:
       rule: Banking, Safe drop (default), Change order, Other; Other makes the note required (max 300).
       source: contracts/spine/shift.yaml#/components/schemas/WithdrawalReason | R222
     - field: Cashier (witness)
-      rule: Prefilled with the box holder and locked; the withdrawal records them as the witness.
-      source: contracts/spine/shift.yaml#withdrawFromDepositBox
+      rule: Prefilled with the box holder; the cashier signs as witness with their PIN on the same device (step-up), and the
+        withdrawal records them as the witness.
+      source: contracts/spine/shift.yaml#withdrawFromDepositBox | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     outputs:
     - element: Boxes holding cash
       rule: 'Cashier, till now (changes during the shift), status (Open, On break), opening float, withdrawn so far, foreign
@@ -6640,6 +7012,10 @@ screens:
     - element: Withdrawal history per box
       rule: Time, amount, reason, taken by, witnessed by, reference; the same rows appear in Cash Movements.
       source: contracts/spine/shift.yaml#withdrawFromDepositBox
+    - element: Over the drawer limit
+      rule: A box above the venue's drawer limit (a setting to be added) is flagged; the till warns the cashier and offers
+        a cash lift.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     actions:
     - action: Bank or safe-drop cash
       result: 'Confirm "Take AED 2,000.00 from Priya Nair''s box (Till 3, Bite & Go) to the safe". Success raises withdrawn-so-far
@@ -6699,17 +7075,25 @@ screens:
         '
       why: The box list is the queue; the rest is plumbing and derived navigation.
       source: R251 | screens/P08-venue-back-office.yaml#BO-042
+      status: fixed
+      by: CHG-WIR-009
     - what: listDepositBoxes requires SHIFT_OPEN.
       why: A cash-office supervisor reading boxes in the back office should not need the permission to open a till shift;
         a permission borrowed from the wrong act.
       source: contracts/spine/shift.yaml#listDepositBoxes | R091
-    openQuestions:
+    decisions:
     - question: How does the cashier sign as witness — PIN step-up on the same device, or named only?
-      default: Named only (the contract takes witnessPrincipalId with no credential); draw the cashier's name, locked.
-      source: contracts/spine/shift.yaml#withdrawFromDepositBox | R144
+      decision: The cashier signs as witness with a PIN on the same device (step-up).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-178 | CHG-NOTE-004
+      questionSource: contracts/spine/shift.yaml#withdrawFromDepositBox | R144
     - question: Where is the drawer ceiling configured, so the screen can flag boxes over it?
-      default: No flag drawn; no contract field exists for the configurable cash-drawer limit.
-      source: DI-274 | F73 step 3
+      decision: 'Drawer limit setting: the till warns when the drawer is over the limit and offers a cash lift.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-179 | CHG-NOTE-004
+      questionSource: DI-274 | F73 step 3
   BO-044:
     summary: 'The outlet register: every F&B outlet (and, under the retail licence, every shop) at the venue, whether it
       is trading now, and the outlet''s own configuration — name, code, kind, zone, stock location, cost centre, opening
@@ -6720,9 +7104,10 @@ screens:
       '
     inputs:
     - field: Code and name
-      rule: Code unique within the venue (max 64; 409 "Code already in use"); name max 200. Kind is fixed after creation
-        (no edit field).
-      source: contracts/spine/tenancy.yaml#createOutlet | contracts/spine/tenancy.yaml#updateOutlet
+      rule: Code unique within the venue (max 64; 409 "Code already in use"); name max 200. Kind is fixed after creation (no
+        edit field). The name is in English, plus the local-language name where the country requires it (Arabic in the UAE).
+      source: contracts/spine/tenancy.yaml#createOutlet | contracts/spine/tenancy.yaml#updateOutlet | decided 2 October 2026
+        by Chinmay (CHG-NOTE-004)
     - field: Kind
       rule: 'Under F&B: Restaurant, Bar, Café, Kiosk, Mobile. Under retail: Shop. Game floor and ticket office are not offered
         here.
@@ -6773,8 +7158,8 @@ screens:
       source: contracts/satellite/fnb.yaml#signCorrectiveAction | F28 step 6
     edgeCases:
     - case: Outlet made inactive while orders are live
-      expected: Not specified by the contract — see open question; the guest dining list stops showing it.
-      source: contracts/satellite/fnb.yaml#listDiningOutlets
+      expected: Allowed, with a warning that names the live orders; the guest dining list stops showing the outlet.
+      source: contracts/satellite/fnb.yaml#listDiningOutlets | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     - case: Food-safety escalation with no food-safety lead set
       expected: Refused "no food-safety lead"; link to Venue Configuration where the lead is set.
       source: contracts/spine/tenancy.yaml#getVenueSettings | R096
@@ -6822,6 +7207,8 @@ screens:
 
         '
       source: R254 | R236 | R215 | screens/P08-venue-back-office.yaml#BO-044
+      status: fixed
+      by: CHG-WIR-008
     - what: Text fields "Venue id" and "Kind"; columns id, venueId, stockLocationId, costCenterId.
       why: Plumbing; venue comes from the session, stock location and cost centre are names.
       source: screens/P08-venue-back-office.yaml#BO-044
@@ -6839,16 +7226,25 @@ screens:
         this pair.
       why: Two outlet registers will be built unless one is merged into the other.
       source: R276 | DI-319
-    openQuestions:
+    decisions:
     - question: Are outlet names bilingual (English and Arabic)?
-      default: One name field, as the contract has.
-      source: contracts/spine/tenancy.yaml#/components/schemas/Outlet | DI-210
+      decision: 'Outlet names: English, plus the local language where the country requires it.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-031 | CHG-NOTE-004
+      questionSource: contracts/spine/tenancy.yaml#/components/schemas/Outlet | DI-210
     - question: Can an outlet be deactivated while it has live orders?
-      default: Allow with a warning naming the live orders.
-      source: designer default
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Allow with a warning naming the live orders.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-032 | CHG-NOTE-004
+      questionSource: designer default
     - question: Homogeneous venue-owned outlets set up once centrally — via templates or a bulk edit?
-      default: Via outlet templates (BO-730).
-      source: DI-330
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Via outlet templates (BO-730).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-033 | CHG-NOTE-004
+      questionSource: DI-330
   BO-045:
     summary: 'The F&B manager''s home for one outlet''s menus: which menus the outlet has, what is live, what is a draft,
       what is scheduled, and the history a refund dispute asks about ("what were we charging at noon"). From here the manager
@@ -6921,6 +7317,11 @@ screens:
       rule: In the venue currency with its own scale (AED 46.00; BHD and KWD to 3 decimals, never rounded). Bulk repricing
         previews show old and new price side by side.
       source: DI-306 | contracts/satellite/fnb.yaml#applyMenuActions
+    - element: Who owns the price
+      rule: 'F&B owns its prices: the F&B service has its own catalogue table (prices were migrated into F&B so ticketing
+        scales on its own), so the menu item''s price is F&B''s price, and an outlet may set its own. The central catalogue
+        prices tickets and single-price booths only; never draw a central catalogue price beside the menu price.'
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     actions:
     - action: Create menu
       result: Creates the menu for the chosen outlet with no sections. It reaches tills and guest menus only after it is
@@ -7032,17 +7433,25 @@ screens:
         now exists (it names BO-045 and BO-111) and is not declared on the screen.
       why: Without it the panel only ever shows a manual re-check, which undoes R241's automatic check.
       source: contracts/satellite/fnb.yaml#getAllergenVerification | R241
+      status: fixed
+      by: CHG-WIR-008
     - what: listMenuVersions and listMenuSchedules are not declared on BO-045.
       why: Rollback needs the version list to pick from and cancelling a schedule needs the pending list; F31 steps 4 and
         7 cannot be drawn without them. Both were added 26 September for exactly this.
       source: contracts/satellite/fnb.yaml#listMenuVersions | contracts/satellite/fnb.yaml#listMenuSchedules | F31 step
         7
+      status: fixed
+      by: CHG-WIR-008
     - what: listModifierGroups is not declared, only createModifierGroup and attachModifierGroup.
       why: Attaching an existing group (the reusable "cooked how" on nine steaks) needs the list of groups to choose from.
       source: contracts/satellite/fnb.yaml#attachModifierGroup | contracts/satellite/fnb.yaml#listModifierGroups
+      status: fixed
+      by: CHG-WIR-008
     - what: The approval path for a repricing above threshold (createApprovalRequest) is not on the screen.
       why: F31 branch at 2 requires it before publish, and the client's FNB-2J draws per-change approval state.
       source: F31 step 2 | screens/P08-venue-back-office.yaml#BO-045
+      status: fixed
+      by: CHG-WIR-008
     - what: BO-045 and BO-109 overlap. Both list menus, both save menu sections, and both point at the same client frame
         fnb-2b; BO-045 sits under the F&B hub (BO-104) and BO-109 under Sell (BO-102).
       why: Two screens editing the same section order from two hubs is the one-screen-per-concept pattern the client asked
@@ -7050,21 +7459,34 @@ screens:
         verdicts; frames fnb-2a, 2e, 2j, 2k); BO-109 is the arranging canvas opened from a menu ("Open in builder"), with
         no menu list of its own and one hub entry.
       source: DI-671 | DI-987 | DI-474 | screens/P08-venue-back-office.yaml#BO-109
-    openQuestions:
+    decisions:
     - question: Where is an F&B price owned? MenuItem.price says pricing and tax come from the catalogue variant ("a menu
-        is a presentation of the catalogue"), yet applyMenuActions reprices menu items and FNB-2J shows price changes as
-        menu changes.
-      default: Draw repricing on the menu (with preview), and show the catalogue price beside it read-only until decided.
-      source: contracts/satellite/fnb.yaml#/components/schemas/MenuItem | contracts/satellite/fnb.yaml#applyMenuActions
+        is a presentation of the catalogue"), yet applyMenuActions reprices menu items and FNB-2J shows price changes as menu
+        changes.
+      decision: 'F&B prices are owned by F&B: the F&B service has its own catalogue table (prices migrated into F&B so ticketing
+        scales in isolation); an outlet may set its own price. The central catalogue prices tickets and single-price booths.
+        Fix the stale MenuItem text (''pricing and tax come from the catalogue variant''); withdraw the F&B notes'' correction
+        asking to drop the menu''s own price; check BO-045 and the F&B screens read F&B''s catalogue.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-034 | CHG-NOTE-004
+      questionSource: contracts/satellite/fnb.yaml#/components/schemas/MenuItem | contracts/satellite/fnb.yaml#applyMenuActions
     - question: R197 names menu publish and rollback as escalated actions, but publishMenu and rollbackMenu carry no escalated
         permission. Is the escalation dropped (R197's "no threshold makes sense") or still owed?
-      default: Draw Publish and Roll back for anyone with menu-configure rights, behind the approval path of F31 branch
-        at 2.
-      source: R197 | contracts/satellite/fnb.yaml#publishMenu
-    - question: Can a scheduled publish take a time of day? The contract fixes local midnight; the client's FNB-2J frame
-        shows "Tomorrow at 06:00".
-      default: Date only, local midnight, as the contract says.
-      source: contracts/satellite/fnb.yaml#scheduleMenuPublish | screens/P08-venue-back-office.yaml#BO-045
+      decision: 'Not answered by Chinmay: the workbook cell repeats the superseded first BO-045 price answer. The question
+        (R197 escalation of menu publish/rollback) takes its drawn default.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-035 | CHG-NOTE-004
+      questionSource: R197 | contracts/satellite/fnb.yaml#publishMenu
+    - question: Can a scheduled publish take a time of day? The contract fixes local midnight; the client's FNB-2J frame shows
+        "Tomorrow at 06:00".
+      decision: 'Not answered by Chinmay: the workbook cell repeats the superseded first BO-045 price answer. The question
+        (scheduled menu publish time of day) takes its drawn default.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-036 | CHG-NOTE-004
+      questionSource: contracts/satellite/fnb.yaml#scheduleMenuPublish | screens/P08-venue-back-office.yaml#BO-045
   BO-046:
     summary: 'The back-office view of the kitchen rail: a manager or F&B supervisor watching one outlet''s tickets from
       a desk, not the screen at the pass (that is P15). It is for seeing what is late and for owning a queue jump (prioritise,
@@ -7167,6 +7589,8 @@ screens:
       why: Configuration lives on BO-134 (and BO-135); a desk view of the rail that also rewrites routing is the bulk-attachment
         R254 removes.
       source: R254 | screens/P08-venue-back-office.yaml#BO-134
+      status: fixed
+      by: CHG-WIR-008
     - what: '"Save kitchen ticket status" is a modal collecting a status from all six values plus "recordedAt" and a station
         id.'
       why: Only four moves are allowed (received to preparing, preparing to ready, ready to recalled, recalled to preparing);
@@ -7186,12 +7610,16 @@ screens:
       why: Three rail views for one manager is what DI-671 asks to consolidate; propose folding BO-046 into BO-020 as its
         "Kitchen rail" tab.
       source: DI-671 | DI-987 | screens/P15-kitchen-display.yaml#KIT-001
-    openQuestions:
+    decisions:
     - question: Does the back office advance tickets at all, or only watch and prioritise? And with Allam's position that
         Softlabs need only an integration point to an existing KDS (DI-077) against the full P15 app, is a back-office rail
         view needed in r1?
-      default: Draw read-only rail plus Prioritise; no status moves from the back office.
-      source: DI-077 | contracts/satellite/fnb.yaml#listKitchenTickets
+      decision: 'Drawn default stands (answer: "Watch + prioritise only"): Draw read-only rail plus Prioritise; no status
+        moves from the back office.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-180 | CHG-NOTE-004
+      questionSource: DI-077 | contracts/satellite/fnb.yaml#listKitchenTickets
   BO-048:
     summary: 'Retail Products is where a venue manager sets up what each shop sells. A merchandise item links a catalogue
       variant (which carries the price and VAT) to an outlet and to the inventory item that a sale depletes. The one thing
@@ -7328,6 +7756,8 @@ screens:
 
         '
       source: contracts/satellite/retail.yaml#lookupMerchandise
+      status: fixed
+      by: CHG-WIR-008
     - what: 'A barcode exists in three places: the catalogue variant (updateProductVariant), the merchandise item and the
         inventory item.
 
@@ -7338,6 +7768,8 @@ screens:
         '
       source: DI-354 | contracts/spine/catalogue.yaml#updateProductVariant | contracts/satellite/retail.yaml#lookupMerchandise
         | contracts/satellite/inventory.yaml#/components/schemas/CreateInventoryItemRequest
+      status: fixed
+      by: CHG-WIR-008
     - what: 'The flow transition to GST-026 ("Guest tracks it in the app") and the F17 shop-and-drop steps are attached
         to this configuration screen.
 
@@ -7347,17 +7779,25 @@ screens:
 
         '
       source: F17 step 3 | F17 step 5 | R251
-    openQuestions:
+    decisions:
     - question: 'Should a merchandise item require a stock link? Sales are gated on system stock per venue, and an unlinked
         item cannot be gated.
 
         '
-      default: Draw the stock item as required, with an explicit "Not stock-tracked" escape and a warning.
-      source: DI-294 | contracts/satellite/retail.yaml#createMerchandise
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw the stock item as required, with an
+        explicit "Not stock-tracked" escape and a warning.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-037 | CHG-NOTE-004
+      questionSource: DI-294 | contracts/satellite/retail.yaml#createMerchandise
     - question: The client asked for a product command centre (products per store, top sellers, by category). Which reads
         feed it?
-      default: No KPI tiles on this screen until a summary read exists.
-      source: DI-353 | R283
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): No KPI tiles on this screen until a summary
+        read exists.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-038 | CHG-NOTE-004
+      questionSource: DI-353 | R283
   BO-049:
     summary: 'Stock Levels answers "what is on the shelf, and where" for one venue: on hand, allocated and available, by
       item and by stock location, valued where the user may see value. It is the storekeeper''s start screen (F92 step 1)
@@ -7516,6 +7956,8 @@ screens:
 
         '
       source: R254 | R110 | contracts/satellite/fnb.yaml#setItemAvailability
+      status: fixed
+      by: CHG-WIR-008
     - what: '"No results" is declared as never shown because the location list takes no filter.'
       why: 'Stock positions do take filters (location, item, include zero), so a filter that matches nothing is a real state.
 
@@ -7527,19 +7969,28 @@ screens:
 
         '
       source: designer default
-    openQuestions:
+    decisions:
     - question: 'The client''s command centre asks for "low-stock / critical / out-of-stock". The contract has only "below
         reorder point" and zero. What makes an item "critical"?
 
         '
-      default: Draw two flags, "Below reorder point" and "Out of stock". No "Critical" badge until it is defined.
-      source: DI-340
+      decision: 'Drawn default accepted: Draw two flags, "Below reorder point" and "Out of stock". No "Critical" badge until
+        it is defined.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-284 | CHG-NOTE-004
+      reviewable: true
+      questionSource: DI-340
     - question: 'Does Allocated include merchandise held for collection and online orders awaiting pickup or shipment, or
         only inventory stock reservations?
 
         '
-      default: Draw Allocated as one number, with a tooltip "Reserved for orders and collections".
-      source: DI-361 | R171 | contracts/satellite/retail.yaml#reserveMerchandise
+      decision: 'Drawn default accepted: Draw Allocated as one number, with a tooltip "Reserved for orders and collections".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-285 | CHG-NOTE-004
+      reviewable: true
+      questionSource: DI-361 | R171 | contracts/satellite/retail.yaml#reserveMerchandise
   BO-050:
     summary: 'Stock Position & Valuation is the finance-facing view of stock: what the venue''s stock is worth on a date,
       by location and by category, under each item''s costing method (weighted average or FIFO). It is read-only. The one
@@ -7628,13 +8079,18 @@ screens:
         '
       why: Department is not a valuation dimension in the contract.
       source: DI-342 | contracts/satellite/inventory.yaml#/components/schemas/StockValuation
-    openQuestions:
+    decisions:
     - question: 'Item costing offers four methods (weighted average, FIFO, standard cost, last purchase price). The workshop
         agreed weighted average and FIFO. Should the other two be offered?
 
         '
-      default: The note names weighted average and FIFO only. The item form (BO-081) offers those two.
-      source: DI-344 | MATRIX 4.5.35
+      decision: 'Drawn default accepted: The note names weighted average and FIFO only. The item form (BO-081) offers those
+        two.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-286 | CHG-NOTE-004
+      reviewable: true
+      questionSource: DI-344 | MATRIX 4.5.35
   BO-051:
     summary: 'Purchase Orders is where the buyer turns an approved requisition and its chosen quotation into an order, sends
       it, records the supplier''s acknowledgement, and later cancels it or closes it short. The one thing to get right is
@@ -7825,16 +8281,25 @@ screens:
     - what: The filters are text fields "Status" and "Supplier id". The list shows approvalRequestId as a column.
       why: These leak plumbing. Use status chips, a supplier picker and a "Pending approval" badge.
       source: screens/P08-venue-back-office.yaml#BO-051
-    openQuestions:
+    decisions:
     - question: 'How does "Send to supplier" reach the supplier: an emailed PDF from TICVAI, or a status change after the
         buyer sends it themselves?
 
         '
-      default: Draw "Send" as emailing a PDF to the supplier's contact email, with a "Download PDF" secondary action.
-      source: contracts/satellite/inventory.yaml#sendPurchaseOrder
+      decision: 'Drawn default accepted: Draw "Send" as emailing a PDF to the supplier''s contact email, with a "Download
+        PDF" secondary action.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-287 | CHG-NOTE-004
+      reviewable: true
+      questionSource: contracts/satellite/inventory.yaml#sendPurchaseOrder
     - question: Is the proposed PO number format PO-<venue code>-<six-digit sequence> accepted?
-      default: Use PO-AQP-000214 in all mock-ups.
-      source: R171
+      decision: 'Drawn default accepted: Use PO-AQP-000214 in all mock-ups.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-288 | CHG-NOTE-004
+      reviewable: true
+      questionSource: R171
   BO-052:
     summary: 'Goods Receipt is where the storekeeper books in what actually arrived against a purchase order. Partial deliveries
       are normal. Batch and expiry are captured per line. Over-delivery beyond the tolerance is refused, and damaged or
@@ -7951,6 +8416,8 @@ screens:
 
         '
       source: R254 | F76 step 5 | F92 step 5 | screens/P08-venue-back-office.yaml#BO-051
+      status: fixed
+      by: CHG-WIR-008
     - what: 'F35 step 4 receives the remainder of a stock transfer with createGoodsReceipt. F15 branch at 4 answers a short
         delivery with closeTransferShort.
 
@@ -7960,6 +8427,8 @@ screens:
 
         '
       source: F35 step 4 | F15 step 4 | contracts/satellite/inventory.yaml#receiveStockTransfer
+      status: fixed
+      by: CHG-WIR-008
     - what: The rejection reasons are a fixed list.
       why: The client asked for a user-defined reason list that can be extended in the backend without development.
       source: DI-363 | contracts/satellite/inventory.yaml#rejectReceivedGoods
@@ -7967,10 +8436,14 @@ screens:
         journal id).
       why: These leak plumbing.
       source: screens/P08-venue-back-office.yaml#BO-052
-    openQuestions:
+    decisions:
     - question: Is the over-receipt tolerance of 5% accepted as the tenant default?
-      default: Show "Up to <outstanding + 5%>".
-      source: R094
+      decision: 'Drawn default accepted: Show "Up to <outstanding + 5%>".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-289 | CHG-NOTE-004
+      reviewable: true
+      questionSource: R094
   BO-065:
     summary: 'The venue''s own settings, which everything at the venue inherits: the configured limits (cart hold, resale/exchange/reschedule
       cut-offs, shift variance threshold, F&B recall window and comp escalation, food-safety lead, stock-count tolerances…),
@@ -8103,6 +8576,8 @@ screens:
         '
       why: Not venue configuration; outlets are configured on BO-044. Bulk attach.
       source: R254 | contracts/satellite/fnb.yaml#listDiningOutlets
+      status: fixed
+      by: CHG-WIR-008
     - what: 'Only guest two-step is laid out; the venue-settings modal lists 18 raw property names with "nothing required",
         although they are the screen''s whole purpose.
 
@@ -8119,16 +8594,23 @@ screens:
     - what: Exit to BO-008 Product Detail & Variants; module "Orders & Money".
       why: Derived navigation with no meaning; venue configuration belongs with the venue settings, not orders.
       source: R251 | screens/P08-venue-back-office.yaml#BO-065
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-009
+    decisions:
     - question: Is the trading day configurable (midnight-to-midnight or 6am-to-6am)?
-      default: 'Draw "Calendar day starts at 06:00" (calendarDayStartHour) as the calendar view setting only, and do not
-        label it as the trading/business day.
-
-        '
-      source: DI-149 | contracts/spine/tenancy.yaml#/components/schemas/VenueSettings
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw "Calendar day starts at 06:00" (calendarDayStartHour)
+        as the calendar view setting only, and do not label it as the trading/business day.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-039 | CHG-NOTE-004
+      questionSource: DI-149 | contracts/spine/tenancy.yaml#/components/schemas/VenueSettings
     - question: Who may read venue settings — TENANT_VIEW, or a dedicated read permission?
-      default: Read-only view for anyone who can open the screen; edit with the configure permission.
-      source: R091
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Read-only view for anyone who can open the
+        screen; edit with the configure permission.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-040 | CHG-NOTE-004
+      questionSource: R091
   BO-078:
     summary: 'Requisitions is the purchase request: a department asks to buy, its head approves, returns or rejects it,
       quotations are compared, and the approved request becomes a purchase order. It serves two people: the requester (raise,
@@ -8298,14 +8780,22 @@ screens:
 
         '
       source: screens/P08-venue-back-office.yaml#BO-078 | R251
-    openQuestions:
+    decisions:
     - question: Should internal replenishment (outlet from warehouse, store to store) go through requisitions with approval,
         or through transfers with an approval step?
-      default: Draw supplier purchase only. Mark internal replenishment as pending.
-      source: DI-341 | DI-362
+      decision: 'Drawn default accepted: Draw supplier purchase only. Mark internal replenishment as pending.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-290 | CHG-NOTE-004
+      reviewable: true
+      questionSource: DI-341 | DI-362
     - question: What is the requisition number format?
-      default: REQ-<venue code>-<six-digit sequence>, as an example only.
-      source: R152
+      decision: 'Drawn default accepted: REQ-<venue code>-<six-digit sequence>, as an example only.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-291 | CHG-NOTE-004
+      reviewable: true
+      questionSource: R152
   BO-079:
     summary: 'Stock Count is the supervisor''s side of counting: start a full, cycle or spot count at a location, watch
       progress, review the variance once counting is submitted, send lines back for recount, and post. Counting itself mostly
@@ -8461,13 +8951,21 @@ screens:
         '
       why: First run should offer "Start count". Filters are pickers.
       source: screens/P08-venue-back-office.yaml#BO-079
-    openQuestions:
+    decisions:
     - question: Which counting API is the build target, the inventory one or the F&B one?
-      default: Draw per-line entry and per-line recount (F30), with the supervisor PIN on recount.
-      source: R144 | F30 step 4
+      decision: 'Drawn default accepted: Draw per-line entry and per-line recount (F30), with the supervisor PIN on recount.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-292 | CHG-NOTE-004
+      reviewable: true
+      questionSource: R144 | F30 step 4
     - question: Are a 2% line tolerance and an AED 1,000.00 posting approval amount accepted?
-      default: Use them in mock-ups.
-      source: R094
+      decision: 'Drawn default accepted: Use them in mock-ups.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-293 | CHG-NOTE-004
+      reviewable: true
+      questionSource: R094
   BO-080:
     summary: 'Stock Transfers moves stock between any two stock locations: outlet to outlet, warehouse to outlet, outlet
       to warehouse, and between venues. It shows both outbound and inbound transfers for the venue. Dispatch takes stock
@@ -8590,19 +9088,29 @@ screens:
 
         '
       source: R254 | contracts/satellite/inventory.yaml#createGoodsReceipt
+      status: fixed
+      by: CHG-WIR-008
     - what: The table shows fromVenueId, toVenueId and scopePath columns, and the status filter is a text field.
       why: These leak plumbing. Show venue names and a direction badge.
       source: screens/P08-venue-back-office.yaml#BO-080
-    openQuestions:
+    decisions:
     - question: 'Closing a transfer short with a supervisor PIN (rather than an approval request) was proposed by the coordinator.
         The R144 decision did not name this act.
 
         '
-      default: Draw the supervisor PIN on the same device.
-      source: R144 | contracts/satellite/inventory.yaml#closeTransferShort
+      decision: 'Drawn default accepted: Draw the supervisor PIN on the same device.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-294 | CHG-NOTE-004
+      reviewable: true
+      questionSource: R144 | contracts/satellite/inventory.yaml#closeTransferShort
     - question: What is the transfer number format?
-      default: TRF-<venue code>-<six-digit sequence>, as an example only.
-      source: R152
+      decision: 'Drawn default accepted: TRF-<venue code>-<six-digit sequence>, as an example only.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-295 | CHG-NOTE-004
+      reviewable: true
+      questionSource: R152
   BO-081:
     summary: 'Inventory Items is the item master: what the venue stocks, in which unit, how it is bought, how it is costed,
       when it needs reordering, and where it can be held (the location hierarchy). The one thing to get right is which fields
@@ -8775,10 +9283,13 @@ screens:
         '
       why: The venue comes from the session. Locations belong on their own tab as a tree.
       source: screens/P08-venue-back-office.yaml#BO-081
-    openQuestions:
+    decisions:
     - question: Offer only weighted average and FIFO (agreed), or also standard cost and last purchase price (in the contract)?
-      default: Two options.
-      source: DI-344 | MATRIX 4.5.35
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Two options.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-041 | CHG-NOTE-004
+      questionSource: DI-344 | MATRIX 4.5.35
   BO-082:
     summary: 'Stock Movements is the ledger. Every change to stock is a movement with a kind, a reason, a person and a source:
       receipts, sales, transfers, counts, waste, adjustments. On hand is derived from it. It is also where a manager records
@@ -8892,6 +9403,8 @@ screens:
 
         '
       source: R254 | F35 step 7
+      status: fixed
+      by: CHG-WIR-008
     - what: 'F34 step 8 dispositions a returned item here with a manual movement. The retail return already restocks or
         writes off by condition.
 
@@ -9007,6 +9520,8 @@ screens:
     - what: Navigation exits to Stock Count and Stock Transfers.
       why: Inferred edges with no purpose. Navigation is re-derived from purpose.
       source: R251 | screens/P08-venue-back-office.yaml#BO-083
+      status: fixed
+      by: CHG-WIR-009
   BO-104:
     summary: 'The Food & Beverage section landing in the back office: today''s takings at the top, cards into every F&B
       screen (orders, order search, menus, kitchen display, stations, routing, global settings, outlets, outlet set-up)
@@ -9020,12 +9535,9 @@ screens:
       source: screens/P08-venue-back-office.yaml#BO-104
     outputs:
     - element: KPI tiles
-      rule: 'Takings today with movement against the previous period, and admissions today, from the seeded KPIs; period
-        is today in the venue time zone. Takings is gross payments less refunds for the whole venue — label it "Venue takings
-        today" unless an F&B-scoped figure is decided.
-
-        '
-      source: R283 | contracts/satellite/reporting.yaml#getKpiValues | DI-041
+      rule: F&B takings today (the F&B outlets only), with movement against the previous period, from the seeded KPIs; the
+        period is today in the venue time zone. Admissions are not on the F&B hub.
+      source: R283 | contracts/satellite/reporting.yaml#getKpiValues | DI-041 | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     - element: Section cards
       rule: 'F&B Order Management, Order Search, Menu Management, Kitchen Display, Kitchen & Preparation Stations, Order
         Routing & KDS/Printer Rules, F&B Global Settings & Controls, F&B Outlets. No counts on the cards.
@@ -9051,12 +9563,9 @@ screens:
       note: The client pack's F&B Command Center is a second F&B landing; one must link to the other.
     sampleData:
       tiles:
-      - name: Venue takings today
-        value: AED 186,420.00
-        delta: +6.2% vs yesterday
-      - name: Admissions today
-        value: 4,812
-        delta: +3.1%
+      - name: F&B takings today
+        value: AED 48,960.00
+        delta: +4.8% vs yesterday
       cards:
       - F&B Order Management
       - Order Search
@@ -9073,23 +9582,34 @@ screens:
         '
       why: Plumbing and menu management on a hub; menus belong to BO-045.
       source: screens/P08-venue-back-office.yaml#BO-104 | R283
+      status: fixed
+      by: CHG-WIR-008
     - what: getVenueSettings is declared with purpose "What is enabled here".
       why: The contract says VenueSettings carries no module enablement (R279); the hub cannot learn licensed modules from
         it.
       source: contracts/spine/tenancy.yaml#getVenueSettings
+      status: fixed
+      by: CHG-WIR-008
     - what: requiresModule core on the F&B hub.
       why: F&B is an optional licensed module; a tenant without it should not see an F&B hub.
       source: DI-505 | screens/P08-venue-back-office.yaml#BO-104
     - what: No way to F&B Outlets (BO-044, reached only from Venue Operations) or the pack's outlet set-up screens (BO-727–BO-733).
       why: Outlet configuration is the first F&B task (DI-330) and is unreachable from the F&B section.
       source: R251 | screens/P08-venue-back-office.yaml#BO-044
-    openQuestions:
+    decisions:
     - question: Should the F&B hub show F&B takings rather than venue takings, and drop admissions?
-      default: Keep the R283 pair, labelled as venue figures.
-      source: R283 | DI-318
+      decision: The F&B hub shows F&B takings; admissions are dropped from it.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-181 | CHG-NOTE-004
+      questionSource: R283 | DI-318
     - question: Is BO-104 or BO-727 (F&B Command Center) the F&B landing?
-      default: BO-104 is the section hub; BO-727 is a card on it.
-      source: DI-400
+      decision: 'Drawn default stands (answer: "BO-104 is the landing hub; BO-727 is a card on it"): BO-104 is the section
+        hub; BO-727 is a card on it.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-182 | CHG-NOTE-004
+      questionSource: DI-400
   BO-105:
     summary: 'The Stock & Supply landing page in Venue Management. It is a hub: one card per stock and procurement screen,
       the two seeded KPI tiles, and nothing else. The one thing to get right is that it stays a launcher. It must not become
@@ -9160,6 +9680,8 @@ screens:
 
         '
       source: R254 | R283 | screens/P08-venue-back-office.yaml#BO-105
+      status: fixed
+      by: CHG-WIR-008
     - what: 'The hub declares getVenueSettings for "What is enabled here". The contract says it carries no module enablement
         and no retail setting.
 
@@ -9169,6 +9691,8 @@ screens:
 
         '
       source: contracts/spine/tenancy.yaml#getVenueSettings
+      status: fixed
+      by: CHG-WIR-008
   BO-109:
     summary: 'The arranging canvas for one outlet''s menu draft: sections on the left, the till grid in the middle, button
       properties on the right - what is arranged here is exactly what the cashier taps on the counter till (FNB-2B). The
@@ -9192,6 +9716,10 @@ screens:
         and "prompt modifiers" for items with required choices. Tile kinds are an item, a category jump, an action (system
         function) or a spacer.
       source: DI-326 | DI-157 | contracts/spine/tenancy.yaml#/components/schemas/SaleBoard
+    - field: Layout scope
+      rule: One layout per outlet; a till may override it (Workstation.saleBoard), and the editor says which tills use an
+        override.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     outputs:
     - element: Till preview
       rule: Renders the tiles as POS-021 does - name, price in the venue currency, image when on, an "86" overlay on unavailable
@@ -9277,6 +9805,8 @@ screens:
     - what: emptyFirstRun says the screen offers no create action, yet createSaleBoard exists (on BO-124).
       why: An outlet with no board yet cannot start from the builder.
       source: contracts/spine/tenancy.yaml#createSaleBoard | screens/P08-venue-back-office.yaml#BO-124
+      status: fixed
+      by: CHG-WIR-008
     - what: Overlap with BO-045 (shared frame fnb-2b, both set sections) and with BO-124/BO-125 (the same sale-board update
         on seven screens).
       why: Consolidate - BO-109 as the canvas opened from BO-045, sharing one designer with BO-124/BO-125.
@@ -9284,15 +9814,24 @@ screens:
     - what: Purpose is a placeholder ("from the client design board, 20 August").
       why: Write the purpose - arrange one outlet's menu and till grid for the next publish.
       source: screens/P08-venue-back-office.yaml#BO-109
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-010
+    decisions:
     - question: Is the till layout per outlet (DI-326) or per workstation (Workstation.saleBoard binds a board to a till,
         MATRIX 2.1.9)? Can two tills in one outlet differ?
-      default: One layout per outlet, every till of the outlet uses it.
-      source: DI-326 | MATRIX 2.1.9
+      decision: Till layout per outlet, with a till override (Workstation.saleBoard).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-183 | CHG-NOTE-004
+      questionSource: DI-326 | MATRIX 2.1.9
     - question: Which system functions may be placed on an F&B till grid (DI-157 lists ticket list, reservation list, transaction
         list, media lookup)?
-      default: Recall held sale, Table map, Order list as action tiles; no ticketing functions on an F&B grid.
-      source: DI-157
+      decision: 'Drawn default stands (answer: "F&B functions only"): Recall held sale, Table map, Order list as action tiles;
+        no ticketing functions on an F&B grid.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-184 | CHG-NOTE-004
+      questionSource: DI-157
   BO-110:
     summary: 'One dish''s recipe and bill of materials: the ingredient lines (inventory item, quantity, unit, optional),
       the yield, and the computed plate cost, with the selling price and food-cost percentage beside it. The recipe is what
@@ -9390,11 +9929,15 @@ screens:
     - what: BO-110 and BO-111 both save the recipe (setRecipe) as separate screens under Sell.
       why: One dish's recipe, substitutions and allergens are one editing job; merge as tabs (Recipe | Substitutions & allergens).
       source: DI-987 | DI-474 | screens/P08-venue-back-office.yaml#BO-111
-    openQuestions:
-    - question: How is a sub-recipe (Burger Sauce SUB-0071) modelled - as an inventory item produced by a production run
-        and used as an ingredient line?
-      default: Draw sub-recipes as ingredient lines with a "sub-recipe" tag that links to their own recipe.
-      source: screens/P08-venue-back-office.yaml#BO-110 | contracts/satellite/fnb.yaml#planProductionRun
+    decisions:
+    - question: How is a sub-recipe (Burger Sauce SUB-0071) modelled - as an inventory item produced by a production run and
+        used as an ingredient line?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw sub-recipes as ingredient lines with
+        a "sub-recipe" tag that links to their own recipe.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-044 | CHG-NOTE-004
+      questionSource: screens/P08-venue-back-office.yaml#BO-110 | contracts/satellite/fnb.yaml#planProductionRun
   BO-111:
     summary: 'For one dish, what is actually in it against what its label claims: allergens derived from the recipe lines,
       the approved substitutions for that recipe and the modifier groups, plus nutrition. The server re-checks the claim
@@ -9493,9 +10036,13 @@ screens:
       why: updateMenu has nothing to do with allergens (attached by name, R254); recipe editing belongs to BO-110; cost
         is computed.
       source: R254 | R125 | screens/P08-venue-back-office.yaml#BO-111
+      status: fixed
+      by: CHG-WIR-008
     - what: The "Last allergen verdict" note says no read exists; getAllergenVerification exists and names BO-111.
       why: Wire it so the panel shows the automatic verdict (R241).
       source: contracts/satellite/fnb.yaml#getAllergenVerification
+      status: fixed
+      by: CHG-WIR-008
     - what: '"Nutrition" is in the name but no operation writes nutrition; the Nutrition and Allergen (contains / may contain)
         schemas are referenced by nothing; MenuItem.allergens is a flat list, so "may contain" from a shared fryer cannot
         be declared although the verdict reports shared equipment.'
@@ -9506,13 +10053,23 @@ screens:
       why: It is a per-dish detail screen; the way back is "Back to the menu"; re-verification is automatic after the change
         (R241), not an updateMenu call.
       source: screens/P08-venue-back-office.yaml#BO-111 | F31 step 3 | R241
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-008
+    decisions:
     - question: Who approves an allergen-changing substitution, and where? No approval operation is wired for it.
-      default: Draw "Needs approval - head chef" as a state on the rule with no approve button until decided.
-      source: contracts/satellite/fnb.yaml#/components/schemas/SubstitutionRule | DI-329
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Draw "Needs approval - head chef" as a state
+        on the rule with no approve button until decided.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-045 | CHG-NOTE-004
+      questionSource: contracts/satellite/fnb.yaml#/components/schemas/SubstitutionRule | DI-329
     - question: Is nutrition (per-serving energy, fat, sugar, salt) in the first release?
-      default: Leave a Nutrition section drawn but marked "coming later".
-      source: contracts/satellite/fnb.yaml#/components/schemas/Nutrition
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Leave a Nutrition section drawn but marked
+        "coming later".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-046 | CHG-NOTE-004
+      questionSource: contracts/satellite/fnb.yaml#/components/schemas/Nutrition
   BO-112:
     summary: 'Tomorrow''s prep list: a plan built from the demand forecast through the recipes into quantities per item
       and per station, edited by the chef, then released into production runs grouped by station - one printable prep sheet
@@ -9542,7 +10099,8 @@ screens:
       source: contracts/satellite/ai.yaml#requestSuggestion
     - element: Prep sheet
       rule: One printable sheet per station for the day, listing items, quantities and start times (what releasing produces).
-      source: R125 | screens/P08-venue-back-office.yaml#BO-112
+        Printed from a print template, to the kitchen printer or the browser.
+      source: R125 | screens/P08-venue-back-office.yaml#BO-112 | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     actions:
     - action: Build plan
       result: Creates a draft plan from the forecast for the chosen day and kitchen; nothing is produced or issued.
@@ -9600,6 +10158,8 @@ screens:
         BO-136.
       why: Planning is this screen's job (DI-329 scopes BO-112); move both operations here.
       source: DI-329 | F85 step 1 | screens/P08-venue-back-office.yaml#BO-136
+      status: fixed
+      by: CHG-WIR-008
     - what: No read of plans exists (no list or get of production plans).
       why: A draft plan cannot be reopened, edited or released after the page is left.
       source: contracts/satellite/fnb.yaml#/components/schemas/ProductionPlan
@@ -9610,15 +10170,20 @@ screens:
     - what: The transition to BO-009 (Pricing Rules) cites flow F78 step 3 to 4, but F78 has no BO-112 step.
       why: The navigation edge is invented; remove it.
       source: F78 step 3 | screens/P08-venue-back-office.yaml#BO-112
+      status: fixed
+      by: CHG-WIR-009
     - what: Production is split over BO-112, BO-113, BO-136, BO-137 and BO-138 with the same operations repeated (planProductionRun
         on three, completeProductionRun on two).
       why: Consolidate into one Production screen with tabs Plan | Commissary | Batches, consumption staying with stock
         (DI-987, DI-671).
       source: DI-987 | DI-671
-    openQuestions:
+    decisions:
     - question: Is the printed prep sheet a browser print of the station view, or does it need a print operation and template?
-      default: Browser print of the station view.
-      source: screens/P08-venue-back-office.yaml#BO-112
+      decision: Prep sheets print from a print template, to kitchen printers and the browser.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-185 | CHG-NOTE-004
+      questionSource: screens/P08-venue-back-office.yaml#BO-112
   BO-113:
     summary: 'One central kitchen producing for many outlets: outlet demand rolled up per item, batches sized and costed
       once, and each outlet''s share sent as a transfer (FNB-2N). A run is a stock movement in both directions - ingredients
@@ -9691,19 +10256,27 @@ screens:
         ProductionRun fields (id, status, actualQuantity, varianceReason).
       why: This is a list of batches with their allocation, not a settings form.
       source: contracts/satellite/fnb.yaml#listProductionRuns | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: Each outlet's share "becomes a transfer" (FNB-2N), but no transfer operation (createStockTransfer) is wired.
       why: Without it the commissary's output never reaches the outlets in stock.
       source: screens/P08-venue-back-office.yaml#BO-113 | contracts/satellite/inventory.yaml#createStockTransfer
+      status: fixed
+      by: CHG-WIR-008
     - what: There is no operation to start or cancel a run - the state model gives planned to inProgress to planProductionRun
         and inProgress to cancelled to completeProductionRun.
       why: The screen cannot draw "Start batch" (the moment ingredients leave stock, R125 (8)) or "Cancel batch" with an
         honest call.
       source: R125
-    openQuestions:
-    - question: Is the commissary a kind of outlet (DI-330 outlet-level model) or a kitchen shared by outlets as FNB-1H
-        draws ("Main Kitchen linked to 3 outlets")?
-      default: Treat the commissary as an outlet that produces for others (producing outlet plus for-outlets).
-      source: DI-330 | screens/P08-venue-back-office.yaml#BO-113
+    decisions:
+    - question: Is the commissary a kind of outlet (DI-330 outlet-level model) or a kitchen shared by outlets as FNB-1H draws
+        ("Main Kitchen linked to 3 outlets")?
+      decision: 'Drawn default stands (answer: "The commissary is an outlet that produces for others"): Treat the commissary
+        as an outlet that produces for others (producing outlet plus for-outlets).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-186 | CHG-NOTE-004
+      questionSource: DI-330 | screens/P08-venue-back-office.yaml#BO-113
   BO-114:
     summary: 'By its title this screen manages variants, attributes, barcodes and RFID for retail products. By its operations
       it is only a serialised-stock list with a barcode price check. The designer should draw the serialised-stock and barcode
@@ -9769,10 +10342,14 @@ screens:
     - what: The serial and status filters are text fields. The table is "Every serialised" with raw id columns.
       why: Plumbing. Use scan/search and status chips.
       source: screens/P08-venue-back-office.yaml#BO-114
-    openQuestions:
+    decisions:
     - question: Should BO-114 carry variant and attribute management, or is BO-008 the only place?
-      default: Draw serialised lookup and price check here, and link to BO-008 for variants.
-      source: DI-354 | DI-987
+      decision: 'Drawn default accepted: Draw serialised lookup and price check here, and link to BO-008 for variants.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-296 | CHG-NOTE-004
+      reviewable: true
+      questionSource: DI-354 | DI-987
   BO-134:
     summary: 'One outlet''s kitchen set-up: its preparation stations (grill, fryer, cold, beverage, dessert), which kitchen
       displays show each station''s rail (a primary and fallbacks in order), which items each station makes, and the outlet''s
@@ -9780,8 +10357,9 @@ screens:
       assignment - it is how a kitchen display knows its station; there is no picker on the display.'
     inputs:
     - field: Outlet
-      rule: Outlet picker by name (from the outlet list); stations are always one outlet's set.
-      source: contracts/satellite/fnb.yaml#setKitchenStations | DI-330
+      rule: Outlet picker by name (from the outlet list); stations are always one outlet's set. A kitchen that serves several
+        outlets is set up once, as a producing outlet that produces for the others.
+      source: contracts/satellite/fnb.yaml#setKitchenStations | DI-330 | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     - field: Station
       rule: Name (Grill Station), short code (GRL), active toggle.
       source: contracts/satellite/fnb.yaml#/components/schemas/KitchenStation
@@ -9801,6 +10379,10 @@ screens:
       rule: Four weights (Age, Promise time, Table stage, VIP), whole numbers from 0, shown as sliders with their effect
         explained.
       source: contracts/satellite/fnb.yaml#setKitchenSla
+    - field: Kitchen printers
+      rule: 'In release 1: each station has its kitchen printers beside its displays (the printer models are still to be named
+        on the hardware list).'
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     outputs:
     - element: Station rows
       rule: Name, primary display and fallbacks, number of items routed, active. No live load percentage, open orders or
@@ -9887,18 +10469,25 @@ screens:
         area ("Kitchens & Stations | Routing Rules").
       why: Merge into one "Kitchen stations & routing" screen (DI-987 asks to merge 3-4 configuration screens into one).
       source: DI-987 | DI-671 | screens/P08-venue-back-office.yaml#BO-134
+      status: fixed
+      by: CHG-WIR-008
     - what: Kitchen targets are set on both BO-134 and KIT-009.
       why: Two writers of one setting; keep it here (back office) and show it read-only on the display side.
       source: contracts/satellite/fnb.yaml#setKitchenSla | screens/P15-kitchen-display.yaml#KIT-009
-    openQuestions:
-    - question: Are kitchen printers in the first release, and which models? The hardware list still says "decide later"
-        for kitchen displays and printers.
-      default: Draw displays only, with a disabled "Add printer" marked later.
-      source: TRACKER 30-Sep/Tracker row 28 | DI-323
-    - question: Can one kitchen serve several outlets (FNB-1H "Main Kitchen linked to 3 outlets") when the model is per
-        outlet?
-      default: One outlet's stations per screen; a shared kitchen is set up once per outlet.
-      source: DI-330 | screens/P08-venue-back-office.yaml#BO-134
+    decisions:
+    - question: Are kitchen printers in the first release, and which models? The hardware list still says "decide later" for
+        kitchen displays and printers.
+      decision: Kitchen printers are in release 1.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-187 | CHG-NOTE-004
+      questionSource: TRACKER 30-Sep/Tracker row 28 | DI-323
+    - question: Can one kitchen serve several outlets (FNB-1H "Main Kitchen linked to 3 outlets") when the model is per outlet?
+      decision: One kitchen serves several outlets through a producing outlet (one kitchen outlet produces for several).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-188 | CHG-NOTE-004
+      questionSource: DI-330 | screens/P08-venue-back-office.yaml#BO-134
   BO-135:
     summary: 'Where each item''s kitchen ticket goes: the rules that send an item to a station and its display, and what
       happens when that station''s display is down. The client''s frame draws ordered rules (product, then category, then
@@ -9911,12 +10500,16 @@ screens:
         single items. Every item must land on exactly one station.
       source: contracts/satellite/fnb.yaml#setKitchenStations | MATRIX 4.6.33 | DI-323
     - field: Fallback
-      rule: Per station, the order of displays to fall back to (from BO-134). A fallback station (FNB-1J "else if station
-        offline, route to Backup Grill Station") is drawn as a later item only.
-      source: DI-323 | screens/P08-venue-back-office.yaml#BO-135
+      rule: Per station, the order of displays to fall back to (from BO-134), and a fallback station (FNB-1J "else if station
+        offline, route to Backup Grill Station").
+      source: DI-323 | screens/P08-venue-back-office.yaml#BO-135 | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     - field: Test a ticket
       rule: Pick items and see which station and display each would go to now, including any fallback in force.
       source: screens/P08-venue-back-office.yaml#BO-135
+    - field: Category rules
+      rule: Route by category as well as by item; an item rule wins over its category's rule, and an item no rule covers goes
+        to the outlet's default station.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     outputs:
     - element: Unrouted items
       rule: A count and list of menu items with no station, shown first, with a "Route them" action.
@@ -9963,6 +10556,8 @@ screens:
       why: The screen is about item-to-station routing; the workstation table is plumbing (only the display devices of the
         outlet are needed, on BO-134).
       source: screens/P08-venue-back-office.yaml#BO-135 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: No routing-rule model - no rule priority, no category or outlet condition, no fallback station, no printers.
       why: DI-323 and the client frame FNB-1J ask for category rules and a fallback station or device; only per-item routing
         and display fallback exist.
@@ -9970,14 +10565,22 @@ screens:
     - what: Overlap with BO-134 (same save operation, same board area).
       why: Merge (see BO-134).
       source: DI-987 | screens/P08-venue-back-office.yaml#BO-134
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-008
+    decisions:
     - question: Is per-item routing with display fallback enough for r1, or do we owe category rules and a fallback station
         (DI-323 is client-requested)?
-      default: Draw the item matrix with section bulk-assign; draw rules as a later step.
-      source: DI-323
+      decision: 'Kitchen routing: item routing plus category rules plus a fallback station (DI-323).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-189 | CHG-NOTE-004
+      questionSource: DI-323
     - question: Where does an item with no station go - refused at Send to kitchen, or to a default station?
-      default: To a default station named per outlet.
-      source: designer default
+      decision: 'Drawn default stands (answer: "A default station named per outlet"): To a default station named per outlet.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-190 | CHG-NOTE-004
+      questionSource: designer default
   BO-136:
     summary: 'F&B policy for the venue (FNB-1K): which F&B actions need approval at which amount and by whom - voids, manual
       price changes, complimentary items, refunds, moving items between checks, re-opening a closed check - plus the venue''s
@@ -10053,6 +10656,8 @@ screens:
         kind and from filters) and F85 step 1 are on BO-136.
       why: Move to BO-112 (planning); F85 step 1 should point there.
       source: F85 step 1 | R254 | screens/P08-venue-back-office.yaml#BO-112
+      status: fixed
+      by: CHG-WIR-008
     - what: The whole VenueSettings record is shown and editable - id, currency scale, support hours, quiet hours, biometrics,
         segregated access, alerting, cart and resale limits.
       why: Only the F&B group belongs on an F&B screen; the rest are other screens' settings.
@@ -10064,15 +10669,22 @@ screens:
     - what: requiresModule is "core" although the screen is F&B.
       why: A tenant without the F&B module would see F&B controls.
       source: screens/P08-venue-back-office.yaml#BO-136
-    openQuestions:
-    - question: At which level is F&B policy set? DI-324 says globally, FNB-1K says tenant level with outlet overrides,
-        and the contract has venue settings with tenant defaults (R094) and no outlet override.
-      default: Venue values with the tenant default shown; no outlet override in r1.
-      source: DI-324 | R094 | screens/P08-venue-back-office.yaml#BO-136
-    - question: FNB-1K lists "86 an item - head chef approval", while R110 (c) makes 86 immediate. Does marking an item
-        unavailable ever need approval?
-      default: No approval; 86 is immediate (R110 (c)).
-      source: R110 | screens/P08-venue-back-office.yaml#BO-136
+    decisions:
+    - question: At which level is F&B policy set? DI-324 says globally, FNB-1K says tenant level with outlet overrides, and
+        the contract has venue settings with tenant defaults (R094) and no outlet override.
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Venue values with the tenant default shown;
+        no outlet override in r1.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-047 | CHG-NOTE-004
+      questionSource: DI-324 | R094 | screens/P08-venue-back-office.yaml#BO-136
+    - question: FNB-1K lists "86 an item - head chef approval", while R110 (c) makes 86 immediate. Does marking an item unavailable
+        ever need approval?
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): No approval; 86 is immediate (R110 (c)).'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-048 | CHG-NOTE-004
+      questionSource: R110 | screens/P08-venue-back-office.yaml#BO-136
   BO-137:
     summary: 'What the recipes say should have been used against what the count found, per outlet and count period (FNB-5C,
       F30 step 8): theoretical, actual, variance %, its value, and the lines beyond the venue''s tolerance. The client asked
@@ -10142,10 +10754,14 @@ screens:
         read is per count (on-hand expected against counted).
       why: The frame's period totals and "probable cause" column have no source; draw per-count variance until one exists.
       source: contracts/satellite/inventory.yaml#getCountVariance | screens/P08-venue-back-office.yaml#BO-137
-    openQuestions:
+    decisions:
     - question: Is "probable cause" (re-fires logged, trim yield, breakage) wanted in r1, and from which data?
-      default: Omit the column; link to waste and production for the same period.
-      source: screens/P08-venue-back-office.yaml#BO-137
+      decision: 'Drawn default stands (answer: "No cause column; link to waste and production for the period"): Omit the column;
+        link to waste and production for the same period.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-191 | CHG-NOTE-004
+      questionSource: screens/P08-venue-back-office.yaml#BO-137
   BO-138:
     summary: 'Today''s production batches being made: planned against made, yield, state, and the components issued (FNB-5D).
       The client asked for planned versus actual versus yield and batch losses. A batch that under-yields shows here before
@@ -10215,6 +10831,8 @@ screens:
       why: Production execution is about production runs (listProductionRuns, getProductionRun); expiring stock belongs
         to the stock and availability screens.
       source: screens/P08-venue-back-office.yaml#BO-138 | contracts/satellite/inventory.yaml#listExpiringBatches | DI-341
+      status: fixed
+      by: CHG-WIR-008
     - what: No board frame; the client's frame FNB-5D ("Production Execution & Batch") is listed on BO-136.
       why: The designer would draw this screen from nothing.
       source: screens/P08-venue-back-office.yaml#BO-138
@@ -10263,9 +10881,10 @@ screens:
       expected: Recorded on the device with "Will sync"; the time recorded is when it was logged, not when it synced.
       source: contracts/satellite/fnb.yaml#recordWaste
     - case: A large write-off
-      expected: Shown with an approval state if an approval band applies (see open question); until decided, no approval
-        step is drawn.
-      source: screens/P08-venue-back-office.yaml#BO-139
+      expected: 'Where the venue has switched its waste-approval policy on, an entry above a value band waits for approval
+        and needs a photo above the photo threshold (FNB-5E: AED 100 / 500 / 2,000); with the policy off, no approval step
+        is drawn.'
+      source: screens/P08-venue-back-office.yaml#BO-139 | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     - case: A retail customer return
       expected: Not here - retail returns go through the till by receipt or order number; "Customer return" here is food
         sent back.
@@ -10322,11 +10941,14 @@ screens:
     - what: The name says "Returns" but the screen records only food waste; retail returns are elsewhere.
       why: Rename to "Wastage, Spoilage & Write-Off" to avoid a cashier looking here for a refund.
       source: R139 | screens/P08-venue-back-office.yaml#BO-139
-    openQuestions:
+    decisions:
     - question: Does waste above a value need approval (FNB-5E draws AED 100 / 500 / 2,000 bands and photo evidence above
         AED 500)? R144 lists recounts and retail returns, not waste, and no setting or approval call exists.
-      default: No approval in r1; draw the value prominently.
-      source: R144 | screens/P08-venue-back-office.yaml#BO-139
+      decision: A waste-approval policy the venue can switch on or off; when on, value bands and a photo above a value.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-192 | CHG-NOTE-004
+      questionSource: R144 | screens/P08-venue-back-office.yaml#BO-139
   BO-140:
     summary: What is sellable right now at an outlet, and the kitchen's food-safety state beside it (FNB-5J, FNB-2H). Staff
       switch a dish off (86) with a reason and an optional automatic return time, and on again; the change is live on every
@@ -10362,6 +10984,9 @@ screens:
     - element: Temperatures
       rule: Degrees Celsius with one decimal; a reading outside the range in danger colour, near the limit in warning.
       source: contracts/satellite/fnb.yaml#/components/schemas/TemperatureLog
+    - element: Daily counts
+      rule: An item can carry a daily count ("6 left"); at zero it goes Sold out automatically, until the next count.
+      source: decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     actions:
     - action: 86 now
       result: Live on every till and guest menu of the outlet when it returns; the row flips at once and the history adds
@@ -10436,10 +11061,14 @@ screens:
         toggle has no menu item to bind to.
       why: The list must be the outlet's menu items with their availability (getMenu items carry isAvailable and the reason).
       source: screens/P08-venue-back-office.yaml#BO-140 | contracts/satellite/fnb.yaml#getMenu
+      status: fixed
+      by: CHG-WIR-008
     - what: list86Events, getHaccpStatus and listTemperatureCheckpoints are not declared; setTemperatureCheckpoint is, with
         no list to edit from.
       why: The 86 history, the HACCP status and the checkpoint list are what the frame FNB-5J and flow F28 show.
       source: contracts/satellite/fnb.yaml#list86Events | contracts/satellite/fnb.yaml#getHaccpStatus | F28 step 6
+      status: fixed
+      by: CHG-WIR-008
     - what: No board frame; FNB-5J ("Availability, 86 & Food Safety") is mapped to EMP-062 and FNB-2H ("Availability & 86
         Management") to nothing.
       why: Attach both so the designer starts from the client's drawing.
@@ -10453,15 +11082,21 @@ screens:
         86s that clear on receipt; the contract has no link between an 86 and a corrective action, and no stock-driven 86.
       why: The frame promises behaviour nothing implements; draw only manual 86 until decided.
       source: screens/P08-venue-back-office.yaml#BO-140 | contracts/satellite/fnb.yaml#setItemAvailability
-    openQuestions:
+    decisions:
     - question: Should a temperature breach automatically 86 the dishes that depend on that unit (FNB-5J "auto-86 on safety
         breach")?
-      default: No automatic 86; the breach banner suggests "86 affected items".
-      source: screens/P08-venue-back-office.yaml#BO-140
-    - question: Are daily counts ("6 left") with automatic 86 at zero in scope (FNB-2H "Count set")? No operation sets a
-        count.
-      default: Not drawn in r1.
-      source: screens/P08-venue-back-office.yaml#BO-140
+      decision: 'Drawn default stands (answer: "Suggest, don''t auto: the breach banner offers ''86 affected items''"): No
+        automatic 86; the breach banner suggests "86 affected items".'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-193 | CHG-NOTE-004
+      questionSource: screens/P08-venue-back-office.yaml#BO-140
+    - question: Are daily counts ("6 left") with automatic 86 at zero in scope (FNB-2H "Count set")? No operation sets a count.
+      decision: Daily counts ('6 left') on menu items; an item goes sold out automatically at zero.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-194 | CHG-NOTE-004
+      questionSource: screens/P08-venue-back-office.yaml#BO-140
   BO-142:
     summary: 'Store Rules, Controls & Permissions lists the controls in force in a shop (discount limit, refund threshold,
       age check, manager override, price override) and who may act past each one. The one thing to get right is that a rule
@@ -10471,12 +11106,11 @@ screens:
       '
     inputs:
     - field: Rule
-      rule: 'Kind (Discount limit, Refund threshold, Age check, Manager override, Price override), outlet (or all outlets),
-        limit (an amount in AED for a refund threshold, years for an age check), "Needs" (a picker of permission names in
-        plain words, e.g. "Supervisor approval"), Enabled toggle.
-
-        '
-      source: contracts/satellite/retail.yaml#/components/schemas/StoreRule
+      rule: Kind (Discount limit, Refund threshold, Age check, Manager override, Price override), outlet (or all outlets),
+        limit (a percentage or an amount, chosen per limit by the venue, for a discount or price-override limit; an amount
+        in AED for a refund threshold; years for an age check), "Needs" (a picker of permission names in plain words, e.g.
+        "Supervisor approval"), Enabled toggle.
+      source: contracts/satellite/retail.yaml#/components/schemas/StoreRule | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     outputs:
     - element: Rules table
       rule: 'Grouped by outlet: rule, limit, who may pass it, enabled, last changed by and when. Changing a rule takes effect
@@ -10529,13 +11163,18 @@ screens:
 
         '
       source: R091 | R254 | contracts/spine/tenancy.yaml#getVenueSettings | contracts/spine/identity.yaml#listRoles
+      status: fixed
+      by: CHG-WIR-008
     - what: listStoreRules and setStoreRules are stubs whose shape is "a proposal".
       why: The screen cannot be built against an unconfirmed shape.
       source: contracts/satellite/retail.yaml#setStoreRules
-    openQuestions:
+    decisions:
     - question: Is a discount or price-override limit an amount or a percentage?
-      default: Draw a percentage for discount limit and an amount for refund threshold.
-      source: contracts/satellite/retail.yaml#/components/schemas/StoreRule
+      decision: A discount or price-override limit is a percentage or an amount, chosen per limit by the venue.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-195 | CHG-NOTE-004
+      questionSource: contracts/satellite/retail.yaml#/components/schemas/StoreRule
   BO-452:
     summary: 'Configuration of direct-pay prize machines (cranes and similar), which take wallet value and dispense prizes
       from stock. It belongs to Games & Rides (route, module and entry from the Redemption Operations Dashboard all say
@@ -10573,6 +11212,8 @@ screens:
 
         '
       source: contracts/satellite/games.yaml#listGames | contracts/satellite/games.yaml#setGamePricing | contracts/satellite/games.yaml#listReaders
+      status: fixed
+      by: CHG-WIR-008
   BO-494:
     summary: 'The rental manager''s list of every rental product (bicycles, kayaks, strollers, life jackets) with its status,
       tracking model and what still blocks it from sale. Entry point of the product set-up board. The one thing to get right:
@@ -10713,10 +11354,14 @@ screens:
     - what: Layout is two buttons, one labelled "Allow return to different location — YES/NO".
       why: A yes/no setting drawn as a button; nothing shows the stations.
       source: screens/P08-venue-back-office.yaml#BO-499
-    openQuestions:
+    decisions:
     - question: Must rental stations appear on the live venue map, and is the map builder enough to place them?
-      default: Stations listed by name only until the map question is answered.
-      source: DI-773
+      decision: 'Drawn default accepted: Stations listed by name only until the map question is answered.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-297 | CHG-NOTE-004
+      reviewable: true
+      questionSource: DI-773
   BO-500:
     summary: 'How long a product can be rented: minimum, maximum, step, default, extensions, same-day return, overnight,
       and the turnaround buffer between rentals. The one thing to get right: durations in minutes shown as hours and minutes,
@@ -10773,10 +11418,14 @@ screens:
     sampleData:
       requirements: Name, mobile, Emirates ID required; email optional · waiver v2.1 required · e-signature required · guardian
         signs for under 18
-    openQuestions:
+    decisions:
     - question: Which signature-capture device signs waivers at the counter?
-      default: Signature on the staff tablet screen.
-      source: DI-756 | TRACKER 30-Sep/Tracker row 28
+      decision: 'Drawn default accepted: Signature on the staff tablet screen.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-298 | CHG-NOTE-004
+      reviewable: true
+      questionSource: DI-756 | TRACKER 30-Sep/Tracker row 28
   BO-503:
     summary: 'The last gate before a rental product is sold: a checklist of every configuration section with what is missing,
       then maker/checker approval and publication on-site and online. The one thing to get right: nothing publishes while
@@ -10799,6 +11448,8 @@ screens:
     - what: approveMembershipProductValidation (a membership operation) is attached.
       why: Bulk-attached by name; rental publication is publishRentalProduct.
       source: screens/P08-venue-back-office.yaml#BO-503 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: Sample values drawn as select fields ("Product - Double Kayak", "Configuration Score - 87%") and checklist ticks
         as selects.
       why: Pack content used as controls; no configuration score exists in the contract.
@@ -10821,6 +11472,8 @@ screens:
         maintenance state.
       why: Rental unit status lives with rental bookings and assets; stock positions cannot fill these tiles.
       source: screens/P08-venue-back-office.yaml#BO-504 | DI-744
+      status: fixed
+      by: CHG-WIR-008
   BO-505:
     summary: 'The register of individually numbered rental units: serial, asset code, product, station, purchase and warranty,
       condition and status, with each unit''s history. The one thing to get right: search by serial or scan, and condition
@@ -10839,6 +11492,8 @@ screens:
         a form of select fields.
       why: Rental units are assets with rental states; a registry is a searchable list with a detail.
       source: contracts/satellite/inventory.yaml#listSerialisedItems | screens/P08-venue-back-office.yaml#BO-505
+      status: fixed
+      by: CHG-WIR-008
   BO-507:
     summary: 'Quantity-only rental stock (life jackets, paddles, towels) per station: increase, decrease, adjust with a
       reason, transfer, or mark units out of service. The one thing to get right: every change carries a reason.
@@ -10865,6 +11520,8 @@ screens:
     - what: Bound to generic stock locations (list/create stock location).
       why: Stations are rental locations; creating a stock location is warehouse set-up, not allocation.
       source: screens/P08-venue-back-office.yaml#BO-510 | R254
+      status: fixed
+      by: CHG-WIR-008
   BO-511:
     summary: 'Moving rental units between stations: a serialised unit by scan, or a pooled quantity, sent and received.
       The one thing to get right: in transit units are not available at either end.
@@ -10906,10 +11563,16 @@ screens:
     - what: getSuggestedRequisitions (procurement reorder suggestions) is bound for rebalancing.
       why: Reorder suggestions buy stock; rebalancing moves rental units between stations.
       source: screens/P08-venue-back-office.yaml#BO-513 | R254
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-008
+    decisions:
     - question: Is AI rebalancing in scope, given the client limited rental AI to reporting and maintenance recommendations?
-      default: Show shortfalls as a report; no AI recommendation panel.
-      source: DI-772
+      decision: 'Drawn default accepted: Show shortfalls as a report; no AI recommendation panel.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-299 | CHG-NOTE-004
+      reviewable: true
+      questionSource: DI-772
   BO-514:
     summary: 'Live rental availability across stations: total, available now, reserved, rented, blocked, and demand in the
       next two hours, with revenue. The one thing to get right: availability already net of turnaround and buffers, per
@@ -11162,6 +11825,8 @@ screens:
     - what: listCommercialPricing (ticket catalogue pricing) is attached.
       why: Not rental pricing; bulk-attached.
       source: contracts/spine/catalogue.yaml#listCommercialPricing | R254
+      status: fixed
+      by: CHG-WIR-008
   BO-534:
     summary: 'All rental bookings across stations: today''s, upcoming, awaiting arrival (online not collected), checked
       out, completed, cancelled, no-shows, groups. The one thing to get right: tiles filter the list; status words match
@@ -11240,10 +11905,14 @@ screens:
       source: DI-755 | contracts/satellite/rental.yaml#signRentalAgreement
     sampleData:
       waiver: Waiver v2.1 · signed by Khalid Al Mansoori 13:52 · 2 participants pending
-    openQuestions:
+    decisions:
     - question: Which signature device is used for group waivers?
-      default: On-screen signature on the tablet.
-      source: DI-756
+      decision: 'Drawn default accepted: On-screen signature on the tablet.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-300 | CHG-NOTE-004
+      reviewable: true
+      questionSource: DI-756
   BO-540:
     summary: 'The full financial commitment before payment: rental price, extras, deposit (held, not charged), taxes, total.
       The one thing to get right: rental price and deposit are separate blocks, never summed.
@@ -11289,6 +11958,8 @@ screens:
     - what: createRentalBooking attached to a modification screen.
       why: Modifying is updateRentalBooking; a second booking is not a change.
       source: screens/P08-venue-back-office.yaml#BO-542 | R254
+      status: fixed
+      by: CHG-WIR-008
   BO-543:
     summary: 'One booking''s full record before check-out: products, timing, amounts paid, deposit status, readiness, timeline.
 
@@ -11740,8 +12411,9 @@ screens:
       '
     inputs:
     - field: Outlet type
-      rule: Fine dining, quick service, coffee… — the type switches features (no floor plan for quick service).
-      source: DI-319
+      rule: Fine dining, quick service, coffee… — the type switches features (no floor plan for quick service). Outlet type
+        and department are fields on the outlet (DI-319).
+      source: DI-319 | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     - field: Department / sub-department / cost centre / status
       rule: Department Food & Beverage (or Retail), sub-department is the outlet's name, cost centre picker, Active/Inactive.
       source: DI-319 | DI-350
@@ -11760,13 +12432,18 @@ screens:
         '
       why: A Create / Edit Outlet screen cannot create or edit an outlet.
       source: screens/P08-venue-back-office.yaml#BO-729 | contracts/spine/tenancy.yaml#createOutlet
+      status: fixed
+      by: CHG-WIR-008
     - what: The same form as BO-044's Create/Save outlet.
       why: Duplicate screens; merge or make one the other's form.
       source: R276
-    openQuestions:
+    decisions:
     - question: Where are outlet type and department stored? The outlet has kind and cost centre only.
-      default: Draw them as in DI-319; flagged as having no field.
-      source: DI-319 | contracts/spine/tenancy.yaml#/components/schemas/Outlet
+      decision: Outlet type and department are fields on the outlet (DI-319).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-196 | CHG-NOTE-004
+      questionSource: DI-319 | contracts/spine/tenancy.yaml#/components/schemas/Outlet
   BO-730:
     summary: 'Outlet templates: a starting configuration (type, service model, default menus, coursing, kitchen target,
       delivery policy) that a new outlet copies at creation. Changing a template never changes outlets already made from
@@ -11804,6 +12481,8 @@ screens:
     - what: The content table is bound to listMenus ("Menu items"), not listOutletTemplates.
       why: The templates list is the screen.
       source: screens/P08-venue-back-office.yaml#BO-730 | contracts/satellite/fnb.yaml#listOutletTemplates
+      status: fixed
+      by: CHG-WIR-008
     - what: createOutlet takes no template, although a template is what a new outlet "copies at creation".
       why: There is no way to create an outlet from a template.
       source: contracts/spine/tenancy.yaml#createOutlet | contracts/satellite/fnb.yaml#setOutletTemplate
@@ -11817,8 +12496,9 @@ screens:
       '
     inputs:
     - field: Opening hours
-      rule: Weekly windows per outlet, several per day, local HH:MM in the region time zone.
-      source: contracts/spine/tenancy.yaml#/components/schemas/OpeningHoursWindow
+      rule: Weekly windows per outlet, several per day, local HH:MM in the region time zone. A late-night window is one window
+        past midnight, marked "ends next day" (23:00 to 01:00).
+      source: contracts/spine/tenancy.yaml#/components/schemas/OpeningHoursWindow | decided 2 October 2026 by Chinmay (CHG-NOTE-004)
     - field: Service periods
       rule: Named periods with days and times; today only expressible as each menu's availability window.
       source: DI-320 | contracts/satellite/fnb.yaml#/components/schemas/MenuAvailability
@@ -11844,15 +12524,20 @@ screens:
 
         '
       source: screens/P08-venue-back-office.yaml#BO-731 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: No service-period entity for revenue by time slot, and no per-outlet recipe depletion mode (real time or end
         of day).
       why: DI-320 asks for both; neither has a field.
       source: DI-320
-    openQuestions:
+    decisions:
     - question: How is a late-night window that crosses midnight (23:00–01:00) entered? OpeningHoursWindow states no overnight
         rule.
-      default: Two windows (23:00–23:59 on the day, 00:00–01:00 on the next).
-      source: contracts/spine/tenancy.yaml#/components/schemas/OpeningHoursWindow | DI-320
+      decision: A late-night window is one window past midnight, marked 'ends next day'.
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-197 | CHG-NOTE-004
+      questionSource: contracts/spine/tenancy.yaml#/components/schemas/OpeningHoursWindow | DI-320
   BO-733:
     summary: 'Per outlet, which sales channels the outlet sells on and which items each channel may sell (till, kiosk, QR
       table ordering, app, web), with the channel''s own rules (menu, payment, guest login, minimum order).
@@ -11891,12 +12576,16 @@ screens:
         '
       why: Turn times belong to reservations; the screen can read and save nothing it shows.
       source: screens/P08-venue-back-office.yaml#BO-733 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: The pack's channel list mixes channels and order types (POS Counter, Dine-In, Takeaway, Delivery, VIP / Hospitality).
       why: Order type is a separate dimension (ServiceMode); mixing them double-counts in channel reporting.
       source: contracts/shared/common.yaml#/components/schemas/SalesChannel
     - what: setFnbServiceChargePolicy is described as "the service charge per channel".
       why: The policy varies by service type (order type), not by channel.
       source: contracts/satellite/fnb.yaml#setFnbServiceChargePolicy
+      status: fixed
+      by: CHG-WIR-008
   BO-904:
     summary: 'Rental behaviour of a physical resource from the resource-management board (strollers, wheelchairs, towels):
       rental enabled, durations, extensions, walk-in and advance, eligibility, quantity model.
@@ -12053,6 +12742,8 @@ screens:
         record.
       why: The form cannot show current values and a save would reset fields it never loaded (e.g. allowed AI residencies).
       source: contracts/spine/tenancy.yaml#getRegionSettings | contracts/spine/tenancy.yaml#updateRegionSettings
+      status: fixed
+      by: CHG-WIR-008
     - what: '"Channels" — enabling web, mobile, POS, box office, call centre, B2B, partner API and marketplace per venue
         — has no operation, and RegionSettings has no channels.
 
@@ -12065,13 +12756,20 @@ screens:
     - what: The layout has no content region (only Save/Cancel) because the pack page gave no fields.
       why: The screen cannot be drawn from its definition; the fields above are the contract's.
       source: screens/P08-venue-back-office.yaml#BO-1065
-    openQuestions:
+    decisions:
     - question: Is a week-start setting needed (Saturday/Sunday/Monday) for reports and calendars?
-      default: Not drawn.
-      source: screens/P08-venue-back-office.yaml#BO-1065
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Not drawn.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-042 | CHG-NOTE-004
+      questionSource: screens/P08-venue-back-office.yaml#BO-1065
     - question: The screen is wave 3 while Block A tills need denominations; is the R229 seed enough for the first release?
-      default: Seed covers r1; the screen is still drawn in full.
-      source: R229
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Seed covers r1; the screen is still drawn
+        in full.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-043 | CHG-NOTE-004
+      questionSource: R229
   CMS-009:
     summary: 'Where a venue decides what appears in its website header and footer and in the mobile app''s tab bar, plus
       the Buy tickets button. From the food and retail side, Dining and Shop entries can exist only while those modules
@@ -12145,14 +12843,20 @@ screens:
       why: '"Navigation & Menus" means site navigation menus. The F&B menu operations were attached by name resemblance
         and belong to the menu screens (BO-045, BO-109). Keep only getNavigation and setNavigation.'
       source: screens/P13-white-label-cms.yaml#CMS-009 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: The screen requires the fnb module.
       why: Every tenant needs navigation, so it should require only core (white label). Only Dining entries depend on F&B.
       source: screens/P13-white-label-cms.yaml#CMS-009 | DI-285
-    openQuestions:
-    - question: Is one navigation configuration held per surface (web header, web footer, mobile tabs), as DI-285 needs?
-        The contract has one NavigationConfig with a kind.
-      default: Draw three separate editors (header, footer, tab bar), each saved on its own.
-      source: DI-285 | contracts/satellite/white-label.yaml#getNavigation
+    decisions:
+    - question: Is one navigation configuration held per surface (web header, web footer, mobile tabs), as DI-285 needs? The
+        contract has one NavigationConfig with a kind.
+      decision: Three navigation editors (header, footer, tab bar), each saved on its own. The DNS/custom-domain and landing-page-template
+        parts of this answer are separate decisions (see related).
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-049 | CHG-NOTE-004
+      questionSource: DI-285 | contracts/satellite/white-label.yaml#getNavigation
   KIT-001:
     summary: 'The kitchen supervisor''s or head chef''s overview of the whole kitchen during service: how deep each station''s
       rail is, the oldest ticket and how late it is against its target, held courses, refires and 86''d items, and a way
@@ -12398,9 +13102,13 @@ screens:
         '
       why: Course rules are set up before service (BO-136/BO-134); request fields are not inputs.
       source: screens/P15-kitchen-display.yaml#KIT-003 | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: Course rules and kitchen targets have setters (setCourseRules, setKitchenSla) but no read operation.
       why: An editor cannot load the current values; the pass cannot show the outlet's course names.
       source: contracts/satellite/fnb.yaml#setCourseRules | contracts/satellite/fnb.yaml#setKitchenSla
+      status: fixed
+      by: CHG-WIR-008
   KIT-004:
     summary: 'One order''s journey across stations for the pass or a supervisor: which of its kitchen tickets are ready,
       which are still on which station, and how it will be handed over. The one thing to get right: an order split across
@@ -12437,6 +13145,8 @@ screens:
     - what: The purpose is "Active Order Management & Fulfilment Journey — board 3 of the client F&B design set".
       why: Not a purpose a designer can act on.
       source: screens/P15-kitchen-display.yaml#KIT-004
+      status: fixed
+      by: CHG-WIR-010
   KIT-005:
     summary: 'A head chef moves work between stations mid-service when one is buried and another idle (a temporary rebalance
       that reverts at close), and sees each station''s queue depth to decide. The one thing to get right: a rebalance is
@@ -12480,11 +13190,17 @@ screens:
         '
       why: The contract says a temporary move is the rebalance, not this; permanent set-up belongs in BO-134.
       source: contracts/satellite/fnb.yaml#setKitchenStations | screens/P15-kitchen-display.yaml#KIT-005
-    openQuestions:
+      status: fixed
+      by: CHG-WIR-008
+    decisions:
     - question: R277 dropped the station-load tile from the first release. Is queue depth and oldest age per station acceptable
         as the "workload" on this screen?
-      default: Show depth and oldest age only; no load gauge or percentage.
-      source: R277
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Show depth and oldest age only; no load
+        gauge or percentage.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-055 | CHG-NOTE-004
+      questionSource: R277
   KIT-006:
     summary: 'The expeditor at the pass assembles orders whose parts come from several stations, chases a station that is
       holding the rest up, prints the bag label for takeaway and delivery, and hands over. The one thing to get right: for
@@ -12528,6 +13244,8 @@ screens:
     - what: Collection is recorded with markOrderCollected only; a runner's delivery has no action here.
       why: Delivered needs recordOrderHandover with the location (R125(1)).
       source: contracts/satellite/fnb.yaml#recordOrderHandover | R125
+      status: fixed
+      by: CHG-WIR-008
   KIT-007:
     summary: 'Two faces of collection. (1) The **guest status board**: a customer-facing screen in the dining area showing
       order numbers only, under Preparing and Ready for pickup, readable across the room; this screen owns it and the till''s
@@ -12582,11 +13300,15 @@ screens:
     - what: The buzzer number exists on the ticket, but nothing writes it from the till and nothing dispatches to a pager.
       why: The screen promises "Buzzer" in its name; pagers cannot work as specified.
       source: contracts/satellite/fnb.yaml#/components/schemas/KitchenTicket | screens/P15-kitchen-display.yaml#KIT-007
-    openQuestions:
+    decisions:
     - question: Does the guest board carry the venue's branding (it is guest-facing) or TICVAI branding (it runs on a staff
         device)?
-      default: Venue branding on the guest board; TICVAI branding on the staff collection view.
-      source: DI-296 | DI-084
+      decision: 'Drawn default stands (answer: "Default / recommended accepted"): Venue branding on the guest board; TICVAI
+        branding on the staff collection view.'
+      decidedBy: Chinmay
+      date: '2026-10-02'
+      source: DEC-056 | CHG-NOTE-004
+      questionSource: DI-296 | DI-084
   KIT-008:
     summary: 'What went wrong in the kitchen tonight and the controls for it: take an item off sale (86) at once on every
       till and guest menu, see what was 86''d today and for how long, log an equipment failure or a late delivery, and the
@@ -12634,6 +13356,8 @@ screens:
         screen.
       why: Plumbing; the screen shows today's events and has no ticket status to save.
       source: screens/P15-kitchen-display.yaml#KIT-008 | R254
+      status: fixed
+      by: CHG-WIR-008
   KIT-009:
     summary: 'The kitchen''s targets and priority rules for an outlet: how long a ticket may wait per order type before
       it is late, when it turns amber, and what pushes a ticket up the rail (age, promise time, table stage, VIP). Used
@@ -12676,6 +13400,8 @@ screens:
       why: A kitchen rules screen needs only the F&B recall window; exposing the whole venue record on a kitchen device
         is a permission leak.
       source: contracts/spine/tenancy.yaml#setVenueSettings | R254
+      status: fixed
+      by: CHG-WIR-008
     - what: Prioritising a single ticket ("Reason", "Priority" fields) is on a rules screen; there is no read of the current
         targets.
       why: Prioritising is a live act on the pass (KIT-003); a rules editor needs to load what is set.
