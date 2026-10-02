@@ -30,7 +30,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-migration-tickets.py
-status: open
+status: closed
+closed_by_commit: dbabd46f
 notes: 'Of the 148 on the r2 tickets, the plan regenerated from HEAD already gave 127 a later-block migration (they are
   in plan-tasks.csv, not yet ticketed, so the audit counted them as missing); 21 had none: the 17 V0101 tables, the
   three kernel tables and ai.signal_observation. After: 1,107 of 1,108 tables in a migration and one listed as storage

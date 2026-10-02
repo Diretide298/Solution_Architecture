@@ -36,7 +36,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-text.py
-status: open
+status: closed
+closed_by_commit: dbabd46f
 notes: 'check-ticket-text T-DONE-WHEN: 152 tickets without a checkable Done-when on the plan regenerated from HEAD, 144
   after this batch (8 gone, this batch''s among them; the 144 left are app-module features and later-block tasks
   outside it). The gaps the design does not answer went to Chinmay as questions with defaults in the batch report

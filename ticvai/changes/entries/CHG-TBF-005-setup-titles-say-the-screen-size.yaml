@@ -27,7 +27,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-scope.py
-status: open
+status: closed
+closed_by_commit: dbabd46f
 notes: 'Before: 113 setup titles in the old form, none saying the screen''s size (94 of them with a count other than the
   screen''s, p7). After: 196 setup and rest titles checked, 0 findings; p7 counts 0 title mismatches. Its other rules now
   read the new titles as full-screen tickets (its regex expects the old form), so its screen-op-not-linked count is not

@@ -33,7 +33,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-text.py
-status: open
+status: closed
+closed_by_commit: dbabd46f
 notes: 'The tenant and venue attributes and the dashboards stay with PLATFORM-OBSERVE; the relay-lag alert (ADR-0058) and
   the SLO dashboards (ADR-0060, OBS-SLO) come after SETUP-OBS. The separate migration role is the one point the ADRs
   do not settle: asked of Chinmay with a default in the batch report.'

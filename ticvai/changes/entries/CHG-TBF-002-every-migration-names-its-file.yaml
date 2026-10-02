@@ -38,7 +38,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-migration-tickets.py
-status: open
+status: closed
+closed_by_commit: dbabd46f
 notes: 'On the plan regenerated from HEAD before the change: 179 migration tickets named no file (M-FILE-NAMED) and
   backend/MIGRATIONS.md named 20 files nothing has (M-BACKEND-MD). After: 213 tickets each name a file (34 first
   release, 179 forward from V1000), no number twice, none outside its range, none running before a migration it

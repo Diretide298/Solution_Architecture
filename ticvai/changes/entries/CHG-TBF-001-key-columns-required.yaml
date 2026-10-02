@@ -28,7 +28,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-table-keys.py
-status: open
+status: closed
+closed_by_commit: dbabd46f
 notes: 'Before 355 key columns not required (check-table-keys on the schema reference derived without this change),
   after 0 of 1,116 key columns checked. derive-ddl in frozen mode writes the same forward migration and the same 10
   review items before and after this change.'

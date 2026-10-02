@@ -29,6 +29,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/build-service-docs.py::POLICY_LABEL
-status: open
+status: closed
+closed_by_commit: dbabd46f
 notes: 'The 167 tables keep their policy: the count is unchanged by design. ADAM shows the note only once the viewer is
   deployed from a build that has this commit.'
