@@ -1,0 +1,48 @@
+id: CHG-MOV-003
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The empty first-run state of sixteen moved Block B screens no longer promises a create action that none of their
+  operations offers.
+decision:
+  what: 'Rewrite emptyFirstRun on ADM-238, 240, 244, 246, 247, 248, 249, 250, 251, 252, 254, 255, 256, 257, 584 and 618: "Offers
+    no create action: nothing on this screen creates one, so for a monitor or a queue an empty list is the good outcome."
+    ADM-145 already said so.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction on each screen (platform-foundation): "emptyFirstRun says it ''carries the create action'',
+  and the screen declares no operation that creates anything" (audit R250 class). Chinmay, 2 October (PHASE-B): apply the
+  open Block A and B corrections of the screens in your files.'
+keys_touched:
+  screens:
+  - ADM-145
+  - ADM-238
+  - ADM-240
+  - ADM-244
+  - ADM-246
+  - ADM-247
+  - ADM-248
+  - ADM-249
+  - ADM-250
+  - ADM-251
+  - ADM-252
+  - ADM-254
+  - ADM-255
+  - ADM-256
+  - ADM-257
+  - ADM-584
+  - ADM-618
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: check-screen-wiring S-STATE-BOILERPLATE fails a screen whose empty state promises a create action with no create operation.
+  ADM-145's text had been rewritten before this batch ("Nothing is waiting, which is the good outcome"), so its correction
+  is closed here after checking it.

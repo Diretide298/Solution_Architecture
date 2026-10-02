@@ -1,0 +1,124 @@
+id: CHG-MOV-002
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: 'Thirty-two moved screens that duplicate a venue screen are merged with it: five as full anchors with no operations
+  of their own, twenty-seven as sections of the venue screen; ADM-088 stops changing a strategy''s state.'
+decision:
+  what: 'Full merges, the ids kept as anchors that route to the venue screen and declare nothing (as BO-031 and the M24-03
+    merges): ADM-097 into BO-441, ADM-242 into BO-086, ADM-249 into BO-084, ADM-252 into BO-391, ADM-611 into BO-1146. Section
+    merges, rendered inside the venue screen''s component under its route and keeping their own operations because the first-release
+    slice and its pushed tickets name them: ADM-049 into BO-009, ADM-051 into BO-009, ADM-052 into BO-009, ADM-053 into BO-011,
+    ADM-178 into BO-011, ADM-179 into BO-011, ADM-180 into BO-011, ADM-181 into BO-011, ADM-119 into BO-007, ADM-131 into
+    BO-008, ADM-121 into BO-117, ADM-138 into BO-010, ADM-140 into BO-010, ADM-141 into BO-010, ADM-148 into BO-010, ADM-157
+    into BO-010, ADM-158 into BO-010, ADM-159 into BO-010, ADM-169 into BO-010, ADM-172 into BO-010, ADM-173 into BO-010,
+    ADM-174 into BO-010, ADM-199 into BO-010, ADM-210 into BO-010, ADM-145 into BO-084, ADM-243 into BO-087, ADM-244 into
+    BO-388. ADM-088 lists strategies and ADM-089 changes their state (transitionDynamicPricingStrategy).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026: DEC-100 (batch 1, ADM-049) "merge them with BO-008 to BO-011 ... so one surface edits each
+  record", and the pre-apply round, "Duplicate screens: merge as proposed" (one screen per job, merged ids kept as anchors).
+  The design-notes consistency entries name the pairs (ADM-049 and ADM-052 with BO-009; ADM-053, ADM-178, ADM-179 with BO-011;
+  ADM-138, ADM-148, ADM-159 with BO-010; ADM-097 with BO-441; ADM-145 and ADM-249 with BO-084; ADM-119 with BO-007; ADM-121
+  with BO-117; ADM-131 with BO-008; ADM-611 with BO-1146); CHG-CSA-044 names the promotion builders. On one platform the five
+  full merges declared the same operations as the venue screen (check-screen-wiring S-DUP-SCREEN), as ADM-088 did with BO-528.'
+keys_touched:
+  screens:
+  - ADM-049
+  - ADM-051
+  - ADM-052
+  - ADM-053
+  - ADM-088
+  - ADM-097
+  - ADM-119
+  - ADM-121
+  - ADM-131
+  - ADM-138
+  - ADM-140
+  - ADM-141
+  - ADM-145
+  - ADM-148
+  - ADM-157
+  - ADM-158
+  - ADM-159
+  - ADM-169
+  - ADM-172
+  - ADM-173
+  - ADM-174
+  - ADM-178
+  - ADM-179
+  - ADM-180
+  - ADM-181
+  - ADM-199
+  - ADM-210
+  - ADM-242
+  - ADM-243
+  - ADM-244
+  - ADM-249
+  - ADM-252
+  - ADM-611
+  - BO-007
+  - BO-008
+  - BO-009
+  - BO-010
+  - BO-011
+  - BO-084
+  - BO-086
+  - BO-087
+  - BO-1146
+  - BO-117
+  - BO-388
+  - BO-391
+  - BO-441
+  operations:
+  - listRulePriorityConflict
+  - setRulePriorityConflict
+  - listApprovalMatrices
+  - setApprovalMatrix
+  - listApprovalRequests
+  - decideApprovalRequest
+  - getApprovalRequestScore
+  - listSlaEscalationBottleneck
+  - actOnWorkflowInstance
+  - getRefundPolicy
+  - setRefundPolicy
+  - transitionDynamicPricingStrategy
+  flows:
+  - F147
+  - F164
+  - F165
+root_class: 'new: duplicated-definition'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-049 (#20641)
+  - APP-SETUP-ADM-051 (#20642)
+  - APP-SETUP-ADM-121 (#20646)
+  - APP-SETUP-ADM-148 (#20647)
+  - APP-SETUP-ADM-159 (#20648)
+  - APP-SETUP-ADM-169 (#20650)
+  - APP-SETUP-ADM-172 (#20651)
+  - APP-SETUP-ADM-173 (#20652)
+  - APP-SETUP-ADM-174 (#20653)
+  - APP-SETUP-ADM-179 (#20654)
+  - APP-SETUP-ADM-180 (#20655)
+  - APP-SETUP-ADM-181 (#20656)
+  - APP-SETUP-ADM-199 (#20657)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'check-screen-wiring S-DUP-SCREEN fails on two screens of one platform declaring the same operations, which is how
+  the five full merges were found once the move put them on P08. **Flows the merge breaks (for the flows owner, screens-other;
+  not a rename, so not edited here):** F147 step 18 (listRulePriorityConflict on ADM-097: the step moves to BO-441), F164
+  step 8 (listApprovalMatrices and setApprovalMatrix on ADM-242: BO-086), F165 step 2 (listApprovalRequests and decideApprovalRequest
+  on ADM-249: BO-084) and step 8 (listSlaEscalationBottleneck on ADM-252: BO-391); check-flows reports these six errors on
+  this branch, and each board then needs its edge to the venue screen. **For the P08 owner:** BO-441 requires the games module
+  and BO-528 resources, so a venue without them cannot reach rule priority or the strategy list from there; BO-009 labels
+  price-list priority "Higher number wins" and shows the overlapping lists (DEC-101; ADM-049 is now its section). The section
+  merges keep duplicate writers (setPriceListMaster beside createPriceList, setPromotionRule beside createPromotion, setBundleDefinition
+  beside createBundle ...): retiring them is CHG-MOV-008. Design-note corrections on the five full anchors are withdrawn (the
+  anchor is not built).'

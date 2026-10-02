@@ -1,0 +1,35 @@
+id: CHG-MOV-006
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: ADM-247 publishes a workflow version through approveVersioningGovernance with the step-up challenge it demands.
+decision:
+  what: Publish Now calls approveVersioningGovernance through a confirmation that asks for the authentication code in place
+    (verifyMfaChallenge), with Email me a code instead (createMfaChallenge); both operations are declared and the identity
+    contract's consumed-by lists name ADM-247.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction platform-foundation ADM-247: "Reaches approveVersioningGovernance (step-up mfa) and declares
+  no way to raise the challenge ... the action can never succeed from this screen" (audit R135 and R126, the pattern on BO-053).
+  Chinmay, 2 October (PHASE-B): apply the open Block A and B corrections.'
+keys_touched:
+  screens:
+  - ADM-247
+  operations:
+  - approveVersioningGovernance
+  - createMfaChallenge
+  - verifyMfaChallenge
+  files:
+  - contracts/spine/identity.yaml (x-ticvai-consumed-by)
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-step-up.py
+status: open
+notes: check-step-up lists every screen calling a step-up operation with no way to present the challenge.

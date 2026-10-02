@@ -3770,7 +3770,6 @@ paths:
       operationId: listMembershipCommercialPricing
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
-        - "P09 ADM-048 Commercial Pricing Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.14-15 (13.1.8

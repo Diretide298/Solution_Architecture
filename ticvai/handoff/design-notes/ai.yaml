@@ -5436,7 +5436,7 @@ screens:
     corrections:
     - what: Name contains "\t170" and module is Commercial with requiresModule core.
       why: Clean the name; fraud intelligence is an AI capability (riskIntelligence).
-      source: screens/P09-platform-admin-console.yaml#ADM-633
+      source: screens/P08-venue-back-office.yaml#ADM-633
   ADM-637:
     block: later
     summary: >-
@@ -5470,7 +5470,7 @@ screens:
     corrections:
     - what: getChargebackAnalytics is declared twice; name contains "\t175".
       why: Duplicate and stray tab.
-      source: screens/P09-platform-admin-console.yaml#ADM-637
+      source: screens/P08-venue-back-office.yaml#ADM-637
       status: fixed
       by: CHG-WIR-012
   ADM-680:
@@ -5512,7 +5512,7 @@ screens:
     corrections:
     - what: Name ends ".123".
       why: Stray characters.
-      source: screens/P09-platform-admin-console.yaml#ADM-686
+      source: screens/P08-venue-back-office.yaml#ADM-686
   ADM-687:
     block: later
     summary: >-

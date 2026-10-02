@@ -189,7 +189,7 @@ vocabulary:
   - Price band (that is a seat-category band)
   - Fare type (transport)
   source: >-
-    contracts/spine/catalogue.yaml#setPriceCategoryRateType | screens/P09-platform-admin-console.yaml#ADM-050
+    contracts/spine/catalogue.yaml#setPriceCategoryRateType | screens/P08-venue-back-office.yaml#ADM-050
 - term: Price band
   meaning: A priced band on a seat category (code, label, colour, amount, channel, from-date).
   avoid:
@@ -10367,19 +10367,25 @@ screens:
         venue-scoped PRODUCT_VIEW.
       why: Mixed scopes on one page; under PR-1 the operator acts in one tenant and venue.
       source: contracts/satellite/subscription.yaml#listMembershipCommercialPricing
+      status: fixed
+      by: CHG-MOV-007
     - what: >-
         Pack actions with no operation: Create Price List, Duplicate, Open, Compare, Validate, View Dependencies,
         Export, Archive.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-048
+      source: screens/P08-venue-back-office.yaml#ADM-048
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         List operation(s) listBundlePricingCommercial return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listBundlePricingCommercial carry no identifier.
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listBundlePricingCommercial
+      status: logged
+      by: CHG-MOV-008
   ADM-049:
     block: A
     summary: >-
@@ -10445,13 +10451,15 @@ screens:
         status vocabularies (draft, configured, inactive, archived vs CatalogueConfigStatus) for one record.
       source: >-
         contracts/spine/catalogue.yaml#setPriceListMaster | contracts/spine/catalogue.yaml#createPriceList | ADR-0018
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setPriceListMaster and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setPriceListMaster | screens/P09-platform-admin-console.yaml#ADM-049
+        contracts/spine/catalogue.yaml#setPriceListMaster | screens/P08-venue-back-office.yaml#ADM-049
       status: fixed
       by: CHG-WIR-025
     decisions:
@@ -10465,7 +10473,7 @@ screens:
       decidedBy: Chinmay
       date: '2026-10-02'
       source: DEC-100 | CHG-NOTE-006
-      questionSource: R098 | screens/P09-platform-admin-console.yaml#ADM-049 | contracts/spine/catalogue.yaml#setPriceListMaster
+      questionSource: R098 | screens/P08-venue-back-office.yaml#ADM-049 | contracts/spine/catalogue.yaml#setPriceListMaster
     - question: Which way does price list priority run (does the higher or the lower number win)?
       decision: 'Drawn default stands (answer: "Default: higher number wins"): Label it "Higher number wins" and show the
         overlapping lists.'
@@ -10524,6 +10532,8 @@ screens:
         match.
       source: >-
         contracts/spine/catalogue.yaml#listPriceCategoryRate | contracts/spine/catalogue.yaml#setPriceCategoryRateType
+      status: logged
+      by: CHG-MOV-008
   ADM-051:
     block: A
     summary: >-
@@ -10568,18 +10578,22 @@ screens:
       why: >-
         Currency resolves from the region (ADR-0018); a rate in another currency is exactly what setPrices refuses.
       source: contracts/spine/catalogue.yaml#setRateStructure | ADR-0018
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         Rates are written by setRateStructure here and by setPrices on BO-009, two writers for the price of one
         ticket type.
       why: The designer cannot tell which the tills read; the lead should name one writer.
       source: contracts/spine/catalogue.yaml#setPrices
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setRateStructure and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setRateStructure | screens/P09-platform-admin-console.yaml#ADM-051
+        contracts/spine/catalogue.yaml#setRateStructure | screens/P08-venue-back-office.yaml#ADM-051
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -10587,7 +10601,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-051
+      source: screens/P08-venue-back-office.yaml#ADM-051
+      status: logged
+      by: CHG-MOV-008
   ADM-052:
     block: B
     summary: >-
@@ -10628,14 +10644,16 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setProductServicePrice | screens/P09-platform-admin-console.yaml#ADM-052
+        contracts/spine/catalogue.yaml#setProductServicePrice | screens/P08-venue-back-office.yaml#ADM-052
       status: logged
       by: CHG-WIR-027
     - what: 'Pack actions with no operation: Ticket Type, Event, Venue.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-052
+      source: screens/P08-venue-back-office.yaml#ADM-052
+      status: logged
+      by: CHG-MOV-008
   ADM-053:
     block: B
     summary: >-
@@ -10677,6 +10695,8 @@ screens:
         Currency resolves from the region (ADR-0018); a selling currency per node contradicts it unless multi-currency
         selling is decided.
       source: contracts/spine/catalogue.yaml#setMarketPricingConfiguration | ADR-0018
+      status: logged
+      by: CHG-MOV-008
   ADM-055:
     block: A
     summary: >-
@@ -10715,7 +10735,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setPriceHierarchyInheritance | screens/P09-platform-admin-console.yaml#ADM-055
+        contracts/spine/catalogue.yaml#setPriceHierarchyInheritance | screens/P08-venue-back-office.yaml#ADM-055
       status: logged
       by: CHG-WIR-027
   ADM-056:
@@ -10746,7 +10766,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-056
+      source: screens/P08-venue-back-office.yaml#ADM-056
+      status: logged
+      by: CHG-MOV-008
   ADM-057:
     block: B
     summary: >-
@@ -10788,7 +10810,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-058
+      source: screens/P08-venue-back-office.yaml#ADM-058
+      status: logged
+      by: CHG-MOV-008
   ADM-059:
     block: B
     summary: >-
@@ -10830,7 +10854,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-060
+      source: screens/P08-venue-back-office.yaml#ADM-060
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Membership & Loyalty Pricing Rules) declares only reads (listMembershipLoyaltyPricing).
       why: >-
@@ -10905,7 +10931,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-063
+      source: screens/P08-venue-back-office.yaml#ADM-063
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Location, Venue & Event Pricing Rules) declares only reads (listLocationVenueEvent).
       why: >-
@@ -10933,7 +10961,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-064
+      source: screens/P08-venue-back-office.yaml#ADM-064
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Quantity, Group & Volume Pricing Rules) declares only reads
         (listQuantityGroupVolume).
@@ -11044,20 +11074,24 @@ screens:
     - what: Product, category, venue, legal entity and customer type are strings.
       why: They must be pickers with ids.
       source: contracts/spine/catalogue.yaml#setTaxRuleTreatment
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setTaxRuleTreatment and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setTaxRuleTreatment | screens/P09-platform-admin-console.yaml#ADM-070
+        contracts/spine/catalogue.yaml#setTaxRuleTreatment | screens/P08-venue-back-office.yaml#ADM-070
       status: logged
       by: CHG-WIR-027
     - what: 'Pack actions with no operation: Out of Scope, Fixed Tax.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-070
+      source: screens/P08-venue-back-office.yaml#ADM-070
+      status: logged
+      by: CHG-MOV-008
   ADM-071:
     block: B
     summary: >-
@@ -11106,7 +11140,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setFeeApplicabilityCharging | screens/P09-platform-admin-console.yaml#ADM-072
+        contracts/spine/catalogue.yaml#setFeeApplicabilityCharging | screens/P08-venue-back-office.yaml#ADM-072
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -11115,7 +11149,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-072
+      source: screens/P08-venue-back-office.yaml#ADM-072
+      status: logged
+      by: CHG-MOV-008
   ADM-073:
     block: B
     summary: >-
@@ -11136,7 +11172,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-073
+      source: screens/P08-venue-back-office.yaml#ADM-073
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Fee Waiver, Tax Exemption & Exception Rules) declares only reads
         (listFeeWaiverTax).
@@ -11203,6 +11241,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listCurrencyPrecisionRounding
+      status: logged
+      by: CHG-MOV-008
   ADM-076:
     block: B
     summary: >-
@@ -11227,7 +11267,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#simulatePriceBreakdownCalculation | screens/P09-platform-admin-console.yaml#ADM-076
+        contracts/spine/catalogue.yaml#simulatePriceBreakdownCalculation | screens/P08-venue-back-office.yaml#ADM-076
       status: logged
       by: CHG-WIR-027
   ADM-078:
@@ -11254,7 +11294,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-078
+      source: screens/P08-venue-back-office.yaml#ADM-078
+      status: logged
+      by: CHG-MOV-008
   ADM-079:
     block: B
     summary: >-
@@ -11281,7 +11323,7 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setPricingChangeRequest | contracts/spine/catalogue.yaml#submitPricingChangeRequest
-        | contracts/spine/catalogue.yaml#decidePricingChangeRequest | screens/P09-platform-admin-console.yaml#ADM-079
+        | contracts/spine/catalogue.yaml#decidePricingChangeRequest | screens/P08-venue-back-office.yaml#ADM-079
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -11290,7 +11332,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-079
+      source: screens/P08-venue-back-office.yaml#ADM-079
+      status: logged
+      by: CHG-MOV-008
   ADM-080:
     block: B
     summary: >-
@@ -11313,7 +11357,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-080
+      source: screens/P08-venue-back-office.yaml#ADM-080
+      status: logged
+      by: CHG-MOV-008
   ADM-081:
     block: B
     summary: >-
@@ -11353,6 +11399,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listChangeImpactAnalysis
+      status: logged
+      by: CHG-MOV-008
   ADM-083:
     block: B
     summary: >-
@@ -11375,7 +11423,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#approvePricingWorkflowAuthority | screens/P09-platform-admin-console.yaml#ADM-083
+        contracts/spine/catalogue.yaml#approvePricingWorkflowAuthority | screens/P08-venue-back-office.yaml#ADM-083
       status: fixed
       by: CHG-WIR-025
   ADM-084:
@@ -11401,14 +11449,16 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#publishPricingEffectiveDate | screens/P09-platform-admin-console.yaml#ADM-084
+        contracts/spine/catalogue.yaml#publishPricingEffectiveDate | screens/P08-venue-back-office.yaml#ADM-084
       status: logged
       by: CHG-WIR-027
     - what: 'Pack actions with no operation: Scheduled Publication, Staged Publication.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-084
+      source: screens/P08-venue-back-office.yaml#ADM-084
+      status: logged
+      by: CHG-MOV-008
   ADM-085:
     block: B
     summary: >-
@@ -11466,7 +11516,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-087
+      source: screens/P08-venue-back-office.yaml#ADM-087
+      status: logged
+      by: CHG-MOV-008
   ADM-088:
     block: B
     summary: >-
@@ -11490,7 +11542,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-088
+      source: screens/P08-venue-back-office.yaml#ADM-088
+      status: logged
+      by: CHG-MOV-008
   ADM-089:
     block: B
     summary: >-
@@ -11513,6 +11567,8 @@ screens:
         Owner, market, venue, product and event are strings in the builder, while the strategy record carries ids.
       why: Pickers need ids.
       source: contracts/spine/catalogue.yaml#setDynamicPricingStrategy
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setDynamicPricingStrategy, transitionDynamicPricingStrategy
         and nothing that returns the current configuration.
@@ -11521,7 +11577,7 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/catalogue.yaml#setDynamicPricingStrategy | contracts/spine/catalogue.yaml#transitionDynamicPricingStrategy
-        | screens/P09-platform-admin-console.yaml#ADM-089
+        | screens/P08-venue-back-office.yaml#ADM-089
       status: fixed
       by: CHG-WIR-025
   ADM-090:
@@ -11565,7 +11621,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setDemandOccupancyAvailability | screens/P09-platform-admin-console.yaml#ADM-090
+        contracts/spine/catalogue.yaml#setDemandOccupancyAvailability | screens/P08-venue-back-office.yaml#ADM-090
       status: fixed
       by: CHG-WIR-025
   ADM-091:
@@ -11604,7 +11660,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setBookingVelocityTime | screens/P09-platform-admin-console.yaml#ADM-091
+        contracts/spine/catalogue.yaml#setBookingVelocityTime | screens/P08-venue-back-office.yaml#ADM-091
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -11613,7 +11669,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-091
+      source: screens/P08-venue-back-office.yaml#ADM-091
+      status: logged
+      by: CHG-MOV-008
   ADM-092:
     block: B
     summary: >-
@@ -11645,7 +11703,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-093
+      source: screens/P08-venue-back-office.yaml#ADM-093
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Channel, Customer Segment & Location Dynamic Rules) declares
         only reads (listChannelCustomerSegment).
@@ -11840,7 +11900,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-104
+      source: screens/P08-venue-back-office.yaml#ADM-104
+      status: logged
+      by: CHG-MOV-008
   ADM-105:
     block: B
     summary: >-
@@ -11912,7 +11974,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-108
+      source: screens/P08-venue-back-office.yaml#ADM-108
+      status: logged
+      by: CHG-MOV-008
   ADM-109:
     block: B
     summary: >-
@@ -11938,13 +12002,15 @@ screens:
       why: A simulation writes nothing; scope fields need ids; one channel vocabulary.
       source: >-
         contracts/spine/catalogue.yaml#setPricing | contracts/spine/catalogue.yaml#simulatePriceBreakdownCalculation
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setPricing and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setPricing | screens/P09-platform-admin-console.yaml#ADM-109
+        contracts/spine/catalogue.yaml#setPricing | screens/P08-venue-back-office.yaml#ADM-109
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -11952,7 +12018,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-109
+      source: screens/P08-venue-back-office.yaml#ADM-109
+      status: logged
+      by: CHG-MOV-008
   ADM-110:
     block: B
     summary: >-
@@ -11979,7 +12047,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-110
+      source: screens/P08-venue-back-office.yaml#ADM-110
+      status: logged
+      by: CHG-MOV-008
   ADM-111:
     block: B
     summary: >-
@@ -12006,7 +12076,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setPricingExperiment | screens/P09-platform-admin-console.yaml#ADM-111
+        contracts/spine/catalogue.yaml#setPricingExperiment | screens/P08-venue-back-office.yaml#ADM-111
       status: logged
       by: CHG-WIR-027
   ADM-112:
@@ -12085,12 +12155,16 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#createLiveDynamicPrice | screens/P09-platform-admin-console.yaml#ADM-115
+        contracts/spine/catalogue.yaml#createLiveDynamicPrice | screens/P08-venue-back-office.yaml#ADM-115
+      status: logged
+      by: CHG-MOV-008
     - what: 'Pack actions with no operation: Retry, Hold, Revert, Escalate, Freeze Channel.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-115
+      source: screens/P08-venue-back-office.yaml#ADM-115
+      status: logged
+      by: CHG-MOV-008
   ADM-116:
     block: B
     summary: >-
@@ -12110,7 +12184,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-116
+      source: screens/P08-venue-back-office.yaml#ADM-116
+      status: logged
+      by: CHG-MOV-008
   ADM-117:
     block: B
     summary: >-
@@ -12178,7 +12254,9 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#createProduct | screens/P09-platform-admin-console.yaml#ADM-119
+        contracts/spine/catalogue.yaml#createProduct | screens/P08-venue-back-office.yaml#ADM-119
+      status: fixed
+      by: CHG-MOV-002
   ADM-120:
     block: B
     summary: >-
@@ -12203,9 +12281,13 @@ screens:
       why: A tenant-defined status the lifecycle operation does not know cannot be reached.
       source: >-
         contracts/spine/catalogue.yaml#setLifecycleStatuWorkflow | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState
+      status: logged
+      by: CHG-MOV-008
     - what: The operation is named setLifecycleStatuWorkflow (typo).
       why: The name will appear in generated clients.
       source: contracts/spine/catalogue.yaml#setLifecycleStatuWorkflow
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setLifecycleStatuWorkflow and nothing that returns the current
         configuration.
@@ -12213,7 +12295,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setLifecycleStatuWorkflow | screens/P09-platform-admin-console.yaml#ADM-120
+        contracts/spine/catalogue.yaml#setLifecycleStatuWorkflow | screens/P08-venue-back-office.yaml#ADM-120
       status: logged
       by: CHG-WIR-027
   ADM-121:
@@ -12252,6 +12334,8 @@ screens:
       why: One import job, two operations and two screens; the lead should name one.
       source: >-
         contracts/spine/catalogue.yaml#createBulkProductCatalogue | contracts/spine/catalogue.yaml#importProductCatalogue
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only createBulkProductCatalogue and nothing that returns the current
         configuration.
@@ -12259,7 +12343,9 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#createBulkProductCatalogue | screens/P09-platform-admin-console.yaml#ADM-121
+        contracts/spine/catalogue.yaml#createBulkProductCatalogue | screens/P08-venue-back-office.yaml#ADM-121
+      status: fixed
+      by: CHG-MOV-002
   ADM-122:
     block: B
     summary: >-
@@ -12317,7 +12403,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setProductContextOwnership | screens/P09-platform-admin-console.yaml#ADM-123
+        contracts/spine/catalogue.yaml#setProductContextOwnership | screens/P08-venue-back-office.yaml#ADM-123
       status: logged
       by: CHG-WIR-027
   ADM-124:
@@ -12345,7 +12431,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#publishChannelAvailability | screens/P09-platform-admin-console.yaml#ADM-124
+        contracts/spine/catalogue.yaml#publishChannelAvailability | screens/P08-venue-back-office.yaml#ADM-124
       status: logged
       by: CHG-WIR-027
   ADM-125:
@@ -12402,7 +12488,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setCatalogueReview | screens/P09-platform-admin-console.yaml#ADM-127
+        contracts/spine/catalogue.yaml#setCatalogueReview | screens/P08-venue-back-office.yaml#ADM-127
       status: logged
       by: CHG-WIR-027
   ADM-128:
@@ -12440,7 +12526,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#approveWorkflow | screens/P09-platform-admin-console.yaml#ADM-129
+        contracts/spine/catalogue.yaml#approveWorkflow | screens/P08-venue-back-office.yaml#ADM-129
       status: fixed
       by: CHG-WIR-025
   ADM-130:
@@ -12468,7 +12554,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#approveReviewDecision | screens/P09-platform-admin-console.yaml#ADM-130
+        contracts/spine/catalogue.yaml#approveReviewDecision | screens/P08-venue-back-office.yaml#ADM-130
       status: fixed
       by: CHG-WIR-025
   ADM-131:
@@ -12490,13 +12576,17 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-131
+      source: screens/P08-venue-back-office.yaml#ADM-131
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         List operation(s) listProductVersions return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listProductVersions
+      status: logged
+      by: CHG-MOV-008
   ADM-132:
     block: B
     summary: >-
@@ -12541,6 +12631,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/spine/catalogue.yaml#listChangeImpactAnalysis
+      status: logged
+      by: CHG-MOV-008
   ADM-134:
     block: B
     summary: >-
@@ -12573,7 +12665,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-135
+      source: screens/P08-venue-back-office.yaml#ADM-135
+      status: logged
+      by: CHG-MOV-008
   ADM-136:
     block: B
     summary: >-
@@ -12661,6 +12755,8 @@ screens:
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: >-
         contracts/satellite/promotions.yaml#listPromotionCampaign | contracts/satellite/promotions.yaml#listCampaignPromotionPerformance
+      status: logged
+      by: CHG-MOV-008
   ADM-140:
     block: B
     summary: >-
@@ -12720,12 +12816,16 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listPromotionLifecycleStatus
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Promotion Lifecycle & Status Manager) declares only reads (listPromotionLifecycleStatus).
       why: >-
         Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor,
         which it should link to) or a write is missing.
       source: contracts/satellite/promotions.yaml#listPromotionLifecycleStatus
+      status: fixed
+      by: CHG-MOV-002
   ADM-142:
     block: B
     summary: >-
@@ -12751,6 +12851,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listCampaignCalendarTimeline
+      status: logged
+      by: CHG-MOV-008
   ADM-143:
     block: B
     summary: >-
@@ -12776,13 +12878,17 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-143
+      source: screens/P08-venue-back-office.yaml#ADM-143
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         List operation(s) listPromotionChannel return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listPromotionChannel carry no identifier.
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listPromotionChannel
+      status: logged
+      by: CHG-MOV-008
   ADM-144:
     block: B
     summary: >-
@@ -12805,13 +12911,17 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-144
+      source: screens/P08-venue-back-office.yaml#ADM-144
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         List operation(s) listPromotionAlertException return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listPromotionAlertException
+      status: logged
+      by: CHG-MOV-008
   ADM-146:
     block: B
     summary: >-
@@ -12839,6 +12949,8 @@ screens:
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: >-
         contracts/satellite/promotions.yaml#listPromotionHealthPerformance | contracts/satellite/promotions.yaml#listPromotionPerformance
+      status: logged
+      by: CHG-MOV-008
   ADM-147:
     block: B
     summary: >-
@@ -12861,6 +12973,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listPromotionActivityVersion
+      status: logged
+      by: CHG-MOV-008
   ADM-148:
     block: A
     summary: >-
@@ -12896,6 +13010,8 @@ screens:
         checkout evaluates.
       source: >-
         contracts/satellite/promotions.yaml#setPromotionRule | contracts/satellite/promotions.yaml#createPromotion
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setPromotionRule, setPromotionStackingRule and nothing that
         returns the current configuration.
@@ -12904,14 +13020,16 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setPromotionRule | contracts/satellite/promotions.yaml#setPromotionStackingRule
-        | screens/P09-platform-admin-console.yaml#ADM-148
+        | screens/P08-venue-back-office.yaml#ADM-148
       status: logged
       by: CHG-WIR-027
     - what: 'Pack actions with no operation: Nested condition groups.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-148
+      source: screens/P08-venue-back-office.yaml#ADM-148
+      status: logged
+      by: CHG-MOV-008
   ADM-149:
     block: B
     summary: >-
@@ -12937,6 +13055,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listPercentageFixedDiscount
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Percentage & Fixed Discount Configurator) declares only reads
         (listPercentageFixedDiscount).
@@ -12970,6 +13090,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listCartTransactionThreshold
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Cart & Transaction Threshold Rules) declares only reads (listCartTransactionThreshold).
       why: >-
@@ -13000,6 +13122,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listVolumeBulkTier
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Volume, Bulk & Tier Discount Configurator) declares only reads
         (listVolumeBulkTier).
@@ -13029,6 +13153,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listTimeBasedSeasonal
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Time-Based & Seasonal Discount Rules) declares only reads (listTimeBasedSeasonal).
       why: >-
@@ -13059,6 +13185,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listCustomerMembershipSegment
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Customer, Membership & Segment Discount Rules) declares only
         reads (listCustomerMembershipSegment).
@@ -13094,13 +13222,17 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-154
+      source: screens/P08-venue-back-office.yaml#ADM-154
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         List operation(s) listPaymentMethodBank return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listPaymentMethodBank carry no identifier.
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listPaymentMethodBank
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Payment Method, Bank & Partner Discount Rules) declares only
         reads (listPaymentMethodBank).
@@ -13132,6 +13264,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listSpecialPriceGuest
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Special Price & Guest Offer Configurator) declares only reads
         (listSpecialPriceGuest).
@@ -13165,6 +13299,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listDiscountLimitGuardrail
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Discount Limits, Guardrails & Commercial Controls) declares
         only reads (listDiscountLimitGuardrail).
@@ -13204,7 +13340,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setRuleTestRecommendation | screens/P09-platform-admin-console.yaml#ADM-157
+        contracts/satellite/promotions.yaml#setRuleTestRecommendation | screens/P08-venue-back-office.yaml#ADM-157
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -13213,14 +13349,18 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-157
+      source: screens/P08-venue-back-office.yaml#ADM-157
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         The purpose text is shared word for word with ADM-187 and does not describe this screen (Rule Test, Simulation
         & AI Recommendation Workspace).
       why: >-
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
-      source: screens/P09-platform-admin-console.yaml#ADM-157
+      source: screens/P08-venue-back-office.yaml#ADM-157
+      status: fixed
+      by: CHG-MOV-005
   ADM-158:
     block: B
     summary: >-
@@ -13243,7 +13383,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-158
+      source: screens/P08-venue-back-office.yaml#ADM-158
+      status: logged
+      by: CHG-MOV-008
   ADM-159:
     block: A
     summary: >-
@@ -13280,13 +13422,15 @@ screens:
       why: One coupon campaign, two writers; pickers need ids.
       source: >-
         contracts/satellite/promotions.yaml#setCouponPromoCode | contracts/satellite/promotions.yaml#createCouponCampaign
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setCouponPromoCode and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setCouponPromoCode | screens/P09-platform-admin-console.yaml#ADM-159
+        contracts/satellite/promotions.yaml#setCouponPromoCode | screens/P08-venue-back-office.yaml#ADM-159
       status: fixed
       by: CHG-WIR-025
   ADM-160:
@@ -13318,6 +13462,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listUniqueCodeGeneration
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Unique Code Generation & Batch Manager) declares only reads
         (listUniqueCodeGeneration).
@@ -13345,6 +13491,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listCodeEligibilityRestriction
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Code Eligibility & Restriction Manager) declares only reads
         (listCodeEligibilityRestriction).
@@ -13377,6 +13525,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listUsageCapacityFrequency
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Usage, Capacity & Frequency Control) declares only reads (listUsageCapacityFrequency).
       why: >-
@@ -13407,6 +13557,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listValidityDateTime
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Validity, Date & Time Control) declares only reads (listValidityDateTime).
       why: >-
@@ -13446,6 +13598,8 @@ screens:
         The funnel counts generated, assigned, sent, delivered, viewed and redeemed are typed as strings.
       why: Counts must be integers to draw a funnel.
       source: contracts/satellite/promotions.yaml#setCodeDistributionManager
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setCodeDistributionManager and nothing that returns the current
         configuration.
@@ -13453,7 +13607,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setCodeDistributionManager | screens/P09-platform-admin-console.yaml#ADM-164
+        contracts/satellite/promotions.yaml#setCodeDistributionManager | screens/P08-venue-back-office.yaml#ADM-164
       status: fixed
       by: CHG-WIR-025
   ADM-165:
@@ -13479,6 +13633,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listRedemptionCodeLookup
+      status: logged
+      by: CHG-MOV-008
   ADM-166:
     block: B
     summary: >-
@@ -13502,6 +13658,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listCodeSecurityFraud
+      status: logged
+      by: CHG-MOV-008
   ADM-167:
     block: B
     summary: >-
@@ -13525,6 +13683,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listRedemption
+      status: logged
+      by: CHG-MOV-008
   ADM-168:
     block: B
     summary: >-
@@ -13548,6 +13708,8 @@ screens:
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: >-
         contracts/satellite/promotions.yaml#listAdvancedOffer | contracts/satellite/promotions.yaml#listAdvancedOfferGuardrail
+      status: logged
+      by: CHG-MOV-008
   ADM-169:
     block: A
     summary: >-
@@ -13576,13 +13738,15 @@ screens:
         Pickers and switches need ids and booleans; the typed equivalent is Discount kind buyXGetY on createPromotion.
       source: >-
         contracts/satellite/promotions.yaml#setBuyGetBogo | contracts/satellite/promotions.yaml#/components/schemas/Discount
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setBuyGetBogo and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setBuyGetBogo | screens/P09-platform-admin-console.yaml#ADM-169
+        contracts/satellite/promotions.yaml#setBuyGetBogo | screens/P08-venue-back-office.yaml#ADM-169
       status: logged
       by: CHG-WIR-027
   ADM-170:
@@ -13603,6 +13767,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listMultiBuyQuantity
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Multi-Buy & Quantity Offer Configurator) declares only reads
         (listMultiBuyQuantity).
@@ -13632,6 +13798,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listCheapestLowestValue
+      status: logged
+      by: CHG-MOV-008
   ADM-172:
     block: A
     summary: >-
@@ -13654,13 +13822,15 @@ screens:
         The offer carries its own currency field; maximum repetitions and min/max values are strings.
       why: Currency resolves from the region (ADR-0018); numbers need number types.
       source: contracts/satellite/promotions.yaml#setFixedPriceOffer | ADR-0008
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setFixedPriceOffer and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setFixedPriceOffer | screens/P09-platform-admin-console.yaml#ADM-172
+        contracts/satellite/promotions.yaml#setFixedPriceOffer | screens/P08-venue-back-office.yaml#ADM-172
       status: logged
       by: CHG-WIR-027
   ADM-173:
@@ -13686,13 +13856,15 @@ screens:
     - what: basketValue is a string, and inventory, location and fulfilment point are free text.
       why: A money threshold must be Money; locations must be pickers.
       source: contracts/satellite/promotions.yaml#setGiftFreeProduct
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setGiftFreeProduct and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setGiftFreeProduct | screens/P09-platform-admin-console.yaml#ADM-173
+        contracts/satellite/promotions.yaml#setGiftFreeProduct | screens/P08-venue-back-office.yaml#ADM-173
       status: logged
       by: CHG-WIR-027
   ADM-174:
@@ -13718,6 +13890,8 @@ screens:
         It cannot express a cross-category rule; it needs the qualifier and reward structure of setBuyGetBogo or
         createPromotion with categoryIds.
       source: contracts/satellite/promotions.yaml#setCrossCategoryPromotion
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setCrossCategoryPromotion and nothing that returns the current
         configuration.
@@ -13725,7 +13899,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setCrossCategoryPromotion | screens/P09-platform-admin-console.yaml#ADM-174
+        contracts/satellite/promotions.yaml#setCrossCategoryPromotion | screens/P08-venue-back-office.yaml#ADM-174
       status: logged
       by: CHG-WIR-027
   ADM-175:
@@ -13751,6 +13925,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listRewardSelectionSubstitution
+      status: logged
+      by: CHG-MOV-008
   ADM-176:
     block: B
     summary: >-
@@ -13776,6 +13952,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listAdvancedOfferGuardrail
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No write operation: a configuration screen (Advanced Offer Guardrails & Conflict Controls) declares only
         reads (listAdvancedOfferGuardrail).
@@ -13813,13 +13991,17 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-177
+      source: screens/P08-venue-back-office.yaml#ADM-177
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         List operation(s) listOfferBasketTrace return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listOfferBasketTrace carry no identifier.
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listOfferBasketTrace
+      status: logged
+      by: CHG-MOV-008
   ADM-178:
     block: B
     summary: >-
@@ -13844,6 +14026,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listBundleCombo
+      status: logged
+      by: CHG-MOV-008
   ADM-179:
     block: A
     summary: >-
@@ -13879,6 +14063,8 @@ screens:
         Two writers for one bundle record; the typed createBundle is what the ledger allocation hangs on.
       source: >-
         contracts/satellite/promotions.yaml#setBundleDefinition | contracts/satellite/promotions.yaml#createBundle
+      status: logged
+      by: CHG-MOV-008
   ADM-180:
     block: A
     summary: >-
@@ -13915,13 +14101,15 @@ screens:
         A component that names no product cannot be sold or allocated (BundleComponent requires variantId).
       source: >-
         contracts/satellite/promotions.yaml#setBundleComponent | contracts/satellite/promotions.yaml#/components/schemas/BundleComponent
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setBundleComponent and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setBundleComponent | screens/P09-platform-admin-console.yaml#ADM-180
+        contracts/satellite/promotions.yaml#setBundleComponent | screens/P08-venue-back-office.yaml#ADM-180
       status: fixed
       by: CHG-WIR-025
   ADM-181:
@@ -13968,13 +14156,15 @@ screens:
         Numbers and booleans need types; a group must belong to a bundle (BundleChoiceGroup exists on createBundle).
       source: >-
         contracts/satellite/promotions.yaml#setGuestChoiceBuild | contracts/satellite/promotions.yaml#createBundle
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setGuestChoiceBuild and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setGuestChoiceBuild | screens/P09-platform-admin-console.yaml#ADM-181
+        contracts/satellite/promotions.yaml#setGuestChoiceBuild | screens/P08-venue-back-office.yaml#ADM-181
       status: fixed
       by: CHG-WIR-025
   ADM-182:
@@ -14122,7 +14312,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#simulateBundlePreviewRecommendation | screens/P09-platform-admin-console.yaml#ADM-187
+        contracts/satellite/promotions.yaml#simulateBundlePreviewRecommendation | screens/P08-venue-back-office.yaml#ADM-187
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -14131,14 +14321,14 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-187
+      source: screens/P08-venue-back-office.yaml#ADM-187
     - what: >-
         The purpose text is shared word for word with ADM-157 and does not describe this screen (Bundle Preview,
         Simulation & AI Recommendation).
       why: >-
         The pack text was attached by page rather than by screen; the summary above describes the screen by its
         name and operations.
-      source: screens/P09-platform-admin-console.yaml#ADM-187
+      source: screens/P08-venue-back-office.yaml#ADM-187
       status: fixed
       by: CHG-WIR-026
   ADM-188:
@@ -14200,7 +14390,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-190
+      source: screens/P08-venue-back-office.yaml#ADM-190
     - what: >-
         List operation(s) listBundleSellabilityDependency return a bare array, not the paged list envelope (items,
         nextCursor, hasMore).
@@ -14402,6 +14592,8 @@ screens:
     - what: Every criterion is a free string and nested groups are a string.
       why: A rule engine needs field, operator and value; the typed analogue is PromotionConditions.
       source: contracts/satellite/promotions.yaml#setEligibilityRule
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setEligibilityRule, setResaleEligibilityRule and nothing that
         returns the current configuration.
@@ -14410,14 +14602,16 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setEligibilityRule | contracts/spine/orders.yaml#setResaleEligibilityRule
-        | screens/P09-platform-admin-console.yaml#ADM-199
+        | screens/P08-venue-back-office.yaml#ADM-199
       status: fixed
       by: CHG-WIR-025
     - what: 'Pack actions with no operation: Multiple condition sets.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-199
+      source: screens/P08-venue-back-office.yaml#ADM-199
+      status: logged
+      by: CHG-MOV-008
   ADM-200:
     block: C
     summary: >-
@@ -14495,7 +14689,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-203
+      source: screens/P08-venue-back-office.yaml#ADM-203
     - what: >-
         List operation(s) listContextLocationChannel return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listContextLocationChannel carry no identifier.
@@ -14554,7 +14748,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-206
+      source: screens/P08-venue-back-office.yaml#ADM-206
     - what: >-
         List operation(s) listTargetingConflictFrequency return a bare array, not the paged list envelope (items,
         nextCursor, hasMore); rows of listTargetingConflictFrequency carry no identifier.
@@ -14666,7 +14860,7 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setPromotionStackingRule | contracts/satellite/promotions.yaml#setPromotionRule
-        | screens/P09-platform-admin-console.yaml#ADM-210
+        | screens/P08-venue-back-office.yaml#ADM-210
       status: logged
       by: CHG-WIR-027
   ADM-211:
@@ -14774,7 +14968,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-215
+      source: screens/P08-venue-back-office.yaml#ADM-215
     - what: >-
         List operation(s) listConflictDetectionResolution return a bare array, not the paged list envelope (items,
         nextCursor, hasMore).
@@ -14879,11 +15073,15 @@ screens:
         totalCampaignBudget is an integer, costCenter is typed Money, and the other budgets are strings.
       why: Budgets are Money; a cost centre is an identifier.
       source: contracts/satellite/promotions.yaml#setCampaignBudgetFinancial
+      status: logged
+      by: CHG-MOV-008
     - what: 'Pack actions with no operation: Total campaign budget, Venue budget.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-219
+      source: screens/P08-venue-back-office.yaml#ADM-219
+      status: logged
+      by: CHG-MOV-008
   ADM-220:
     block: C
     summary: >-
@@ -14950,7 +15148,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-222
+      source: screens/P08-venue-back-office.yaml#ADM-222
     - what: >-
         List operation(s) listThresholdActionAutomatic return a bare array, not the paged list envelope (items,
         nextCursor, hasMore).
@@ -14974,7 +15172,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#approveCampaignWorkflow | screens/P09-platform-admin-console.yaml#ADM-223
+        contracts/satellite/promotions.yaml#approveCampaignWorkflow | screens/P08-venue-back-office.yaml#ADM-223
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -14983,7 +15181,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-223
+      source: screens/P08-venue-back-office.yaml#ADM-223
   ADM-224:
     block: C
     summary: >-
@@ -15003,7 +15201,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#approveDecision | screens/P09-platform-admin-console.yaml#ADM-224
+        contracts/satellite/promotions.yaml#approveDecision | screens/P08-venue-back-office.yaml#ADM-224
       status: fixed
       by: CHG-WIR-025
   ADM-225:
@@ -15286,7 +15484,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-237
+      source: screens/P08-venue-back-office.yaml#ADM-237
     - what: >-
         List operation(s) listExecutivePromotionReporting return a bare array, not the paged list envelope (items,
         nextCursor, hasMore); rows of listExecutivePromotionReporting carry no identifier.
@@ -15316,7 +15514,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-258
+      source: screens/P08-venue-back-office.yaml#ADM-258
+      status: logged
+      by: CHG-MOV-008
   ADM-259:
     block: B
     summary: >-
@@ -15341,13 +15541,15 @@ screens:
       source: >-
         contracts/spine/catalogue.yaml#createChannelProfile | contracts/spine/catalogue.yaml#/components/schemas/Channel
         | contracts/shared/common.yaml#/components/schemas/SalesChannel
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only createChannelProfile and nothing that returns the current configuration.
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#createChannelProfile | screens/P09-platform-admin-console.yaml#ADM-259
+        contracts/spine/catalogue.yaml#createChannelProfile | screens/P08-venue-back-office.yaml#ADM-259
       status: logged
       by: CHG-WIR-027
   ADM-260:
@@ -15374,7 +15576,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setProductCatalogue | screens/P09-platform-admin-console.yaml#ADM-260
+        contracts/spine/catalogue.yaml#setProductCatalogue | screens/P08-venue-back-office.yaml#ADM-260
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -15382,7 +15584,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-260
+      source: screens/P08-venue-back-office.yaml#ADM-260
+      status: logged
+      by: CHG-MOV-008
   ADM-261:
     block: B
     summary: >-
@@ -15399,6 +15603,8 @@ screens:
     - what: The assignment carries a currency.
       why: Currency resolves from the region (ADR-0018).
       source: contracts/spine/catalogue.yaml#setChannelPricingCommercial | ADR-0018
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         No read operation: the screen declares only setChannelPricingCommercial and nothing that returns the current
         configuration.
@@ -15406,7 +15612,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setChannelPricingCommercial | screens/P09-platform-admin-console.yaml#ADM-261
+        contracts/spine/catalogue.yaml#setChannelPricingCommercial | screens/P08-venue-back-office.yaml#ADM-261
       status: logged
       by: CHG-WIR-027
   ADM-262:
@@ -15499,7 +15705,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#setChannelFeePayment | screens/P09-platform-admin-console.yaml#ADM-266
+        contracts/spine/catalogue.yaml#setChannelFeePayment | screens/P08-venue-back-office.yaml#ADM-266
       status: logged
       by: CHG-WIR-027
   ADM-267:
@@ -15524,7 +15730,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/catalogue.yaml#publishChannelReadinessValidation | screens/P09-platform-admin-console.yaml#ADM-267
+        contracts/spine/catalogue.yaml#publishChannelReadinessValidation | screens/P08-venue-back-office.yaml#ADM-267
       status: logged
       by: CHG-WIR-027
   ADM-268:
@@ -15595,6 +15801,8 @@ screens:
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/promotions.yaml#listRealTimeAvailability
+      status: logged
+      by: CHG-MOV-008
   ADM-272:
     block: B
     summary: >-
@@ -15640,7 +15848,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-273
+      source: screens/P08-venue-back-office.yaml#ADM-273
+      status: logged
+      by: CHG-MOV-008
   ADM-274:
     block: B
     summary: >-
@@ -15709,7 +15919,9 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-277
+      source: screens/P08-venue-back-office.yaml#ADM-277
+      status: logged
+      by: CHG-MOV-008
   ADM-278:
     block: C
     summary: >-
@@ -15770,14 +15982,14 @@ screens:
         (PR-9).
       source: >-
         contracts/spine/orders.yaml#setResaleEligibilityRule | contracts/satellite/promotions.yaml#setEligibilityRule
-        | screens/P09-platform-admin-console.yaml#ADM-279
+        | screens/P08-venue-back-office.yaml#ADM-279
       status: fixed
       by: CHG-WIR-025
     - what: 'Pack actions with no operation: Identity verification requirement, Membership restriction.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-279
+      source: screens/P08-venue-back-office.yaml#ADM-279
   ADM-280:
     block: C
     summary: >-
@@ -15817,14 +16029,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/orders.yaml#createListingSeller | screens/P09-platform-admin-console.yaml#ADM-281
+        contracts/spine/orders.yaml#createListingSeller | screens/P08-venue-back-office.yaml#ADM-281
       status: fixed
       by: CHG-WIR-025
     - what: 'Pack actions with no operation: Single ticket listing, Multiple ticket listing.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-281
+      source: screens/P08-venue-back-office.yaml#ADM-281
   ADM-282:
     block: C
     summary: >-
@@ -15868,7 +16080,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-283
+      source: screens/P08-venue-back-office.yaml#ADM-283
     - what: >-
         List operation(s) listResaleFeeCommission, listFeeSellerProceed return a bare array, not the paged list
         envelope (items, nextCursor, hasMore); rows of listResaleFeeCommission, listFeeSellerProceed carry no identifier.
@@ -15896,7 +16108,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/orders.yaml#approveListingModeration | screens/P09-platform-admin-console.yaml#ADM-284
+        contracts/spine/orders.yaml#approveListingModeration | screens/P08-venue-back-office.yaml#ADM-284
       status: fixed
       by: CHG-WIR-025
   ADM-285:
@@ -15956,7 +16168,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/orders.yaml#setResaleMarketplaceRecommendation | screens/P09-platform-admin-console.yaml#ADM-287
+        contracts/spine/orders.yaml#setResaleMarketplaceRecommendation | screens/P08-venue-back-office.yaml#ADM-287
       status: fixed
       by: CHG-WIR-025
   ADM-288:
@@ -16122,7 +16334,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-295
+      source: screens/P08-venue-back-office.yaml#ADM-295
     - what: >-
         List operation(s) listRefundDisputeResale return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -16185,7 +16397,7 @@ screens:
       why: >-
         Guests use the guest web, app or the white-label resale portal; the console needs only the configuration
         and operations views.
-      source: screens/P09-platform-admin-console.yaml#ADM-298 | TRACKER Actions row 214
+      source: screens/P08-venue-back-office.yaml#ADM-298 | TRACKER Actions row 214
     - what: >-
         List operation(s) listTicketResaleMarketplace return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listTicketResaleMarketplace carry no identifier.
@@ -16205,12 +16417,12 @@ screens:
     corrections:
     - what: Guest-facing screen on P09.
       why: As ADM-298.
-      source: screens/P09-platform-admin-console.yaml#ADM-299
+      source: screens/P08-venue-back-office.yaml#ADM-299
     - what: 'Pack actions with no operation: Sell selected tickets.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-299
+      source: screens/P08-venue-back-office.yaml#ADM-299
     - what: >-
         List operation(s) listResaleEligibilityTicket return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listResaleEligibilityTicket carry no identifier.
@@ -16233,7 +16445,7 @@ screens:
     corrections:
     - what: Guest-facing screen on P09.
       why: As ADM-298.
-      source: screens/P09-platform-admin-console.yaml#ADM-300
+      source: screens/P08-venue-back-office.yaml#ADM-300
     - what: >-
         List operation(s) listCreateListingResale return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listCreateListingResale carry no identifier.
@@ -16257,7 +16469,7 @@ screens:
     corrections:
     - what: Guest-facing screen on P09.
       why: As ADM-298.
-      source: screens/P09-platform-admin-console.yaml#ADM-301
+      source: screens/P08-venue-back-office.yaml#ADM-301
     - what: >-
         List operation(s) listFeeSellerProceed return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listFeeSellerProceed carry no identifier.
@@ -16280,7 +16492,7 @@ screens:
     corrections:
     - what: Guest-facing screen on P09.
       why: As ADM-298.
-      source: screens/P09-platform-admin-console.yaml#ADM-302
+      source: screens/P08-venue-back-office.yaml#ADM-302
     - what: >-
         List operation(s) listResaleListingSeller return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listResaleListingSeller carry no identifier.
@@ -16303,12 +16515,12 @@ screens:
     corrections:
     - what: Guest-facing screen on P09.
       why: As ADM-298.
-      source: screens/P09-platform-admin-console.yaml#ADM-303
+      source: screens/P08-venue-back-office.yaml#ADM-303
     - what: 'Pack actions with no operation: Event, Venue, Ticket Type, Price, Quantity, Primary only.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-303
+      source: screens/P08-venue-back-office.yaml#ADM-303
     - what: >-
         List operation(s) listOfficialResaleMarketplace return a bare array, not the paged list envelope (items,
         nextCursor, hasMore); rows of listOfficialResaleMarketplace carry no identifier.
@@ -16331,7 +16543,7 @@ screens:
     corrections:
     - what: Guest-facing screen on P09.
       why: As ADM-298.
-      source: screens/P09-platform-admin-console.yaml#ADM-304
+      source: screens/P08-venue-back-office.yaml#ADM-304
     - what: >-
         List operation(s) listResaleTicketDetail return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listResaleTicketDetail carry no identifier.
@@ -16353,7 +16565,7 @@ screens:
     corrections:
     - what: Guest-facing screen on P09.
       why: As ADM-298.
-      source: screens/P09-platform-admin-console.yaml#ADM-305
+      source: screens/P08-venue-back-office.yaml#ADM-305
     - what: >-
         List operation(s) listBuyerCheckoutInventory return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listBuyerCheckoutInventory carry no identifier.
@@ -16375,7 +16587,7 @@ screens:
     corrections:
     - what: Guest-facing screen on P09.
       why: As ADM-298.
-      source: screens/P09-platform-admin-console.yaml#ADM-306
+      source: screens/P08-venue-back-office.yaml#ADM-306
     - what: >-
         List operation(s) listResaleConfirmationOwnership return a bare array, not the paged list envelope (items,
         nextCursor, hasMore).
@@ -16402,7 +16614,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-307
+      source: screens/P08-venue-back-office.yaml#ADM-307
     - what: >-
         List operation(s) listWhiteLabelMarketplace return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listWhiteLabelMarketplace carry no identifier.
@@ -16450,7 +16662,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/orders.yaml#setUpgradeConversionPath | screens/P09-platform-admin-console.yaml#ADM-309
+        contracts/spine/orders.yaml#setUpgradeConversionPath | screens/P08-venue-back-office.yaml#ADM-309
       status: logged
       by: CHG-WIR-027
   ADM-310:
@@ -16495,7 +16707,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-311
+      source: screens/P08-venue-back-office.yaml#ADM-311
     - what: >-
         List operation(s) listUpgradeTimingUsage return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listUpgradeTimingUsage carry no identifier.
@@ -16559,7 +16771,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/orders.yaml#setProRataResidual | screens/P09-platform-admin-console.yaml#ADM-313
+        contracts/spine/orders.yaml#setProRataResidual | screens/P08-venue-back-office.yaml#ADM-313
       status: logged
       by: CHG-WIR-027
   ADM-314:
@@ -16608,7 +16820,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-315
+      source: screens/P08-venue-back-office.yaml#ADM-315
     - what: >-
         List operation(s) listBulkGroupAssisted return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listBulkGroupAssisted carry no identifier.
@@ -16635,7 +16847,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/orders.yaml#createUpgradeCredentialRegeneration | screens/P09-platform-admin-console.yaml#ADM-316
+        contracts/spine/orders.yaml#createUpgradeCredentialRegeneration | screens/P08-venue-back-office.yaml#ADM-316
       status: fixed
       by: CHG-WIR-025
   ADM-317:
@@ -16720,7 +16932,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Payment Command Center\t7".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-559
+      source: screens/P08-venue-back-office.yaml#ADM-559
     - what: >-
         List operation(s) listPaymentMethods, getPaymentPerformance return a bare array, not the paged list envelope
         (items, nextCursor, hasMore); rows of getPaymentPerformance carry no identifier.
@@ -16754,7 +16966,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Payment Method Catalogue\t8".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-560
+      source: screens/P08-venue-back-office.yaml#ADM-560
     - what: >-
         List operation(s) listPaymentMethods return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -16784,14 +16996,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-561
+        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P08-venue-back-office.yaml#ADM-561
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Payment Method Configuration\t9".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-561
+      source: screens/P08-venue-back-office.yaml#ADM-561
   ADM-562:
     block: C
     summary: >-
@@ -16818,14 +17030,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-562
+        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P08-venue-back-office.yaml#ADM-562
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Channel & Touchpoint Payment Configuration\t10".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-562
+      source: screens/P08-venue-back-office.yaml#ADM-562
   ADM-563:
     block: C
     summary: >-
@@ -16846,7 +17058,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-563
+        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P08-venue-back-office.yaml#ADM-563
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -16854,12 +17066,12 @@ screens:
         Assignment\t11".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-563
+      source: screens/P08-venue-back-office.yaml#ADM-563
     - what: 'Pack actions with no operation: Digital Wallet, Gift Card, Card.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-563
+      source: screens/P08-venue-back-office.yaml#ADM-563
   ADM-564:
     block: C
     summary: >-
@@ -16884,14 +17096,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-564
+        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P08-venue-back-office.yaml#ADM-564
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Currency & Payment Currency Configuration\t12".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-564
+      source: screens/P08-venue-back-office.yaml#ADM-564
   ADM-565:
     block: C
     summary: >-
@@ -16909,7 +17121,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-565
+        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P08-venue-back-office.yaml#ADM-565
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -16917,14 +17129,14 @@ screens:
         Builder\t13".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-565
+      source: screens/P08-venue-back-office.yaml#ADM-565
     - what: >-
         Pack actions with no operation: Channel, Venue, Product, Product category, Transaction amount, Customer
         type, Membership, Country/market where applicable ….
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-565
+      source: screens/P08-venue-back-office.yaml#ADM-565
   ADM-566:
     block: C
     summary: >-
@@ -16944,7 +17156,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-566
+        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P08-venue-back-office.yaml#ADM-566
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -16952,14 +17164,14 @@ screens:
         Rules\t14".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-566
+      source: screens/P08-venue-back-office.yaml#ADM-566
     - what: >-
         Pack actions with no operation: Fixed payment fee, Percentage fee, Minimum fee, Maximum fee, Payment-method-specific
         fee, Channel-specific fee, Currency-specific fee, Waiver rule.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-566
+      source: screens/P08-venue-back-office.yaml#ADM-566
   ADM-567:
     block: C
     summary: >-
@@ -16980,12 +17192,12 @@ screens:
         Manager\t15".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-567
+      source: screens/P08-venue-back-office.yaml#ADM-567
     - what: 'Pack actions with no operation: Effective from, Scheduled expiry.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-567
+      source: screens/P08-venue-back-office.yaml#ADM-567
     - what: >-
         List operation(s) listPaymentMethods return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -17017,7 +17229,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#simulatePaymentConfiguration | screens/P09-platform-admin-console.yaml#ADM-568
+        contracts/satellite/payments.yaml#simulatePaymentConfiguration | screens/P08-venue-back-office.yaml#ADM-568
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -17025,7 +17237,7 @@ screens:
         Center\t16".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-568
+      source: screens/P08-venue-back-office.yaml#ADM-568
   ADM-569:
     block: C
     summary: >-
@@ -17044,7 +17256,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Payment Orchestration Command Center\t27".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-569
+      source: screens/P08-venue-back-office.yaml#ADM-569
     - what: >-
         List operation(s) getPaymentProviderHealth, listPaymentProviderConnections return a bare array, not the
         paged list envelope (items, nextCursor, hasMore).
@@ -17093,23 +17305,31 @@ screens:
     - what: listPaymentProviderConnections returns no described schema.
       why: The directory table and the capability matrix cannot bind.
       source: contracts/satellite/payments.yaml#listPaymentProviderConnections
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Gateway, PSP & Acquirer Directory\t28".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-570
+      source: screens/P08-venue-back-office.yaml#ADM-570
+      status: fixed
+      by: CHG-MOV-004
     - what: >-
         Pack actions with no operation: Payment Gateway, Wallet Provider, Alternative Payment Provider.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-570
+      source: screens/P08-venue-back-office.yaml#ADM-570
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         List operation(s) listPaymentProviderConnections return a bare array, not the paged list envelope (items,
         nextCursor, hasMore).
       why: >-
         The table cannot page, and a row without an id cannot open, edit or link to the record it summarises.
       source: contracts/satellite/payments.yaml#listPaymentProviderConnections
+      status: logged
+      by: CHG-MOV-008
   ADM-571:
     block: C
     summary: >-
@@ -17135,21 +17355,21 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#createPaymentProviderConnection | contracts/satellite/payments.yaml#testPaymentProviderConnection
-        | screens/P09-platform-admin-console.yaml#ADM-571
+        | screens/P08-venue-back-office.yaml#ADM-571
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Provider Connection & Adapter Configuration\t29".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-571
+      source: screens/P08-venue-back-office.yaml#ADM-571
     - what: >-
         Pack actions with no operation: API endpoint reference, Webhook configuration, Callback configuration, Retry
         configuration.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-571
+      source: screens/P08-venue-back-office.yaml#ADM-571
   ADM-572:
     block: C
     summary: >-
@@ -17169,7 +17389,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Gateway Capability & Payment Method Mapping\t30".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-572
+      source: screens/P08-venue-back-office.yaml#ADM-572
     - what: >-
         List operation(s) listPaymentProviderConnections return a bare array, not the paged list envelope (items,
         nextCursor, hasMore).
@@ -17191,14 +17411,14 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Payment Routing Rule Builder\t31".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-573
+      source: screens/P08-venue-back-office.yaml#ADM-573
     - what: >-
         Pack actions with no operation: Venue, Legal entity, Channel, Payment method, Transaction amount, Transaction
         type, Customer type where appropriate, Weighted distribution.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-573
+      source: screens/P08-venue-back-office.yaml#ADM-573
     - what: >-
         List operation(s) listPaymentRoutingRules return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -17225,14 +17445,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#setPaymentRoutingRules | screens/P09-platform-admin-console.yaml#ADM-574
+        contracts/satellite/payments.yaml#setPaymentRoutingRules | screens/P08-venue-back-office.yaml#ADM-574
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Routing Strategy, Priority & Load Distribution\t33".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-574
+      source: screens/P08-venue-back-office.yaml#ADM-574
   ADM-575:
     block: C
     summary: >-
@@ -17257,14 +17477,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#setPaymentFailoverPolicy | screens/P09-platform-admin-console.yaml#ADM-575
+        contracts/satellite/payments.yaml#setPaymentFailoverPolicy | screens/P08-venue-back-office.yaml#ADM-575
       status: logged
       by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Failover, Retry & Resilience Manager\t34".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-575
+      source: screens/P08-venue-back-office.yaml#ADM-575
   ADM-576:
     block: C
     summary: >-
@@ -17282,7 +17502,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Provider Health, SLA & Performance Monitor\t35".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-576
+      source: screens/P08-venue-back-office.yaml#ADM-576
     - what: >-
         List operation(s) getPaymentProviderHealth return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -17306,7 +17526,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Provider Cost, Commercial & Routing Economics\t36".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-577
+      source: screens/P08-venue-back-office.yaml#ADM-577
     - what: >-
         List operation(s) getPaymentProviderEconomics return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -17333,7 +17553,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#simulatePaymentRouting | screens/P09-platform-admin-console.yaml#ADM-578
+        contracts/satellite/payments.yaml#simulatePaymentRouting | screens/P08-venue-back-office.yaml#ADM-578
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -17341,7 +17561,7 @@ screens:
         & AI Advisor\t37".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-578
+      source: screens/P08-venue-back-office.yaml#ADM-578
   ADM-579:
     block: C
     summary: >-
@@ -17360,7 +17580,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Terminal & Card-Present Command Center\t48".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-579
+      source: screens/P08-venue-back-office.yaml#ADM-579
     - what: >-
         List operation(s) listPaymentTerminals return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -17384,14 +17604,14 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Payment Terminal & Device Inventory\t49".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-580
+      source: screens/P08-venue-back-office.yaml#ADM-580
     - what: >-
         Pack actions with no operation: Fixed POS terminal, SoftPOS where supported, Device owner, Last service,
         Replacement date.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-580
+      source: screens/P08-venue-back-office.yaml#ADM-580
     - what: >-
         List operation(s) listPaymentTerminals return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -17419,14 +17639,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#setPaymentTerminalConfiguration | screens/P09-platform-admin-console.yaml#ADM-583
+        contracts/satellite/payments.yaml#setPaymentTerminalConfiguration | screens/P08-venue-back-office.yaml#ADM-583
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "EMV & Card-Present Processing Configuration\t53".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-583
+      source: screens/P08-venue-back-office.yaml#ADM-583
   ADM-585:
     block: C
     summary: >-
@@ -17450,7 +17670,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Card-Present Transaction Monitor & Operations\t55".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-585
+      source: screens/P08-venue-back-office.yaml#ADM-585
     - what: >-
         List operation(s) listPaymentTerminals return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -17477,7 +17697,7 @@ screens:
         Manager\t56".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-586
+      source: screens/P08-venue-back-office.yaml#ADM-586
     - what: >-
         List operation(s) listStoredForwardTransactions return a bare array, not the paged list envelope (items,
         nextCursor, hasMore).
@@ -17502,14 +17722,14 @@ screens:
         Operations Advisor\t59".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-588
+      source: screens/P08-venue-back-office.yaml#ADM-588
     - what: >-
         Pack actions with no operation: Successful payment, Card decline, Lost connection, Reversal, Duplicate request,
         Temporary assignment, Venue, Assignment history.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-588
+      source: screens/P08-venue-back-office.yaml#ADM-588
   ADM-589:
     block: C
     summary: >-
@@ -17527,7 +17747,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Digital Payments Command Center\t71".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-589
+      source: screens/P08-venue-back-office.yaml#ADM-589
     - what: >-
         List operation(s) getPaymentPerformance return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of getPaymentPerformance carry no identifier.
@@ -17551,14 +17771,14 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Digital & Alternative Payment Method Manager\t71".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-590
+      source: screens/P08-venue-back-office.yaml#ADM-590
     - what: >-
         Pack actions with no operation: Online card, Mobile/digital wallets, Redirect payments, Stored-value wallet,
         Future payment methods through adapters.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-590
+      source: screens/P08-venue-back-office.yaml#ADM-590
     - what: >-
         List operation(s) listPaymentMethods return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -17585,14 +17805,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P09-platform-admin-console.yaml#ADM-591
+        contracts/satellite/payments.yaml#updatePaymentMethod | screens/P08-venue-back-office.yaml#ADM-591
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Digital Wallet & Mobile Payment Configuration\t72".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-591
+      source: screens/P08-venue-back-office.yaml#ADM-591
   ADM-592:
     block: C
     summary: >-
@@ -17614,14 +17834,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/orders.yaml#createPaymentLink | screens/P09-platform-admin-console.yaml#ADM-592
+        contracts/spine/orders.yaml#createPaymentLink | screens/P08-venue-back-office.yaml#ADM-592
       status: logged
       by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Payment Link Builder & Configuration\t73".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-592
+      source: screens/P08-venue-back-office.yaml#ADM-592
   ADM-593:
     block: C
     summary: >-
@@ -17640,7 +17860,7 @@ screens:
         Manager\t74".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-593
+      source: screens/P08-venue-back-office.yaml#ADM-593
   ADM-594:
     block: C
     summary: >-
@@ -17661,7 +17881,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#setHostedCheckoutConfiguration | screens/P09-platform-admin-console.yaml#ADM-594
+        contracts/satellite/payments.yaml#setHostedCheckoutConfiguration | screens/P08-venue-back-office.yaml#ADM-594
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -17669,12 +17889,12 @@ screens:
         Configuration\t75".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-594
+      source: screens/P08-venue-back-office.yaml#ADM-594
     - what: 'Pack actions with no operation: Hosted checkout, External payment authorization.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-594
+      source: screens/P08-venue-back-office.yaml#ADM-594
   ADM-595:
     block: C
     summary: >-
@@ -17699,13 +17919,13 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/orders.yaml#inquirePaymentStatus | screens/P09-platform-admin-console.yaml#ADM-595
+        contracts/spine/orders.yaml#inquirePaymentStatus | screens/P08-venue-back-office.yaml#ADM-595
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Digital Payment Session & Transaction
         Monitor\t76".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-595
+      source: screens/P08-venue-back-office.yaml#ADM-595
   ADM-596:
     block: C
     summary: >-
@@ -17726,7 +17946,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#setPaymentAuthenticationPolicy | screens/P09-platform-admin-console.yaml#ADM-596
+        contracts/satellite/payments.yaml#setPaymentAuthenticationPolicy | screens/P08-venue-back-office.yaml#ADM-596
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -17734,14 +17954,14 @@ screens:
         Payment Controls\t78".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-596
+      source: screens/P08-venue-back-office.yaml#ADM-596
     - what: >-
         Pack actions with no operation: 3-D Secure, Strong Customer Authentication where applicable, Provider risk
         authentication.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-596
+      source: screens/P08-venue-back-office.yaml#ADM-596
   ADM-597:
     block: C
     summary: >-
@@ -17763,7 +17983,7 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setHostedCheckoutConfiguration | contracts/spine/orders.yaml#inquirePaymentStatus
-        | screens/P09-platform-admin-console.yaml#ADM-597
+        | screens/P08-venue-back-office.yaml#ADM-597
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -17771,7 +17991,7 @@ screens:
         Expiry Center\t79".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-597
+      source: screens/P08-venue-back-office.yaml#ADM-597
   ADM-598:
     block: C
     summary: >-
@@ -17794,7 +18014,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#simulatePaymentConfiguration | screens/P09-platform-admin-console.yaml#ADM-598
+        contracts/satellite/payments.yaml#simulatePaymentConfiguration | screens/P08-venue-back-office.yaml#ADM-598
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -17802,7 +18022,7 @@ screens:
         & AI Advisor\t80".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-598
+      source: screens/P08-venue-back-office.yaml#ADM-598
   ADM-599:
     block: C
     summary: >-
@@ -17818,7 +18038,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Mixed Tender & Credit Command Center\t93".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-599
+      source: screens/P08-venue-back-office.yaml#ADM-599
   ADM-600:
     block: C
     summary: >-
@@ -17837,14 +18057,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#setMixedTenderRules | screens/P09-platform-admin-console.yaml#ADM-600
+        contracts/satellite/payments.yaml#setMixedTenderRules | screens/P08-venue-back-office.yaml#ADM-600
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Mixed Tender Rule & Combination Builder\t93".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-600
+      source: screens/P08-venue-back-office.yaml#ADM-600
   ADM-601:
     block: C
     summary: >-
@@ -17864,7 +18084,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Split Payment & Tender Allocation Manager\t94".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-601
+      source: screens/P08-venue-back-office.yaml#ADM-601
   ADM-602:
     block: C
     summary: >-
@@ -17886,7 +18106,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "B2B Credit Account & Limit Manager\t95".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-602
+      source: screens/P08-venue-back-office.yaml#ADM-602
     - what: >-
         List operation(s) listB2bCreditAccounts return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -17939,20 +18159,24 @@ screens:
       why: >-
         setB2bPaymentTerms has no matching get; the form opens empty for an account that already has terms.
       source: contracts/satellite/payments.yaml#setB2bPaymentTerms
-      status: logged
-      by: CHG-WIR-027
+      status: fixed
+      by: CHG-MOV-007
     - what: >-
         Instalment eligibility uses its own product-kind list (membership, annualPass, seasonPass, groupBooking,
         event), not the catalogue's ProductKind.
       why: Two vocabularies for "what product is this" on one screen; map to ProductKind.
       source: >-
         contracts/satellite/payments.yaml#setInstalmentPolicy | contracts/spine/catalogue.yaml#/components/schemas/ProductKind
+      status: logged
+      by: CHG-MOV-008
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "B2B Invoice, On-Account & Payment Terms
         Configuration\t96".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-603
+      source: screens/P08-venue-back-office.yaml#ADM-603
+      status: fixed
+      by: CHG-MOV-004
   ADM-604:
     block: C
     summary: >-
@@ -17974,7 +18198,7 @@ screens:
         Controls\t97".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-604
+      source: screens/P08-venue-back-office.yaml#ADM-604
   ADM-605:
     block: C
     summary: >-
@@ -17992,7 +18216,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#setMixedTenderRules | screens/P09-platform-admin-console.yaml#ADM-605
+        contracts/satellite/payments.yaml#setMixedTenderRules | screens/P08-venue-back-office.yaml#ADM-605
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -18000,13 +18224,13 @@ screens:
         & Restriction Rules\t98".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-605
+      source: screens/P08-venue-back-office.yaml#ADM-605
     - what: >-
         Pack actions with no operation: Minimum card amount, Credit restriction, Voucher exclusivity.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-605
+      source: screens/P08-venue-back-office.yaml#ADM-605
   ADM-606:
     block: C
     summary: >-
@@ -18027,7 +18251,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Partial Payment, Failure & Recovery Manager\t100".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-606
+      source: screens/P08-venue-back-office.yaml#ADM-606
   ADM-607:
     block: C
     summary: >-
@@ -18048,7 +18272,7 @@ screens:
         Audit\t100".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-607
+      source: screens/P08-venue-back-office.yaml#ADM-607
     - what: >-
         List operation(s) listOrderPaymentDetail return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listOrderPaymentDetail carry no identifier.
@@ -18075,14 +18299,14 @@ screens:
         & AI Advisor\t102".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-608
+      source: screens/P08-venue-back-office.yaml#ADM-608
     - what: >-
         Pack actions with no operation: Require card for excess, Request approval, Reject B2B credit, Reduce credit
         allocation.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-608
+      source: screens/P08-venue-back-office.yaml#ADM-608
     - what: >-
         List operation(s) listB2bCreditAccounts return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -18107,7 +18331,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Refund & Payment Adjustment Command Center\t116".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-609
+      source: screens/P08-venue-back-office.yaml#ADM-609
   ADM-610:
     block: C
     summary: >-
@@ -18132,14 +18356,14 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Refund Request & Eligibility Workspace\t117".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-610
+      source: screens/P08-venue-back-office.yaml#ADM-610
     - what: >-
         Pack actions with no operation: Entire transaction, Selected items, Selected tickets, Selected quantities,
         Specific monetary amount.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-610
+      source: screens/P08-venue-back-office.yaml#ADM-610
   ADM-611:
     block: C
     summary: >-
@@ -18158,14 +18382,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/orders.yaml#setRefundPolicy | screens/P09-platform-admin-console.yaml#ADM-611
+        contracts/spine/orders.yaml#setRefundPolicy | screens/P08-venue-back-office.yaml#ADM-611
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Refund Policy & Rule Configuration\t118".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-611
+      source: screens/P08-venue-back-office.yaml#ADM-611
   ADM-612:
     block: C
     summary: >-
@@ -18185,19 +18409,19 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/wallet.yaml#setWalletRefundPolicy | screens/P09-platform-admin-console.yaml#ADM-612
+        contracts/satellite/wallet.yaml#setWalletRefundPolicy | screens/P08-venue-back-office.yaml#ADM-612
       status: logged
       by: CHG-WIR-027
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Refund Allocation & Original Tender Manager\t119".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-612
+      source: screens/P08-venue-back-office.yaml#ADM-612
     - what: 'Pack actions with no operation: Manual allocation with approval.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-612
+      source: screens/P08-venue-back-office.yaml#ADM-612
   ADM-613:
     block: C
     summary: >-
@@ -18217,19 +18441,19 @@ screens:
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
-      source: contracts/spine/orders.yaml#voidPayment | screens/P09-platform-admin-console.yaml#ADM-613
+      source: contracts/spine/orders.yaml#voidPayment | screens/P08-venue-back-office.yaml#ADM-613
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Void, Reversal & Cancellation Manager\t120".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-613
+      source: screens/P08-venue-back-office.yaml#ADM-613
     - what: 'Pack actions with no operation: Refund ✓, Void ✕, Reversal ✕.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-613
+      source: screens/P08-venue-back-office.yaml#ADM-613
   ADM-614:
     block: C
     summary: >-
@@ -18248,7 +18472,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Refund Approval & Exception Workflow\t121".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-614
+      source: screens/P08-venue-back-office.yaml#ADM-614
   ADM-615:
     block: C
     summary: >-
@@ -18268,7 +18492,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/spine/orders.yaml#inquirePaymentStatus | screens/P09-platform-admin-console.yaml#ADM-615
+        contracts/spine/orders.yaml#inquirePaymentStatus | screens/P08-venue-back-office.yaml#ADM-615
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -18276,7 +18500,7 @@ screens:
         Center\t122".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-615
+      source: screens/P08-venue-back-office.yaml#ADM-615
   ADM-616:
     block: C
     summary: >-
@@ -18296,7 +18520,7 @@ screens:
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
-      source: contracts/spine/orders.yaml#createRefund | screens/P09-platform-admin-console.yaml#ADM-616
+      source: contracts/spine/orders.yaml#createRefund | screens/P08-venue-back-office.yaml#ADM-616
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -18304,7 +18528,7 @@ screens:
         Manager\t123".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-616
+      source: screens/P08-venue-back-office.yaml#ADM-616
   ADM-617:
     block: C
     summary: >-
@@ -18322,7 +18546,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Refund Transaction Trace & Audit Investigation\t124".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-617
+      source: screens/P08-venue-back-office.yaml#ADM-617
     - what: >-
         List operation(s) listOrderPaymentDetail return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of listOrderPaymentDetail carry no identifier.
@@ -18352,19 +18576,19 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#setReconciliationSource | contracts/spine/finance.yaml#ingestSettlementFile
-        | screens/P09-platform-admin-console.yaml#ADM-620
+        | screens/P08-venue-back-office.yaml#ADM-620
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Reconciliation Source & Import Manager\t141".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-620
+      source: screens/P08-venue-back-office.yaml#ADM-620
     - what: 'Pack actions with no operation: Scheduled report imports.'
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-620
+      source: screens/P08-venue-back-office.yaml#ADM-620
   ADM-621:
     block: C
     summary: >-
@@ -18385,7 +18609,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#setReconciliationMatchingRules | screens/P09-platform-admin-console.yaml#ADM-621
+        contracts/satellite/payments.yaml#setReconciliationMatchingRules | screens/P08-venue-back-office.yaml#ADM-621
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -18393,7 +18617,7 @@ screens:
         Engine\t142".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-621
+      source: screens/P08-venue-back-office.yaml#ADM-621
   ADM-624:
     block: C
     summary: >-
@@ -18412,14 +18636,14 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Fees, Commission, FX & Settlement Economics\t145".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-624
+      source: screens/P08-venue-back-office.yaml#ADM-624
     - what: >-
         Pack actions with no operation: Fixed transaction fee, Percentage fee, Authorization fee, Capture fee, Refund
         fee, Chargeback fee, Cross-border fee, Wallet/APM fee ….
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-624
+      source: screens/P08-venue-back-office.yaml#ADM-624
     - what: >-
         List operation(s) getPaymentProviderEconomics return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -18445,7 +18669,7 @@ screens:
         Manager\t146".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-625
+      source: screens/P08-venue-back-office.yaml#ADM-625
     - what: >-
         List operation(s) listMerchantAccounts return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -18469,7 +18693,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Payment Risk & Fraud Command Center\t166".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-629
+      source: screens/P08-venue-back-office.yaml#ADM-629
     - what: >-
         List operation(s) getPaymentPerformance return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of getPaymentPerformance carry no identifier.
@@ -18498,14 +18722,14 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Payment Risk Rule & Decision Engine\t167".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-630
+      source: screens/P08-venue-back-office.yaml#ADM-630
     - what: >-
         Pack actions with no operation: Allow, Monitor, Require additional verification, Route to manual review,
         Block, Trigger alert.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-630
+      source: screens/P08-venue-back-office.yaml#ADM-630
   ADM-631:
     block: C
     summary: >-
@@ -18523,7 +18747,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#setPaymentRiskRules | screens/P09-platform-admin-console.yaml#ADM-631
+        contracts/satellite/payments.yaml#setPaymentRiskRules | screens/P08-venue-back-office.yaml#ADM-631
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -18531,13 +18755,13 @@ screens:
         Controls\t168".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-631
+      source: screens/P08-venue-back-office.yaml#ADM-631
     - what: >-
         Pack actions with no operation: Customer, Device, Payment instrument reference/token, Venue, POS.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-631
+      source: screens/P08-venue-back-office.yaml#ADM-631
   ADM-632:
     block: C
     summary: >-
@@ -18559,7 +18783,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#setPaymentRiskRules | screens/P09-platform-admin-console.yaml#ADM-632
+        contracts/satellite/payments.yaml#setPaymentRiskRules | screens/P08-venue-back-office.yaml#ADM-632
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -18567,13 +18791,13 @@ screens:
         Center\t169".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-632
+      source: screens/P08-venue-back-office.yaml#ADM-632
     - what: >-
         Pack actions with no operation: Trusted device, Blocked instrument reference, High-risk device, Review list.
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-632
+      source: screens/P08-venue-back-office.yaml#ADM-632
   ADM-634:
     block: C
     summary: >-
@@ -18595,7 +18819,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Chargeback & Dispute Command Center\t172".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-634
+      source: screens/P08-venue-back-office.yaml#ADM-634
   ADM-635:
     block: C
     summary: >-
@@ -18619,14 +18843,14 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/payments.yaml#submitChargebackEvidence | screens/P09-platform-admin-console.yaml#ADM-635
+        contracts/satellite/payments.yaml#submitChargebackEvidence | screens/P08-venue-back-office.yaml#ADM-635
       status: fixed
       by: CHG-WIR-025
     - what: >-
         The screen name ends in an escaped tab and the pack page number: "Chargeback Evidence & Representment Workspace\t173".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-635
+      source: screens/P08-venue-back-office.yaml#ADM-635
   ADM-636:
     block: C
     summary: >-
@@ -18643,7 +18867,7 @@ screens:
         The screen name ends in an escaped tab and the pack page number: "Payment Performance & Conversion Analytics\t174".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-636
+      source: screens/P08-venue-back-office.yaml#ADM-636
     - what: >-
         List operation(s) getPaymentPerformance return a bare array, not the paged list envelope (items, nextCursor,
         hasMore); rows of getPaymentPerformance carry no identifier.
@@ -18672,7 +18896,7 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/payments.yaml#simulatePaymentConfiguration | contracts/satellite/ai.yaml#backtestRiskStrategy
-        | screens/P09-platform-admin-console.yaml#ADM-638
+        | screens/P08-venue-back-office.yaml#ADM-638
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -18680,7 +18904,7 @@ screens:
         & AI Advisor\t176".
       why: >-
         The pack page number leaked into the name; it would print on the screen title and the navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-638
+      source: screens/P08-venue-back-office.yaml#ADM-638
   ADM-639:
     block: C
     summary: >-
@@ -18754,7 +18978,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-641
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-641
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -18763,7 +18987,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-641
+      source: screens/P08-venue-back-office.yaml#ADM-641
   ADM-642:
     block: C
     summary: >-
@@ -18784,7 +19008,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-642
+      source: screens/P08-venue-back-office.yaml#ADM-642
     - what: >-
         List operation(s) listProductRelationships return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -18815,7 +19039,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-643
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-643
       status: fixed
       by: CHG-WIR-025
   ADM-644:
@@ -18838,7 +19062,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-644
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-644
       status: fixed
       by: CHG-WIR-025
   ADM-645:
@@ -18854,7 +19078,7 @@ screens:
     corrections:
     - what: The screen name ends in "Manager17", a pack page number joined to the name.
       why: It would print on the title and navigation.
-      source: screens/P09-platform-admin-console.yaml#ADM-645
+      source: screens/P08-venue-back-office.yaml#ADM-645
     - what: >-
         No read operation: the screen declares only setRecommendationSuppression, updateRecommendationStrategy and
         nothing that returns the current configuration.
@@ -18863,7 +19087,7 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#setRecommendationSuppression | contracts/satellite/promotions.yaml#updateRecommendationStrategy
-        | screens/P09-platform-admin-console.yaml#ADM-645
+        | screens/P08-venue-back-office.yaml#ADM-645
       status: logged
       by: CHG-WIR-027
     - what: >-
@@ -18872,7 +19096,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-645
+      source: screens/P08-venue-back-office.yaml#ADM-645
   ADM-646:
     block: C
     summary: >-
@@ -18892,7 +19116,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-646
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-646
       status: fixed
       by: CHG-WIR-025
   ADM-647:
@@ -18943,7 +19167,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-648
+        contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-648
       status: fixed
       by: CHG-WIR-025
   ADM-649:
@@ -18989,7 +19213,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-650
+      source: screens/P08-venue-back-office.yaml#ADM-650
     - what: >-
         List operation(s) listProductRelationships return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -19014,7 +19238,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-651
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-651
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -19023,7 +19247,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-651
+      source: screens/P08-venue-back-office.yaml#ADM-651
   ADM-652:
     block: C
     summary: >-
@@ -19043,7 +19267,7 @@ screens:
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
-      source: contracts/spine/orders.yaml#quoteUpgrade | screens/P09-platform-admin-console.yaml#ADM-652
+      source: contracts/spine/orders.yaml#quoteUpgrade | screens/P08-venue-back-office.yaml#ADM-652
       status: fixed
       by: CHG-WIR-025
   ADM-653:
@@ -19065,7 +19289,7 @@ screens:
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
-      source: contracts/spine/orders.yaml#quoteUpgrade | screens/P09-platform-admin-console.yaml#ADM-653
+      source: contracts/spine/orders.yaml#quoteUpgrade | screens/P08-venue-back-office.yaml#ADM-653
       status: fixed
       by: CHG-WIR-025
   ADM-654:
@@ -19087,7 +19311,7 @@ screens:
       why: >-
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
-      source: contracts/spine/orders.yaml#quoteUpgrade | screens/P09-platform-admin-console.yaml#ADM-654
+      source: contracts/spine/orders.yaml#quoteUpgrade | screens/P08-venue-back-office.yaml#ADM-654
       status: fixed
       by: CHG-WIR-025
   ADM-655:
@@ -19111,7 +19335,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-655
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-655
       status: fixed
       by: CHG-WIR-025
   ADM-656:
@@ -19136,7 +19360,7 @@ screens:
         (PR-9).
       source: >-
         contracts/satellite/promotions.yaml#updateRecommendationStrategy | contracts/spine/orders.yaml#quoteUpgrade
-        | screens/P09-platform-admin-console.yaml#ADM-656
+        | screens/P08-venue-back-office.yaml#ADM-656
       status: fixed
       by: CHG-WIR-025
   ADM-657:
@@ -19178,7 +19402,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-658
+        contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-658
       status: fixed
       by: CHG-WIR-025
   ADM-659:
@@ -19224,7 +19448,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setProductRelationships | screens/P09-platform-admin-console.yaml#ADM-660
+        contracts/satellite/promotions.yaml#setProductRelationships | screens/P08-venue-back-office.yaml#ADM-660
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -19232,7 +19456,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-660
+      source: screens/P08-venue-back-office.yaml#ADM-660
   ADM-661:
     block: C
     summary: >-
@@ -19295,7 +19519,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setProductRelationships | screens/P09-platform-admin-console.yaml#ADM-663
+        contracts/satellite/promotions.yaml#setProductRelationships | screens/P08-venue-back-office.yaml#ADM-663
       status: fixed
       by: CHG-WIR-025
   ADM-664:
@@ -19318,7 +19542,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setProductRelationships | screens/P09-platform-admin-console.yaml#ADM-664
+        contracts/satellite/promotions.yaml#setProductRelationships | screens/P08-venue-back-office.yaml#ADM-664
       status: fixed
       by: CHG-WIR-025
   ADM-665:
@@ -19339,7 +19563,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-665
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-665
       status: fixed
       by: CHG-WIR-025
   ADM-666:
@@ -19360,7 +19584,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-666
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-666
       status: fixed
       by: CHG-WIR-025
   ADM-667:
@@ -19401,7 +19625,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-668
+        contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-668
       status: fixed
       by: CHG-WIR-025
   ADM-669:
@@ -19472,7 +19696,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-671
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-671
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -19481,7 +19705,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-671
+      source: screens/P08-venue-back-office.yaml#ADM-671
   ADM-672:
     block: C
     summary: >-
@@ -19501,7 +19725,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-672
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-672
       status: fixed
       by: CHG-WIR-025
   ADM-673:
@@ -19522,7 +19746,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-673
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-673
       status: fixed
       by: CHG-WIR-025
   ADM-674:
@@ -19543,7 +19767,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-674
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-674
       status: fixed
       by: CHG-WIR-025
   ADM-675:
@@ -19564,7 +19788,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-675
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-675
       status: fixed
       by: CHG-WIR-025
   ADM-676:
@@ -19604,7 +19828,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setRecommendationSuppression | screens/P09-platform-admin-console.yaml#ADM-677
+        contracts/satellite/promotions.yaml#setRecommendationSuppression | screens/P08-venue-back-office.yaml#ADM-677
       status: logged
       by: CHG-WIR-027
   ADM-678:
@@ -19658,7 +19882,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-681
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-681
       status: fixed
       by: CHG-WIR-025
   ADM-682:
@@ -19723,7 +19947,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-684
+        contracts/satellite/promotions.yaml#updateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-684
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -19732,7 +19956,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-684
+      source: screens/P08-venue-back-office.yaml#ADM-684
   ADM-685:
     block: C
     summary: >-
@@ -19751,7 +19975,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#setRecommendationSuppression | screens/P09-platform-admin-console.yaml#ADM-685
+        contracts/satellite/promotions.yaml#setRecommendationSuppression | screens/P08-venue-back-office.yaml#ADM-685
       status: logged
       by: CHG-WIR-027
   ADM-688:
@@ -19774,7 +19998,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-688
+        contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-688
       status: fixed
       by: CHG-WIR-025
   ADM-689:
@@ -19872,7 +20096,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-693
+      source: screens/P08-venue-back-office.yaml#ADM-693
     - what: >-
         List operation(s) getRecommendationPerformance return a bare array, not the paged list envelope (items,
         nextCursor, hasMore); rows of getRecommendationPerformance carry no identifier.
@@ -19922,7 +20146,7 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-695
+      source: screens/P08-venue-back-office.yaml#ADM-695
     - what: >-
         List operation(s) listRecommendationStrategies return a bare array, not the paged list envelope (items,
         nextCursor, hasMore).
@@ -19947,7 +20171,7 @@ screens:
         It opens as an empty form even where a configuration exists; it needs a get or list for the same record
         (PR-9).
       source: >-
-        contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P09-platform-admin-console.yaml#ADM-698
+        contracts/satellite/promotions.yaml#simulateRecommendationStrategy | screens/P08-venue-back-office.yaml#ADM-698
       status: fixed
       by: CHG-WIR-025
     - what: >-
@@ -19955,4 +20179,4 @@ screens:
       why: >-
         The workshop pack names them on this screen and no operation serves them; each needs an operation or removal
         from the screen.
-      source: screens/P09-platform-admin-console.yaml#ADM-698
+      source: screens/P08-venue-back-office.yaml#ADM-698

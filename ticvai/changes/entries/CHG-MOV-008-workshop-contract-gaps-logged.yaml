@@ -1,0 +1,179 @@
+id: CHG-MOV-008
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: The 106 Block A and B corrections on the moved screens that need a contract change, an operation that does not exist
+  or a plan decision are logged, not invented.
+decision:
+  what: 'No contract change in this batch. Logged on the design notes (status logged): 41 pack actions with no operation,
+    36 lists returning a bare array instead of the paged envelope, and 29 shape and ownership faults (strings for ids, numbers,
+    money and booleans; a currency per row against ADR-0018; duplicate writers beside the venue screen''s operation; a channel
+    record against a channel enum; a list with no described schema; a second product-kind vocabulary).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October (PHASE-B): "If a correction needs an operation that doesn''t exist, mark it status: logged and add
+  it to an open CHG entry (kind contract) listing the gap. Don''t invent operations." The workshop-pack console gaps were
+  deferred to the ADM-049 move (CHG-CSP-053, CHG-CSA-044); the design-notes corrections name each one.'
+keys_touched:
+  screens:
+  - ADM-048
+  - ADM-049
+  - ADM-050
+  - ADM-051
+  - ADM-052
+  - ADM-054
+  - ADM-056
+  - ADM-058
+  - ADM-060
+  - ADM-063
+  - ADM-064
+  - ADM-070
+  - ADM-072
+  - ADM-073
+  - ADM-075
+  - ADM-078
+  - ADM-079
+  - ADM-080
+  - ADM-082
+  - ADM-084
+  - ADM-087
+  - ADM-088
+  - ADM-089
+  - ADM-091
+  - ADM-093
+  - ADM-104
+  - ADM-108
+  - ADM-109
+  - ADM-110
+  - ADM-115
+  - ADM-116
+  - ADM-120
+  - ADM-121
+  - ADM-131
+  - ADM-133
+  - ADM-135
+  - ADM-139
+  - ADM-141
+  - ADM-142
+  - ADM-143
+  - ADM-144
+  - ADM-146
+  - ADM-147
+  - ADM-148
+  - ADM-149
+  - ADM-150
+  - ADM-151
+  - ADM-152
+  - ADM-153
+  - ADM-154
+  - ADM-155
+  - ADM-156
+  - ADM-157
+  - ADM-158
+  - ADM-159
+  - ADM-160
+  - ADM-161
+  - ADM-162
+  - ADM-163
+  - ADM-164
+  - ADM-165
+  - ADM-166
+  - ADM-167
+  - ADM-168
+  - ADM-169
+  - ADM-170
+  - ADM-171
+  - ADM-172
+  - ADM-173
+  - ADM-174
+  - ADM-175
+  - ADM-176
+  - ADM-177
+  - ADM-178
+  - ADM-179
+  - ADM-180
+  - ADM-181
+  - ADM-199
+  - ADM-219
+  - ADM-258
+  - ADM-259
+  - ADM-260
+  - ADM-261
+  - ADM-271
+  - ADM-273
+  - ADM-277
+  - ADM-570
+  - ADM-584
+  - ADM-603
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/approvals.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-049 (#20641)
+  - APP-SETUP-ADM-050 (#20627)
+  - APP-SETUP-ADM-051 (#20642)
+  - APP-SETUP-ADM-075 (#20628)
+  - APP-SETUP-ADM-091 (#20645)
+  - APP-SETUP-ADM-121 (#20646)
+  - APP-SETUP-ADM-148 (#20647)
+  - APP-SETUP-ADM-159 (#20648)
+  - APP-SETUP-ADM-164 (#20649)
+  - APP-SETUP-ADM-169 (#20650)
+  - APP-SETUP-ADM-172 (#20651)
+  - APP-SETUP-ADM-173 (#20652)
+  - APP-SETUP-ADM-174 (#20653)
+  - APP-SETUP-ADM-179 (#20654)
+  - APP-SETUP-ADM-180 (#20655)
+  - APP-SETUP-ADM-181 (#20656)
+  - APP-SETUP-ADM-199 (#20657)
+  - APP-SETUP-ADM-219 (#20658)
+  - APP-SETUP-ADM-570 (#20685)
+  - APP-SETUP-ADM-603 (#20691)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: '**The plan question for the lead (the section merges, CHG-MOV-002):** the slice''s setup operations setPriceListMaster,
+  setRateStructure, setPromotionRule, setBuyGetBogo, setFixedPriceOffer, setGiftFreeProduct, setCrossCategoryPromotion, setEligibilityRule,
+  setCouponPromoCode, setBundleDefinition, setBundleComponent, setGuestChoiceBuild and createBulkProductCatalogue duplicate
+  the typed writers the venue screens already call (createPriceList and setPrices, createPromotion with Discount and PromotionConditions,
+  createCouponCampaign, createBundle with BundleComponent and BundleChoiceGroup, importProductCatalogue and commitCatalogueImport).
+  Retiring them moves the work of 13 pushed APP-SETUP-ADM tickets, so it is a plan change (24-hour cooling-off) and a contract
+  deprecation, not a screen edit. CHG-CSA-044 stays open until then: the builders survive the merge as sections. Bare arrays
+  to paged envelopes break r1 and need breaking-changes.yaml or a new paged operation. Shape and ownership faults, per screen:
+  ADM-584: The table''s columns are the workshop pack''s labels with no bound response field (0 of 4 labels bound).; ADM-049:
+  setPriceListMaster takes a defaultCurrency, and creates price lists a second way beside createPriceList.; ADM-050: The list
+  operation is venue-scoped (PRODUCT_VIEW) while the write is tenant-scoped (PRICE_CONFIGURE).; ADM-051: setRateStructure
+  accepts a currency per rate.; ADM-051: Rates are written by setRateStructure here and by setPrices on BO-009, two writers
+  for the price of one ticket type.; ADM-054: The node carries a base and a selling currency and an FX reference rate.; ADM-070:
+  Product, category, venue, legal entity and customer type are strings.; ADM-089: Owner, market, venue, product and event
+  are strings in the builder, while the strategy record carries ids.; ADM-109: The simulation is a PUT named setPricing with
+  every scope field a string, and channel uses the catalogue Channel enum while other simulations use SalesChannel.; ADM-115:
+  No read operation: the screen declares only createLiveDynamicPrice and nothing that returns the current configuration.;
+  ADM-120: Configurable statuses contradict the fixed ProductLifecycleState enum that transitionProductLifecycle moves along.;
+  ADM-120: The operation is named setLifecycleStatuWorkflow (typo).; ADM-121: createBulkProductCatalogue is a second catalogue-import
+  operation beside importProductCatalogue and commitCatalogueImport.; ADM-148: setPromotionRule types promotion, owner, venue,
+  freeProduct, freeTicket, nested groups and priority as strings, and duplicates createPromotion.; ADM-159: setCouponPromoCode
+  duplicates createCouponCampaign and types campaign and eligibleProducts as plain strings.; ADM-164: The funnel counts generated,
+  assigned, sent, delivered, viewed and redeemed are typed as strings.; ADM-169: Product, category, ticket type, segment,
+  channel and venue are strings; sameProduct, differentProduct and free are strings.; ADM-172: The offer carries its own currency
+  field; maximum repetitions and min/max values are strings.; ADM-173: basketValue is a string, and inventory, location and
+  fulfilment point are free text.; ADM-174: The input is ten free-text fields, one per domain, with no qualifier, reward or
+  link between them.; ADM-179: setBundleDefinition duplicates createBundle (which already carries category, owner, campaign,
+  standalone and recommended flags), with effective dates, sales status and standalone as strings.; ADM-180: The component
+  carries no product or variant reference and no bundle id; minimum and maximum are strings.; ADM-181: Minimum and maximum
+  selections, required/optional and selection order are strings, and the group names no bundle.; ADM-199: Every criterion
+  is a free string and nested groups are a string.; ADM-219: totalCampaignBudget is an integer, costCenter is typed Money,
+  and the other budgets are strings.; ADM-259: Channels are records created here (salesChannelId) but a fixed enum (Channel,
+  SalesChannel) everywhere sales, prices and promotions are recorded.; ADM-261: The assignment carries a currency.; ADM-570:
+  listPaymentProviderConnections returns no described schema.; ADM-603: Instalment eligibility uses its own product-kind list
+  (membership, annualPass, seasonPass, groupBooking, event), not the catalogue''s ProductKind..'
