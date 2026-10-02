@@ -11143,6 +11143,8 @@ screens:
         Delegation is set ahead of time (BO-087); decideApprovalRequest has approve, reject, return and requestInformation
         only.
       source: contracts/spine/approvals.yaml#decideApprovalRequest
+      status: fixed
+      by: CHG-MOV-005
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: listPromotions (PRICE_VIEW),
         listApprovalRequests (APPROVAL_VIEW), decideApprovalRequest (APPROVAL_DECIDE).
@@ -11153,18 +11155,24 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: requiresModule is 'marketing' on a TICVAI Console screen.
       why: >-
         requiresModule ties a screen to what a tenant licensed; a platform operator's console does not depend on
         any tenant's modules (and 'membership' is the guest annual-pass module, not TICVAI's subscription). Should
         be core.
-      source: screens/_schema.yaml#requiresModule; screens/P09-platform-admin-console.yaml#ADM-145
+      source: screens/_schema.yaml#requiresModule; screens/P08-venue-back-office.yaml#ADM-145
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-145; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-145; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-238:
     block: B
     summary: >-
@@ -11211,12 +11219,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-238; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-238; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-239:
     block: B
     summary: >-
@@ -11248,6 +11260,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
   ADM-240:
     block: B
     summary: >-
@@ -11272,12 +11286,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-240; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-240; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-241:
     block: B
     summary: >-
@@ -11296,7 +11314,9 @@ screens:
     corrections:
     - what: No canvas component is declared; only form fields.
       why: A visual designer needs a canvas.
-      source: screens/P09-platform-admin-console.yaml#ADM-241
+      source: screens/P08-venue-back-office.yaml#ADM-241
+      status: logged
+      by: CHG-MOV-009
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: setVisualWorkflow
         (APPROVAL_CONFIGURE).
@@ -11307,13 +11327,17 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         Fields drawn as drop-downs that cannot be choices: text field: Workflow Name, Module, Business Process,
         Owner, Version, Priority, Effective Dates.
       why: >-
         Every board field was generated as a selectField. The request schema says these are free text, dates, numbers
         or yes/no; a drop-down for a name, a code or a date has no options to offer.
-      source: screens/P09-platform-admin-console.yaml#ADM-241; contracts/spine/approvals.yaml#setVisualWorkflow
+      source: screens/P08-venue-back-office.yaml#ADM-241; contracts/spine/approvals.yaml#setVisualWorkflow
+      status: fixed
+      by: CHG-MOV-005
   ADM-242:
     block: B
     summary: >-
@@ -11353,7 +11377,9 @@ screens:
     corrections:
     - what: Routing types are drawn as buttons.
       why: They are one choice of route type.
-      source: screens/P09-platform-admin-console.yaml#ADM-242
+      source: screens/P08-venue-back-office.yaml#ADM-242
+      status: withdrawn
+      by: CHG-MOV-002
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: listApprovalMatrices
         (APPROVAL_CONFIGURE), setApprovalMatrix (APPROVAL_CONFIGURE).
@@ -11364,6 +11390,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: withdrawn
+      by: CHG-MOV-002
   ADM-243:
     block: B
     summary: >-
@@ -11437,6 +11465,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
   ADM-244:
     block: B
     summary: >-
@@ -11459,7 +11489,9 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-244; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-244; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-245:
     block: B
     summary: >-
@@ -11475,7 +11507,9 @@ screens:
     corrections:
     - what: Action types (Execute Refund, Apply Hold) are drawn as buttons.
       why: They are options in an action picker; pressing "Execute Refund" here must not refund anything.
-      source: screens/P09-platform-admin-console.yaml#ADM-245
+      source: screens/P08-venue-back-office.yaml#ADM-245
+      status: fixed
+      by: CHG-MOV-005
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: setTriggerActionCross
         (APPROVAL_CONFIGURE).
@@ -11486,6 +11520,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
   ADM-246:
     block: B
     summary: >-
@@ -11512,12 +11548,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-246; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-246; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-247:
     block: B
     summary: >-
@@ -11552,17 +11592,23 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: Reaches approveVersioningGovernance (step-up mfa) and declares no way to raise the challenge.
       why: >-
         The operation refuses without a fresh stepUpToken, so the action can never succeed from this screen. Add
         createMfaChallenge/verifyMfaChallenge (or the supervisor-PIN overlay for pin) in the action's confirmation.
       source: contracts/spine/approvals.yaml#approveVersioningGovernance
+      status: fixed
+      by: CHG-MOV-006
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-247; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-247; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-248:
     block: B
     summary: >-
@@ -11590,12 +11636,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-248; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-248; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-249:
     block: B
     summary: >-
@@ -11674,12 +11724,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: withdrawn
+      by: CHG-MOV-002
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-249; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-249; screens/_components.yaml#contentSpec.emptyStates
+      status: withdrawn
+      by: CHG-MOV-002
   ADM-250:
     block: B
     summary: >-
@@ -11734,12 +11788,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-250; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-250; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-251:
     block: B
     summary: Failed workflow executions by error type with business impact; retry, resolve or escalate each.
@@ -11772,7 +11830,9 @@ screens:
     corrections:
     - what: Error types are drawn as buttons.
       why: They are filters.
-      source: screens/P09-platform-admin-console.yaml#ADM-251
+      source: screens/P08-venue-back-office.yaml#ADM-251
+      status: fixed
+      by: CHG-MOV-005
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: listWorkflowExceptionFailure
         (APPROVAL_VIEW), actOnWorkflowInstance (APPROVAL_ACT).
@@ -11783,12 +11843,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-251; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-251; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-252:
     block: B
     summary: Workflows approaching or past their time limits, the longest-waiting steps and escalation levels.
@@ -11830,12 +11894,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: withdrawn
+      by: CHG-MOV-002
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-252; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-252; screens/_components.yaml#contentSpec.emptyStates
+      status: withdrawn
+      by: CHG-MOV-002
   ADM-253:
     block: B
     summary: >-
@@ -11850,7 +11918,7 @@ screens:
     corrections:
     - what: The only operation creates an autonomous action; nothing lists executions.
       why: A monitor needs the read.
-      source: screens/P09-platform-admin-console.yaml#ADM-253
+      source: screens/P08-venue-back-office.yaml#ADM-253
       status: logged
       by: CHG-WIR-024
     - what: >-
@@ -11863,6 +11931,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
   ADM-254:
     block: B
     summary: A workflow spanning several services (e.g. group booking confirmation) step by step across modules.
@@ -11889,12 +11959,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-254; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-254; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-255:
     block: B
     summary: 'Workflow performance: volume, completion, failure, automation, escalation, rework, SLA compliance.'
@@ -11929,12 +12003,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-255; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-255; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-256:
     block: B
     summary: Processes worth simplifying or automating, by volume, steps, duration and exception rate.
@@ -11963,12 +12041,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-256; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-256; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-257:
     block: B
     summary: >-
@@ -11984,7 +12066,9 @@ screens:
     corrections:
     - what: The table has no columns.
       why: Nothing to draw.
-      source: screens/P09-platform-admin-console.yaml#ADM-257
+      source: screens/P08-venue-back-office.yaml#ADM-257
+      status: fixed
+      by: CHG-MOV-005
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: listWorkflowAutonomouGovernance
         (APPROVAL_VIEW).
@@ -11995,12 +12079,16 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-257; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-257; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   ADM-318:
     block: B
     summary: >-
@@ -15832,7 +15920,9 @@ screens:
     corrections:
     - what: Name ends with a tab and a number.
       why: Import artefact.
-      source: screens/P09-platform-admin-console.yaml#ADM-581
+      source: screens/P08-venue-back-office.yaml#ADM-581
+      status: fixed
+      by: CHG-MOV-004
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: enrolDevice (DEVICE_MANAGE),
         setPaymentTerminalConfiguration (PAYMENT_CONFIGURE).
@@ -15843,6 +15933,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
   ADM-582:
     block: B
     summary: Which payment terminal is paired with which till or kiosk.
@@ -15852,7 +15944,9 @@ screens:
     corrections:
     - what: Name ends with a tab and a number.
       why: Import artefact.
-      source: screens/P09-platform-admin-console.yaml#ADM-582
+      source: screens/P08-venue-back-office.yaml#ADM-582
+      status: fixed
+      by: CHG-MOV-004
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: setDeviceAssignment
         (DEVICE_MANAGE).
@@ -15863,6 +15957,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
   ADM-584:
     block: B
     summary: The communication path from till to terminal to payment server to provider, per terminal.
@@ -15883,7 +15979,9 @@ screens:
     corrections:
     - what: Name ends with a tab and a number.
       why: Import artefact.
-      source: screens/P09-platform-admin-console.yaml#ADM-584
+      source: screens/P08-venue-back-office.yaml#ADM-584
+      status: fixed
+      by: CHG-MOV-004
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: getDeviceTelemetry
         (DEVICE_VIEW).
@@ -15894,18 +15992,24 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-584; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-584; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
     - what: >-
         The table's columns are the workshop pack's labels with no bound response field (0 of 4 labels bound).
       why: >-
         The operation returns no schema with described properties, so a developer cannot fill these columns and
         a designer cannot know their formats. The response schema needs the fields (or the columns go).
-      source: screens/P09-platform-admin-console.yaml#ADM-584
+      source: screens/P08-venue-back-office.yaml#ADM-584
+      status: logged
+      by: CHG-MOV-008
   ADM-587:
     block: B
     summary: 'Terminal health and maintenance: failing terminals, firmware, replacement work orders.'
@@ -15942,7 +16046,9 @@ screens:
     corrections:
     - what: Name ends with a tab and a number.
       why: Import artefact.
-      source: screens/P09-platform-admin-console.yaml#ADM-587
+      source: screens/P08-venue-back-office.yaml#ADM-587
+      status: fixed
+      by: CHG-MOV-004
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: getDeviceTelemetry
         (DEVICE_VIEW), createWorkOrder (WORK_ORDER_MANAGE), listDeviceFirmware (DEVICE_VIEW), getDeviceFirmware
@@ -15954,6 +16060,8 @@ screens:
         (P08), where the tenant's own staff use it.
       source: >-
         R098; contracts/spine/identity.yaml#openPlatformStaffGrant; screens/P09-platform-admin-console.yaml#ADM-412
+      status: fixed
+      by: CHG-MOV-001
   ADM-618:
     block: B
     summary: >-
@@ -15977,7 +16085,7 @@ screens:
     corrections:
     - what: No operation is declared.
       why: A simulator needs a simulate operation.
-      source: screens/P09-platform-admin-console.yaml#ADM-618
+      source: screens/P08-venue-back-office.yaml#ADM-618
       status: logged
       by: CHG-WIR-024
     - what: >-
@@ -15985,7 +16093,9 @@ screens:
       why: >-
         A copy of the pattern's default text. The empty state must say what empty means here (for a queue or monitor:
         nothing waiting, which is good news) and offer the action that exists, or none.
-      source: screens/P09-platform-admin-console.yaml#ADM-618; screens/_components.yaml#contentSpec.emptyStates
+      source: screens/P08-venue-back-office.yaml#ADM-618; screens/_components.yaml#contentSpec.emptyStates
+      status: fixed
+      by: CHG-MOV-003
   PTR-001:
     block: B
     summary: >-

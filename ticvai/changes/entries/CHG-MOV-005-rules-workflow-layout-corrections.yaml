@@ -1,0 +1,46 @@
+id: CHG-MOV-005
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'Layout corrections on moved Block B screens: free-text fields stop being drop-downs (ADM-241), action and error
+  types become one choice (ADM-245, ADM-251), ADM-257''s table gets columns, ADM-145 loses its Delegate button and ADM-157
+  its borrowed purpose.'
+decision:
+  what: 'ADM-241: Workflow Name, Module, Business Process, Owner, Version and Priority become text fields and Effective Dates
+    a date picker, bound to VisualWorkflowDesignerInput; Save calls setVisualWorkflow. ADM-245: the eight action buttons become
+    one multi-select bound to allowedActions, saved by setTriggerActionCross. ADM-251: the eight error-type buttons become
+    an Error type filter on errorType. ADM-257: table and panel columns from AiWorkflowIntelligenceAutonomousGovernanceCenterView.
+    ADM-145: no Delegate (delegation is set ahead on BO-087); requiresModule core. ADM-157: its own purpose (test a basket,
+    replay history).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'The design-notes correction on each screen: platform-foundation ADM-241 ("Fields drawn as drop-downs that cannot be
+  choices"), ADM-245 ("Action types ... are drawn as buttons; pressing Execute Refund here must not refund anything"), ADM-251
+  ("Error types are drawn as buttons. They are filters"), ADM-257 ("The table has no columns"), ADM-145 ("Delegate is a decision
+  button": decideApprovalRequest has no delegate; BO-087), and ticketing-backoffice ADM-157 ("The purpose text is shared word
+  for word with ADM-187"). Chinmay, 2 October (PHASE-B): apply the open Block A and B corrections.'
+keys_touched:
+  screens:
+  - ADM-145
+  - ADM-157
+  - ADM-241
+  - ADM-245
+  - ADM-251
+  - ADM-257
+  operations:
+  - setVisualWorkflow
+  - setTriggerActionCross
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 56035b56
+notes: 'check-screen-wiring S-FIELD-BINDING refuses a binding to a field the schema lacks (the new bindings resolve) and S-BUTTON-FORM
+  a write button with nothing collecting its body. A canvas for ADM-241 needs a component kind the library lacks: CHG-MOV-009.'

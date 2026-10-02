@@ -3467,7 +3467,7 @@ paths:
         - "P09 ADM-519 AI Governance Command Center"
         - "P09 ADM-536 Human Override & Manual Control Center"
         - "P09 ADM-556 AI Incident & Remediation Management"
-        - "P09 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
+        - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 governance, 3.2 events; our build plan, shape follows
         reindexSource'
       summary: Stop a capability now
@@ -6631,8 +6631,8 @@ paths:
     get:
       operationId: getEntityRisk
       x-ticvai-consumed-by:
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows getAiPolicy'
       summary: Current risk of an entity
       description: 'A customer, account, device, token, credential, cluster or staff member (design 5.3, AIP-128):
@@ -6663,7 +6663,7 @@ paths:
     put:
       operationId: configureRiskStrategy
       x-ticvai-consumed-by:
-        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
+        - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk (setRiskStrategy), 8 decision 6; our build plan,
         shape follows setAiPolicy'
       summary: Set the risk strategy
@@ -6716,7 +6716,7 @@ paths:
     post:
       operationId: backtestRiskStrategy
       x-ticvai-consumed-by:
-        - "P09 ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor\t176"
+        - "P08 ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor\t176"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows simulateRecommendationStrategy'
       summary: Backtest a draft strategy
       description: 'What the draft would have done over a past window at the same review rate: recall, precision
@@ -6770,8 +6770,8 @@ paths:
       operationId: listRiskAlerts
       x-ticvai-consumed-by:
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows listProposedActions'
       summary: Risk alerts
       description: 'Alerts to work (AIP-109), highest band first. An alert is a signal, not a finding (AIP-163).
@@ -6864,7 +6864,7 @@ paths:
       operationId: decideRiskAlert
       x-ticvai-consumed-by:
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows decideProposedAction'
       summary: Dismiss, monitor, mark false positive, or escalate
       description: 'An analyst''s disposition. `falsePositive` is a label the next candidate model learns from (design
@@ -6932,7 +6932,7 @@ paths:
       operationId: createRiskCase
       x-ticvai-consumed-by:
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows createAiConversation'
       summary: Open an investigation
       description: 'A case from one or more alerts or entities (AIP-150). The alerts'' assessments are attached
@@ -7021,7 +7021,7 @@ paths:
       operationId: getRiskCase
       x-ticvai-consumed-by:
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows getAiPolicy'
       summary: A case with its evidence and actions
       description: 'The case, its evidence (each labelled source, derived or model-inferred), proposed actions and
@@ -7059,7 +7059,7 @@ paths:
     post:
       operationId: addRiskCaseEvidence
       x-ticvai-consumed-by:
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows recordSuggestionOutcome'
       summary: Add evidence to a case
       description: 'Stored in `jsonb` and as an immutable Blob copy (AIP-155). Evidence is never edited; a correction
@@ -7108,7 +7108,7 @@ paths:
     get:
       operationId: expandRiskNetwork
       x-ticvai-consumed-by:
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk, 2.4; our build plan, shape follows getAiPolicy'
       summary: Expand the relationship graph around an entity
       description: '**Bounded 1 to 3 hops** over shared devices, tokens and accounts (AIP-111). The result is capped
@@ -7177,7 +7177,7 @@ paths:
     post:
       operationId: proposeRiskAction
       x-ticvai-consumed-by:
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk, 3.8; our build plan, shape follows generateConfiguration'
       summary: Propose a restrictive action from a case
       description: '**Restrictive actions go to the owning module through the action pipeline, never straight from
@@ -7257,7 +7257,7 @@ paths:
       operationId: closeRiskCase
       x-ticvai-consumed-by:
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management\t170"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk, 3.2 events; our build plan, shape follows decideProposedAction'
       summary: Close a case with an outcome
       description: 'Confirmed fraud, not fraud, or inconclusive: **alert, case and confirmed fraud stay distinct**
@@ -7408,7 +7408,6 @@ paths:
         - "P08 BO-367 Approval Request Detail"
         - "P08 BO-368 AI Decision Support"
         - "P08 BO-369 High Priority & Risk Queue"
-        - "P09 ADM-249 Unified Approval Inbox & Decision Workspace"
         - "P09 ADM-366 AI Approval Intelligence Center"
       x-ticvai-agreed: '29 September: minutes of 8 September (context only); our build plan, shape follows getEntityRisk'
       summary: The latest context score of an approval request
@@ -7690,13 +7689,13 @@ paths:
       operationId: explainRecommendationDecision
       x-ticvai-consumed-by:
         - "P09 ADM-543 Candidate, Rule & Decision Path Trace"
-        - "P09 ADM-678 Journey Simulator, Decision Trace & AI Optimization"
-        - "P09 ADM-680 Customer Recommendation Profile"
-        - "P09 ADM-683 Next-Best-Offer Decision Studio"
-        - "P09 ADM-686 Anonymous, Known & Identity-Transition Personalization.123"
-        - "P09 ADM-687 AI Explainability, Confidence & Model Governance"
-        - "P09 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
-        - "P09 ADM-697 Recommendation Audit, Decision Trace & Investigation"
+        - "P08 ADM-678 Journey Simulator, Decision Trace & AI Optimization"
+        - "P08 ADM-680 Customer Recommendation Profile"
+        - "P08 ADM-683 Next-Best-Offer Decision Studio"
+        - "P08 ADM-686 Anonymous, Known & Identity-Transition Personalization.123"
+        - "P08 ADM-687 AI Explainability, Confidence & Model Governance"
+        - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
+        - "P08 ADM-697 Recommendation Audit, Decision Trace & Investigation"
       x-ticvai-agreed: '29 September: AI system design 2.3 recommend, 3.9; our build plan, shape follows listAiInteractions'
       summary: Why these recommendations
       description: '**Explanation at three depths, each gated** (AIC-195, AIR-193..202): `business` with `AI_USE`;
@@ -7746,7 +7745,7 @@ paths:
     get:
       operationId: getCustomerRecommendationProfile
       x-ticvai-consumed-by:
-        - "P09 ADM-680 Customer Recommendation Profile"
+        - "P08 ADM-680 Customer Recommendation Profile"
       x-ticvai-agreed: '29 September: AI system design 2.3 recommend; our build plan, shape follows getAiPolicy'
       summary: What the engine knows about a customer
       description: 'Segment, affinities, explicit declines, consent flags and recent decisions for one customer
@@ -8349,7 +8348,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-554 AI Quality, Behavior & Governance Drift Monitoring"
         - "P09 ADM-556 AI Incident & Remediation Management"
-        - "P09 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
+        - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 models, 3.5; our build plan, shape follows decideProposedAction'
       summary: Roll a release back
       description: '**A pointer switch** (design 3.5): production returns to the previous artefact, or to the rule.

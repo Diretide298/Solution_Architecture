@@ -1,0 +1,42 @@
+id: CHG-MOV-004
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: Six moved Block A and B screens lose the pack page number that the import left at the end of their names.
+decision:
+  what: ADM-570 Gateway, PSP & Acquirer Directory; ADM-581 Terminal Provisioning & Device Configuration; ADM-582 POS, Kiosk
+    & Terminal Assignment Manager; ADM-584 Payment Server & Terminal Connectivity Manager; ADM-587 Terminal Health, Maintenance
+    & Incident Center; ADM-603 B2B Invoice, On-Account & Payment Terms Configuration (the consumed-by lines carry the clean
+    names).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'The design-notes correction on each screen (ticketing-backoffice ADM-570, ADM-603; platform-foundation ADM-581, 582,
+  584, 587): "The screen name ends in an escaped tab and the pack page number ... it would print on the screen title and the
+  navigation". The same import artefact remains on the Block C screens (ADM-559..ADM-638), left open for their sprint.'
+keys_touched:
+  screens:
+  - ADM-570
+  - ADM-581
+  - ADM-582
+  - ADM-584
+  - ADM-587
+  - ADM-603
+  files:
+  - contracts/satellite/payments.yaml (x-ticvai-consumed-by)
+  - contracts/spine/tenancy.yaml and contracts/satellite/maintenance.yaml (x-ticvai-consumed-by)
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-570 (#20685)
+  - APP-SETUP-ADM-603 (#20691)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'No check reads screen names for a trailing tab or page number. Proposed for the lead: a check-screens rule that
+    a screen name carries no tab (real or escaped) and does not end in a pack page number; until it exists or the lead approves
+    none, this entry stays open.'
+status: open
+notes: About 80 Block C names still carry the artefact; the proposed rule would list them.

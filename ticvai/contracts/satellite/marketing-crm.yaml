@@ -3537,7 +3537,7 @@ paths:
         - "P08 BO-737 Customer 360 Profile"
         - "P08 BO-738 Activity Timeline"
         - "P08 BO-740 Family & Guardians"
-        - "P09 ADM-680 Customer Recommendation Profile"
+        - "P08 ADM-680 Customer Recommendation Profile"
       security:
       - guestAuth: []
       - bearerAuth: []
