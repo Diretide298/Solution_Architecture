@@ -7289,8 +7289,9 @@ screens:
         - AnalyticsGovernancePolicy.export
         - AnalyticsGovernancePolicy.masking
         operation: getAnalyticsGovernancePolicy
-        notes: Read-only here; edited on ANL-070 (DEC-225). **Sharing, export and subscription cannot
-          bypass the permission model** (the pack's acceptance condition).
+        notes: Read-only here; edited on ANL-070 by holders of `REPORT_GOVERNANCE_MANAGE` (DEC-225, CHG-FUP-007).
+          **Sharing, export and subscription cannot bypass the permission model** (the pack's acceptance
+          condition).
         provenance: contract reporting.yaml GET /analytics-governance-policy (CHG-CSA-021)
     - name: actionBar
       slot: rowActions
@@ -10250,6 +10251,7 @@ screens:
           fields; `masking.unmaskedForPermissions` names who may see them unmasked. Masked before a value
           leaves the query (ADR-0054).'
         provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
       - kind: multiSelect
         label: Export formats allowed
         bindsTo: AnalyticsGovernancePolicy.export
@@ -10257,6 +10259,7 @@ screens:
         notes: '`export.allowedFormats`; `export.personalDataNeedsPermission` (default on: an export carrying
           personal data needs `REPORT_EXPORT_PII`) and `export.maxRows` beside it.'
         provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
       - kind: numberField
         label: Keep report results and exports for (days)
         bindsTo: AnalyticsGovernancePolicy.retention
@@ -10264,6 +10267,7 @@ screens:
         notes: '`retention.resultDays`; empty keeps them until the data-retention settings remove them
           (ANL-050).'
         provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
       - kind: toggle
         label: Allow external share links
         bindsTo: AnalyticsGovernancePolicy.sharing
@@ -10271,6 +10275,7 @@ screens:
         notes: '`sharing.externalLinks` (default off) and `sharing.allowedDomains`, the only domains a
           link may be sent to.'
         provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
       - kind: toggle
         label: AI assistant may answer analytics questions
         bindsTo: AnalyticsGovernancePolicy.aiAndApiAccess
@@ -10278,6 +10283,7 @@ screens:
         notes: '`aiAndApiAccess.aiAssistant` (default on, through the semantic layer only) and `aiAndApiAccess.publicApi`
           (default off).'
         provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
       - kind: detailPanel
         label: The policy in force
         bindsTo: AnalyticsGovernancePolicy
@@ -10296,9 +10302,10 @@ screens:
       - kind: primaryButton
         label: Save governance policy
         operation: setAnalyticsGovernancePolicy
-        notes: Replaces the whole policy; the confirmation names each section that changes. Gated by `PERMISSION_MANAGE`
-          until `REPORT_GOVERNANCE_MANAGE` joins the vocabulary (CHG-CSA-007).
+        notes: Replaces the whole policy; the confirmation names each section that changes. Needs `REPORT_GOVERNANCE_MANAGE`
+          (joined the vocabulary 2 October, CHG-FUP-007); shown only to its holders.
         provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
     - name: contextPanel
       slot: selection
       components:
@@ -10333,8 +10340,10 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the analytics governance security are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Names the missing permission: reading the audit trail and the governance policy needs
+      `REPORT_VIEW_TENANT`, and changing the policy needs `REPORT_GOVERNANCE_MANAGE` (CHG-FUP-007); without
+      it the policy shows read-only and says who can change it. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question.'
   apis:
   - operationId: listAuditRecords
     contract: tenancy
