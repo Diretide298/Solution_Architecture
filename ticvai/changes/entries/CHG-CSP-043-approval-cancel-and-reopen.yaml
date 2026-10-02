@@ -1,0 +1,37 @@
+id: CHG-CSP-043
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: New cancelApprovalRequest and reopenApprovalRequest; expiry stays the timer.
+decision:
+  what: POST /approval-requests/{requestId}/cancel (APPROVAL_CONFIGURE, reason) and /reopen (a new linked request from expired
+    or cancelled); states/approval-request.yaml cancel transitions and reopen note; ApprovalStateProblem lists their refusals.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction on BO-380 (Block B, platform-foundation): "only withdrawApprovalRequest exists, and cancellation,
+  expiry and reopening have no operation", logged open in CHG-WIR-024.'
+keys_touched:
+  screens:
+  - BO-380
+  operations:
+  - cancelApprovalRequest
+  - reopenApprovalRequest
+  files:
+  - contracts/spine/approvals.yaml
+  - states/approval-request.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: closed
+closed_by_commit: ce2e32da
+notes: 'check-states holds the cancel transitions to an existing operation and refused, on this branch, reopen modelled
+  as a move out of a terminal state, which is why reopen creates a new request. BO-380 binds both (screens owner). Applied
+  in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October
+  2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

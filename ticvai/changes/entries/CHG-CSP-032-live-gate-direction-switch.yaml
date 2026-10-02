@@ -1,0 +1,47 @@
+id: CHG-CSP-032
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: A gate's direction can be switched live by a holder of the configuration right, and the switch is logged; audit
+  R221 amended.
+decision:
+  what: New setAccessPointDirection (PUT /access-points/{accessPointId}/direction, ACCESS_POINT_CONFIGURE, reason, optional
+    effectiveAt); AccessGateModeChange.fromDirection and toDirection; R221 text amended on setTurnstileMode and AccessPoint.direction;
+    states/access-gate-mode-change.yaml.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, critical set 1, BO-230 (Q255): "Live direction switch with permission, logged; R221 amended"
+  (DI-648, client 2 September). Decision ledger: DEC-255 (workbook Q255).'
+keys_touched:
+  screens:
+  - BO-230
+  - SCN-016
+  operations:
+  - setAccessPointDirection
+  - setTurnstileMode
+  schemas:
+  - AccessPoint
+  - AccessGateModeChange
+  files:
+  - contracts/spine/access.yaml
+  - states/access-gate-mode-change.yaml
+  tickets:
+  - SVC-ACCESS-ACCESSPOINT-2
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-ACCESS-ACCESSPOINT-2 (#17876)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. A dedicated gate-direction
+  permission, if wanted, belongs in permissions.yaml (permissions owner); the operation is new, so its permission can still
+  change before r2. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block
+  A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

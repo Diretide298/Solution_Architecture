@@ -1,0 +1,65 @@
+id: CHG-CSP-018
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: Biometric capture is consented on the venue's own consent form, recorded per capture; where TICVAI holds the templates
+  the venue is warned.
+decision:
+  what: VenueSettings.biometrics.consentFormId (enabling biometrics refused without it) and templatesHeldByTicvai; Face
+    Tag profile consentFormId and view warning; enrolFaceTag and enrolFacePass record consentFormId and version; BiometricPolicy
+    describes it.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 4, BO-188 (Q128): "Consent first, on the venue''s consent form; warn the venue when
+  TICVAI stores the data" and "Consent form builder in Venue Management" (DEC-549; one builder for Face Pass, Face Tag,
+  marketing and waivers). ADR-0063. Decision ledger: DEC-128, DEC-549 (workbook Q128).'
+keys_touched:
+  screens:
+  - BO-188
+  - BO-187
+  - GST-069
+  - BO-747
+  operations:
+  - setVenueSettings
+  - setFaceTagTemporaryEnrollment
+  - enrolFaceTag
+  - enrolFacePass
+  schemas:
+  - VenueSettings
+  - FaceTagTemporaryEnrollmentInput
+  - FaceTagTemporaryEnrollmentView
+  - FacePassEnrolment
+  - BiometricPolicy
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/access.yaml
+  tickets:
+  - SVC-TENANCY-TENANCY-1
+  - SVC-ACCESS-ACCESS-1
+  - SVC-ACCESS-ACCESS-2
+  - SVC-ACCESS-ACCESS-6
+  - APP-SETUP-BO-188
+  - APP-MOB-GST-069
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-TENANCY-1 (#17884)
+  - SVC-ACCESS-ACCESS-1 (#17927)
+  - SVC-ACCESS-ACCESS-2 (#17874)
+  - SVC-ACCESS-ACCESS-6 (#20662)
+  - APP-SETUP-BO-188 (#20677)
+  - APP-MOB-GST-069 (#18178)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. Depends on the consent-form
+  builder (marketing-crm setDigitalWaiverForm, screens BO-747/CMS-043) and ADR-0063, both other owners. Applied in worktree
+  apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys naming a touched operation or screen.'

@@ -1,0 +1,43 @@
+id: CHG-CSP-040
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: The period close carries wallet pre-close checks and the wallet roll-forward; the close cannot pass while it does
+  not tie.
+decision:
+  what: PeriodCloseResult.walletChecks (walletRollForwardTies, walletLiabilityMatchesLedger, noPendingWalletAuthorisations,
+    expiredBalancesReleased, walletDisputesReviewed) and walletRollForward; beginPeriodClose describes the freeze.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 8, BO-1170 (Q220): "Add a wallet movement summary operation and wallet pre-close
+  checks". Decision ledger: DEC-220 (workbook Q220).'
+keys_touched:
+  screens:
+  - BO-1170
+  - BO-090
+  operations:
+  - beginPeriodClose
+  schemas:
+  - PeriodCloseResult
+  files:
+  - contracts/spine/finance.yaml
+  tickets:
+  - VM-LEDGER-LEDGER-1
+  - VM-BO-090
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - VM-LEDGER-LEDGER-1 (#18332)
+  - VM-BO-090 (#18239)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: open
+notes: 'Open: getWalletMovementSummary is the wallet owner''s; the prevention is a check-finance-rules rule that the close
+  fails when the wallet roll-forward does not tie (DEC-220 hint), tools owner. Applied in worktree apply-contracts-spine
+  (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv
+  keys naming a touched operation or screen.'

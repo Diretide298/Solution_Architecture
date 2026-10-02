@@ -1,0 +1,40 @@
+id: CHG-CSP-025
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: A zone has a security classification level, Public, Restricted, Secure or Critical, with renamable labels.
+decision:
+  what: securityClassificationLevel (public, restricted, secure, critical) on AccessAccessArea and the zone builder input
+    and view; the existing securityClassification string is the venue's label.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 9, BO-146 (Q227): "Public / Restricted / Secure / Critical (renamable)". Decision
+  ledger: DEC-227 (workbook Q227).'
+keys_touched:
+  screens:
+  - BO-146
+  operations:
+  - setAccessAreaZone
+  schemas:
+  - AccessAccessArea
+  - AccessAreaZoneBuilderInput
+  - AccessAreaZoneBuilderView
+  files:
+  - contracts/spine/access.yaml
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. A new field, because
+  turning the r1 string into an enum is a type change against r1. Applied in worktree apply-contracts-spine (batch CSP,
+  2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming
+  a touched operation or screen.'

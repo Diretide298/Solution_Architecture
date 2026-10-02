@@ -1,0 +1,34 @@
+id: CHG-CSP-048
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: New listProductApprovalWorkflows reads back the workflows approveWorkflow writes.
+decision:
+  what: GET /product-approval-workflows (PRODUCT_VIEW), paged, ordered by name.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction on BO-637 (Block B, ticketing-backoffice): "No read operation ... It opens as an empty form
+  even where a configuration exists" (PR-9), logged open in CHG-WIR-027.'
+keys_touched:
+  screens:
+  - BO-637
+  operations:
+  - listProductApprovalWorkflows
+  - approveWorkflow
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 119fe101
+notes: 'S-NO-READ reports BO-637 (an edit with no read) on the parent commit; it clears when BO-637 binds the read (screens
+  owner). Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday
+  5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

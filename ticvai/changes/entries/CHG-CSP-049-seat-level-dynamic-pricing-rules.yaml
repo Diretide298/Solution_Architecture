@@ -1,0 +1,37 @@
+id: CHG-CSP-049
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: New listSeatPricingRules and setSeatPricingRule hold seat-level dynamic pricing rules with floor, ceiling and step.
+decision:
+  what: GET /seat-pricing-rules and PUT /seat-pricing-rules/{ruleId} (PRICE_CONFIGURE, venue config scope) with SeatPricingRule.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction on BO-1044 (Block B, ticketing-backoffice): "The screen only lists strategies; nothing writes
+  a seat pricing rule", logged open in CHG-WIR-027.'
+keys_touched:
+  screens:
+  - BO-1044
+  operations:
+  - listSeatPricingRules
+  - setSeatPricingRule
+  schemas:
+  - SeatPricingRule
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 119fe101
+notes: 'S-NO-READ holds the read beside the rule write; check-config-scope holds setSeatPricingRule to a declared venue
+  scope. BO-1044 binds both (screens owner). Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets:
+  none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation
+  or screen.'

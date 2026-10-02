@@ -1,0 +1,50 @@
+id: CHG-CSP-013
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: A supervisor can reject a variance so the cashier recounts and resubmits; new rejectShiftVariance.
+decision:
+  what: New rejectShiftVariance (OVERSHORT_ACCEPT, PIN step-up, reason) leaves the shift pendingVariance with recountRequestedAt,
+    recountRequestedByPrincipalId and recountReason; submitShiftCount takes the recount at any till; Shift.countNumber;
+    a recount within the threshold closes the shift (states/shift.yaml). No status added.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 #175, BO-040 (Q175): "Add Reject + recount (DI-804)"; MoM 9 September 4.18 (DI-804);
+  still blind (CHG-FIN-003). Decision ledger: DEC-175 (workbook Q175).'
+keys_touched:
+  screens:
+  - BO-040
+  - POS-007
+  - BO-043
+  operations:
+  - rejectShiftVariance
+  - submitShiftCount
+  schemas:
+  - Shift
+  files:
+  - contracts/spine/shift.yaml
+  - states/shift.yaml
+  tickets:
+  - APP-POS-POS-007
+  - VM-BO-040
+  - VM-BO-043
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-007 (#18000)
+  - VM-BO-040 (#18255)
+  - VM-BO-043 (#18247)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. New operation: the
+  permission (OVERSHORT_ACCEPT) is in permissions.yaml; screens bind it. Applied in worktree apply-contracts-spine (batch
+  CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys
+  naming a touched operation or screen.'

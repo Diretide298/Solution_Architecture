@@ -1,0 +1,44 @@
+id: CHG-CSP-030
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: Access supports time-bound entitlements valid for N minutes from the first scan; a later scan is denied, offline
+  too.
+decision:
+  what: AccessValidityTimeRulesView.minutesAfterFirstScan; Entitlement.firstEntryAt and timeBoundUntil; ValidationResult.denyCause
+    timeBoundWindowElapsed (denyReason expired); travels in the offline package (ADR-0068).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 10a, BO-159 (Q232): "Yes: add time-bound entitlements (validity from first scan)"
+  (DI-458). Decision ledger: DEC-232 (workbook Q232).'
+keys_touched:
+  screens:
+  - BO-159
+  - BO-158
+  operations:
+  - listAccessValidityTime
+  - validateAccess
+  schemas:
+  - AccessValidityTimeRulesView
+  - Entitlement
+  - ValidationResult
+  files:
+  - contracts/spine/access.yaml
+  tickets:
+  - VM-ACCESS-VALIDATION-1
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - VM-ACCESS-VALIDATION-1 (#18384)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-access-time-bound.py
+status: open
+notes: 'Open: the prevention is an access test that a second scan after the window is refused and the offline package carries
+  the rule (DEC-232 hint), not yet written. listAccessValidityTime has no write yet (logged in CHG-WIR-004 class). Applied
+  in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October
+  2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

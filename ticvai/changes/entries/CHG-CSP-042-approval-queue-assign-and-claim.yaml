@@ -1,0 +1,36 @@
+id: CHG-CSP-042
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: New assignApprovalRequest lets an approver claim a request in a shared queue, or a delegate assign or reassign
+  it to a person or a department.
+decision:
+  what: PUT /approval-requests/{requestId}/assignment (APPROVAL_DECIDE, escalated APPROVAL_DELEGATE); ApprovalRequest.assignedToPrincipalId,
+    assignedToDepartmentId, assignedAt.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction on BO-366 (Block B, platform-foundation): "DI-723 asks for assign and reassign to department
+  or person; the approvals contract has no assign or claim operation", logged open in CHG-WIR-024.'
+keys_touched:
+  screens:
+  - BO-366
+  operations:
+  - assignApprovalRequest
+  schemas:
+  - ApprovalRequest
+  files:
+  - contracts/spine/approvals.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: 'Open until BO-366 binds it (screens owner). Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026).
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation
+  or screen.'

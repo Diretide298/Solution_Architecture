@@ -1,0 +1,70 @@
+id: CHG-CSP-053
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: The contract gaps on Block A and B workshop-pack console screens (pricing, channel, catalogue lifecycle) are not
+  built; they wait for the ADM-049 move and merge.
+decision:
+  what: No change. Gaps named in CHG-WIR-027 for ADM-052, ADM-055, ADM-059 to ADM-067, ADM-070, ADM-072, ADM-073, ADM-076,
+    ADM-079, ADM-084, ADM-093, ADM-109, ADM-110, ADM-111, ADM-115, ADM-120, ADM-123, ADM-124, ADM-127, ADM-259, ADM-260,
+    ADM-261, ADM-266, ADM-267, ADM-276 stay open.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 1, ADM-049 (DEC-100): the 410 workshop-pack screens "are venue screens", to be moved
+  to Venue Management and merged with BO-008 to BO-011 "so one surface edits each record"; the pre-apply round: "Duplicate
+  screens: merge as proposed". Building reads and writes for each workshop screen now would cement the duplicate surfaces
+  the merge removes. Gaps logged in CHG-WIR-027.'
+keys_touched:
+  screens:
+  - ADM-052
+  - ADM-055
+  - ADM-059
+  - ADM-060
+  - ADM-061
+  - ADM-062
+  - ADM-063
+  - ADM-064
+  - ADM-065
+  - ADM-066
+  - ADM-067
+  - ADM-070
+  - ADM-072
+  - ADM-073
+  - ADM-076
+  - ADM-079
+  - ADM-084
+  - ADM-093
+  - ADM-109
+  - ADM-110
+  - ADM-111
+  - ADM-115
+  - ADM-120
+  - ADM-123
+  - ADM-124
+  - ADM-127
+  - ADM-259
+  - ADM-260
+  - ADM-261
+  - ADM-266
+  - ADM-267
+  - ADM-276
+  files:
+  - contracts/spine/catalogue.yaml
+  tickets:
+  - APP-SETUP-ADM-055
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ADM-055 (#20643)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: open
+notes: 'Open: decided once the screens branch lands the ADM-049 merge; each surviving surface then names the operation it
+  needs on the merged record (createPromotion/updatePromotion and getPromotion, the price matrix, the channel record) rather
+  than a read per workshop screen. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

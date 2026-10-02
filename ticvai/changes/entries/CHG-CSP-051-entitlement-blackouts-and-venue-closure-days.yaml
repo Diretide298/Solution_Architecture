@@ -1,0 +1,41 @@
+id: CHG-CSP-051
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: New setEntitlementTemplateBlackoutDates sets product blackout dates; an operating-calendar entry can close the
+  whole venue.
+decision:
+  what: PUT /entitlement-templates/{templateId}/blackout-dates (PRODUCT_CONFIGURE, venue scope); AccessOperatingCalendarEntry.venueClosed.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction on BO-019 (Block B, ticketing-backoffice): "No operation sets product blackout dates or a
+  venue closure day" (DI-452), logged open in CHG-WIR-027.'
+keys_touched:
+  screens:
+  - BO-019
+  operations:
+  - setEntitlementTemplateBlackoutDates
+  - setOperatingCalendarEntry
+  schemas:
+  - EntitlementTemplate
+  - AccessOperatingCalendarEntry
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/access.yaml
+  tickets:
+  - VM-BO-019
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - VM-BO-019 (#18379)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: 'Open until BO-019 binds them (screens owner). Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026).
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation
+  or screen.'

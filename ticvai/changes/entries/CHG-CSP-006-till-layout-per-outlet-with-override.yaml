@@ -1,0 +1,58 @@
+id: CHG-CSP-006
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: 'The till layout is set per outlet and a till may override it: Outlet.saleBoardId, Workstation.outletId and saleBoardSource,
+  and ConfigureWorkstationRequest.saleBoardId optional.'
+decision:
+  what: Outlet.saleBoardId; Workstation.outletId and readOnly saleBoardSource (outlet or workstation); ConfigureWorkstationRequest.saleBoardId
+    optional (absent inherits the outlet board) and outletId; configureWorkstation refuses 422 sale-board-required when
+    neither applies.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 4, BO-109 (Q183): "Per outlet, with a till override" (DI-326 puts the layout
+  at the outlet; MATRIX 2.1.9 binds a board to a workstation). Also what Session.saleBoardId reads on a till (CHG-CSP-002).
+  Decision ledger: DEC-183 (workbook Q183).'
+keys_touched:
+  screens:
+  - BO-109
+  - POS-016
+  - BO-602
+  operations:
+  - configureWorkstation
+  - getWorkstation
+  - createOutlet
+  - updateOutlet
+  schemas:
+  - Outlet
+  - Workstation
+  - ConfigureWorkstationRequest
+  files:
+  - contracts/spine/tenancy.yaml
+  tickets:
+  - SVC-TENANCY-WORKSTATION-1
+  - SVC-TENANCY-WORKSTATION-3
+  - APP-POS-POS-016
+  - VM-TENANCY-WORKSTATION-1
+  - VM-BO-109
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-WORKSTATION-1 (#17812)
+  - SVC-TENANCY-WORKSTATION-3 (#17814)
+  - APP-POS-POS-016 (#17887)
+  - VM-TENANCY-WORKSTATION-1 (#18326)
+  - VM-BO-109 (#18426)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. Applied in worktree
+  apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys naming a touched operation or screen.'

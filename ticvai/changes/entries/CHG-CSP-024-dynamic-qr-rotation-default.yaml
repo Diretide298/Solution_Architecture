@@ -1,0 +1,39 @@
+id: CHG-CSP-024
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: The dynamic QR rotates every 30 seconds by default; the venue may choose 15, 30, 45, 60 or a custom value of at
+  least 5 seconds.
+decision:
+  what: 'DynamicQrSecurityProfileBuilderInput and View refreshIntervalSeconds: default 30, minimum 5, described.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 1, GST-055 (Q136): "30 seconds"; covered set, BO-165 (Q233): "30 s default; offer 15/30/45/60
+  and custom (5 s minimum)" (DI-1083, DI-632, DI-630). Decision ledger: DEC-136, DEC-233 (workbook Q136, Q233).'
+keys_touched:
+  screens:
+  - GST-055
+  - BO-165
+  schemas:
+  - DynamicQrSecurityProfileBuilderInput
+  files:
+  - contracts/spine/access.yaml
+  tickets:
+  - APP-MOB-GST-055
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-MOB-GST-055 (#17976)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. Applied in worktree
+  apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys naming a touched operation or screen.'

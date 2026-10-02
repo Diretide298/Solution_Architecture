@@ -1,0 +1,67 @@
+id: CHG-CSP-016
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: A drawer limit (venue default, till override) makes the till warn and offer a cash lift; BO-042 flags boxes over
+  it.
+decision:
+  what: VenueSettings.cashDrawerLimit, Workstation and ConfigureWorkstationRequest cashDrawerLimit, DepositBox.overDrawerLimit
+    (computed), createCashMovement describes the offered lift; never a block, never a figure to the cashier.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 #179, BO-042 (Q179): "Add drawer limit setting (warn + offer cash lift)" (DI-274,
+  F73 step 3). Decision ledger: DEC-179 (workbook Q179).'
+keys_touched:
+  screens:
+  - BO-042
+  - POS-015
+  - POS-016
+  operations:
+  - setVenueSettings
+  - configureWorkstation
+  - createCashMovement
+  - listDepositBoxes
+  schemas:
+  - VenueSettings
+  - Workstation
+  - ConfigureWorkstationRequest
+  - DepositBox
+  flows:
+  - F73
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/shift.yaml
+  tickets:
+  - SVC-TENANCY-WORKSTATION-1
+  - SVC-TENANCY-TENANCY-1
+  - SVC-ORDER-CASH-1
+  - APP-POS-POS-016
+  - SVC-ORDER-SHIFT-3
+  - APP-POS-POS-015
+  - VM-BO-042
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-WORKSTATION-1 (#17812)
+  - SVC-TENANCY-TENANCY-1 (#17884)
+  - SVC-ORDER-CASH-1 (#17846)
+  - APP-POS-POS-016 (#17887)
+  - SVC-ORDER-SHIFT-3 (#17854)
+  - APP-POS-POS-015 (#17886)
+  - VM-BO-042 (#18387)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. The Money fields
+  are written oneOf with one member: check-contract-compat reads the required fields of an allOf''d Money inside a new optional
+  request property as newly required request fields (a false positive for the tools owner); flatten them once the check
+  skips required fields under an optional new parent. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026).
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation
+  or screen.'

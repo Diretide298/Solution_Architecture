@@ -1,0 +1,39 @@
+id: CHG-CSP-035
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: Past the venue's maximum offline duration, readers refuse offline taps until they reconnect.
+decision:
+  what: AccessOfflinePolicy.maxOfflineDurationHours describes the refusal (any reader, from the last sync, carried in the
+    offline package); ValidationResult.denyCause offlineLimitExceeded.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, critical set 1, BO-471 (Q426): "Yes: the venue sets a maximum offline duration; readers then
+  refuse offline taps". ADR-0068. Decision ledger: DEC-426 (workbook Q426).'
+keys_touched:
+  screens:
+  - BO-471
+  - BO-206
+  - BO-210
+  operations:
+  - setGateOfflinePolicy
+  schemas:
+  - AccessOfflinePolicy
+  - ValidationResult
+  files:
+  - contracts/spine/access.yaml
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-access-time-bound.py
+status: open
+notes: 'Open: the prevention is an edge test that a tap after the limit is refused (DEC-426 hint), not yet written. Games
+  ReaderOfflineQueue is the games owner''s. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets:
+  none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation
+  or screen.'

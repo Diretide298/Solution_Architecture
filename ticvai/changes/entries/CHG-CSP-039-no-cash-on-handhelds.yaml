@@ -1,0 +1,41 @@
+id: CHG-CSP-039
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: createPayment refuses cash from a session with no till; cash goes to a till, so a server's End shift has no cash
+  count.
+decision:
+  what: createPayment description and 409 cashNotOnHandheld (PaymentProblem).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 6b, EMP-009 (Q200): "No cash on handhelds; cash goes to a till" (DI-805). Decision
+  ledger: DEC-200 (workbook Q200).'
+keys_touched:
+  screens:
+  - EMP-009
+  - EMP-059
+  operations:
+  - createPayment
+  schemas:
+  - PaymentProblem
+  files:
+  - contracts/spine/orders.yaml
+  tickets:
+  - SVC-ORDER-PAYMENT-1
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-ORDER-PAYMENT-1 (#17849)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. Applied in worktree
+  apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys naming a touched operation or screen.'

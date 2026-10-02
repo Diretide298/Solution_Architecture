@@ -1,0 +1,68 @@
+id: CHG-CSP-004
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: An outlet carries its payment timing (send first, or pay first) and whether it sits inside the venue (needs an
+  admission ticket) or is standalone (no ticket).
+decision:
+  what: Outlet.paymentTiming (sendFirst default, payFirst) and Outlet.admissionContext (insideVenue default, standalone),
+    on createOutlet and updateOutlet. F&B keeps its own payment and receipt.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 1: POS-021 (Q64) "Two configurations: one takes the bill (payment) first, the other
+  sends first and charges after" refines R261 per outlet; WEB-036 (Q70) "Inside the venue, a ticket is needed. A restaurant
+  outside the venue (standalone) can sell without one" amends DI-292 for standalone outlets (DI-1039). Decision ledger:
+  DEC-064, DEC-070 (workbook Q64, Q70).'
+keys_touched:
+  screens:
+  - POS-021
+  - WEB-036
+  - GST-024
+  - KSK-016
+  - BO-044
+  - BO-729
+  operations:
+  - createOutlet
+  - updateOutlet
+  - getOutlet
+  - listOutlets
+  schemas:
+  - Outlet
+  - OutletPaymentTiming
+  - OutletAdmissionContext
+  flows:
+  - F108
+  files:
+  - contracts/spine/tenancy.yaml
+  tickets:
+  - SVC-TENANCY-WORKSTATION-1
+  - SVC-TENANCY-WORKSTATION-2
+  - SVC-TENANCY-WORKSTATION-3
+  - APP-POS-POS-021
+  - APP-SETUP-BO-044
+  - APP-MOB-GST-024
+  - APP-WEB-WEB-036
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-WORKSTATION-1 (#17812)
+  - SVC-TENANCY-WORKSTATION-2 (#17813)
+  - SVC-TENANCY-WORKSTATION-3 (#17814)
+  - APP-POS-POS-021 (#18004)
+  - APP-SETUP-BO-044 (#18010)
+  - APP-MOB-GST-024 (#18150)
+  - APP-WEB-WEB-036 (#18163)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. Depends on fnb (createFnbOrder,
+  fireCourse, createGuestFnbOrder refuse per these fields) and on F108 gaining the pay-first branch (flows owner). Applied
+  in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October
+  2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

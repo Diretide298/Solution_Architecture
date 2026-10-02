@@ -1,0 +1,35 @@
+id: CHG-CSP-046
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: New simulateRefund returns what a refund would do (balance, approvals, routes, currency, cash impact) without doing
+  it.
+decision:
+  what: POST /orders/{orderId}/refund-simulation (ORDER_REFUND) returning RefundSimulation; 409 as createRefund.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction on ADM-618 (Block B, platform-foundation): "Refund Simulator declares no operation; a simulator
+  needs a simulate operation", logged open in CHG-WIR-024. CHG-FIN-001 for the tender currency.'
+keys_touched:
+  screens:
+  - ADM-618
+  operations:
+  - simulateRefund
+  schemas:
+  - RefundSimulation
+  files:
+  - contracts/spine/orders.yaml
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: 'Open until ADM-618 binds it (screens owner). Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026).
+  Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation
+  or screen.'

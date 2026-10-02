@@ -1,0 +1,41 @@
+id: CHG-CSP-014
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: New getShiftCountLines returns a shift's denomination breakdown, counted figures only, paged and ordered.
+decision:
+  what: GET /shifts/{shiftId}/count-lines (getShiftCountLines), CashCountLine rows filtered by countKind, PageSize and PageCursor,
+    order stated; never the expected figure.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 #176, BO-040 (Q176): "Add a read for the count lines" (DI-272). Decision ledger:
+  DEC-176 (workbook Q176).'
+keys_touched:
+  screens:
+  - BO-040
+  - BO-043
+  operations:
+  - getShiftCountLines
+  schemas:
+  - CashCountLine
+  files:
+  - contracts/spine/shift.yaml
+  tickets:
+  - VM-BO-040
+  - VM-BO-043
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - VM-BO-040 (#18255)
+  - VM-BO-043 (#18247)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: 'Open until BO-040 binds getShiftCountLines (screens owner); the binding ratchet then refuses its loss. Applied in
+  worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026);
+  unstarted keys are the tasks.csv keys naming a touched operation or screen.'

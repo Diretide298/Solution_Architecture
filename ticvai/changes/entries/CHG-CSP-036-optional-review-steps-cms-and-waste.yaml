@@ -1,0 +1,52 @@
+id: CHG-CSP-036
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: White-label publishing and F&B waste above a value get optional, venue-switched approval through existing kinds
+  narrowed by subject type.
+decision:
+  what: ApprovalKind description maps whiteLabelPublication (configurationChange) and fnbWaste (stockWriteOff, value bands
+    as amount ranges) as optional review steps, off until the venue saves a matrix; ApprovalRule.subjectTypes.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026: batch 1, CMS-014 (Q156): "Simulate, then publish ... Optional review steps would be good
+  if the venue wants to set it up"; batch 6 #192, BO-139 (Q192): "A waste-approval POLICY the venue can switch on or off
+  (value bands + photo when on)" (R144). Decision ledger: DEC-156, DEC-192 (workbook Q156, Q192).'
+keys_touched:
+  screens:
+  - CMS-014
+  - BO-139
+  - BO-086
+  operations:
+  - setApprovalMatrix
+  schemas:
+  - ApprovalKind
+  - ApprovalRule
+  files:
+  - contracts/spine/approvals.yaml
+  tickets:
+  - SVC-TENANCY-MATRIX-1
+  - APP-WL-CMS-014
+  - VM-BO-086
+  - VM-BO-139
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-MATRIX-1 (#17794)
+  - APP-WL-CMS-014 (#18120)
+  - VM-BO-086 (#20795)
+  - VM-BO-139 (#18455)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. Depends on white-label
+  publishContentBlock and fnb recordWaste/setWasteApprovalPolicy raising the requests. Applied in worktree apply-contracts-spine
+  (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv
+  keys naming a touched operation or screen.'

@@ -1,0 +1,47 @@
+id: CHG-CSP-010
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: The edge routing table describes the per-cell platform subdomain and custom domains through Front Door, names each
+  channel's primary host with redirects, and records revalidation; a timed-out custom domain is detached.
+decision:
+  what: resolveTenantHost and setTenantDomainMapping describe venue.<cell>.ticvai.app with a wildcard certificate and host-only
+    cookies, CNAME to Front Door with _dnsauth TXT and managed certificate, delegated subdomain optional, apex on request,
+    no path proxy; TenantDomain gains isPrimary, redirectToHostname and lastValidatedAt.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 5 set 2, Domains: "Subdomain plus CNAME" (and batch 2 #41, batch 3: DNS options; CMS-017
+  covers the guest web app); DI-283 for small tenants under a TICVAI subdomain; SD-021 for the routing table. Decision ledger:
+  DEC-546, DEC-547.'
+keys_touched:
+  screens:
+  - CMS-017
+  - ADM-017
+  operations:
+  - resolveTenantHost
+  - setTenantDomainMapping
+  schemas:
+  - TenantDomain
+  files:
+  - contracts/spine/tenancy.yaml
+  tickets:
+  - APP-WL-CMS-017
+  - APP-WL-ADM-017
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-017 (#18109)
+  - APP-WL-ADM-017 (#18097)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: 'Open until the white-label side lands: CustomDomain pendingRevalidation and timedOut (states/custom-domain.yaml,
+  white-label owner), setPrimaryDomain and regenerateDomainToken, F103 branches and the HLD/LLD Front Door records. check-states
+  then guards active -> pendingRevalidation -> active (DEC-547 hint). Applied in worktree apply-contracts-spine (batch CSP,
+  2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming
+  a touched operation or screen.'

@@ -1,0 +1,45 @@
+id: CHG-CSP-021
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: Face Pass may be enrolled at a self-service kiosk with the consent shown, never at a turnstile.
+decision:
+  what: enrolFacePass request source gains selfServiceKiosk; FacePassEnrolment.enrolmentChannel carries it (source keeps
+    r1 values, a kiosk reading ticketCounter); enrolment configuration channels say no turnstile.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, critical set 1, BO-186 (Q236): "App + staffed counters + self-service kiosk (consent shown);
+  not the turnstile" (DI-641). ADR-0063. Decision ledger: DEC-236 (workbook Q236).'
+keys_touched:
+  screens:
+  - BO-186
+  - GST-069
+  operations:
+  - enrolFacePass
+  schemas:
+  - FacePassEnrolment
+  - FacePassEnrollmentConfigurationInput
+  files:
+  - contracts/spine/access.yaml
+  tickets:
+  - SVC-ACCESS-ACCESS-1
+  - APP-MOB-GST-069
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - SVC-ACCESS-ACCESS-1 (#17927)
+  - APP-MOB-GST-069 (#18178)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. Adding selfServiceKiosk
+  to the response enum FacePassEnrolment.source would be a breaking change against r1, so the response carries enrolmentChannel
+  instead (question for the lead). Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none
+  started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation or screen.'

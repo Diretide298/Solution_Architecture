@@ -1,0 +1,41 @@
+id: CHG-CSP-027
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: Overlapping operating-calendar entries are resolved by a priority the venue sets; equal priorities on an overlap
+  are refused.
+decision:
+  what: AccessOperatingCalendarEntry.priority (higher wins); setOperatingCalendarEntry refuses 422 overlapping-entry-same-priority.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 6 set 10a, BO-152 (Q229): "The venue sets a priority per entry". Decision ledger: DEC-229
+  (workbook Q229).'
+keys_touched:
+  screens:
+  - BO-152
+  - BO-222
+  operations:
+  - setOperatingCalendarEntry
+  schemas:
+  - AccessOperatingCalendarEntry
+  files:
+  - contracts/spine/access.yaml
+  tickets:
+  - APP-SETUP-BO-222
+root_class: A27 CLIENT-DECISIONS
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-BO-222 (#20680)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-applied-decisions.py
+status: open
+notes: 'Open: Planned check (not yet written; the tools owner writes it): for every decision the decisions register marks
+  applied, each contract key the decision names exists in the named contract and its decided default or enum is unchanged,
+  so a decided behaviour cannot be dropped or reverted silently. Until it exists this entry stays open. Applied in worktree
+  apply-contracts-spine (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted
+  keys are the tasks.csv keys naming a touched operation or screen.'

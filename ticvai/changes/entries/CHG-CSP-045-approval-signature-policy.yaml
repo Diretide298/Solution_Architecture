@@ -1,0 +1,39 @@
+id: CHG-CSP-045
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: Approval rules say which signature methods a level accepts, so requiresSignature plus signatureMethods is the signature
+  policy.
+decision:
+  what: ApprovalRule.signatureMethods; signApprovalDecision refuses 422 signature-method-not-accepted.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Design-notes correction on ADM-344 (Block B, platform-foundation): "Configuring which stages need a signature is a
+  policy write", logged open in CHG-WIR-024.'
+keys_touched:
+  screens:
+  - ADM-344
+  operations:
+  - setApprovalMatrix
+  - signApprovalDecision
+  schemas:
+  - ApprovalRule
+  files:
+  - contracts/spine/approvals.yaml
+  tickets:
+  - SVC-TENANCY-MATRIX-1
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - SVC-TENANCY-MATRIX-1 (#17794)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: 'Open until ADM-344 binds setApprovalMatrix and listApprovalMatrices (screens owner). Applied in worktree apply-contracts-spine
+  (batch CSP, 2 October 2026). Tickets: none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv
+  keys naming a touched operation or screen.'

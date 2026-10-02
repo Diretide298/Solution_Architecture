@@ -1,0 +1,45 @@
+id: CHG-CSP-038
+date: '2026-10-02'
+source: client-review
+kind: contract
+summary: New previewProductTickets renders a product's PDF ticket and Apple and Google Wallet pass proofs, so the previews
+  are in Block A.
+decision:
+  what: GET /products/{productId}/ticket-previews (previewProductTickets, PRODUCT_VIEW, bounded) returns TicketProof per
+    output format; TicketProof.walletPlatform.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October 2026, batch 4, CMS-006 (Q151): "the preview of the PDF ticket and the Apple/Google Wallet pass
+  must be in Block A"; and the design-notes correction on BO-008 (Block A): "No operation renders the PDF ticket or Wallet
+  pass preview for a product" (DI-444). Decision ledger: DEC-151 (workbook Q151).'
+keys_touched:
+  screens:
+  - CMS-006
+  - BO-008
+  operations:
+  - previewProductTickets
+  - printTicketProof
+  schemas:
+  - TicketProof
+  files:
+  - contracts/spine/orders.yaml
+  tickets:
+  - APP-WL-CMS-006
+  - APP-SETUP-BO-008
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-WL-CMS-006 (#18119)
+  - APP-SETUP-BO-008 (#20668)
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: 'Open until CMS-006 and BO-008 bind it (screens owner) and white-label createPreview calls it; the Block A slice
+  (derive-delivery-slice) then carries it. Applied in worktree apply-contracts-spine (batch CSP, 2 October 2026). Tickets:
+  none started (Block A starts Monday 5 October 2026); unstarted keys are the tasks.csv keys naming a touched operation
+  or screen.'
