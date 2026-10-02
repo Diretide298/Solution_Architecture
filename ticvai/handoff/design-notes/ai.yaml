@@ -5424,6 +5424,8 @@ screens:
     - what: The upsell suggestion panel binds getUpsellSuggestions, which the screen does not declare.
       why: Bind the preview to the declared slot preview, as on WEB-008.
       source: ADR-0052
+      status: fixed
+      by: CHG-SBO-019
   ADM-004:
     block: later
     summary: >-

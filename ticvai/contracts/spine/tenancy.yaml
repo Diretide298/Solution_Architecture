@@ -224,6 +224,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-055 Rota & Scheduling"
         - "P08 BO-064 Zones & Areas"
+        - "P08 BO-068 Audit Log"
         - "P08 BO-145 Venue & Park Access Structure"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-412 Payment Method & Settlement Setup"
@@ -981,7 +982,6 @@ paths:
         - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-100 Venue Home"
-        - "P08 BO-101 Orders & Money"
         - "P08 BO-102 Sell"
         - "P08 BO-106 People & Access Rights"
         - "P08 BO-187 Biometric Consent & Guardian Management"
@@ -1351,6 +1351,7 @@ paths:
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
+        - "P08 BO-068 Audit Log"
         - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-126 Deployment, Preview & Audit"
         - "P08 BO-128 Live Workstation Health Monitor"

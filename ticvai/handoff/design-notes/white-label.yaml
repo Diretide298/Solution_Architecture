@@ -2444,6 +2444,8 @@ screens:
     - what: Its pack asks for site health metrics (pages, scheduled content, accessibility score, SEO health, broken links) and storefront insights (getStorefrontInsights), and the P13 screens it merged into declare none of it.
       why: Analytics insights (matrix 22.10.29) lost their screen in the merge.
       source: [DI-996, MATRIX 22.10.29, contracts/satellite/white-label.yaml#getStorefrontInsights]
+      status: logged
+      by: CHG-SBO-020
     openQuestions: []
 
   BO-835:
@@ -2455,6 +2457,8 @@ screens:
     - what: Its pack asks for several digital properties per tenant (websites, microsites by brand, venue and business unit) with environments.
       why: The contract has one working draft per tenant; several branded sites and environment promotion are not modelled (the matrix row says scopePath gives multi-brand, but nothing writes per brand).
       source: [DI-110, DI-393, MATRIX 22.10.1, contracts/satellite/white-label.yaml#/info]
+      status: logged
+      by: CHG-SBO-005
     openQuestions: []
 
   BO-836:
@@ -2466,6 +2470,8 @@ screens:
     - what: Its pack asks for spacing, shadow, breakpoint and transition tokens per brand.
       why: Out of the agreed boundary (graphics, colours, fonts, tabs only); record as not built.
       source: [DI-223, DI-285]
+      status: fixed
+      by: CHG-SBO-019
     openQuestions: []
 
   BO-837:
@@ -2485,6 +2491,8 @@ screens:
     - what: Its pack asks for staged rollout of app content by app version.
       why: Not modelled; publish reaches every app on next launch.
       source: contracts/satellite/white-label.yaml#publishTenantConfig
+      status: logged
+      by: CHG-SBO-005
     openQuestions: []
 
   BO-843:
@@ -2496,6 +2504,8 @@ screens:
     - what: getStorefrontInsights (page and app views, engagement, conversion) is declared here and on no P13 screen.
       why: As BO-834; the analytics read needs a home.
       source: [contracts/satellite/white-label.yaml#getStorefrontInsights, MATRIX 22.10.29]
+      status: logged
+      by: CHG-SBO-020
     openQuestions: []
 
 # =========================================================================================================

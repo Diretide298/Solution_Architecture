@@ -1603,7 +1603,6 @@ paths:
       operationId: setSubscription
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-410 Contract & Billing Cycle Selection"
         - "P09 ADM-417 Subscription Confirmation & Commercial Activation"
         - "P09 ADM-463 Subscription & Commercial Change Management"
@@ -2038,10 +2037,7 @@ paths:
         - "P09 ADM-013 Tenant Performance Monitor"
         - "P09 ADM-014 Auto-Scaling Configuration"
         - "P09 ADM-029 Deployment Monitor"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2067,7 +2063,6 @@ paths:
       operationId: updateCellTier
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
       x-ticvai-audience:
       - staff
       summary: Change a cell's tier
@@ -2233,9 +2228,6 @@ paths:
         - "P09 ADM-014 Auto-Scaling Configuration"
         - "P09 ADM-029 Deployment Monitor"
         - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
-        - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       summary: Load against headroom
@@ -2625,10 +2617,7 @@ paths:
         - "P09 ADM-013 Tenant Performance Monitor"
         - "P09 ADM-014 Auto-Scaling Configuration"
         - "P09 ADM-029 Deployment Monitor"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2667,10 +2656,6 @@ paths:
         - "P09 ADM-013 Tenant Performance Monitor"
         - "P09 ADM-014 Auto-Scaling Configuration"
         - "P09 ADM-029 Deployment Monitor"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
-        - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
         - "P09 ADM-419 Provisioning Command Center"
       x-ticvai-audience:
       - staff

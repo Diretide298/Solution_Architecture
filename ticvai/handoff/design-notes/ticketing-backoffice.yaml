@@ -1193,6 +1193,8 @@ screens:
         A publishing screen needs the pending list and the release action; editing belongs to the product configuration
         (DI-987).
       source: screens/P08-venue-back-office.yaml#BO-014
+      status: fixed
+      by: CHG-SBO-017
     - what: >-
         List operation(s) listAlternativeCodes return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -2118,6 +2120,8 @@ screens:
       why: >-
         They belong to the POS layout (POS-4A) and reporting; the category tree is the screen's job.
       source: screens/P08-venue-back-office.yaml#BO-115
+      status: fixed
+      by: CHG-SBO-017
     - what: >-
         List operation(s) listProductCategories, listSaleBoards return a bare array, not the paged list envelope
         (items, nextCursor, hasMore).
@@ -2878,6 +2882,8 @@ screens:
         A venue membership manager would need a platform-operator permission; it should be PRODUCT_CONFIGURE like
         setMembershipBenefit beside it.
       source: contracts/satellite/subscription.yaml#setMembershipEntitlementAdmission
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         List operation(s) listEntitlementTemplates return a bare array, not the paged list envelope (items, nextCursor,
         hasMore).
@@ -2919,6 +2925,8 @@ screens:
       why: >-
         They must be pickers of existing profiles, and a venue user should not need a platform permission.
       source: contracts/satellite/subscription.yaml#setMembershipCommercialConfig
+      status: logged
+      by: CHG-SBO-005
   BO-298:
     block: B
     summary: >-
@@ -4310,9 +4318,13 @@ screens:
         workflow designer.
       why: Two different workflows; the screen should say product approvals or move to accreditation.
       source: screens/P08-venue-back-office.yaml#BO-637 | contracts/spine/catalogue.yaml#approveWorkflow
+      status: fixed
+      by: CHG-SBO-017
     - what: The operation is named approveWorkflow but it designs (creates or changes) a workflow.
       why: The name reads as approving; designers and developers will label the button wrongly.
       source: contracts/spine/catalogue.yaml#approveWorkflow
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         No read operation: the screen declares only approveWorkflow and nothing that returns the current configuration.
       why: >-
@@ -4398,6 +4410,8 @@ screens:
         setEventType writes at tenant scope while listEventTypes reads at venue scope, on a venue screen.
       why: A venue user may not be able to save; show "applies to the whole tenant" or align scopes.
       source: contracts/spine/catalogue.yaml#setEventType
+      status: fixed
+      by: CHG-SBO-017
     - what: >-
         The purpose text is shared word for word with BO-707, BO-719, BO-722 and does not describe this screen (Event
         Type & Behaviour Configuration).
@@ -4658,6 +4672,8 @@ screens:
     - what: accessRules is an untyped object.
       why: A rules editor needs a shape.
       source: contracts/spine/catalogue.yaml#setSpace
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         No read operation: the screen declares only setSpace and nothing that returns the current configuration.
       why: >-
@@ -4917,6 +4933,8 @@ screens:
     - what: admissionPolicy is an untyped object.
       why: An entry-policy editor needs a shape.
       source: contracts/spine/catalogue.yaml#setEventRegistration
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         No read operation: the screen declares only setEventRegistration and nothing that returns the current configuration.
       why: >-
@@ -5538,6 +5556,8 @@ screens:
         Thresholds and approval modes are strings (campaignBudget, financialExposure, sequentialApproval).
       why: Money and booleans need types; compare BO-637's typed workflow.
       source: contracts/satellite/promotions.yaml#approveCampaignWorkflow
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         No read operation: the screen declares only approveCampaignWorkflow and nothing that returns the current
         configuration.
@@ -7528,6 +7548,8 @@ screens:
     - what: The request carries a currency.
       why: Currency resolves from the region (ADR-0018).
       source: contracts/spine/catalogue.yaml#simulatePriceBreakdownCalculation | ADR-0018
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         No read operation: the screen declares only simulatePriceBreakdownCalculation and nothing that returns the
         current configuration.

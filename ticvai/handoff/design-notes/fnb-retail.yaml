@@ -10642,6 +10642,8 @@ screens:
       why: DI-323 and the client frame FNB-1J ask for category rules and a fallback station or device; only per-item routing
         and display fallback exist.
       source: DI-323 | contracts/satellite/fnb.yaml#/components/schemas/KitchenStation | screens/P08-venue-back-office.yaml#BO-135
+      status: fixed
+      by: CHG-SBO-018
     - what: Overlap with BO-134 (same save operation, same board area).
       why: Merge (see BO-134).
       source: DI-987 | screens/P08-venue-back-office.yaml#BO-134
@@ -10732,6 +10734,8 @@ screens:
       why: The production frames belong to BO-112, BO-113 and BO-138; this mis-mapping is why production operations landed
         here.
       source: screens/P08-venue-back-office.yaml#BO-136
+      status: fixed
+      by: CHG-SBO-018
     - what: Production operations (buildProductionPlan, releaseProductionPlan, listProductionRuns with status, location
         kind and from filters) and F85 step 1 are on BO-136.
       why: Move to BO-112 (planning); F85 step 1 should point there.
@@ -10742,13 +10746,19 @@ screens:
         segregated access, alerting, cart and resale limits.
       why: Only the F&B group belongs on an F&B screen; the rest are other screens' settings.
       source: contracts/spine/tenancy.yaml#/components/schemas/VenueSettings | R254
+      status: fixed
+      by: CHG-SBO-018
     - what: No setting holds the void, manual price change, refund, transfer or re-open approval bands; VenueSettings.fnb
         has only the comp escalation, recall window and food-safety lead.
       why: DI-324's approval workflow by amount and privilege cannot be configured; FNB-1K draws ten threshold rows.
       source: DI-324 | contracts/spine/tenancy.yaml#/components/schemas/VenueSettings
+      status: logged
+      by: CHG-SBO-005
     - what: requiresModule is "core" although the screen is F&B.
       why: A tenant without the F&B module would see F&B controls.
       source: screens/P08-venue-back-office.yaml#BO-136
+      status: fixed
+      by: CHG-SBO-003
     decisions:
     - question: At which level is F&B policy set? DI-324 says globally, FNB-1K says tenant level with outlet overrides, and
         the contract has venue settings with tenant defaults (R094) and no outlet override.
@@ -12517,6 +12527,8 @@ screens:
     - what: The same form as BO-044's Create/Save outlet.
       why: Duplicate screens; merge or make one the other's form.
       source: R276
+      status: fixed
+      by: CHG-SBO-021
     decisions:
     - question: Where are outlet type and department stored? The outlet has kind and cost centre only.
       decision: Outlet type and department are fields on the outlet (DI-319).
@@ -12610,6 +12622,8 @@ screens:
         of day).
       why: DI-320 asks for both; neither has a field.
       source: DI-320
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: How is a late-night window that crosses midnight (23:00–01:00) entered? OpeningHoursWindow states no overnight
         rule.

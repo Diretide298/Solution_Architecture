@@ -1936,6 +1936,7 @@ paths:
       operationId: diffSeatMapVersions
       x-ticvai-consumed-by:
         - "P08 BO-977 Version Compare"
+        - "P08 BO-981 Conflict & Impact Simulation"
       summary: Compare two versions of a layout
       description: '**The layout version-comparison view, decided 21 August.** Seat counts and configuration
         differences between two saved layouts.

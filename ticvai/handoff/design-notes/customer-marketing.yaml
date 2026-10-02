@@ -3722,6 +3722,8 @@ screens:
       - what: A select labelled "Key requirement - 12.1.57".
         why: A matrix reference leaks into the UI.
         source: screens/P08-venue-back-office.yaml#BO-678
+        status: fixed
+        by: CHG-SBO-019
 
   BO-679:
     summary: >-

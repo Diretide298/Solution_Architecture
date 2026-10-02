@@ -2981,8 +2981,6 @@ paths:
       operationId: setApprovalSlaPolicy
       x-ticvai-consumed-by:
         - "P08 BO-388 Approval SLA Policy Configuration"
-        - "P08 BO-389 Reminder & Breach Notification Rules"
-        - "P08 BO-390 Escalation Policy Builder"
         - "P08 ADM-244 SLA, Escalation, Reminder & Timeout Rules"
         - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
       summary: How long a decision may take, and what happens when it does not
@@ -3150,6 +3148,7 @@ paths:
     post:
       operationId: createApprovalEvidencePackage
       x-ticvai-consumed-by:
+        - "P08 BO-375 Business Context & Evidence Viewer"
         - "P09 ADM-347 Regulatory Audit & Evidence Center"
       summary: Assemble what an auditor asked for
       description: 'Approvals board 6.9. **The request is never *show me an approval*; it is *show me

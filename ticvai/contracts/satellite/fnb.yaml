@@ -5175,7 +5175,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-024 Outlet Setup"
-        - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
         - "P15 KIT-008 Exceptions, Re-Fire & Unavailable Items"
       x-ticvai-audience:

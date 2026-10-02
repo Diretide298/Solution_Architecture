@@ -21055,10 +21055,14 @@ screens:
         eleven select fields
       why: They are the columns and event types of a read-only timeline.
       source: screens/P08-venue-back-office.yaml#BO-403
+      status: fixed
+      by: CHG-SBO-016
     - what: Archive / Restore have no contract path
       why: >-
         retired is terminal and needs approval; there is no restore, and no dependency read for the impact warning.
       source: contracts/satellite/games.yaml#updateGame
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: Is "Archive" the same as retire (terminal), or a reversible hide?
       decision: 'Drawn default accepted: Archive = retire with approval; Restore disabled.'
@@ -23155,10 +23159,14 @@ screens:
         trace, remaining balance or remaining plays.
       source: >-
         contracts/satellite/games.yaml#/components/schemas/GameplayAuthorisation | contracts/satellite/games.yaml#/components/schemas/GameplayTransaction
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         An unlabelled primary button and Cancel are the only components; gap says the pack gives nothing to draw
       why: Pack p40 gives the full seven-step example, the result and the entitlement alternative.
       source: screens/P08-venue-back-office.yaml#BO-432
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: How long are full decision traces kept for investigation?
       decision: 'Drawn default accepted: Show trace where available, else "Trace not retained" with the summary row.'
@@ -25508,6 +25516,8 @@ screens:
       why: >-
         Three actions merged into one label; View card and View wallet are row actions, Export is a toolbar action.
       source: screens/P08-venue-back-office.yaml#BO-458
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: Should warning messages be sent from here (manual nudge) or only by the schedule in the expiry rule?
       decision: 'Drawn default accepted: Schedule only; the pack defers guest communication to CRM.'
@@ -27484,11 +27494,15 @@ screens:
     - what: Five of the pack's eight KPI tiles drawn
       why: Top-ups, Wallets viewed and Failed sessions are missing.
       source: screens/P08-venue-back-office.yaml#BO-485 | screens/P08-venue-back-office.yaml#BO-484
+      status: logged
+      by: CHG-SBO-005
     - what: Board 10's customer screens have no guest-app counterpart
       why: >-
         BO-486 to BO-492 describe what a guest sees on a kiosk, a guest surface (VO-R15), but the guest kiosk P05
         has no game-wallet screens; P08 can only hold their configuration and preview.
       source: screens/P05-guest-kiosk.yaml#KSK-001
+      status: logged
+      by: CHG-SBO-020
   BO-485:
     summary: >-
       Defines each kiosk's role: which game-wallet functions it offers, how a guest identifies, which languages
@@ -29684,10 +29698,14 @@ screens:
         They are ranked shortlists; the table the pack gives is the equipment performance table (asset, rentals,
         hours, revenue, damage, downtime, health).
       source: screens/P08-venue-back-office.yaml#BO-588
+      status: fixed
+      by: CHG-SBO-016
     - what: Health rating has no definition
       why: >-
         The pack shows Excellent, Good, Poor per asset with no rule; the lead should confirm how it is derived.
       source: screens/P08-venue-back-office.yaml#BO-588
+      status: logged
+      by: CHG-SBO-005
     decisions:
     - question: How is an asset's Health derived (damage count, downtime, maintenance cost against revenue, last inspection
         condition)?
@@ -32191,9 +32209,13 @@ screens:
         The accreditation contract says it does not own the approval machinery; this screen should be the approvals
         validation screen opened with an accreditation scope (per VO-R14).
       source: contracts/satellite/accreditation.yaml#decideAccreditationApplication
+      status: fixed
+      by: CHG-SBO-016
     - what: A dataTable with no columns; gap says nothing can be drawn
       why: The pack lists ten checks and seven actions.
       source: screens/P08-venue-back-office.yaml#BO-643
+      status: fixed
+      by: CHG-SBO-016
     decisions:
     - question: Is BO-643 kept, or does accreditation link to the approvals module's validation screen?
       decision: 'Drawn default accepted: Keep the entry on board 3 and open the shared component.'
@@ -32531,9 +32553,13 @@ screens:
         Active per medium, identifier format, activation, channel, replacement policy, expiry behaviour and access
         integration have no schema.
       source: screens/P08-venue-back-office.yaml#BO-646 | MATRIX 12.1.21
+      status: logged
+      by: CHG-SBO-005
     - what: Primary button has no label
       why: The action is Save media settings.
       source: screens/P08-venue-back-office.yaml#BO-156 | DI-039
+      status: fixed
+      by: CHG-SBO-016
     decisions:
     - question: Is media configuration per programme or per category (media all zones on mobile, contractors printed only)?
       decision: 'Drawn default accepted: Per programme, with a per-category override drawn greyed.'
@@ -34806,6 +34832,8 @@ screens:
         are programme scope (BO-667), profiles are category defaults.
       source: >-
         screens/P08-venue-back-office.yaml#BO-669 | contracts/satellite/accreditation.yaml#/components/schemas/AccreditationValidity
+      status: fixed
+      by: CHG-SBO-016
     - what: Duplicate of BO-666 (same operation, same record)
       why: Per VO-R14 draw as presets inside the validity editor.
       source: DI-671 | DI-987
@@ -35227,6 +35255,8 @@ screens:
         communications) are drawn as columns of a table "Every accreditation communications"
       why: They are charts on a dashboard; KPIs are tiles (VO-R02).
       source: screens/P08-venue-back-office.yaml#BO-675 | screens/P08-venue-back-office.yaml#BO-674
+      status: fixed
+      by: CHG-SBO-016
     - what: The only bound operation is a write (setAccreditationNotificationRules) used "at a glance"
       why: >-
         No read returns accreditation notification sends or delivery outcomes; the communication platform's delivery
@@ -35624,10 +35654,14 @@ screens:
       why: All ten pack columns but the counts are unbound, and records cannot keep a batch reference.
       source: >-
         screens/P08-venue-back-office.yaml#BO-681 | contracts/satellite/accreditation.yaml#/components/schemas/AccreditationImportResult
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         Table and panel titled "Every import validation processing" / "The selected import validation processing"
       why: Generated placeholders; "Import batches".
       source: screens/P08-venue-back-office.yaml#BO-156 | DI-039
+      status: fixed
+      by: CHG-SBO-016
   BO-682:
     summary: >-
       Exporting accreditation data (holders, applications, credentials, access assignments, documents) as CSV or
@@ -42507,12 +42541,18 @@ screens:
     - what: Filed under the Games & Rides process module while the screen is Rentals / resource management
       why: The pack is the Resource Management reference, board 9; the module tag routes it to the wrong board.
       source: screens/P08-venue-back-office.yaml#BO-942
+      status: fixed
+      by: CHG-SBO-003
     - what: A primary button labelled "Board 9 — Smart Mobile Home Principle"
       why: A pack heading parsed as an action.
       source: screens/P08-venue-back-office.yaml#BO-942
+      status: fixed
+      by: CHG-SBO-016
     - what: No record for the mobile offline settings
       why: Per-function offline switches, maximum offline period and sync frequency have no field anywhere.
       source: screens/P08-venue-back-office.yaml#BO-942
+      status: logged
+      by: CHG-SBO-005
   BO-943:
     summary: >-
       The executive dashboard of resource management: a Resource Health score with its components, headline KPIs,
@@ -43143,10 +43183,14 @@ screens:
         It belongs to Seat Management and Venue Mapping (board 3, reached from BO-973 Layout Command Center); venue
         operations is a dependency through gates and routes.
       source: screens/P08-venue-back-office.yaml#BO-980 | screens/P08-venue-back-office.yaml#BO-981
+      status: fixed
+      by: CHG-SBO-003
     - what: >-
         An unlabelled primary button and Cancel are the only content; the gap says the pack gives nothing to draw
       why: The pack lists the change types, the impact measures and the resolutions.
       source: screens/P08-venue-back-office.yaml#BO-980 | screens/P08-venue-back-office.yaml#BO-981
+      status: fixed
+      by: CHG-SBO-016
     - what: No seating operation simulates a layout change, so the screen has nothing correct to bind
       why: >-
         The seating contract has diffSeatMapVersions (BO-977), validateSeatMap and reassignSeats (BO-1040) but no
@@ -43156,6 +43200,8 @@ screens:
       source: >-
         screens/P08-venue-back-office.yaml#BO-980 | contracts/satellite/seating.yaml#diffSeatMapVersions | contracts/satellite/seating.yaml#validateSeatMap
         | contracts/satellite/seating.yaml#reassignSeats
+      status: logged
+      by: CHG-SBO-005
   ACC-001:
     summary: >-
       The public front door of accreditation for one tenant: an applicant (a contractor, a journalist, a sponsor's

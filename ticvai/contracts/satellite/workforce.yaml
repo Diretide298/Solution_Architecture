@@ -1291,6 +1291,7 @@ paths:
       operationId: listJobTitles
       x-ticvai-consumed-by:
         - "P08 BO-053 Staff Directory"
+        - "P08 BO-873 Staff Resource Directory"
       summary: The job titles a posting can name
       tags:
       - workforce
@@ -1512,6 +1513,7 @@ paths:
       operationId: listWorkAssignments
       x-ticvai-consumed-by:
         - "P08 BO-053 Staff Directory"
+        - "P08 BO-873 Staff Resource Directory"
       summary: Where each person is posted, and from when
       description: '**A posting is not a rota slot.** `rota_assignment` says a principal works
         Saturday 14:00 to 22:00; this says they are a Ride Operator at Venue 3, Attractions

@@ -5166,11 +5166,6 @@ screens:
       slot: collection
       components:
       - kind: textField
-        label: Venue id
-        operation: listProducts
-        notes: Sends `?venueId=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: textField
         label: Kind
         operation: listProducts
         notes: Sends `?kind=` to `listProducts`.
@@ -5181,7 +5176,7 @@ screens:
         notes: Sends `?isSellable=` to `listProducts`.
         provenance: contract catalogue.yaml GET /products
       - kind: dataTable
-        label: Every product
+        label: Waiting to publish
         bindsTo: Product
         columns:
         - Product.id
@@ -5198,6 +5193,8 @@ screens:
         - Product.onSaleTo
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
+        notes: Products with unpublished changes; the release is Publish bundle, and Transition product
+          lifecycle moves a product to published (F78). Editing the product is BO-007 and BO-008.
       - kind: dataTable
         label: Every price
         bindsTo: Price
@@ -5256,10 +5253,6 @@ screens:
         label: Publish bundle
         operation: publishBundle
         provenance: contract catalogue.yaml POST /catalogue/bundles
-      - kind: secondaryButton
-        label: Save item availability
-        operation: setItemAvailability
-        provenance: contract fnb.yaml PUT /menu-items/{itemId}/availability
       - kind: publishGate
         label: What publishing changes
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
@@ -5297,12 +5290,6 @@ screens:
   - operationId: publishBundle
     contract: catalogue
     purpose: Compute, sign and publish a catalogue bundle
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: setItemAvailability
-    contract: fnb
-    purpose: Mark an item available or eighty-sixed
     trigger: onAction
     invalidates:
     - listProducts
@@ -5369,22 +5356,6 @@ screens:
       - note
       - staleAfterHours
     provenance: contract catalogue.yaml POST /catalogue/bundles
-  - id: formSetItemAvailability
-    component: modal
-    trigger: Save item availability
-    body: '**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`,
-      `recordedAt`. Optional: `reason`, `restoreAt`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save item availability
-      operation: setItemAvailability
-    dismiss:
-      label: Cancel
-      discards:
-      - isAvailable
-      - recordedAt
-      - reason
-      - restoreAt
-    provenance: contract fnb.yaml PUT /menu-items/{itemId}/availability
   gaps:
   - operation: createProduct
     removed: true
@@ -5442,6 +5413,11 @@ screens:
       publishBundle) that F78 step 4 calls, and editing stays on the product configuration (DI-987) (design-notes
       correction ticketing-backoffice BO-014)'
     source: screens/P08-venue-back-office.yaml#BO-014 | DI-987 | F78 step 4
+  - operation: setItemAvailability
+    removed: true
+    why: Editing a product belongs to the product configuration (BO-007, BO-008); publishing needs the
+      pending list and the release (design-note correction ticketing-backoffice BO-014, DI-987).
+    source: screens/P08-venue-back-office.yaml#BO-008
 - id: BO-015
   name: Performance Calendar
   module: Sell
@@ -16025,6 +16001,8 @@ screens:
     - to: BO-055
       trigger: Rota & Scheduling
       provenance: design-note correction, 2 October 2026 (CHG-SBO)
+    notes: A top-level Venue Management menu entry (People & Access Rights); it opens the rota (BO-055)
+      and each person's record.
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 31 August**
@@ -16234,13 +16212,15 @@ screens:
     trigger: onAction
   entryState:
     params:
-    - name: principalId
-      from: session
     - name: challengeId
       from: navigation
     - name: sessionId
       from: session
-    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+    - name: principalId
+      from: navigation
+      optional: true
+    coldEntry: Opened from the Venue Management menu; lists everyone in scope. The selected person comes
+      from the row, not the session.
     preloaded:
     - Principal.id
     - Principal.username
@@ -19895,30 +19875,37 @@ screens:
     - name: contentBody
       slot: carried
       components:
-      - kind: textField
-        label: Org unit id
-        operation: listAuditRecords
-        notes: Sends `?orgUnitId=` to `listAuditRecords`.
+      - kind: selectField
+        label: Where
+        operation: listOrgUnits
+        notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract tenancy.yaml GET /audit-records
-      - kind: textField
-        label: Principal id
+        bindsTo: OrgUnit
+        columns:
+        - OrgUnit.name
+      - kind: selectField
+        label: Who
         operation: listAuditRecords
-        notes: Sends `?principalId=` to `listAuditRecords`.
+        notes: A pick list of people by name.
         provenance: contract tenancy.yaml GET /audit-records
-      - kind: textField
-        label: Workstation id
-        operation: listAuditRecords
-        notes: Sends `?workstationId=` to `listAuditRecords`.
+        bindsTo: AuditRecord.principalId
+      - kind: selectField
+        label: Till or device
+        operation: listWorkstations
+        notes: A pick list in words, never a typed id (design-note correction, 2 October 2026).
         provenance: contract tenancy.yaml GET /audit-records
+        bindsTo: Workstation
+        columns:
+        - Workstation.name
       - kind: textField
         label: Action
         operation: listAuditRecords
         notes: Sends `?action=` to `listAuditRecords`.
         provenance: contract tenancy.yaml GET /audit-records
-      - kind: textField
-        label: Subject ref
+      - kind: searchField
+        label: About
         operation: listAuditRecords
-        notes: Sends `?subjectRef=` to `listAuditRecords`.
+        notes: Search by what the record is about (an order number, a product name), never a raw reference.
         provenance: contract tenancy.yaml GET /audit-records
       - kind: datePicker
         label: From
@@ -19939,12 +19926,10 @@ screens:
         - AuditRecord.occurredAt
         operation: listAuditRecords
         provenance: contract tenancy.yaml GET /audit-records
-      - kind: textField
-        label: Platform-staff grant id
+      - kind: selectField
+        label: Under a TICVAI grant
         operation: listAuditRecords
-        notes: Sends `?platformStaffGrantId=` to `listAuditRecords`, so the log shows only what a platform
-          operator did under that grant. Choosing a row in **Platform-staff grants** fills it (decided
-          28 September, audit R098).
+        notes: Pick one of the grants listed below, by operator and reason.
         provenance: contract tenancy.yaml GET /audit-records
       - kind: toggle
         label: Open grants only
@@ -19987,6 +19972,16 @@ screens:
     purpose: Every platform-staff grant into this tenant, so the tenant sees when TICVAI staff acted and
       under what reason (decided 28 September, audit R098)
     trigger: onLoad
+  - operationId: listOrgUnits
+    contract: tenancy
+    purpose: List scope nodes visible to the session (the pick list)
+    trigger: onLoad
+    provenance: design-note correction, 2 October 2026 (BO-068)
+  - operationId: listWorkstations
+    contract: tenancy
+    purpose: List workstations (the pick list)
+    trigger: onLoad
+    provenance: design-note correction, 2 October 2026 (BO-068)
   wireframe:
     status: notStarted
     provenance: generated
@@ -28305,21 +28300,6 @@ screens:
         - OrderSummary.heldUntil
         operation: listOrders
         provenance: contract orders.yaml GET /orders
-      - kind: detailPanel
-        label: The venue settings
-        bindsTo: VenueSettings
-        columns:
-        - VenueSettings.id
-        - VenueSettings.venueId
-        - VenueSettings.currencyCode
-        - VenueSettings.currencyScale
-        - VenueSettings.supportHours
-        - VenueSettings.quietHours
-        - VenueSettings.biometrics
-        - VenueSettings.segregatedAccess
-        - VenueSettings.alerting
-        operation: getVenueSettings
-        provenance: contract tenancy.yaml GET /venues/{venueId}/settings
   states:
     loading: The list, with counts.
     error: Could not load. Venue Home is still reachable.
@@ -28329,10 +28309,6 @@ screens:
     emptyNoAccess: You do not have permission for orders & money. **Said plainly** — an empty section
       reads as broken.
   apis:
-  - operationId: getVenueSettings
-    contract: tenancy
-    purpose: What is enabled here
-    trigger: onLoad
   - operationId: listOrders
     contract: orders
     purpose: Orders taken in this venue
@@ -28361,6 +28337,12 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: getVenueSettings
+    removed: true
+    why: Venue settings are not part of orders and money (design-note correction platform-foundation BO-101,
+      CHG-SBO-015).
+    source: screens/P08-venue-back-office.yaml#BO-065
 - id: BO-102
   name: Sell
   module: Sell
@@ -28649,19 +28631,9 @@ screens:
         provenance: contract promotions.yaml GET /upsell-rules
       - kind: detailPanel
         label: The upsell suggestion
-        bindsTo: UpsellSuggestion
-        columns:
-        - UpsellSuggestion.variantId
-        - UpsellSuggestion.bundleId
-        - UpsellSuggestion.name
-        - UpsellSuggestion.price
-        - UpsellSuggestion.discountedPrice
-        - UpsellSuggestion.source
-        - UpsellSuggestion.ruleId
-        - UpsellSuggestion.rank
-        - UpsellSuggestion.rationale
-        operation: getUpsellSuggestions
+        operation: decideRecommendations
         provenance: contract promotions.yaml POST /upsell-suggestions
+        notes: 'The slot preview, as on WEB-008: `decideRecommendations` with `previewOnly` (ADR-0052).'
       - kind: detailPanel
         label: The venue settings
         bindsTo: VenueSettings
@@ -32798,27 +32770,19 @@ screens:
   - id: formDeployConfigurationProfile
     component: modal
     trigger: Deploy configuration profile
-    body: '**Collects what `deployConfigurationProfile` sends before it is called.** Required: `profileId`.
-      Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`,
-      `startedAt`, `completedAt`. **Not asked:** `id` is a client UUIDv7 generated silently; `status`
-      is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: ProfileDeployment
+    body: '**Collects what `deployConfigurationProfile` sends before it is called.** Nothing in the body
+      is required. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`. Only the version (profile),
+      the target and the strategy are asked; status, counts and timestamps are the server''s. Dismissing
+      sends nothing; the screen behind is unchanged.'
     confirm:
       label: Deploy configuration profile
       operation: deployConfigurationProfile
     dismiss:
       label: Cancel
       discards:
-      - profileId
       - targetWorkstationIds
       - targetFilter
       - strategy
-      - succeededCount
-      - failedCount
-      - failureReasons
-      - startedAt
-      - completedAt
     provenance: contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy
   gaps:
   - operation: recordDeviceHeartbeat
@@ -32838,7 +32802,7 @@ screens:
 - id: BO-125
   name: Product & Category Button Configuration
   module: Sell
-  requiresModule: ticketing
+  requiresModule: core
   wave: 2
   implementation:
     app: venue-management-web
@@ -33909,41 +33873,36 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: textField
-        label: id
-        bindsTo: ConnectivityPolicy.id
-        provenance: contract tenancy.yaml PUT /connectivity-policy
-      - kind: textField
-        label: scopePath
-        bindsTo: ConnectivityPolicy.scopePath
-        provenance: contract tenancy.yaml PUT /connectivity-policy
-      - kind: textField
-        label: failuresBeforeOffline
+      - kind: numberField
+        label: Failures before offline
         bindsTo: ConnectivityPolicy.failuresBeforeOffline
         provenance: contract tenancy.yaml PUT /connectivity-policy
-      - kind: textField
-        label: probeIntervalSeconds
+        operation: setConnectivityThresholds
+      - kind: numberField
+        label: Probe every (seconds)
         bindsTo: ConnectivityPolicy.probeIntervalSeconds
         provenance: contract tenancy.yaml PUT /connectivity-policy
-      - kind: textField
-        label: probeTimeoutMs
+        operation: setConnectivityThresholds
+      - kind: numberField
+        label: Probe timeout (ms)
         bindsTo: ConnectivityPolicy.probeTimeoutMs
         provenance: contract tenancy.yaml PUT /connectivity-policy
-      - kind: textField
-        label: successesBeforeOnline
+        operation: setConnectivityThresholds
+      - kind: numberField
+        label: Successes before online
         bindsTo: ConnectivityPolicy.successesBeforeOnline
         provenance: contract tenancy.yaml PUT /connectivity-policy
-      - kind: textField
-        label: minimumStableSeconds
+        operation: setConnectivityThresholds
+      - kind: numberField
+        label: Stable for (seconds)
         bindsTo: ConnectivityPolicy.minimumStableSeconds
         provenance: contract tenancy.yaml PUT /connectivity-policy
-      - kind: textField
-        label: autoSwitch
+        operation: setConnectivityThresholds
+      - kind: toggle
+        label: Switch automatically
         bindsTo: ConnectivityPolicy.autoSwitch
         provenance: contract tenancy.yaml PUT /connectivity-policy
-      - kind: searchField
-        label: Search connectivity
-        provenance: carried from the previous definition
+        operation: setConnectivityThresholds
     - name: actionBar
       slot: publish
       components:
@@ -34760,7 +34719,7 @@ screens:
 - id: BO-136
   name: F&B Global Settings & Controls
   module: Food & Beverage
-  requiresModule: core
+  requiresModule: fnb
   wave: 2
   implementation:
     app: venue-management-web
@@ -34791,8 +34750,7 @@ screens:
     is not.'
   density: compact
   boardFrames:
-  - FnB Board 2.dc.html#fnb-2n
-  - FnB Board 5.dc.html#fnb-5d
+  - FnB Board 1.dc.html#fnb-1k
   pattern: listDetail
   patternReason: '`listProductionRuns` reads the population and `getVenueSettings` reads one of them —
     list, select, act'
@@ -34813,15 +34771,6 @@ screens:
         label: The venue settings
         bindsTo: VenueSettings
         columns:
-        - VenueSettings.id
-        - VenueSettings.venueId
-        - VenueSettings.currencyCode
-        - VenueSettings.currencyScale
-        - VenueSettings.supportHours
-        - VenueSettings.quietHours
-        - VenueSettings.biometrics
-        - VenueSettings.segregatedAccess
-        - VenueSettings.alerting
         - VenueSettings.fnb
         operation: getVenueSettings
         provenance: contract tenancy.yaml GET /venues/{venueId}/settings
@@ -34887,43 +34836,6 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formSetVenueSettings
-    component: modal
-    trigger: Save venue settings
-    body: '**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required.
-      Optional: `id`, `venueId`, `currencyCode`, `currencyScale`, `supportHours`, `quietHours`, `biometrics`,
-      `segregatedAccess`, `alerting`, and **the configured limits** — `displayCurrencies`, the cart, resale,
-      exchange, reschedule and reservation limits, `shiftVarianceThreshold`, and the `catalogue`, `inventory`,
-      `seating`, `promotions`, `fnb`, `queue` and `reporting` groups (decided 28 September, audit R094).
-      **A limit left empty inherits the tenant default** (null = inherit); each field shows the default
-      it would inherit. **`fnb.foodSafetyLeadPrincipalId` is settable here** — until a food-safety lead
-      is named, escalating a corrective action is refused 409 no-food-safety-lead, and the screen says
-      so (decided 28 September, audit R096 (9)). Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: VenueSettings
-    confirm:
-      label: Save venue settings
-      operation: setVenueSettings
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - venueId
-      - currencyCode
-      - currencyScale
-      - supportHours
-      - quietHours
-      - biometrics
-      - segregatedAccess
-      - alerting
-      - displayCurrencies
-      - catalogue
-      - inventory
-      - seating
-      - promotions
-      - fnb
-      - queue
-      - reporting
-    provenance: contract tenancy.yaml PUT /venues/{venueId}/settings
   - id: formSetCourseRules
     component: modal
     trigger: Save course rules
@@ -34935,6 +34847,21 @@ screens:
     dismiss:
       label: Cancel
     provenance: contract fnb.yaml PUT /outlets/{outletId}/course-rules; wiring fix, 2 October 2026
+  - id: formSetVenueSettings
+    component: modal
+    trigger: Save venue settings
+    body: '**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required.
+      Optional: `fnb`. Only the F&B group (recall window, comp escalation, table reserved lead, food-safety
+      lead); the other venue settings are other screens''. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    confirm:
+      label: Save venue settings
+      operation: setVenueSettings
+    dismiss:
+      label: Cancel
+      discards:
+      - fnb
+    provenance: contract tenancy.yaml PUT /venues/{venueId}/settings
   gaps:
   - operation: buildProductionPlan
     removed: true
@@ -53736,6 +53663,12 @@ screens:
     - name: contentBody
       slot: headline
       components:
+      - kind: multiSelect
+        label: Membership type
+        operation: listMembershipAnnualPass
+        notes: 'Monthly, fixed-term, corporate, family, individual, student, VIP or custom: a filter (and
+          the type chosen when creating), not buttons.'
+        provenance: contract subscription.yaml GET /membership-annual-pass
       - kind: metricTile
         label: Active Membership Products
         bindsTo: MembershipAnnualPassCommandCenterSummary.activeMembershipProducts
@@ -53835,38 +53768,6 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Monthly Membership
-        provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable
-          types such as
-      - kind: secondaryButton
-        label: Fixed-Term Membership
-        provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable
-          types such as
-      - kind: secondaryButton
-        label: Corporate Membership
-        provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable
-          types such as
-      - kind: secondaryButton
-        label: Family Membership
-        provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable
-          types such as
-      - kind: secondaryButton
-        label: Individual Membership
-        provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable
-          types such as
-      - kind: secondaryButton
-        label: Student Membership
-        provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable
-          types such as
-      - kind: secondaryButton
-        label: VIP Membership
-        provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable
-          types such as
-      - kind: secondaryButton
-        label: Custom Membership
-        provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable
-          types such as
       - kind: destructiveButton
         label: Suspend membership product
         operation: approveMembershipProductValidation
@@ -53882,6 +53783,16 @@ screens:
         notes: 'Quick action: sends `action: reinstate`, moving a `suspended` version back to `active`;
           refused once its `effectiveTo` has passed (decided 29 September, writers pass; DM4).'
         provenance: contract subscription.yaml PUT /membership-product-validation
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: 'Asked in the confirmation of the approval: `approveMembershipProductValidation` is step-up
+          mfa and refuses without a fresh token.'
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        provenance: contract identity.yaml POST /auth/mfa/challenge
   states:
     loading: The membership annual pass list.
     error: Could not load. Names which read failed and leaves the membership annual pass untouched.
@@ -53902,6 +53813,16 @@ screens:
     trigger: onAction
     invalidates:
     - listMembershipAnnualPass
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: The step-up approveMembershipProductValidation asks for, in place
+    trigger: onAction
+    provenance: design-note correction, 2 October 2026 (BO-284)
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Answers the step-up; its token goes into the approval
+    trigger: onAction
+    provenance: design-note correction, 2 October 2026 (BO-284)
   entryState:
     preloaded:
     - MembershipAnnualPassCommandCenterSummary.activeMembershipProducts
@@ -53972,45 +53893,69 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: selectField
+      - kind: textField
         label: Membership Name
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture
-      - kind: selectField
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.membershipName
+      - kind: textField
         label: Membership Code
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture
-      - kind: selectField
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.membershipCode
+      - kind: textField
         label: Description
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.description
       - kind: selectField
         label: Membership Type
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture
-      - kind: selectField
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.membershipType
+      - kind: textField
         label: Brand
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture
-      - kind: selectField
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.brand
+      - kind: textField
         label: Venue
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture
-      - kind: selectField
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.venue
+      - kind: textField
         label: Attraction
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture
-      - kind: selectField
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.attraction
+      - kind: textField
         label: Market
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.market
       - kind: selectField
         label: Currency Context
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture
-      - kind: selectField
+      - kind: datePicker
         label: Effective From
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture
-      - kind: selectField
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.effectiveFrom
+      - kind: datePicker
         label: Effective To
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.effectiveTo
       - kind: selectField
         label: Tier Level
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define
-      - kind: selectField
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.tierLevel
+      - kind: numberField
         label: Display Order
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define
+        operation: setMembershipProductTier
+        bindsTo: MembershipProductTierBuilderInput.displayOrder
       - kind: selectField
         label: Upgrade Path
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define
@@ -54045,8 +53990,9 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
-        label: Save changes
+        label: Save membership product
         provenance: contract operation setMembershipProductTier
+        operation: setMembershipProductTier
   states:
     loading: The membership product tier configuration as saved.
     error: Could not load. Names which read failed and leaves the membership product tier untouched.
@@ -54073,6 +54019,48 @@ screens:
     0 of 0 labels bound to a contract property; 23 of 39 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetMembershipProductTier
+    component: modal
+    trigger: Save membership product
+    body: '**Collects what `setMembershipProductTier` sends before it is called.** Nothing in the body
+      is required. Optional: `membershipName`, `membershipCode`, `description`, `membershipType`, `brand`,
+      `venue`, `attraction`, `market`, `currencyContext`, `effectiveFrom`, `effectiveTo`, `tierLevel`,
+      `displayOrder`, `parentMembership`, `replacementMembership`, `holderModel`, `transferable`, `credentialForm`,
+      `renewable`, `autoRenewEligible`, `benefitModel`, `tier`, `upgradePath`, `downgradePath`, `catalogueProductId`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save membership product
+      operation: setMembershipProductTier
+    dismiss:
+      label: Cancel
+      discards:
+      - membershipName
+      - membershipCode
+      - description
+      - membershipType
+      - brand
+      - venue
+      - attraction
+      - market
+      - currencyContext
+      - effectiveFrom
+      - effectiveTo
+      - tierLevel
+      - displayOrder
+      - parentMembership
+      - replacementMembership
+      - holderModel
+      - transferable
+      - credentialForm
+      - renewable
+      - autoRenewEligible
+      - benefitModel
+      - tier
+      - upgradePath
+      - downgradePath
+      - catalogueProductId
+    provenance: contract subscription.yaml PUT /membership-product-tier
 - id: BO-286
   name: Membership Eligibility & Qualification Rule Builder
   module: Sell
@@ -55072,6 +55060,16 @@ screens:
       - kind: primaryButton
         label: Approve
         provenance: contract operation approveMembershipProductValidation
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: 'Asked in the confirmation of the approval: `approveMembershipProductValidation` is step-up
+          mfa and refuses without a fresh token.'
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        provenance: contract identity.yaml POST /auth/mfa/challenge
   states:
     loading: The membership product validation configuration as saved.
     error: Could not load. Names which read failed and leaves the membership product validation untouched.
@@ -55084,6 +55082,16 @@ screens:
     contract: subscription
     purpose: Membership Product Validation, Approval, Publication & Versioning
     trigger: onAction
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: The step-up approveMembershipProductValidation asks for, in place
+    trigger: onAction
+    provenance: design-note correction, 2 October 2026 (BO-293)
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Answers the step-up; its token goes into the approval
+    trigger: onAction
+    provenance: design-note correction, 2 October 2026 (BO-293)
   wireframe:
     status: notStarted
     provenance: generated
@@ -64898,7 +64906,7 @@ screens:
       provenance: 'wiring fix, 2 October 2026 (CHG-WIR-022): pack board 1 wiring, 9 September 2026, retargeted
         from merged BO-365'
   density: compact
-  pattern: listDetail
+  pattern: commandCentre
   patternReason: the pack gives this screen a display directory (§Key Functions) and no metric row
   purpose: Provide management and approvers with a real-time overview of approval activity.
   gaps:
@@ -64913,61 +64921,99 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every approval
+      - kind: metricTile
+        label: Pending approvals
+        operation: getApprovalAnalytics
+        notes: A tile over the population; the response schema still has to name the measure (logged,
+          CHG-SBO-005).
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: metricTile
+        label: Awaiting my approval
+        operation: getApprovalAnalytics
+        notes: A tile over the population; the response schema still has to name the measure (logged,
+          CHG-SBO-005).
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: metricTile
+        label: Approved today
+        operation: getApprovalAnalytics
+        notes: A tile over the population; the response schema still has to name the measure (logged,
+          CHG-SBO-005).
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: metricTile
+        label: Rejected
+        operation: getApprovalAnalytics
+        notes: A tile over the population; the response schema still has to name the measure (logged,
+          CHG-SBO-005).
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: metricTile
+        label: Escalated
+        operation: getApprovalAnalytics
+        notes: A tile over the population; the response schema still has to name the measure (logged,
+          CHG-SBO-005).
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: metricTile
+        label: SLA breached
+        operation: getApprovalAnalytics
+        notes: A tile over the population; the response schema still has to name the measure (logged,
+          CHG-SBO-005).
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: metricTile
+        label: High-risk requests
+        operation: getApprovalAnalytics
+        notes: A tile over the population; the response schema still has to name the measure (logged,
+          CHG-SBO-005).
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: metricTile
+        label: AI-prioritized requests
+        operation: getApprovalAnalytics
+        notes: A tile over the population; the response schema still has to name the measure (logged,
+          CHG-SBO-005).
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: metricTile
+        label: Average approval time
+        operation: getApprovalAnalytics
+        notes: A tile over the population; the response schema still has to name the measure (logged,
+          CHG-SBO-005).
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: metricTile
+        label: Approval volume
+        operation: getApprovalAnalytics
+        notes: A tile over the population; the response schema still has to name the measure (logged,
+          CHG-SBO-005).
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: metricTile
+        label: Approval trend
+        operation: getApprovalAnalytics
+        notes: A tile over the population; the response schema still has to name the measure (logged,
+          CHG-SBO-005).
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: multiSelect
+        label: Filter by
         columns:
-        - Pending approvals
-        - Awaiting my approval
-        - Approved today
-        - Rejected
-        - Escalated
-        - SLA breached
-        - High-risk requests
-        - AI-prioritized requests
-        - Average approval time
-        - Approval volume
-        - Approval trend
-        - o Tenant
-        - o Venue
-        - o Department
-        - o Module
-        - o Request type
-        - o Priority
-        - o Risk
-        - o Status
-        - o Date
-        bindsTo: null
-        operation: null
-        provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 3 §Key Functions
+        - Tenant
+        - Venue
+        - Department
+        - Module
+        - Request type
+        - Priority
+        - Risk
+        - Status
+        - Date
+        operation: getApprovalAnalytics
+        provenance: contract approvals.yaml GET /approval-analytics
+      - kind: dataTable
+        label: Waiting for a decision
+        bindsTo: ApprovalRequest
+        columns:
+        - ApprovalRequest.kind
+        - ApprovalRequest.status
+        - ApprovalRequest.requestedAt
+        - ApprovalRequest.amount
+        operation: listApprovalRequests
+        provenance: contract approvals.yaml GET /approval-requests
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected approval
-        bindsTo: null
-        columns:
-        - Pending approvals
-        - Awaiting my approval
-        - Approved today
-        - Rejected
-        - Escalated
-        - SLA breached
-        - High-risk requests
-        - AI-prioritized requests
-        - Average approval time
-        - Approval volume
-        - Approval trend
-        - o Tenant
-        - o Venue
-        - o Department
-        - o Module
-        - o Request type
-        - o Priority
-        - o Risk
-        - o Status
-        - o Date
-        notes: null
-        provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 3 §Key Functions
+      components: []
   states:
     loading: The approval list.
     error: Could not load. Names which read failed and leaves the approval untouched.
@@ -64988,14 +65034,7 @@ screens:
     purpose: What is waiting
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  entryState:
-    preloaded:
-    - Pending approvals
-    - Awaiting my approval
-    - Approved today
-    - Rejected
-    - Escalated
-    - SLA breached
+  entryState: {}
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-364
@@ -65710,17 +65749,21 @@ screens:
       slot: headline
       components:
       - kind: metricTile
-        label: Within SLA — 92%
+        label: Within SLA
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 9 §KPI Cards
+        operation: listSlaEscalationReminder
       - kind: metricTile
-        label: At Risk — 17
+        label: At Risk
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 9 §KPI Cards
+        operation: listSlaEscalationReminder
       - kind: metricTile
-        label: Breached — 6
+        label: Breached
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 9 §KPI Cards
+        operation: listSlaEscalationReminder
       - kind: metricTile
-        label: Average Approval — 34 min
+        label: Average Approval
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 9 §KPI Cards
+        operation: listSlaEscalationReminder
   states:
     loading: The approval sla workload list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the approval sla workload untouched.
@@ -66022,11 +66065,21 @@ screens:
     regions:
     - name: contentBody
       components:
-      - kind: dataTable
-        derived: true
-        impliedBy: listApprovalRequests
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
+      - kind: detailPanel
+        label: The request
+        bindsTo: ApprovalRequest
+        operation: listApprovalRequests
+        notes: 'The request opened by its id, with its subject (read from the subject''s own contract:
+          the order, the payment).'
+        provenance: contract approvals.yaml GET /approval-requests
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: secondaryButton
+        label: Build evidence package
+        operation: createApprovalEvidencePackage
+        notes: The evidence package (`createApprovalEvidencePackage`) for the request's period and kind.
+        provenance: contract approvals.yaml POST /approval-evidence-packages
   states:
     loading: The business context evidence list.
     error: Could not load. Names which read failed and leaves the business context evidence untouched.
@@ -66042,6 +66095,11 @@ screens:
     purpose: The request and its evidence
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: createApprovalEvidencePackage
+    contract: approvals
+    purpose: Assemble what an auditor asked for
+    trigger: onAction
+    provenance: design-note correction, 2 October 2026 (BO-375)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-375
@@ -66050,6 +66108,25 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formCreateApprovalEvidencePackage
+    component: modal
+    trigger: Build evidence package
+    body: '**Collects what `createApprovalEvidencePackage` sends before it is called.** Required: `from`,
+      `to`. Optional: `requestKinds`, `includePolicyVersions`, `includeSignatures`. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    confirm:
+      label: Build evidence package
+      operation: createApprovalEvidencePackage
+    dismiss:
+      label: Cancel
+      discards:
+      - from
+      - to
+      - requestKinds
+      - includePolicyVersions
+      - includeSignatures
+    provenance: contract approvals.yaml POST /approval-evidence-packages
 - id: BO-376
   name: Approval Timeline & Decision Chain
   module: Venue Operations
@@ -66079,57 +66156,29 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide a visual representation of the complete approval journey.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Approval_Workflows_and_Governance_Reference.pdf, page 33 §Display
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every approval timeline decision
+      - kind: timeline
+        label: Decision chain
+        bindsTo: ApprovalRecord
         columns:
-        - Request created
-        - Workflow triggered
-        - Routing decision
-        - Assignment
-        - Reassignment
-        - Delegation
-        - Comments
-        - Approval
-        - Rejection
-        - Escalation
-        - Notification
-        - Execution
-        bindsTo: null
-        operation: null
-        provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 33 §Display
+        - ApprovalRecord.sequence
+        - ApprovalRecord.recordedAt
+        - ApprovalRecord.decision
+        - ApprovalRecord.decidedBy
+        - ApprovalRecord.comment
+        - ApprovalRecord.integrity
+        operation: getApprovalRecord
+        notes: Events (created, routed, assigned, reassigned, decided ...) are rows of the timeline, verified
+          on read, not table columns.
+        provenance: contract approvals.yaml GET /approval-requests/{requestId}/record
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected approval timeline decision
-        bindsTo: null
-        columns:
-        - Request created
-        - Workflow triggered
-        - Routing decision
-        - Assignment
-        - Reassignment
-        - Delegation
-        - Comments
-        - Approval
-        - Rejection
-        - Escalation
-        - Notification
-        - Execution
-        notes: 'The pack groups this record''s detail under its own headings: “Current”.'
-        provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 33 §Display
+      components: []
   states:
     loading: The approval timeline decision list.
     error: Could not load. Names which read failed and leaves the approval timeline decision untouched.
@@ -66146,13 +66195,6 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
   entryState:
-    preloaded:
-    - Request created
-    - Workflow triggered
-    - Routing decision
-    - Assignment
-    - Reassignment
-    - Delegation
     params:
     - name: requestId
       from: navigation
@@ -66668,9 +66710,20 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Retry | Investigate | Escalate
+        label: Retry
         operation: resolveApprovedActionExecution
-        provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 37 §Actions
+        notes: '`resolveApprovedActionExecution` with action retry.'
+        provenance: contract approvals.yaml POST /approved-action-executions/{executionId}/resolve
+      - kind: secondaryButton
+        label: Investigate
+        operation: resolveApprovedActionExecution
+        notes: '`resolveApprovedActionExecution` with action investigate.'
+        provenance: contract approvals.yaml POST /approved-action-executions/{executionId}/resolve
+      - kind: secondaryButton
+        label: Escalate
+        operation: resolveApprovedActionExecution
+        notes: '`resolveApprovedActionExecution` with action escalate.'
+        provenance: contract approvals.yaml POST /approved-action-executions/{executionId}/resolve
     - name: contentBody
       components:
       - kind: dataTable
@@ -66714,6 +66767,22 @@ screens:
     params:
     - name: executionId
       from: navigation
+  overlays:
+  - id: formResolveApprovedActionExecution
+    component: modal
+    trigger: Retry
+    body: '**Collects what `resolveApprovedActionExecution` sends before it is called.** Required: `action`.
+      Optional: `assigneeId`, `note`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Retry
+      operation: resolveApprovedActionExecution
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - assigneeId
+      - note
+    provenance: contract approvals.yaml POST /approved-action-executions/{executionId}/resolve
 - id: BO-383
   name: Decision Record & Immutable Audit View
   module: Venue Operations
@@ -67011,17 +67080,23 @@ screens:
       slot: fields
       components:
       - kind: selectField
-        label: 'Delegator: Ahmed Raza'
+        label: Delegator
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 41 §Delegation Setup
-      - kind: textField
-        label: 'Delegate To: Sara Khan'
+        notes: A pick list of people by name; sample names belong in the sample data.
+      - kind: selectField
+        label: Delegate to
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 41 §Delegation Setup
     - name: actionBar
       slot: publish
       components:
       - kind: primaryButton
-        label: Save Draft | Activate Delegation | Cancel
-        provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 41 §Actions
+        label: Activate delegation
+        operation: createApprovalDelegation
+        provenance: contract approvals.yaml POST /delegations
+      - kind: destructiveButton
+        label: Cancel delegation
+        operation: revokeApprovalDelegation
+        provenance: contract approvals.yaml DELETE /delegations/{delegationId}
   states:
     loading: The delegation configuration as saved.
     error: Could not load. Names which read failed and leaves the delegation untouched.
@@ -67073,6 +67148,27 @@ screens:
       approval delegation is listApprovalDelegations, already declared (design-notes correction platform-foundation
       BO-385).'
     source: contracts/spine/identity.yaml#listDelegations | contracts/spine/approvals.yaml#listApprovalDelegations
+  overlays:
+  - id: formCreateApprovalDelegation
+    component: modal
+    trigger: Activate delegation
+    body: '**Collects what `createApprovalDelegation` sends before it is called.** Required: `delegatorPrincipalId`,
+      `delegatePrincipalId`, `from`, `to`. Optional: `kinds`, `maxAmount`, `reason`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    confirm:
+      label: Activate delegation
+      operation: createApprovalDelegation
+    dismiss:
+      label: Cancel
+      discards:
+      - delegatorPrincipalId
+      - delegatePrincipalId
+      - from
+      - to
+      - kinds
+      - maxAmount
+      - reason
+    provenance: contract approvals.yaml POST /delegations
 - id: BO-386
   name: Temporary Delegation & Availability Calendar
   module: Venue Operations
@@ -67320,7 +67416,7 @@ screens:
     purpose: Target, reminders and breach behaviour
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id003
+    invalidates:
     - listSlaEscalationReminder
   wireframe:
     status: notStarted
@@ -67330,6 +67426,9 @@ screens:
     0 of 0 labels bound to a contract property; 8 of 18 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  notes: '**One SLA policy screen (decided 2 October 2026, merge as proposed; CHG-SBO-021):** reminders
+    and breach notifications (BO-389) and the escalation policy (BO-390) are sections of this one policy
+    object.'
 - id: BO-389
   name: Reminder & Breach Notification Rules
   module: Venue Operations
@@ -67361,57 +67460,31 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Configure proactive notifications before and after SLA breaches. The source requires reminders
-    for pending approvals and alerts when SLA thresholds are exceeded.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Approval_Workflows_and_Governance_Reference.pdf, page 44
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Approval_Workflows_and_Governance_Reference.pdf, page 44
+    for pending approvals and alerts when SLA thresholds are exceeded (merged into BO-388 Approval SLA
+    Policy Configuration).
   layout:
     template: split
     regions:
     - name: contentBody
-      components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setApprovalSlaPolicy
-        label: Save approval SLA policy
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setApprovalSlaPolicy
+      components: []
   states:
-    loading: The reminder breach notification list.
-    error: Could not load. Names which read failed and leaves the reminder breach notification untouched.
-    emptyFirstRun: No reminder breach notification yet. Carries the create action; distinct from a filter
-      that matched nothing.
-    emptyNoResults: The filter narrowed it and the reminder breach notification are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: setApprovalSlaPolicy
-    contract: approvals
-    purpose: Reminder and breach rules
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates: *id003
+    loading: Routes to BO-388 while it opens.
+    error: Could not open BO-388; says so and offers to retry.
+    emptyFirstRun: 'Never shown: this id routes to BO-388, whose empty states apply.'
+    emptyNoResults: 'Never shown: this id routes to BO-388.'
+    emptyNoAccess: 'As BO-388: shown when the caller lacks the access BO-388 requires, named in words.'
+  apis: []
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-389
     workshopBoard: wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-389
-  apisNote: Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 44.
-    0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest
-    are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+  apisNote: 'No operations of its own since 2 October 2026 (CHG-SBO-021): merged into BO-388, whose operations
+    it routes to.'
+  notes: '**Merged into BO-388** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed;
+    CHG-SBO-021). Reminders, breach notifications and escalation are parts of the one approval SLA policy
+    (`setApprovalSlaPolicy`), edited on BO-388 (design-note correction platform-foundation BO-389). **One
+    implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes
+    to BO-388, and nothing on it is built separately.'
 - id: BO-390
   name: Escalation Policy Builder
   module: Venue Operations
@@ -67443,62 +67516,30 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Define what TICVAI should do when an approval remains unresolved or meets another escalation
-    condition.
-  gaps:
-  - operation: null
-    why: '**Escalation Policy Builder declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Approval_Workflows_and_Governance_Reference.pdf, page 45
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Approval_Workflows_and_Governance_Reference.pdf, page 45
+    condition (merged into BO-388 Approval SLA Policy Configuration).
   layout:
     template: split
     regions:
     - name: contentBody
-      components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setApprovalSlaPolicy
-        label: Save approval SLA policy
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setApprovalSlaPolicy
+      components: []
   states:
-    loading: The escalation policy list.
-    error: Could not load. Names which read failed and leaves the escalation policy untouched.
-    emptyFirstRun: No escalation policy yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the escalation policy are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: setApprovalSlaPolicy
-    contract: approvals
-    purpose: Escalation on breach
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates: *id003
+    loading: Routes to BO-388 while it opens.
+    error: Could not open BO-388; says so and offers to retry.
+    emptyFirstRun: 'Never shown: this id routes to BO-388, whose empty states apply.'
+    emptyNoResults: 'Never shown: this id routes to BO-388.'
+    emptyNoAccess: 'As BO-388: shown when the caller lacks the access BO-388 requires, named in words.'
+  apis: []
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-390
     workshopBoard: wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-390
-  apisNote: Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 45.
-    0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest
-    are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+  apisNote: 'No operations of its own since 2 October 2026 (CHG-SBO-021): merged into BO-388, whose operations
+    it routes to.'
+  notes: '**Merged into BO-388** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed;
+    CHG-SBO-021). Reminders, breach notifications and escalation are parts of the one approval SLA policy
+    (`setApprovalSlaPolicy`), edited on BO-388 (design-note correction platform-foundation BO-390). **One
+    implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes
+    to BO-388, and nothing on it is built separately.'
 - id: BO-391
   name: Live Escalation Operations Center
   module: Venue Operations
@@ -68816,7 +68857,7 @@ screens:
     purpose: Assign one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id004
+    invalidates: &id003
     - listReaders
   - operationId: testReader
     contract: games
@@ -69070,39 +69111,22 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: selectField
-        label: Attraction created
-        provenance: pack Game_and_Ride_Module.pdf, page 11 §Capture
-      - kind: selectField
-        label: Type changed
-        provenance: pack Game_and_Ride_Module.pdf, page 11 §Capture
-      - kind: selectField
-        label: Reader assigned/replaced
-        provenance: pack Game_and_Ride_Module.pdf, page 11 §Capture
-      - kind: selectField
-        label: Wallet acceptance changed
-        provenance: pack Game_and_Ride_Module.pdf, page 11 §Capture
-      - kind: selectField
-        label: Package association changed
-        provenance: pack Game_and_Ride_Module.pdf, page 11 §Capture
-      - kind: selectField
-        label: Operational status changed
-        provenance: pack Game_and_Ride_Module.pdf, page 11 §Capture
-      - kind: selectField
-        label: Activation/deactivation
-        provenance: pack Game_and_Ride_Module.pdf, page 11 §Capture
-      - kind: selectField
-        label: User
-        provenance: pack Game_and_Ride_Module.pdf, page 11 §Capture
-      - kind: selectField
-        label: Date/time
-        provenance: pack Game_and_Ride_Module.pdf, page 11 §Capture
-      - kind: selectField
-        label: Previous value
-        provenance: pack Game_and_Ride_Module.pdf, page 11 §Capture
-      - kind: selectField
-        label: New value
-        provenance: pack Game_and_Ride_Module.pdf, page 11 §Capture
+      - kind: timeline
+        label: Change history
+        columns:
+        - Attraction created
+        - Type changed
+        - Reader assigned/replaced
+        - Wallet acceptance changed
+        - Package association changed
+        - Operational status changed
+        - Activation/deactivation
+        - User
+        - Date/time
+        - Previous value
+        - New value
+        notes: Event types and columns of a read-only timeline; no read exists yet (logged).
+        provenance: design-note correction, 2 October 2026
   states:
     loading: The attraction audit dependencies configuration as saved.
     error: Could not load. Names which read failed and leaves the attraction audit dependencies untouched.
@@ -69767,7 +69791,7 @@ screens:
     purpose: Credit and payment acceptance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id004
+    invalidates: *id003
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-408
@@ -69847,7 +69871,7 @@ screens:
     purpose: Which attraction it opens
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id004
+    invalidates: *id003
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-409
@@ -69932,7 +69956,7 @@ screens:
     purpose: Retap delay
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id004
+    invalidates: *id003
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-410
@@ -70031,7 +70055,7 @@ screens:
     purpose: Free-game glow and display
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id004
+    invalidates: *id003
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-411
@@ -71159,7 +71183,7 @@ screens:
     purpose: Grant free play
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id005
+    invalidates: &id004
     - listGameEntitlements
   wireframe:
     status: notStarted
@@ -71870,7 +71894,7 @@ screens:
     purpose: Unlimited on one game
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id004
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-428
@@ -71945,7 +71969,7 @@ screens:
     purpose: A limited number of plays
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id004
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-429
@@ -72038,7 +72062,7 @@ screens:
     purpose: Build a package
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id004
   - operationId: listGameEntitlements
     contract: games
     purpose: Existing packages
@@ -72126,7 +72150,7 @@ screens:
     purpose: Validity and activation
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id004
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-431
@@ -72517,7 +72541,7 @@ screens:
     purpose: Standard price
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id006
+    invalidates: &id005
     - getGamePricing
   wireframe:
     status: notStarted
@@ -72616,7 +72640,7 @@ screens:
     purpose: Group pricing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id006
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-436
@@ -72707,7 +72731,7 @@ screens:
     purpose: Peak and off-peak
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id006
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-437
@@ -72792,7 +72816,7 @@ screens:
     purpose: Calendar and exception dates
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id006
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-438
@@ -72868,7 +72892,7 @@ screens:
     purpose: Normal and VIP
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id006
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-439
@@ -75051,10 +75075,7 @@ screens:
         provenance: pack Game_and_Ride_Module.pdf, page 68 §Filters
     - name: actionBar
       slot: rowActions
-      components:
-      - kind: primaryButton
-        label: View Card | View Wallet | Export
-        provenance: pack Game_and_Ride_Module.pdf, page 68 §Actions
+      components: []
   states:
     loading: The expiry monitoring upcoming list.
     error: Could not load. Names which read failed and leaves the expiry monitoring upcoming untouched.
@@ -75074,6 +75095,9 @@ screens:
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack
     actions reconciled 29 September (VM close-out):** View Card | View Wallet | Export dropped (navigation
     (View Card / View Wallet) and a generic export already on the reporting screens).
+  notes: View card and View wallet are row actions and Export a toolbar action (the board merged three
+    actions into one label); no staff read of a game card or wallet exists (`getGameCard` is guest-only),
+    so they wait for one (logged, CHG-SBO-005).
 - id: BO-459
   name: Card Expiry Runtime Validation
   module: Games & Rides
@@ -75293,7 +75317,7 @@ screens:
     purpose: Block, suspend or reactivate
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id007
+    invalidates: &id006
     - getGameCard
   entryState:
     preloaded:
@@ -75394,7 +75418,7 @@ screens:
     purpose: Replace and relink
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id007
+    invalidates: *id006
   - operationId: linkWalletCredential
     contract: wallet
     purpose: Bind the new credential
@@ -77278,7 +77302,7 @@ screens:
     purpose: Trigger and I/O mapping
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id004
+    invalidates: *id003
   entryState:
     preloaded:
     - → TICVAI Authorization
@@ -77370,7 +77394,7 @@ screens:
     purpose: Screen, LED and sound
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id004
+    invalidates: *id003
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-480
@@ -79254,7 +79278,7 @@ screens:
     purpose: Pooled, serialised or hybrid
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id038
+    invalidates: &id037
     - getRentalProduct
     - getRentalAvailability
   wireframe:
@@ -79440,7 +79464,7 @@ screens:
     purpose: Duration, increment and turnaround
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id010
+    invalidates: &id009
     - getRentalProduct
     - getRentalAvailability
   wireframe:
@@ -80270,7 +80294,7 @@ screens:
     purpose: Adjust the pool
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id008
+    invalidates: &id007
     - getStockPositions
     - listStockMovements
   - operationId: createStockTransfer
@@ -80368,7 +80392,7 @@ screens:
     purpose: Available, rented or faulty
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id018
+    invalidates: &id017
     - getAsset
     - listAssets
   - operationId: getAsset
@@ -80753,7 +80777,7 @@ screens:
     purpose: Adjust with a reason
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id008
+    invalidates: *id007
   - operationId: listStockMovements
     contract: inventory
     purpose: Adjustments so far
@@ -81130,7 +81154,7 @@ screens:
     purpose: Windows, slots and holds
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id009
+    invalidates: &id008
     - getRentalAvailability
   wireframe:
     status: notStarted
@@ -81216,7 +81240,7 @@ screens:
     purpose: Operating hours and rental windows
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id009
+    invalidates: *id008
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-516
@@ -81308,7 +81332,7 @@ screens:
     purpose: Slot and duration setup
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id010
+    invalidates: *id009
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-517
@@ -81871,7 +81895,7 @@ screens:
     purpose: Buffers and hold release
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id009
+    invalidates: *id008
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-522
@@ -82238,7 +82262,7 @@ screens:
     purpose: Change it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id011
+    invalidates: &id010
     - listRentalPricingProfiles
   wireframe:
     status: notStarted
@@ -82324,7 +82348,7 @@ screens:
     purpose: Duration and tiered rates
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id011
+    invalidates: *id010
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-526
@@ -82408,7 +82432,7 @@ screens:
     purpose: Peak, weekend and seasonal rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id011
+    invalidates: *id010
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-527
@@ -82559,7 +82583,7 @@ screens:
     purpose: Deposit basis, limits and instruments
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id012
+    invalidates: &id011
     - listRentalPricingProfiles
   wireframe:
     status: notStarted
@@ -82642,7 +82666,7 @@ screens:
     purpose: Release, capture and approval thresholds
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id012
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-530
@@ -82723,7 +82747,7 @@ screens:
     purpose: Grace, late fee and extension pricing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id040
+    invalidates: &id039
     - listRentalPricingProfiles
   wireframe:
     status: notStarted
@@ -83137,7 +83161,7 @@ screens:
     purpose: Reserve it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id013
+    invalidates: &id012
     - listRentalBookings
     - getRentalAvailability
   - operationId: quoteRentalPrice
@@ -83446,7 +83470,7 @@ screens:
     purpose: One booking, many participants
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id013
+    invalidates: *id012
   - operationId: signRentalAgreement
     contract: rental
     purpose: Capture one group waiver signature for the booking
@@ -84395,7 +84419,7 @@ screens:
     purpose: Scan to assign
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id015
+    invalidates: &id014
     - getRentalBooking
   - operationId: lookupAsset
     contract: maintenance
@@ -84488,7 +84512,7 @@ screens:
     purpose: Condition before it goes out
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id016
+    invalidates: &id015
     - getRentalBooking
   wireframe:
     status: notStarted
@@ -84578,7 +84602,7 @@ screens:
     purpose: Safety briefing and handover
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id014
+    invalidates: &id013
     - getRentalBooking
     - listRentalBookings
     - getRentalAvailability
@@ -84665,7 +84689,7 @@ screens:
     purpose: Hold the deposit
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id014
+    invalidates: *id013
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-551
@@ -84750,7 +84774,7 @@ screens:
     purpose: Several items at once
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id015
+    invalidates: *id014
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-552
@@ -84819,7 +84843,7 @@ screens:
     purpose: Activate the rental
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id014
+    invalidates: *id013
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-553
@@ -85253,7 +85277,7 @@ screens:
     purpose: Extend it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id039
+    invalidates: &id038
     - getRentalBooking
     - getRentalAvailability
   wireframe:
@@ -86074,7 +86098,7 @@ screens:
     purpose: Record the actual return time
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id017
+    invalidates: &id016
     - getRentalBooking
     - listRentalBookings
     - getRentalAvailability
@@ -86161,7 +86185,7 @@ screens:
     purpose: Condition on the way back
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id016
+    invalidates: *id015
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-567
@@ -86418,7 +86442,7 @@ screens:
     purpose: Partial return, with what is missing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id017
+    invalidates: *id016
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-570
@@ -86502,7 +86526,7 @@ screens:
     purpose: Late fee, damage and settlement
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id017
+    invalidates: *id016
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-571
@@ -87078,7 +87102,7 @@ screens:
     purpose: Schedule a job
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id041
+    invalidates: &id040
     - listWorkOrders
     - getDueMaintenance
   - operationId: listWorkOrders
@@ -87882,7 +87906,7 @@ screens:
     purpose: Retire or write off
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id018
+    invalidates: *id017
   - operationId: getAssetHistory
     contract: maintenance
     purpose: The case for retiring it
@@ -88406,8 +88430,8 @@ screens:
     - name: contentBody
       slot: moduleTiles
       components:
-      - kind: dataTable
-        label: Every inventory equipment performance
+      - kind: cardList
+        label: Ranked shortlists
         columns:
         - Most utilized assets
         - Least utilized assets
@@ -88418,6 +88442,9 @@ screens:
         bindsTo: null
         operation: null
         provenance: pack Rental_Management.pdf, page 127 §Identify
+        notes: Six ranked shortlists (most and least utilised, highest revenue ...), not the columns of
+          one table; the equipment performance table is asset, rentals, hours, revenue, damage, downtime,
+          health.
     - name: contextPanel
       slot: selection
       components:
@@ -89081,7 +89108,11 @@ screens:
         7", 11 September 2026'
   notes: '**Moved from P09 `ADM-428` on 11 September 2026.** Board 6 is worked by the new customer''s
     own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py`
-    records why. `ADM-428` is retired and never reissued.'
+    records why. `ADM-428` is retired and never reissued.
+
+
+    The pack''s flow text ("Initial Configuration - 42%", arrows, board headings) is narrative, not fields;
+    the screen tells the customer the environment is ready and hands over to AI setup (BO-595).'
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configuration Status; AI Configuration
@@ -89101,25 +89132,7 @@ screens:
     regions:
     - name: contentBody
       slot: fields
-      components:
-      - kind: selectField
-        label: 'Initial Configuration: 42%'
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Configuration Status
-      - kind: textField
-        label: Board 6 — Zero-Touch Requirement
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §AI Configuration prepares
-      - kind: selectField
-        label: ↓
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared
-      - kind: textField
-        label: Customer Receives “Environment Ready”
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared
-      - kind: textField
-        label: Board 6 — Trial Handling
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared
-      - kind: textField
-        label: Tenant Type = Trial
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared
+      components: []
   states:
     loading: The environment ready handoff configuration as saved.
     error: Could not load. Names which read failed and leaves the environment ready handoff untouched.
@@ -89235,9 +89248,11 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: selectField
-        label: 42% Configuration Complete
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 84 §Setup Progress
+      - kind: progressIndicator
+        label: Configuration complete
+        operation: getGoLiveReadiness
+        notes: The percentage is an output of the go-live readiness, not a field.
+        provenance: contract subscription.yaml GET /go-live-readiness
   states:
     loading: The record configuration as saved.
     error: Could not load. Names which read failed and leaves the record untouched.
@@ -89920,7 +89935,10 @@ screens:
       back: true
   notes: '**Moved from P09 `ADM-436` on 11 September 2026.** Board 7 is worked by the new customer''s
     own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py`
-    records why. `ADM-436` is retired and never reissued.'
+    records why. `ADM-436` is retired and never reissued.
+
+
+    Progress ("6 of 12", "10") is shown from the go-live readiness on BO-595, not as fields here.'
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configured; Configure) and no
@@ -89939,12 +89957,6 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: selectField
-        label: 6/12
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 90 §Configured
-      - kind: selectField
-        label: '10'
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 90 §Configured
       - kind: selectField
         label: POS Name
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 90 §Configure
@@ -90078,7 +90090,7 @@ screens:
     purpose: Configuration health
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id019
+    invalidates: &id018
     - getGoLiveReadiness
   wireframe:
     status: notStarted
@@ -90445,7 +90457,7 @@ screens:
     purpose: Run the plan
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id019
+    invalidates: *id018
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-606
@@ -90528,7 +90540,7 @@ screens:
     purpose: Ticketing and product checks
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id019
+    invalidates: *id018
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-607
@@ -90611,7 +90623,7 @@ screens:
     purpose: Sales channel tests
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id019
+    invalidates: *id018
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-608
@@ -90695,7 +90707,7 @@ screens:
     purpose: Payment and financial checks
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id019
+    invalidates: *id018
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-609
@@ -90778,7 +90790,7 @@ screens:
     purpose: Ticket, QR and access checks
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id019
+    invalidates: *id018
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-610
@@ -90871,7 +90883,7 @@ screens:
     purpose: User, security and integration checks
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id019
+    invalidates: *id018
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-611
@@ -90954,7 +90966,7 @@ screens:
     purpose: Communication and journey checks
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id019
+    invalidates: *id018
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-612
@@ -92574,7 +92586,7 @@ screens:
     purpose: Identity and verification
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id020
+    invalidates: &id019
     - getAccreditationHolder
     - listAccreditationHolders
   - operationId: getAccreditationHolder
@@ -92673,7 +92685,7 @@ screens:
     purpose: Photo management
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id020
+    invalidates: *id019
   - operationId: getAccreditationHolder
     contract: accreditation
     purpose: The holder as saved, with the current photo
@@ -93625,7 +93637,8 @@ screens:
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
-  purpose: Configure reusable accreditation approval workflows.
+  purpose: Design the product approval workflows (who approves a product change, in which order); accreditation
+    approvals are configured with the approvals platform.
   gaps:
   - operation: null
     why: '**Approval Workflow Builder declares no operation that writes anything** — its only declared
@@ -93650,17 +93663,16 @@ screens:
     template: split
     regions:
     - name: contentBody
+      components: []
+    - name: actionBar
+      slot: rowActions
       components:
       - kind: primaryButton
-        derived: true
-        impliedBy: approveWorkflow
-        label: Approve workflow
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: approveWorkflow
+        label: Save product approval workflow
+        operation: approveWorkflow
+        notes: Despite its name, `approveWorkflow` designs (creates or changes) the workflow; the button
+          says what it does.
+        provenance: contract catalogue.yaml PUT /workflow
   states:
     loading: The approval workflow list.
     error: Could not load. Names which read failed and leaves the approval workflow untouched.
@@ -93682,6 +93694,30 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 22. 0 of 0 labels bound to a contract
     property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  overlays:
+  - id: formApproveWorkflow
+    component: modal
+    trigger: Save product approval workflow
+    body: '**Collects what `approveWorkflow` sends before it is called.** Nothing in the body is required.
+      Optional: `workflowName`, `applicableProductTypes`, `venue`, `department`, `changeTypes`, `approvalStages`,
+      `rejectionBehavior`, `resubmissionBehavior`, `workflowId`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Save product approval workflow
+      operation: approveWorkflow
+    dismiss:
+      label: Cancel
+      discards:
+      - workflowName
+      - applicableProductTypes
+      - venue
+      - department
+      - changeTypes
+      - approvalStages
+      - rejectionBehavior
+      - resubmissionBehavior
+      - workflowId
+    provenance: contract catalogue.yaml PUT /workflow
 - id: BO-638
   name: Approval Rules & Conditions
   module: Access & Venue
@@ -94163,14 +94199,14 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
-        derived: true
-        impliedBy: listAccreditationAudit
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-      - kind: dataTable
         label: Workflows
         operation: listWorkflow
         provenance: contract approvals.yaml GET /workflow; wiring fix, 2 October 2026
+      - kind: dataTable
+        label: Validation checks
+        operation: simulateWorkflowTestingImpact
+        notes: The ten checks the pack lists, as results of the simulation, before Publish.
+        provenance: contract approvals.yaml PUT /workflow-testing-impact
     - name: actionBar
       components:
       - kind: secondaryButton
@@ -94242,6 +94278,8 @@ screens:
       label: Cancel
     provenance: contract approvals.yaml PUT /visual-workflow; wiring fix, 2 October 2026
   entryState: {}
+  notes: 'The approvals validation and publication, opened with the accreditation scope (VO-R14): the
+    approvals platform owns the machinery; accreditation does not (design-note correction).'
 - id: BO-644
   name: Credential Issuance Command Center
   module: Access & Venue
@@ -95408,7 +95446,7 @@ screens:
     purpose: Define one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id022
+    invalidates: &id021
     - listAccessProfiles
   wireframe:
     status: notStarted
@@ -95495,7 +95533,7 @@ screens:
     purpose: Venue and zone matrix
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id021
+    invalidates: &id020
     - listAccessProfiles
   - operationId: listAccessProfiles
     contract: accreditation
@@ -95588,7 +95626,7 @@ screens:
     purpose: Operational area permissions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id021
+    invalidates: *id020
   - operationId: listAccessProfiles
     contract: accreditation
     purpose: The access profiles and their operational areas
@@ -95680,7 +95718,7 @@ screens:
     purpose: Date and time rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id021
+    invalidates: *id020
   - operationId: listAccessProfiles
     contract: accreditation
     purpose: The access profiles and their date and time rules
@@ -95766,7 +95804,7 @@ screens:
     purpose: Schedule by event phase
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id022
+    invalidates: *id021
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-659
@@ -96065,7 +96103,7 @@ screens:
     purpose: Revoke or suspend
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id023
+    invalidates: &id022
     - listAccreditationHolders
     - listAccreditationAudit
   wireframe:
@@ -96341,7 +96379,7 @@ screens:
     purpose: Move through the workflow
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id023
+    invalidates: *id022
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-665
@@ -96629,7 +96667,7 @@ screens:
     purpose: Multi-venue accreditation
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id021
+    invalidates: *id020
   - operationId: listAccessProfiles
     contract: accreditation
     purpose: Profiles and the venues they cover
@@ -96683,18 +96721,6 @@ screens:
         label: Accreditation type
         provenance: pack ACCREDITATION.pdf, page 50 §Administrators shall configure
       - kind: selectField
-        label: Start/end date
-        provenance: pack ACCREDITATION.pdf, page 50 §Administrators shall configure
-      - kind: selectField
-        label: Events
-        provenance: pack ACCREDITATION.pdf, page 50 §Administrators shall configure
-      - kind: selectField
-        label: Venues
-        provenance: pack ACCREDITATION.pdf, page 50 §Administrators shall configure
-      - kind: selectField
-        label: Access profile
-        provenance: pack ACCREDITATION.pdf, page 50 §Administrators shall configure
-      - kind: selectField
         label: Automatic expiry
         provenance: pack ACCREDITATION.pdf, page 50 §Administrators shall configure
       - kind: selectField
@@ -96721,7 +96747,11 @@ screens:
     Period Configuration; temporary and seasonal periods are presets inside the validity editor (VO-R14;
     DI-671, DI-987; design-notes correction venue-operations BO-669). **One implementation, both ids kept**,
     as the M24-03 merges do: this id stays for traceability and routes to BO-666, and nothing on it is
-    built separately.'
+    built separately.
+
+
+    Dates follow from the validity kind and the programme; events and venues are the programme''s scope
+    (BO-667); access profiles are category defaults (design-note correction).'
 - id: BO-670
   name: Suspension & Reactivation Management
   module: Access & Venue
@@ -96800,7 +96830,7 @@ screens:
     purpose: Suspend and reactivate
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id023
+    invalidates: *id022
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-670
@@ -96884,7 +96914,7 @@ screens:
     purpose: Revoke
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id023
+    invalidates: *id022
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-671
@@ -97169,31 +97199,20 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every accreditation communications
+      - kind: chart
+        label: Communications
         columns:
         - Delivery success rate
         - Notifications by type
         - Notifications by channel
         - Failure trends
         - Upcoming scheduled communications
-        bindsTo: null
-        operation: null
-        provenance: pack ACCREDITATION.pdf, page 55 §Dashboard analytics shall show
+        notes: Delivery success rate, notifications by type and channel, failure trends and upcoming scheduled
+          communications are charts and tiles on a dashboard (VO-R02), not table columns.
+        provenance: design-note correction, 2 October 2026
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected accreditation communications
-        bindsTo: null
-        columns:
-        - Delivery success rate
-        - Notifications by type
-        - Notifications by channel
-        - Failure trends
-        - Upcoming scheduled communications
-        notes: 'The pack groups this record''s detail under its own headings: “Scope of Work”, “Key requirements”.'
-        provenance: pack ACCREDITATION.pdf, page 55 §Dashboard analytics shall show
+      components: []
   states:
     loading: The accreditation communications list.
     error: Could not load. Names which read failed and leaves the accreditation communications untouched.
@@ -97501,9 +97520,6 @@ screens:
       - kind: selectField
         label: Contact information
         provenance: pack ACCREDITATION.pdf, page 59 §Administrators shall configure
-      - kind: selectField
-        label: 'Key requirement: 12.1.57'
-        provenance: pack ACCREDITATION.pdf, page 59 §Administrators shall configure
   states:
     loading: The channel language branding configuration as saved.
     error: Could not load. Names which read failed and leaves the channel language branding untouched.
@@ -97741,7 +97757,7 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every import validation processing
+        label: Import batches
         columns:
         - Import batch ID
         - File name
@@ -97760,7 +97776,7 @@ screens:
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected import validation processing
+        label: The selected batch
         bindsTo: null
         columns:
         - Import batch ID
@@ -98839,9 +98855,6 @@ screens:
       - kind: selectField
         label: Delivery history
         provenance: pack ACCREDITATION.pdf, page 71 §Webhook configuration shall include
-      - kind: selectField
-        label: 'Key requirement: 12.1.53'
-        provenance: pack ACCREDITATION.pdf, page 71 §Webhook configuration shall include
   states:
     loading: The accreditation webhook configuration as saved.
     error: Could not load. Names which read failed and leaves the accreditation webhook untouched.
@@ -99106,20 +99119,18 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
-        derived: true
-        impliedBy: listEventTypes
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
+        label: Event types
+        operation: listEventTypes
+        provenance: contract catalogue.yaml GET /event-types
+    - name: actionBar
+      slot: rowActions
+      components:
       - kind: primaryButton
-        derived: true
-        impliedBy: setEventType
         label: Save event type
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setEventType
+        operation: setEventType
+        notes: '**Applies to the whole tenant**: `setEventType` writes at tenant scope while the list
+          reads the venue''s; the dialog says so.'
+        provenance: contract catalogue.yaml PUT /event-types
   states:
     loading: The event type behaviour list.
     error: Could not load. Names which read failed and leaves the event type behaviour untouched.
@@ -99150,6 +99161,31 @@ screens:
     page 85. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: formSetEventType
+    component: modal
+    trigger: Save event type
+    body: '**Collects what `setEventType` sends before it is called.** Required: `code`, `name`. Optional:
+      `hasPerformances`, `capacityBasis`, `ticketNamesDate`, `multiDay`, `requiresRegistration`, `requiresAccreditation`,
+      `seatingModesAllowed`, `defaultLifecycle`. `id` is a client UUIDv7 generated silently, never asked.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save event type
+      operation: setEventType
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - hasPerformances
+      - capacityBasis
+      - ticketNamesDate
+      - multiDay
+      - requiresRegistration
+      - requiresAccreditation
+      - seatingModesAllowed
+      - defaultLifecycle
+    provenance: contract catalogue.yaml PUT /event-types
 - id: BO-696
   name: Event Duplication & Clone Configuration
   module: Sell
@@ -99344,7 +99380,7 @@ screens:
     purpose: The schedule
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id024
+    invalidates: &id023
     - listEvents
   - operationId: getEvent
     contract: catalogue
@@ -99449,7 +99485,7 @@ screens:
     purpose: Dynamic duration and turnaround
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id024
+    invalidates: *id023
   - operationId: getEvent
     contract: catalogue
     purpose: Read an event
@@ -99552,7 +99588,7 @@ screens:
     purpose: Move or cancel, and treat the tickets
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id029
+    invalidates: &id028
     - listEvents
     - getSeatInventory
   - operationId: getEvent
@@ -99743,7 +99779,7 @@ screens:
     purpose: Define a space
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id025
+    invalidates: &id024
     - listSpaces
   - operationId: listSpaces
     contract: catalogue
@@ -99845,7 +99881,7 @@ screens:
     purpose: Space access rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id025
+    invalidates: *id024
   - operationId: listSpaces
     contract: catalogue
     purpose: Halls, rooms and areas an event can occupy
@@ -99958,7 +99994,7 @@ screens:
     purpose: Capacity at a glance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id026
+    invalidates: &id025
     - getSeatInventory
   - operationId: getEvent
     contract: catalogue
@@ -100061,7 +100097,7 @@ screens:
     purpose: The capacity profile
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id026
+    invalidates: *id025
   - operationId: getEvent
     contract: catalogue
     purpose: Read an event
@@ -100163,7 +100199,7 @@ screens:
     purpose: Seating mode
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id026
+    invalidates: *id025
   - operationId: getEvent
     contract: catalogue
     purpose: Read an event
@@ -100799,7 +100835,7 @@ screens:
     purpose: What the event needs
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id027
+    invalidates: &id026
     - getEventResourcePlan
   - operationId: getEventResourcePlan
     contract: catalogue
@@ -100906,13 +100942,13 @@ screens:
     purpose: Staff and roles
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id027
+    invalidates: *id026
   - operationId: createRotaAssignment
     contract: workforce
     purpose: Roster them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id036
+    invalidates: &id035
     - listRotaAssignments
     - getStaffingCoverage
   - operationId: getEventResourcePlan
@@ -101024,7 +101060,7 @@ screens:
     purpose: Contractors and external workforce
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id027
+    invalidates: *id026
   - operationId: getEventResourcePlan
     contract: catalogue
     purpose: Everything an event needs, and whether it has been secured
@@ -101263,7 +101299,7 @@ screens:
     purpose: Deployment by location
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id027
+    invalidates: *id026
   - operationId: getEventResourcePlan
     contract: catalogue
     purpose: Everything an event needs, and whether it has been secured
@@ -101387,7 +101423,7 @@ screens:
     purpose: Lifecycle at a glance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id028
+    invalidates: &id027
     - listEvents
   - operationId: getEvent
     contract: catalogue
@@ -101490,7 +101526,7 @@ screens:
     purpose: Move through the lifecycle
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id028
+    invalidates: *id027
   - operationId: getEvent
     contract: catalogue
     purpose: Read an event
@@ -101676,7 +101712,7 @@ screens:
     purpose: Cancellation workflow
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates: *id028
   - operationId: getEvent
     contract: catalogue
     purpose: Read an event
@@ -101787,7 +101823,7 @@ screens:
     purpose: How tickets and customers are treated
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates: *id028
   - operationId: getEvent
     contract: catalogue
     purpose: Read an event
@@ -101902,7 +101938,7 @@ screens:
     purpose: Slot templates
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id030
+    invalidates: &id029
     - listPerformanceTemplates
   - operationId: listPerformanceTemplates
     contract: catalogue
@@ -102096,7 +102132,7 @@ screens:
     purpose: Peak, off-peak and super prime
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id030
+    invalidates: *id029
   - operationId: listPerformanceTemplates
     contract: catalogue
     purpose: Slot templates, peak bands and walk-in rules
@@ -102195,7 +102231,7 @@ screens:
     purpose: Walk-in policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id030
+    invalidates: *id029
   - operationId: listPerformanceTemplates
     contract: catalogue
     purpose: Slot templates, peak bands and walk-in rules
@@ -105715,7 +105751,7 @@ screens:
     purpose: Build a rule-based audience
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id031
+    invalidates: &id030
     - listSegments
     - getAudienceOverlap
   - operationId: listSegments
@@ -105955,7 +105991,7 @@ screens:
     purpose: Behavioural conditions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id031
+    invalidates: *id030
   - operationId: listSegments
     contract: marketing-crm
     purpose: The behavioural segments to open
@@ -106060,7 +106096,7 @@ screens:
     purpose: Membership, loyalty and wallet conditions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id031
+    invalidates: *id030
   - operationId: previewSegment
     contract: marketing-crm
     purpose: Preview who the conditions reach
@@ -106153,7 +106189,7 @@ screens:
     purpose: Demographic and geographic conditions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id032
+    invalidates: &id031
     - listSegments
     - getAudienceOverlap
   wireframe:
@@ -106250,7 +106286,7 @@ screens:
     purpose: Value and engagement bands
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id031
+    invalidates: *id030
   - operationId: previewSegment
     contract: marketing-crm
     purpose: Preview the value and engagement distribution
@@ -106437,7 +106473,7 @@ screens:
     purpose: Convert a predictive audience into a segment
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id031
   - operationId: previewSegment
     contract: marketing-crm
     purpose: Threshold simulation
@@ -114191,6 +114227,10 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53
+  - operation: null
+    why: 'Spacing, shadow, breakpoint and transition tokens per brand are outside the agreed boundary
+      (graphics, colours, fonts, tabs only; DI-223, DI-285): recorded as not built.'
+    source: DI-223
   layout:
     template: split
     regions:
@@ -117465,7 +117505,7 @@ screens:
     purpose: Create a reservation from a free slot
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id034
+    invalidates: &id033
     - getResourceCalendar
     - listResourceBookings
     - getResourceAvailability
@@ -117474,7 +117514,7 @@ screens:
     purpose: Block a period
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id035
+    invalidates: &id034
     - listResourceBlocks
     - getResourceCalendar
   wireframe:
@@ -117714,7 +117754,7 @@ screens:
     purpose: Operating hours and working pattern
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id033
+    invalidates: &id032
     - getResourceSchedule
     - getResourceAvailability
   wireframe:
@@ -117856,7 +117896,7 @@ screens:
     purpose: Slot length and booking limits
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id033
+    invalidates: *id032
   - operationId: getResourceSchedule
     contract: resources
     purpose: The current slots
@@ -118021,7 +118061,7 @@ screens:
     purpose: Reserve in advance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id034
+    invalidates: *id033
   - operationId: updateResourceBooking
     contract: resources
     purpose: Move or resize it
@@ -118134,7 +118174,7 @@ screens:
     purpose: Create the series
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id034
+    invalidates: *id033
   - operationId: cancelResourceBooking
     contract: resources
     purpose: Cancel an occurrence or the series
@@ -118249,7 +118289,7 @@ screens:
     purpose: Block a window
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id035
+    invalidates: *id034
   - operationId: releaseResourceBlock
     contract: resources
     purpose: Put it back into service
@@ -118389,7 +118429,7 @@ screens:
     purpose: Fill each requirement
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id037
+    invalidates: &id036
     - getResourceCalendar
     - listResourceBookings
   entryState:
@@ -118608,6 +118648,19 @@ screens:
           and 4 more — which are present is a decision the pack already made.
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 33 §Users shall filter
           by
+      - kind: multiSelect
+        label: Job title
+        bindsTo: WorkforceJobTitle
+        operation: listJobTitles
+        notes: 'The role filter: job titles by name.'
+        provenance: contract workforce.yaml GET /job-titles
+      - kind: dataTable
+        label: Staff resources
+        bindsTo: WorkforceWorkAssignment
+        operation: listWorkAssignments
+        notes: The workforce postings (job title, venue) beside each person, so the directory is a resource
+          view, not a second copy of the staff directory (BO-053).
+        provenance: contract workforce.yaml GET /work-assignments
   states:
     loading: The staff resource list.
     error: Could not load. Names which read failed and leaves the staff resource untouched.
@@ -118623,6 +118676,16 @@ screens:
     purpose: The staff directory
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listWorkAssignments
+    contract: workforce
+    purpose: Who is posted to which job title at which venue
+    trigger: onLoad
+    provenance: design-note correction, 2 October 2026 (BO-873)
+  - operationId: listJobTitles
+    contract: workforce
+    purpose: Job titles, for the role filter
+    trigger: onLoad
+    provenance: design-note correction, 2 October 2026 (BO-873)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-873
@@ -120020,7 +120083,7 @@ screens:
     purpose: Roster a position
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id036
+    invalidates: *id035
   - operationId: listRotaAssignments
     contract: workforce
     purpose: Who is rostered on each position
@@ -121929,7 +121992,7 @@ screens:
     purpose: Assign at the counter
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id037
+    invalidates: *id036
   - operationId: suggestResources
     contract: resources
     purpose: What is free and suitable
@@ -122134,7 +122197,7 @@ screens:
     purpose: Change the strategy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id042
+    invalidates: &id041
     - getResourceAllocationPolicy
   wireframe:
     status: notStarted
@@ -122596,7 +122659,7 @@ screens:
     purpose: Pooled, serialised or hybrid
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id038
+    invalidates: *id037
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-904
@@ -122686,7 +122749,7 @@ screens:
     purpose: Buffers and release rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id009
+    invalidates: *id008
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-905
@@ -122789,7 +122852,7 @@ screens:
     purpose: Hand it over
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id014
+    invalidates: *id013
   - operationId: getRentalBooking
     contract: rental
     purpose: The booking being checked out
@@ -122907,7 +122970,7 @@ screens:
     purpose: Bind assets to the booking
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id015
+    invalidates: *id014
   - operationId: checkOutResource
     contract: resources
     purpose: Hand the resource over
@@ -123037,13 +123100,13 @@ screens:
     purpose: Keep it longer
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id039
+    invalidates: *id038
   - operationId: returnRental
     contract: rental
     purpose: Take it back and settle
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id017
+    invalidates: *id016
   entryState:
     preloaded:
     - Resource
@@ -123153,13 +123216,13 @@ screens:
     purpose: How much is held, and how
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id012
+    invalidates: *id011
   - operationId: setRentalFeePolicy
     contract: rental
     purpose: Grace period and late fees
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id040
+    invalidates: *id039
   entryState:
     preloaded:
     - Required
@@ -123289,7 +123352,7 @@ screens:
     purpose: Raise the repair
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id040
   - operationId: getDueMaintenance
     contract: maintenance
     purpose: What is due
@@ -124007,7 +124070,7 @@ screens:
     purpose: What an event needs
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id027
+    invalidates: *id026
   - operationId: getEventResourcePlan
     contract: catalogue
     purpose: Everything an event needs, and whether it has been secured
@@ -127249,10 +127312,7 @@ screens:
     regions:
     - name: actionBar
       slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Board 9 — Smart Mobile Home Principle
-        provenance: pack Resource_Management_Configuration_Reference.pdf, page 146 §Operations Manager
+      components: []
     - name: contentBody
       components: []
   states:
@@ -128103,7 +128163,7 @@ screens:
     purpose: Change it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id042
+    invalidates: *id041
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-948
@@ -129144,7 +129204,7 @@ screens:
     contract: seating
     purpose: Standing areas
     trigger: onAction
-    invalidates: &id043
+    invalidates: &id042
     - getSeatMap
   - operationId: getSeatMap
     contract: seating
@@ -129247,7 +129307,7 @@ screens:
     contract: seating
     purpose: Suites and boxes
     trigger: onAction
-    invalidates: *id043
+    invalidates: *id042
   - operationId: getSeatMap
     contract: seating
     purpose: Read a seat map with its structure
@@ -129348,7 +129408,7 @@ screens:
     contract: seating
     purpose: Stage and focal point
     trigger: onAction
-    invalidates: *id043
+    invalidates: *id042
   - operationId: proposeSeatMapChanges
     contract: ai
     purpose: Propose categories, numbering, a stage variant or consistency findings for this map
@@ -129454,7 +129514,7 @@ screens:
     contract: seating
     purpose: Entrances, exits and aisles
     trigger: onAction
-    invalidates: *id043
+    invalidates: *id042
   - operationId: getSeatMap
     contract: seating
     purpose: Read a seat map with its structure
@@ -129555,7 +129615,7 @@ screens:
     contract: seating
     purpose: Amenities and obstructions
     trigger: onAction
-    invalidates: *id043
+    invalidates: *id042
   - operationId: getSeatMap
     contract: seating
     purpose: Read a seat map with its structure
@@ -129669,7 +129729,7 @@ screens:
     contract: seating
     purpose: Save this map as a template
     trigger: onAction
-    invalidates: &id044
+    invalidates: &id043
     - listSeatMapTemplates
   - operationId: validateSeatMap
     contract: seating
@@ -130794,7 +130854,7 @@ screens:
     contract: seating
     purpose: Publish
     trigger: onAction
-    invalidates: &id045
+    invalidates: &id044
     - listSeatMaps
     - getSeatMap
   - operationId: getImportJob
@@ -131024,7 +131084,7 @@ screens:
     contract: seating
     purpose: Add to the library
     trigger: onAction
-    invalidates: *id044
+    invalidates: *id043
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-974
@@ -131718,7 +131778,7 @@ screens:
     purpose: Scheduled release
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id052
+    invalidates: &id051
     - listSeatHoldPools
     - getSeatInventory
     - getSeatAvailability
@@ -131802,7 +131862,22 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        label: What the layout change does
+        bindsTo: SeatMapDiff
+        columns:
+        - SeatMapDiff.seatCountBefore
+        - SeatMapDiff.seatCountAfter
+        - SeatMapDiff.sectionsAdded
+        - SeatMapDiff.sectionsRemoved
+        - SeatMapDiff.sectionsChanged
+        - SeatMapDiff.accessibleSeatsBefore
+        - SeatMapDiff.accessibleSeatsAfter
+        operation: diffSeatMapVersions
+        notes: Drawn from the pack (change types, impact measures, resolutions) with the version diff
+          as its only bound data until an impact simulation exists.
+        provenance: contract seating.yaml GET /seat-maps/{seatMapId}/diff
   states:
     loading: The conflict impact simulation list.
     error: Could not load. Names which read failed and leaves the conflict impact simulation untouched.
@@ -131812,7 +131887,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
       decides access.'
-  apis: []
+  apis:
+  - operationId: diffSeatMapVersions
+    contract: seating
+    purpose: The version difference, the one bound part of the simulation
+    trigger: onLoad
+    provenance: design-note correction, 2 October 2026 (BO-981)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-981
@@ -131821,6 +131901,13 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  notes: Belongs to Seat Management and Venue Mapping (board 3, from BO-973 Layout Command Center); venue
+    operations is a dependency through gates and routes.
+  entryState:
+    params:
+    - name: seatMapId
+      from: navigation
+      optional: true
 - id: BO-982
   name: Approval, Publish & Rollback
   module: Access & Venue
@@ -131915,7 +132002,7 @@ screens:
     contract: seating
     purpose: Publish or roll back
     trigger: onAction
-    invalidates: *id045
+    invalidates: *id044
   - operationId: proposeSeatMapChanges
     contract: ai
     purpose: Propose categories, numbering, a stage variant or consistency findings for this map
@@ -134358,7 +134445,7 @@ screens:
     purpose: Define one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id048
+    invalidates: &id047
     - listSeatHoldTypes
   wireframe:
     status: notStarted
@@ -134559,7 +134646,7 @@ screens:
     purpose: Which rule applies where
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id046
+    invalidates: &id045
     - listSeatHoldTypes
   - operationId: listSeatHoldTypes
     contract: seating
@@ -134659,7 +134746,7 @@ screens:
     purpose: Expiration rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id046
+    invalidates: *id045
   - operationId: listSeatHoldTypes
     contract: seating
     purpose: The kinds of hold a venue places, and who may release them
@@ -134763,7 +134850,7 @@ screens:
     purpose: Automatic release
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id047
+    invalidates: &id046
     - listSeatHoldPools
     - getSeatInventory
     - getSeatAvailability
@@ -134873,7 +134960,7 @@ screens:
     purpose: Release, convert or reassign
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id047
+    invalidates: *id046
   - operationId: listSeatHoldPools
     contract: seating
     purpose: Held seats, by pool, with what is left and when it releases
@@ -135077,7 +135164,7 @@ screens:
     purpose: Priority between kinds
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id048
+    invalidates: *id047
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1011
@@ -135440,7 +135527,7 @@ screens:
     purpose: Kill a seat, with a reason
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id049
+    invalidates: &id048
     - getSeatRules
     - getSeatInventory
   - operationId: getSeatRules
@@ -135542,7 +135629,7 @@ screens:
     purpose: Buffer seats around a sale
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id049
+    invalidates: *id048
   - operationId: getSeatRules
     contract: seating
     purpose: Kill, buffer, companion and accessibility rules
@@ -135641,7 +135728,7 @@ screens:
     purpose: Companion pairing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id049
+    invalidates: *id048
   - operationId: getSeatRules
     contract: seating
     purpose: Kill, buffer, companion and accessibility rules
@@ -135931,7 +136018,7 @@ screens:
     purpose: Routes to each space
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id050
+    invalidates: &id049
     - getAccessibleSeating
     - validateSeatCompliance
   - operationId: getAccessibleSeating
@@ -136033,7 +136120,7 @@ screens:
     purpose: Who may buy them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id050
+    invalidates: *id049
   - operationId: getAccessibleSeating
     contract: seating
     purpose: Accessible seats, their routes and who may buy them
@@ -136132,7 +136219,7 @@ screens:
     purpose: Flexible spacing and density
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id049
+    invalidates: *id048
   - operationId: getSeatRules
     contract: seating
     purpose: Kill, buffer, companion and accessibility rules
@@ -136686,7 +136773,7 @@ screens:
     purpose: Find the best block
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id051
+    invalidates: &id050
     - listGroupSeatRequests
     - getSeatInventory
   - operationId: listGroupSeatRequests
@@ -136789,7 +136876,7 @@ screens:
     purpose: Allocate in bulk
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id051
+    invalidates: *id050
   - operationId: listGroupSeatRequests
     contract: seating
     purpose: Group bookings, their status and their deposits
@@ -137096,7 +137183,7 @@ screens:
     purpose: Release on cancellation
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id052
+    invalidates: *id051
   - operationId: listGroupSeatRequests
     contract: seating
     purpose: The booking being changed
@@ -137545,7 +137632,7 @@ screens:
     purpose: What "best seat" means here
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id053
+    invalidates: &id052
     - getSeatRecommendationRules
   - operationId: getSeatRecommendationRules
     contract: seating
@@ -137645,7 +137732,7 @@ screens:
     purpose: Best value weighting
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id053
+    invalidates: *id052
   - operationId: getSeatRecommendationRules
     contract: seating
     purpose: What "best" means at this venue
@@ -137744,7 +137831,7 @@ screens:
     purpose: Closest to stage
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id053
+    invalidates: *id052
   - operationId: getSeatRecommendationRules
     contract: seating
     purpose: What "best" means at this venue
@@ -137843,7 +137930,7 @@ screens:
     purpose: Family together
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id053
+    invalidates: *id052
   - operationId: getSeatRecommendationRules
     contract: seating
     purpose: What "best" means at this venue
@@ -138243,7 +138330,7 @@ screens:
     purpose: Scoring and governance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id053
+    invalidates: *id052
   - operationId: getSeatRecommendationRules
     contract: seating
     purpose: What "best" means at this venue
@@ -140917,7 +141004,7 @@ screens:
 - id: BO-1066
   name: Roles, Permissions & Masking
   module: Access & Venue
-  requiresModule: seating
+  requiresModule: core
   wave: 3
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
@@ -142006,15 +142093,8 @@ screens:
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
-  purpose: 'Configure technical controls that prevent duplicate or conflicting inventory actions. Define
-    expected version/ETag, lock token, conflict response and retry boundary for write operations. Require
-    idempotency key, retention window and duplicate-response behavior for supported commands. Set rate,
-    burst, connection, read/write timeout and payload limits by client, endpoint and environment. All
-    writes require authenticated, authorized, idempotent and concurrency-safe requests; events and audit
-    records carry tenant, version and correlation context and are retained under approved policy. Acceptance
-    condition: Authorized users can complete the described task end to end; saved changes are validated,
-    permission-controlled, integrated with the named shared services and traceable in the immutable audit
-    history.'
+  purpose: See the integrations calling this tenant and the platform limits and idempotency rules they
+    run under (ADR-0064).
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -142032,10 +142112,12 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
-        derived: true
-        impliedBy: listApiClients
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
+        label: Integrations and their limits
+        bindsTo: ApiClient
+        operation: listApiClients
+        notes: 'Read-only: idempotency retention and limits are platform rules (ADR-0064), not tenant
+          configuration.'
+        provenance: contract public-api.yaml GET /api-clients
   states:
     loading: The concurrency idempotency limits list.
     error: Could not load. Names which read failed and leaves the concurrency idempotency limits untouched.
@@ -143223,7 +143305,7 @@ screens:
     purpose: Change them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id054
+    invalidates: &id053
     - listWalletTypes
   - operationId: listWalletTypes
     contract: wallet
@@ -143480,7 +143562,7 @@ screens:
     purpose: Currency and monetary limits
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id054
+    invalidates: *id053
   - operationId: listWalletTypes
     contract: wallet
     purpose: The kinds of wallet that may exist — who owns one
@@ -143761,7 +143843,7 @@ screens:
     purpose: Which features this wallet type has
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id054
+    invalidates: *id053
   - operationId: listWalletTypes
     contract: wallet
     purpose: The kinds of wallet that may exist — who owns one
@@ -143870,7 +143952,7 @@ screens:
     purpose: Lifecycle states and transitions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id054
+    invalidates: *id053
   - operationId: listWalletTypes
     contract: wallet
     purpose: The kinds of wallet that may exist — who owns one
@@ -143997,13 +144079,13 @@ screens:
     purpose: Numbering and identity
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id054
+    invalidates: *id053
   - operationId: linkWalletCredential
     contract: wallet
     purpose: Digital credentials
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id062
+    invalidates: &id061
     - getWallet
   - operationId: listWalletTypes
     contract: wallet
@@ -144164,7 +144246,7 @@ screens:
     purpose: Validate and publish
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id057
+    invalidates: &id056
     - listWalletTypes
     - listCreditTypes
   - operationId: listWalletConfigurationVersions
@@ -144490,7 +144572,7 @@ screens:
     purpose: Which methods may fund a wallet
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id055
+    invalidates: &id054
     - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
@@ -144632,7 +144714,7 @@ screens:
     purpose: Amounts, presets and bonus rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id055
+    invalidates: *id054
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -144775,7 +144857,7 @@ screens:
     purpose: Channel and funding-source mapping
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id055
+    invalidates: *id054
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -144904,7 +144986,7 @@ screens:
     purpose: Auto-reload on a threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id055
+    invalidates: *id054
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -145036,7 +145118,7 @@ screens:
     purpose: Recurring funding on a date
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id055
+    invalidates: *id054
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -145183,7 +145265,7 @@ screens:
     purpose: Approval above a threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id055
+    invalidates: *id054
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -145313,7 +145395,7 @@ screens:
     purpose: Reverse or correct a top-up
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id063
+    invalidates: &id062
     - listWalletTransactions
     - listCreditLots
   - operationId: adjustWallet
@@ -145493,7 +145575,7 @@ screens:
     purpose: Limits and velocity controls
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id055
+    invalidates: *id054
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -145953,7 +146035,7 @@ screens:
     purpose: Change one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id056
+    invalidates: &id055
     - listCreditTypes
   - operationId: listCreditTypes
     contract: wallet
@@ -146072,7 +146154,7 @@ screens:
     purpose: How this credit is issued
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id056
+    invalidates: *id055
   - operationId: listCreditTypes
     contract: wallet
     purpose: The kinds of value that may sit in a wallet
@@ -146413,7 +146495,7 @@ screens:
     purpose: Expiry and validity
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id056
+    invalidates: *id055
   - operationId: listCreditTypes
     contract: wallet
     purpose: The kinds of value that may sit in a wallet
@@ -146746,7 +146828,7 @@ screens:
     purpose: Expire, extend or forfeit
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id060
+    invalidates: &id059
     - listCreditLots
     - getWalletLiability
   - operationId: listCreditLots
@@ -146867,7 +146949,7 @@ screens:
     purpose: Validate and publish the rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id057
+    invalidates: *id056
   - operationId: getCreditConsumptionPolicy
     contract: wallet
     purpose: Which credit is spent first
@@ -147310,7 +147392,7 @@ screens:
     purpose: Household members and roles
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id058
+    invalidates: &id057
     - listSharedWallets
   - operationId: listSharedWallets
     contract: wallet
@@ -147437,13 +147519,13 @@ screens:
     purpose: Parent and child distribution
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id058
+    invalidates: *id057
   - operationId: transferWalletBalance
     contract: wallet
     purpose: Move value between them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id059
+    invalidates: &id058
     - getWallet
     - listWalletTransactions
   - operationId: listSharedWallets
@@ -147568,7 +147650,7 @@ screens:
     purpose: Allowance and budget
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id058
+    invalidates: *id057
   - operationId: listSharedWallets
     contract: wallet
     purpose: Family, household and corporate structures
@@ -147716,7 +147798,7 @@ screens:
     purpose: Spending controls per member
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id058
+    invalidates: *id057
   - operationId: listSharedWallets
     contract: wallet
     purpose: Family, household and corporate structures
@@ -147945,7 +148027,7 @@ screens:
     purpose: Corporate budget and policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id058
+    invalidates: *id057
   - operationId: setApprovalMatrix
     contract: approvals
     purpose: Set how corporate wallet spend is approved (levels, mode, thresholds)
@@ -148068,7 +148150,7 @@ screens:
     purpose: Reallocate balance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id059
+    invalidates: *id058
   - operationId: getWalletBalance
     contract: wallet
     purpose: A wallet's balance
@@ -149446,7 +149528,7 @@ screens:
     purpose: Gift card and voucher expiry
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id060
+    invalidates: *id059
   - operationId: listCreditLots
     contract: wallet
     purpose: The tranches behind a balance, with their expiry
@@ -149664,7 +149746,7 @@ screens:
     purpose: Validate and publish
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id057
+    invalidates: *id056
   - operationId: listWalletConfigurationVersions
     contract: wallet
     purpose: Wallet configuration versions, newest first
@@ -150005,7 +150087,7 @@ screens:
     purpose: Channel configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id061
+    invalidates: &id060
     - getWalletFundingRules
   wireframe:
     status: notStarted
@@ -150121,7 +150203,7 @@ screens:
     purpose: Payment and redemption policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id061
+    invalidates: *id060
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1135
@@ -150264,7 +150346,7 @@ screens:
     purpose: Credential kinds accepted
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id061
+    invalidates: *id060
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1136
@@ -150409,7 +150491,7 @@ screens:
     purpose: Bind a wearable to a wallet
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id062
+    invalidates: *id061
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1137
@@ -150513,7 +150595,7 @@ screens:
     purpose: NFC, RFID and QR rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id061
+    invalidates: *id060
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1138
@@ -150630,7 +150712,7 @@ screens:
     purpose: Authentication and PIN policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id061
+    invalidates: *id060
   - operationId: setWalletAuthenticationPolicy
     contract: wallet
     purpose: Save authentication policy
@@ -150765,7 +150847,7 @@ screens:
     purpose: Offline and degraded mode
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id061
+    invalidates: *id060
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1140
@@ -151847,7 +151929,7 @@ screens:
     purpose: Reverse a transaction
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id063
+    invalidates: *id062
   - operationId: listWalletTransactions
     contract: wallet
     purpose: Wallet transaction history
@@ -152145,7 +152227,7 @@ screens:
     purpose: Freeze, block or restrict
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id064
+    invalidates: &id063
     - getWallet
   - operationId: suspendWallet
     contract: wallet
@@ -153323,7 +153405,7 @@ screens:
     purpose: Freeze on a hit
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id064
+    invalidates: *id063
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1159
@@ -153804,7 +153886,7 @@ screens:
     purpose: Publish the rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id057
+    invalidates: *id056
   - operationId: listAuditRecords
     contract: tenancy
     purpose: Show who changed wallet security configuration
@@ -154175,7 +154257,7 @@ screens:
     purpose: Credit types to ledger accounts
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id065
+    invalidates: &id064
     - getWalletLiability
   wireframe:
     status: notStarted
@@ -154839,7 +154921,7 @@ screens:
     purpose: Breakage recognition policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id065
+    invalidates: *id064
   entryState:
     preloaded:
     - Original value → AED 500
@@ -155847,7 +155929,7 @@ screens:
     purpose: Integration profile
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id061
+    invalidates: *id060
   - operationId: setWalletIntegrationMapping
     contract: wallet
     purpose: Save mapping
@@ -156123,35 +156205,14 @@ screens:
         label: Certificate configuration
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure
       - kind: selectField
-        label: Access Models
+        label: Access model
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure
+        notes: A preset to start from (read only, finance, partner, internal service, high-risk operations,
+          balance adjustment, wallet block, high-value refund), filling the scopes below; the board drew
+          them as buttons.
     - name: actionBar
       slot: publish
-      components:
-      - kind: primaryButton
-        label: Read Only
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support
-      - kind: secondaryButton
-        label: Finance
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support
-      - kind: secondaryButton
-        label: Partner
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support
-      - kind: secondaryButton
-        label: Internal Service
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support
-      - kind: secondaryButton
-        label: High-Risk Operations
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support
-      - kind: secondaryButton
-        label: Balance Adjustment
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Operations such as
-      - kind: secondaryButton
-        label: Wallet Block
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Operations such as
-      - kind: secondaryButton
-        label: High-Value Refund
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Operations such as
+      components: []
   states:
     loading: The api security access configuration as saved.
     error: Could not load. Names which read failed and leaves the api security access untouched.
@@ -156585,7 +156646,7 @@ screens:
     purpose: Governance and version control
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id057
+    invalidates: *id056
   - operationId: listWalletConfigurationVersions
     contract: wallet
     purpose: Wallet configuration versions, newest first
@@ -156692,7 +156753,7 @@ screens:
     purpose: Approval and publication
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id057
+    invalidates: *id056
   - operationId: createApprovalRequest
     contract: approvals
     purpose: Send for approval
@@ -194691,7 +194752,7 @@ screens:
     purpose: Configure a method
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id066
+    invalidates: &id065
     - listPaymentMethods
   - operationId: listPaymentMethods
     contract: payments
@@ -194791,7 +194852,7 @@ screens:
     purpose: Per channel and touchpoint
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id066
+    invalidates: *id065
   - operationId: listPaymentMethods
     contract: payments
     purpose: The methods this tenant can offer, and where
@@ -194909,7 +194970,7 @@ screens:
     purpose: Per venue and business unit
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id066
+    invalidates: *id065
   - operationId: listPaymentMethods
     contract: payments
     purpose: The methods this tenant can offer, and where
@@ -195003,7 +195064,7 @@ screens:
     purpose: Currencies accepted
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id066
+    invalidates: *id065
   - operationId: getPaymentRules
     contract: payments
     purpose: Currency, eligibility and fee rules as one set
@@ -195131,7 +195192,7 @@ screens:
     purpose: Eligibility and availability rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id066
+    invalidates: *id065
   - operationId: getPaymentRules
     contract: payments
     purpose: Currency, eligibility and fee rules as one set
@@ -195253,7 +195314,7 @@ screens:
     purpose: Fees and surcharges
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id066
+    invalidates: *id065
   - operationId: getPaymentRules
     contract: payments
     purpose: Currency, eligibility and fee rules as one set
@@ -197010,7 +197071,7 @@ screens:
     purpose: Its payment configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id067
+    invalidates: &id066
     - listPaymentTerminals
   wireframe:
     status: notStarted
@@ -197585,7 +197646,7 @@ screens:
     purpose: Store-and-forward limits
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id067
+    invalidates: *id066
   entryState:
     preloaded:
     - Terminal
@@ -198256,7 +198317,7 @@ screens:
     purpose: Digital wallet configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id066
+    invalidates: *id065
   - operationId: listPaymentMethods
     contract: payments
     purpose: The methods this tenant can offer, and where
@@ -199374,7 +199435,7 @@ screens:
     purpose: Which combinations are allowed
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id069
+    invalidates: &id068
     - getMixedTenderRules
   - operationId: getMixedTenderRules
     contract: payments
@@ -199516,7 +199577,7 @@ screens:
     purpose: The sequence rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id068
+    invalidates: &id067
     - getMixedTenderRules
   - operationId: listPaymentAllocationRules
     contract: orders
@@ -199850,7 +199911,7 @@ screens:
     purpose: Stored value and voucher tenders
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id068
+    invalidates: *id067
   - operationId: getCreditConsumptionPolicy
     contract: wallet
     purpose: The order within stored value
@@ -199966,7 +200027,7 @@ screens:
     purpose: Sequence and restrictions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id069
+    invalidates: *id068
   - operationId: getMixedTenderRules
     contract: payments
     purpose: Which tenders may be combined, and in what order
@@ -200070,7 +200131,7 @@ screens:
     purpose: Partial payment and recovery
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id068
+    invalidates: *id067
   - operationId: getDunningPolicy
     contract: payments
     purpose: Read the retry schedule this venue runs
@@ -204219,7 +204280,7 @@ screens:
     purpose: Change one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id073
+    invalidates: &id072
     - listRecommendationStrategies
   wireframe:
     status: notStarted
@@ -204330,7 +204391,7 @@ screens:
     purpose: Objective and KPI
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id070
+    invalidates: &id069
     - listRecommendationStrategies
   - operationId: listRecommendationStrategies
     contract: promotions
@@ -204469,7 +204530,7 @@ screens:
     purpose: Declare them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id071
+    invalidates: &id070
     - listProductRelationships
   wireframe:
     status: notStarted
@@ -204567,7 +204628,7 @@ screens:
     purpose: Placements and touchpoints
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -204670,7 +204731,7 @@ screens:
     purpose: Channels and journey
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -204899,7 +204960,7 @@ screens:
     purpose: Commercial guardrails
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -205365,7 +205426,7 @@ screens:
     purpose: Order it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id071
+    invalidates: *id070
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-650
@@ -205479,7 +205540,7 @@ screens:
     purpose: Eligibility and qualification
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -205909,7 +205970,7 @@ screens:
     purpose: Cart and checkout placements
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -206009,7 +206070,7 @@ screens:
     purpose: Post-purchase placements
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: quoteUpgrade
     contract: orders
     purpose: Upgrade after the fact
@@ -206494,7 +206555,7 @@ screens:
     purpose: Build the relationships
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id072
+    invalidates: &id071
     - listProductRelationships
   - operationId: listProductRelationships
     contract: promotions
@@ -206792,7 +206853,7 @@ screens:
     purpose: Across categories
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id072
+    invalidates: *id071
   - operationId: listProductRelationships
     contract: promotions
     purpose: The product relationships already declared
@@ -206889,7 +206950,7 @@ screens:
     purpose: Across attractions and partners
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id072
+    invalidates: *id071
   - operationId: listProductRelationships
     contract: promotions
     purpose: The product relationships already declared
@@ -206985,7 +207046,7 @@ screens:
     purpose: Exclude what is in the basket
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -207075,7 +207136,7 @@ screens:
     purpose: Require availability
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -207666,7 +207727,7 @@ screens:
     purpose: Context rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -207768,7 +207829,7 @@ screens:
     purpose: Pre-purchase placements
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -207869,7 +207930,7 @@ screens:
     purpose: Pre-visit placements
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -207969,7 +208030,7 @@ screens:
     purpose: In-venue and location-aware
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -208065,7 +208126,7 @@ screens:
     purpose: Visit state and timing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -208692,7 +208753,7 @@ screens:
     purpose: Which signals count
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -208906,7 +208967,7 @@ screens:
     purpose: Next-best-offer policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id073
+    invalidates: *id072
   - operationId: explainRecommendationDecision
     contract: ai
     purpose: Why these recommendations
@@ -209033,7 +209094,7 @@ screens:
     purpose: Ranking and decision policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id070
+    invalidates: *id069
   - operationId: listRecommendationStrategies
     contract: promotions
     purpose: The strategies this screen edits
@@ -210314,7 +210375,7 @@ screens:
     purpose: Pause or retire
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id073
+    invalidates: *id072
   entryState:
     preloaded:
     - ↓

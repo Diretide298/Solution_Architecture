@@ -1077,11 +1077,15 @@ screens:
         The directory is opened from the Venue Management menu and lists everyone; the selected principal comes
         from the row, not the session.
       source: screens/P08-venue-back-office.yaml#BO-053
+      status: fixed
+      by: CHG-SBO-015
     - what: Reaches resetPrincipalCredential (step-up mfa) and declares no way to raise the challenge.
       why: >-
         The operation refuses without a fresh stepUpToken, so the action can never succeed from this screen. Add
         createMfaChallenge/verifyMfaChallenge (or the supervisor-PIN overlay for pin) in the action's confirmation.
       source: contracts/spine/identity.yaml#resetPrincipalCredential
+      status: fixed
+      by: CHG-SBO-015
     - what: 'Tables show every schema field, plumbing included: ''Every principal'' drop id, primaryRoleId.'
       why: >-
         Identifiers and partition keys mean nothing to the reader; show the name each id points at (principal name,
@@ -1549,6 +1553,8 @@ screens:
         R197 says escalation is above a configured value threshold to a distinct manager permission; this one has
         no threshold defined.
       source: contracts/spine/approvals.yaml#createApprovalDelegation; R197
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         Tables show every schema field, plumbing included: 'Every approval delegation' drop id, delegatorPrincipalId,
         delegatePrincipalId, scopePath.
@@ -1751,6 +1757,8 @@ screens:
         Create and Save sale board forms ask for `id`, and the deploy form for status, counts and timestamps.
       why: Server or client-generated values; the deploy form needs version, target and strategy only.
       source: contracts/spine/tenancy.yaml#deployConfigurationProfile
+      status: fixed
+      by: CHG-SBO-015
     - what: '"Record device heartbeat" button.'
       why: Device-audience operation.
       source: contracts/spine/tenancy.yaml#recordDeviceHeartbeat
@@ -3641,6 +3649,8 @@ screens:
     - what: Filters are free-text id fields (org unit id, principal id, workstation id, subject ref).
       why: Nobody knows a UUID; use pickers.
       source: screens/P08-venue-back-office.yaml#BO-068
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         Tables show every schema field, plumbing included: 'Every audit' drop id, principalId, orgUnitId, workstationId,
         platformStaffGrantId; 'Platform-staff grants' drop operatorPrincipalId.
@@ -3824,6 +3834,8 @@ screens:
     - what: getVenueSettings is declared on an orders overview.
       why: Venue settings are not part of orders and money.
       source: screens/P08-venue-back-office.yaml#BO-101
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         Tables show every schema field, plumbing included: 'Every order' drop id; 'Every settlement' drop id.
       why: >-
@@ -4005,6 +4017,8 @@ screens:
     - what: requiresModule 'ticketing' while F&B and retail boards also have buttons.
       why: Should be core (or the board's own module).
       source: screens/P08-venue-back-office.yaml#BO-125
+      status: fixed
+      by: CHG-SBO-003
     - what: Shows a button or form for recordDeviceHeartbeat, whose only audience is device.
       why: >-
         No person calls these: a device or another service does. A staff member pressing them is refused 403. Remove
@@ -4317,6 +4331,8 @@ screens:
     - what: id and scopePath are form fields.
       why: Not typed by anyone.
       source: screens/P08-venue-back-office.yaml#BO-131
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         8 text fields are raw schema property names, not inputs: id, scopePath, failuresBeforeOffline, probeIntervalSeconds,
         probeTimeoutMs, successesBeforeOnline, minimumStableSeconds, autoSwitch.
@@ -4324,6 +4340,8 @@ screens:
         They were generated from a response schema; ids, statuses and computed totals are not typed by anybody.
         Replace with the real form the write operation needs (or a read-only summary).
       source: screens/P08-venue-back-office.yaml#BO-131
+      status: fixed
+      by: CHG-SBO-015
   BO-143:
     block: B
     summary: >-
@@ -4504,11 +4522,15 @@ screens:
     - what: Membership types (Monthly, Fixed-Term, Corporate...) are drawn as buttons.
       why: They are a filter or a create-choice.
       source: screens/P08-venue-back-office.yaml#BO-284
+      status: fixed
+      by: CHG-SBO-015
     - what: Reaches approveMembershipProductValidation (step-up mfa) and declares no way to raise the challenge.
       why: >-
         The operation refuses without a fresh stepUpToken, so the action can never succeed from this screen. Add
         createMfaChallenge/verifyMfaChallenge (or the supervisor-PIN overlay for pin) in the action's confirmation.
       source: contracts/satellite/subscription.yaml#approveMembershipProductValidation
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         A Venue Management screen calls operations gated by TICVAI-only permissions: listMembershipAnnualPass (PLATFORM_TENANT_VIEW),
         approveMembershipProductValidation (PLATFORM_CELL_MANAGE).
@@ -4596,6 +4618,8 @@ screens:
         or yes/no; a drop-down for a name, a code or a date has no options to offer.
       source: >-
         screens/P08-venue-back-office.yaml#BO-285; contracts/satellite/subscription.yaml#setMembershipProductTier
+      status: fixed
+      by: CHG-SBO-015
   BO-286:
     block: B
     summary: 'Who may buy, activate, hold or renew a membership: exclusivity, prerequisites, verification level.'
@@ -4823,6 +4847,8 @@ screens:
         The operation refuses without a fresh stepUpToken, so the action can never succeed from this screen. Add
         createMfaChallenge/verifyMfaChallenge (or the supervisor-PIN overlay for pin) in the action's confirmation.
       source: contracts/satellite/subscription.yaml#approveMembershipProductValidation
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         A Venue Management screen calls operations gated by TICVAI-only permissions: approveMembershipProductValidation
         (PLATFORM_CELL_MANAGE).
@@ -5236,6 +5262,8 @@ screens:
     - what: The KPIs are drawn as table columns of a dataTable.
       why: They are tiles over a population, not rows.
       source: screens/P08-venue-back-office.yaml#BO-364
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -5628,6 +5656,8 @@ screens:
     - what: Tile labels carry fixed values ("Within SLA — 92%").
       why: Values are data; labels are "Within SLA" etc.
       source: screens/P08-venue-back-office.yaml#BO-372
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -5695,6 +5725,8 @@ screens:
     - what: Only listApprovalRequests; nothing reads the subject.
       why: Evidence comes from the subject's contract (order, payment) or an evidence package.
       source: contracts/spine/approvals.yaml#createApprovalEvidencePackage
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -5746,6 +5778,8 @@ screens:
     - what: The timeline events are drawn as table columns.
       why: Events are rows of a timeline component.
       source: screens/_components.yaml#timeline
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -6027,6 +6061,8 @@ screens:
     - what: One button labelled "Retry | Investigate | Escalate".
       why: Three actions in one label.
       source: screens/P08-venue-back-office.yaml#BO-382
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -6172,6 +6208,8 @@ screens:
     - what: Fields are prefilled with sample names ("Delegator Ahmed Raza", "Delegate To Sara Khan").
       why: Sample data baked into labels.
       source: screens/P08-venue-back-office.yaml#BO-385
+      status: fixed
+      by: CHG-SBO-015
   BO-386:
     block: B
     summary: >-
@@ -6265,6 +6303,8 @@ screens:
     - what: Shares setApprovalSlaPolicy with BO-388 and BO-390 and has no fields.
       why: Three screens edit one policy object; merge or bind fields.
       source: contracts/spine/approvals.yaml#setApprovalSlaPolicy
+      status: fixed
+      by: CHG-SBO-021
   BO-390:
     block: B
     summary: 'What happens when an approval stays unresolved: escalation levels, timing and targets.'
@@ -6286,6 +6326,8 @@ screens:
     - what: No fields; shares setApprovalSlaPolicy.
       why: As BO-389.
       source: contracts/spine/approvals.yaml#setApprovalSlaPolicy
+      status: fixed
+      by: CHG-SBO-021
   BO-391:
     block: B
     summary: Live view of escalated approvals for managers to intervene (reassign, decide, extend).
@@ -6489,6 +6531,8 @@ screens:
     - what: Field labels are flow text ("Initial Configuration - 42%", "↓", "Board 6 — Zero-Touch Requirement").
       why: Pack narrative rendered as fields.
       source: screens/P08-venue-back-office.yaml#BO-594
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         A Venue Management screen calls operations gated by TICVAI-only permissions: listTenants (PLATFORM_TENANT_VIEW).
       why: >-
@@ -6525,6 +6569,8 @@ screens:
     - what: The only component is a field labelled "42% Configuration Complete".
       why: A value rendered as a field; the screen has no content to draw.
       source: screens/P08-venue-back-office.yaml#BO-595
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         A Venue Management screen calls operations gated by TICVAI-only permissions: getGoLiveReadiness (PLATFORM_TENANT_MANAGE).
       why: >-
@@ -6678,6 +6724,8 @@ screens:
     - what: Field labels "6/12" and "10" are data rendered as fields.
       why: Progress values are outputs.
       source: screens/P08-venue-back-office.yaml#BO-602
+      status: fixed
+      by: CHG-SBO-015
   BO-603:
     block: B
     summary: AI review of the whole configuration for missing, inconsistent or risky settings before validation.
@@ -7123,6 +7171,8 @@ screens:
     - what: Only listApiClients with an empty table.
       why: No accreditation-specific scopes or writes.
       source: screens/P08-venue-back-office.yaml#BO-691
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -7170,6 +7220,8 @@ screens:
     - what: '"Key requirement: 12.1.53" is a field label.'
       why: A requirement reference rendered as a field.
       source: screens/P08-venue-back-office.yaml#BO-692
+      status: fixed
+      by: CHG-SBO-015
   BO-718:
     block: B
     summary: Configure which event changes need approval and how a change request is raised.
@@ -7267,6 +7319,8 @@ screens:
     - what: The table has no columns and there is no create or update operation.
       why: Outlet management needs outlet writes.
       source: screens/P08-venue-back-office.yaml#BO-728
+      status: fixed
+      by: CHG-SBO-021
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -7427,6 +7481,8 @@ screens:
     - what: Same listPrincipals as BO-053.
       why: Either filter BO-053 or add the workforce resource reads.
       source: screens/P08-venue-back-office.yaml#BO-873
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -7782,6 +7838,8 @@ screens:
     - what: requiresModule 'seating' on the tenant's access-policy screen.
       why: Access policy is core.
       source: screens/P08-venue-back-office.yaml#BO-1066
+      status: fixed
+      by: CHG-SBO-003
   BO-1067:
     block: B
     summary: Approval paths for high-impact seat changes (map, capacity, kills, holds, pricing).
@@ -7828,6 +7886,8 @@ screens:
     - what: Purpose promises draft/test/staging/production contexts; the contract has one deploy operation.
       why: Environments for tenant configuration are not modelled.
       source: screens/P08-venue-back-office.yaml#BO-1068
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -7992,6 +8052,8 @@ screens:
     - what: Only listApiClients.
       why: Idempotency retention and limits are platform rules (ADR-0064), not tenant configuration.
       source: ADR-0064
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -8205,6 +8267,8 @@ screens:
     - what: Access model names (Read Only, Finance, Partner, High-Value Refund) are drawn as buttons.
       why: They are scope presets to choose from.
       source: screens/P08-venue-back-office.yaml#BO-1177
+      status: fixed
+      by: CHG-SBO-015
   CMS-061:
     block: B
     summary: >-
@@ -10093,6 +10157,8 @@ screens:
     - what: Duplicates ADM-007 and ADM-008 operations (add-ons, subscription change).
       why: Three screens edit the same licence position.
       source: screens/P09-platform-admin-console.yaml#ADM-007
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: getSsoConfig (USER_MANAGE).
       why: >-
@@ -10548,6 +10614,8 @@ screens:
         Platform staff are not a tenant's principals; the Console needs platform-staff operations or a statement
         that TICVAI is a tenant of its own.
       source: R098
+      status: logged
+      by: CHG-SBO-005
     - what: Purpose "Find the right one quickly, and act on it without opening it" is generic.
       why: Say platform staff.
       source: screens/P09-platform-admin-console.yaml#ADM-020
@@ -11164,6 +11232,8 @@ screens:
     - what: Copied cell operations; "Save scaling policy" has no operation.
       why: Nothing writes a scaling policy.
       source: screens/P09-platform-admin-console.yaml#ADM-030
+      status: fixed
+      by: CHG-SBO-015
     - what: formSetScalingPolicy asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -11232,6 +11302,8 @@ screens:
     - what: '"Save waf policy" on a screen named "View", plus copied cell actions.'
       why: Either a view or an editor.
       source: screens/P09-platform-admin-console.yaml#ADM-032
+      status: fixed
+      by: CHG-SBO-015
     - what: formSetWafPolicy asks the person for id.
       why: >-
         Status and timestamps are the server's; an id is a client UUIDv7 generated silently. A form that asks for
@@ -11297,6 +11369,8 @@ screens:
     - what: Copied cell actions (decommission, tier).
       why: Not part of backup status.
       source: screens/P09-platform-admin-console.yaml#ADM-033
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         Tables show every schema field, plumbing included: 'Every cell job' drop id; 'Every backup run' drop id.
       why: >-
@@ -11359,6 +11433,8 @@ screens:
     - what: Copied cell actions.
       why: Not part of archival.
       source: ADR-0047
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         Tables show every schema field, plumbing included: 'Every cell job' drop id; 'Every archival job' drop id.
       why: >-
@@ -12626,6 +12702,8 @@ screens:
     - what: approveWorkflow requires PRODUCT_CONFIGURE.
       why: Approving a workflow is an approval-configuration act (R091 separated product approve and publish).
       source: R091
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: listRuleWorkflow (APPROVAL_VIEW),
         approveWorkflow (PRODUCT_CONFIGURE).
@@ -12671,6 +12749,8 @@ screens:
     - what: Step headings ("Step 2 — Applicability") are rendered as fields.
       why: Wizard steps.
       source: screens/P09-platform-admin-console.yaml#ADM-320
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: setVisualWorkflow
         (APPROVAL_CONFIGURE).
@@ -12688,6 +12768,8 @@ screens:
         Every board field was generated as a selectField. The request schema says these are free text, dates, numbers
         or yes/no; a drop-down for a name, a code or a date has no options to offer.
       source: screens/P09-platform-admin-console.yaml#ADM-320; contracts/spine/approvals.yaml#setVisualWorkflow
+      status: fixed
+      by: CHG-SBO-015
   ADM-322:
     block: B
     summary: 'The detail of one approval stage: approvers, decision rule, SLA, escalation, required comments.'
@@ -12701,6 +12783,8 @@ screens:
     - what: The only field is "Stage Name - Finance Manager Approval".
       why: Sample value in a label; the stage fields are missing.
       source: screens/P09-platform-admin-console.yaml#ADM-322
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: setVisualWorkflow
         (APPROVAL_CONFIGURE).
@@ -13003,6 +13087,8 @@ screens:
     - what: The only field is "→ IT Director".
       why: Sample text as a label.
       source: screens/P09-platform-admin-console.yaml#ADM-332
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: setApprovalMatrix
         (APPROVAL_CONFIGURE).
@@ -13305,6 +13391,8 @@ screens:
     - what: The only field is labelled "=R".
       why: Broken label.
       source: screens/P09-platform-admin-console.yaml#ADM-340
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: setSegregationRules
         (ROLE_MANAGE).
@@ -13455,6 +13543,8 @@ screens:
     - what: Column labels contain status text and emoji ("Record Integrity - VERIFIED ✓").
       why: Values in labels.
       source: screens/P09-platform-admin-console.yaml#ADM-345
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: getApprovalRecord
         (APPROVAL_VIEW).
@@ -13796,6 +13886,8 @@ screens:
     - what: Only listAuthorisationPolicies and an empty table.
       why: No columns, no write.
       source: screens/P09-platform-admin-console.yaml#ADM-356
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -14007,6 +14099,8 @@ screens:
     - what: Approval kinds (Refund, Discount) are drawn as table columns.
       why: A heatmap's axes.
       source: screens/P09-platform-admin-console.yaml#ADM-362
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         Calls tenant-permission operations with no tenant picker and no platform-staff grant: listSlaEscalationBottleneck
         (APPROVAL_VIEW).
@@ -14564,6 +14658,8 @@ screens:
     - what: Only simulateCommercialPackage.
       why: Exceptions need a read.
       source: screens/P09-platform-admin-console.yaml#ADM-377
+      status: logged
+      by: CHG-SBO-005
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -15095,6 +15191,8 @@ screens:
     - what: Buttons labelled "Revised Board 3 — Critical Architecture" and "1. Operational Classification".
       why: Pack headings as buttons.
       source: screens/P09-platform-admin-console.yaml#ADM-398
+      status: fixed
+      by: CHG-SBO-015
   ADM-399:
     block: B
     summary: TICVAI's view of the recommended package for a prospect (the Console twin of SGN-011).
@@ -15406,6 +15504,8 @@ screens:
     - what: A button labelled "Board 4 — Required Package Data Model".
       why: Pack heading as a button.
       source: screens/P09-platform-admin-console.yaml#ADM-408
+      status: fixed
+      by: CHG-SBO-015
   ADM-409:
     block: B
     summary: 'How a customer enters activation: trial or purchase; also where TICVAI''s trial terms are set.'
@@ -15631,6 +15731,8 @@ screens:
         Model Behavior".
       why: Four actions in one label; a pack heading as a button.
       source: screens/P09-platform-admin-console.yaml#ADM-418
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -15776,6 +15878,8 @@ screens:
     - what: Fields are check-marked status lines ("✓ Administrator Account Created").
       why: Progress outputs, not inputs.
       source: screens/P09-platform-admin-console.yaml#ADM-422
+      status: fixed
+      by: CHG-SBO-015
   ADM-423:
     block: B
     summary: Turn the purchased subscription into enforceable technical entitlements (modules, limits).
@@ -16054,6 +16158,8 @@ screens:
     - what: Column labels contain values ("Projected month-end billable tickets - 43,800").
       why: Values in labels.
       source: screens/P09-platform-admin-console.yaml#ADM-454
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-
@@ -16534,6 +16640,8 @@ screens:
     - what: Button labelled "Revised Board 10 — Commercial Model Calculation".
       why: Pack heading as a button.
       source: screens/P09-platform-admin-console.yaml#ADM-468
+      status: fixed
+      by: CHG-SBO-015
     - what: >-
         emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything.
       why: >-

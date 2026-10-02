@@ -3653,7 +3653,12 @@ screens:
     each screen now keeps only what it is for. **Removed 24 August**: createTenant, provisionCell, reactivateTenant,
     setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management`
     could create and terminate tenants.** The 18 August bulk attach reached the platform console too —
-    provisioning, licensing and SSO were on every screen that mentioned a tenant.'
+    provisioning, licensing and SSO were on every screen that mentioned a tenant.
+
+
+    **Division (2 October 2026, CHG-SBO-015):** ADM-007 shows module entitlement, ADM-008 changes the
+    subscription (Save subscription), ADM-011 holds the licence position, seats and add-ons and previews
+    what a plan change would do to them (F96, F105).'
   density: compact
   pattern: listDetail
   patternReason: '`listTenantCells` reads the population and `getEntitlementUsage` reads one of them —
@@ -3790,10 +3795,6 @@ screens:
         label: Remove licence add on
         operation: removeLicenceAddOn
         provenance: contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons
-      - kind: secondaryButton
-        label: Save subscription
-        operation: setSubscription
-        provenance: contract subscription.yaml PUT /tenants/{tenantId}/subscription
   overlays:
   - id: confirmRemoveLicenceAddOn
     component: confirmDialog
@@ -3841,25 +3842,6 @@ screens:
       - prorate
       - note
     provenance: contract subscription.yaml POST /tenants/{tenantId}/subscription/preview
-  - id: formSetSubscription
-    component: modal
-    trigger: Save subscription
-    body: '**Collects what `setSubscription` sends before it is called.** Required: `planId`. Optional:
-      `planVersion`, `effectiveFrom`, `prorate`, `note`. Dismissing sends nothing; the screen behind is
-      unchanged.'
-    bindsTo: SetSubscriptionRequest
-    confirm:
-      label: Save subscription
-      operation: setSubscription
-    dismiss:
-      label: Cancel
-      discards:
-      - planId
-      - planVersion
-      - effectiveFrom
-      - prorate
-      - note
-    provenance: contract subscription.yaml PUT /tenants/{tenantId}/subscription
   states:
     loading: The licence seat list.
     error: Could not load. Names which read failed and leaves the licence seat untouched.
@@ -3912,12 +3894,6 @@ screens:
     trigger: onAction
     invalidates:
     - listTenantCells
-  - operationId: setSubscription
-    contract: subscription
-    purpose: Assign or change a subscription
-    trigger: onAction
-    invalidates:
-    - listTenantCells
   entryState:
     params:
     - name: tenantId
@@ -3943,6 +3919,11 @@ screens:
       of the Console; licences and seats do not read SSO (R098; design-notes corrections platform-foundation
       ADM-002, ADM-011).'
     source: R098 | contracts/spine/identity.yaml#getSsoConfig
+  - operation: setSubscription
+    removed: true
+    why: Changing the subscription is ADM-008's; this screen is the licence position, seats and add-ons
+      (design-note correction platform-foundation ADM-011, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-008
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template
     ("See licence & seat management for this venue").'
 - id: ADM-012
@@ -9102,72 +9083,10 @@ screens:
     regions:
     - name: contentBody
       slot: collection
-      components:
-      - kind: dataTable
-        label: Every cell job
-        bindsTo: CellJob
-        columns:
-        - CellJob.kind
-        - CellJob.status
-        - CellJob.progressPercent
-        - CellJob.message
-        - CellJob.error
-        - CellJob.scheduledFor
-        - CellJob.completedAt
-        operation: listCellJobs
-        provenance: contract subscription.yaml GET /cells/{cellId}/jobs
+      components: []
     - name: contextPanel
       slot: selection
       components:
-      - kind: detailPanel
-        label: The selected cell job
-        bindsTo: CellJob
-        columns:
-        - CellJob.id
-        - CellJob.kind
-        - CellJob.status
-        - CellJob.progressPercent
-        - CellJob.message
-        - CellJob.error
-        - CellJob.scheduledFor
-        - CellJob.completedAt
-        operation: listCellJobs
-        provenance: contract subscription.yaml GET /cells/{cellId}/jobs
-      - kind: detailPanel
-        label: The cell
-        bindsTo: CellDetail
-        columns:
-        - CellDetail.id
-        - CellDetail.name
-        - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
-        - CellDetail.lastContactAt
-        - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
-        - CellDetail.regionName
-        - CellDetail.countryCode
-        - CellDetail.tier
-        - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
-        operation: getCell
-        provenance: contract subscription.yaml GET /cells/{cellId}
-      - kind: detailPanel
-        label: The cell health
-        bindsTo: CellHealth
-        columns:
-        - CellHealth.isHealthy
-        - CellHealth.isSchemaBehind
-        - CellHealth.databaseStatus
-        - CellHealth.replicationLagSeconds
-        - CellHealth.lastBackupAt
-        - CellHealth.lastRestoreDrillAt
-        - CellHealth.checkedAt
-        operation: getCellHealth
-        provenance: contract subscription.yaml GET /cells/{cellId}/health
       - kind: detailPanel
         label: The scaling policy
         bindsTo: ScalingPolicy
@@ -9197,28 +9116,10 @@ screens:
       slot: rowActions
       components:
       - kind: secondaryButton
-        label: Save cell tier
-        operation: updateCellTier
-        provenance: contract subscription.yaml PATCH /cells/{cellId}
-      - kind: secondaryButton
         label: Save scaling policy
         operation: setScalingPolicy
         provenance: contract platform-ops.yaml PUT /scaling-policies
   overlays:
-  - id: formUpdateCellTier
-    component: modal
-    trigger: Save cell tier
-    body: '**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save cell tier
-      operation: updateCellTier
-    dismiss:
-      label: Cancel
-      discards:
-      - tier
-      - scheduledFor
-    provenance: contract subscription.yaml PATCH /cells/{cellId}
   - id: formSetScalingPolicy
     component: modal
     trigger: Save scaling policy
@@ -9254,24 +9155,6 @@ screens:
     contract: subscription
     purpose: Load against headroom
     trigger: onLoad
-  - operationId: getCell
-    contract: subscription
-    purpose: Read a cell
-    trigger: onLoad
-  - operationId: getCellHealth
-    contract: subscription
-    purpose: Cell health and schema version
-    trigger: onLoad
-  - operationId: listCellJobs
-    contract: subscription
-    purpose: Provisioning, migration and maintenance jobs
-    trigger: onLoad
-  - operationId: updateCellTier
-    contract: subscription
-    purpose: Change a cell's tier
-    trigger: onAction
-    invalidates:
-    - listCellJobs
   - operationId: getScalingPolicy
     contract: platform-ops
     purpose: The policy as it stands
@@ -9280,8 +9163,6 @@ screens:
     contract: platform-ops
     purpose: Change it
     trigger: onAction
-    invalidates:
-    - listCellJobs
   entryState:
     params:
     - name: cellId
@@ -9316,6 +9197,26 @@ screens:
       only. The tier change stays here as sizing, beside the scaling policy (getScalingPolicy/setScalingPolicy)
       (design-notes corrections platform-foundation ADM-030, ADM-013).'
     source: screens/P09-platform-admin-console.yaml#ADM-030
+  - operation: listCellJobs
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-030, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
+  - operation: updateCellTier
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-030, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
+  - operation: getCellHealth
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-030, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
+  - operation: getCell
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-030, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template
     ("See infrastructure sizing & scaling policy for this venue").'
 - id: ADM-031
@@ -9638,7 +9539,11 @@ screens:
       - cellId
       provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-032 holds cellId,
         so an edge into it carries them
-  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+
+
+    An editor of the firewall policy (`setWafPolicy`) with the rules in force; the name says View and
+    the screen edits (design-note correction).'
   openQuestions:
   - No contract — infrastructure
   density: compact
@@ -9653,19 +9558,6 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every cell job
-        bindsTo: CellJob
-        columns:
-        - CellJob.kind
-        - CellJob.status
-        - CellJob.progressPercent
-        - CellJob.message
-        - CellJob.error
-        - CellJob.scheduledFor
-        - CellJob.completedAt
-        operation: listCellJobs
-        provenance: contract subscription.yaml GET /cells/{cellId}/jobs
-      - kind: dataTable
         label: Every waf rule
         bindsTo: WafRule
         columns:
@@ -9679,69 +9571,7 @@ screens:
         provenance: contract platform-ops.yaml GET /waf-policies
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected cell job
-        bindsTo: CellJob
-        columns:
-        - CellJob.id
-        - CellJob.kind
-        - CellJob.status
-        - CellJob.progressPercent
-        - CellJob.message
-        - CellJob.error
-        - CellJob.scheduledFor
-        - CellJob.completedAt
-        operation: listCellJobs
-        provenance: contract subscription.yaml GET /cells/{cellId}/jobs
-      - kind: detailPanel
-        label: The cell
-        bindsTo: CellDetail
-        columns:
-        - CellDetail.id
-        - CellDetail.name
-        - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
-        - CellDetail.lastContactAt
-        - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
-        - CellDetail.regionName
-        - CellDetail.countryCode
-        - CellDetail.tier
-        - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
-        operation: getCell
-        provenance: contract subscription.yaml GET /cells/{cellId}
-      - kind: detailPanel
-        label: The cell capacity
-        bindsTo: CellCapacity
-        columns:
-        - CellCapacity.kind
-        - CellCapacity.tenantCount
-        - CellCapacity.isConstrained
-        - CellCapacity.constrainedDimension
-        - CellCapacity.dimensions
-        - CellCapacity.forecastBreachAt
-        - CellCapacity.measuredAt
-        operation: getCellCapacity
-        provenance: contract subscription.yaml GET /cells/{cellId}/capacity
-      - kind: detailPanel
-        label: The cell health
-        bindsTo: CellHealth
-        columns:
-        - CellHealth.isHealthy
-        - CellHealth.isSchemaBehind
-        - CellHealth.databaseStatus
-        - CellHealth.replicationLagSeconds
-        - CellHealth.lastBackupAt
-        - CellHealth.lastRestoreDrillAt
-        - CellHealth.checkedAt
-        operation: getCellHealth
-        provenance: contract subscription.yaml GET /cells/{cellId}/health
+      components: []
     - name: actionBar
       slot: rowActions
       components:
@@ -9782,22 +9612,6 @@ screens:
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
   apis:
-  - operationId: getCellHealth
-    contract: subscription
-    purpose: Cell health and schema version
-    trigger: onLoad
-  - operationId: getCell
-    contract: subscription
-    purpose: Read a cell
-    trigger: onLoad
-  - operationId: getCellCapacity
-    contract: subscription
-    purpose: Load against headroom
-    trigger: onLoad
-  - operationId: listCellJobs
-    contract: subscription
-    purpose: Provisioning, migration and maintenance jobs
-    trigger: onLoad
   - operationId: listWafRules
     contract: platform-ops
     purpose: Firewall rules in force
@@ -9806,8 +9620,6 @@ screens:
     contract: platform-ops
     purpose: Change the firewall policy
     trigger: onAction
-    invalidates:
-    - listCellJobs
   entryState:
     params:
     - name: cellId
@@ -9848,6 +9660,26 @@ screens:
       screen; decommission stays on ADM-003 only (design-notes corrections platform-foundation ADM-032,
       ADM-013).'
     source: screens/P09-platform-admin-console.yaml#ADM-032
+  - operation: listCellJobs
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-032, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
+  - operation: getCell
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-032, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
+  - operation: getCellCapacity
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-032, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
+  - operation: getCellHealth
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-032, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template
     ("See waf & security policy view for this venue").'
 - id: ADM-033
@@ -9900,19 +9732,6 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every cell job
-        bindsTo: CellJob
-        columns:
-        - CellJob.kind
-        - CellJob.status
-        - CellJob.progressPercent
-        - CellJob.message
-        - CellJob.error
-        - CellJob.scheduledFor
-        - CellJob.completedAt
-        operation: listCellJobs
-        provenance: contract subscription.yaml GET /cells/{cellId}/jobs
-      - kind: dataTable
         label: Every backup run
         bindsTo: BackupRun
         columns:
@@ -9928,20 +9747,6 @@ screens:
     - name: contextPanel
       slot: selection
       components:
-      - kind: detailPanel
-        label: The selected cell job
-        bindsTo: CellJob
-        columns:
-        - CellJob.id
-        - CellJob.kind
-        - CellJob.status
-        - CellJob.progressPercent
-        - CellJob.message
-        - CellJob.error
-        - CellJob.scheduledFor
-        - CellJob.completedAt
-        operation: listCellJobs
-        provenance: contract subscription.yaml GET /cells/{cellId}/jobs
       - kind: detailPanel
         label: The cell
         bindsTo: CellDetail
@@ -9964,19 +9769,6 @@ screens:
         - CellDetail.apiEndpoint
         operation: getCell
         provenance: contract subscription.yaml GET /cells/{cellId}
-      - kind: detailPanel
-        label: The cell capacity
-        bindsTo: CellCapacity
-        columns:
-        - CellCapacity.kind
-        - CellCapacity.tenantCount
-        - CellCapacity.isConstrained
-        - CellCapacity.constrainedDimension
-        - CellCapacity.dimensions
-        - CellCapacity.forecastBreachAt
-        - CellCapacity.measuredAt
-        operation: getCellCapacity
-        provenance: contract subscription.yaml GET /cells/{cellId}/capacity
       - kind: detailPanel
         label: The cell health
         bindsTo: CellHealth
@@ -10011,14 +9803,6 @@ screens:
   - operationId: getCell
     contract: subscription
     purpose: Read a cell
-    trigger: onLoad
-  - operationId: getCellCapacity
-    contract: subscription
-    purpose: Load against headroom
-    trigger: onLoad
-  - operationId: listCellJobs
-    contract: subscription
-    purpose: Provisioning, migration and maintenance jobs
     trigger: onLoad
   - operationId: listBackupRuns
     contract: platform-ops
@@ -10064,6 +9848,16 @@ screens:
       of backup status; decommission stays on ADM-003 only (design-notes corrections platform-foundation
       ADM-033, ADM-013).'
     source: screens/P09-platform-admin-console.yaml#ADM-033
+  - operation: listCellJobs
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-033, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
+  - operation: getCellCapacity
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-033, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template
     ("See backup & dr status for this venue").'
 - id: ADM-034
@@ -10118,19 +9912,6 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every cell job
-        bindsTo: CellJob
-        columns:
-        - CellJob.kind
-        - CellJob.status
-        - CellJob.progressPercent
-        - CellJob.message
-        - CellJob.error
-        - CellJob.scheduledFor
-        - CellJob.completedAt
-        operation: listCellJobs
-        provenance: contract subscription.yaml GET /cells/{cellId}/jobs
-      - kind: dataTable
         label: Every archival job
         bindsTo: ArchivalJob
         columns:
@@ -10145,69 +9926,7 @@ screens:
         provenance: contract platform-ops.yaml GET /archival-jobs
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected cell job
-        bindsTo: CellJob
-        columns:
-        - CellJob.id
-        - CellJob.kind
-        - CellJob.status
-        - CellJob.progressPercent
-        - CellJob.message
-        - CellJob.error
-        - CellJob.scheduledFor
-        - CellJob.completedAt
-        operation: listCellJobs
-        provenance: contract subscription.yaml GET /cells/{cellId}/jobs
-      - kind: detailPanel
-        label: The cell capacity
-        bindsTo: CellCapacity
-        columns:
-        - CellCapacity.kind
-        - CellCapacity.tenantCount
-        - CellCapacity.isConstrained
-        - CellCapacity.constrainedDimension
-        - CellCapacity.dimensions
-        - CellCapacity.forecastBreachAt
-        - CellCapacity.measuredAt
-        operation: getCellCapacity
-        provenance: contract subscription.yaml GET /cells/{cellId}/capacity
-      - kind: detailPanel
-        label: The cell health
-        bindsTo: CellHealth
-        columns:
-        - CellHealth.isHealthy
-        - CellHealth.isSchemaBehind
-        - CellHealth.databaseStatus
-        - CellHealth.replicationLagSeconds
-        - CellHealth.lastBackupAt
-        - CellHealth.lastRestoreDrillAt
-        - CellHealth.checkedAt
-        operation: getCellHealth
-        provenance: contract subscription.yaml GET /cells/{cellId}/health
-      - kind: detailPanel
-        label: The cell
-        bindsTo: CellDetail
-        columns:
-        - CellDetail.id
-        - CellDetail.name
-        - CellDetail.kind
-        - CellDetail.clusterId
-        - CellDetail.isReachable
-        - CellDetail.lastContactAt
-        - CellDetail.licenceExpiresAt
-        - CellDetail.participatesInCrossCell
-        - CellDetail.regionId
-        - CellDetail.regionName
-        - CellDetail.countryCode
-        - CellDetail.tier
-        - CellDetail.status
-        - CellDetail.cloudProvider
-        - CellDetail.cloudRegion
-        - CellDetail.apiEndpoint
-        operation: getCell
-        provenance: contract subscription.yaml GET /cells/{cellId}
+      components: []
     - name: actionBar
       slot: rowActions
       components: []
@@ -10222,22 +9941,6 @@ screens:
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
   apis:
-  - operationId: listCellJobs
-    contract: subscription
-    purpose: Provisioning, migration and maintenance jobs
-    trigger: onLoad
-  - operationId: getCell
-    contract: subscription
-    purpose: Read a cell
-    trigger: onLoad
-  - operationId: getCellCapacity
-    contract: subscription
-    purpose: Load against headroom
-    trigger: onLoad
-  - operationId: getCellHealth
-    contract: subscription
-    purpose: Cell health and schema version
-    trigger: onLoad
   - operationId: listArchivalJobs
     contract: platform-ops
     purpose: Archival and retention jobs
@@ -10279,6 +9982,26 @@ screens:
     why: 'Removed 2 October 2026 (CHG-WIR-021): Copied cell actions are not part of archival; decommission
       stays on ADM-003 only (ADR-0047; design-notes corrections platform-foundation ADM-034, ADM-013).'
     source: ADR-0047 | screens/P09-platform-admin-console.yaml#ADM-034
+  - operation: listCellJobs
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-034, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
+  - operation: getCellCapacity
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-034, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
+  - operation: getCellHealth
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-034, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
+  - operation: getCell
+    removed: true
+    why: Copied cell operations are not part of this screen (design-note correction platform-foundation
+      ADM-034, CHG-SBO-015).
+    source: screens/P09-platform-admin-console.yaml#ADM-012
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template
     ("Find archival job monitor for this venue").'
 - id: ADM-035
@@ -13960,15 +13683,19 @@ screens:
         notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
-      - kind: selectField
-        label: Workflow Name
+      - kind: textField
+        label: Workflow name
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 12 §Configure
+        operation: setVisualWorkflow
+        bindsTo: VisualWorkflowDesignerInput.workflowName
       - kind: selectField
         label: Description
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 12 §Configure
-      - kind: selectField
-        label: Business Process
+      - kind: textField
+        label: Business process
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 12 §Configure
+        operation: setVisualWorkflow
+        bindsTo: VisualWorkflowDesignerInput.businessProcess
       - kind: selectField
         label: Source Module
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 12 §Configure
@@ -13987,9 +13714,10 @@ screens:
       - kind: selectField
         label: Workflow Owner
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 12 §Configure
-      - kind: textField
-        label: Step 2 — Applicability
+      - kind: progressIndicator
+        label: Applicability
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 12 §Configure
+        notes: A wizard step header (1 Basics, 2 Applicability, 3 Controls), not a field.
       - kind: selectField
         label: Require approval
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 12 §Configure
@@ -14160,18 +13888,19 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: textField
-        label: 'Stage Name: Finance Manager Approval'
+        label: Stage name
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 14 §Configuration
+        operation: setVisualWorkflow
+        bindsTo: VisualWorkflowDesignerInput.definition
+        notes: 'Each stage of `definition`: its name, approvers, SLA and outcome; "Finance Manager Approval"
+          is sample data.'
+    - name: actionBar
+      slot: rowActions
+      components:
       - kind: primaryButton
-        derived: true
-        impliedBy: setVisualWorkflow
-        label: Save visual workflow
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setVisualWorkflow
+        label: Save stages
+        operation: setVisualWorkflow
+        provenance: contract approvals.yaml PUT /visual-workflow
   states:
     loading: The approval stage configuration as saved.
     error: Could not load. Names which read failed and leaves the approval stage untouched.
@@ -14234,6 +13963,33 @@ screens:
       - ticketRef
       - expiresAt
     provenance: contract identity.yaml POST /platform-staff-grants
+  - id: formSetVisualWorkflow
+    component: modal
+    trigger: Save stages
+    body: '**Collects what `setVisualWorkflow` sends before it is called.** Required: `workflowName`,
+      `module`, `definition`. Optional: `nodeTypes`, `businessProcess`, `owner`, `version`, `priority`,
+      `effectiveFrom`, `validationIssues`, `workflowId`, `trigger`, `effectiveTo`. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    confirm:
+      label: Save stages
+      operation: setVisualWorkflow
+    dismiss:
+      label: Cancel
+      discards:
+      - workflowName
+      - module
+      - definition
+      - nodeTypes
+      - businessProcess
+      - owner
+      - version
+      - priority
+      - effectiveFrom
+      - validationIssues
+      - workflowId
+      - trigger
+      - effectiveTo
+    provenance: contract approvals.yaml PUT /visual-workflow
   entryState:
     params:
     - name: tenantId
@@ -15877,9 +15633,11 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: selectField
-        label: → IT Director
+        label: Approver by department
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 24 §Critical configuration
           change
+        notes: Per department, the approver role; "IT Director" is sample data.
+        operation: setApprovalMatrix
     - name: actionBar
       slot: publish
       components:
@@ -17254,20 +17012,18 @@ screens:
         notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
-      - kind: selectField
-        label: =R
+      - kind: multiSelect
+        label: Roles that may not be held together
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 51 §Price Configuration
           User
+        operation: setSegregationRules
+    - name: actionBar
+      slot: rowActions
+      components:
       - kind: primaryButton
-        derived: true
-        impliedBy: setSegregationRules
         label: Save segregation rules
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setSegregationRules
+        operation: setSegregationRules
+        provenance: contract identity.yaml PUT /segregation-rules
   states:
     loading: The segregation duties policy configuration as saved.
     error: Could not load. Names which read failed and leaves the segregation duties policy untouched.
@@ -17329,6 +17085,19 @@ screens:
       - ticketRef
       - expiresAt
     provenance: contract identity.yaml POST /platform-staff-grants
+  - id: formSetSegregationRules
+    component: modal
+    trigger: Save segregation rules
+    body: '**Collects what `setSegregationRules` sends before it is called.** Required: `rules`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save segregation rules
+      operation: setSegregationRules
+    dismiss:
+      label: Cancel
+      discards:
+      - rules
+    provenance: contract identity.yaml PUT /segregation-rules
   entryState:
     params:
     - name: tenantId
@@ -18123,8 +17892,8 @@ screens:
       - kind: dataTable
         label: Every immutable approval record
         columns:
-        - 'Record Integrity: VERIFIED ✓'
-        - 🔴 Potential Tamper Event Detected
+        - Record Integrity
+        - Potential Tamper Event Detected
         - Record affected
         - User/service
         - Date/time
@@ -18142,8 +17911,8 @@ screens:
         label: The selected immutable approval record
         bindsTo: null
         columns:
-        - 'Record Integrity: VERIFIED ✓'
-        - 🔴 Potential Tamper Event Detected
+        - Record Integrity
+        - Potential Tamper Event Detected
         - Record affected
         - User/service
         - Date/time
@@ -20180,15 +19949,15 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
-        derived: true
-        impliedBy: listAuthorisationPolicies
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-      - kind: dataTable
         label: Integrations with access
         bindsTo: ApiClient
         operation: listApiClients
         provenance: contract public-api.yaml GET /api-clients; wiring fix, 2 October 2026
+      - kind: dataTable
+        label: Authorisation policies
+        bindsTo: AuthorisationPolicy
+        operation: listAuthorisationPolicies
+        provenance: contract identity.yaml GET /authorisation-policies
   states:
     loading: The integration security access list.
     error: Could not load. Names which read failed and leaves the integration security access untouched.
@@ -21203,8 +20972,8 @@ screens:
         notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
-      - kind: dataTable
-        label: Every bottleneck analysis heatmap
+      - kind: chart
+        label: Bottleneck heatmap
         columns:
         - Refund
         - Discount
@@ -21213,8 +20982,10 @@ screens:
         - Access Change
         - Configuration
         bindsTo: null
-        operation: null
+        operation: listSlaEscalationBottleneck
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 74 §Columns
+        notes: 'A heatmap: approval kinds (refund, discount, price override ...) on one axis, stages or
+          approvers on the other; the board drew the kinds as table columns.'
     - name: contextPanel
       slot: selection
       components:
@@ -25448,13 +25219,7 @@ screens:
     regions:
     - name: actionBar
       slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Revised Board 3 — Critical Architecture
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 41 §Actions
-      - kind: secondaryButton
-        label: 1. Operational Classification
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 41 §Actions
+      components: []
     - name: contentBody
       components: []
   states:
@@ -26422,10 +26187,7 @@ screens:
     regions:
     - name: actionBar
       slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Board 4 — Required Package Data Model
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 54 §Actions
+      components: []
     - name: contentBody
       components: []
   states:
@@ -27626,13 +27388,7 @@ screens:
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Show
     - name: actionBar
       slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Retry / Investigate / Assign / Escalate
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Actions
-      - kind: secondaryButton
-        label: Revised Board 5 — Commercial Model Behavior
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Actions
+      components: []
   states:
     loading: The subscription lifecycle trial-to-paid list.
     error: Could not load. Names which read failed and leaves the subscription lifecycle trial-to-paid
@@ -27668,6 +27424,8 @@ screens:
     14 labels bound to a contract property; 16 of 88 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  notes: Retry, investigate, assign and escalate are four row actions on a stuck conversion; they need
+    an operation each (none exists yet).
 - id: ADM-419
   name: Provisioning Command Center
   module: Tenants & Licensing
@@ -28244,24 +28002,30 @@ screens:
           action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
           The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.'
         provenance: contract identity.yaml GET /platform-staff-grants/mine
-      - kind: textField
-        label: ✓ Administrator Account Created
+      - kind: progressIndicator
+        label: Administrator Account Created
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
-      - kind: selectField
-        label: ✓ Email Verified
+        notes: A progress output of initialisation, not an input.
+      - kind: progressIndicator
+        label: Email Verified
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
-      - kind: textField
-        label: ✓ Tenant Access Assigned
+        notes: A progress output of initialisation, not an input.
+      - kind: progressIndicator
+        label: Tenant Access Assigned
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
-      - kind: textField
-        label: ✓ Default Role Applied
+        notes: A progress output of initialisation, not an input.
+      - kind: progressIndicator
+        label: Default Role Applied
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
-      - kind: textField
-        label: ✓ Security Policy Applied
+        notes: A progress output of initialisation, not an input.
+      - kind: progressIndicator
+        label: Security Policy Applied
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
-      - kind: textField
-        label: ✓ Audit Logging Enabled
+        notes: A progress output of initialisation, not an input.
+      - kind: progressIndicator
+        label: Audit Logging Enabled
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
+        notes: A progress output of initialisation, not an input.
     - name: actionBar
       components:
       - kind: secondaryButton
@@ -29626,7 +29390,7 @@ screens:
       - kind: dataTable
         label: Every minimum guarantee variable
         columns:
-        - 'Projected month-end billable tickets: 43,800'
+        - Projected month-end billable tickets
         - 'Projected variable billing basis: AED 32,850'
         bindsTo: null
         operation: null
@@ -29638,7 +29402,7 @@ screens:
         label: The selected minimum guarantee variable
         bindsTo: null
         columns:
-        - 'Projected month-end billable tickets: 43,800'
+        - Projected month-end billable tickets
         - 'Projected variable billing basis: AED 32,850'
         notes: 'The pack groups this record''s detail under its own headings: “Rate”, “Billable Tickets”,
           “Current Position”, “Automatically calculate”, “Progress Visualization”, “Where applicable show”.'
@@ -31070,10 +30834,7 @@ screens:
     regions:
     - name: actionBar
       slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Revised Board 10 — Commercial Model Calculation
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 133 §Actions
+      components: []
     - name: contentBody
       components: []
   states:
