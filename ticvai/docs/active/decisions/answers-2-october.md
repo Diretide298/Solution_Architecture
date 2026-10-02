@@ -232,7 +232,7 @@ Logged, not yet applied.
 | 216 | BO-076 | POS sales recognise immediately (12 August) but rules are per product kind, not per channel. How is a POS-sold dated ticket treated? | By the product kind's rule (a dated ticket is recognised at admission) |
 | 217 | BO-1081 | Is Gross sales shown excluding VAT, and are service fees inside it or a separate line? | Excluding VAT; fees on their own line with a footnote |
 | 218 | BO-1081 | What is the pack's "Attraction" filter in scope terms (a scope node below venue, or a product category)? | Product category (venue + category filters) |
-| 219 | BO-1081 | Does BO-1081 stay as its own P08 screen (DI-260) or become the Finance standard dashboard in P16 opened from Orders & Money (DI-721)? | One P16 Finance dashboard; Orders & Money shows a link card |
+| 219 | BO-1081 | Does BO-1081 stay as its own P08 screen (DI-260) or become the Finance standard dashboard in P16 opened from Orders & Money (DI-721)? | One P16 [Venue Analytics] Finance dashboard; Orders & Money shows a link card |
 | 220 | BO-1170 | Which wallet-specific checks join the period-close checks, and does a wallet movement summary operation get added? | Add a wallet movement summary operation and wallet pre-close checks |
 
 # Batch 6 (selections, set 9)

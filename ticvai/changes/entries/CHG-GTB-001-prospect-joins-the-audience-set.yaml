@@ -1,0 +1,48 @@
+id: CHG-GTB-001
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: The closed x-ticvai-audience set gains prospect (eight values), in check-package, build-audience and ADR-0025, so the
+  twelve sign-up operations that already declare it pass.
+decision:
+  what: 'prospect is a closed-set audience value: a would-be customer on the P17 sign-up journey holding the prospectAuth session
+    scoped to one onboarding application, with no tenant and no permission. check-package VOCAB and its "who may call" rule
+    (rule 23) admit it; build-audience publishes all eight values (its list had stopped at five, without partner and public);
+    ADR-0025 records the value and why it is none of staff, guest or public.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'DEC-167 (Chinmay, 2 October, batch 5: "Email + one-time code") and the lead''s call recorded in CHG-CLN-010 ("P17 sign-up
+  runs on a public prospect audience scoped to the sign-up session"). CHG-CLN-010 and CHG-CLN-019 wrote prospect on twelve
+  operations without adding it to the closed set ADR-0025 makes check-package enforce, so the release r2 full refresh failed
+  check-package with twelve "not in the closed set" errors (refresh-safe run 20261002-184829).'
+keys_touched:
+  operations:
+  - startProspectSignup
+  - verifyProspectSignupCode
+  - setPaymentProvider
+  - submitOnboardingApplication
+  - listPlans
+  - setSubscription
+  - previewSubscriptionChange
+  - setAgreementContractTerm
+  - scoreVsiAssessment
+  - listModuleCatalogue
+  - simulateCommercialPackage
+  - addCapacityPack
+  files:
+  - tools/check-package.py
+  - tools/build-audience.py
+  - docs/adr/0025-one-audience-field.md
+root_class: A20 TYPES-AND-VOCAB
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-package.py
+status: open
+notes: The prevention is the closed-set rule that caught it (check-package rule 13); a contract cannot use an audience value
+  the check does not know. The gap was that a new value reached the contracts in a branch whose checks ran scoped, not full.

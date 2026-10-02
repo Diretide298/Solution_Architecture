@@ -8143,10 +8143,10 @@
    "block": "C",
    "status": "to-apply",
    "kind": "spec",
-   "decision": "One P16 Finance dashboard; Orders & Money (P08) shows a link card to it.",
+   "decision": "One Finance dashboard in P16 Venue Analytics; Orders & Money (P08) shows a link card to it.",
    "by": "Chinmay",
    "date": "2026-10-02",
-   "why": "Chinmay, 2 Oct (Batch 6 (selections, set 8)): \"One P16 Finance dashboard; Orders & Money shows a link card\" (restates or leaves the drawn default). Question: Does BO-1081 stay as its own P08 screen (DI-260) or become the Finance standard dashboard in P16 opened from Orders & Money (DI-721)? Drawn default: Draw it once, as the P16 Finance dashboard; Orders & Money shows a link card to it. Source: DI-260 | DI-721.",
+   "why": "Chinmay, 2 Oct (Batch 6 (selections, set 8)): \"One P16 [Venue Analytics] Finance dashboard; Orders & Money shows a link card\" (restates or leaves the drawn default). Question: Does BO-1081 stay as its own P08 screen (DI-260) or become the Finance standard dashboard in P16 opened from Orders & Money (DI-721)? Drawn default: Draw it once, as the Finance dashboard in P16 Venue Analytics; Orders & Money shows a link card to it. Source: DI-260 | DI-721.",
    "new_requirement": false,
    "adr_or_hld": "ADR-0041 (a command centre is a saved dashboard); CHG-FIN-006",
    "design_input_refs": [

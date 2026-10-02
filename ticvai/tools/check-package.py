@@ -601,7 +601,7 @@ def main() -> int:
                         continue
                     aud = set(op.get("x-ticvai-audience") or [])
                     if (op.get("x-ticvai-permission") or op.get("x-ticvai-self-service")
-                            or (aud & {"guest", "public", "anonymous", "service", "device", "partner"})):
+                            or (aud & {"guest", "public", "anonymous", "service", "device", "partner", "prospect"})):
                         continue
                     ERRORS.append(f"{f.stem}.{op['operationId']}: no permission, no non-staff "
                                   "audience and not self-service — who may call it is unstated")
@@ -1325,7 +1325,11 @@ def main() -> int:
         "x-ticvai-read-routing": {"primary", "replica", "analytical"},
         # A partner and an external reviewer hold real permissions and are neither staff nor guests.
         # Omitting them is what let P11 be treated as a guest surface on 17 August.
-        "x-ticvai-audience": {"staff", "guest", "partner", "public", "anonymous", "device", "service"},
+        # `prospect`: a would-be customer on the P17 sign-up journey, holding the prospectAuth
+        # session scoped to one onboarding application and nothing else -- no tenant, no permission
+        # (DEC-167, CHG-CLN-010, CHG-CLN-019; added to the closed set by CHG-GTB-001, ADR-0025).
+        "x-ticvai-audience": {"staff", "guest", "partner", "public", "anonymous", "device", "service",
+                              "prospect"},
     }
     for tier in ("spine", "satellite"):
         for f in (C / tier).glob("*.yaml"):

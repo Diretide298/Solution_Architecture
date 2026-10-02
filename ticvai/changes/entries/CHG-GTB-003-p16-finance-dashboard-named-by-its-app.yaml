@@ -1,0 +1,33 @@
+id: CHG-GTB-003
+date: '2026-10-02'
+source: cr
+kind: spec
+summary: DEC-219's wording names P16 by its declared name (the Finance dashboard in P16 Venue Analytics) in the 2 October
+  decisions JSON, its generated register and the answers record.
+decision:
+  what: 'handoff/decisions-2-october.json DEC-219 decision and drawn default read "the Finance dashboard in P16 Venue Analytics";
+    the quoted answer (there and in docs/active/decisions/answers-2-october.md) keeps the lead''s words with the declared name
+    inserted in brackets: "One P16 [Venue Analytics] Finance dashboard". docs/registers/decisions-2-october.md is regenerated
+    by tools/build-audit-decisions.py (which also fills its stale Applied-by column from the CHG-NOTE entries).'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-package rule 19 (one code, one name) failed on the r2 full refresh: "P16 Finance dashboard" pairs P16 with a name
+  its screens file does not declare (Venue Analytics). The meaning of DEC-219 (Q219, BO-1081, CHG-SOT-008) is unchanged.'
+keys_touched:
+  files:
+  - handoff/decisions-2-october.json
+  - docs/registers/decisions-2-october.md
+  - docs/active/decisions/answers-2-october.md
+root_class: A25 PROSE-QUALITY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-package.py
+status: open
+notes: Prevention is check-package rule 19, which caught it. The lead's quoted words are kept; the bracket is an editorial
+  insertion, not a rewording.

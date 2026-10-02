@@ -5807,7 +5807,8 @@ paths:
 
 
         A wrong code answers 422 (`codeInvalid`) and counts against the challenge; after five, once the code has
-        expired, or once it was used, the challenge is spent (409 `codeExpired`) and a new one is started.
+        expired, or once it was used, the challenge is spent (409 `codeExpired`) and a new one is started. A retry
+        with the same `Idempotency-Key` (a lost response) returns the same session, not 409.
 
         '
       tags:
@@ -5816,6 +5817,8 @@ paths:
       x-ticvai-scope-level: platform
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       security: []
       requestBody:
         required: true

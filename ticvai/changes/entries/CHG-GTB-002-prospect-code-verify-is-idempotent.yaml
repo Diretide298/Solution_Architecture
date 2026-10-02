@@ -1,0 +1,32 @@
+id: CHG-GTB-002
+date: '2026-10-02'
+source: cr
+kind: contract
+summary: verifyProspectSignupCode takes the Idempotency-Key header, as verifyGuestOtp does, so a retried verify returns the
+  same prospect session instead of 409 codeExpired.
+decision:
+  what: 'identity verifyProspectSignupCode gains the common IdempotencyKey parameter (required header) and its description says
+    a retry with the same key returns the same session. Not an exemption: the call writes (it spends the challenge and issues
+    a session), and without a key a lost response leaves the prospect with a spent code.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-package rule 48 (every mutating operation takes IdempotencyKey or states x-ticvai-idempotency-exempt) failed on the
+  r2 full refresh; CHG-CLN-019 added the operation (commit f73c2b0c) without it, while its sibling startProspectSignup and the
+  guest twin verifyGuestOtp take the key.'
+keys_touched:
+  operations:
+  - verifyProspectSignupCode
+  files:
+  - contracts/spine/identity.yaml
+root_class: A18 API-CONVENTIONS
+tickets:
+  started: []
+  unstarted: []
+release_tag: r2
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-package.py
+status: open
+notes: Additive against r1 (the operation is new in r2). Prevention is check-package rule 48, which caught it.
