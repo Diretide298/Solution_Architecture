@@ -25,7 +25,7 @@ release_tag: r2
 decision_owner: Chinmay
 triage: blocker
 prevention:
-  type: check
+  type: generator-rule
   ref: tools/op-release.py
 status: closed
 closed_by_commit: 8bfcbcb7
